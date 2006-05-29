@@ -1,0 +1,16 @@
+<project name="dpp" basedir=".">
+    <description>DPP/Saros Project.</description>
+
+    <!-- set global properties for this build -->
+	<property name="src" value="src" />
+	
+    <target name="insertHeader">
+    	<loadfile property="header" srcFile="header.txt"/>
+    	
+    	<replaceregexp match="(^.*)package" replace="${header}package" flags="s">
+	    	<fileset dir="${src}">
+			    <include name="**/*.java"/>
+			</fileset>
+		</replaceregexp>
+    </target>
+</project>

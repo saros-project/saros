@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry sourcepath="D:/Coding/Java/Saros/lib/smack-source" kind="lib" path="lib/smack.jar">
+		<attributes>
+			<attribute value="file:/D:/Coding/Java/Saros/lib/smack-javadoc/" name="javadoc_location"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="lib/smack-source/" kind="lib" path="lib/smackx.jar"/>
+	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
+	<classpathentry sourcepath="lib/junitsrc.zip" kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/easymock.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
