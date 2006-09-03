@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="Saros"
+            name="Saros"/>
+      <view
+            category="Saros"
+            class="de.fu_berlin.inf.dpp.ui.RosterView"
+            icon="icons/sample.gif"
+            id="de.fu_berlin.inf.dpp.ui.RosterView"
+            name="Roster"/>
+      <view
+            category="Saros"
+            class="de.fu_berlin.inf.dpp.ui.SessionView"
+            icon="icons/sample.gif"
+            id="de.fu_berlin.inf.dpp.ui.SessionView"
+            name="Saros Session"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="de.fu_berlin.inf.dpp.ui.RosterView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList"/>
+      </perspectiveExtension>
+      <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+         <view
+               id="de.fu_berlin.inf.dpp.ui.SessionView"
+               ratio="0.5"
+               relationship="right"
+               relative="org.eclipse.ui.views.TaskList"/>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.fu_berlin.inf.dpp.ui.popupmenu"
+            objectClass="org.eclipse.core.resources.IResource">
+         <menu
+               id="Saros.menu1"
+               label="Saros.menu1"/>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.NewSessionAction"
+               icon="icons/transmit.png"
+               id="Saros.action1"
+               label="Share project...">
+         </action>
+         <visibility>
+            <or>
+               <objectClass name="org.eclipse.core.resources.IProject"/>
+               <objectClass name="org.eclipse.jdt.core.IJavaProject"/>
+            </or>
+         </visibility>
+      </objectContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
+            id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectDecorator"
+            label="Shared Project Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+            <objectClass name="org.eclipse.core.resources.IFile"/>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="de.fu_berlin.inf.dpp.ui.PreferencePage"
+            id="de.fu_berlin.inf.dpp.preferences.PreferencePage"
+            name="Saros"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer class="de.fu_berlin.inf.dpp.PreferenceInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.actionSets">
+      <actionSet
+            id="de.fu_berlin.inf.dpp.actionSet"
+            label="Saros"
+            visible="true">
+         <menu
+               id="de.fu_berlin.inf.dpp.menu"
+               label="Saros">
+            <separator name="de.fu_berlin.inf.dpp.menu.group"/>
+         </menu>
+         <action
+               class="de.fu_berlin.inf.dpp.ui.actions.NewAccountAction"
+               icon="icons/vcard_add.png"
+               id="de.fu_berlin.inf.dpp.ui.actions.createAccountAction"
+               label="&amp;Create Account"
+               menubarPath="de.fu_berlin.inf.dpp.menu/de.fu_berlin.inf.dpp.menu.group"
+               />
+      </actionSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.documentProviders">
+      <provider
+            class="de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider"
+            id="Saros.shared_document_provider"
+            inputTypes="org.eclipse.ui.IFileEditorInput"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.annotationTypes">
+      <type
+            markerType="de.fu_berlin.inf.dpp.viewport"
+            name="de.fu_berlin.inf.dpp.viewport"/>
+      <type
+            markerType="de.fu_berlin.inf.dpp.annotation.user"
+            name="de.fu_berlin.inf.dpp.annotation.user"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.viewport"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.viewport.color"
+            colorPreferenceValue="0,255,0"
+            contributesToHeader="true"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.viewport.highlight"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            label="DPP Viewport"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.viewport.overview"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.viewport.text"
+            textPreferenceValue="false"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.viewport.ruler"
+            verticalRulerPreferenceValue="true"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotation.user"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.color"
+            colorPreferenceValue="138,165,189"
+            contributesToHeader="false"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="DPP User"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.overview"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="7"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotation.user.textstyle"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.ruler"
+            verticalRulerPreferenceValue="false"/>
+   </extension>
+   <extension
+         id="de.fu_berlin.inf.dpp.modelProvider"
+         point="org.eclipse.core.resources.modelProviders">
+      <modelProvider class="de.fu_berlin.inf.dpp.project.internal.SharedModelProvider"/>
+      <enablement>
+         <instanceof value="org.eclipse.core.resources.IResource"/>
+      </enablement>
+   </extension>
+</plugin>

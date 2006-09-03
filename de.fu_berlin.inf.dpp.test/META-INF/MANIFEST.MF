@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SarosTest Plug-in
+Bundle-SymbolicName: de.fu_berlin.inf.dpp.test
+Bundle-Version: 0.7
+Bundle-Localization: plugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.pde.junit.runtime,
+ org.junit,
+ org.eclipse.jdt.junit,
+ org.eclipse.jdt.junit.runtime,
+ de.fu_berlin.inf.dpp,
+ org.eclipse.core.resources,
+ org.eclipse.jface.text,
+ org.eclipse.text,
+ org.eclipse.ui.workbench.texteditor,
+ org.eclipse.ui.editors
+Eclipse-LazyStart: false
+Export-Package: de.fu_berlin.inf.dpp.test.actions,
+ de.fu_berlin.inf.dpp.test.stubs
+Import-Package: org.eclipse.ui.part

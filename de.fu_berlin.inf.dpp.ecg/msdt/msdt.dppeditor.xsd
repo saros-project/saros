@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:annotation>
+  <xs:documentation>
+    This XML schema defines the structure of the "dppEditor"
+    MicroSensorDataType. The instance documents, the XML documents 
+    using this schema, are actual "dppEditor" MicroActivities.
+  </xs:documentation>
+</xs:annotation>
+
+<xs:include schemaLocation="msdt.common.xsd"/>
+
+<xs:element name="microActivity">
+  <xs:complexType>
+  <xs:sequence>
+    <xs:element name="commonData" type="commonDataType"/>
+    <xs:element name="dppEditor">
+      <xs:complexType>
+      <xs:sequence>
+        <xs:element name="activity">
+          <xs:simpleType>
+          <xs:restriction base="xs:string">
+                  
+          <xs:annotation>
+            <xs:documentation>
+            The "activity" element of the "dppEditor" 
+            MicroActivity can have one of the following values.
+            </xs:documentation>
+          </xs:annotation>
+                  
+            <xs:enumeration value="activated"/>
+            <xs:enumeration value="closed"/>
+            <xs:enumeration value="followActivated"/>
+            <xs:enumeration value="followDeactivated"/>
+          </xs:restriction>
+          </xs:simpleType>
+        </xs:element>
+            
+        <xs:element name="path" type="xs:string"/>
+        
+      </xs:sequence>
+      </xs:complexType>     
+    </xs:element>
+  </xs:sequence>
+  </xs:complexType>
+</xs:element>
+</xs:schema>

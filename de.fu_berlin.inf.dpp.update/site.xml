@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/de.fu_berlin.inf.dpp.feature_0.8.1.jar" id="de.fu_berlin.inf.dpp.feature" version="0.8.1"/>
+   <feature url="features/de.fu_berlin.inf.dpp.ecg.feature_0.8.1.jar" id="de.fu_berlin.inf.dpp.ecg.feature" version="0.8.1"/>
+</site>

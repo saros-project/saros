@@ -1,0 +1,11 @@
+
+ Saros CHANGELOG
+ 
+ 0.8.2
+ - Fixed severe bug in project synchronization
+ - Fixed severe bug in account creation
+ - Show invitee name without XMPP-Resource on invitation wizard
+ 
+ 
+ 0.8.1
+ - First beta release
