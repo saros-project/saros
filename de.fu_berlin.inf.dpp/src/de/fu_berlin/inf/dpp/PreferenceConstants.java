@@ -21,13 +21,15 @@ package de.fu_berlin.inf.dpp;
 
 /**
  * Constant definitions for plug-in preferences
+ * 
+ * @author rdjemili
  */
 public class PreferenceConstants {
-    public static final String SERVER       = "server";
-    public static final String USERNAME     = "username";
-    public static final String PASSWORD     = "password";
+    public static final String SERVER             = "server";
+    public static final String USERNAME           = "username";
+    public static final String PASSWORD           = "password";
 
-    public static final String AUTO_CONNECT = "autoconnect";
-    
-    public static final String DEBUG        = "debug";
+    public static final String AUTO_CONNECT       = "autoconnect";
+    public static final String DEBUG              = "debug";
+    public static final String FILE_TRANSFER_PORT = "port";
 }

@@ -77,8 +77,13 @@
          point="org.eclipse.ui.preferencePages">
       <page
             class="de.fu_berlin.inf.dpp.ui.PreferencePage"
-            id="de.fu_berlin.inf.dpp.preferences.PreferencePage"
+            id="de.fu_berlin.inf.dpp.preferences"
             name="Saros"/>
+      <page
+            category="de.fu_berlin.inf.dpp.preferences/"
+            class="de.fu_berlin.inf.dpp.ui.AdvancedPreferencePage"
+            id="de.fu_berlin.inf.dpp.preferences.advanced"
+            name="Advanced"/>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">

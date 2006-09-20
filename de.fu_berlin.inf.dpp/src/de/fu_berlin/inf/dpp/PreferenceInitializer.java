@@ -25,11 +25,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Class used to initialize default preference values.
+ * 
+ * @author rdjemili
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	/*
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
+	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
 	 */
 	public void initializeDefaultPreferences() {
 	    IPreferenceStore store = Saros.getDefault().getPreferenceStore();
@@ -38,7 +40,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	    store.setDefault(PreferenceConstants.PASSWORD, "Your password");
         
 	    store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
-        
         store.setDefault(PreferenceConstants.DEBUG, false);
+        store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
 	}
 }
