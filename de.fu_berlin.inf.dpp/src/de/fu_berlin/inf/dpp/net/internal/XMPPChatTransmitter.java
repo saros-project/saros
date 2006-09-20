@@ -38,6 +38,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -55,6 +56,7 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -115,7 +117,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
         fileTransferManager = new FileTransferManager(connection);
         fileTransferManager.addFileTransferListener(this);
         
-        chooseProxyPort(connection);
+        setProxyPort(connection);
         
         // TODO always preserve threads
         this.connection.addPacketListener(this, 
@@ -566,12 +568,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
         return chat;
     }
 
-    private void chooseProxyPort(XMPPConnection connection) {
-        // UGLY UGLY HACK. come up with something better
+    private void setProxyPort(XMPPConnection connection) {
+        IPreferenceStore preferenceStore = Saros.getDefault().getPreferenceStore();
         
-        if (connection.getUser().indexOf("saros3") >= 0) {
-            fileTransferManager.getProperties().setProperty(
-                Socks5TransferNegotiator.PROPERTIES_PORT, Integer.toString(7778));
-        }
+        fileTransferManager.getProperties().setProperty(
+            Socks5TransferNegotiator.PROPERTIES_PORT, 
+            preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT)
+        );
     }
 }

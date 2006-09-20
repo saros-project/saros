@@ -2,10 +2,12 @@ package de.fu_berlin.inf.dpp.ui;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
+import de.fu_berlin.inf.dpp.Saros;
 
 /**
  * Contains the advanced preferences - consisting of preferences that are geared
@@ -18,10 +20,15 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage
 
     public AdvancedPreferencePage() {
         super(GRID);
+        setPreferenceStore(Saros.getDefault().getPreferenceStore());
+        setDescription("Advanced settings geared toward developers and power users.");
     }
     
     @Override
     protected void createFieldEditors() {
+        addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT, 
+            "File transfer port:", getFieldEditorParent()));
+        
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
             "Show Jabber debug window (needs restart).", getFieldEditorParent()));
     }
