@@ -27,7 +27,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage
     @Override
     protected void createFieldEditors() {
         addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT, 
-            "File transfer port:", getFieldEditorParent()));
+            "File transfer port (needs reconnect):", getFieldEditorParent()));
         
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
             "Show Jabber debug window (needs restart).", getFieldEditorParent()));
