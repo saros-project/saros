@@ -5,8 +5,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" sourcepath="D:/Coding/Java/Saros/lib/smack-source" kind="lib" path="lib/smackx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smackx-debug.jar"/>
-	<classpathentry exported="true" sourcepath="lib/junitsrc.zip" kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/easymock.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/smack.jar">
 		<attributes>
 			<attribute value="file:/D:/Coding/Java/Saros/lib/smack-javadoc/" name="javadoc_location"/>
