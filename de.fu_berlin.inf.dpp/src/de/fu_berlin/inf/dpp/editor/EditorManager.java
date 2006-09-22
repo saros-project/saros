@@ -188,7 +188,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     
     private static Logger log = Logger.getLogger(EditorManager.class.getName());
     
-    private static EditorManager           instance;
+    private static EditorManager    instance;
     private IEditorAPI              editorAPI;
     private ISharedProject          sharedProject;
 
@@ -419,7 +419,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 IFile file = sharedProject.getProject().getFile(driverEditor);
                 
                 String text = fixDelimiters(file, textEdit.text);
-                setText(file,textEdit.offset, textEdit.replace, text);
+                insertDriverText(file,textEdit.offset, textEdit.replace, text);
                 
                 Set<IEditorPart> editors = editorPool.getEditors(driverEditor);
                 for (IEditorPart editorPart : editors) {
@@ -607,7 +607,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             resource.getProject() == sharedProject.getProject());
     }
     
-    private void setText(IFile file, int offset, int replace, String text) {
+    private void insertDriverText(IFile file, int offset, int replace, String text) {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = editorAPI.getDocumentProvider(input);
     

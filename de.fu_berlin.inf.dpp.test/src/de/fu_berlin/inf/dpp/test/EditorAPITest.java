@@ -1,15 +1,12 @@
 
 package de.fu_berlin.inf.dpp.test;
 
-import java.io.ByteArrayInputStream;
 import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.ui.IEditorPart;
@@ -20,6 +17,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.test.util.ResourceHelper;
 
+/**
+ * JUnit Plug-in Test for the EditorAPI.
+ * 
+ * @author rdjemili
+ */
 public class EditorAPITest extends TestCase {
     private IProject      project;
     private IFile         file;
@@ -33,8 +35,8 @@ public class EditorAPITest extends TestCase {
         
         editorAPI = new EditorAPI();
         
-        SharedProject sharedProject =
-            new SharedProject(null, project, new JID("riad@jabber.org"));
+//        SharedProject sharedProject =
+//            new SharedProject(null, project, new JID("riad@jabber.org"));
 
         editorManager = EditorManager.getDefault();
     }

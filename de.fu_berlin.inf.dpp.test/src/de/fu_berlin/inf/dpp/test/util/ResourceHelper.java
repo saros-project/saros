@@ -9,6 +9,11 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 
+/**
+ * A simple helper class for use with JUnit plug-in tests.
+ * 
+ * @author rdjemili
+ */
 public class ResourceHelper {
     
     public static IProject createProject(String name) throws CoreException {
@@ -29,5 +34,4 @@ public class ResourceHelper {
         
         return file;
     }
-
 }
