@@ -42,12 +42,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -62,7 +61,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
+import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -313,6 +312,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (!isDriver) return;
         
         fireActivity(new TextEditActivity(offset, text, replace));
+        
+        IEditorInput input = editorAPI.getActiveEditor().getEditorInput();
+        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+        IAnnotationModel model = provider.getAnnotationModel(input);
+        
+        ContributionHelper.splitAnnotation(model, offset);
     }
 
     /* ---------- ISharedProjectListener --------- */
@@ -616,15 +621,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IDocument doc = provider.getDocument(input);
             doc.replace(offset, replace, text);
             
-            if (text.length() > 0) {
-                IAnnotationModel model = provider.getAnnotationModel(input);
-                
-                String username = sharedProject.getDriver().toString();
-                Annotation annotation = new ContributionAnnotation(username);
-                
-                Position position = new Position(offset, text.length());
-                model.addAnnotation(annotation, position);
-            }
+            IAnnotationModel model = provider.getAnnotationModel(input);
+            ContributionHelper.insertContribution(model, offset, text.length());
             
             // TODO We can't just disconnect from the provider, because
             // otherwise pending text changes will be lost.

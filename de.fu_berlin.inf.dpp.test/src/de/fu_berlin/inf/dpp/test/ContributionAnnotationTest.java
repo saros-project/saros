@@ -57,67 +57,88 @@ public class ContributionAnnotationTest extends TestCase {
         annotationModel.disconnect(document);
     }
     
-    public void testAddGetAnnotation() {
-        Position pos = new Position(5, 5);
-        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
-        
-        Iterator it = annotationModel.getAnnotationIterator();
-        assertNotNull(it.next());
-        assertFalse(it.hasNext());
-    }
-    
-//    public void testExtendIAnnotationInMiddle() {
-//        Position pos = new Position(5, 5);
-//        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
-//        
-//        ContributionHelper.insertContribution(annotationModel, 7, 3);
-//        
-//        Iterator it = annotationModel.getAnnotationIterator();
-//        pos = annotationModel.getPosition((Annotation)it.next());
-//        assertEquals(7, pos.getOffset());
-//        assertEquals(3, pos.getLength());
-//        
-//        pos = annotationModel.getPosition((Annotation)it.next());
-//        assertEquals(5, pos.getOffset());
-//        assertEquals(5, pos.getLength());
-//    }
-    
-    public void testNormalReplaceExpandsAnnotation() throws BadLocationException {
-        Position pos = new Position(5, 5);
-        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
-        
-        document.replace(7, 0, "abc");
-        
-        Iterator it = annotationModel.getAnnotationIterator();
-        pos = annotationModel.getPosition((Annotation)it.next());
-        assertEquals(5, pos.getOffset());
-        assertEquals(8, pos.getLength());        
-        
-        assertFalse(it.hasNext());
-    }
-    
-    /*   
-     *   0123456789
-     *    xx___xxx
+    /*  0123456789
+     *     xxx  
      */
-    public void testInsertNeutralAtCenterOfContribution() throws BadLocationException {
+    public void testInsertSimpleAnnotation() throws BadLocationException {
+        document.replace(5, 0, "abc");
+        ContributionHelper.insertContribution(annotationModel, 5, 3);
+        assertPositions(annotationModel, new int[]{5,3});
+    }
+    
+    /*  0123456789
+     *     xx---x  
+     */
+    public void testExpandAnnotationAtCenter() throws BadLocationException {
+        Position pos = new Position(3, 3);
+        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
+        
+        document.replace(5, 0, "abc");
+        ContributionHelper.insertContribution(annotationModel, 5, 3);
+        assertPositions(annotationModel, new int[]{3,6});
+    }
+    
+    /*  0123456789
+     *     xxx---  
+     */
+    public void testExpandAnnotationAtEnd() throws BadLocationException {
+        Position pos = new Position(3, 3);
+        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
+        
+        document.replace(6, 0, "abc");
+        ContributionHelper.insertContribution(annotationModel, 6, 3);
+        assertPositions(annotationModel, new int[]{3,3, 6,3});
+    }
+    
+    /*  0123456789
+     *     ---xxx  
+     */
+    public void testExpandAnnotationAtBegin() throws BadLocationException {
+        Position pos = new Position(3, 3);
+        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
+        
+        document.replace(3, 0, "abc");
+        ContributionHelper.insertContribution(annotationModel, 3, 3);
+        assertPositions(annotationModel, new int[]{3,3, 6,3});
+    }
+    
+    /*  0123456789
+     *   xx___xxx
+     */
+    public void testSplitAtCenter() throws BadLocationException {
         Position pos = new Position(1, 5);
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
-        ContributionHelper.insertNeutral(annotationModel, 3, 3);
-        assertPositions(annotationModel, new int[]{6,3, 1,2});
+        ContributionHelper.splitAnnotation(annotationModel, 3);
+        document.replace(3, 0, "___");
+        
+        assertPositions(annotationModel, new int[]{1,2, 6,3});
     }
     
-    /*   
-     *   0123456789
-     *    ___xxxxx
+    /*  0123456789
+     *   ___xxxxx
      */
-    public void testInsertNeutralAtBeginOfContribution() throws BadLocationException {
+    public void testDontExpandAtBegin() throws BadLocationException {
         Position pos = new Position(1, 5);
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
-        ContributionHelper.insertNeutral(annotationModel, 1, 3);
-        assertPositions(annotationModel, new int[]{4,5, 6,3});
+        ContributionHelper.splitAnnotation(annotationModel, 1);
+        document.replace(1, 0, "___");
+        
+        assertPositions(annotationModel, new int[]{4,5});
+    }
+    
+    /*  0123456789
+     *   xxxxx___
+     */
+    public void testDontExpandAtEnd() throws BadLocationException {
+        Position pos = new Position(1, 5);
+        annotationModel.addAnnotation(new ContributionAnnotation(), pos);
+        
+        ContributionHelper.splitAnnotation(annotationModel, 6);
+        document.replace(6, 0, "___");
+        
+        assertPositions(annotationModel, new int[]{1,5});
     }
     
     /**

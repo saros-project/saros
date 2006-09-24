@@ -11,10 +11,18 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 
-public class ContributionHelper implements IDocumentListener {
+public class ContributionHelper {
     
     public static void insertContribution(IAnnotationModel model, int offset, 
         int length) {
+        
+        for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+            Annotation annotation = (Annotation)it.next();
+            Position pos = model.getPosition(annotation);
+            
+            if (pos.includes(offset))
+                return;
+        }
         
         if (length > 0) {
             Annotation annotation = new ContributionAnnotation("");
@@ -24,29 +32,22 @@ public class ContributionHelper implements IDocumentListener {
         }
     }
     
-    public static void insertNeutral(IAnnotationModel model, int offset, 
-        int length) {
-        
+    /**
+     * This needs to be called before the text is changed.
+     */
+    public static void splitAnnotation(IAnnotationModel model, int offset) {
         for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
             Annotation annotation = (Annotation)it.next();
             Position pos = model.getPosition(annotation);
             
-            if (offset >= pos.offset && offset < pos.offset+pos.length) {
+            if (offset > pos.offset && offset < pos.offset+pos.length) {
                 Position pos1 = new Position(pos.offset, offset-pos.offset);
-                Position pos2 = new Position(offset+length, pos.length - (offset-pos.offset));
+                Position pos2 = new Position(offset, pos.length - (offset-pos.offset));
                 
                 model.removeAnnotation(annotation);
                 model.addAnnotation(new ContributionAnnotation(), pos1);
                 model.addAnnotation(new ContributionAnnotation(), pos2);
             }
         }
-    }
-    
-    public void documentAboutToBeChanged(DocumentEvent event) {
-        // TODO Auto-generated method stub
-    }
-
-    public void documentChanged(DocumentEvent event) {
-        // TODO Auto-generated method stub
     }
 }
