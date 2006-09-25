@@ -121,8 +121,9 @@ public class SharedProject implements ISharedProject {
         
         this.driver = driver;
 
+        JID jid = driver.getJid();
         for (ISharedProjectListener listener : listeners) {
-            listener.driverChanged(driver.getJid(), replicated);
+            listener.driverChanged(jid, replicated);
         }
     }
     

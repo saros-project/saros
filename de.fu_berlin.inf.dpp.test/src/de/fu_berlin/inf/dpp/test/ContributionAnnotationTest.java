@@ -41,8 +41,8 @@ public class ContributionAnnotationTest extends TestCase {
     }
     
 
-    private AnnotationModel annotationModel;
-    private Document        document;
+    private AnnotationModel        annotationModel;
+    private Document               document;
 
     @Override
     protected void setUp() throws Exception {
@@ -62,7 +62,7 @@ public class ContributionAnnotationTest extends TestCase {
      */
     public void testInsertSimpleAnnotation() throws BadLocationException {
         document.replace(5, 0, "abc");
-        ContributionHelper.insertContribution(annotationModel, 5, 3);
+        ContributionHelper.insertAnnotation(annotationModel, 5, 3);
         assertPositions(annotationModel, new int[]{5,3});
     }
     
@@ -74,7 +74,7 @@ public class ContributionAnnotationTest extends TestCase {
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
         document.replace(5, 0, "abc");
-        ContributionHelper.insertContribution(annotationModel, 5, 3);
+        ContributionHelper.insertAnnotation(annotationModel, 5, 3);
         assertPositions(annotationModel, new int[]{3,6});
     }
     
@@ -86,7 +86,7 @@ public class ContributionAnnotationTest extends TestCase {
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
         document.replace(6, 0, "abc");
-        ContributionHelper.insertContribution(annotationModel, 6, 3);
+        ContributionHelper.insertAnnotation(annotationModel, 6, 3);
         assertPositions(annotationModel, new int[]{3,3, 6,3});
     }
     
@@ -98,14 +98,14 @@ public class ContributionAnnotationTest extends TestCase {
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
         document.replace(3, 0, "abc");
-        ContributionHelper.insertContribution(annotationModel, 3, 3);
+        ContributionHelper.insertAnnotation(annotationModel, 3, 3);
         assertPositions(annotationModel, new int[]{3,3, 6,3});
     }
     
     /*  0123456789
      *   xx___xxx
      */
-    public void testSplitAtCenter() throws BadLocationException {
+    public void testSplitAnnotationAtCenter() throws BadLocationException {
         Position pos = new Position(1, 5);
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
@@ -118,7 +118,7 @@ public class ContributionAnnotationTest extends TestCase {
     /*  0123456789
      *   ___xxxxx
      */
-    public void testDontExpandAtBegin() throws BadLocationException {
+    public void testDontExpandAnnotationAtBegin() throws BadLocationException {
         Position pos = new Position(1, 5);
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         
@@ -131,7 +131,7 @@ public class ContributionAnnotationTest extends TestCase {
     /*  0123456789
      *   xxxxx___
      */
-    public void testDontExpandAtEnd() throws BadLocationException {
+    public void testDontExpandAnnotationAtEnd() throws BadLocationException {
         Position pos = new Position(1, 5);
         annotationModel.addAnnotation(new ContributionAnnotation(), pos);
         

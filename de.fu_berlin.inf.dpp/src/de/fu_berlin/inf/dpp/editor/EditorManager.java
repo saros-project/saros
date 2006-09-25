@@ -61,6 +61,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
@@ -175,7 +176,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         public void documentAboutToBeChanged(final DocumentEvent event) {
             // don't give NULL string
             String text = event.getText() == null ? "" : event.getText();
-            textChanged(event.getOffset(), text, event.getLength());
+            textAboutToBeChanged(event.getOffset(), text, event.getLength());
         }
         
         /* (non-Javadoc)
@@ -308,7 +309,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /* (non-Javadoc)
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
-    public void textChanged(int offset, String text, int replace) {
+    public void textAboutToBeChanged(int offset, String text, int replace) {
         if (!isDriver) return;
         
         fireActivity(new TextEditActivity(offset, text, replace));
@@ -622,7 +623,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             doc.replace(offset, replace, text);
             
             IAnnotationModel model = provider.getAnnotationModel(input);
-            ContributionHelper.insertContribution(model, offset, text.length());
+            ContributionHelper.insertAnnotation(model, offset, text.length());
             
             // TODO We can't just disconnect from the provider, because
             // otherwise pending text changes will be lost.
