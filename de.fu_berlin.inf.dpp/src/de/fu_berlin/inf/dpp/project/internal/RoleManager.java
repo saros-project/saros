@@ -21,13 +21,13 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * 
  * @author rdjemili
  */
-public class DriverManager implements IActivityProvider, ISharedProjectListener {
+public class RoleManager implements IActivityProvider, ISharedProjectListener {
 	private List<IActivityListener> activityListeners = 
 		new LinkedList<IActivityListener>();
 	
 	private ISharedProject sharedProject;
     
-    public DriverManager() {
+    public RoleManager() {
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 

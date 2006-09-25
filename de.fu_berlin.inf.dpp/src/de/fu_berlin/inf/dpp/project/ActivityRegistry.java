@@ -10,7 +10,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.project.internal.DriverManager;
+import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 
 public class ActivityRegistry {
 	private List<IActivityProvider> activityProviders = new ArrayList<IActivityProvider>();
@@ -61,7 +61,7 @@ public class ActivityRegistry {
 	private void loadDefaultActivityProviders() {
 		addProvider(EditorManager.getDefault());
 		addProvider(new SharedResourcesManager());
-		addProvider(new DriverManager());
+		addProvider(new RoleManager());
 	}
 	
 	private void loadExtensionPoints() {
