@@ -8,8 +8,18 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 
+/**
+ * A helper class for handling the contribution annotation.
+ * 
+ * @author rdjemili
+ */
 public class ContributionHelper {
     
+    /**
+     * Inserts a contribution annotation to given model if there is not already 
+     * a contribution annotation at given position. This method should be called 
+     * after the text has changed.
+     */
     public static void insertAnnotation(IAnnotationModel model, 
         int offset, int length) {
         
@@ -31,7 +41,9 @@ public class ContributionHelper {
     }
     
     /**
-     * This needs to be called before the text is changed.
+     * Splits the contribution annotation at given position, so that the
+     * following text change won't expand the annotation. This needs to be
+     * called before the text is changed.
      */
     public static void splitAnnotation(IAnnotationModel model, int offset) {
         for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
