@@ -40,6 +40,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	    store.setDefault(PreferenceConstants.PASSWORD, "Your password");
         
 	    store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
+        store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
         store.setDefault(PreferenceConstants.DEBUG, false);
         store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
 	}

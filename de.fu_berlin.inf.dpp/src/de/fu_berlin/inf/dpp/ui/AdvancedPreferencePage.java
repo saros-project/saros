@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -26,6 +27,9 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage
     
     @Override
     protected void createFieldEditors() {
+        addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME, 
+            "Skype name:", getFieldEditorParent()));
+        
         addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT, 
             "File transfer port (needs reconnect):", getFieldEditorParent()));
         

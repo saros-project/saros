@@ -28,8 +28,9 @@ public class PreferenceConstants {
     public static final String SERVER             = "server";
     public static final String USERNAME           = "username";
     public static final String PASSWORD           = "password";
-
+    
     public static final String AUTO_CONNECT       = "autoconnect";
+    public static final String SKYPE_USERNAME     = "skypename";
     public static final String DEBUG              = "debug";
     public static final String FILE_TRANSFER_PORT = "port";
 }

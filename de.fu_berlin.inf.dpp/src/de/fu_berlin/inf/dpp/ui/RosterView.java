@@ -63,6 +63,7 @@ import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.MessagingAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
+import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
 
 /**
  * This view displays the roster (also known as contact list) of the local user.
@@ -78,6 +79,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
     private Action              inviteAction;
     private RenameContactAction renameContactAction;
     private DeleteContactAction deleteContactAction;
+    private SkypeAction         skypeAction;
 
     /**
      * An item of the roster tree. Can be either a group or a single contact.
@@ -440,6 +442,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
 
     private void fillContextMenu(IMenuManager manager) {
         manager.add(messagingAction);
+        manager.add(skypeAction);
         manager.add(inviteAction);
         manager.add(new Separator());
         manager.add(renameContactAction);
@@ -451,6 +454,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
 
     private void makeActions() {
         messagingAction = new MessagingAction(viewer);
+        skypeAction = new SkypeAction(viewer);
         inviteAction = new InviteAction(viewer);
         renameContactAction = new RenameContactAction(viewer);
         deleteContactAction = new DeleteContactAction(viewer);

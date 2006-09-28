@@ -64,6 +64,7 @@ public class Saros extends AbstractUIPlugin {
     private MessagingManager          messagingManager;
     private SessionManager            sessionManager;
     private ActivityRegistry          activityRegister;
+    private SkypeManager              skypeManager;
 
 //  TODO use ListenerList instead
     private List<IConnectionListener> listeners        = new CopyOnWriteArrayList<IConnectionListener>();
@@ -93,6 +94,7 @@ public class Saros extends AbstractUIPlugin {
         messagingManager = new MessagingManager();
         sessionManager = new SessionManager();
         activityRegister = ActivityRegistry.getDefault();
+        skypeManager = SkypeManager.getDefault();
         
         uiInstance = new SarosUI(sessionManager);
         addPreferencesListener();
