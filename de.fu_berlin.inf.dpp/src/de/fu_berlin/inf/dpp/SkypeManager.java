@@ -85,14 +85,21 @@ public class SkypeManager implements IConnectionListener {
         return skypeName.length() == 0 ? null : skypeName;
     }
     
+    /**
+     * Returns the Skype-URL for given roster entry.
+     */
     public String getSkypeURL(RosterEntry rosterEntry) {
         XMPPConnection connection = Saros.getDefault().getConnection();
-        JID jid = new JID(rosterEntry.getUser());
+//        JID jid = new JID(rosterEntry.getUser());
+        JID jid = new JID("saros1@jabber.org/Smack");
         
         String skypeName = discoverSkypeName(connection, jid);
-        return "skype:"+skypeName;
+        return skypeName == null ? null : "skype:"+skypeName;
     }
 
+    /* (non-Javadoc)
+     * @see de.fu_berlin.inf.dpp.net.IConnectionListener
+     */
     public void connectionStateChanged(XMPPConnection connection, 
         ConnectionState newState) {
         
