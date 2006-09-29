@@ -61,7 +61,6 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
@@ -640,6 +639,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * Needs to be called form a UI thread.
      */
     private void resetText(IFile file) {
+        if (!file.exists())
+            return;
+        
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = editorAPI.getDocumentProvider(input);
     
