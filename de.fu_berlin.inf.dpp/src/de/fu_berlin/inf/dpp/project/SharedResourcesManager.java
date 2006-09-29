@@ -91,16 +91,16 @@ public class SharedResourcesManager
             if (replicationInProgess || !sharedProject.isDriver()) 
                 return false;
             
-            if (delta.getResource().getProject() == null) // work space root
+            IResource resource = delta.getResource();
+            if (resource.getProject() == null) // work space root
                 return true;
             
-            if (delta.getResource().getProject() != sharedProject.getProject())
+            if (resource.getProject() != sharedProject.getProject())
                 return false;
             
-            if (delta.getResource().isDerived())
+            if (resource.isDerived())
                 return false;
             
-            IResource resource = delta.getResource();
             IPath path = delta.getProjectRelativePath();
             int kind = delta.getKind();
             
@@ -132,12 +132,14 @@ public class SharedResourcesManager
         }
 
         private IActivity handleFileDelta(IPath path, int kind) {
-            if (EditorManager.getDefault().isOpened(path))
-                return null;
-            
             switch(kind) {
             case IResourceDelta.CHANGED:
             case IResourceDelta.ADDED:
+                // ignore opened files because otherwise we might send CHANGED
+                // events for files that are also handled by the editor manager.
+                if (EditorManager.getDefault().isOpened(path))
+                    return null;
+                
                 return new FileActivity(FileActivity.Type.Created, path);
                 
             case IResourceDelta.REMOVED:
@@ -278,19 +280,19 @@ public class SharedResourcesManager
 	private void exec(FileActivity activity) throws CoreException {
         IProject project = sharedProject.getProject();
         IFile file = project.getFile(activity.getPath());
-        
+
         if (activity.getType() == FileActivity.Type.Created) {
-            InputStream in = activity.getContents();    
+            InputStream in = activity.getContents();
             if (file.exists()) {
                 file.setContents(in, IResource.FORCE, null);
             } else {
                 file.create(in, true, new NullProgressMonitor());
             }
-            
+
         } else if (activity.getType() == FileActivity.Type.Removed) {
-            file.delete(true, new NullProgressMonitor());
+            file.delete(false, new NullProgressMonitor());
         }
-        
+
         closeRemovedEditors();
     }
     
@@ -310,16 +312,16 @@ public class SharedResourcesManager
 
     	IPath path = new Path(parser.getAttributeValue(null, "path"));
     	return new FileActivity(
-    			FileActivity.Type.valueOf(parser.getAttributeValue(null, "type")),
-    			path);
+			FileActivity.Type.valueOf(parser.getAttributeValue(null, "type")),
+			path);
     }
 
     private FolderActivity parseFolder(XmlPullParser parser) {
     	Path path = new Path(parser.getAttributeValue(null, "path"));
 
     	return new FolderActivity(
-    			FolderActivity.Type.valueOf(parser.getAttributeValue(null, "type")),
-    			path);
+			FolderActivity.Type.valueOf(parser.getAttributeValue(null, "type")),
+			path);
     }
     
     /**
