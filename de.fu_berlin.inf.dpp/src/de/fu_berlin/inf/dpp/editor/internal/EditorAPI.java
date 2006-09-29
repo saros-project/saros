@@ -371,6 +371,9 @@ public class EditorAPI implements IEditorAPI {
                 ITextViewerExtension textViewer = 
                     (ITextViewerExtension)getViewer(editorPart);
                 
+                if (textViewer == null)
+                    return;
+                
                 if (editable && lockedEditors.contains(editorPart)) {
                     lockedEditors.remove(editorPart);
                     textViewer.removeVerifyKeyListener(keyVerifier);
