@@ -1,20 +1,23 @@
 package de.fu_berlin.inf.dpp;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.jivesoftware.smack.PacketCollector;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.NodeInformationProvider;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.packet.DiscoverInfo;
-import org.jivesoftware.smackx.packet.DiscoverItems;
+import org.jivesoftware.smack.filter.IQTypeFilter;
+import org.jivesoftware.smack.filter.PacketIDFilter;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.provider.ProviderManager;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype
@@ -23,13 +26,12 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author rdjemili
  */
 public class SkypeManager implements IConnectionListener {
-    public static final String DISCO_NAMESPACE = "de.fu_berlin.inf.dpp/skype";
-    public static final String DISCO_NODE      = "de.fu_berlin.inf.dpp/skype#name";
-
     private static SkypeManager instance;
+    private Map<JID, String>    skypeNames = new HashMap<JID, String>();
     
     private SkypeManager() {
         Saros.getDefault().addListener(this);
+        ProviderManager.addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
     }
     
     public static SkypeManager getDefault() {
@@ -40,61 +42,25 @@ public class SkypeManager implements IConnectionListener {
     }
     
     /**
-     * Discovers the Skype name for given JID.
-     * 
-     * @param jid the user for which the Skype name should be discovered.
-     * @return the skype name of given JID. Returns <code>null</code> if the
-     * given JID doesn't support this feature.
-     */
-    public static String discoverSkypeName(XMPPConnection connection, JID jid) {
-        ServiceDiscoveryManager discoManager = 
-            ServiceDiscoveryManager.getInstanceFor(connection);
-        
-        try {
-            DiscoverItems result = discoManager.discoverItems(jid.toString(), DISCO_NODE);
-            DiscoverItems.Item item = (DiscoverItems.Item)result.getItems().next();
-            return item.getEntityID();
-            
-        } catch (XMPPException e) {
-            System.out.println(e);
-            return null;
-        }
-    }
-    
-    /**
-     * Discovers if the given JID supports Skype sessions.
-     */
-    public static boolean isServiceEnabled(XMPPConnection connection, JID jid) {
-        try {
-            DiscoverInfo result = getDiscoManager(connection).discoverInfo(jid.toString());
-            return result.containsFeature(DISCO_NAMESPACE);
-            
-        } catch (XMPPException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * @return the local skype name or <code>null</code> if none is set.
-     */
-    public static String getLocalSkypeName() {
-        IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
-        String skypeName = prefs.getString(PreferenceConstants.SKYPE_USERNAME);
-        
-        return skypeName.length() == 0 ? null : skypeName;
-    }
-    
-    /**
      * Returns the Skype-URL for given roster entry.
+     * 
+     * @return the skype url for given roster entry or <code>null</code> if
+     * roster entry has no skype name.
      */
     public String getSkypeURL(RosterEntry rosterEntry) {
         XMPPConnection connection = Saros.getDefault().getConnection();
-//        JID jid = new JID(rosterEntry.getUser());
-        JID jid = new JID("saros1@jabber.org/Smack");
+        JID jid = new JID(rosterEntry.getUser());
         
-        String skypeName = discoverSkypeName(connection, jid);
-        return skypeName == null ? null : "skype:"+skypeName;
+        String name;
+        if (skypeNames.containsKey(jid)) {
+            name = skypeNames.get(jid);
+            
+        } else {
+            name = requestSkypeName(connection, jid);
+            skypeNames.put(jid, name);
+        }
+        
+        return name == null ? null : "skype:"+name;
     }
 
     /* (non-Javadoc)
@@ -104,31 +70,67 @@ public class SkypeManager implements IConnectionListener {
         ConnectionState newState) {
         
         if (newState == ConnectionState.CONNECTED) {
-            ServiceDiscoveryManager discoManager = 
-                ServiceDiscoveryManager.getInstanceFor(connection);
-            
-            if (getLocalSkypeName() != null)
-                enableFeature(discoManager);
+            final XMPPConnection con = connection;
+            connection.addPacketListener(new PacketListener() {
+
+                /* (non-Javadoc)
+                 * @see org.jivesoftware.smack.PacketListener
+                 */
+                public void processPacket(Packet packet) {
+                    if (packet instanceof SkypeIQ) {
+                        SkypeIQ iq = (SkypeIQ)packet;
+                        
+                        SkypeIQ result = new SkypeIQ();
+                        result.setType(IQ.Type.RESULT);
+                        result.setPacketID(iq.getPacketID());
+                        result.setTo(iq.getFrom()); // HACK
+                        result.setName(getLocalSkypeName());
+                        
+                        con.sendPacket(result);
+                    }
+                }
+            }, new IQTypeFilter(IQ.Type.GET));
         }
     }
 
-    private static ServiceDiscoveryManager getDiscoManager(XMPPConnection connection) {
-        return ServiceDiscoveryManager.getInstanceFor(connection);
+    /**
+     * @return the local skype name or <code>null</code> if none is set.
+     */
+    private String getLocalSkypeName() {
+        IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
+        return prefs.getString(PreferenceConstants.SKYPE_USERNAME);
     }
 
-    private static void enableFeature(ServiceDiscoveryManager manager) {
-        manager.addFeature(DISCO_NAMESPACE);
+    /**
+     * Requests the Skype user name of given user. This method blocks up to 5
+     * seconds to receive the value.
+     * 
+     * @param user the user for which the Skype name is requested.
+     * @return the Skype user name of given user or <code>null</code> if the
+     * user doesn't respond in time or has no Skype name.
+     */
+    private static String requestSkypeName(XMPPConnection connection, JID user) {
+        // Request the time from a remote user.
+        SkypeIQ request = new SkypeIQ();
         
-        manager.setNodeInformationProvider(
-            DISCO_NODE,
-            new NodeInformationProvider() {
-                public Iterator getNodeItems() {
-                    ArrayList answer = new ArrayList();
-                    String skypeName = getLocalSkypeName();
-                    answer.add(new DiscoverItems.Item(skypeName));
-                    return answer.iterator();
-                }
-            }
-        );
+        request.setType(IQ.Type.GET);
+        request.setTo(user.toString()+"/Smack"); // HACK
+        
+        // Create a packet collector to listen for a response.
+        PacketCollector collector = connection.createPacketCollector(
+            new PacketIDFilter(request.getPacketID()));
+    
+        connection.sendPacket(request);
+        
+        // Wait up to 5 seconds for a result.
+        IQ result = (IQ)collector.nextResult(5000);
+        if (result != null && result.getType() == IQ.Type.RESULT) {
+            SkypeIQ skypeResult = (SkypeIQ)result;
+            
+            return skypeResult.getName().length() == 0 ? 
+                null : skypeResult.getName();
+        }
+        
+        return null;
     }
 }

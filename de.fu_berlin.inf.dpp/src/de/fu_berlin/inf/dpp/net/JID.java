@@ -88,6 +88,11 @@ public class JID {
         return false;
     }
     
+    @Override
+    public int hashCode() {
+        return getBase().hashCode();
+    }
+    
     /** 
      * @return the complete string that was used to construct this object.
      * 

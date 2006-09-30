@@ -47,8 +47,8 @@ public class SkypeAction extends SelectionProviderAction {
                 public void run() {
                     setEnabled(false);
                     SkypeManager sm = SkypeManager.getDefault();
-                    String url = sm.getSkypeURL((RosterEntry)item);
-                    setEnabled(url != null);
+                    skypeURL = sm.getSkypeURL((RosterEntry)item);
+                    setEnabled(skypeURL != null);
                 }
             }).start();
         }
