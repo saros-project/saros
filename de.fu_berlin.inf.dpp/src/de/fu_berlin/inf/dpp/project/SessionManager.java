@@ -228,6 +228,10 @@ public class SessionManager implements IConnectionListener {
 
             private void removeDroppedUserFromSession(String XMPPAddress) {
                 Roster roster = Saros.getDefault().getRoster();
+                
+                if (roster == null)
+                    return;
+                
                 Presence presence = roster.getPresence(XMPPAddress);
                 if (presence == null) {
                     JID jid = new JID(XMPPAddress);
