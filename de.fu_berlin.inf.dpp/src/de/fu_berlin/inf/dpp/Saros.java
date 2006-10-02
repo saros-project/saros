@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -324,8 +323,8 @@ public class Saros extends AbstractUIPlugin {
             handler.setFormatter(new SimpleFormatter());
             sarosRootLogger.addHandler(handler);
             
-            handler = new ConsoleHandler();
-            sarosRootLogger.addHandler(handler);
+//            handler = new ConsoleHandler();
+//            sarosRootLogger.addHandler(handler);
             
         } catch (SecurityException e) {
             e.printStackTrace();
