@@ -284,6 +284,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
         
         if (activitiesPacket != null) {
             List<TimedActivity> timedActivities = activitiesPacket.getActivities();
+            
+            log.info("Received activities: "+timedActivities);
+            
             for (TimedActivity timedActivity : timedActivities) {
                 
                 /*
@@ -299,8 +302,6 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
                     project.getSequencer().exec(timedActivity);
                 }
             }
-            
-            log.info("Received activities: "+timedActivities);
         }
 
         if (PacketExtensions.getJoinExtension(message) != null) {
