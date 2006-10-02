@@ -66,11 +66,10 @@ public class SkypeManager implements IConnectionListener {
     /* (non-Javadoc)
      * @see de.fu_berlin.inf.dpp.net.IConnectionListener
      */
-    public void connectionStateChanged(XMPPConnection connection, 
+    public void connectionStateChanged(final XMPPConnection connection, 
         ConnectionState newState) {
         
         if (newState == ConnectionState.CONNECTED) {
-            final XMPPConnection con = connection;
             connection.addPacketListener(new PacketListener() {
 
                 /* (non-Javadoc)
@@ -86,7 +85,7 @@ public class SkypeManager implements IConnectionListener {
                         result.setTo(iq.getFrom()); // HACK
                         result.setName(getLocalSkypeName());
                         
-                        con.sendPacket(result);
+                        connection.sendPacket(result);
                     }
                 }
             }, new IQTypeFilter(IQ.Type.GET));
