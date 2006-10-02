@@ -31,8 +31,6 @@ import java.util.logging.SimpleFormatter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -63,8 +61,6 @@ public class Saros extends AbstractUIPlugin {
 
     private MessagingManager          messagingManager;
     private SessionManager            sessionManager;
-    private ActivityRegistry          activityRegister;
-    private SkypeManager              skypeManager;
 
 //  TODO use ListenerList instead
     private List<IConnectionListener> listeners        = new CopyOnWriteArrayList<IConnectionListener>();
@@ -93,11 +89,11 @@ public class Saros extends AbstractUIPlugin {
         
         messagingManager = new MessagingManager();
         sessionManager = new SessionManager();
-        activityRegister = ActivityRegistry.getDefault();
-        skypeManager = SkypeManager.getDefault();
+        
+        ActivityRegistry.getDefault();
+        SkypeManager.getDefault();
         
         uiInstance = new SarosUI(sessionManager);
-        addPreferencesListener();
         
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)) {
             asyncConnect();
@@ -176,21 +172,17 @@ public class Saros extends AbstractUIPlugin {
             
             setConnectionState(ConnectionState.CONNECTING, null);
             
-            IPreferenceStore preferenceStore = getPreferenceStore();
-            String server   = preferenceStore.getString(PreferenceConstants.SERVER);
-            String username = preferenceStore.getString(PreferenceConstants.USERNAME);
-            String password = preferenceStore.getString(PreferenceConstants.PASSWORD);
+            IPreferenceStore prefStore = getPreferenceStore();
+            String server   = prefStore.getString(PreferenceConstants.SERVER);
+            String username = prefStore.getString(PreferenceConstants.USERNAME);
+            String password = prefStore.getString(PreferenceConstants.PASSWORD);
             
             connection = new XMPPConnection(server);
             connection.login(username, password);
             
-            connectionState = ConnectionState.CONNECTED;
-            
             setConnectionState(ConnectionState.CONNECTED, null);
             
         } catch (Exception e) {
-            e.printStackTrace();
-            
             disconnect(e.getMessage());
         }        
     }
@@ -209,7 +201,8 @@ public class Saros extends AbstractUIPlugin {
         }
         connection = null;
         
-        connectionState = error == null ? ConnectionState.NOT_CONNECTED : ConnectionState.ERROR;
+        connectionState = error == null ? 
+            ConnectionState.NOT_CONNECTED : ConnectionState.ERROR;
         
         setConnectionState(ConnectionState.NOT_CONNECTED, error);
     }
@@ -252,10 +245,7 @@ public class Saros extends AbstractUIPlugin {
     public void addContact(JID jid, String nickname, String[] groups) 
         throws XMPPException {
         
-        if (!isConnected()) {
-            throw new XMPPException("No connection");
-        }
-        
+        assertConnection();
         connection.getRoster().createEntry(jid.toString(), nickname, groups);
     }
     
@@ -266,10 +256,7 @@ public class Saros extends AbstractUIPlugin {
      * @throws XMPPException is thrown if no connection is establised.
      */
     public void removeContact(RosterEntry rosterEntry) throws XMPPException {
-        if (!isConnected()) {
-            throw new XMPPException("No connection");
-        }
-        
+        assertConnection();
         connection.getRoster().removeEntry(rosterEntry);
     }
     
@@ -310,23 +297,15 @@ public class Saros extends AbstractUIPlugin {
     public void removeListener(IConnectionListener listener) {
         listeners.remove(listener);
     }
-
-    private void addPreferencesListener() {
-        IPreferenceStore store = getPreferenceStore();
-        store.addPropertyChangeListener(new IPropertyChangeListener() {
-
-            public void propertyChange(PropertyChangeEvent event) {
-                // reconnect if jabber values were changed reconnect
-                if (event.getProperty() == PreferenceConstants.USERNAME ||
-                    event.getProperty() == PreferenceConstants.PASSWORD ||
-                    event.getProperty() == PreferenceConstants.SERVER) {
-                    
-                    asyncConnect();
-                }
-            }
-        });
-    }
     
+    private void assertConnection() throws XMPPException {
+        if (!isConnected())
+            throw new XMPPException("No connection");
+    }
+
+    /**
+     * Sets a new connection state and notifies all connection listeners.
+     */
     private void setConnectionState(ConnectionState state, String error) {
         connectionState = state;
         connectionError = error;
