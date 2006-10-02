@@ -1,22 +1,29 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 
+/**
+ * The activity registry holds references to all active activity providers and
+ * their activities.
+ * 
+ * @author rdjemili
+ */
 public class ActivityRegistry {
-	private List<IActivityProvider> activityProviders = new ArrayList<IActivityProvider>();
+	private List<IActivityProvider> activityProviders = 
+        new ArrayList<IActivityProvider>();
 	
 	private static ActivityRegistry instance;
 	
+	/**
+	 * @return the singleton instance of this registry..
+	 */
 	public static ActivityRegistry getDefault() {
 		if (instance == null)
 			instance = new ActivityRegistry();
@@ -24,16 +31,14 @@ public class ActivityRegistry {
 		return instance;
 	}
 	
-	private ActivityRegistry() {
-		loadDefaultActivityProviders();
-		loadExtensionPoints();
-	}
-	
 	public void addProvider(IActivityProvider provider) {
 		if (!activityProviders.contains(provider))
 			activityProviders.add(provider);
 	}
 	
+	/**
+     * Converts given XML data into an activity.
+	 */
 	public IActivity parseActivity(XmlPullParser parser) {
 		IActivity activity = null;
 		for (IActivityProvider provider : activityProviders) {
@@ -46,6 +51,9 @@ public class ActivityRegistry {
 		return null;
 	}
 	
+	/**
+     * Converts given activity into a XML format.
+	 */
 	public String toXML(IActivity activity) {
 		String xml;
 		for (IActivityProvider provider : activityProviders) {
@@ -58,13 +66,21 @@ public class ActivityRegistry {
 		return null;
 	}
 	
-	private void loadDefaultActivityProviders() {
+	/**
+	 * Singleton constructor
+	 */
+	private ActivityRegistry() {
+    	loadDefaultActivityProviders();
+    	loadExtensionPoints();
+    }
+
+    private void loadDefaultActivityProviders() {
 		addProvider(EditorManager.getDefault());
 		addProvider(new SharedResourcesManager());
 		addProvider(new RoleManager());
 	}
 	
 	private void loadExtensionPoints() {
-		// TODO
+		// TODO load activity providers from the extension-point for Saros
 	}
 }
