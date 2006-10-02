@@ -35,12 +35,18 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 
+/**
+ * Implements {@link IActivitySequencer} and {@link IActivityManager}.
+ * 
+ * @author rdjemili
+ */
 public class ActivitySequencer implements IActivitySequencer, IActivityManager {
+    // TODO separate into two classes!?
+    
     private List<IActivity>         activities = new LinkedList<IActivity>();
     private List<IActivity>         flushedLog = new LinkedList<IActivity>();
 
     private List<IActivityProvider> providers  = new LinkedList<IActivityProvider>();
-    // TODO use ListenerList instead !?
     private List<TimedActivity>     queue      = new CopyOnWriteArrayList<TimedActivity>();
     private int                     timestamp  = 0;
     
@@ -57,7 +63,8 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public void exec(TimedActivity timedActivity) {
-        exec(timedActivity.getActivity());
+        queue.add(timedActivity);
+        execQueue();
     }
 
     /* (non-Javadoc)
@@ -127,10 +134,17 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
         activities.add(activity);
     }
 
+    /* (non-Javadoc)
+     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
+     */
     public int getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Executes as much activities as possible from the current queue regarding 
+     * to their individual time stamps.
+     */
     private void execQueue() {
         boolean executed = false;
         
@@ -148,6 +162,7 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
             execQueue();
     }
     
+    // TODO extract this into the activities themselves
     private List<IActivity> optimize(List<IActivity> activities) {
         List<IActivity> result = new ArrayList<IActivity>(activities.size());
         
