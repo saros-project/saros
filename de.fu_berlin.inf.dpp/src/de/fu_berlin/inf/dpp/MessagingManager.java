@@ -103,7 +103,10 @@ public class MessagingManager implements PacketListener, IConnectionListener {
         }
         
         public void processPacket(Packet packet) {
-            final Message message = (Message)packet; 
+            final Message message = (Message)packet;
+            
+            if (message.getBody() == null)
+                return;
             
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
