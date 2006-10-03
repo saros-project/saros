@@ -28,19 +28,29 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
+/**
+ * Leaves the current Saros session. Is deactivated if there is no running
+ * session.
+ * 
+ * @author rdjemili
+ */
 public class LeaveSessionAction extends Action implements ISessionListener {
 
     public LeaveSessionAction() {
         setToolTipText("Leave the session");
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
         
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        getSessionManager().addSessionListener(this);
         updateEnablement();
     }
     
     @Override
     public void run() {
-        Saros.getDefault().getSessionManager().leaveSession();
+        try {
+            getSessionManager().leaveSession();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /* (non-Javadoc)
@@ -65,7 +75,10 @@ public class LeaveSessionAction extends Action implements ISessionListener {
     }
     
     private void updateEnablement() {
-        SessionManager sessionManager = Saros.getDefault().getSessionManager();
-        setEnabled(sessionManager.getSharedProject() != null);
+        setEnabled(getSessionManager().getSharedProject() != null);
+    }
+    
+    private static SessionManager getSessionManager() {
+        return Saros.getDefault().getSessionManager();
     }
 }
