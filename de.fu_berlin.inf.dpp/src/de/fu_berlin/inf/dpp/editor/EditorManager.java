@@ -151,7 +151,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             editors.add(editorPart);
         }
 
-        public void remove(IEditorPart editor) {
+        public void remove(IEditorPart editorPart) {
+            IResource resource = editorAPI.getEditorResource(editorPart);
+            IPath path = resource.getProjectRelativePath();
+            
+            if (path == null)
+                return;
+            
+            HashSet<IEditorPart> editors = editorParts.get(path);
+            editors.remove(editorPart);
         }
         
         public Set<IEditorPart> getEditors(IPath path) {
@@ -499,7 +507,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         
         IResource resource = editorAPI.getEditorResource(editorPart);
         IPath path = resource.getProjectRelativePath();
-        removeDriverEditor(path, false); // HACK
+        
+        editorPool.remove(editorPart);
+        removeDriverEditor(path, false);
     }
     
     /**
@@ -736,6 +746,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IEditorInput input = editor.getEditorInput();
             IDocumentProvider provider = editorAPI.getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
+            
+            if (model == null)
+                continue;
             
             for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
                 Annotation annotation = (Annotation)it.next();

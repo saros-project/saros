@@ -78,7 +78,7 @@ public class SharedResourcesManager
         new LinkedList<IActivityListener>();
     
     /**
-     * Listens for resource changes in shared project.
+     * Listens for resource changes in shared project and fires activities. 
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
         
@@ -139,6 +139,8 @@ public class SharedResourcesManager
                 // events for files that are also handled by the editor manager.
                 if (EditorManager.getDefault().isOpened(path))
                     return null;
+                
+                // fall through
                 
                 return new FileActivity(FileActivity.Type.Created, path);
                 
