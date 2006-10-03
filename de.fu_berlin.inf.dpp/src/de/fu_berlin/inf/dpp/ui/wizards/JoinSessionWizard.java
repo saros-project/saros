@@ -20,6 +20,8 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -41,7 +43,15 @@ import org.eclipse.swt.widgets.Text;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 
+/**
+ * A wizard that guides the user through an incoming invitiation process.
+ * 
+ * @author rdjemili
+ */
 public class JoinSessionWizard extends Wizard {
+    private static Logger log = Logger.getLogger(
+        JoinSessionWizard.class.getName());
+    
     private ShowDescriptionPage              descriptionPage;
     private EnterNamePage                    namePage;
 
@@ -56,8 +66,8 @@ public class JoinSessionWizard extends Wizard {
             super("firstPage");
             
             setTitle("Session Invitation");
-            setDescription("You have been invited to join on a session for a shared " +            
-                "project. Click next if you want to accept the invitation.");
+            setDescription("You have been invited to join on a session for a " +
+                "shared project. Click next if you want to accept the invitation.");
         }
 
         /* (non-Javadoc)
@@ -133,6 +143,7 @@ public class JoinSessionWizard extends Wizard {
                 SWT.FILL, SWT.BEGINNING, true, false);
             gridData.verticalIndent = 20;
             newProjectNameText.setLayoutData(gridData);
+            newProjectNameText.setFocus();
             
             attachListeners();
             setControl(composite);
@@ -144,8 +155,7 @@ public class JoinSessionWizard extends Wizard {
          * project.
          */
         public String getNewProjectName() {
-            return newProjectNameText != null ? 
-                newProjectNameText.getText() : "";
+            return newProjectNameText != null ? newProjectNameText.getText() : "";
         }
         
         private IProject getLocalProject() {
@@ -174,7 +184,7 @@ public class JoinSessionWizard extends Wizard {
                 FileList remoteFileList = process.getRemoteFileList();
                 return remoteFileList.match(new FileList(project));
             } catch (CoreException e) {
-                e.printStackTrace();
+                log.log(Level.FINE, "Couldn't calculate match for project "+project, e);
                 
                 return 0;
             }
@@ -183,18 +193,17 @@ public class JoinSessionWizard extends Wizard {
         private void requestRemoteFileList() {
             try {
                 getContainer().run(true, false, new IRunnableWithProgress(){
-                    public void run(IProgressMonitor monitor) throws 
-                        InvocationTargetException, InterruptedException {
+                    public void run(IProgressMonitor monitor) {
                         
                         process.requestRemoteFileList(monitor);
                     }
                 });
+                
             } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.log(Level.WARNING, "Exception while requesting remote file list", e);
+                
             } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.log(Level.FINE, "Request of remote file list canceled/interrupted", e);
             }
         }
 
@@ -261,9 +270,10 @@ public class JoinSessionWizard extends Wizard {
                 }
             });
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            log.log(Level.WARNING, "Exception while requesting remote file list", e);
+            
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.log(Level.FINE, "Request of remote file list canceled/interrupted", e);
         }
         
         return true;
