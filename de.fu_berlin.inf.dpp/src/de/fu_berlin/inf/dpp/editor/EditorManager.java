@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +44,7 @@ import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.swt.widgets.Display;
@@ -61,6 +63,8 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
@@ -236,6 +240,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 */
 	public void sessionEnded(ISharedProject session) {
 		setAllEditorsToEditable();
+        removeAnnotations();
 		
 		sharedProject.removeListener(this);
 		sharedProject.getActivityManager().removeProvider(this);
@@ -570,7 +575,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		return null;
 	}
 
-	private IActivity parseTextEditActivity(XmlPullParser parser) throws XmlPullParserException, IOException {
+	private IActivity parseTextEditActivity(XmlPullParser parser) 
+        throws XmlPullParserException, IOException {
+        
 		// TODO extract constants
 		int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
 		int replace = Integer.parseInt(parser.getAttributeValue(null, "replace"));
@@ -720,6 +727,28 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			editorAPI.setEditable(editor, true);
 		}
 	}
+    
+    /**
+     * Removes all contribution and viewport annotations.
+     */
+    private void removeAnnotations() {
+        for (IEditorPart editor : editorPool.getAllEditors()) {
+            IEditorInput input = editor.getEditorInput();
+            IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+            IAnnotationModel model = provider.getAnnotationModel(input);
+            
+            for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+                Annotation annotation = (Annotation)it.next();
+                String type = annotation.getType();
+                
+                boolean isContribution = type.equals(ContributionAnnotation.TYPE);
+                boolean isViewport = type.equals(ViewportAnnotation.TYPE);
+                
+                if (isContribution || isViewport)
+                    model.removeAnnotation(annotation);
+            }
+        }
+    }
 
 	private EditorManager() {
 	    setEditorAPI(new EditorAPI());
