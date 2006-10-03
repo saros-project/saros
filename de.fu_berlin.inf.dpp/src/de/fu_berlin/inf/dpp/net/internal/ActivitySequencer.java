@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
@@ -43,6 +45,8 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 public class ActivitySequencer implements IActivitySequencer, IActivityManager {
     // TODO separate into two classes!?
     
+    private static Logger log = Logger.getLogger(ActivitySequencer.class.getName());
+    
     private List<IActivity>         activities = new LinkedList<IActivity>();
     private List<IActivity>         flushedLog = new LinkedList<IActivity>();
 
@@ -54,8 +58,13 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
      * @see de.fu_berlin.inf.dpp.project.IActivityManager
      */
     public void exec(IActivity activity) {
-        for (IActivityProvider executor : providers) {
-            executor.exec(activity);
+        try {
+            for (IActivityProvider executor : providers) {
+                executor.exec(activity);
+            }
+            
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Error while executing activity.", e);
         }
     }
 
