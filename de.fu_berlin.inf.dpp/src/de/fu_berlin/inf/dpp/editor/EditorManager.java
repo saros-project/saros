@@ -217,7 +217,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private ITextSelection          driverTextSelection;
     
-    private List<ISharedEditorListener> editorListeners = new ArrayList<ISharedEditorListener>();
+    /** all files that have connected document providers */
+    private Set<IFile>              connectedFiles       = new HashSet<IFile>();
+    
+    private List<ISharedEditorListener> editorListeners  = new ArrayList<ISharedEditorListener>();
     
     public static EditorManager getDefault() {
     	if (instance == null)
@@ -248,7 +251,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 */
 	public void sessionEnded(ISharedProject session) {
 		setAllEditorsToEditable();
-        removeAnnotations();
+        removeAllAnnotations();
 		
 		sharedProject.removeListener(this);
 		sharedProject.getActivityManager().removeProvider(this);
@@ -502,14 +505,16 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
     
     public void partClosed(IEditorPart editorPart) {
-        if (!isSharedEditor(editorPart) || !isDriver)
+        if (!isSharedEditor(editorPart))
             return;
         
         IResource resource = editorAPI.getEditorResource(editorPart);
         IPath path = resource.getProjectRelativePath();
         
         editorPool.remove(editorPart);
-        removeDriverEditor(path, false);
+        
+        if (isDriver)
+            removeDriverEditor(path, false);
     }
     
     /**
@@ -634,26 +639,31 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IDocumentProvider provider = editorAPI.getDocumentProvider(input);
     
         try {
-            provider.connect(input);
+            if (!connectedFiles.contains(file)) {
+                provider.connect(input);
+                connectedFiles.add(file);
+            }
+            
             IDocument doc = provider.getDocument(input);
             doc.replace(offset, replace, text);
             
             IAnnotationModel model = provider.getAnnotationModel(input);
             ContributionHelper.insertAnnotation(model, offset, text.length());
             
-            // TODO We can't just disconnect from the provider, because
-            // otherwise pending text changes will be lost.
+            // Don't disconnect from provider yet, because otherwise the text 
+            // changes would be lost. We only disconnect when the document is 
+            // reset or saved.
             
         } catch (BadLocationException e) {
-            log.log(Level.SEVERE, "Couldn't edit text because of bad location.", e);
+            log.log(Level.SEVERE, "Couldn't insert driver text because of bad location.", e);
             
         } catch (CoreException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, "Couldn't insert driver text.", e);
         }
     }
     
     /**
-     * Needs to be called form a UI thread.
+     * Needs to be called from a UI thread.
      */
     private void resetText(IFile file) {
         if (!file.exists())
@@ -662,15 +672,61 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = editorAPI.getDocumentProvider(input);
     
-        try {
-            provider.connect(input);
-            provider.resetDocument(input);
-            
-        } catch (CoreException e) {
-            e.printStackTrace();
+        if (connectedFiles.contains(file)) {
+            provider.disconnect(input); 
+            connectedFiles.remove(file);
         }
     }
     
+    /**
+     * Saves the driver editor.
+     * 
+     * @param path the path to the resource that the driver was editting.
+     * @param replicated <code>false</code> if this action originates on this
+     * client. <code>false</code> if it is an replication of an action from
+     * another participant of the shared project.
+     */
+    private void saveDriverEditor(IPath path, boolean replicated) {
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.driverEditorSaved(path, replicated);
+        }
+        
+        if (replicated) {
+            IFile file = sharedProject.getProject().getFile(path);
+            FileEditorInput input = new FileEditorInput(file);
+            
+            try {
+                IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+                
+                // save not necessary, if we have no modified document
+                if (!connectedFiles.contains(file))
+                    return;
+                
+                IDocument doc = provider.getDocument(input);
+                
+                IAnnotationModel model = provider.getAnnotationModel(input);
+                model.connect(doc);
+                
+                provider.saveDocument(new NullProgressMonitor(), input, doc, true);
+                log.fine("Saved document "+path);
+                
+                model.disconnect(doc);
+                
+                provider.disconnect(input);
+                connectedFiles.remove(file);
+                
+            } catch (CoreException e) {
+                log.log(Level.SEVERE, "Failed to save document.", e);
+            }
+            
+        } else {
+            IActivity activity = new EditorActivity(Type.Saved, path);
+            for (IActivityListener listener : activityListeners) {
+                listener.activityCreated(activity);
+            }
+        }
+    }
+
     /**
      * Sends given activity to all registered activity listeners.
      */
@@ -741,7 +797,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /**
      * Removes all contribution and viewport annotations.
      */
-    private void removeAnnotations() {
+    private void removeAllAnnotations() {
         for (IEditorPart editor : editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
             IDocumentProvider provider = editorAPI.getDocumentProvider(input);
@@ -812,9 +868,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * another participant of the shared project.
      */
     private void removeDriverEditor(final IPath path, boolean replicated) {
-        if (path.equals(activeDriverEditor)) { // HACK
+        if (path.equals(activeDriverEditor))
             setActiveDriverEditor(null, replicated);
-        }
         
         driverEditors.remove(path);
         
@@ -846,50 +901,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
     
-    /**
-     * Saves the driver editor.
-     * 
-     * @param path the path to the resource that the driver was editting.
-     * @param replicated <code>false</code> if this action originates on this
-     * client. <code>false</code> if it is an replication of an action from
-     * another participant of the shared project.
-     */
-    private void saveDriverEditor(IPath path, boolean replicated) {
-        for (ISharedEditorListener listener : editorListeners) {
-            listener.driverEditorSaved(path, replicated);
-        }
-        
-        if (replicated) {
-            IFile file = sharedProject.getProject().getFile(path);
-            FileEditorInput input = new FileEditorInput(file);
-            
-            try {
-                IDocumentProvider provider = editorAPI.getDocumentProvider(input);
-                
-                provider.connect(input);
-                IDocument doc = provider.getDocument(input);
-                
-                IAnnotationModel model = provider.getAnnotationModel(input);
-                model.connect(doc);
-                
-                provider.saveDocument(new NullProgressMonitor(), input, doc, true);
-                log.fine("Saved document at "+path);
-                
-                model.disconnect(doc);
-                provider.disconnect(input);
-                
-            } catch (CoreException e) {
-                log.log(Level.SEVERE, "Failed to save document.", e);
-            }
-            
-        } else {
-            IActivity activity = new EditorActivity(Type.Saved, path);
-            for (IActivityListener listener : activityListeners) {
-                listener.activityCreated(activity);
-            }
-        }
-    }
-
     /**
      * @param selection sets the current text selection that is used by the
      * driver.
