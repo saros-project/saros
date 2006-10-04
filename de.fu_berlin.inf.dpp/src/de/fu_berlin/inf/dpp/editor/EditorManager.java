@@ -99,7 +99,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 return;
             
             IPath path = file.getProjectRelativePath();
-            saveDriverEditor(path, false);
+            saveText(path, false);
         }
         
         public void elementContentAboutToBeReplaced(Object element) {
@@ -414,7 +414,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 removeDriverEditor(editorActivity.getPath(), true);
                 
             } else if (editorActivity.getType().equals(Type.Saved)) {
-                saveDriverEditor(editorActivity.getPath(), true);
+                saveText(editorActivity.getPath(), true);
             } 
         } 
         
@@ -440,7 +440,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 IFile file = sharedProject.getProject().getFile(driverEditor);
                 
                 String text = fixDelimiters(file, textEdit.text);
-                insertDriverText(file,textEdit.offset, textEdit.replace, text);
+                replaceText(file,textEdit.offset, textEdit.replace, text);
                 
                 Set<IEditorPart> editors = editorPool.getEditors(driverEditor);
                 for (IEditorPart editorPart : editors) {
@@ -634,7 +634,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             resource.getProject() == sharedProject.getProject());
     }
     
-    private void insertDriverText(IFile file, int offset, int replace, String text) {
+    private void replaceText(IFile file, int offset, int replace, String text) {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = editorAPI.getDocumentProvider(input);
     
@@ -686,7 +686,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * client. <code>false</code> if it is an replication of an action from
      * another participant of the shared project.
      */
-    private void saveDriverEditor(IPath path, boolean replicated) {
+    private void saveText(IPath path, boolean replicated) {
         for (ISharedEditorListener listener : editorListeners) {
             listener.driverEditorSaved(path, replicated);
         }
