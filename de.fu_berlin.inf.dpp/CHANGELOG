@@ -1,6 +1,9 @@
 
  Saros CHANGELOG
  
+ 1.0
+ - added skype support
+ 
  0.8.2
  - Fixed severe bug in project synchronization
  - Fixed severe bug in account creation
