@@ -2,7 +2,7 @@
 <feature
       id="de.fu_berlin.inf.saros_feature"
       label="Saros Feature"
-      version="1.0">
+      version="1.0.0">
 
    <description>
       Serious Distributed Pair Programming for Eclipse.
