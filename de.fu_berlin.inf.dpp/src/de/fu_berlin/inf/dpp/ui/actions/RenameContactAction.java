@@ -50,16 +50,18 @@ public class RenameContactAction extends SelectionProviderAction {
     @Override
     public void run() {
         Shell shell = Display.getDefault().getActiveShell();
-        if (shell == null)
+        if (shell == null || rosterEntry == null)
             return;
         
         InputDialog dialog = new InputDialog(shell, "Set new nickname", 
-            "Enter the new nickname of this contact.", 
-            rosterEntry.getUser(), new InputValidator());
-        dialog.open();
+            "Enter the new nickname of this contact '" + rosterEntry.getName() + "' ('"
+				+ rosterEntry.getUser() + "'):", 
+            rosterEntry.getName(), new InputValidator());
         
-        String name = (dialog.getValue().length() == 0) ? "" : dialog.getValue();
-        rosterEntry.setName(name);
+        if (dialog.open() == InputDialog.OK){ 
+	        String name = (dialog.getValue().length() == 0) ? "" : dialog.getValue();
+	        rosterEntry.setName(name);
+        }
     }
     
     @Override
