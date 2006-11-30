@@ -31,37 +31,36 @@ import de.fu_berlin.inf.dpp.Saros;
 /**
  * Contains the basic preferences for Saros.
  * 
- * @author rdjemili 
+ * @author rdjemili
  */
-public class PreferencePage extends FieldEditorPreferencePage 
-    implements IWorkbenchPreferencePage {
+public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    public PreferencePage() {
-        super(GRID);
-        setPreferenceStore(Saros.getDefault().getPreferenceStore());
-        setDescription("Your settings for Jabber.");
-    }
+	public PreferencePage() {
+		super(GRID);
+		setPreferenceStore(Saros.getDefault().getPreferenceStore());
+		setDescription("Your settings for Jabber.");
+	}
 
-    @Override
-    public void createFieldEditors() {
-        addField(new StringFieldEditor(PreferenceConstants.SERVER, 
-            "Server:", getFieldEditorParent()));
-        
-        addField(new StringFieldEditor(PreferenceConstants.USERNAME, 
-            "Username:", getFieldEditorParent()));
-        
-        StringFieldEditor passwordField = new StringFieldEditor(
-            PreferenceConstants.PASSWORD, "Password:", getFieldEditorParent());
-        passwordField.getTextControl(getFieldEditorParent()).setEchoChar('*');
-        addField(passwordField);
-        
-        addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
-            "Automatically connect on startup.", getFieldEditorParent()));
-    }
+	@Override
+	public void createFieldEditors() {
+		addField(new StringFieldEditor(PreferenceConstants.SERVER, "Server:",
+			getFieldEditorParent()));
 
-    /*
-     * @see org.eclipse.ui.IWorkbenchPreferencePage
-     */
-    public void init(IWorkbench workbench) {
-    }
+		addField(new StringFieldEditor(PreferenceConstants.USERNAME, "Username:",
+			getFieldEditorParent()));
+
+		StringFieldEditor passwordField = new StringFieldEditor(PreferenceConstants.PASSWORD,
+			"Password:", getFieldEditorParent());
+		passwordField.getTextControl(getFieldEditorParent()).setEchoChar('*');
+		addField(passwordField);
+
+		addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
+			"Automatically connect on startup.", getFieldEditorParent()));
+	}
+
+	/*
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage
+	 */
+	public void init(IWorkbench workbench) {
+	}
 }
