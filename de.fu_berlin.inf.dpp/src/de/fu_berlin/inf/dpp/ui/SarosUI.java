@@ -20,6 +20,8 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaDocumentSetupParticipant;
@@ -41,6 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.ForwardingDocumentProvider;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -50,121 +53,140 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 
 public class SarosUI implements ISessionListener {
-    private static final String SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
 
-    public SarosUI(SessionManager sessionManager) {
-        setupCompilationUnitDocumentProvider();
-        sessionManager.addSessionListener(this);
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-        // ignore
-    }
+	private static final String SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void invitationReceived(final IIncomingInvitationProcess process) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    Shell shell = Display.getDefault().getActiveShell();
-                    new WizardDialog(shell, new JoinSessionWizard(process)).open();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }                
-            }
-        });
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-        Display.getDefault().syncExec(new Runnable() { // show session view
-            public void run() {
-                try {
-                    IWorkbench workbench = PlatformUI.getWorkbench();
-                    IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-                    window.getActivePage().showView(SESSION_VIEW, null, 
-                        IWorkbenchPage.VIEW_VISIBLE);
-                    
-                } catch (PartInitException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-    
-    /**
-     * @param state
-     * @return a nice string description of the given state, which can be used
-     * to be shown in labels (e.g. CONNECTING becomes "Connecting..").
-     */
-    public static String getDescription(ConnectionState state) {
-        switch (state) {
-            case NOT_CONNECTED:
-                return "Not connected";
-            case CONNECTING:
-                return "Connecting..";
-            case CONNECTED:
-                return "Connected";
-            case DISCONNECTING:
-                return "Disconnecting...";
-            case ERROR:
-                return "Error";
-        }
-        
-        return "";
-    }
-    
-    public static Composite createLabelComposite(Composite parent, String text) {
-        Composite composite = new Composite(parent, SWT.NONE);
-        
-        FillLayout layout = new FillLayout(SWT.NONE);
-        layout.marginHeight = 20;
-        composite.setLayout(layout);
-        
-        Label label = new Label(composite, SWT.NONE);
-        label.setText(text);
-      
-        return composite;
-    }
-    
-    public static Image getImage(String path) {
-        return new Image(Display.getDefault(), 
-            SarosUI.getImageDescriptor(path).getImageData());
-    }
-    
-    /**
-     * Returns an image descriptor for the image file at the given plug-in
-     * relative path.
-     * 
-     * @param path the path
-     * @return the image descriptor
-     */
-    public static ImageDescriptor getImageDescriptor(String path) {
-        return AbstractUIPlugin.imageDescriptorFromPlugin(
-            "de.fu_berlin.inf.dpp", path);
-    }
-    
-    @SuppressWarnings("restriction")
-    private void setupCompilationUnitDocumentProvider() { // UGLY HACK
-        CompilationUnitDocumentProvider cuProvider = (CompilationUnitDocumentProvider) 
-            JavaPlugin.getDefault().getCompilationUnitDocumentProvider();
-        
-        SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
-        
-        IDocumentSetupParticipant setupParticipant = new JavaDocumentSetupParticipant();
-        ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
-            IJavaPartitions.JAVA_PARTITIONING, setupParticipant, sharedProvider);
-        
-        cuProvider.setParentDocumentProvider(parentProvider);
-    }
+	private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
-//    MessageDialog.openInformation(viewer.getControl().getShell(), "Roster View", message);
+	public SarosUI(SessionManager sessionManager) {
+		setupCompilationUnitDocumentProvider();
+		sessionManager.addSessionListener(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionEnded(ISharedProject session) {
+		// ignore
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void invitationReceived(final IIncomingInvitationProcess process) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				try {
+					Shell shell = Display.getDefault().getActiveShell();
+					new WizardDialog(shell, new JoinSessionWizard(process)).open();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionStarted(ISharedProject session) {
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				try {
+					// Create Session View
+					IWorkbench workbench = PlatformUI.getWorkbench();
+					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+					window.getActivePage().showView(SESSION_VIEW, null, IWorkbenchPage.VIEW_CREATE);
+				} catch (PartInitException e) {
+					Saros.getDefault().getLog().log(
+						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+							"Could not create Session View", e));
+				}
+
+				try {
+					// Open Roster so that a participant can be invited
+					IWorkbench workbench = PlatformUI.getWorkbench();
+					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+					window.getActivePage()
+						.showView(ROSTER_VIEW, null, IWorkbenchPage.VIEW_ACTIVATE);
+				} catch (PartInitException e) {
+					Saros.getDefault().getLog().log(
+						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+							"Could not activate Roster View", e));
+				}
+
+			}
+		});
+	}
+
+	/**
+	 * @param state
+	 * @return a nice string description of the given state, which can be used
+	 *         to be shown in labels (e.g. CONNECTING becomes "Connecting..").
+	 */
+	public static String getDescription(ConnectionState state) {
+		switch (state) {
+		case NOT_CONNECTED:
+			return "Not connected";
+		case CONNECTING:
+			return "Connecting...";
+		case CONNECTED:
+			return "Connected";
+		case DISCONNECTING:
+			return "Disconnecting...";
+		case ERROR:
+			return "Error";
+		}
+
+		return "";
+	}
+
+	public static Composite createLabelComposite(Composite parent, String text) {
+		Composite composite = new Composite(parent, SWT.NONE);
+
+		FillLayout layout = new FillLayout(SWT.NONE);
+		layout.marginHeight = 20;
+		composite.setLayout(layout);
+
+		Label label = new Label(composite, SWT.NONE);
+		label.setText(text);
+
+		return composite;
+	}
+
+	public static Image getImage(String path) {
+		return new Image(Display.getDefault(), SarosUI.getImageDescriptor(path).getImageData());
+	}
+
+	/**
+	 * Returns an image descriptor for the image file at the given plug-in
+	 * relative path.
+	 * 
+	 * @param path
+	 *            the path
+	 * @return the image descriptor
+	 */
+	public static ImageDescriptor getImageDescriptor(String path) {
+		return AbstractUIPlugin.imageDescriptorFromPlugin("de.fu_berlin.inf.dpp", path);
+	}
+
+	@SuppressWarnings("restriction")
+	private void setupCompilationUnitDocumentProvider() { // UGLY HACK
+		CompilationUnitDocumentProvider cuProvider = (CompilationUnitDocumentProvider) JavaPlugin
+			.getDefault().getCompilationUnitDocumentProvider();
+
+		SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
+
+		IDocumentSetupParticipant setupParticipant = new JavaDocumentSetupParticipant();
+		ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
+			IJavaPartitions.JAVA_PARTITIONING, setupParticipant, sharedProvider);
+
+		cuProvider.setParentDocumentProvider(parentProvider);
+	}
 }
