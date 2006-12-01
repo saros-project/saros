@@ -20,8 +20,12 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.jivesoftware.smack.XMPPConnection;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -29,9 +33,20 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class ConnectDisconnectAction extends Action implements IConnectionListener {
     
-    public ConnectDisconnectAction() {
+    private IPropertyChangeListener propertyListener;
+
+	public ConnectDisconnectAction() {
         updateStatus();
         Saros.getDefault().addListener(this);
+        
+        propertyListener = new IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
+					updateStatus();
+				}
+			}
+		};
+		Saros.getDefault().getPreferenceStore().addPropertyChangeListener(propertyListener);
     }
     
     @Override
@@ -62,6 +77,7 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
         switch (state) {
             case CONNECTED:
             case CONNECTING:
+            case ERROR:
                 setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
                 break;
                 
@@ -71,7 +87,13 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
                 break;
         }
         
-        setEnabled(state == ConnectionState.CONNECTED || state == ConnectionState.NOT_CONNECTED);
+        String username = Saros.getDefault().getPreferenceStore().getString(PreferenceConstants.USERNAME);
+        
+        setEnabled(
+        	state == ConnectionState.CONNECTED || 
+        	((state == ConnectionState.NOT_CONNECTED ||
+        	 state == ConnectionState.ERROR) && (
+        		username != null && username.length() > 0)));
         updateText();
     }
     
@@ -80,6 +102,10 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
         String text = SarosUI.getDescription(state);
         
         setText(text);
+        
+        if (state == ConnectionState.CONNECTED){
+        	text += "(as '" + Saros.getDefault().getConnection().getUser() + "')";
+        }
         setToolTipText(text);
     }
 }
