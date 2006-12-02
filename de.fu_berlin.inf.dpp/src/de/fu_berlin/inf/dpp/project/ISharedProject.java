@@ -36,131 +36,140 @@ import de.fu_berlin.inf.dpp.net.JID;
  * collaboration.
  * 
  * @author rdjemili
-*/
+ */
 public interface ISharedProject {
 
-    /**
-     * @return a list of all participants of the shared project. This list
-     * includes yourself.
-     */
-    public List<User> getParticipants();
-
-    /**
-     * Sets the new driver. If given driver is already driver the call is
-     * ignored.
-     * 
-     * @param driver the new driver.
-     * @param replicated <code>false</code> if this event was created by this
-     * client. <code>true</code> if it was created by another client and only
-     * replicated to this client.
-     */
-    public void setDriver(User driver, boolean replicated);
-
-    /**
-     * The driver is the person that is currently allowed to edit the resources.
-     * 
-     * @return the driver.
-     */
-    public User getDriver();
-
-    /**
-     * @return <code>true</code> if the local client is the current driver of
-     * this shared project. <code>false</code> otherwise.
-     */
-    public boolean isDriver();
-
-    /**
-     * The host is the person that initiated this SharedProject and holds all
-     * original files.
-     * 
-     * @return the host.
-     */
-    public User getHost();
-
-    /**
-     * @return <code>true</code> if the local client is the host of this
-     * shared project. <code>false</code> otherwise.
-     */
-    public boolean isHost();
-
-    /**
-     * Adds the user.
-     * 
-     * @param user the user that is to be added.
-     */
-    public void addUser(User user);
-    
-    /**
-     * Removes the user.
-     * 
-     * @param user the user that is to be removed.
-     */
-    public void removeUser(User user);
-
-    /**
-     * Invites a user to the shared project.
-     * 
-     * @param jid the JID of the user that is to be invited.
-     * @param description a description that will be shown to the invited user
-     * before he makes the decision to accept or decline the invitation.
-     * @return the outgoing invitation process.
-     */
-    public IOutgoingInvitationProcess invite(JID jid, String description);
-    
-    /**
-     * Adds the given shared project listener. This call is ignored if the
-     * listener is all a listener of this shared project.
-     * 
-     * @param listener The listener that is to be added.
-     */
-    public void addListener(ISharedProjectListener listener);
-
-    /**
-     * Removes the given shared project listener. This call is ignored if the 
-     * listener doesn't belongs to the current listeners of this shared project.
-     * 
-     * @param listener the listener that is to be removed.
-     */
-    public void removeListener(ISharedProjectListener listener);
-
-    /**
-     * @return the Eclipse project associtated with this shared project. This 
-     * never returns <code>null</code>.
-     */
-    public IProject getProject();
-
-    /**
-     * @return the file list representation of the Eclipse project that is
-     * associated with this shared project.
-     * @throws CoreException if there are problems while reading file tree of
-     * the Eclipse project.
-     */
-    public FileList getFileList() throws CoreException;
-//  TODO remove direct uses of FileList
-
-    /**
-     * @return the sequencer that is responsible for sending and receiving
-     * activities.
-     */
-    public IActivitySequencer getSequencer();
-    
-    /**
-	 * @return the activity manager that is responsible for all activity
-	 * providers.
+	/**
+	 * @return a list of all participants of the shared project. This list
+	 *         includes yourself.
 	 */
-    public IActivityManager getActivityManager();
-    
-    /**
-     * Activates sending of activities. The reason that this isn't done
-     * automatically are unit tests.
-     */
-    public void start();
-    
-    /**
-     * Deactivates sending of activities. 
-     */
-    public void stop();
-    
-    
-    public User getParticipant(JID jid);
+	public List<User> getParticipants();
+
+	/**
+	 * Sets the new driver. If given driver is already driver the call is
+	 * ignored.
+	 * 
+	 * @param driver
+	 *            the new driver.
+	 * @param replicated
+	 *            <code>false</code> if this event was created by this client.
+	 *            <code>true</code> if it was created by another client and
+	 *            only replicated to this client.
+	 */
+	public void setDriver(User driver, boolean replicated);
+
+	/**
+	 * The driver is the person that is currently allowed to edit the resources.
+	 * 
+	 * @return the driver.
+	 */
+	public User getDriver();
+
+	/**
+	 * @return <code>true</code> if the local client is the current driver of
+	 *         this shared project. <code>false</code> otherwise.
+	 */
+	public boolean isDriver();
+
+	/**
+	 * The host is the person that initiated this SharedProject and holds all
+	 * original files.
+	 * 
+	 * @return the host.
+	 */
+	public User getHost();
+
+	/**
+	 * @return <code>true</code> if the local client is the host of this
+	 *         shared project. <code>false</code> otherwise.
+	 */
+	public boolean isHost();
+
+	/**
+	 * Adds the user.
+	 * 
+	 * @param user
+	 *            the user that is to be added.
+	 */
+	public void addUser(User user);
+
+	/**
+	 * Removes the user.
+	 * 
+	 * @param user
+	 *            the user that is to be removed.
+	 */
+	public void removeUser(User user);
+
+	/**
+	 * Invites a user to the shared project.
+	 * 
+	 * @param jid
+	 *            the JID of the user that is to be invited.
+	 * @param description
+	 *            a description that will be shown to the invited user before he
+	 *            makes the decision to accept or decline the invitation.
+	 * @return the outgoing invitation process.
+	 */
+	public IOutgoingInvitationProcess invite(JID jid, String description);
+
+	/**
+	 * Adds the given shared project listener. This call is ignored if the
+	 * listener is all a listener of this shared project.
+	 * 
+	 * @param listener
+	 *            The listener that is to be added.
+	 */
+	public void addListener(ISharedProjectListener listener);
+
+	/**
+	 * Removes the given shared project listener. This call is ignored if the
+	 * listener doesn't belongs to the current listeners of this shared project.
+	 * 
+	 * @param listener
+	 *            the listener that is to be removed.
+	 */
+	public void removeListener(ISharedProjectListener listener);
+
+	/**
+	 * @return the Eclipse project associtated with this shared project. This
+	 *         never returns <code>null</code>.
+	 */
+	public IProject getProject();
+
+	/**
+	 * @return the file list representation of the Eclipse project that is
+	 *         associated with this shared project.
+	 * @throws CoreException
+	 *             if there are problems while reading file tree of the Eclipse
+	 *             project.
+	 */
+	public FileList getFileList() throws CoreException;
+
+	// TODO remove direct uses of FileList
+
+	/**
+	 * @return the sequencer that is responsible for sending and receiving
+	 *         activities.
+	 */
+	public IActivitySequencer getSequencer();
+
+	/**
+	 * @return the activity manager that is responsible for all activity
+	 *         providers.
+	 */
+	public IActivityManager getActivityManager();
+
+	/**
+	 * Activates sending of activities. The reason that this isn't done
+	 * automatically are unit tests.
+	 */
+	public void start();
+
+	/**
+	 * Deactivates sending of activities.
+	 */
+	public void stop();
+
+	public User getParticipant(JID jid);
 }

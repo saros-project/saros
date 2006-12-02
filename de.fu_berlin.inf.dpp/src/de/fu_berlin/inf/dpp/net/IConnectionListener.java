@@ -31,13 +31,16 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
  * @author rdjemili
  */
 public interface IConnectionListener {
-    
-    /**
-     * Is fired when the state of the connection changes.
-     * @param connection TODO
-     * @param newState the new state of the connection. If the new state is
-     * <code>ERROR</code>, you can use {@link Saros#getConnectionError()} to
-     * get the error message.
-     */
-    public void connectionStateChanged(XMPPConnection connection, ConnectionState newState);
+
+	/**
+	 * Is fired when the state of the connection changes.
+	 * 
+	 * @param connection
+	 *            TODO
+	 * @param newState
+	 *            the new state of the connection. If the new state is
+	 *            <code>ERROR</code>, you can use
+	 *            {@link Saros#getConnectionError()} to get the error message.
+	 */
+	public void connectionStateChanged(XMPPConnection connection, ConnectionState newState);
 }

@@ -44,90 +44,98 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 /**
  * @author rdjemili
  */
-public class InviteAction extends SelectionProviderAction 
-    implements ISessionListener, IInvitationUI {
-    
-    private RosterEntry selectedEntry;
+public class InviteAction extends SelectionProviderAction implements ISessionListener,
+	IInvitationUI {
 
-    public InviteAction(ISelectionProvider provider) {
-        super(provider, "Invite user to shared project..");
-        
-        setToolTipText("Start a IM messaging session with this user");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/transmit_blue.png"));
-        
-        Saros.getDefault().getSessionManager().addSessionListener(this);
-    }
-    
-    @Override
-    public void run() {
-        JID jid = new JID(selectedEntry.getUser());
-        SessionManager sessionManager = Saros.getDefault().getSessionManager();
-        ISharedProject project = sessionManager.getSharedProject();
-        
-        String name = project.getProject().getName();
-        IOutgoingInvitationProcess process = project.invite(jid, name);
-        process.setInvitationUI(this);
-    }
-    
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        if (selection.size() == 1 && selection.getFirstElement() instanceof RosterEntry) {
-            selectedEntry = (RosterEntry)selection.getFirstElement();
-        } else {
-            selectedEntry = null;
-        }
-        
-        updateEnablement();
-    }
+	private RosterEntry selectedEntry;
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-        updateEnablement();
-    }
+	public InviteAction(ISelectionProvider provider) {
+		super(provider, "Invite user to shared project..");
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-        updateEnablement();
-    }
+		setToolTipText("Start a IM messaging session with this user");
+		setImageDescriptor(SarosUI.getImageDescriptor("icons/transmit_blue.png"));
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
-     */
-    public void runWithProgressBar(final IRunnableWithProgress runnable) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    IWorkbench wb = PlatformUI.getWorkbench();
-                    IProgressService ps = wb.getProgressService();
-                    ps.run(true, true, runnable);
-                    
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                    
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });        
-    }
-    
-    private void updateEnablement() {
-        setEnabled(getSharedProject() != null && selectedEntry != null && 
-            getSharedProject().isHost());
-    }
-    
-    private ISharedProject getSharedProject() {
-        return Saros.getDefault().getSessionManager().getSharedProject();
-    }
+		Saros.getDefault().getSessionManager().addSessionListener(this);
+	}
+
+	@Override
+	public void run() {
+		JID jid = new JID(selectedEntry.getUser());
+		SessionManager sessionManager = Saros.getDefault().getSessionManager();
+		ISharedProject project = sessionManager.getSharedProject();
+
+		String name = project.getProject().getName();
+		IOutgoingInvitationProcess process = project.invite(jid, name);
+		process.setInvitationUI(this);
+	}
+
+	@Override
+	public void selectionChanged(IStructuredSelection selection) {
+		if (selection.size() == 1 && selection.getFirstElement() instanceof RosterEntry) {
+			selectedEntry = (RosterEntry) selection.getFirstElement();
+		} else {
+			selectedEntry = null;
+		}
+
+		updateEnablement();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionStarted(ISharedProject session) {
+		updateEnablement();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionEnded(ISharedProject session) {
+		updateEnablement();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void invitationReceived(IIncomingInvitationProcess process) {
+		// ignore
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
+	 */
+	public void runWithProgressBar(final IRunnableWithProgress runnable) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				try {
+					IWorkbench wb = PlatformUI.getWorkbench();
+					IProgressService ps = wb.getProgressService();
+					ps.run(true, true, runnable);
+
+				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	private void updateEnablement() {
+		setEnabled(getSharedProject() != null && selectedEntry != null
+			&& getSharedProject().isHost());
+	}
+
+	private ISharedProject getSharedProject() {
+		return Saros.getDefault().getSessionManager().getSharedProject();
+	}
 }

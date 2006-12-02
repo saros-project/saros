@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * 
  */
 public class NewSessionAction implements IObjectActionDelegate {
-	
+
 	private IProject selectedProject;
 
 	/*
@@ -62,8 +62,7 @@ public class NewSessionAction implements IObjectActionDelegate {
 				public void run() {
 					ErrorDialog.openError(Display.getDefault().getActiveShell(),
 						"Error Starting Session", "Session could not be started", new Status(
-							Status.ERROR, "de.fu_berlin.inf.dpp", Status.ERROR,
-							e.getMessage(), e));
+							Status.ERROR, "de.fu_berlin.inf.dpp", Status.ERROR, e.getMessage(), e));
 				}
 			});
 		}
@@ -79,8 +78,9 @@ public class NewSessionAction implements IObjectActionDelegate {
 		boolean running = sm.getSharedProject() != null;
 		boolean connected = Saros.getDefault().isConnected();
 
-		// TODO This action should rather connect if not already connected instead of being disabled.
-		
+		// TODO This action should rather connect if not already connected
+		// instead of being disabled.
+
 		action.setEnabled(connected && !running && selectedProject != null
 			&& selectedProject.isAccessible());
 	}

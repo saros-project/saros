@@ -52,187 +52,190 @@ import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener {
-    private TableViewer          viewer;
-    private ISharedProject       sharedProject;
-    private GiveDriverRoleAction giveDriverRoleAction;
+	private TableViewer viewer;
 
-    private class SessionContentProvider implements IStructuredContentProvider, 
-        ISharedProjectListener {
-        
-        private TableViewer    tableViewer;
-        
-        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-            if (oldInput != null) {
-                ISharedProject oldProject = (ISharedProject)oldInput;
-                oldProject.removeListener(this);
-            }
-            
-            sharedProject = (ISharedProject)newInput;
-            if (sharedProject != null) {
-                sharedProject.addListener(this);
-            }
-            
-            tableViewer = (TableViewer)v;
-            tableViewer.refresh();
-            
-            updateEnablement();
-        }
+	private ISharedProject sharedProject;
 
-        public Object[] getElements(Object parent) {
-            if (sharedProject != null) {
-                return sharedProject.getParticipants().toArray();
-            }
+	private GiveDriverRoleAction giveDriverRoleAction;
 
-            return new Object[]{};
-        }
+	private class SessionContentProvider implements IStructuredContentProvider,
+		ISharedProjectListener {
 
-        public void driverChanged(JID driver, boolean replicated) {
-            refreshTable();
-        }
-        
-        public void userJoined(JID user) {
-            refreshTable();
-        }
+		private TableViewer tableViewer;
 
-        public void userLeft(JID user) {
-            refreshTable();
-        }
+		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+			if (oldInput != null) {
+				ISharedProject oldProject = (ISharedProject) oldInput;
+				oldProject.removeListener(this);
+			}
 
-        public void dispose() {
-        }
+			sharedProject = (ISharedProject) newInput;
+			if (sharedProject != null) {
+				sharedProject.addListener(this);
+			}
 
-        private void refreshTable() {
-            Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    tableViewer.refresh();
-                }
-            });
-        }
-    }
+			tableViewer = (TableViewer) v;
+			tableViewer.refresh();
 
-    private class SessionLabelProvider extends LabelProvider implements ITableLabelProvider {
-        private Image userImage   = SarosUI.getImage("icons/user.png");
-        private Image driverImage = SarosUI.getImage("icons/user_edit.png");
-        
-        public String getColumnText(Object obj, int index) {
-            User participant = (User)obj;
-            
-            StringBuffer sb = new StringBuffer(participant.getJid().getName());
-            if (participant.equals(sharedProject.getDriver())) {
-                sb.append(" (Driver)");
-            }
-            
-            return sb.toString();
-        }
+			updateEnablement();
+		}
 
-        @Override
-        public Image getImage(Object obj) {
-            User user = (User)obj;
-            return user.equals(sharedProject.getDriver()) ? driverImage : userImage;  
-        }
-        
-        public Image getColumnImage(Object obj, int index) {
-            return getImage(obj);
-        }
-    }
+		public Object[] getElements(Object parent) {
+			if (sharedProject != null) {
+				return sharedProject.getParticipants().toArray();
+			}
 
-    /**
-     * The constructor.
-     */
-    public SessionView() {
-    }
+			return new Object[] {};
+		}
 
-    public void sessionStarted(final ISharedProject session) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                viewer.setInput(session);
-            }
-        });
-    }
+		public void driverChanged(JID driver, boolean replicated) {
+			refreshTable();
+		}
 
-    public void sessionEnded(ISharedProject session) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                viewer.setInput(null);
-            }
-        });
-    }
+		public void userJoined(JID user) {
+			refreshTable();
+		}
 
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
+		public void userLeft(JID user) {
+			refreshTable();
+		}
 
-    /**
-     * This is a callback that will allow us to create the viewer and initialize
-     * it.
-     */
-    public void createPartControl(Composite parent) {
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        viewer.setContentProvider(new SessionContentProvider());
-        viewer.setLabelProvider(new SessionLabelProvider());
-        viewer.setInput(null);
+		public void dispose() {
+		}
 
-        giveDriverRoleAction = new GiveDriverRoleAction(viewer);
-        
-        contributeToActionBars();
-        hookContextMenu();
-        attachSessionListener();
-        updateEnablement();
-        
-        setPartName("Shared Project Session");
-    }
-    
-    /**
-     * Passing the focus request to the viewer's control.
-     */
-    public void setFocus() {
-        viewer.getControl().setFocus();
-    }
-    
-    /**
-     * Needs to called from the UI thread.
-     */
-    private void updateEnablement() {
-        viewer.getControl().setEnabled(sharedProject != null);
-    }
-    
-    private void attachSessionListener() {
-        SessionManager sessionManager = Saros.getDefault().getSessionManager();
+		private void refreshTable() {
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					tableViewer.refresh();
+				}
+			});
+		}
+	}
 
-        sessionManager.addSessionListener(this);
-        if (sessionManager.getSharedProject() != null) {
-            viewer.setInput(sessionManager.getSharedProject());
-        }
-    }
-    
-    private void contributeToActionBars() {
-        IActionBars bars = getViewSite().getActionBars();
-        IToolBarManager toolBar = bars.getToolBarManager();
-        
-        toolBar.add(new TakeDriverRoleAction());
-        toolBar.add(new FollowModeAction());
-        toolBar.add(new LeaveSessionAction());
-    }
-    
-    private void hookContextMenu() {
-        MenuManager menuMgr = new MenuManager("#PopupMenu");
-        menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
-                fillContextMenu(manager);
-            }
-        });
-        
-        Menu menu = menuMgr.createContextMenu(viewer.getControl());
-        
-        viewer.getControl().setMenu(menu);
-        getSite().registerContextMenu(menuMgr, viewer);
-    }
-    
-    private void fillContextMenu(IMenuManager manager) {
-        manager.add(giveDriverRoleAction);
-        
-        // Other plug-ins can contribute there actions here
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-    }
+	private class SessionLabelProvider extends LabelProvider implements ITableLabelProvider {
+		private Image userImage = SarosUI.getImage("icons/user.png");
+
+		private Image driverImage = SarosUI.getImage("icons/user_edit.png");
+
+		public String getColumnText(Object obj, int index) {
+			User participant = (User) obj;
+
+			StringBuffer sb = new StringBuffer(participant.getJid().getName());
+			if (participant.equals(sharedProject.getDriver())) {
+				sb.append(" (Driver)");
+			}
+
+			return sb.toString();
+		}
+
+		@Override
+		public Image getImage(Object obj) {
+			User user = (User) obj;
+			return user.equals(sharedProject.getDriver()) ? driverImage : userImage;
+		}
+
+		public Image getColumnImage(Object obj, int index) {
+			return getImage(obj);
+		}
+	}
+
+	/**
+	 * The constructor.
+	 */
+	public SessionView() {
+	}
+
+	public void sessionStarted(final ISharedProject session) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				viewer.setInput(session);
+			}
+		});
+	}
+
+	public void sessionEnded(ISharedProject session) {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				viewer.setInput(null);
+			}
+		});
+	}
+
+	public void invitationReceived(IIncomingInvitationProcess process) {
+		// ignore
+	}
+
+	/**
+	 * This is a callback that will allow us to create the viewer and initialize
+	 * it.
+	 */
+	public void createPartControl(Composite parent) {
+		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		viewer.setContentProvider(new SessionContentProvider());
+		viewer.setLabelProvider(new SessionLabelProvider());
+		viewer.setInput(null);
+
+		giveDriverRoleAction = new GiveDriverRoleAction(viewer);
+
+		contributeToActionBars();
+		hookContextMenu();
+		attachSessionListener();
+		updateEnablement();
+
+		setPartName("Shared Project Session");
+	}
+
+	/**
+	 * Passing the focus request to the viewer's control.
+	 */
+	public void setFocus() {
+		viewer.getControl().setFocus();
+	}
+
+	/**
+	 * Needs to called from the UI thread.
+	 */
+	private void updateEnablement() {
+		viewer.getControl().setEnabled(sharedProject != null);
+	}
+
+	private void attachSessionListener() {
+		SessionManager sessionManager = Saros.getDefault().getSessionManager();
+
+		sessionManager.addSessionListener(this);
+		if (sessionManager.getSharedProject() != null) {
+			viewer.setInput(sessionManager.getSharedProject());
+		}
+	}
+
+	private void contributeToActionBars() {
+		IActionBars bars = getViewSite().getActionBars();
+		IToolBarManager toolBar = bars.getToolBarManager();
+
+		toolBar.add(new TakeDriverRoleAction());
+		toolBar.add(new FollowModeAction());
+		toolBar.add(new LeaveSessionAction());
+	}
+
+	private void hookContextMenu() {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				fillContextMenu(manager);
+			}
+		});
+
+		Menu menu = menuMgr.createContextMenu(viewer.getControl());
+
+		viewer.getControl().setMenu(menu);
+		getSite().registerContextMenu(menuMgr, viewer);
+	}
+
+	private void fillContextMenu(IMenuManager manager) {
+		manager.add(giveDriverRoleAction);
+
+		// Other plug-ins can contribute there actions here
+		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
 }

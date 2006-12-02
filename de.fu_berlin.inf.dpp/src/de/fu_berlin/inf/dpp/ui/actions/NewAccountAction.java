@@ -29,36 +29,44 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
-    private IWorkbenchWindow window;
+	private IWorkbenchWindow window;
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IActionDelegate
-     */
-    public void run(IAction action) {
-        try {
-            Shell shell = window.getShell();
-            new WizardDialog(shell, new CreateAccountWizard()).open();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionDelegate
+	 */
+	public void run(IAction action) {
+		try {
+			Shell shell = window.getShell();
+			new WizardDialog(shell, new CreateAccountWizard()).open();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
-     */
-    public void init(IWorkbenchWindow window) {
-        this.window = window;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
+	 */
+	public void init(IWorkbenchWindow window) {
+		this.window = window;
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IActionDelegate
-     */
-    public void selectionChanged(IAction action, ISelection selection) {
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IActionDelegate
+	 */
+	public void selectionChanged(IAction action, ISelection selection) {
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
-     */
-    public void dispose() {
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
+	 */
+	public void dispose() {
+	}
 }

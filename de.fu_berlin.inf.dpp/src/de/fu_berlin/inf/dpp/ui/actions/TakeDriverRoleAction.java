@@ -29,73 +29,85 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
-public class TakeDriverRoleAction extends Action 
-    implements ISharedProjectListener, ISessionListener {
+public class TakeDriverRoleAction extends Action implements ISharedProjectListener,
+	ISessionListener {
 
-    public TakeDriverRoleAction() {
-        super("Take user driver role");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
-        setToolTipText("Take driver role");
-        
-        Saros.getDefault().getSessionManager().addSessionListener(this);
-        updateEnablement();
-    }
+	public TakeDriverRoleAction() {
+		super("Take user driver role");
+		setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
+		setToolTipText("Take driver role");
 
-    @Override
-    public void run() {
-        getSharedProject().setDriver(getSharedProject().getHost(), false);
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-        session.addListener(this);
-        updateEnablement();
-    }
+		Saros.getDefault().getSessionManager().addSessionListener(this);
+		updateEnablement();
+	}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-        session.removeListener(this);
-        updateEnablement();
-    }
+	@Override
+	public void run() {
+		getSharedProject().setDriver(getSharedProject().getHost(), false);
+	}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionStarted(ISharedProject session) {
+		session.addListener(this);
+		updateEnablement();
+	}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void driverChanged(JID driver, boolean replicated) {
-        updateEnablement();
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionEnded(ISharedProject session) {
+		session.removeListener(this);
+		updateEnablement();
+	}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void userJoined(JID user) {
-        // ignore
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void invitationReceived(IIncomingInvitationProcess process) {
+		// ignore
+	}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void userLeft(JID user) {
-        // ignore
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+	 */
+	public void driverChanged(JID driver, boolean replicated) {
+		updateEnablement();
+	}
 
-    private void updateEnablement() {
-        ISharedProject project = getSharedProject();
-        setEnabled(project != null && project.isHost() && !project.isDriver());
-    }
-    
-    private ISharedProject getSharedProject() {
-        return Saros.getDefault().getSessionManager().getSharedProject();
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+	 */
+	public void userJoined(JID user) {
+		// ignore
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+	 */
+	public void userLeft(JID user) {
+		// ignore
+	}
+
+	private void updateEnablement() {
+		ISharedProject project = getSharedProject();
+		setEnabled(project != null && project.isHost() && !project.isDriver());
+	}
+
+	private ISharedProject getSharedProject() {
+		return Saros.getDefault().getSessionManager().getSharedProject();
+	}
 }

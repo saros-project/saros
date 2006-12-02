@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * TODO Very kludgy window for chat messages. Needs some work
  * 
  * @author rdjemili
- *
+ * 
  */
 public class MessagingWindow extends ApplicationWindow {
 	private MessagingManager.SessionProvider session;

@@ -31,38 +31,38 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class MessagingAction extends SelectionProviderAction {
-    private RosterEntry rosterEntry;
+	private RosterEntry rosterEntry;
 
-    public MessagingAction(ISelectionProvider provider) {
-        super(provider, "Send instant message..");
-        
-        setToolTipText("Start a IM session with this user");
-        setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
-    }
-    
-    @Override
-    public void run() {
-        try {
-            MessagingManager mm = Saros.getDefault().getMessagingManager();
-            mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
-            
-        } catch (XMPPException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        Object selected = selection.getFirstElement();
-        
-        if (selection.size() == 1 && selected instanceof RosterEntry) {
-            rosterEntry = (RosterEntry)selected;
-            setEnabled(true);
-        } else {
-            rosterEntry = null;
-            setEnabled(false);
-        }
-        
-        // TODO disable if user == self
-    }
+	public MessagingAction(ISelectionProvider provider) {
+		super(provider, "Send instant message..");
+
+		setToolTipText("Start a IM session with this user");
+		setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
+	}
+
+	@Override
+	public void run() {
+		try {
+			MessagingManager mm = Saros.getDefault().getMessagingManager();
+			mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
+
+		} catch (XMPPException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void selectionChanged(IStructuredSelection selection) {
+		Object selected = selection.getFirstElement();
+
+		if (selection.size() == 1 && selected instanceof RosterEntry) {
+			rosterEntry = (RosterEntry) selected;
+			setEnabled(true);
+		} else {
+			rosterEntry = null;
+			setEnabled(false);
+		}
+
+		// TODO disable if user == self
+	}
 }

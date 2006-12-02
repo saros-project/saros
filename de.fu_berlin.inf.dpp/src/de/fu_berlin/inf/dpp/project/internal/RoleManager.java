@@ -22,16 +22,17 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * @author rdjemili
  */
 public class RoleManager implements IActivityProvider, ISharedProjectListener {
-	private List<IActivityListener> activityListeners = 
-		new LinkedList<IActivityListener>();
-	
-	private ISharedProject sharedProject;
-    
-    public RoleManager() {
-        Saros.getDefault().getSessionManager().addSessionListener(this);
-    }
+	private List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-	/* (non-Javadoc)
+	private ISharedProject sharedProject;
+
+	public RoleManager() {
+		Saros.getDefault().getSessionManager().addSessionListener(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISessionListener
 	 */
 	public void sessionStarted(ISharedProject session) {
@@ -40,7 +41,9 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
 		sharedProject.getActivityManager().addProvider(this);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISessionListener
 	 */
 	public void sessionEnded(ISharedProject session) {
@@ -49,85 +52,103 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
 		sharedProject = null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISessionListener
 	 */
 	public void invitationReceived(IIncomingInvitationProcess invitation) {
 		// ignore
 	}
 
-	/* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void addActivityListener(IActivityListener listener) {
-        activityListeners.add(listener);
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityProvider
+	 */
+	public void addActivityListener(IActivityListener listener) {
+		activityListeners.add(listener);
+	}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void removeActivityListener(IActivityListener listener) {
-        activityListeners.remove(listener);
-    }
-	
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
-    public void exec(IActivity activity) {
-        if (activity instanceof RoleActivity) {
-            RoleActivity roleActivity = (RoleActivity)activity;
-            User user = sharedProject.getParticipant(roleActivity.getDriver());
-            sharedProject.setDriver(user, true);
-        }
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityProvider
+	 */
+	public void removeActivityListener(IActivityListener listener) {
+		activityListeners.remove(listener);
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityProvider
+	 */
+	public void exec(IActivity activity) {
+		if (activity instanceof RoleActivity) {
+			RoleActivity roleActivity = (RoleActivity) activity;
+			User user = sharedProject.getParticipant(roleActivity.getDriver());
+			sharedProject.setDriver(user, true);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
 	 */
 	public void driverChanged(JID driver, boolean replicated) {
 		if (!replicated) {
-            IActivity activity = new RoleActivity(driver);
-            for (IActivityListener listener : activityListeners) {
-                listener.activityCreated(activity);
-            }
-        }
+			IActivity activity = new RoleActivity(driver);
+			for (IActivityListener listener : activityListeners) {
+				listener.activityCreated(activity);
+			}
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
 	 */
 	public void userJoined(JID user) {
 		// ignore
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
 	 */
 	public void userLeft(JID user) {
 		// ignore
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.IActivityProvider
 	 */
 	public IActivity fromXML(XmlPullParser parser) {
 		if (parser.getName().equals("driver")) {
 			JID user = new JID(parser.getAttributeValue(null, "id"));
-	        return new RoleActivity(user);
+			return new RoleActivity(user);
 		}
-		
+
 		return null;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.project.IActivityProvider
 	 */
 	public String toXML(IActivity activity) {
 		if (activity instanceof RoleActivity) {
-            RoleActivity roleActivity = (RoleActivity)activity;
-            return "<driver id=\""+roleActivity.getDriver()+"\" />";
+			RoleActivity roleActivity = (RoleActivity) activity;
+			return "<driver id=\"" + roleActivity.getDriver() + "\" />";
 		}
-		
+
 		return null;
 	}
 }

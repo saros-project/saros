@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-
 import java.text.MessageFormat;
 import java.util.List;
 
@@ -30,80 +29,90 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesPacketExtension implements PacketExtension {
-    public static final String  NAMESPACE        = "de.fu_berlin.inf.dpp";
-    public static final String  ELEMENT          = "activities";
-    public static final String  TEXT_CHANGE_TAG  = "edit";
+	public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
-    private List<TimedActivity> activities;
+	public static final String ELEMENT = "activities";
 
-    
-    MessageFormat textChangeFormat = new MessageFormat(
-        "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract into consts
+	public static final String TEXT_CHANGE_TAG = "edit";
 
-    public ActivitiesPacketExtension() {
-    }
-    
-    public ActivitiesPacketExtension(List<TimedActivity> activities) {
-        setActivities(activities);
-    }
+	private List<TimedActivity> activities;
 
-    /* (non-Javadoc)
-     * @see org.jivesoftware.smack.packet.PacketExtension#getElementName()
-     */
-    public String getElementName() {
-        return ELEMENT;
-    }
+	MessageFormat textChangeFormat = new MessageFormat(
+		"<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract into
+															// consts
 
-    /* (non-Javadoc)
-     * @see org.jivesoftware.smack.packet.PacketExtension#getNamespace()
-     */
-    public String getNamespace() {
-        return NAMESPACE;
-    }
-    
-    public void setActivities(List<TimedActivity> activities) {
-        this.activities = activities;
-    }
-    
-    public List<TimedActivity> getActivities() {
-        return activities;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
-     */
-    public String toXML() {
-        if (activities.size() == 0)
-            return "";
-        
-        StringBuffer buf = new StringBuffer();
-        buf.append("<").append(getElementName());
-        buf.append(" xmlns=\"").append(getNamespace()).append("\">");
-        
-        int firstTimestamp = activities.get(0).getTimestamp();
-        buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
-        
-        ActivityRegistry activityRegistry = ActivityRegistry.getDefault();
-        for (TimedActivity timedActivity : activities) {
-            IActivity activity = timedActivity.getActivity();
-            buf.append(activityRegistry.toXML(activity));
-        }
-        
-        buf.append("</").append(getElementName()).append(">");
-        return buf.toString();
-    }
-    
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ActivitiesPacketExtension) {
-            ActivitiesPacketExtension other = (ActivitiesPacketExtension)obj;
-            
-            return activities.equals(other.getActivities());
-        }
-        
-        return false;
-    }
+	public ActivitiesPacketExtension() {
+	}
+
+	public ActivitiesPacketExtension(List<TimedActivity> activities) {
+		setActivities(activities);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jivesoftware.smack.packet.PacketExtension#getElementName()
+	 */
+	public String getElementName() {
+		return ELEMENT;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jivesoftware.smack.packet.PacketExtension#getNamespace()
+	 */
+	public String getNamespace() {
+		return NAMESPACE;
+	}
+
+	public void setActivities(List<TimedActivity> activities) {
+		this.activities = activities;
+	}
+
+	public List<TimedActivity> getActivities() {
+		return activities;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
+	 */
+	public String toXML() {
+		if (activities.size() == 0)
+			return "";
+
+		StringBuffer buf = new StringBuffer();
+		buf.append("<").append(getElementName());
+		buf.append(" xmlns=\"").append(getNamespace()).append("\">");
+
+		int firstTimestamp = activities.get(0).getTimestamp();
+		buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
+
+		ActivityRegistry activityRegistry = ActivityRegistry.getDefault();
+		for (TimedActivity timedActivity : activities) {
+			IActivity activity = timedActivity.getActivity();
+			buf.append(activityRegistry.toXML(activity));
+		}
+
+		buf.append("</").append(getElementName()).append(">");
+		return buf.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof ActivitiesPacketExtension) {
+			ActivitiesPacketExtension other = (ActivitiesPacketExtension) obj;
+
+			return activities.equals(other.getActivities());
+		}
+
+		return false;
+	}
 }

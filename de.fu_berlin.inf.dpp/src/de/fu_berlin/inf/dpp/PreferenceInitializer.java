@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-
 /**
  * Class used to initialize default preference values.
  * 
@@ -34,14 +33,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
 	 */
 	public void initializeDefaultPreferences() {
-	    IPreferenceStore store = Saros.getDefault().getPreferenceStore();
-	    store.setDefault(PreferenceConstants.SERVER,   "jabber.org");
-	    store.setDefault(PreferenceConstants.USERNAME, "");
-	    store.setDefault(PreferenceConstants.PASSWORD, "");
-        
-	    store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
-        store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
-        store.setDefault(PreferenceConstants.DEBUG, false);
-        store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
+		IPreferenceStore store = Saros.getDefault().getPreferenceStore();
+		store.setDefault(PreferenceConstants.SERVER, "jabber.org");
+		store.setDefault(PreferenceConstants.USERNAME, "");
+		store.setDefault(PreferenceConstants.PASSWORD, "");
+
+		store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
+		store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
+		store.setDefault(PreferenceConstants.DEBUG, false);
+		store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
 	}
 }

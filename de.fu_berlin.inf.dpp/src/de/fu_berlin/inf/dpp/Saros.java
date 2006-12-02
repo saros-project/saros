@@ -63,7 +63,7 @@ public class Saros extends AbstractUIPlugin {
 	private static Saros plugin;
 
 	public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
-	
+
 	private static SarosUI uiInstance;
 
 	private XMPPConnection connection;
@@ -121,7 +121,7 @@ public class Saros extends AbstractUIPlugin {
 
 		sessionManager.leaveSession();
 		disconnect(null);
-		
+
 		plugin = null;
 	}
 
@@ -179,12 +179,12 @@ public class Saros extends AbstractUIPlugin {
 	 * disconnects before connecting.
 	 */
 	public void connect() {
-		
+
 		IPreferenceStore prefStore = getPreferenceStore();
 		final String server = prefStore.getString(PreferenceConstants.SERVER);
 		final String username = prefStore.getString(PreferenceConstants.USERNAME);
 		String password = prefStore.getString(PreferenceConstants.PASSWORD);
-		
+
 		try {
 			if (isConnected())
 				disconnect(null);
@@ -366,17 +366,19 @@ public class Saros extends AbstractUIPlugin {
 	}
 
 	/**
-	 * Log a message to the Eclipse ErrorLog. This method should be used 
-	 * to log all errors that occur in the plugin that cannot be corrected by the user
+	 * Log a message to the Eclipse ErrorLog. This method should be used to log
+	 * all errors that occur in the plugin that cannot be corrected by the user
 	 * and seem to be errors within the plug-in or the used libraries.
 	 * 
-	 * @param message A meaningful description of during which operation the error occurred
-	 * @param e The exception associated with the error (may be null)
+	 * @param message
+	 *            A meaningful description of during which operation the error
+	 *            occurred
+	 * @param e
+	 *            The exception associated with the error (may be null)
 	 */
-	public static void log(String message, Exception e){
+	public static void log(String message, Exception e) {
 		Saros.getDefault().getLog().log(
-			new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-				message, e));
+			new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message, e));
 	}
-	
+
 }

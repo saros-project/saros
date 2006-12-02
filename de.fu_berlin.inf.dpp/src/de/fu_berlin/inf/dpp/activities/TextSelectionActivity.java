@@ -20,34 +20,35 @@
 package de.fu_berlin.inf.dpp.activities;
 
 public class TextSelectionActivity implements IActivity {
-    private int offset;
-    private int length;
-    
-    public TextSelectionActivity(int offset, int length) {
-        this.offset = offset;
-        this.length = length;
-    }
+	private int offset;
 
-    public int getLength() {
-        return length;
-    }
+	private int length;
 
-    public int getOffset() {
-        return offset;
-    }
+	public TextSelectionActivity(int offset, int length) {
+		this.offset = offset;
+		this.length = length;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof TextSelectionActivity) {
-            TextSelectionActivity activity = (TextSelectionActivity)obj;
-            return offset == activity.offset && length == activity.length;
-        }
-        
-        return false;
-    }
-    
-    @Override
-    public String toString() {
-        return "TextSelectionActivity(offset:"+offset+", length:"+length+")";
-    }
+	public int getLength() {
+		return length;
+	}
+
+	public int getOffset() {
+		return offset;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof TextSelectionActivity) {
+			TextSelectionActivity activity = (TextSelectionActivity) obj;
+			return offset == activity.offset && length == activity.length;
+		}
+
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "TextSelectionActivity(offset:" + offset + ", length:" + length + ")";
+	}
 }

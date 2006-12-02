@@ -28,118 +28,126 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public abstract class InvitationProcess implements IInvitationProcess {
-    protected final ITransmitter transmitter;
+	protected final ITransmitter transmitter;
 
-    protected State              state;
-    private   Exception          exception;
+	protected State state;
 
-    protected JID                peer;
-    protected String             description;
-    
-    
-    public InvitationProcess(ITransmitter transmitter, JID peer, 
-        String description) {
-        
-        this.transmitter = transmitter;
-        this.peer = peer;
-        this.description = description;
-        
-        transmitter.addInvitationProcess(this);
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public Exception getException() {
-        return exception;
-    }
+	private Exception exception;
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public State getState() {
-        return state;
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public JID getPeer() {
-        return peer;
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public String getDescription() {
-        return description;
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
-     */
-    public void cancel(final String errorMsg, final boolean replicated) {
-        if (state == State.CANCELED)
-            return;
-        
-        state = State.CANCELED;
-        
-        System.out.println("Invitation was cancelled. "+errorMsg);
-        
-        if (!replicated) {
-            transmitter.sendCancelInvitationMessage(peer, errorMsg);
-        }
+	protected JID peer;
 
-        // TODO move to ui package
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                Shell shell = Display.getDefault().getActiveShell();
-                
-                if (errorMsg != null) {
-                    MessageDialog.openError(shell, 
-                        "Invitation aborted", 
-                        "A technical error was detected. Could not " +
-                        "complete invitation. ("+errorMsg+")");
-                    
-                } else if (replicated) {
-                    MessageDialog.openInformation(shell, 
-                        "Invitation cancelled", 
-                        "Invitation was cancelled by peer.");
-                }
-            }
-        });
-        
-        
-        transmitter.removeInvitationProcess(this);
-    }
-    
-    @Override
-    public String toString() {
-        return "InvitationProcess(peer:"+peer+ ", state:"+state+")";
-    }
-    
-    /**
-     * Should be called if an exception occured. This saves the exception and
-     * sets the invitation to cancelled.
-     */
-    protected void failed(Exception e) {
-        exception = e;
-        e.printStackTrace(); // HACK
-        cancel(e.getMessage(), false);
-    }
-    
-    /**
-     * Asssert that the process is in given state or throw an exception
-     * otherwise.
-     * 
-     * @param expected the state that the process should currently have.
-     */
-    protected void assertState(State expected) {
-        if (state != expected)
-            cancel("Unexpected state("+state+")", false);
-    }
-    
-    protected void failState() {
-        throw new IllegalStateException("Bad input while in state "+state);
-    }
+	protected String description;
+
+	public InvitationProcess(ITransmitter transmitter, JID peer, String description) {
+
+		this.transmitter = transmitter;
+		this.peer = peer;
+		this.description = description;
+
+		transmitter.addInvitationProcess(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public Exception getException() {
+		return exception;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public State getState() {
+		return state;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public JID getPeer() {
+		return peer;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
+	 */
+	public void cancel(final String errorMsg, final boolean replicated) {
+		if (state == State.CANCELED)
+			return;
+
+		state = State.CANCELED;
+
+		System.out.println("Invitation was cancelled. " + errorMsg);
+
+		if (!replicated) {
+			transmitter.sendCancelInvitationMessage(peer, errorMsg);
+		}
+
+		// TODO move to ui package
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				Shell shell = Display.getDefault().getActiveShell();
+
+				if (errorMsg != null) {
+					MessageDialog.openError(shell, "Invitation aborted",
+						"A technical error was detected. Could not " + "complete invitation. ("
+							+ errorMsg + ")");
+
+				} else if (replicated) {
+					MessageDialog.openInformation(shell, "Invitation cancelled",
+						"Invitation was cancelled by peer.");
+				}
+			}
+		});
+
+		transmitter.removeInvitationProcess(this);
+	}
+
+	@Override
+	public String toString() {
+		return "InvitationProcess(peer:" + peer + ", state:" + state + ")";
+	}
+
+	/**
+	 * Should be called if an exception occured. This saves the exception and
+	 * sets the invitation to cancelled.
+	 */
+	protected void failed(Exception e) {
+		exception = e;
+		e.printStackTrace(); // HACK
+		cancel(e.getMessage(), false);
+	}
+
+	/**
+	 * Asssert that the process is in given state or throw an exception
+	 * otherwise.
+	 * 
+	 * @param expected
+	 *            the state that the process should currently have.
+	 */
+	protected void assertState(State expected) {
+		if (state != expected)
+			cancel("Unexpected state(" + state + ")", false);
+	}
+
+	protected void failState() {
+		throw new IllegalStateException("Bad input while in state " + state);
+	}
 }

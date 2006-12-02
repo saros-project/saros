@@ -34,48 +34,47 @@ import org.jivesoftware.smack.RosterEntry;
  * @author rdjemili
  */
 public class RenameContactAction extends SelectionProviderAction {
-    private class InputValidator implements IInputValidator {
-        public String isValid(String newText) {
-            return null;
-        }
-    }
-    
-    private RosterEntry rosterEntry;
+	private class InputValidator implements IInputValidator {
+		public String isValid(String newText) {
+			return null;
+		}
+	}
 
-    public RenameContactAction(ISelectionProvider provider) {
-        super(provider, "Rename...");
-        setToolTipText("Set the nickname of this contact.");
-    }
-    
-    @Override
-    public void run() {
-        Shell shell = Display.getDefault().getActiveShell();
-        if (shell == null || rosterEntry == null)
-            return;
-        
-        InputDialog dialog = new InputDialog(shell, "Set new nickname", 
-            "Enter the new nickname of this contact '" + rosterEntry.getName() + "' ('"
-				+ rosterEntry.getUser() + "'):", 
-            rosterEntry.getName(), new InputValidator());
-        
-        if (dialog.open() == InputDialog.OK){ 
-	        String name = (dialog.getValue().length() == 0) ? "" : dialog.getValue();
-	        rosterEntry.setName(name);
-        }
-    }
-    
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-        Object selected = selection.getFirstElement();
-        
-        if (selection.size() == 1 && selected instanceof RosterEntry) {
-            rosterEntry = (RosterEntry)selected;
-            setEnabled(true);
-        } else {
-            rosterEntry = null;
-            setEnabled(false);
-        }
-        
-        // TODO disable if user == self
-    }
+	private RosterEntry rosterEntry;
+
+	public RenameContactAction(ISelectionProvider provider) {
+		super(provider, "Rename...");
+		setToolTipText("Set the nickname of this contact.");
+	}
+
+	@Override
+	public void run() {
+		Shell shell = Display.getDefault().getActiveShell();
+		if (shell == null || rosterEntry == null)
+			return;
+
+		InputDialog dialog = new InputDialog(shell, "Set new nickname",
+			"Enter the new nickname of this contact '" + rosterEntry.getName() + "' ('"
+				+ rosterEntry.getUser() + "'):", rosterEntry.getName(), new InputValidator());
+
+		if (dialog.open() == InputDialog.OK) {
+			String name = (dialog.getValue().length() == 0) ? "" : dialog.getValue();
+			rosterEntry.setName(name);
+		}
+	}
+
+	@Override
+	public void selectionChanged(IStructuredSelection selection) {
+		Object selected = selection.getFirstElement();
+
+		if (selection.size() == 1 && selected instanceof RosterEntry) {
+			rosterEntry = (RosterEntry) selected;
+			setEnabled(true);
+		} else {
+			rosterEntry = null;
+			setEnabled(false);
+		}
+
+		// TODO disable if user == self
+	}
 }

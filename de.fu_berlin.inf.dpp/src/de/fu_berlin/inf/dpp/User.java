@@ -22,28 +22,28 @@ package de.fu_berlin.inf.dpp;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class User {
-    private JID     jid;
+	private JID jid;
 
-    public User(JID jid) {
-        this.jid = jid;
-    }
+	public User(JID jid) {
+		this.jid = jid;
+	}
 
-    public JID getJid() {
-        return jid;
-    }
-    
-    @Override
-    public String toString() {   	
-        return jid.getName();
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof User) {
-            User other = (User)obj;
-            return jid.equals(other.jid);
-        }
-        
-        return false;
-    }
+	public JID getJid() {
+		return jid;
+	}
+
+	@Override
+	public String toString() {
+		return jid.getName();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof User) {
+			User other = (User) obj;
+			return jid.equals(other.jid);
+		}
+
+		return false;
+	}
 }

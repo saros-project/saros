@@ -10,14 +10,14 @@ import org.eclipse.jface.text.source.Annotation;
  * @author coezbek
  */
 public class SelectionAnnotation extends Annotation {
-    
+
 	public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
-    
-    public SelectionAnnotation() {
-        this("");
-    }
-    
-    public SelectionAnnotation(String username) {
-        super(TYPE, false, username);
-    }
+
+	public SelectionAnnotation() {
+		this("");
+	}
+
+	public SelectionAnnotation(String username) {
+		super(TYPE, false, username);
+	}
 }

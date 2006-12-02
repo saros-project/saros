@@ -20,42 +20,47 @@
 package de.fu_berlin.inf.dpp.activities;
 
 /**
- * A simple immutable text activity. 
+ * A simple immutable text activity.
  * 
  * @author rdjemili
  */
 public class TextEditActivity implements IActivity {
-    public final int    offset;
-    /**
-     * This string only uses \n as line delimiter. Keep this in mind when adding
-     * it to an IDocument with probably other line delimiters.
-     */
-    public final String text;
-    public final int    replace;
-    
-    /**
-     * @param offset the offset inside the document where this activity happend.
-     * @param text the text that was inserted.
-     * @param replace the length of text that was replaced by this activity.
-     */
-    public TextEditActivity(int offset, String text, int replace) {
-        this.offset = offset;
-        this.text = text;
-        this.replace = replace;
-    }
-    
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof TextEditActivity) {
-            TextEditActivity other = (TextEditActivity)obj;
-            return offset == other.offset && text.equals(other.text) && replace == other.replace;
-        }
-        
-        return false;
-    }
-    
-    @Override
-    public String toString() {
-        return "TextEditActivity(offset:"+offset+",text:"+text+",replace:"+replace+")";
-    }
+	public final int offset;
+
+	/**
+	 * This string only uses \n as line delimiter. Keep this in mind when adding
+	 * it to an IDocument with probably other line delimiters.
+	 */
+	public final String text;
+
+	public final int replace;
+
+	/**
+	 * @param offset
+	 *            the offset inside the document where this activity happend.
+	 * @param text
+	 *            the text that was inserted.
+	 * @param replace
+	 *            the length of text that was replaced by this activity.
+	 */
+	public TextEditActivity(int offset, String text, int replace) {
+		this.offset = offset;
+		this.text = text;
+		this.replace = replace;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof TextEditActivity) {
+			TextEditActivity other = (TextEditActivity) obj;
+			return offset == other.offset && text.equals(other.text) && replace == other.replace;
+		}
+
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return "TextEditActivity(offset:" + offset + ",text:" + text + ",replace:" + replace + ")";
+	}
 }

@@ -10,40 +10,40 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class FollowModeAction extends Action implements ISessionListener {
-    private boolean isFollowMode = false;
+	private boolean isFollowMode = false;
 
-    public FollowModeAction() {
-        setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
-        setToolTipText("Enable/disable follow mode");
-        
-        Saros.getDefault().getSessionManager().addSessionListener(this);
-        updateEnablement();
-    }
-    
-    @Override
-    public void run() {
-        isFollowMode = !isFollowMode;
-        EditorManager.getDefault().setEnableFollowing(isFollowMode);
-    }
+	public FollowModeAction() {
+		setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
+		setToolTipText("Enable/disable follow mode");
 
-    public void sessionStarted(ISharedProject session) {
-        updateEnablement();
-    }
+		Saros.getDefault().getSessionManager().addSessionListener(this);
+		updateEnablement();
+	}
 
-    public void sessionEnded(ISharedProject session) {
-        updateEnablement();
-    }
+	@Override
+	public void run() {
+		isFollowMode = !isFollowMode;
+		EditorManager.getDefault().setEnableFollowing(isFollowMode);
+	}
 
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
-    
-    private void updateEnablement() {
-        setEnabled(getSharedProject() != null);
-        setChecked(isFollowMode);
-    }
-    
-    private ISharedProject getSharedProject() {
-        return Saros.getDefault().getSessionManager().getSharedProject();
-    }
+	public void sessionStarted(ISharedProject session) {
+		updateEnablement();
+	}
+
+	public void sessionEnded(ISharedProject session) {
+		updateEnablement();
+	}
+
+	public void invitationReceived(IIncomingInvitationProcess process) {
+		// ignore
+	}
+
+	private void updateEnablement() {
+		setEnabled(getSharedProject() != null);
+		setChecked(isFollowMode);
+	}
+
+	private ISharedProject getSharedProject() {
+		return Saros.getDefault().getSessionManager().getSharedProject();
+	}
 }

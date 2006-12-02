@@ -43,205 +43,225 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
  * @author rdjemili
  */
 public class ActivitySequencer implements IActivitySequencer, IActivityManager {
-    // TODO separate into two classes!?
-    
-    private static Logger log = Logger.getLogger(ActivitySequencer.class.getName());
-    
-    private List<IActivity>         activities = new LinkedList<IActivity>();
-    private List<IActivity>         flushedLog = new LinkedList<IActivity>();
+	// TODO separate into two classes!?
 
-    private List<IActivityProvider> providers  = new LinkedList<IActivityProvider>();
-    private List<TimedActivity>     queue      = new CopyOnWriteArrayList<TimedActivity>();
-    private int                     timestamp  = 0;
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.project.IActivityManager
-     */
-    public void exec(IActivity activity) {
-        try {
-            for (IActivityProvider executor : providers) {
-                executor.exec(activity);
-            }
-            
-        } catch (Exception e) {
-            log.log(Level.SEVERE, "Error while executing activity.", e);
-        }
-    }
+	private static Logger log = Logger.getLogger(ActivitySequencer.class.getName());
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
-     */
-    public void exec(TimedActivity timedActivity) {
-        queue.add(timedActivity);
-        execQueue();
-    }
+	private List<IActivity> activities = new LinkedList<IActivity>();
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivitySequencer
-     */
-    public void exec(List<TimedActivity> activities) {
-        queue.addAll(activities);
-        execQueue();
-    }
+	private List<IActivity> flushedLog = new LinkedList<IActivity>();
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityManager
-     */
-    public List<IActivity> flush() {
-        List<IActivity> out = new ArrayList<IActivity>(activities);
-        activities.clear();
-        out = optimize(out);
-        flushedLog.addAll(out);
-        return out.size() > 0 ? out : null;
-    }
+	private List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
-     */
-    public List<TimedActivity> flushTimed() {
-        List<IActivity> activities = flush();
-        
-        if (activities == null)
-            return null;
-        
-        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-        
-        for (IActivity activity : activities) {
-            timedActivities.add(new TimedActivity(activity, timestamp++));
-        }
-        
-        return timedActivities;
-    }
+	private List<TimedActivity> queue = new CopyOnWriteArrayList<TimedActivity>();
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityManager
-     */
-    public void addProvider(IActivityProvider provider) {
-        providers.add(provider);
-        provider.addActivityListener(this);
-    }
+	private int timestamp = 0;
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityManager
-     */
-    public void removeProvider(IActivityProvider provider) {
-        providers.remove(provider);
-        provider.removeActivityListener(this);
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivitySequencer
-     */
-    public List<IActivity> getLog() {
-        return flushedLog;
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.IActivityListener
-     */
-    public void activityCreated(IActivity activity) {
-        activities.add(activity);
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.project.IActivityManager
+	 */
+	public void exec(IActivity activity) {
+		try {
+			for (IActivityProvider executor : providers) {
+				executor.exec(activity);
+			}
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
-     */
-    public int getTimestamp() {
-        return timestamp;
-    }
+		} catch (Exception e) {
+			log.log(Level.SEVERE, "Error while executing activity.", e);
+		}
+	}
 
-    /**
-     * Executes as much activities as possible from the current queue regarding 
-     * to their individual time stamps.
-     */
-    private void execQueue() {
-        boolean executed = false;
-        
-        for (TimedActivity timedActivity : queue) {
-            if (timedActivity.getTimestamp() <= timestamp) { // HACK
-                queue.remove(timedActivity);
-                
-                timestamp++;
-                exec(timedActivity.getActivity());
-                executed = true;
-            }
-        }
-        
-        if (executed)
-            execQueue();
-    }
-    
-    // TODO extract this into the activities themselves
-    private List<IActivity> optimize(List<IActivity> activities) {
-        List<IActivity> result = new ArrayList<IActivity>(activities.size());
-        
-        ITextSelection selection = null;
-        for (IActivity activity : activities) {
-            if (activity instanceof TextEditActivity) {
-                TextEditActivity textEdit = (TextEditActivity)activity;
-                
-                textEdit = joinTextEdits(result, textEdit);
-                
-                selection = new TextSelection(textEdit.offset + textEdit.text.length(), 0);
-                result.add(textEdit);
-                
-            } else if (activity instanceof TextSelectionActivity) {
-                TextSelectionActivity textSelection = (TextSelectionActivity)activity;
-                
-                selection = new TextSelection(textSelection.getOffset(), 
-                    textSelection.getLength());
-                
-            } else {
-                selection = addSelection(result, selection);
-                result.add(activity);
-            }
-        }
-        
-        selection = addSelection(result, selection);
-        
-        return result;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
+	 */
+	public void exec(TimedActivity timedActivity) {
+		queue.add(timedActivity);
+		execQueue();
+	}
 
-    private TextEditActivity joinTextEdits(List<IActivity> result, TextEditActivity textEdit) {
-        if (result.size() == 0)
-            return textEdit;
-        
-        IActivity lastActivity = result.get(result.size() - 1);
-        if (lastActivity instanceof TextEditActivity) {
-            TextEditActivity lastTextEdit = (TextEditActivity)lastActivity;
-            
-            if (textEdit.offset == lastTextEdit.offset + lastTextEdit.text.length()) {
-                result.remove(lastTextEdit);
-                textEdit = new TextEditActivity(lastTextEdit.offset,
-                    lastTextEdit.text + textEdit.text, 
-                    lastTextEdit.replace + textEdit.replace);
-            } 
-        }
-        
-        return textEdit;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivitySequencer
+	 */
+	public void exec(List<TimedActivity> activities) {
+		queue.addAll(activities);
+		execQueue();
+	}
 
-    private ITextSelection addSelection(List<IActivity> result, ITextSelection selection) {
-        if (selection == null)
-            return null;
-        
-        if (result.size() > 0) {
-            IActivity lastActivity = result.get(result.size() - 1);
-            if (lastActivity instanceof TextEditActivity) {
-                TextEditActivity lastTextEdit = (TextEditActivity)lastActivity;
-                
-                if (selection.getOffset() == lastTextEdit.offset + lastTextEdit.text.length() &&
-                    selection.getLength() == 0) {
-                    
-                    return selection;
-                }
-            }
-        }
-            
-        result.add(new TextSelectionActivity(
-            selection.getOffset(), selection.getLength()));
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityManager
+	 */
+	public List<IActivity> flush() {
+		List<IActivity> out = new ArrayList<IActivity>(activities);
+		activities.clear();
+		out = optimize(out);
+		flushedLog.addAll(out);
+		return out.size() > 0 ? out : null;
+	}
 
-        selection = null;
-        return selection;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
+	 */
+	public List<TimedActivity> flushTimed() {
+		List<IActivity> activities = flush();
+
+		if (activities == null)
+			return null;
+
+		List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
+
+		for (IActivity activity : activities) {
+			timedActivities.add(new TimedActivity(activity, timestamp++));
+		}
+
+		return timedActivities;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityManager
+	 */
+	public void addProvider(IActivityProvider provider) {
+		providers.add(provider);
+		provider.addActivityListener(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityManager
+	 */
+	public void removeProvider(IActivityProvider provider) {
+		providers.remove(provider);
+		provider.removeActivityListener(this);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivitySequencer
+	 */
+	public List<IActivity> getLog() {
+		return flushedLog;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IActivityListener
+	 */
+	public void activityCreated(IActivity activity) {
+		activities.add(activity);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
+	 */
+	public int getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * Executes as much activities as possible from the current queue regarding
+	 * to their individual time stamps.
+	 */
+	private void execQueue() {
+		boolean executed = false;
+
+		for (TimedActivity timedActivity : queue) {
+			if (timedActivity.getTimestamp() <= timestamp) { // HACK
+				queue.remove(timedActivity);
+
+				timestamp++;
+				exec(timedActivity.getActivity());
+				executed = true;
+			}
+		}
+
+		if (executed)
+			execQueue();
+	}
+
+	// TODO extract this into the activities themselves
+	private List<IActivity> optimize(List<IActivity> activities) {
+		List<IActivity> result = new ArrayList<IActivity>(activities.size());
+
+		ITextSelection selection = null;
+		for (IActivity activity : activities) {
+			if (activity instanceof TextEditActivity) {
+				TextEditActivity textEdit = (TextEditActivity) activity;
+
+				textEdit = joinTextEdits(result, textEdit);
+
+				selection = new TextSelection(textEdit.offset + textEdit.text.length(), 0);
+				result.add(textEdit);
+
+			} else if (activity instanceof TextSelectionActivity) {
+				TextSelectionActivity textSelection = (TextSelectionActivity) activity;
+
+				selection = new TextSelection(textSelection.getOffset(), textSelection.getLength());
+
+			} else {
+				selection = addSelection(result, selection);
+				result.add(activity);
+			}
+		}
+
+		selection = addSelection(result, selection);
+
+		return result;
+	}
+
+	private TextEditActivity joinTextEdits(List<IActivity> result, TextEditActivity textEdit) {
+		if (result.size() == 0)
+			return textEdit;
+
+		IActivity lastActivity = result.get(result.size() - 1);
+		if (lastActivity instanceof TextEditActivity) {
+			TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
+
+			if (textEdit.offset == lastTextEdit.offset + lastTextEdit.text.length()) {
+				result.remove(lastTextEdit);
+				textEdit = new TextEditActivity(lastTextEdit.offset, lastTextEdit.text
+					+ textEdit.text, lastTextEdit.replace + textEdit.replace);
+			}
+		}
+
+		return textEdit;
+	}
+
+	private ITextSelection addSelection(List<IActivity> result, ITextSelection selection) {
+		if (selection == null)
+			return null;
+
+		if (result.size() > 0) {
+			IActivity lastActivity = result.get(result.size() - 1);
+			if (lastActivity instanceof TextEditActivity) {
+				TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
+
+				if (selection.getOffset() == lastTextEdit.offset + lastTextEdit.text.length()
+					&& selection.getLength() == 0) {
+
+					return selection;
+				}
+			}
+		}
+
+		result.add(new TextSelectionActivity(selection.getOffset(), selection.getLength()));
+
+		selection = null;
+		return selection;
+	}
 }

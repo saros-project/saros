@@ -16,30 +16,32 @@ import de.fu_berlin.inf.dpp.Saros;
  * 
  * @author rdjemili
  */
-public class AdvancedPreferencePage extends FieldEditorPreferencePage 
-    implements IWorkbenchPreferencePage {
+public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
+	IWorkbenchPreferencePage {
 
-    public AdvancedPreferencePage() {
-        super(GRID);
-        setPreferenceStore(Saros.getDefault().getPreferenceStore());
-        setDescription("Advanced settings geared toward developers and power users.");
-    }
-    
-    @Override
-    protected void createFieldEditors() {
-        addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME, 
-            "Skype name:", getFieldEditorParent()));
-        
-        addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT, 
-            "File transfer port (needs reconnect):", getFieldEditorParent()));
-        
-        addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
-            "Show Jabber debug window (needs restart).", getFieldEditorParent()));
-    }
+	public AdvancedPreferencePage() {
+		super(GRID);
+		setPreferenceStore(Saros.getDefault().getPreferenceStore());
+		setDescription("Advanced settings geared toward developers and power users.");
+	}
 
-    /* (non-Javadoc)
-     * @see org.eclipse.ui.IWorkbenchPreferencePage
-     */
-    public void init(IWorkbench workbench) {
-    }
+	@Override
+	protected void createFieldEditors() {
+		addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME, "Skype name:",
+			getFieldEditorParent()));
+
+		addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
+			"File transfer port (needs reconnect):", getFieldEditorParent()));
+
+		addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
+			"Show Jabber debug window (needs restart).", getFieldEditorParent()));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage
+	 */
+	public void init(IWorkbench workbench) {
+	}
 }
