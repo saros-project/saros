@@ -9,7 +9,7 @@ Saros CHANGELOG
 		- Added Confirm Dialog to before actually deleting a contact.
 		- Better tool-tip for connect button (shows current username)
 	- Upgrade to Smack 2.2.1
-	- Fixed leak of timer resources.
+	- Fixed leak of timer resources since sharing a project was actually never stopped.
  
 1.0
 	- added skype support

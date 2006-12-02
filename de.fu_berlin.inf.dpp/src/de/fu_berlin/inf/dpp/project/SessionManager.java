@@ -79,9 +79,7 @@ public class SessionManager implements IConnectionListener {
         JID myJID = Saros.getDefault().getMyJID();
         sharedProject = new SharedProject(transmitter, project, myJID);
         sharedProject.start();
-        
-//        sharedProject.getActivityManager().addProvider(provider)
-        
+              
         for (ISessionListener listener : listeners) {
             listener.sessionStarted(sharedProject);
         }
@@ -124,6 +122,8 @@ public class SessionManager implements IConnectionListener {
     public void leaveSession() {
         if (sharedProject == null)
             return;
+        
+        sharedProject.stop();
         
         transmitter.sendLeaveMessage(sharedProject);
         
