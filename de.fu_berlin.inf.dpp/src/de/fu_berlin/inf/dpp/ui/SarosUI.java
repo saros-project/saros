@@ -84,7 +84,9 @@ public class SarosUI implements ISessionListener {
 					Shell shell = Display.getDefault().getActiveShell();
 					new WizardDialog(shell, new JoinSessionWizard(process)).open();
 				} catch (Exception e) {
-					e.printStackTrace();
+					Saros.getDefault().getLog().log(
+						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+							"Error while joining a session", e));
 				}
 			}
 		});
