@@ -62,11 +62,11 @@ import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
- * The central implementation of the IEditorAPI which basically encapsulates the interaction with the 
- * TextEditor.
+ * The central implementation of the IEditorAPI which basically encapsulates the
+ * interaction with the TextEditor.
  * 
  * @author rdjemili
- *
+ * 
  */
 public class EditorAPI implements IEditorAPI {
 
@@ -225,7 +225,9 @@ public class EditorAPI implements IEditorAPI {
 
 	private VerifyKeyListener keyVerifier = new VerifyKeyListener() {
 		public void verifyKey(VerifyEvent event) {
-			System.out.println(((int)event.character) + " - " + event.keyCode + " - " + event.stateMask);
+
+			// System.out.println(((int)event.character) + " - " + event.keyCode
+			// + " - " + event.stateMask);
 			if (event.character > 0) {
 				event.doit = false;
 
@@ -375,7 +377,8 @@ public class EditorAPI implements IEditorAPI {
 	}
 
 	/*
-	 * This implementation does not really set the selection but rather adds an annotation.
+	 * This implementation does not really set the selection but rather adds an
+	 * annotation.
 	 * 
 	 * (non-Javadoc)
 	 * 
@@ -443,7 +446,6 @@ public class EditorAPI implements IEditorAPI {
 				if (editable && lockedEditors.contains(editorPart)) {
 					lockedEditors.remove(editorPart);
 					textViewer.removeVerifyKeyListener(keyVerifier);
-
 				} else if (!editable && !lockedEditors.contains(editorPart)) {
 					lockedEditors.add(editorPart);
 					textViewer.appendVerifyKeyListener(keyVerifier);
