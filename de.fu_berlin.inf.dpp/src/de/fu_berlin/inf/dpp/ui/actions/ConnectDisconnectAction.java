@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.jivesoftware.smack.XMPPConnection;
