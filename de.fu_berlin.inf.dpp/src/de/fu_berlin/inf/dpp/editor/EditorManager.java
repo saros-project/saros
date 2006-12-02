@@ -636,36 +636,37 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
     
     private void replaceText(IFile file, int offset, int replace, String text) {
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorAPI.getDocumentProvider(input);
-    
-        try {
-            if (!connectedFiles.contains(file)) {
-                provider.connect(input);
-                connectedFiles.add(file);
-            }
-            
-            IDocument doc = provider.getDocument(input);
-            doc.replace(offset, replace, text);
-            
-            IAnnotationModel model = provider.getAnnotationModel(input);
-            ContributionHelper.insertAnnotation(model, offset, text.length());
-            
-            // Don't disconnect from provider yet, because otherwise the text 
-            // changes would be lost. We only disconnect when the document is 
-            // reset or saved.
-            
-        } catch (BadLocationException e) {
-            log.log(Level.SEVERE, "Couldn't insert driver text because of bad location.", e);
-            
-        } catch (CoreException e) {
-            log.log(Level.SEVERE, "Couldn't insert driver text.", e);
-        }
-    }
+		FileEditorInput input = new FileEditorInput(file);
+		IDocumentProvider provider = editorAPI.getDocumentProvider(input);
+
+		try {
+			if (!connectedFiles.contains(file)) {
+				provider.connect(input);
+				connectedFiles.add(file);
+			}
+
+			IDocument doc = provider.getDocument(input);
+			doc.replace(offset, replace, text);
+
+			IAnnotationModel model = provider.getAnnotationModel(input);
+			ContributionHelper.insertAnnotation(model, offset, text.length());
+
+			// Don't disconnect from provider yet, because otherwise the text
+			// changes would be lost. We only disconnect when the document is
+			// reset or saved.
+
+		} catch (BadLocationException e) {
+			// TODO If this happens a resend of the original text should be
+			// initiated.
+			Saros.log("Couldn't insert driver text because of bad location.", e);
+		} catch (CoreException e) {
+			Saros.log("Couldn't insert driver text.", e);
+		}
+	}
     
     /**
-     * Needs to be called from a UI thread.
-     */
+	 * Needs to be called from a UI thread.
+	 */
     private void resetText(IFile file) {
         if (!file.exists())
             return;
