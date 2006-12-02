@@ -1,14 +1,24 @@
 
- Saros CHANGELOG
+Saros CHANGELOG
  
- 1.0
- - added skype support
+1.0.1
+	- Disallow connect if username is not set.
+	- Allow to connect also if in Error-State (after a failed connect)
+	- Fixed bug in rename action.
+	- Usability Enhancements 
+		- Added Confirm Dialog to before actually deleting a contact.
+		- Better tool-tip for connect button (shows current username)
+	- Upgrade to Smack 2.2.1
+	- Fixed leak of timer resources.
  
- 0.8.2
- - Fixed severe bug in project synchronization
- - Fixed severe bug in account creation
- - Show invitee name without XMPP-Resource on invitation wizard
+1.0
+	- added skype support
+ 
+0.8.2
+	- Fixed severe bug in project synchronization
+	- Fixed severe bug in account creation
+	- Show invitee name without XMPP-Resource on invitation wizard
  
  
- 0.8.1
- - First beta release
+0.8.1
+	- First beta release

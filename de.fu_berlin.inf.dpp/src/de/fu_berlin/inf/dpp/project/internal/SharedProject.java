@@ -224,15 +224,16 @@ public class SharedProject implements ISharedProject {
         return new FileList(project);
     }
 
+    public Timer flushTimer = new Timer(true);
+    
     /* (non-Javadoc)
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void start() {
-        Timer timer = new Timer(true);
-        timer.schedule(new TimerTask() {
+    	flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                if (participants.size() <= 1) {
+            	if (participants.size() <= 1) {
                     activitySequencer.flush();
                     
                 } else {
@@ -243,6 +244,13 @@ public class SharedProject implements ISharedProject {
                 }
             }
         }, 0, MILLIS_UPDATE);
+    }
+
+    /* (non-Javadoc)
+     * @see de.fu_berlin.inf.dpp.project.ISharedProject
+     */
+    public void stop() {
+    	flushTimer.cancel();
     }
     
     /* (non-Javadoc)
