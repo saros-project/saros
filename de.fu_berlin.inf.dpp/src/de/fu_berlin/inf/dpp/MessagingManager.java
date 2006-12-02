@@ -252,8 +252,14 @@ public class MessagingManager implements PacketListener, IConnectionListener {
             
         // try to get name from roster
         RosterEntry rosterEntry = connection.getRoster().getEntry(remoteUser.getBase());
-        String name = (rosterEntry != null) ? rosterEntry.getName() : remoteUser.getName();
-
+        
+        String name;
+        if (rosterEntry != null){
+        	name = "Talking to " + (rosterEntry.getName() != null ? rosterEntry.getName() : rosterEntry.getUser()); 
+        } else {
+        	name = "Chat";
+        }
+        
         ChatSession session = new ChatSession(chat, name);
         sessions.add(session);
         
