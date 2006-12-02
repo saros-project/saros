@@ -20,16 +20,12 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.text.ITextSelection;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -40,7 +36,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * collaboration.
  * 
  * @author rdjemili
- */
+*/
 public interface ISharedProject {
 
     /**
@@ -159,6 +155,12 @@ public interface ISharedProject {
      * automatically are unit tests.
      */
     public void start();
+    
+    /**
+     * Deactivates sending of activities. 
+     */
+    public void stop();
+    
     
     public User getParticipant(JID jid);
 }
