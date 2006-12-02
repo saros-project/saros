@@ -75,507 +75,526 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * @author rdjemili
  */
 public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTransferListener {
-    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class.getName());
-    
-    private static final int         MAX_PARALLEL_SENDS            = 10;
-    private static final int         MAX_TRANSFER_RETRIES          = 5;
+	private static Logger log = Logger.getLogger(XMPPChatTransmitter.class.getName());
 
-    /*
-     * the following string descriptions are used to differentiate between
-     * transfers that are for invitations and transfers that are an activity for
-     * the current project.
-     */
-    private static final String      RESOURCE_TRANSFER_DESCRIPTION = 
-        "resourceAddActivity";
-    private static final String      FILELIST_TRANSFER_DESCRIPTION = 
-        "filelist";
+	private static final int MAX_PARALLEL_SENDS = 10;
 
-    private final XMPPConnection     connection;
-    private Map<JID, Chat>           chats = new HashMap<JID, Chat>();
-    private FileTransferManager      fileTransferManager;
+	private static final int MAX_TRANSFER_RETRIES = 5;
 
-    // TODO use ListenerList instead
-    private List<IInvitationProcess> processes = new CopyOnWriteArrayList<IInvitationProcess>();
+	/*
+	 * the following string descriptions are used to differentiate between
+	 * transfers that are for invitations and transfers that are an activity for
+	 * the current project.
+	 */
+	private static final String RESOURCE_TRANSFER_DESCRIPTION = "resourceAddActivity";
 
-    private List<FileTransfer>       fileTransferQueue = new LinkedList<FileTransfer>();
-    private int                      runningFileTransfers = 0;
-    
-    /**
-     * A simple struct that is used to queue file transfers.
-     */
-    private class FileTransfer {
-        public JID                   recipient;
-        public IPath                 path;
-        public int                   timestamp;
-        public IFileTransferCallback callback;
-        public int                   retries = 0;
-    }
+	private static final String FILELIST_TRANSFER_DESCRIPTION = "filelist";
 
-    public XMPPChatTransmitter(XMPPConnection connection) {
-        this.connection = connection;
-        fileTransferManager = new FileTransferManager(connection);
-        fileTransferManager.addFileTransferListener(this);
-        
-        setProxyPort(connection);
-        
-        // TODO always preserve threads
-        this.connection.addPacketListener(this, 
-            new MessageTypeFilter(Message.Type.CHAT)); // HACK
-    }
-    
-    public void addInvitationProcess(IInvitationProcess process) {
-        processes.add(process);
-    }
-    
-    public void removeInvitationProcess(IInvitationProcess process) {
-        processes.remove(process);
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.net.ITransmitter
-     */
-    public void sendCancelInvitationMessage(JID user, String errorMsg) {
-    	sendMessage(user, PacketExtensions.createCancelInviteExtension(errorMsg));
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
-    public void sendRequestForFileListMessage(JID user) {
-        sendMessage(user, PacketExtensions.createRequestForFileListExtension());
-    }
+	private final XMPPConnection connection;
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
-    public void sendInviteMessage(ISharedProject sharedProject, JID guest, 
-        String description) {
-        
-        sendMessage(guest, PacketExtensions.createInviteExtension(description));
-    }
+	private Map<JID, Chat> chats = new HashMap<JID, Chat>();
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
-    public void sendJoinMessage(ISharedProject sharedProject) {
-        sendMessageToAll(sharedProject, PacketExtensions.createJoinExtension());
-    }
+	private FileTransferManager fileTransferManager;
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
-    public void sendLeaveMessage(ISharedProject sharedProject) {
-        sendMessageToAll(sharedProject, PacketExtensions.createLeaveExtension());
-    }
+	// TODO use ListenerList instead
+	private List<IInvitationProcess> processes = new CopyOnWriteArrayList<IInvitationProcess>();
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
-    public void sendActivities(ISharedProject sharedProject, 
-        List<TimedActivity> timedActivities) {
-        
-        // timer that calls sendActivities is called before setting chat
-        
-        for (TimedActivity timedActivity : timedActivities) {
-            IActivity activity = timedActivity.getActivity();
-            
-            if (activity instanceof FileActivity) {
-                FileActivity fileAdd = (FileActivity)activity;
-                
-                if (fileAdd.getType().equals(FileActivity.Type.Created)) {
-                    JID myJID = Saros.getDefault().getMyJID();
-                    
-                    for (User participant : sharedProject.getParticipants()) {
-                        JID jid = participant.getJid();
-                        if (jid.equals(myJID))
-                            continue;
-                        
-                        // TODO use callback
-                        int time = timedActivity.getTimestamp();
-                        sendFile(jid, fileAdd.getPath(), time, null);
-                    }
-                    
-                    // TODO remove activity and let this be handled by
-                    // ActivitiesProvider instead
-                    
-                    // don't remove file activity so that it still bumps the
-                    // time stamp when being received
-                }
-            }
-        }
-        
-        log.info("Sent activities: "+timedActivities);
-        
-        if (timedActivities != null && connection != null) {
-            sendMessageToAll(sharedProject, new ActivitiesPacketExtension(timedActivities));
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
-    public void sendFileList(JID recipient, FileList fileList) 
-        throws XMPPException {
-        
-        log.fine("Establishing file list transfer");
-        
-        String xml = fileList.toXML();
+	private List<FileTransfer> fileTransferQueue = new LinkedList<FileTransfer>();
 
-        OutgoingFileTransfer transfer = 
-            fileTransferManager.createOutgoingFileTransfer(recipient.toString());
-        
-        OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, 
-            xml.getBytes().length, FILELIST_TRANSFER_DESCRIPTION);
-        
-        log.fine("Sending file list");
+	private int runningFileTransfers = 0;
 
-        if (out == null)
-            throw new XMPPException(transfer.getException());
-            
-        try {
-            BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
-            writer.write(xml);
-            writer.flush();
-            writer.close();
-        } catch (IOException e) {
-            throw new XMPPException(e);
-        }
-            
-        log.info("Sent file list");
-    }
+	/**
+	 * A simple struct that is used to queue file transfers.
+	 */
+	private class FileTransfer {
+		public JID recipient;
 
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.net.ITransmitter
-     */
-    public void sendFile(JID to, IPath path, IFileTransferCallback callback) {
-        sendFile(to, path, -1, callback);
-    }
-    
-    /* (non-Javadoc)
-     * @see de.fu_berlin.inf.dpp.net.ITransmitter
-     */
-    public void sendFile(JID to, IPath path, int timestamp, 
-        IFileTransferCallback callback) {
-        
-        FileTransfer transfer = new FileTransfer();
-        transfer.recipient = to;
-        transfer.path = path;
-        transfer.timestamp = timestamp;
-        transfer.callback = callback;
-        
-        fileTransferQueue.add(transfer);
-        sendNextFile();
-    }
-    
-    // TODO replace dependencies by more generic listener interfaces
-    /* (non-Javadoc)
-     * @see org.jivesoftware.smack.PacketListener
-     */
-    public void processPacket(Packet packet) {
-        Message message = (Message)packet;
-        
-        JID fromJID = new JID(message.getFrom());
-        putIncomingChat(fromJID, message.getThread());
-        ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
+		public IPath path;
 
-        ActivitiesPacketExtension activitiesPacket = 
-            PacketExtensions.getActvitiesExtension(message);
-        
-        if (activitiesPacket != null) {
-            List<TimedActivity> timedActivities = activitiesPacket.getActivities();
-            
-            log.info("Received activities: "+timedActivities);
-            
-            for (TimedActivity timedActivity : timedActivities) {
-                
-                /*
-                 * incoming fileActivities that add files are only used as
-                 * placeholder to bump the timestamp. the real fileActivity
-                 * will be processed by using a file transfer.
-                 */
-                IActivity activity = timedActivity.getActivity();
-                if (!(activity instanceof FileActivity) || 
-                    !((FileActivity)activity).getType().equals(FileActivity.Type.Created)) {
-                    
-                    
-                    project.getSequencer().exec(timedActivity);
-                }
-            }
-        }
+		public int timestamp;
 
-        if (PacketExtensions.getJoinExtension(message) != null) {
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(fromJID))
-                    process.joinReceived(fromJID);
-            }
-        }
-        
-        if (PacketExtensions.getLeaveExtension(message) != null) {
-            if (project != null)
-                project.removeUser(new User(fromJID)); // HACK
-        }
-        
-        if (PacketExtensions.getRequestExtension(message)!= null) {
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(fromJID))
-                    process.fileListRequested(fromJID);
-            }
-        }
-        
-        DefaultPacketExtension inviteExtension = 
-            PacketExtensions.getInviteExtension(message);
-        
-        if (inviteExtension != null) {
-            String desc = inviteExtension.getValue(PacketExtensions.DESCRIPTION);
-            
-            SessionManager sm = Saros.getDefault().getSessionManager();
-            sm.invitationReceived(fromJID, desc);
-        }
-        
-        DefaultPacketExtension cancelInviteExtension = 
-            PacketExtensions.getCancelInviteExtension(message);
-        
-        if (cancelInviteExtension != null) {
-            String errorMsg = cancelInviteExtension.getValue(PacketExtensions.ERROR);
-            
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(fromJID))
-                    process.cancel(errorMsg, true);
-            }
-        }
-    }
-    
-    /* (non-Javadoc)
-     * @see org.jivesoftware.smackx.filetransfer.FileTransferListener
-     */
-    public void fileTransferRequest(FileTransferRequest request) {
-        String fileDescription = request.getDescription();
+		public IFileTransferCallback callback;
 
-        if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
-            FileList fileList = receiveFileList(request);
-            JID fromJID = new JID(request.getRequestor());
-            
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(fromJID))
-                    process.fileListReceived(fromJID, fileList);
-            }
-            
-        } else if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
-            receiveResource(request);
-        }
-    }
-    
-    private void sendMessageToAll(ISharedProject sharedProject, 
-        PacketExtension extension) { // HACK
-        
-        JID myJID = Saros.getDefault().getMyJID();
-        
-        for (User participant : sharedProject.getParticipants()) {
-            if (participant.getJid().equals(myJID))
-                continue;
-            
-            sendMessage(participant.getJid(), extension);
-        }
-    }
+		public int retries = 0;
+	}
 
-    private void sendMessage(JID jid, PacketExtension extension) {
-        try {
-            Chat chat = getChat(jid);
-            
-            Message message = chat.createMessage();
-            message.addExtension(extension);
-            chat.sendMessage(message);
-        } catch (XMPPException e) {
-        	Saros.getDefault().getLog().log(
-				new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-					"Could not send message", e));
-        }
-    }
+	public XMPPChatTransmitter(XMPPConnection connection) {
+		this.connection = connection;
+		fileTransferManager = new FileTransferManager(connection);
+		fileTransferManager.addFileTransferListener(this);
 
-    private void receiveResource(FileTransferRequest request) {
-        try {
-            log.fine("Receiving resource "+request.getFileName());
-            
-            JID from = new JID(request.getRequestor());
-            Path path = new Path(request.getFileName());
-            InputStream in = request.accept().recieveFile();
-            
-            boolean handledByInvitation = false;
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(from)) {
-                    process.resourceReceived(from, path, in);
-                    handledByInvitation = true;
-                }
-            }
-            
-            if (!handledByInvitation) {
-                FileActivity activity = new FileActivity(
-                    FileActivity.Type.Created, path, in
-                );
-                
-                int time;
-                String description = request.getDescription();
-                try {
-                    time = Integer.parseInt(description.substring(
-                        RESOURCE_TRANSFER_DESCRIPTION.length() + 1));
-                } catch (NumberFormatException e) {
-                    Saros.log("Could not parse time from description: " + description, e);
-                    time = 0; // HACK
-                }
-                
-                TimedActivity timedActivity = new TimedActivity(activity, time);
-                
-                SessionManager sm = Saros.getDefault().getSessionManager();
-                sm.getSharedProject().getSequencer().exec(timedActivity);    
-            }
-            
-            log.info("Received resource "+request.getFileName());
-            
-        } catch (Exception e) {
-            log.log(Level.WARNING, "Failed to receive "+request.getFileName(), e);
-        }        
-    }
+		setProxyPort(connection);
 
-    private void sendNextFile() {
-        if (fileTransferQueue.size() == 0 || runningFileTransfers > MAX_PARALLEL_SENDS)
-            return;
-        
-        final FileTransfer transfer = fileTransferQueue.remove(0);
-        
-        new Thread(new Runnable() {
-            
-            /* (non-Javadoc)
-             * @see java.lang.Runnable#run()
-             */
-            public void run() {
-                try {
-                    runningFileTransfers++;
-                    transferFile(transfer);
-                    
-                } catch (Exception e) {
-                    if (transfer.retries >= MAX_TRANSFER_RETRIES) {
-                        log.log(Level.WARNING, "Failed to send "+transfer.path, e);
-                        if (transfer.callback != null)
-                            transfer.callback.fileTransferFailed(transfer.path, e);
-                        
-                    } else {
-                        transfer.retries++;
-                        fileTransferQueue.add(transfer);
-                    }
-                    
-                } finally {
-                    runningFileTransfers--;
-                    sendNextFile();
-                }
-            }
-            
-        }).start();
-    }
-    
-    private void transferFile(FileTransfer transferData) 
-        throws CoreException, XMPPException, IOException {
-        
-        log.fine("Sending file "+transferData.path);
-        
-        JID recipient = transferData.recipient;
-        
-        SessionManager sm = Saros.getDefault().getSessionManager();
-        IProject project = sm.getSharedProject().getProject();
-        InputStream in = project.getFile(transferData.path).getContents();
-        
-        OutgoingFileTransfer transfer = 
-            fileTransferManager.createOutgoingFileTransfer(recipient.toString());
-        
-        String description = RESOURCE_TRANSFER_DESCRIPTION;
-        if (transferData.timestamp >= 0) {
-            description = description + ':' + transferData.timestamp;
-        }
-        
-        // HACK file size
-        OutputStream out = transfer.sendFile(transferData.path.toString(), 
-            1, description);
-        
-        if (out == null || transfer.getException() != null)
-            throw new XMPPException(transfer.getException());
-        
-        byte[] buffer = new byte[1000];
-        int length = -1;
-        
-        while ((length = in.read(buffer)) >= 0) {
-            out.write(buffer, 0, length);
-        }
-        
-        out.close();
-        in.close();
-        
-        log.info("Sent file "+transferData.path);
-        
-        if (transferData.callback != null)
-            transferData.callback.fileSent(transferData.path);
-    }
+		// TODO always preserve threads
+		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.CHAT)); // HACK
+	}
 
-    private FileList receiveFileList(FileTransferRequest request) {
-        log.fine("Receiving file list");
-        
-        FileList fileList = null;
-        final IncomingFileTransfer transfer = request.accept();
-        
-        try {
-            InputStream in = transfer.recieveFile();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            StringBuffer sb = new StringBuffer();
-            
-            try {
-                String line = null;
-                while((line=reader.readLine()) != null) {
-                    sb.append(line+"\n");
-                }
-            } catch(Exception e) {
-            	Saros.log("Error while receiving file list", e);
-            } finally {
-                reader.close();
-            }   
-            
-            fileList = new FileList(sb.toString());
-            
-            log.info("Received file list");
-            
-        } catch (Exception e) {
-        	Saros.log("Exception while receiving file list", e);
-        }
-        
-        return fileList;
-    }
+	public void addInvitationProcess(IInvitationProcess process) {
+		processes.add(process);
+	}
 
-    private void putIncomingChat(JID jid, String thread) {
-        if (!chats.containsKey(jid))
-            chats.put(jid, new Chat(connection, jid.toString(), thread));
-    }
+	public void removeInvitationProcess(IInvitationProcess process) {
+		processes.remove(process);
+	}
 
-    private Chat getChat(JID jid) {
-        if (connection == null)
-            throw new NullPointerException("Connection can't be null.");
-        
-        Chat chat = chats.get(jid);
-        
-        if (chat == null) {
-            chat = new Chat(connection, jid.toString());
-            chats.put(jid, chat);
-        }
-        
-        return chat;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter
+	 */
+	public void sendCancelInvitationMessage(JID user, String errorMsg) {
+		sendMessage(user, PacketExtensions.createCancelInviteExtension(errorMsg));
+	}
 
-    private void setProxyPort(XMPPConnection connection) {
-        /*
-         * Not supported!
-         *  
-         IPreferenceStore preferenceStore = Saros.getDefault().getPreferenceStore();
-        
-        fileTransferManager.getProperties().setProperty(
-            Socks5TransferNegotiator.PROPERTIES_PORT, 
-            preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT)
-        );
-        */
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.ITransmitter
+	 */
+	public void sendRequestForFileListMessage(JID user) {
+		sendMessage(user, PacketExtensions.createRequestForFileListExtension());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.ITransmitter
+	 */
+	public void sendInviteMessage(ISharedProject sharedProject, JID guest, String description) {
+
+		sendMessage(guest, PacketExtensions.createInviteExtension(description));
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.ITransmitter
+	 */
+	public void sendJoinMessage(ISharedProject sharedProject) {
+		sendMessageToAll(sharedProject, PacketExtensions.createJoinExtension());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.ITransmitter
+	 */
+	public void sendLeaveMessage(ISharedProject sharedProject) {
+		sendMessageToAll(sharedProject, PacketExtensions.createLeaveExtension());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.ITransmitter
+	 */
+	public void sendActivities(ISharedProject sharedProject, List<TimedActivity> timedActivities) {
+
+		// timer that calls sendActivities is called before setting chat
+
+		for (TimedActivity timedActivity : timedActivities) {
+			IActivity activity = timedActivity.getActivity();
+
+			if (activity instanceof FileActivity) {
+				FileActivity fileAdd = (FileActivity) activity;
+
+				if (fileAdd.getType().equals(FileActivity.Type.Created)) {
+					JID myJID = Saros.getDefault().getMyJID();
+
+					for (User participant : sharedProject.getParticipants()) {
+						JID jid = participant.getJid();
+						if (jid.equals(myJID))
+							continue;
+
+						// TODO use callback
+						int time = timedActivity.getTimestamp();
+						sendFile(jid, fileAdd.getPath(), time, null);
+					}
+
+					// TODO remove activity and let this be handled by
+					// ActivitiesProvider instead
+
+					// don't remove file activity so that it still bumps the
+					// time stamp when being received
+				}
+			}
+		}
+
+		log.info("Sent activities: " + timedActivities);
+
+		if (timedActivities != null && connection != null) {
+			sendMessageToAll(sharedProject, new ActivitiesPacketExtension(timedActivities));
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.ITransmitter
+	 */
+	public void sendFileList(JID recipient, FileList fileList) throws XMPPException {
+
+		log.fine("Establishing file list transfer");
+
+		String xml = fileList.toXML();
+
+		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(recipient
+			.toString());
+
+		OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
+			FILELIST_TRANSFER_DESCRIPTION);
+
+		log.fine("Sending file list");
+
+		if (out == null)
+			throw new XMPPException(transfer.getException());
+
+		try {
+			BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
+			writer.write(xml);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new XMPPException(e);
+		}
+
+		log.info("Sent file list");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter
+	 */
+	public void sendFile(JID to, IPath path, IFileTransferCallback callback) {
+		sendFile(to, path, -1, callback);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter
+	 */
+	public void sendFile(JID to, IPath path, int timestamp, IFileTransferCallback callback) {
+
+		FileTransfer transfer = new FileTransfer();
+		transfer.recipient = to;
+		transfer.path = path;
+		transfer.timestamp = timestamp;
+		transfer.callback = callback;
+
+		fileTransferQueue.add(transfer);
+		sendNextFile();
+	}
+
+	// TODO replace dependencies by more generic listener interfaces
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jivesoftware.smack.PacketListener
+	 */
+	public void processPacket(Packet packet) {
+		Message message = (Message) packet;
+
+		JID fromJID = new JID(message.getFrom());
+		putIncomingChat(fromJID, message.getThread());
+		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
+
+		ActivitiesPacketExtension activitiesPacket = PacketExtensions
+			.getActvitiesExtension(message);
+
+		if (activitiesPacket != null) {
+			List<TimedActivity> timedActivities = activitiesPacket.getActivities();
+
+			log.info("Received activities: " + timedActivities);
+
+			for (TimedActivity timedActivity : timedActivities) {
+
+				/*
+				 * incoming fileActivities that add files are only used as
+				 * placeholder to bump the timestamp. the real fileActivity will
+				 * be processed by using a file transfer.
+				 */
+				IActivity activity = timedActivity.getActivity();
+				if (!(activity instanceof FileActivity)
+					|| !((FileActivity) activity).getType().equals(FileActivity.Type.Created)) {
+
+					project.getSequencer().exec(timedActivity);
+				}
+			}
+		}
+
+		if (PacketExtensions.getJoinExtension(message) != null) {
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(fromJID))
+					process.joinReceived(fromJID);
+			}
+		}
+
+		if (PacketExtensions.getLeaveExtension(message) != null) {
+			if (project != null)
+				project.removeUser(new User(fromJID)); // HACK
+		}
+
+		if (PacketExtensions.getRequestExtension(message) != null) {
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(fromJID))
+					process.fileListRequested(fromJID);
+			}
+		}
+
+		DefaultPacketExtension inviteExtension = PacketExtensions.getInviteExtension(message);
+
+		if (inviteExtension != null) {
+			String desc = inviteExtension.getValue(PacketExtensions.DESCRIPTION);
+
+			SessionManager sm = Saros.getDefault().getSessionManager();
+			sm.invitationReceived(fromJID, desc);
+		}
+
+		DefaultPacketExtension cancelInviteExtension = PacketExtensions
+			.getCancelInviteExtension(message);
+
+		if (cancelInviteExtension != null) {
+			String errorMsg = cancelInviteExtension.getValue(PacketExtensions.ERROR);
+
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(fromJID))
+					process.cancel(errorMsg, true);
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.jivesoftware.smackx.filetransfer.FileTransferListener
+	 */
+	public void fileTransferRequest(FileTransferRequest request) {
+		String fileDescription = request.getDescription();
+
+		if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
+			FileList fileList = receiveFileList(request);
+			JID fromJID = new JID(request.getRequestor());
+
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(fromJID))
+					process.fileListReceived(fromJID, fileList);
+			}
+
+		} else if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
+			receiveResource(request);
+		}
+	}
+
+	private void sendMessageToAll(ISharedProject sharedProject, PacketExtension extension) { // HACK
+
+		JID myJID = Saros.getDefault().getMyJID();
+
+		for (User participant : sharedProject.getParticipants()) {
+			if (participant.getJid().equals(myJID))
+				continue;
+
+			sendMessage(participant.getJid(), extension);
+		}
+	}
+
+	private void sendMessage(JID jid, PacketExtension extension) {
+		try {
+			Chat chat = getChat(jid);
+
+			Message message = chat.createMessage();
+			message.addExtension(extension);
+			chat.sendMessage(message);
+		} catch (XMPPException e) {
+			Saros.getDefault().getLog().log(
+				new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, "Could not send message", e));
+		}
+	}
+
+	private void receiveResource(FileTransferRequest request) {
+		try {
+			log.fine("Receiving resource " + request.getFileName());
+
+			JID from = new JID(request.getRequestor());
+			Path path = new Path(request.getFileName());
+			InputStream in = request.accept().recieveFile();
+
+			boolean handledByInvitation = false;
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(from)) {
+					process.resourceReceived(from, path, in);
+					handledByInvitation = true;
+				}
+			}
+
+			if (!handledByInvitation) {
+				FileActivity activity = new FileActivity(FileActivity.Type.Created, path, in);
+
+				int time;
+				String description = request.getDescription();
+				try {
+					time = Integer.parseInt(description.substring(RESOURCE_TRANSFER_DESCRIPTION
+						.length() + 1));
+				} catch (NumberFormatException e) {
+					Saros.log("Could not parse time from description: " + description, e);
+					time = 0; // HACK
+				}
+
+				TimedActivity timedActivity = new TimedActivity(activity, time);
+
+				SessionManager sm = Saros.getDefault().getSessionManager();
+				sm.getSharedProject().getSequencer().exec(timedActivity);
+			}
+
+			log.info("Received resource " + request.getFileName());
+
+		} catch (Exception e) {
+			log.log(Level.WARNING, "Failed to receive " + request.getFileName(), e);
+		}
+	}
+
+	private void sendNextFile() {
+		if (fileTransferQueue.size() == 0 || runningFileTransfers > MAX_PARALLEL_SENDS)
+			return;
+
+		final FileTransfer transfer = fileTransferQueue.remove(0);
+
+		new Thread(new Runnable() {
+
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see java.lang.Runnable#run()
+			 */
+			public void run() {
+				try {
+					runningFileTransfers++;
+					transferFile(transfer);
+
+				} catch (Exception e) {
+					if (transfer.retries >= MAX_TRANSFER_RETRIES) {
+						log.log(Level.WARNING, "Failed to send " + transfer.path, e);
+						if (transfer.callback != null)
+							transfer.callback.fileTransferFailed(transfer.path, e);
+
+					} else {
+						transfer.retries++;
+						fileTransferQueue.add(transfer);
+					}
+
+				} finally {
+					runningFileTransfers--;
+					sendNextFile();
+				}
+			}
+
+		}).start();
+	}
+
+	private void transferFile(FileTransfer transferData) throws CoreException, XMPPException,
+		IOException {
+
+		log.fine("Sending file " + transferData.path);
+
+		JID recipient = transferData.recipient;
+
+		SessionManager sm = Saros.getDefault().getSessionManager();
+		IProject project = sm.getSharedProject().getProject();
+		InputStream in = project.getFile(transferData.path).getContents();
+
+		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(recipient
+			.toString());
+
+		String description = RESOURCE_TRANSFER_DESCRIPTION;
+		if (transferData.timestamp >= 0) {
+			description = description + ':' + transferData.timestamp;
+		}
+
+		// HACK file size
+		OutputStream out = transfer.sendFile(transferData.path.toString(), 1, description);
+
+		if (out == null || transfer.getException() != null)
+			throw new XMPPException(transfer.getException());
+
+		byte[] buffer = new byte[1000];
+		int length = -1;
+
+		while ((length = in.read(buffer)) >= 0) {
+			out.write(buffer, 0, length);
+		}
+
+		out.close();
+		in.close();
+
+		log.info("Sent file " + transferData.path);
+
+		if (transferData.callback != null)
+			transferData.callback.fileSent(transferData.path);
+	}
+
+	private FileList receiveFileList(FileTransferRequest request) {
+		log.fine("Receiving file list");
+
+		FileList fileList = null;
+		final IncomingFileTransfer transfer = request.accept();
+
+		try {
+			InputStream in = transfer.recieveFile();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			StringBuffer sb = new StringBuffer();
+
+			try {
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+					sb.append(line + "\n");
+				}
+			} catch (Exception e) {
+				Saros.log("Error while receiving file list", e);
+			} finally {
+				reader.close();
+			}
+
+			fileList = new FileList(sb.toString());
+
+			log.info("Received file list");
+
+		} catch (Exception e) {
+			Saros.log("Exception while receiving file list", e);
+		}
+
+		return fileList;
+	}
+
+	private void putIncomingChat(JID jid, String thread) {
+		if (!chats.containsKey(jid))
+			chats.put(jid, new Chat(connection, jid.toString(), thread));
+	}
+
+	private Chat getChat(JID jid) {
+		if (connection == null)
+			throw new NullPointerException("Connection can't be null.");
+
+		Chat chat = chats.get(jid);
+
+		if (chat == null) {
+			chat = new Chat(connection, jid.toString());
+			chats.put(jid, chat);
+		}
+
+		return chat;
+	}
+
+	private void setProxyPort(XMPPConnection connection) {
+		/*
+		 * Not supported!
+		 * 
+		 * IPreferenceStore preferenceStore =
+		 * Saros.getDefault().getPreferenceStore();
+		 * 
+		 * fileTransferManager.getProperties().setProperty(
+		 * Socks5TransferNegotiator.PROPERTIES_PORT,
+		 * preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT) );
+		 */
+	}
 }
