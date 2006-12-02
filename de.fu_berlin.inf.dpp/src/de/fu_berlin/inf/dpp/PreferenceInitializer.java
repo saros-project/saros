@@ -36,8 +36,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public void initializeDefaultPreferences() {
 	    IPreferenceStore store = Saros.getDefault().getPreferenceStore();
 	    store.setDefault(PreferenceConstants.SERVER,   "jabber.org");
-	    store.setDefault(PreferenceConstants.USERNAME, "Your username");
-	    store.setDefault(PreferenceConstants.PASSWORD, "Your password");
+	    store.setDefault(PreferenceConstants.USERNAME, "");
+	    store.setDefault(PreferenceConstants.PASSWORD, "");
         
 	    store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
         store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
