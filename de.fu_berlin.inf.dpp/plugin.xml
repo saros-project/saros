@@ -119,48 +119,69 @@
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
       <type
-            markerType="de.fu_berlin.inf.dpp.viewport"
-            name="de.fu_berlin.inf.dpp.viewport"/>
+            markerType="de.fu_berlin.inf.dpp.annotations.viewport"
+            name="de.fu_berlin.inf.dpp.annotations.viewport"/>
       <type
-            markerType="de.fu_berlin.inf.dpp.annotation.user"
-            name="de.fu_berlin.inf.dpp.annotation.user"/>
+            markerType="de.fu_berlin.inf.dpp.annotations.contribution"
+            name="de.fu_berlin.inf.dpp.annotations.contribution"/>
+      <type
+            markerType="de.fu_berlin.inf.dpp.annotations.selection"
+            name="de.fu_berlin.inf.dpp.annotations.selection"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationType="de.fu_berlin.inf.dpp.viewport"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.viewport.color"
+            annotationType="de.fu_berlin.inf.dpp.annotations.viewport"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color"
             colorPreferenceValue="0,255,0"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.viewport.highlight"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.viewport.overview"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
-            textPreferenceKey="de.fu_berlin.inf.dpp.viewport.text"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.viewport.ruler"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler"
             verticalRulerPreferenceValue="true"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotation.user"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.color"
+            annotationType="de.fu_berlin.inf.dpp.annotations.contribution"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.highlight"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.overview"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler"
             colorPreferenceValue="138,165,189"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.highlight"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
             label="DPP User"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.overview"
             overviewRulerPreferenceValue="false"
             presentationLayer="7"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.text"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotation.user.textstyle"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotation.user.ruler"
+            verticalRulerPreferenceValue="false"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.selection"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color"
+            colorPreferenceValue="255,0,0"
+            contributesToHeader="false"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="Selection of other user"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview"
+            overviewRulerPreferenceValue="false"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text"
+            textPreferenceValue="true"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler"
             verticalRulerPreferenceValue="false"/>
    </extension>
    <extension
