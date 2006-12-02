@@ -29,7 +29,11 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -45,291 +49,334 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
+ * The main plug-in of Saros.
+ * 
  * @author rdjemili
+ * @author coezbek
  */
 public class Saros extends AbstractUIPlugin {
-    public static enum ConnectionState{NOT_CONNECTED, CONNECTING, CONNECTED, DISCONNECTING, ERROR};
-    
-    // The shared instance.
-    private static Saros              plugin;
-    private static SarosUI            uiInstance;
+	public static enum ConnectionState {
+		NOT_CONNECTED, CONNECTING, CONNECTED, DISCONNECTING, ERROR
+	};
 
-    private XMPPConnection            connection;
-    private ConnectionState           connectionState  = ConnectionState.NOT_CONNECTED;
-    private String                    connectionError;
+	// The shared instance.
+	private static Saros plugin;
 
-    private MessagingManager          messagingManager;
-    private SessionManager            sessionManager;
+	public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
+	
+	private static SarosUI uiInstance;
 
-//  TODO use ListenerList instead
-    private List<IConnectionListener> listeners        = new CopyOnWriteArrayList<IConnectionListener>();
-    
-    static {
-        PacketExtensions.hookExtensionProviders();
-    }
-    
-    /**
-     * Create the shared instance.
-     */
-    public Saros() {
-        plugin = this;
-    }
-    
-    /**
-     * This method is called upon plug-in activation
-     */
-    public void start(BundleContext context) throws Exception {
-        super.start(context);
-        
-        XMPPConnection.DEBUG_ENABLED = 
-            getPreferenceStore().getBoolean(PreferenceConstants.DEBUG);
-        
-        setupLoggers();
-        
-        messagingManager = new MessagingManager();
-        sessionManager = new SessionManager();
-        
-        ActivityRegistry.getDefault();
-        SkypeManager.getDefault();
-        
-        uiInstance = new SarosUI(sessionManager);
-        
-        if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)) {
-            asyncConnect();
-        }
-    }
+	private XMPPConnection connection;
 
-    /**
-     * This method is called when the plug-in is stopped
-     */
-    public void stop(BundleContext context) throws Exception {
-        super.stop(context);
-        
-        sessionManager.leaveSession();
-        disconnect(null);
-        
-        plugin = null;
-    }
-    
-    /**
-     * Returns the shared instance.
-     * 
-     * @return the shared instance.
-     */
-    public static Saros getDefault() {
-        return plugin;
-    }
-    
-    public JID getMyJID() {
-        return isConnected() ? new JID(connection.getUser()) : null;
-    }
+	private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
-    public SarosUI getUI() { // HACK
-        return uiInstance;
-    }
+	private String connectionError;
 
-    public Roster getRoster() {
-        if (!isConnected())
-            return null;
-        
-        return connection.getRoster();
-    }
-    
-    /**
-     * @return the MessagingManager which is responsible for handling instant
-     * messaging. Is never <code>null</code>.
-     */
-    public MessagingManager getMessagingManager() {
-        return messagingManager;
-    }
-    
-    /**
-     * @return the SessionManager. Is never <code>null</code>.
-     */
-    public SessionManager getSessionManager() {
-        return sessionManager;
-    }
-    
-    public void asyncConnect() {
-        new Thread(new Runnable() {
-            public void run() {
-                connect();
-            }
-        }).start();
-    }
-    
-    /**
-     * Connects according to the preferences. This is a blocking method.
-     * 
-     * If there is already a established connection when calling this method, it
-     * disconnects before connecting.
-     */
-    public void connect() {
-        try {
-            if (isConnected())
-                disconnect(null);
-            
-            setConnectionState(ConnectionState.CONNECTING, null);
-            
-            IPreferenceStore prefStore = getPreferenceStore();
-            String server   = prefStore.getString(PreferenceConstants.SERVER);
-            String username = prefStore.getString(PreferenceConstants.USERNAME);
-            String password = prefStore.getString(PreferenceConstants.PASSWORD);
-            
-            connection = new XMPPConnection(server);
-            connection.login(username, password);
-            
-            setConnectionState(ConnectionState.CONNECTED, null);
-            
-        } catch (Exception e) {
-            disconnect(e.getMessage());
-        }        
-    }
-    
-    /**
-     * Disconnects.This is a blocking method.
-     * 
-     * @param reason the error why the connection was closed. If the connection
-     * was not closed due to an error <code>null</code> is passed.
-     */
-    public void disconnect(String error) {
-        setConnectionState(ConnectionState.DISCONNECTING, error);
-        
-        if (connection != null) {
-            connection.close();
-        }
-        connection = null;
-        
-        connectionState = error == null ? 
-            ConnectionState.NOT_CONNECTED : ConnectionState.ERROR;
-        
-        setConnectionState(ConnectionState.NOT_CONNECTED, error);
-    }
-    
-    /**
-     * Creates the given account on the given Jabber server. This is a blocking
-     * method.
-     * 
-     * @param server the server on which to create the account.
-     * @param username the username for the new account.
-     * @param password the password for the new account.
-     * @param monitor the progressmonitor for the operation.
-     * @throws XMPPException exception that occcurs while registering.
-     */
-    public void createAccount(String server, String username, String password, 
-        IProgressMonitor monitor) throws XMPPException {
-        
-        monitor.beginTask("Registering account", 3);
-        
-        XMPPConnection connection = new XMPPConnection(server);
-        monitor.worked(1);
-        
-        connection.getAccountManager().createAccount(username, password);
-        monitor.worked(1);
-        
-        connection.close();
-        monitor.done();
-    }
-    
-    /**
-     * Adds given contact to the roster. This is a blocking method.
-     * 
-     * @param jid the Jabber ID of the contact.
-     * @param nickname the nickname under which the new contact should appear in
-     * the roster.
-     * @param groups the groups to which the new contact should belong to. This
-     * information will be saved on the server.
-     * @throws XMPPException is thrown if no connection is establised.
-     */
-    public void addContact(JID jid, String nickname, String[] groups) 
-        throws XMPPException {
-        
-        assertConnection();
-        connection.getRoster().createEntry(jid.toString(), nickname, groups);
-    }
-    
-    /**
-     * Removes given contact from the roster. This is a blocking method.
-     * 
-     * @param rosterEntry the contact that is to be removed
-     * @throws XMPPException is thrown if no connection is establised.
-     */
-    public void removeContact(RosterEntry rosterEntry) throws XMPPException {
-        assertConnection();
-        connection.getRoster().removeEntry(rosterEntry);
-    }
-    
-    public boolean isConnected() {
-        return connection != null && connection.isConnected();
-    }
-    
-    /**
-     * @return the current state of the connection.
-     */
-    public ConnectionState getConnectionState() {
-        return connectionState;
-    }
-    
-    /**
-     * @return an error string that contains the error message for the current
-     * connection error if the state is {@link ConnectionState.ERROR} or
-     * <code>null</code> if there is another state set.
-     */
-    public String getConnectionError() {
-       return connectionError; 
-    }
-    
-    /**
-     * @return the currently established connection or <code>null</code> if
-     * there is none.
-     */
-    public XMPPConnection getConnection() {
-        return connection;
-    }
-    
-    public void addListener(IConnectionListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
-    }
-    
-    public void removeListener(IConnectionListener listener) {
-        listeners.remove(listener);
-    }
-    
-    private void assertConnection() throws XMPPException {
-        if (!isConnected())
-            throw new XMPPException("No connection");
-    }
+	private MessagingManager messagingManager;
 
-    /**
-     * Sets a new connection state and notifies all connection listeners.
-     */
-    private void setConnectionState(ConnectionState state, String error) {
-        connectionState = state;
-        connectionError = error;
-        
-        for (IConnectionListener listener : listeners) {
-            listener.connectionStateChanged(connection, state);
-        }
-    }
-    
-    private void setupLoggers() {
-        try {
-            Logger sarosRootLogger = Logger.getLogger("de.fu_berlin.inf.dpp");
-            sarosRootLogger.setLevel(Level.ALL);
-            
-            Handler handler = new FileHandler("saros.log", 10 * 1024 * 1024, 1, true);
-            handler.setFormatter(new SimpleFormatter());
-            sarosRootLogger.addHandler(handler);
-            
-//            handler = new ConsoleHandler();
-//            sarosRootLogger.addHandler(handler);
-            
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	private SessionManager sessionManager;
+
+	// TODO use ListenerList instead
+	private List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
+
+	static {
+		PacketExtensions.hookExtensionProviders();
+	}
+
+	/**
+	 * Create the shared instance.
+	 */
+	public Saros() {
+		plugin = this;
+	}
+
+	/**
+	 * This method is called upon plug-in activation
+	 */
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+
+		XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(PreferenceConstants.DEBUG);
+
+		setupLoggers();
+
+		messagingManager = new MessagingManager();
+		sessionManager = new SessionManager();
+
+		ActivityRegistry.getDefault();
+		SkypeManager.getDefault();
+
+		uiInstance = new SarosUI(sessionManager);
+
+		if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)) {
+			asyncConnect();
+		}
+	}
+
+	/**
+	 * This method is called when the plug-in is stopped
+	 */
+	public void stop(BundleContext context) throws Exception {
+		super.stop(context);
+
+		sessionManager.leaveSession();
+		disconnect(null);
+		
+		plugin = null;
+	}
+
+	/**
+	 * Returns the shared instance.
+	 * 
+	 * @return the shared instance.
+	 */
+	public static Saros getDefault() {
+		return plugin;
+	}
+
+	public JID getMyJID() {
+		return isConnected() ? new JID(connection.getUser()) : null;
+	}
+
+	public SarosUI getUI() { // HACK
+		return uiInstance;
+	}
+
+	public Roster getRoster() {
+		if (!isConnected())
+			return null;
+
+		return connection.getRoster();
+	}
+
+	/**
+	 * @return the MessagingManager which is responsible for handling instant
+	 *         messaging. Is never <code>null</code>.
+	 */
+	public MessagingManager getMessagingManager() {
+		return messagingManager;
+	}
+
+	/**
+	 * @return the SessionManager. Is never <code>null</code>.
+	 */
+	public SessionManager getSessionManager() {
+		return sessionManager;
+	}
+
+	public void asyncConnect() {
+		new Thread(new Runnable() {
+			public void run() {
+				connect();
+			}
+		}).start();
+	}
+
+	/**
+	 * Connects according to the preferences. This is a blocking method.
+	 * 
+	 * If there is already a established connection when calling this method, it
+	 * disconnects before connecting.
+	 */
+	public void connect() {
+		
+		IPreferenceStore prefStore = getPreferenceStore();
+		final String server = prefStore.getString(PreferenceConstants.SERVER);
+		final String username = prefStore.getString(PreferenceConstants.USERNAME);
+		String password = prefStore.getString(PreferenceConstants.PASSWORD);
+		
+		try {
+			if (isConnected())
+				disconnect(null);
+
+			setConnectionState(ConnectionState.CONNECTING, null);
+
+			connection = new XMPPConnection(server);
+			connection.login(username, password);
+
+			setConnectionState(ConnectionState.CONNECTED, null);
+
+		} catch (final Exception e) {
+			disconnect(e.getMessage());
+
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					MessageDialog.openError(Display.getDefault().getActiveShell(),
+						"Error Connecting", "Could not connect to server '" + server
+							+ "' as user '" + username + "'.\nErrorMessage was: " + e.getMessage());
+				}
+			});
+		}
+	}
+
+	/**
+	 * Disconnects. This is a blocking method.
+	 * 
+	 * @param reason
+	 *            the error why the connection was closed. If the connection was
+	 *            not closed due to an error <code>null</code> should be
+	 *            passed.
+	 */
+	public void disconnect(String error) {
+		setConnectionState(ConnectionState.DISCONNECTING, error);
+
+		if (connection != null) {
+			connection.close();
+			connection = null;
+		}
+
+		setConnectionState(error == null ? ConnectionState.NOT_CONNECTED : ConnectionState.ERROR,
+			error);
+	}
+
+	/**
+	 * Creates the given account on the given Jabber server. This is a blocking
+	 * method.
+	 * 
+	 * @param server
+	 *            the server on which to create the account.
+	 * @param username
+	 *            the username for the new account.
+	 * @param password
+	 *            the password for the new account.
+	 * @param monitor
+	 *            the progressmonitor for the operation.
+	 * @throws XMPPException
+	 *             exception that occcurs while registering.
+	 */
+	public void createAccount(String server, String username, String password,
+		IProgressMonitor monitor) throws XMPPException {
+
+		monitor.beginTask("Registering account", 3);
+
+		XMPPConnection connection = new XMPPConnection(server);
+		monitor.worked(1);
+
+		connection.getAccountManager().createAccount(username, password);
+		monitor.worked(1);
+
+		connection.close();
+		monitor.done();
+	}
+
+	/**
+	 * Adds given contact to the roster. This is a blocking method.
+	 * 
+	 * @param jid
+	 *            the Jabber ID of the contact.
+	 * @param nickname
+	 *            the nickname under which the new contact should appear in the
+	 *            roster.
+	 * @param groups
+	 *            the groups to which the new contact should belong to. This
+	 *            information will be saved on the server.
+	 * @throws XMPPException
+	 *             is thrown if no connection is establised.
+	 */
+	public void addContact(JID jid, String nickname, String[] groups) throws XMPPException {
+		assertConnection();
+		connection.getRoster().createEntry(jid.toString(), nickname, groups);
+	}
+
+	/**
+	 * Removes given contact from the roster. This is a blocking method.
+	 * 
+	 * @param rosterEntry
+	 *            the contact that is to be removed
+	 * @throws XMPPException
+	 *             is thrown if no connection is establised.
+	 */
+	public void removeContact(RosterEntry rosterEntry) throws XMPPException {
+		assertConnection();
+		connection.getRoster().removeEntry(rosterEntry);
+	}
+
+	public boolean isConnected() {
+		return connection != null && connection.isConnected();
+	}
+
+	/**
+	 * @return the current state of the connection.
+	 */
+	public ConnectionState getConnectionState() {
+		return connectionState;
+	}
+
+	/**
+	 * @return an error string that contains the error message for the current
+	 *         connection error if the state is {@link ConnectionState.ERROR} or
+	 *         <code>null</code> if there is another state set.
+	 */
+	public String getConnectionError() {
+		return connectionError;
+	}
+
+	/**
+	 * @return the currently established connection or <code>null</code> if
+	 *         there is none.
+	 */
+	public XMPPConnection getConnection() {
+		return connection;
+	}
+
+	public void addListener(IConnectionListener listener) {
+		if (!listeners.contains(listener)) {
+			listeners.add(listener);
+		}
+	}
+
+	public void removeListener(IConnectionListener listener) {
+		listeners.remove(listener);
+	}
+
+	private void assertConnection() throws XMPPException {
+		if (!isConnected())
+			throw new XMPPException("No connection");
+	}
+
+	/**
+	 * Sets a new connection state and notifies all connection listeners.
+	 */
+	private void setConnectionState(ConnectionState state, String error) {
+		connectionState = state;
+		connectionError = error;
+
+		for (IConnectionListener listener : listeners) {
+			listener.connectionStateChanged(connection, state);
+		}
+	}
+
+	private void setupLoggers() {
+		try {
+			Logger sarosRootLogger = Logger.getLogger("de.fu_berlin.inf.dpp");
+			sarosRootLogger.setLevel(Level.ALL);
+
+			Handler handler = new FileHandler("saros.log", 10 * 1024 * 1024, 1, true);
+			handler.setFormatter(new SimpleFormatter());
+			sarosRootLogger.addHandler(handler);
+
+			// handler = new ConsoleHandler();
+			// sarosRootLogger.addHandler(handler);
+
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Log a message to the Eclipse ErrorLog. This method should be used 
+	 * to log all errors that occur in the plugin that cannot be corrected by the user
+	 * and seem to be errors within the plug-in or the used libraries.
+	 * 
+	 * @param message A meaningful description of during which operation the error occurred
+	 * @param e The exception associated with the error (may be null)
+	 */
+	public static void log(String message, Exception e){
+		Saros.getDefault().getLog().log(
+			new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+				message, e));
+	}
+	
 }
