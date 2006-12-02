@@ -37,8 +37,9 @@ import java.util.logging.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.core.runtime.Status;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -53,10 +54,8 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -387,8 +386,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
             message.addExtension(extension);
             chat.sendMessage(message);
         } catch (XMPPException e) {
-            // TODO
-            e.printStackTrace();
+        	Saros.getDefault().getLog().log(
+				new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+					"Could not send message", e));
         }
     }
 
@@ -414,13 +414,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
                 );
                 
                 int time;
+                String description = request.getDescription();
                 try {
-                    String description = request.getDescription();
                     time = Integer.parseInt(description.substring(
                         RESOURCE_TRANSFER_DESCRIPTION.length() + 1));
-                    
                 } catch (NumberFormatException e) {
-                    e.printStackTrace();
+                    Saros.log("Could not parse time from description: " + description, e);
                     time = 0; // HACK
                 }
                 
@@ -528,13 +527,11 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
             
             try {
                 String line = null;
-                
                 while((line=reader.readLine()) != null) {
                     sb.append(line+"\n");
                 }
-            } catch(Throwable e) {
-                e.printStackTrace();
-                
+            } catch(Exception e) {
+            	Saros.log("Error while receiving file list", e);
             } finally {
                 reader.close();
             }   
@@ -543,8 +540,8 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
             
             log.info("Received file list");
             
-        } catch (Throwable e) {
-            log.log(Level.SEVERE, "Exception while receiving file list", e);
+        } catch (Exception e) {
+        	Saros.log("Exception while receiving file list", e);
         }
         
         return fileList;
@@ -570,11 +567,15 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
     }
 
     private void setProxyPort(XMPPConnection connection) {
-        IPreferenceStore preferenceStore = Saros.getDefault().getPreferenceStore();
+        /*
+         * Not supported!
+         *  
+         IPreferenceStore preferenceStore = Saros.getDefault().getPreferenceStore();
         
         fileTransferManager.getProperties().setProperty(
             Socks5TransferNegotiator.PROPERTIES_PORT, 
             preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT)
         );
+        */
     }
 }
