@@ -313,7 +313,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void selectionChanged(ITextSelection selection) { 
-        if (!isDriver) return;
+		// Commented to allow selection to work for observer too.
+        // if (!isDriver) return;
         
         int offset = selection.getOffset();
         int length = selection.getLength();

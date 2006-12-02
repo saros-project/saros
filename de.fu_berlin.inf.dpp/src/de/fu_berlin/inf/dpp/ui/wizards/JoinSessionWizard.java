@@ -46,6 +46,13 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 /**
  * A wizard that guides the user through an incoming invitiation process.
  * 
+ * Todo:
+ *   - Enhance Usability of this dialog:
+ *     - Automatically switch to follow mode
+ *     - Make a suggestion for the name of the project
+ *   - Suggest if the project is a CVS project that the user checks 
+ *     it out and offers an option to transfer the settings
+ * 
  * @author rdjemili
  */
 public class JoinSessionWizard extends Wizard {

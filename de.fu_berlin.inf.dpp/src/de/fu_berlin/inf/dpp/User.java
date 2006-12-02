@@ -33,7 +33,7 @@ public class User {
     }
     
     @Override
-    public String toString() {
+    public String toString() {   	
         return jid.getName();
     }
     

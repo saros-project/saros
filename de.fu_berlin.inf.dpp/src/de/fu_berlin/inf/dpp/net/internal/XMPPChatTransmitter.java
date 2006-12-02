@@ -406,7 +406,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			Message message = chat.createMessage();
 			message.addExtension(extension);
 			chat.sendMessage(message);
-		} catch (XMPPException e) {
+		} catch (Exception e) {
 			Saros.getDefault().getLog().log(
 				new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, "Could not send message", e));
 		}

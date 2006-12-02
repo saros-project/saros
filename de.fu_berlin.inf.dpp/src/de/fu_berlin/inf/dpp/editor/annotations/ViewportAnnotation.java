@@ -17,10 +17,18 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
+
+/**
+ * The annotation that shows were the driver currently is.
+ * 
+ * Preferences are set in the plug-in XML
+ * 
+ * @author rdjemili
+ */
 public class ViewportAnnotation extends Annotation 
     implements IAnnotationPresentation, IPropertyChangeListener {
 
-    public static final String  TYPE         = "de.fu_berlin.inf.dpp.viewport";
+    public static final String  TYPE         = "de.fu_berlin.inf.dpp.annotations.viewport";
     public static final int     LAYER        = 6;
     private static final int    INSET        = 2;
 

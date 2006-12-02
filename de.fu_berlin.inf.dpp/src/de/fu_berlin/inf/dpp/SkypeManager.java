@@ -104,11 +104,15 @@ public class SkypeManager implements IConnectionListener {
      * Requests the Skype user name of given user. This method blocks up to 5
      * seconds to receive the value.
      * 
+     * @param connection 
      * @param user the user for which the Skype name is requested.
      * @return the Skype user name of given user or <code>null</code> if the
      * user doesn't respond in time or has no Skype name.
      */
-    private static String requestSkypeName(XMPPConnection connection, JID user) {
+    private static String requestSkypeName(XMPPConnection connection, JID user){
+    	if (connection == null || !connection.isConnected())
+    		return null;
+    	
         // Request the time from a remote user.
         SkypeIQ request = new SkypeIQ();
         

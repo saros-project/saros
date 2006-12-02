@@ -8,10 +8,10 @@ import org.eclipse.jface.text.source.Annotation;
  * @author rdjemili
  */
 public class ContributionAnnotation extends Annotation {
-    public static final String TYPE = "de.fu_berlin.inf.dpp.annotation.user";
+    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
     
     public ContributionAnnotation() {
-        super(TYPE, false, "");
+        this("");
     }
     
     public ContributionAnnotation(String username) {
