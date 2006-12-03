@@ -45,6 +45,8 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 	// TODO separate into two classes!?
 
+	private static final int UNDEFINED_TIME = -1;
+
 	private static Logger log = Logger.getLogger(ActivitySequencer.class.getName());
 
 	private List<IActivity> activities = new LinkedList<IActivity>();
@@ -55,7 +57,7 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 
 	private List<TimedActivity> queue = new CopyOnWriteArrayList<TimedActivity>();
 
-	private int timestamp = 0;
+	private int timestamp = UNDEFINED_TIME;
 
 	/*
 	 * (non-Javadoc)
@@ -117,8 +119,10 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 		if (activities == null)
 			return null;
 
+		if (timestamp == UNDEFINED_TIME)
+			timestamp = 0;
+		
 		List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-
 		for (IActivity activity : activities) {
 			timedActivities.add(new TimedActivity(activity, timestamp++));
 		}
@@ -181,7 +185,10 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 		boolean executed = false;
 
 		for (TimedActivity timedActivity : queue) {
-			if (timedActivity.getTimestamp() <= timestamp) { // HACK
+			if (timestamp == UNDEFINED_TIME)
+				timestamp = timedActivity.getTimestamp();
+			
+			if (timedActivity.getTimestamp() <= timestamp) {
 				queue.remove(timedActivity);
 
 				timestamp++;

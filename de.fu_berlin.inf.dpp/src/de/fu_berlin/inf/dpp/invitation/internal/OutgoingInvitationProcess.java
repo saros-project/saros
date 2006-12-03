@@ -108,7 +108,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		try {
 			FileList local = new FileList(sharedProject.getProject());
-
 			FileList diff = remoteFileList.diff(local);
 
 			List<IPath> added = diff.getAddedPaths();
@@ -235,7 +234,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 *         <code>false</code> if the user chose to cancel.
 	 */
 	private boolean blockUntilFilesSent(IProgressMonitor monitor) {
-		while (state != State.SYNCHRONIZING_DONE) {
+		while (state != State.SYNCHRONIZING_DONE && state != State.DONE) {
 			if (monitor.isCanceled() || getState() == State.CANCELED)
 				return false;
 
