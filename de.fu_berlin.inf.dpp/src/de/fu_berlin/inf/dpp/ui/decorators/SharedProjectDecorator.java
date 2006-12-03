@@ -76,7 +76,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator, ISess
 			return;
 
 		IFile file = (IFile) element; // enablement ensures that we only get
-										// IFile's
+		// IFile's
 		if (!sharedProject.getProject().equals(file.getProject()))
 			return;
 

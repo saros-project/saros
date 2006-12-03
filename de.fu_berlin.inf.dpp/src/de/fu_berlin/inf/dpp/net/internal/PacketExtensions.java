@@ -47,6 +47,8 @@ public class PacketExtensions {
 	// attributes
 	public static final String DESCRIPTION = "description";
 
+	public static final String PROJECTNAME = "description";
+
 	public static final String ERROR = "error";
 
 	public static void hookExtensionProviders() {
@@ -61,8 +63,9 @@ public class PacketExtensions {
 	 *            an informal text that will be shown with the invitation.
 	 * @return the packet extension.
 	 */
-	public static PacketExtension createInviteExtension(String description) {
+	public static PacketExtension createInviteExtension(String projectName, String description) {
 		DefaultPacketExtension extension = new DefaultPacketExtension(INVITATION, NAMESPACE);
+		extension.setValue(PROJECTNAME, projectName);
 		extension.setValue(DESCRIPTION, description);
 
 		return extension;

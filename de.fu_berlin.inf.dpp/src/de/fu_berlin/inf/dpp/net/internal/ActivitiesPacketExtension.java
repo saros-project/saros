@@ -39,7 +39,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
 	MessageFormat textChangeFormat = new MessageFormat(
 		"<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract into
-															// consts
+
+	// consts
 
 	public ActivitiesPacketExtension() {
 	}

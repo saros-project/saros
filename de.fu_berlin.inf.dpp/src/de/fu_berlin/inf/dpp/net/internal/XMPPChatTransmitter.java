@@ -161,8 +161,8 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 * @see de.fu_berlin.inf.dpp.ITransmitter
 	 */
 	public void sendInviteMessage(ISharedProject sharedProject, JID guest, String description) {
-
-		sendMessage(guest, PacketExtensions.createInviteExtension(description));
+		sendMessage(guest, PacketExtensions.createInviteExtension(sharedProject.getProject()
+			.getName(), description));
 	}
 
 	/*
@@ -347,9 +347,10 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 		if (inviteExtension != null) {
 			String desc = inviteExtension.getValue(PacketExtensions.DESCRIPTION);
+			String pName = inviteExtension.getValue(PacketExtensions.PROJECTNAME);
 
 			SessionManager sm = Saros.getDefault().getSessionManager();
-			sm.invitationReceived(fromJID, desc);
+			sm.invitationReceived(fromJID, pName, desc);
 		}
 
 		DefaultPacketExtension cancelInviteExtension = PacketExtensions

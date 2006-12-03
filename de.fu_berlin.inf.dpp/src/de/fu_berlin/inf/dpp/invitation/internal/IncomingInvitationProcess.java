@@ -58,11 +58,14 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 	private IProgressMonitor progressMonitor;
 
-	public IncomingInvitationProcess(ITransmitter transmitter, JID from, String description) {
+	protected String projectName;
+
+	public IncomingInvitationProcess(ITransmitter transmitter, JID from, String projectName,
+		String description) {
 
 		super(transmitter, from, description);
 
-		this.description = description;
+		this.projectName = projectName;
 		this.state = State.INVITATION_SENT;
 	}
 
@@ -340,5 +343,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		transmitter.removeInvitationProcess(this); // HACK
 
 		state = State.DONE;
+	}
+
+	public String getProjectName() {
+		return this.projectName;
 	}
 }

@@ -297,4 +297,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		sharedProject.getSequencer().activityCreated(
 			new EditorActivity(EditorActivity.Type.Activated, activeDriverEditor));
 	}
+
+	public String getProjectName() {
+		return sharedProject.getProject().getName();
+	}
 }

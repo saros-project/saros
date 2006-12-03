@@ -28,6 +28,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public abstract class InvitationProcess implements IInvitationProcess {
+
 	protected final ITransmitter transmitter;
 
 	protected State state;

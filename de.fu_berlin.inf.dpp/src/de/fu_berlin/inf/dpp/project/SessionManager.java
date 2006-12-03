@@ -182,10 +182,11 @@ public class SessionManager implements IConnectionListener {
 	 * @return the process that represents the invitation and which handles the
 	 *         further interaction with the invitation.
 	 */
-	public IIncomingInvitationProcess invitationReceived(JID from, String description) {
+	public IIncomingInvitationProcess invitationReceived(JID from, String projectName,
+		String description) {
 
 		IIncomingInvitationProcess process = new IncomingInvitationProcess(transmitter, from,
-			description);
+			projectName, description);
 
 		for (ISessionListener listener : listeners) {
 			listener.invitationReceived(process);

@@ -53,6 +53,12 @@ public interface IInvitationProcess {
 	public String getDescription();
 
 	/**
+	 * 
+	 * @return the name of the project that is shared by the peer.
+	 */
+	public String getProjectName();
+
+	/**
 	 * Cancels the invitation process. Is ignored if invitation was already
 	 * cancelled.
 	 * 
@@ -78,7 +84,8 @@ public interface IInvitationProcess {
 	public void fileListReceived(JID from, FileList fileList);
 
 	public void fileListRequested(JID from); // TODO rename to
-												// invitationAccepted
+
+	// invitationAccepted
 
 	public void joinReceived(JID from);
 }

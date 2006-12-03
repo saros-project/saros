@@ -22,6 +22,8 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -109,6 +111,7 @@ public class JoinSessionWizard extends Wizard {
 	 * overwrite the project selected by the {@link ProjectSelectionPage}.
 	 */
 	private class EnterNamePage extends WizardPage {
+
 		private Text newProjectNameText;
 
 		protected EnterNamePage() {
@@ -116,8 +119,6 @@ public class JoinSessionWizard extends Wizard {
 
 			setTitle("Session Invitation");
 			setDescription("Enter the name of the new project.");
-
-			updatePageComplete();
 		}
 
 		/*
@@ -147,11 +148,17 @@ public class JoinSessionWizard extends Wizard {
 			newProjectNameText.setLayoutData(gridData);
 			newProjectNameText.setFocus();
 
+			newProjectNameText.setText(findProjectNameProposal());
+
 			attachListeners();
 			setControl(composite);
+
+			updatePageComplete();
 		}
 
 		/**
+		 * TODO this documentation seems to be wrong
+		 * 
 		 * @return the project name of the project that should be created or
 		 *         <code>null</code> if the user chose to overwrite an
 		 *         existing project.
@@ -230,7 +237,24 @@ public class JoinSessionWizard extends Wizard {
 		}
 
 		private void updatePageComplete() {
-			setPageComplete(getNewProjectName().length() >= 1);
+
+			String newText = newProjectNameText.getText();
+
+			if (newText.length() == 0) {
+				setMessage(null);
+				setErrorMessage("Please set a project name");
+				setPageComplete(false);
+			} else {
+				if (projectIsUnique(newText)) {
+					setMessage(null);
+					setErrorMessage(null);
+					setPageComplete(true);
+				} else {
+					setMessage(null);
+					setErrorMessage("A project with this name already exists");
+					setPageComplete(false);
+				}
+			}
 		}
 	}
 
@@ -240,6 +264,59 @@ public class JoinSessionWizard extends Wizard {
 		setWindowTitle("Session Invitation");
 		setHelpAvailable(false);
 		setNeedsProgressMonitor(true);
+	}
+
+	public boolean projectIsUnique(String name) {
+
+		// Then check with all the projects
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject[] projects = workspace.getRoot().getProjects();
+
+		return projectIsUnique(name, projects);
+	}
+
+	public boolean projectIsUnique(String name, IProject[] projects) {
+
+		for (int i = 0; i < projects.length; i++) {
+			IProject p = projects[i];
+			if (p.getName().equals(name))
+				return false;
+		}
+		return true;
+	}
+
+	public String findProjectNameProposal() {
+		// Start with the projects name
+		String projectProposal = process.getProjectName();
+
+		// Then check with all the projects
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject[] projects = workspace.getRoot().getProjects();
+
+		if (projectIsUnique(projectProposal, projects)) {
+			return projectProposal;
+		} else {
+
+			// Name is already in use!
+			Pattern p = Pattern.compile("^(.*)(\\d+)$");
+			Matcher m = p.matcher(projectProposal);
+
+			int i;
+			// Check whether the name ends in a number or not
+			if (m.find()) {
+				projectProposal = m.group(1).trim();
+				i = Integer.parseInt(m.group(2));
+			} else {
+				i = 2;
+			}
+
+			// Then find the next available number
+			while (!projectIsUnique(projectProposal + " " + i, projects)) {
+				i++;
+			}
+
+			return projectProposal + " " + i;
+		}
 	}
 
 	@Override
@@ -272,7 +349,6 @@ public class JoinSessionWizard extends Wizard {
 			});
 		} catch (InvocationTargetException e) {
 			log.log(Level.WARNING, "Exception while requesting remote file list", e);
-
 		} catch (InterruptedException e) {
 			log.log(Level.FINE, "Request of remote file list canceled/interrupted", e);
 		}
