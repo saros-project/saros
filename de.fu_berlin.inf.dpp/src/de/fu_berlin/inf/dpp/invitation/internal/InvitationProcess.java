@@ -27,6 +27,9 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * @author rdjemili
+ */
 public abstract class InvitationProcess implements IInvitationProcess {
 
 	protected final ITransmitter transmitter;
@@ -40,7 +43,6 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	protected String description;
 
 	public InvitationProcess(ITransmitter transmitter, JID peer, String description) {
-
 		this.transmitter = transmitter;
 		this.peer = peer;
 		this.description = description;
@@ -108,8 +110,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
 				if (errorMsg != null) {
 					MessageDialog.openError(shell, "Invitation aborted",
-						"A technical error was detected. Could not " + "complete invitation. ("
-							+ errorMsg + ")");
+						"Could not complete invitation. ("+ errorMsg + ")");
 
 				} else if (replicated) {
 					MessageDialog.openInformation(shell, "Invitation cancelled",

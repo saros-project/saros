@@ -97,7 +97,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		transmitter.sendRequestForFileListMessage(peer);
 		state = State.HOST_FILELIST_REQUESTED;
 
-		while (remoteFileList == null) {
+		while (remoteFileList == null && state != State.CANCELED) {
+			if (monitor.isCanceled()) {
+				cancel(null, false);
+			}
+			
 			try {
 				Thread.sleep(500);
 				monitor.worked(1);

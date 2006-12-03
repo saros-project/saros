@@ -233,16 +233,15 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 * @see de.fu_berlin.inf.dpp.ITransmitter
 	 */
 	public void sendFileList(JID recipient, FileList fileList) throws XMPPException {
-
 		log.fine("Establishing file list transfer");
 
 		String xml = fileList.toXML();
 
-		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(recipient
-			.toString());
+		String to = recipient.toString();
+		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(to);
 
-		OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
-			FILELIST_TRANSFER_DESCRIPTION);
+		OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, 
+			xml.getBytes().length, FILELIST_TRANSFER_DESCRIPTION);
 
 		log.fine("Sending file list");
 
@@ -254,6 +253,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			writer.write(xml);
 			writer.flush();
 			writer.close();
+			
 		} catch (IOException e) {
 			throw new XMPPException(e);
 		}

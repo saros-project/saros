@@ -129,6 +129,9 @@ public class JoinSessionWizard extends Wizard {
 		 */
 		public void createControl(Composite parent) {
 			requestRemoteFileList();
+			
+			if (process.getRemoteFileList() == null)
+				getShell().close();
 
 			Composite composite = new Composite(parent, SWT.NONE);
 			composite.setLayout(new GridLayout(2, false));
@@ -202,7 +205,7 @@ public class JoinSessionWizard extends Wizard {
 
 		private void requestRemoteFileList() {
 			try {
-				getContainer().run(true, false, new IRunnableWithProgress() {
+				getContainer().run(true, true, new IRunnableWithProgress() {
 					public void run(IProgressMonitor monitor) {
 
 						process.requestRemoteFileList(monitor);
