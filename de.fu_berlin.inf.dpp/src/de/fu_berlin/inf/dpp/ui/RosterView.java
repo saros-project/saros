@@ -116,18 +116,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
 		 * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
 		 */
 		public Object[] getChildren() {
-			List<RosterEntry> users = new LinkedList<RosterEntry>();
-
-			for (Iterator it = group.getEntries(); it.hasNext();) {
-				RosterEntry entry = (RosterEntry) it.next();
-				
-				if (entry.getType() == RosterPacket.ItemType.BOTH || 
-					entry.getType() == RosterPacket.ItemType.TO) {
-						users.add(entry);
-				}
-			}
-
-			return users.toArray();
+			return RosterView.getChildren(group.getEntries());
 		}
 
 		@Override
@@ -147,18 +136,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
 		 * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
 		 */
 		public Object[] getChildren() {
-			List<RosterEntry> users = new LinkedList<RosterEntry>();
-
-			for (Iterator it = roster.getUnfiledEntries(); it.hasNext();) {
-				RosterEntry entry = (RosterEntry) it.next();
-				
-				if (entry.getType() == RosterPacket.ItemType.BOTH || 
-					entry.getType() == RosterPacket.ItemType.TO) {
-						users.add(entry);
-				}
-			}
-
-			return users.toArray();
+			return RosterView.getChildren(roster.getUnfiledEntries());
 		}
 
 		@Override
@@ -364,6 +342,21 @@ public class RosterView extends ViewPart implements IConnectionListener {
 				updateEnablement();
 			}
 		});
+	}
+	
+	public static Object[] getChildren(Iterator iterator) {
+		List<RosterEntry> users = new LinkedList<RosterEntry>();
+
+		while(iterator.hasNext()) {
+			RosterEntry entry = (RosterEntry) iterator.next();
+			
+			if (entry.getType() == RosterPacket.ItemType.BOTH || 
+				entry.getType() == RosterPacket.ItemType.TO) {
+					users.add(entry);
+			}
+		}
+
+		return users.toArray();
 	}
 
 	/**
