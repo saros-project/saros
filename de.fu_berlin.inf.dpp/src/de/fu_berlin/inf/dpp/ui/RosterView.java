@@ -53,6 +53,7 @@ import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.packet.RosterPacket;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
@@ -118,7 +119,12 @@ public class RosterView extends ViewPart implements IConnectionListener {
 			List<RosterEntry> users = new LinkedList<RosterEntry>();
 
 			for (Iterator it = group.getEntries(); it.hasNext();) {
-				users.add((RosterEntry) it.next());
+				RosterEntry entry = (RosterEntry) it.next();
+				
+				if (entry.getType() == RosterPacket.ItemType.BOTH || 
+					entry.getType() == RosterPacket.ItemType.TO) {
+						users.add(entry);
+				}
 			}
 
 			return users.toArray();
@@ -144,7 +150,12 @@ public class RosterView extends ViewPart implements IConnectionListener {
 			List<RosterEntry> users = new LinkedList<RosterEntry>();
 
 			for (Iterator it = roster.getUnfiledEntries(); it.hasNext();) {
-				users.add((RosterEntry) it.next());
+				RosterEntry entry = (RosterEntry) it.next();
+				
+				if (entry.getType() == RosterPacket.ItemType.BOTH || 
+					entry.getType() == RosterPacket.ItemType.TO) {
+						users.add(entry);
+				}
 			}
 
 			return users.toArray();
@@ -337,14 +348,12 @@ public class RosterView extends ViewPart implements IConnectionListener {
 	 * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
 	 */
 	public void connectionStateChanged(XMPPConnection connection, final ConnectionState newState) {
-
 		if (newState == ConnectionState.CONNECTED) {
 			roster = Saros.getDefault().getRoster();
 			attachRosterListener();
 
 		} else if (newState == ConnectionState.NOT_CONNECTED) {
 			roster = null;
-			refreshRosterTree(true);
 		}
 
 		refreshRosterTree(true);
@@ -402,7 +411,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
 	private void refreshRosterTree(final boolean updateLabels) {
 		if (viewer.getControl().isDisposed())
 			return;
-
+		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				viewer.refresh(updateLabels);
