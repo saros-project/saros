@@ -102,10 +102,5 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
 		String text = SarosUI.getDescription(state);
 
 		setText(text);
-
-		if (state == ConnectionState.CONNECTED) {
-			text += "(as '" + Saros.getDefault().getConnection().getUser() + "')";
-		}
-		setToolTipText(text);
 	}
 }

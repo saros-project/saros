@@ -264,10 +264,9 @@ public class MessagingManager implements PacketListener, IConnectionListener {
 
 		String name;
 		if (rosterEntry != null) {
-			name = "Talking to "
-				+ (rosterEntry.getName() != null ? rosterEntry.getName() : rosterEntry.getUser());
+			name = rosterEntry.getName() != null ? rosterEntry.getName() : rosterEntry.getUser();
 		} else {
-			name = "Chat";
+			name = "unknown";
 		}
 
 		ChatSession session = new ChatSession(chat, name);

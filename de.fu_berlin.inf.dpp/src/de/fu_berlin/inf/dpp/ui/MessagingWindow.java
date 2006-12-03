@@ -98,16 +98,11 @@ public class MessagingWindow extends ApplicationWindow {
 
 	@Override
 	protected void configureShell(Shell shell) {
+    	super.configureShell(shell);
 
-		String sessionName = session.getName();
-		if (sessionName == null) {
-			sessionName = "Talking to Unknown";
-		}
-
-		shell.setText(sessionName);
+		shell.setText("Talking to "+session.getName());
 		shell.setSize(500, 400);
-
-		super.configureShell(shell);
+		shell.setImage(SarosUI.getImage("icons/comment.png"));
 	}
 
 	private void sendInput() {

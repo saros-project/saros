@@ -44,6 +44,8 @@ public class RenameContactAction extends SelectionProviderAction {
 
 	public RenameContactAction(ISelectionProvider provider) {
 		super(provider, "Rename...");
+		selectionChanged((IStructuredSelection)provider.getSelection());
+		
 		setToolTipText("Set the nickname of this contact.");
 	}
 

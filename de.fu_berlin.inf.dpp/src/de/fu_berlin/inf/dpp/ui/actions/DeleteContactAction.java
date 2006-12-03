@@ -37,6 +37,7 @@ public class DeleteContactAction extends SelectionProviderAction {
 
 	public DeleteContactAction(ISelectionProvider provider) {
 		super(provider, "Delete");
+		selectionChanged((IStructuredSelection)provider.getSelection());
 
 		setToolTipText("Set the nickname of this contact.");
 

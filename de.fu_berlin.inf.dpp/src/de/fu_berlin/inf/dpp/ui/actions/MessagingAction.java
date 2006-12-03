@@ -35,7 +35,8 @@ public class MessagingAction extends SelectionProviderAction {
 
 	public MessagingAction(ISelectionProvider provider) {
 		super(provider, "Send instant message..");
-
+		selectionChanged((IStructuredSelection)provider.getSelection());
+		
 		setToolTipText("Start a IM session with this user");
 		setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
 	}
@@ -54,7 +55,7 @@ public class MessagingAction extends SelectionProviderAction {
 	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		Object selected = selection.getFirstElement();
-
+		
 		if (selection.size() == 1 && selected instanceof RosterEntry) {
 			rosterEntry = (RosterEntry) selected;
 			setEnabled(true);

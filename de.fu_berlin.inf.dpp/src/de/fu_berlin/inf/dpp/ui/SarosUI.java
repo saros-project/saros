@@ -139,11 +139,11 @@ public class SarosUI implements ISessionListener {
 		case CONNECTING:
 			return "Connecting...";
 		case CONNECTED:
-			return "Connected";
+			return "Connected (as " + Saros.getDefault().getConnection().getUser() + ")";
 		case DISCONNECTING:
 			return "Disconnecting...";
 		case ERROR:
-			return "Error";
+			return "Error (" + Saros.getDefault().getConnectionError()+ ")";
 		}
 
 		return "";

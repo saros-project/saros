@@ -51,6 +51,7 @@ public class InviteAction extends SelectionProviderAction implements ISessionLis
 
 	public InviteAction(ISelectionProvider provider) {
 		super(provider, "Invite user to shared project..");
+		selectionChanged((IStructuredSelection)provider.getSelection());
 
 		setToolTipText("Start a IM messaging session with this user");
 		setImageDescriptor(SarosUI.getImageDescriptor("icons/transmit_blue.png"));
