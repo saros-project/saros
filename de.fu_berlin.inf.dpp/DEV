@@ -1,0 +1,129 @@
+
+Saros Developer Readme
+  
+-----------------------------------------------------------------
+Content
+ 
+1. Introduction
+2. The repository
+3. Java packages
+
+-----------------------------------------------------------------
+
+1. Introduction
+
+  Saros is a Eclipse plugin for distributed pair programming. It 
+  features code editing in real-time, view port and text 
+  selection awareness and full project support. Saros is 
+  is free open source software, licensed under the GPL.
+  
+  This document is for developing on the Saros project. If you're
+  completly new to Saros it's better to read the README file 
+  first.
+  
+2. The repository
+
+  The official SVN code repository for Saros can be found at
+  
+    https://svn.sourceforge.net/svnroot/dpp
+    
+  For more information on how to access it, please see the
+  Sourceforge information at
+  
+    http://sourceforge.net/svn/?group_id=167540
+    
+  The repository is laid out in the following structure. All main
+  development happens in the trunk.  
+  
+  + root
+    + trunk
+      + de.fu_berlin.dpp 
+      
+        Contains the code for the Saros plugin (including 
+        necessary libs and resources)
+        
+      + de.fu_berlin.dpp.test
+      
+        Contains unit tests for the Saros plugin.
+        
+      + de.fu_berlin.dpp.feature
+      
+        Contains the feature project for the Saros plugin
+        
+      + de.fu_berlin.dpp.ecg
+      
+        Contains the SarosECG plugin - an extension of the ECG-
+        Eclipse sensor with new distributed-pair-programming 
+        micro activities.
+        
+      + de.fu_berlin.dpp.ecg.feature
+      
+        Contains the feature project for the SarosECG plugin
+        
+      + de.fu_berlin.dpp.update
+      
+        Contains the update site for the Saros and SarosECG
+        plugins.
+      
+    + branches
+    
+      Contains stable releases and experimental feature branches.
+      
+    + tags
+    
+      Generally branches should be used over tags.
+  
+3. Java packages
+
+  The Saros plugin (located under /trunk/de.fu_berlin.dpp) uses
+  the following packages. Generally all main packages have a
+  package named 'internal'. This shouldn't be accessed outside of
+  the Saros plugin.
+  
+  + de.fu_berlin.dpp
+    + de.fu_berlin.dpp.activities
+    
+      An activity is a action that can be captured and replicated
+      on the remote system. It's the basic model for the Saros
+      system. This package contains all activity classes.
+      
+    + de.fu_berlin.dpp.editor
+    + de.fu_berlin.dpp.editor.internal
+    
+      Types that deal with editors and capturing and
+      replicated text changes, view port changes, text selections
+      and so on.
+      
+    + de.fu_berlin.dpp.editor.annotations
+    
+      Custom annotations that are used within the editors to add
+      visual information (e.g. the current view port of the
+      driver). 
+      
+    + de.fu_berlin.dpp.editor.invitation
+    + de.fu_berlin.dpp.editor.invitation.internal
+    
+      Types that deal with incoming and outgoing invitations to
+      shared projects. They are used to initiate projects.
+      
+    + de.fu_berlin.dpp.editor.net
+    + de.fu_berlin.dpp.editor.net.internal
+    
+      Types that deal with sending and receiving data over the
+      network. Currently only a XMPP-implementation is supported.
+      
+    + de.fu_berlin.dpp.editor.project
+    + de.fu_berlin.dpp.editor.project.internal
+    
+      Types that deal with general shared project organization,
+      like handling the life cycle of a shared project or 
+      managing floor control.
+    
+    + de.fu_berlin.dpp.editor.ui
+    + de.fu_berlin.dpp.editor.ui.actions
+    + de.fu_berlin.dpp.editor.ui.wizards
+    + de.fu_berlin.dpp.editor.ui.decorators
+    
+      Handles visual aspects, like showing wizards and adding
+      actions and decorators.
+    
