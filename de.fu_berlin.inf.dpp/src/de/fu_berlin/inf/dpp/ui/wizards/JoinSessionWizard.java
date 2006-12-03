@@ -116,6 +116,7 @@ public class JoinSessionWizard extends Wizard {
 
 		protected EnterNamePage() {
 			super("namePage");
+			setPageComplete(false);
 
 			setTitle("Session Invitation");
 			setDescription("Enter the name of the new project.");
@@ -244,11 +245,13 @@ public class JoinSessionWizard extends Wizard {
 				setMessage(null);
 				setErrorMessage("Please set a project name");
 				setPageComplete(false);
+				
 			} else {
 				if (projectIsUnique(newText)) {
 					setMessage(null);
 					setErrorMessage(null);
 					setPageComplete(true);
+					
 				} else {
 					setMessage(null);
 					setErrorMessage("A project with this name already exists");
@@ -295,8 +298,8 @@ public class JoinSessionWizard extends Wizard {
 
 		if (projectIsUnique(projectProposal, projects)) {
 			return projectProposal;
+			
 		} else {
-
 			// Name is already in use!
 			Pattern p = Pattern.compile("^(.*)(\\d+)$");
 			Matcher m = p.matcher(projectProposal);
