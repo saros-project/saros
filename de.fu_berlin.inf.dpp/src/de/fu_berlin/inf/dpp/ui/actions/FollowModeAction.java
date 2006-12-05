@@ -44,7 +44,6 @@ public class FollowModeAction extends Action implements ISessionListener {
 			.getBoolean(PreferenceConstants.AUTO_FOLLOW_MODE)) {
 			setFollowMode(true);
 		}
-		System.out.println(getFollowMode());
 		updateEnablement();
 	}
 
