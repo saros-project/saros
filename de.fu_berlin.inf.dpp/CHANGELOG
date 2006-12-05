@@ -7,11 +7,12 @@ Saros CHANGELOG
 	
 	Usability Enhancements 
 		- Added Confirm Dialog to before actually deleting a contact.
-		- Better tool-tip for connect button (shows current username)
+		- Better tool-tip for connect button (shows current username).
 		- Disallow connect if username is not set.
-		- Allow to connect also if in Error-State (after a failed connect)
+		- Allow to connect also if in Error-State (after a failed connect).
 		- Create Jabber-Account requires repeated password entry and 
 		  stores configuration by default.
+		- Can automatically start follow mode.
 	
 	Bugs
 		- Fixed leak of timer resources since sharing a project was actually never stopped.

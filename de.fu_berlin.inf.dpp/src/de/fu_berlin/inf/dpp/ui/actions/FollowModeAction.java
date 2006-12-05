@@ -15,6 +15,7 @@ public class FollowModeAction extends Action implements ISessionListener {
 	private boolean isFollowMode = false;
 
 	public FollowModeAction() {
+		super();
 		setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
 		setToolTipText("Enable/disable follow mode");
 
@@ -32,10 +33,8 @@ public class FollowModeAction extends Action implements ISessionListener {
 	}
 
 	public void setFollowMode(boolean isFollowMode) {
-		if (this.isFollowMode != isFollowMode) {
-			this.isFollowMode = isFollowMode;
-			EditorManager.getDefault().setEnableFollowing(isFollowMode);
-		}
+		this.isFollowMode = isFollowMode;
+		EditorManager.getDefault().setEnableFollowing(isFollowMode);
 	}
 
 	public void sessionStarted(ISharedProject session) {
@@ -45,6 +44,7 @@ public class FollowModeAction extends Action implements ISessionListener {
 			.getBoolean(PreferenceConstants.AUTO_FOLLOW_MODE)) {
 			setFollowMode(true);
 		}
+		System.out.println(getFollowMode());
 		updateEnablement();
 	}
 
