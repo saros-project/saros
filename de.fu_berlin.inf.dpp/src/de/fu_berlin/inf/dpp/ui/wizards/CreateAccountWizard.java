@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -30,6 +31,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -45,6 +48,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * An wizard that is used to create Jabber accounts.
  * 
  * @author rdjemili
+ * @author coezbek
  */
 public class CreateAccountWizard extends Wizard {
 	private class CreateAccountPage extends WizardPage {
@@ -53,6 +57,8 @@ public class CreateAccountWizard extends Wizard {
 		private Text userText;
 
 		private Text passwordText;
+
+		private Text repeatPasswordText;
 
 		private Button prefButton;
 
@@ -88,9 +94,18 @@ public class CreateAccountWizard extends Wizard {
 			passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 			passwordText.setEchoChar('*');
 
+			Label rpwLabel = new Label(composite, SWT.NONE);
+			rpwLabel.setText("Repeat Password");
+
+			repeatPasswordText = new Text(composite, SWT.BORDER);
+			repeatPasswordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+			repeatPasswordText.setEchoChar('*');
+
 			prefButton = new Button(composite, SWT.CHECK | SWT.SEPARATOR);
 			prefButton.setText("Store the new configuration in your preferences.");
 			prefButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+
+			setInitialValues();
 
 			hookListeners();
 			updateNextEnablement();
@@ -124,14 +139,50 @@ public class CreateAccountWizard extends Wizard {
 			serverText.addModifyListener(listener);
 			userText.addModifyListener(listener);
 			passwordText.addModifyListener(listener);
+			repeatPasswordText.addModifyListener(listener);
+			prefButton.addSelectionListener(new SelectionListener() {
+				public void widgetDefaultSelected(SelectionEvent e) {
+					// do nothing
+				}
+
+				public void widgetSelected(SelectionEvent e) {
+					IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+					if (preferences.getString(PreferenceConstants.USERNAME).length() != 0
+						&& prefButton.getSelection()) {
+						setMessage(
+							"Storing the configuration will override the existing settings.",
+							DialogPage.WARNING);
+					} else {
+						setMessage(null);
+					}
+				}
+
+			});
 		}
 
 		private void updateNextEnablement() {
+			
+			boolean passwordsMatch = passwordText.getText().equals(repeatPasswordText.getText());
 			boolean done = serverText.getText().length() > 0 && userText.getText().length() > 0
-				&& passwordText.getText().length() > 0;
+				&& passwordText.getText().length() > 0
+				&& passwordsMatch;
+
+			if (passwordsMatch) {
+				setErrorMessage(null);
+			} else {
+				setErrorMessage("Passwords don't match.");
+			}
 
 			setPageComplete(done);
 		}
+
+		public void setInitialValues() {
+			IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+			serverText.setText(preferences.getDefaultString(PreferenceConstants.SERVER));
+			prefButton
+				.setSelection(preferences.getString(PreferenceConstants.USERNAME).length() == 0);
+		}
+
 	}
 
 	private CreateAccountPage page = new CreateAccountPage();
@@ -183,18 +234,16 @@ public class CreateAccountWizard extends Wizard {
 		try {
 			Saros.getDefault().createAccount(server, username, password, monitor);
 
-			if (storeInPrefernces)
-				storeToPreferences();
+			if (storeInPrefernces) {
+				IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+				preferences.putValue(PreferenceConstants.SERVER, server);
+				preferences.putValue(PreferenceConstants.USERNAME, username);
+				preferences.putValue(PreferenceConstants.PASSWORD, password);
+			}
 
 		} catch (final XMPPException e) {
 			throw new InvocationTargetException(e);
 		}
 	}
 
-	private void storeToPreferences() {
-		IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
-		preferences.putValue(PreferenceConstants.SERVER, page.getServer());
-		preferences.putValue(PreferenceConstants.USERNAME, page.getUsername());
-		preferences.putValue(PreferenceConstants.PASSWORD, page.getPassword());
-	}
 }

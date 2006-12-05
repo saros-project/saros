@@ -10,6 +10,8 @@ Saros CHANGELOG
 		- Better tool-tip for connect button (shows current username)
 		- Disallow connect if username is not set.
 		- Allow to connect also if in Error-State (after a failed connect)
+		- Create Jabber-Account requires repeated password entry and 
+		  stores configuration by default.
 	
 	Bugs
 		- Fixed leak of timer resources since sharing a project was actually never stopped.
@@ -27,7 +29,6 @@ Saros CHANGELOG
 	- Fixed severe bug in project synchronization
 	- Fixed severe bug in account creation
 	- Show invitee name without XMPP-Resource on invitation wizard
- 
  
 0.8.1
 	- First beta release
