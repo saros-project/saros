@@ -56,6 +56,11 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
 		addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
 			"Automatically connect on startup.", getFieldEditorParent()));
+		
+		addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE, 
+			"Start in Follow Mode.", getFieldEditorParent()));
+		
+		
 	}
 
 	/*

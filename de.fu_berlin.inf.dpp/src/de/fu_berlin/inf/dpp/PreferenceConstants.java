@@ -23,8 +23,10 @@ package de.fu_berlin.inf.dpp;
  * Constant definitions for plug-in preferences
  * 
  * @author rdjemili
+ * @author coezbek
  */
 public class PreferenceConstants {
+	
 	public static final String SERVER = "server";
 
 	public static final String USERNAME = "username";
@@ -32,7 +34,9 @@ public class PreferenceConstants {
 	public static final String PASSWORD = "password";
 
 	public static final String AUTO_CONNECT = "autoconnect";
-
+	
+	public static final String AUTO_FOLLOW_MODE = "autofollowmode";
+	
 	public static final String SKYPE_USERNAME = "skypename";
 
 	public static final String DEBUG = "debug";

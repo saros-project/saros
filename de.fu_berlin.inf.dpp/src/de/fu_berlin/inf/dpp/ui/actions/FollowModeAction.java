@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.eclipse.jface.action.Action;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -10,6 +11,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class FollowModeAction extends Action implements ISessionListener {
+
 	private boolean isFollowMode = false;
 
 	public FollowModeAction() {
@@ -22,11 +24,27 @@ public class FollowModeAction extends Action implements ISessionListener {
 
 	@Override
 	public void run() {
-		isFollowMode = !isFollowMode;
-		EditorManager.getDefault().setEnableFollowing(isFollowMode);
+		setFollowMode(!getFollowMode());
+	}
+
+	public boolean getFollowMode() {
+		return isFollowMode;
+	}
+
+	public void setFollowMode(boolean isFollowMode) {
+		if (this.isFollowMode != isFollowMode) {
+			this.isFollowMode = isFollowMode;
+			EditorManager.getDefault().setEnableFollowing(isFollowMode);
+		}
 	}
 
 	public void sessionStarted(ISharedProject session) {
+		// Automatically start follow mode at the beginning of a session if
+		// Auto-Follow-Mode is enabled.
+		if (Saros.getDefault().getPreferenceStore()
+			.getBoolean(PreferenceConstants.AUTO_FOLLOW_MODE)) {
+			setFollowMode(true);
+		}
 		updateEnablement();
 	}
 
@@ -39,11 +57,7 @@ public class FollowModeAction extends Action implements ISessionListener {
 	}
 
 	private void updateEnablement() {
-		setEnabled(getSharedProject() != null);
-		setChecked(isFollowMode);
-	}
-
-	private ISharedProject getSharedProject() {
-		return Saros.getDefault().getSessionManager().getSharedProject();
+		setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
+		setChecked(getFollowMode());
 	}
 }
