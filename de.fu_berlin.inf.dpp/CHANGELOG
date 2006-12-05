@@ -18,10 +18,7 @@ Saros CHANGELOG
 		- Fixed bug in rename action.
 		- Fixed [ 1607388 ] Invitation dialog should suggest project name
 		- Fixed [ 1607387 ] Invitation dialog fails if project already exists
- 
- 	Other
- 		- Upgrade to Smack 2.2.1
- 
+ 	
 1.0
 	- added skype support
  

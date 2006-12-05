@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -54,8 +55,10 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -240,8 +243,8 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		String to = recipient.toString();
 		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(to);
 
-		OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, 
-			xml.getBytes().length, FILELIST_TRANSFER_DESCRIPTION);
+		OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
+			FILELIST_TRANSFER_DESCRIPTION);
 
 		log.fine("Sending file list");
 
@@ -253,7 +256,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			writer.write(xml);
 			writer.flush();
 			writer.close();
-			
+
 		} catch (IOException e) {
 			throw new XMPPException(e);
 		}
@@ -587,15 +590,11 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	}
 
 	private void setProxyPort(XMPPConnection connection) {
-		/*
-		 * Not supported!
-		 * 
-		 * IPreferenceStore preferenceStore =
-		 * Saros.getDefault().getPreferenceStore();
-		 * 
-		 * fileTransferManager.getProperties().setProperty(
-		 * Socks5TransferNegotiator.PROPERTIES_PORT,
-		 * preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT) );
-		 */
+
+		IPreferenceStore preferenceStore = Saros.getDefault().getPreferenceStore();
+ 
+		fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
+			preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
+
 	}
 }
