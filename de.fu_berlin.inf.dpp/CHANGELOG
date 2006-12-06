@@ -4,6 +4,7 @@ Saros CHANGELOG
 1.0.1
 	New Features
 		- Better selection support for both driver and observer.
+
 	
 	Usability Enhancements 
 		- Added Confirm Dialog to before actually deleting a contact.
@@ -13,6 +14,7 @@ Saros CHANGELOG
 		- Create Jabber-Account requires repeated password entry and 
 		  stores configuration by default.
 		- Can automatically start follow mode.
+		- On first install a configuration dialog is shown.
 	
 	Bugs
 		- Fixed leak of timer resources since sharing a project was actually never stopped.

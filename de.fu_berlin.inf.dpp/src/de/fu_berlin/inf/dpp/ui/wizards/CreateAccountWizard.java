@@ -2,6 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
+ * (c) Christopher Oezbek - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,30 +20,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.DialogPage;
-import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.jivesoftware.smack.XMPPException;
-
-import de.fu_berlin.inf.dpp.PreferenceConstants;
-import de.fu_berlin.inf.dpp.Saros;
 
 /**
  * An wizard that is used to create Jabber accounts.
@@ -51,148 +29,35 @@ import de.fu_berlin.inf.dpp.Saros;
  * @author coezbek
  */
 public class CreateAccountWizard extends Wizard {
-	private class CreateAccountPage extends WizardPage {
-		private Text serverText;
+	
+	private RegisterAccountPage page;
 
-		private Text userText;
-
-		private Text passwordText;
-
-		private Text repeatPasswordText;
-
-		private Button prefButton;
-
-		protected CreateAccountPage() {
-			super("create");
-
-			setTitle("New User Account");
-			setDescription("Create a new user account for a Jabber server");
+	public CreateAccountWizard(boolean createAccount, boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
+		
+		if (createAccount){
+			setWindowTitle("Create New User Account");
+		} else {
+			setWindowTitle("Enter User Account");
 		}
-
-		public void createControl(Composite parent) {
-			Composite composite = new Composite(parent, SWT.NONE);
-
-			composite.setLayout(new GridLayout(2, false));
-
-			Label serverLabel = new Label(composite, SWT.NONE);
-			serverLabel.setText("Jabber Server");
-
-			serverText = new Text(composite, SWT.BORDER);
-			serverText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			serverText.setText("jabber.org");
-
-			Label userLabel = new Label(composite, SWT.NONE);
-			userLabel.setText("Username");
-
-			userText = new Text(composite, SWT.BORDER);
-			userText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-			Label pwLabel = new Label(composite, SWT.NONE);
-			pwLabel.setText("Password");
-
-			passwordText = new Text(composite, SWT.BORDER);
-			passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			passwordText.setEchoChar('*');
-
-			Label rpwLabel = new Label(composite, SWT.NONE);
-			rpwLabel.setText("Repeat Password");
-
-			repeatPasswordText = new Text(composite, SWT.BORDER);
-			repeatPasswordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-			repeatPasswordText.setEchoChar('*');
-
-			prefButton = new Button(composite, SWT.CHECK | SWT.SEPARATOR);
-			prefButton.setText("Store the new configuration in your preferences.");
-			prefButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-
-			setInitialValues();
-
-			hookListeners();
-			updateNextEnablement();
-
-			setControl(composite);
-		}
-
-		public String getServer() {
-			return serverText.getText();
-		}
-
-		public String getUsername() {
-			return userText.getText();
-		}
-
-		public String getPassword() {
-			return passwordText.getText();
-		}
-
-		public boolean isStoreInPreferences() {
-			return prefButton.getSelection();
-		}
-
-		private void hookListeners() {
-			ModifyListener listener = new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
-					updateNextEnablement();
-				}
-			};
-
-			serverText.addModifyListener(listener);
-			userText.addModifyListener(listener);
-			passwordText.addModifyListener(listener);
-			repeatPasswordText.addModifyListener(listener);
-			prefButton.addSelectionListener(new SelectionListener() {
-				public void widgetDefaultSelected(SelectionEvent e) {
-					// do nothing
-				}
-
-				public void widgetSelected(SelectionEvent e) {
-					IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
-					if (preferences.getString(PreferenceConstants.USERNAME).length() != 0
-						&& prefButton.getSelection()) {
-						setMessage(
-							"Storing the configuration will override the existing settings.",
-							DialogPage.WARNING);
-					} else {
-						setMessage(null);
-					}
-				}
-
-			});
-		}
-
-		private void updateNextEnablement() {
-			
-			boolean passwordsMatch = passwordText.getText().equals(repeatPasswordText.getText());
-			boolean done = serverText.getText().length() > 0 && userText.getText().length() > 0
-				&& passwordText.getText().length() > 0
-				&& passwordsMatch;
-
-			if (passwordsMatch) {
-				setErrorMessage(null);
-			} else {
-				setErrorMessage("Passwords don't match.");
-			}
-
-			setPageComplete(done);
-		}
-
-		public void setInitialValues() {
-			IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
-			serverText.setText(preferences.getDefaultString(PreferenceConstants.SERVER));
-			prefButton
-				.setSelection(preferences.getString(PreferenceConstants.USERNAME).length() == 0);
-		}
-
-	}
-
-	private CreateAccountPage page = new CreateAccountPage();
-
-	public CreateAccountWizard() {
-		setWindowTitle("New User Account");
+		page = new RegisterAccountPage(createAccount, showStoreInPrefsButton, storeInPrefsDefault);
 		setHelpAvailable(false);
 		setNeedsProgressMonitor(true);
 	}
 
+	public String getServer() {
+		return server;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+	
+	String server, password, username;
+	
 	@Override
 	public void addPages() {
 		addPage(page);
@@ -200,49 +65,14 @@ public class CreateAccountWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		final String server = page.getServer();
-		final String username = page.getUsername();
-		final String password = page.getPassword();
-		final boolean storeInPreferences = page.isStoreInPreferences();
-
-		try {
-			getContainer().run(false, false, new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException,
-					InterruptedException {
-
-					createAccount(server, username, password, storeInPreferences, monitor);
-				}
-			});
-
-		} catch (InvocationTargetException e) {
-			page.setMessage(e.getCause().getMessage(), IMessageProvider.ERROR);
-			e.printStackTrace();
+		if (page.performFinish()){
+			server = page.getServer();
+			username = page.getUsername();
+			password = page.getPassword();
+			
+			return true;
+		} else {
 			return false;
-
-		} catch (InterruptedException e) {
-			page.setMessage(e.getCause().getMessage(), IMessageProvider.ERROR);
-			e.printStackTrace();
-			return false;
-		}
-
-		return true;
-	}
-
-	private void createAccount(String server, String username, String password,
-		boolean storeInPrefernces, IProgressMonitor monitor) throws InvocationTargetException {
-
-		try {
-			Saros.getDefault().createAccount(server, username, password, monitor);
-
-			if (storeInPrefernces) {
-				IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
-				preferences.putValue(PreferenceConstants.SERVER, server);
-				preferences.putValue(PreferenceConstants.USERNAME, username);
-				preferences.putValue(PreferenceConstants.PASSWORD, password);
-			}
-
-		} catch (final XMPPException e) {
-			throw new InvocationTargetException(e);
 		}
 	}
 

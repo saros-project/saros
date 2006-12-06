@@ -33,7 +33,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
@@ -47,6 +49,7 @@ import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 
 /**
  * The main plug-in of Saros.
@@ -108,9 +111,28 @@ public class Saros extends AbstractUIPlugin {
 
 		uiInstance = new SarosUI(sessionManager);
 
-		if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)) {
+		boolean hasUserName = getPreferenceStore().getString(PreferenceConstants.USERNAME).length() > 0;
+		
+		if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT) && hasUserName) {
 			asyncConnect();
 		}
+		
+		if (!hasUserName){
+			
+			Display.getDefault().asyncExec(new Runnable() {
+				public void run() {
+					try {
+						Shell shell = Display.getDefault().getActiveShell();
+						new WizardDialog(shell, new ConfigurationWizard()).open();
+					} catch (Exception e) {
+						Saros.getDefault().getLog().log(
+							new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+								"Error while running configuration wizard", e));
+					}
+				}
+			});
+		}
+		
 	}
 
 	/**

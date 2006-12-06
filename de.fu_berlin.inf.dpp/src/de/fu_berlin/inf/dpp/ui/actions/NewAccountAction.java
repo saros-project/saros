@@ -26,6 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
@@ -39,9 +40,9 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 	public void run(IAction action) {
 		try {
 			Shell shell = window.getShell();
-			new WizardDialog(shell, new CreateAccountWizard()).open();
+			new WizardDialog(shell, new CreateAccountWizard(true, true, true)).open();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Saros.log("Could not create new Account.", e); 
 		}
 	}
 
