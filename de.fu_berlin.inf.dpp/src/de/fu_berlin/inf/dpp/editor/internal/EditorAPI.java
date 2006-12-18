@@ -6,13 +6,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.awt.Toolkit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
@@ -60,6 +60,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -231,10 +232,21 @@ public class EditorAPI implements IEditorAPI {
 			if (event.character > 0) {
 				event.doit = false;
 
+				Object adapter = getActiveEditor().getAdapter(IEditorStatusLine.class);
+				if (adapter != null) {
+					IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
+					statusLine.setMessage(false,
+							"You're not allowed to perform modifications while not being the driver of the seesion.",
+							null);
+					Toolkit.getDefaultToolkit().beep();
+				}
+
+/*			
 				MessageDialog.openInformation(Display.getDefault().getActiveShell(),
 					"You're not the driver",
 					"You're not allowed to change the text while not being "
 						+ "the driver of the session.");
+*/						
 			}
 		}
 	};
