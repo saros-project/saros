@@ -236,7 +236,7 @@ public class EditorAPI implements IEditorAPI {
 				if (adapter != null) {
 					IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
 					statusLine.setMessage(false,
-							"You're not allowed to perform modifications while not being the driver of the seesion.",
+							"You're not allowed to perform modifications while not being the driver of the session.",
 							null);
 					Toolkit.getDefaultToolkit().beep();
 				}
