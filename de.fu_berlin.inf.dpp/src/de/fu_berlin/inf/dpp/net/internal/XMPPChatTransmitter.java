@@ -83,7 +83,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 	private static final int MAX_PARALLEL_SENDS = 10;
 	private static final int MAX_TRANSFER_RETRIES = 5;
-	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 30;
+	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
 	/*
 	 * the following string descriptions are used to differentiate between
@@ -184,7 +184,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 */
 	public void sendRequestForActivity(ISharedProject sharedProject, int timestamp, boolean andup) {
 		
-		log.info("Requesting old activity (timestamp=" + timestamp+")"+andup+" from all...");
+		log.info("Requesting old activity (timestamp=" + timestamp+", "+andup+") from all...");
 
 		sendMessageToAll(sharedProject, 
 				PacketExtensions.createRequestForActivityExtension(timestamp,andup) );
@@ -255,6 +255,8 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				} 
 			} else {
 				sharedProject.getSequencer().getActivityHistory().add(timedActivity);
+				
+				// TODO: removed very old entries
 			}
 		}
 
@@ -489,22 +491,22 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			String sID = rae.getValue("ID");
 			String sIDandup = rae.getValue("ANDUP");
 			
-			int ts,tsfrom;
-			ts=tsfrom=-1;
-			if (sID!=null)
+			int ts=-1;
+			if (sID!=null) {
 				ts= (new Integer(sID)).intValue();
-			
-			// get that activity from history (if it was mine) and send it
-			boolean sent=resendActivity(fromJID, ts, (sIDandup!=null) );
-			
-			String info="Received Activity request for timestamp="+ts+".";
-			if (sIDandup!=null)
-				info+=" (andup) ";
-			if (sent)
-				info+=" I sent response.";
-			else
-				info+=" (not for me)";
-			log.info(info);
+				// get that activity from history (if it was mine) and send it
+				boolean sent=resendActivity(fromJID, ts, (sIDandup!=null) );
+				
+				String info="Received Activity request for timestamp="+ts+".";
+				if (sIDandup!=null)
+					info+=" (andup) ";
+				if (sent)
+					info+=" I sent response.";
+				else
+					info+=" (not for me)";
+				
+				log.info(info);
+			}
 		}
 
 		if (PacketExtensions.getRequestExtension(message) != null) {
@@ -576,6 +578,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 					
 					// offline for too long
 					if ( user.getOfflineSecs() > FORCEDPART_OFFLINEUSER_AFTERSECS ) {
+						log.info("Removing offline user from session...");
 						sharedProject.removeUser(user);
 					} else {
 						queueMessage(participant.getJid(),extension);

@@ -134,11 +134,36 @@ public interface ITransmitter {
 	 */
 	public void sendFile(JID recipient, IPath path, int timestamp, IFileTransferCallback callback);
 
-	// TODO: doc
+	/**
+	 * Sends queued file transfers.
+	 */
 	public void sendRemainingFiles();
+
+	/**
+	 * Sends queued messages.
+	 */	
 	public void sendRemainingMessages();
+	
+	/**
+	 * Sets my XMPP connection to the given connection - for changing the current connection (like after reconnect).
+	 * 
+	 * @param connection
+	 *            the new XMPPConnection 
+	 */
 	public void SetXMPPConnection(XMPPConnection connection);
+
+	/**
+	 * Sends a request for activities to all users.
+	 * 
+	 * @param sharedProject
+	 *            the shared project
+	 * @param timestamp
+	 *            the timestamp of the requested activity
+	 * @param andup
+	 *            boolean, if all activities after the requested one are requested too 
+	 */	
 	public void sendRequestForActivity(ISharedProject sharedProject, int timestamp, boolean andup);
+	
 	
 	/* ---------- etc --------- */
 

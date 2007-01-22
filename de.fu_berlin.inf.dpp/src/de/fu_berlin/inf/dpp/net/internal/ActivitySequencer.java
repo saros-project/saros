@@ -61,7 +61,7 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 
 	private List<TimedActivity>	activityHistory = new LinkedList<TimedActivity>();
 
-	private int timestamp = UNDEFINED_TIME;		// my next timestamp
+	private int timestamp = UNDEFINED_TIME;
 
 	/*
 	 * (non-Javadoc)
