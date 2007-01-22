@@ -131,9 +131,8 @@ public class MessagingManager implements PacketListener, IConnectionListener {
 		public void openWindow() {
 			if (window == null) {
 				window = new MessagingWindow(this);
+				window.open();
 			}
-
-			window.open();
 
 			window.getShell().addDisposeListener(new DisposeListener() {
 				public void widgetDisposed(DisposeEvent e) {
