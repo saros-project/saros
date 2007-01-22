@@ -19,10 +19,17 @@
  */
 package de.fu_berlin.inf.dpp;
 
+import org.jivesoftware.smack.packet.Presence;
+
 import de.fu_berlin.inf.dpp.net.JID;
 
+
 public class User {
+	public enum UserConnectionState {UNKNOWN,ONLINE,OFFLINE};
+	private UserConnectionState presence = UserConnectionState.UNKNOWN;
+	
 	private JID jid;
+	private long offlineTime=0;
 
 	public User(JID jid) {
 		this.jid = jid;
@@ -30,6 +37,15 @@ public class User {
 
 	public JID getJid() {
 		return jid;
+	}
+	
+	public UserConnectionState getPresence() {
+		return presence;
+	}
+	public void setPresence(UserConnectionState p) {
+		presence=p;
+		if (presence==null)
+			offlineTime = (new java.util.Date().getTime() /1000 ) ;
 	}
 
 	@Override
@@ -46,4 +62,9 @@ public class User {
 
 		return false;
 	}
+	
+	public int getOfflineSecs() {
+		return (int)( (new java.util.Date().getTime() /1000 ) - offlineTime) ;
+	}
+
 }

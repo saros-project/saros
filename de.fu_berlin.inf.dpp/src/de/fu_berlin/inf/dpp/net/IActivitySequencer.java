@@ -44,4 +44,8 @@ public interface IActivitySequencer extends IActivityListener {
 	 * @return the current timestamp.
 	 */
 	public int getTimestamp();
+
+	public List<TimedActivity> getActivityHistory();
+	
+	public int getQueuedActivities();
 }

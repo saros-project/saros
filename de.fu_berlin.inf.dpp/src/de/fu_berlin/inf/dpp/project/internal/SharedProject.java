@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 public class SharedProject implements ISharedProject {
 	private static Logger log = Logger.getLogger(SharedProject.class.getName());
 
+	private static final int REQUEST_ACTIVITY_ON_AGE = 5;
 	protected static final int MILLIS_UPDATE = 1000;
 
 	protected JID myID;
@@ -208,6 +209,8 @@ public class SharedProject implements ISharedProject {
 		for (ISharedProjectListener listener : listeners) {
 			listener.userLeft(user.getJid());
 		}
+		
+		log.info("User " + user.getJid() + " left session");
 	}
 
 	/*
@@ -258,7 +261,7 @@ public class SharedProject implements ISharedProject {
 	}
 
 	public Timer flushTimer = new Timer(true);
-
+	private static int queuedsince=0;
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -277,6 +280,26 @@ public class SharedProject implements ISharedProject {
 					if (activities != null)
 						transmitter.sendActivities(SharedProject.this, activities);
 				}
+				
+				// missing activities? (cant execute all)
+				if ( activitySequencer.getQueuedActivities()>0) {
+					queuedsince++;
+
+					// if i am missing activities for X seconds, ask all (because I dont know the origin)
+					// to send it to me.
+					if (queuedsince >= REQUEST_ACTIVITY_ON_AGE ) {
+
+						transmitter.sendRequestForActivity( SharedProject.this, 
+								activitySequencer.getTimestamp() , 
+								false);
+					
+						queuedsince=0;
+						
+						// TODO: forever?
+					}
+					
+				} else
+					queuedsince=0;
 			}
 		}, 0, MILLIS_UPDATE);
 	}

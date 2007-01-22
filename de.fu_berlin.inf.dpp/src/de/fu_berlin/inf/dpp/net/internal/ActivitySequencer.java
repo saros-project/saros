@@ -28,7 +28,9 @@ import java.util.logging.Logger;
 
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.ui.internal.operations.TimeTriggeredProgressMonitorDialog;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
@@ -57,7 +59,9 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 
 	private List<TimedActivity> queue = new CopyOnWriteArrayList<TimedActivity>();
 
-	private int timestamp = UNDEFINED_TIME;
+	private List<TimedActivity>	activityHistory = new LinkedList<TimedActivity>();
+
+	private int timestamp = UNDEFINED_TIME;		// my next timestamp
 
 	/*
 	 * (non-Javadoc)
@@ -177,28 +181,40 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 		return timestamp;
 	}
 
+	public int getQueuedActivities() {
+		return queue.size();
+	}
+	
+
+	public List<TimedActivity> getActivityHistory() {
+		return activityHistory; 
+	}
+		
 	/**
 	 * Executes as much activities as possible from the current queue regarding
 	 * to their individual time stamps.
 	 */
 	private void execQueue() {
-		boolean executed = false;
+		boolean executed;
 
-		for (TimedActivity timedActivity : queue) {
-			if (timestamp == UNDEFINED_TIME)
-				timestamp = timedActivity.getTimestamp();
+		do {
+			executed = false;
 			
-			if (timedActivity.getTimestamp() <= timestamp) {
-				queue.remove(timedActivity);
-
-				timestamp++;
-				exec(timedActivity.getActivity());
-				executed = true;
+			for (TimedActivity timedActivity : queue) {
+				if (timestamp == UNDEFINED_TIME)
+					timestamp = timedActivity.getTimestamp();
+				
+				if (timedActivity.getTimestamp() <= timestamp) {
+					queue.remove(timedActivity);
+	
+					timestamp++;
+					exec(timedActivity.getActivity());
+					executed = true;
+				}
 			}
-		}
-
-		if (executed)
-			execQueue();
+			
+		} while (executed);
+		
 	}
 
 	// TODO extract this into the activities themselves
@@ -271,4 +287,5 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 		selection = null;
 		return selection;
 	}
+		
 }

@@ -57,7 +57,7 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
 				if (saros.isConnected()) {
 					saros.disconnect(null);
 				} else {
-					saros.connect();
+					saros.connect(false);
 				}
 			}
 		}).start();

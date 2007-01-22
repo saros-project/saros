@@ -205,11 +205,19 @@ public class SessionManager implements IConnectionListener {
 	public void connectionStateChanged(XMPPConnection connection, ConnectionState newState) {
 
 		if (newState == Saros.ConnectionState.CONNECTED) {
-			transmitter = new XMPPChatTransmitter(connection);
-			attachRosterListener();
+			if (transmitter==null) {
+				transmitter = new XMPPChatTransmitter(connection);
+				attachRosterListener();
+			}
+			else
+				transmitter.SetXMPPConnection(connection);
+			
+			
 
-		} else {
-			leaveSession();
+		} else if (newState == Saros.ConnectionState.NOT_CONNECTED) { 
+			if (sharedProject != null) 
+				leaveSession();
+			
 			transmitter = null;
 		}
 	}
@@ -227,27 +235,35 @@ public class SessionManager implements IConnectionListener {
 			}
 
 			public void presenceChanged(String XMPPAddress) {
-				if (sharedProject == null)
+				
+				if (sharedProject==null)
 					return;
-
-				removeDroppedUserFromSession(XMPPAddress);
-			}
-
-			private void removeDroppedUserFromSession(String XMPPAddress) {
+				
 				Roster roster = Saros.getDefault().getRoster();
-
-				if (roster == null)
-					return;
-
 				Presence presence = roster.getPresence(XMPPAddress);
-				if (presence == null) {
-					JID jid = new JID(XMPPAddress);
-					User user = sharedProject.getParticipant(jid);
 
-					if (user != null)
-						sharedProject.removeUser(user);
+				JID jid = new JID(XMPPAddress);
+				User user = sharedProject.getParticipant(jid);
+				if (user!=null){
+					if (presence==null) {
+						user.setPresence( User.UserConnectionState.OFFLINE);
+						
+					} else
+						user.setPresence( User.UserConnectionState.ONLINE );
 				}
 			}
+
 		});
+	}
+	
+	public void OnReconnect(){
+
+		// ask for next expected timestamp activities (in case I missed someting while being not available)
+		transmitter.sendRequestForActivity( sharedProject ,
+				sharedProject.getSequencer().getTimestamp(), true  );
+
+		
+		transmitter.sendRemainingFiles();
+		transmitter.sendRemainingMessages();
 	}
 }

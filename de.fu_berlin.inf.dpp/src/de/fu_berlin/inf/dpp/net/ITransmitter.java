@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.net;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -133,6 +134,12 @@ public interface ITransmitter {
 	 */
 	public void sendFile(JID recipient, IPath path, int timestamp, IFileTransferCallback callback);
 
+	// TODO: doc
+	public void sendRemainingFiles();
+	public void sendRemainingMessages();
+	public void SetXMPPConnection(XMPPConnection connection);
+	public void sendRequestForActivity(ISharedProject sharedProject, int timestamp, boolean andup);
+	
 	/* ---------- etc --------- */
 
 	/**

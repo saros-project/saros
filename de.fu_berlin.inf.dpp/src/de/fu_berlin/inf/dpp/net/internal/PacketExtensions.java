@@ -43,6 +43,8 @@ public class PacketExtensions {
 	private static final String LEAVE = "leave";
 
 	private static final String REQUEST_FOR_LIST = "requestList";
+	
+	private static final String REQUEST_FOR_ACTIVITY = "requestActivity";
 
 	// attributes
 	public static final String DESCRIPTION = "description";
@@ -87,6 +89,18 @@ public class PacketExtensions {
 		return extension;
 	}
 
+	public static PacketExtension createRequestForActivityExtension(int timestamp, boolean andup) {
+		
+		DefaultPacketExtension extension = new DefaultPacketExtension(REQUEST_FOR_ACTIVITY, NAMESPACE);
+		extension.setValue("ID",  (new Integer(timestamp)).toString() );
+		
+		if (andup)
+			extension.setValue("ANDUP",  "true" );
+
+		return extension;
+	}
+	
+	
 	public static PacketExtension createRequestForFileListExtension() {
 		return createExtension(REQUEST_FOR_LIST);
 	}
@@ -122,6 +136,10 @@ public class PacketExtensions {
 	public static DefaultPacketExtension getLeaveExtension(Message message) {
 		return getExtension(LEAVE, message);
 	}
+	
+	public static DefaultPacketExtension getRequestActivityExtension(Message message) {
+		return getExtension(REQUEST_FOR_ACTIVITY, message);
+	}
 
 	public static DefaultPacketExtension getRequestExtension(Message message) {
 		return getExtension(REQUEST_FOR_LIST, message);
@@ -141,4 +159,5 @@ public class PacketExtensions {
 	private static DefaultPacketExtension getExtension(String element, Message message) {
 		return (DefaultPacketExtension) message.getExtension(element, NAMESPACE);
 	}
+	
 }
