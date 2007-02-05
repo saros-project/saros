@@ -79,9 +79,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 		if (fileList == null)
 			cancel("Failed to receive remote file list", false);
-
-		remoteFileList = fileList;
-		state = State.HOST_FILELIST_SENT;
+		else {
+			remoteFileList = fileList;
+			state = State.HOST_FILELIST_SENT;
+		}
 	}
 
 	/*

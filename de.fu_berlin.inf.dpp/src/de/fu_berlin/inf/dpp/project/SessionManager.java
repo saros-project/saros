@@ -256,14 +256,13 @@ public class SessionManager implements IConnectionListener {
 		});
 	}
 	
-	public void OnReconnect(){
+	public void OnReconnect(int oldtimestamp){
 
 		// ask for next expected timestamp activities (in case I missed someting while being not available)
-		transmitter.sendRequestForActivity( sharedProject ,
-				sharedProject.getSequencer().getTimestamp(), true  );
-
+		transmitter.sendRequestForActivity( sharedProject, oldtimestamp, true );
 		
 		transmitter.sendRemainingFiles();
 		transmitter.sendRemainingMessages();
+
 	}
 }

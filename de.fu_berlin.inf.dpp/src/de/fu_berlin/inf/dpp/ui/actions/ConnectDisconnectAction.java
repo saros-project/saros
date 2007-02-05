@@ -53,11 +53,14 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
 		new Thread(new Runnable() {
 			public void run() {
 				Saros saros = Saros.getDefault();
+				boolean reconnect=false;
+				if (saros.getConnectionState() == Saros.ConnectionState.ERROR)
+					reconnect=true;
 
 				if (saros.isConnected()) {
 					saros.disconnect(null);
 				} else {
-					saros.connect(false);
+					saros.connect(reconnect);
 				}
 			}
 		}).start();
@@ -78,10 +81,10 @@ public class ConnectDisconnectAction extends Action implements IConnectionListen
 		switch (state) {
 		case CONNECTED:
 		case CONNECTING:
-		case ERROR:
 			setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
 			break;
 
+		case ERROR:
 		case NOT_CONNECTED:
 		case DISCONNECTING:
 			setImageDescriptor(SarosUI.getImageDescriptor("/icons/disconnect.png"));

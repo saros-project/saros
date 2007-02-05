@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -121,6 +122,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		public IFileTransferCallback callback;
 
 		public int retries = 0;
+		
+		public byte[] 	content;
+		public long 	filesize;
 	}
 
 	/**
@@ -315,13 +319,39 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 * 
 	 * @see de.fu_berlin.inf.dpp.net.ITransmitter
 	 */
-	public void sendFile(JID to, IPath path, int timestamp, IFileTransferCallback callback) {
+	public void sendFile(JID to, IPath path, int timestamp, IFileTransferCallback callback)
+	{
 
 		FileTransfer transfer = new FileTransfer();
 		transfer.recipient = to;
 		transfer.path = path;
 		transfer.timestamp = timestamp;
 		transfer.callback = callback;
+		
+		// if transfer will be delayed, we need to buffer the file 
+		// to not send modified versions later
+		if (!connection.isConnected()) {
+			SessionManager sm = Saros.getDefault().getSessionManager();
+			IProject project = sm.getSharedProject().getProject();
+			
+			File f=new File(project.getFile(path).getLocation().toOSString());
+			transfer.filesize=f.length();
+			transfer.content=new byte[(int)transfer.filesize];
+			
+			try {
+				InputStream in = project.getFile(path).getContents();
+				in.read(transfer.content, 0, (int)transfer.filesize);
+			} catch (CoreException e) {
+				e.printStackTrace();
+				transfer.content=null;
+			} catch (IOException e) {
+				e.printStackTrace();
+				transfer.content=null;
+			}
+			
+		
+		} else 
+			transfer.content=null;
 
 		fileTransferQueue.add(transfer);
 		sendNextFile();
@@ -564,7 +594,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	private void sendMessageToAll(ISharedProject sharedProject, PacketExtension extension) { // HACK
 
 		JID myJID = Saros.getDefault().getMyJID();
-
+		
 		for (User participant : sharedProject.getParticipants()) {
 			if (participant.getJid().equals(myJID))
 				continue;
@@ -601,6 +631,11 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	}
 	
 	private void sendMessage(JID jid, PacketExtension extension) {
+		
+		if (!connection.isConnected()) {
+			queueMessage(jid,extension);
+			return;
+		}
 		
 		try {
 			Chat chat = getChat(jid);
@@ -670,8 +705,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 		SessionManager sm = Saros.getDefault().getSessionManager();
 		IProject project = sm.getSharedProject().getProject();
-		InputStream in = project.getFile(transferData.path).getContents();
-
+		
 		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(recipient
 			.toString());
 
@@ -686,15 +720,19 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		if (out == null || transfer.getException() != null)
 			throw new XMPPException(transfer.getException());
 
-		byte[] buffer = new byte[1000];
-		int length = -1;
-
-		while ((length = in.read(buffer)) >= 0) {
-			out.write(buffer, 0, length);
+		if (transferData.content==null) {
+			byte[] buffer = new byte[1000];
+			int length = -1;
+			InputStream in = project.getFile(transferData.path).getContents();
+			while ((length = in.read(buffer)) >= 0) {
+				out.write(buffer, 0, length);
+			}
+			in.close();
+		} else {
+			out.write(transferData.content, 0, (int)transferData.filesize);
 		}
 
 		out.close();
-		in.close();
 
 		log.info("Sent file " + transferData.path);
 

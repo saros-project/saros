@@ -325,7 +325,9 @@ public class FileList {
 
 			if (resources[i] instanceof IFile) {
 				IFile file = (IFile) resources[i];
-				members.put(file.getProjectRelativePath(), checksum(file));
+				Long checksum=checksum(file);
+				if (checksum!=-1)
+					members.put(file.getProjectRelativePath(), checksum);
 
 			} else if (resources[i] instanceof IFolder) {
 				IFolder folder = (IFolder) resources[i];

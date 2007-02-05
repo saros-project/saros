@@ -76,6 +76,8 @@ public class Saros extends AbstractUIPlugin {
 	private static SarosUI uiInstance;
 
 	private XMPPConnection connection;
+	
+	private JID myjid;
 
 	private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 	
@@ -97,48 +99,35 @@ public class Saros extends AbstractUIPlugin {
 		public void connectionClosedOnError(Exception e) { 
 			Toolkit.getDefaultToolkit().beep();
 			System.out.println("XMPP Connection Error: "+e.toString());
+			setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
 			
-			// attempt reconnection
-			connect(true);
-			
-			if (connection.isConnected()) {
-				// successfull
-				sessionManager.OnReconnect();
-				System.out.println("XMPP reconnected (quick)");
-				
-				
-			} else {
-				// failed - tell the user
-				setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
-				
-				Display.getDefault().syncExec(new Runnable() {
-					public void run() {
-						boolean retry=true;
-						while (retry) {
-						
-							retry=MessageDialog.openQuestion(Display.getDefault().getActiveShell(),
-									"Network error", "Network error occured. Do you want to reconnect?\nIf not, the session will be disconnected.");
-						
-							if (retry) {
-								connect(true);
-								if (connection.isConnected()) {
-									sessionManager.OnReconnect();
-									System.out.println("XMPP reconnected (requested)");
-									break;
-								}
-							}
-							else {
-								disconnect("XMPP connection error");
-							}
-						
-						}
-					}
-				});
+			new Thread(new Runnable() {
 
-				
-//				if( Saros.getDefault().getSessionManager().getSharedProject().isDriver())
-			
-			}
+				public void run() {
+					
+					int offlineAtTS=sessionManager.getSharedProject().getSequencer().getTimestamp();
+					
+					try {
+						do {
+							connect(true);
+							
+							if (!connection.isConnected())
+								Thread.sleep(5000);
+
+						} while (!connection.isConnected());
+						
+						if (connection.isConnected()) {
+							sessionManager.OnReconnect(offlineAtTS);
+							System.out.println("XMPP reconnected");
+						}						
+						
+					} catch (InterruptedException e) {
+
+						e.printStackTrace();
+					}
+				}
+			}).start();				
+
 		} 
 	}; 
 	
@@ -217,7 +206,7 @@ public class Saros extends AbstractUIPlugin {
 	}
 
 	public JID getMyJID() {
-		return isConnected() ? new JID(connection.getUser()) : null;
+		return myjid;
 	}
 
 	public SarosUI getUI() { // HACK
@@ -285,6 +274,8 @@ public class Saros extends AbstractUIPlugin {
 			
 			setConnectionState(ConnectionState.CONNECTED, null);
 			
+			myjid=new JID(connection.getUser());
+			
 
 		} catch (final Exception e) {
 			//disconnect(e.getMessage());
@@ -321,6 +312,8 @@ public class Saros extends AbstractUIPlugin {
 
 		setConnectionState(error == null ? ConnectionState.NOT_CONNECTED : ConnectionState.ERROR,
 			error);
+		
+		myjid=null;
 
 	}
 
