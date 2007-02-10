@@ -41,6 +41,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Button;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -113,7 +114,9 @@ public class JoinSessionWizard extends Wizard {
 	private class EnterNamePage extends WizardPage {
 
 		private Text newProjectNameText;
-
+		private Button projUpd;
+		
+		
 		protected EnterNamePage() {
 			super("namePage");
 			setPageComplete(false);
@@ -136,23 +139,43 @@ public class JoinSessionWizard extends Wizard {
 			Composite composite = new Composite(parent, SWT.NONE);
 			composite.setLayout(new GridLayout(2, false));
 
+			GridData gridData;
+			
+			IProject project = getLocalProject();
+
 			Label helpLabel = new Label(composite, SWT.WRAP);
-			helpLabel.setText(getHelpText());
+			helpLabel.setText(getHelpText(project));
 			helpLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
 
+			Button projCopy = new Button(composite, SWT.RADIO);
+			projCopy.setText("Create new project copy");
+			projCopy.setSelection(true);
+			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false,2,1);
+			gridData.verticalIndent = 20;
+			projCopy.setLayoutData(gridData);
+			
 			Label newProjectNameLabel = new Label(composite, SWT.NONE);
 			newProjectNameLabel.setText("Project name");
-			GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
-			gridData.verticalIndent = 20;
+			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
+			gridData.verticalIndent = 3;
 			newProjectNameLabel.setLayoutData(gridData);
 
 			newProjectNameText = new Text(composite, SWT.BORDER);
 			gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-			gridData.verticalIndent = 20;
+			gridData.verticalIndent = 1;
 			newProjectNameText.setLayoutData(gridData);
 			newProjectNameText.setFocus();
-
 			newProjectNameText.setText(findProjectNameProposal());
+			
+			projUpd = new Button(composite, SWT.RADIO);
+			projUpd.setText("Update and use existing project");
+			if (project==null)
+				projUpd.setEnabled(false);
+			else
+				projUpd.setText("Update and use existing project ("+ project.getName() +")");
+			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false,2,1);
+			gridData.verticalIndent = 20;
+			projUpd.setLayoutData(gridData);
 
 			attachListeners();
 			setControl(composite);
@@ -161,14 +184,12 @@ public class JoinSessionWizard extends Wizard {
 		}
 
 		/**
-		 * TODO this documentation seems to be wrong
-		 * 
 		 * @return the project name of the project that should be created or
 		 *         <code>null</code> if the user chose to overwrite an
 		 *         existing project.
 		 */
 		public String getNewProjectName() {
-			return newProjectNameText != null ? newProjectNameText.getText() : "";
+			return projUpd.getSelection()?null:newProjectNameText.getText();
 		}
 
 		private IProject getLocalProject() {
@@ -220,8 +241,7 @@ public class JoinSessionWizard extends Wizard {
 			}
 		}
 
-		private String getHelpText() {
-			IProject project = getLocalProject();
+		private String getHelpText(IProject project) {
 			if (project == null) {
 				return "Project replication will start from scratch.";
 			}
