@@ -282,26 +282,37 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		String xml = fileList.toXML();
 
 		String to = recipient.toString();
-		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(to);
+		
+		int attempts = MAX_TRANSFER_RETRIES;
+		
+		while (true) {
+			
+			try {
+				OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(to);
+	
+				OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
+						FILELIST_TRANSFER_DESCRIPTION);
+	
+				log.fine("Sending file list");
+	
+				if (out == null) {
+					if (attempts-- > 0)
+						continue;
+					throw new XMPPException(transfer.getException());
+				}
+					
+				BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
+				writer.write(xml);
+				writer.flush();
+				writer.close();
+				break;
 
-		OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
-			FILELIST_TRANSFER_DESCRIPTION);
-
-		log.fine("Sending file list");
-
-		if (out == null)
-			throw new XMPPException(transfer.getException());
-
-		try {
-			BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
-			writer.write(xml);
-			writer.flush();
-			writer.close();
-
-		} catch (IOException e) {
-			throw new XMPPException(e);
+			} catch (IOException e) {
+				if (attempts-- > 0)
+					continue;
+				throw new XMPPException(e);
+			}
 		}
-
 		log.info("Sent file list");
 	}
 
@@ -744,9 +755,10 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		log.fine("Receiving file list");
 
 		FileList fileList = null;
-		final IncomingFileTransfer transfer = request.accept();
 
 		try {
+			final IncomingFileTransfer transfer = request.accept();
+
 			InputStream in = transfer.recieveFile();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			StringBuffer sb = new StringBuffer();

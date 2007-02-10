@@ -136,26 +136,17 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * @see de.fu_berlin.inf.dpp.InvitationProcess
 	 */
 	public void fileListRequested(JID from) {
-		//assertState(State.INVITATION_SENT);
-		if (state != State.INVITATION_SENT && state !=State.HOST_FILELIST_SENT)
-			cancel("Unexpected state(" + state + ")", false);
+		assertState(State.INVITATION_SENT);
 
 		// HACK add resource specifier to jid
 		if (peer.equals(from))
 			peer = from;
 
-		for (int attempt=0;attempt<3;attempt++) {
-			
 		try {
 			transmitter.sendFileList(peer, sharedProject.getFileList());
 			state = State.HOST_FILELIST_SENT;
-			break;
-			
 		} catch (Exception e) {
-			System.out.println("Sending file list failed (fileListRequested())");
-			if (attempt==2)
-				failed(e);
-		}
+			failed(e);
 		}
 	}
 

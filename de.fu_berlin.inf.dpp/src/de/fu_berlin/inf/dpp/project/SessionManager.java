@@ -258,11 +258,10 @@ public class SessionManager implements IConnectionListener {
 	
 	public void OnReconnect(int oldtimestamp){
 
-		// ask for next expected timestamp activities (in case I missed someting while being not available)
-		transmitter.sendRequestForActivity( sharedProject, oldtimestamp, true );
-		
 		transmitter.sendRemainingFiles();
 		transmitter.sendRemainingMessages();
 
+		// ask for next expected timestamp activities (in case I missed something while being not available)
+		transmitter.sendRequestForActivity( sharedProject, oldtimestamp, true );
 	}
 }
