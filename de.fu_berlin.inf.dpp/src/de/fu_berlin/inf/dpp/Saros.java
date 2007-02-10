@@ -99,34 +99,43 @@ public class Saros extends AbstractUIPlugin {
 		public void connectionClosedOnError(Exception e) { 
 			Toolkit.getDefaultToolkit().beep();
 			System.out.println("XMPP Connection Error: "+e.toString());
-			setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
 			
-			new Thread(new Runnable() {
-
-				public void run() {
-					
-					int offlineAtTS=sessionManager.getSharedProject().getSequencer().getTimestamp();
-					
-					try {
-						do {
-							connect(true);
+			if (connection != null) {
+				connection.removeConnectionListener(smackConnectionListener);
+				connection.close();
+			}
+			
+			if (getConnectionState()!=ConnectionState.ERROR) {
+				setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
+				
+				new Thread(new Runnable() {
+	
+					public void run() {
+						
+						int offlineAtTS=sessionManager.getSharedProject().getSequencer().getTimestamp();
+						
+						try {
+							do {
+								connect(true);
+								
+								if (!connection.isConnected())
+									Thread.sleep(5000);
+	
+							} while (!connection.isConnected());
 							
-							if (!connection.isConnected())
-								Thread.sleep(5000);
-
-						} while (!connection.isConnected());
-						
-						if (connection.isConnected()) {
-							sessionManager.OnReconnect(offlineAtTS);
-							System.out.println("XMPP reconnected");
-						}						
-						
-					} catch (InterruptedException e) {
-
-						e.printStackTrace();
+							if (connection.isConnected()) {
+								sessionManager.OnReconnect(offlineAtTS);
+								System.out.println("XMPP reconnected");
+							}						
+							
+						} catch (InterruptedException e) {
+	
+							e.printStackTrace();
+						}
 					}
-				}
-			}).start();				
+				}).start();		
+				
+			}
 
 		} 
 	}; 
