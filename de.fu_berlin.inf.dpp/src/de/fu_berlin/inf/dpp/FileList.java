@@ -325,6 +325,9 @@ public class FileList {
 
 			if (resources[i] instanceof IFile) {
 				IFile file = (IFile) resources[i];
+				if (file.exists()==false)
+					continue;
+				
 				Long checksum=checksum(file);
 				if (checksum!=-1)
 					members.put(file.getProjectRelativePath(), checksum);
