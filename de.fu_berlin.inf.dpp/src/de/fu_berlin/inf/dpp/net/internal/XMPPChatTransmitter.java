@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,8 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -409,6 +412,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		}).start();
 	}
 	
+	public void sendUserListTo(JID to, List<User> participants) {
+		log.fine("Sending user list to "+to.toString());
+
+		sendMessage(to, PacketExtensions.createUserListExtension(participants) );		
+	}
+	
 	public void sendRemainingFiles() {
 		
 		if ( fileTransferQueue.size() > 0)
@@ -426,7 +435,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				message = chat.createMessage();
 				message.addExtension(pex.packetextension);
 				chat.sendMessage(message);
-				log.info("resending message");
+				log.info("Resending message");
 			}
 		} catch (Exception e) {
 			Saros.getDefault().getLog().log(
@@ -491,7 +500,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		if (activitiesPacket != null) {
 			List<TimedActivity> timedActivities = activitiesPacket.getActivities();
 
-			log.info("Received activities: " + timedActivities);
+			log.info("Received activities from "+fromJID.toString()+": " + timedActivities);
 
 			if (!isProjectParticipant) {
 				log.info("user not member!");
@@ -500,12 +509,20 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 			for (TimedActivity timedActivity : timedActivities) {
 
+				IActivity activity = timedActivity.getActivity();
+				
+				if (activity instanceof TextSelectionActivity ){
+					((TextSelectionActivity)activity).setSource(fromJID.toString());
+				}
+				if (activity instanceof TextEditActivity ){
+					((TextEditActivity)activity).setSource(fromJID.toString());
+				}
+				
 				/*
 				 * incoming fileActivities that add files are only used as
 				 * placeholder to bump the timestamp. the real fileActivity will
 				 * be processed by using a file transfer.
 				 */
-				IActivity activity = timedActivity.getActivity();
 				if (!(activity instanceof FileActivity)
 					|| !((FileActivity) activity).getType().equals(FileActivity.Type.Created)) {
 
@@ -516,10 +533,18 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		}
 
 		if (PacketExtensions.getJoinExtension(message) != null) {
+			
+			boolean iAmInviter=false;
+			
 			for (IInvitationProcess process : processes) {
-				if (process.getPeer().equals(fromJID))
+				if (process.getPeer().equals(fromJID)){
 					process.joinReceived(fromJID);
+					iAmInviter=true;
+				}
 			}
+			if (!iAmInviter && project!=null)
+				project.addUser(new User(fromJID));
+				
 		}
 
 		if (PacketExtensions.getLeaveExtension(message) != null) {
@@ -557,6 +582,31 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			}
 		}
 
+		DefaultPacketExtension userlistExtension = PacketExtensions.getUserlistExtension(message);
+		if (userlistExtension != null ) {
+			
+			System.out.println( Saros.getDefault().getMyJID()+ "received user list from "+fromJID);
+			
+			int count=0;
+			while( true ){
+				String jidS=userlistExtension.getValue( "User" + new Integer(count++).toString() );
+				if (jidS==null)
+					break;
+				System.out.println("   *:"+jidS);
+				
+				JID jid=new JID(jidS);
+				User user=new User( jid);
+
+				if (project.getParticipant(jid) == null) {
+					project.addUser(user);
+					sendMessage(jid, PacketExtensions.createJoinExtension());
+				}
+			}
+			
+			
+			
+		}
+		
 		DefaultPacketExtension inviteExtension = PacketExtensions.getInviteExtension(message);
 
 		if (inviteExtension != null) {
@@ -667,10 +717,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 	private void receiveResource(FileTransferRequest request) {
 		try {
-			log.fine("Receiving resource " + request.getFileName());
 
 			JID from = new JID(request.getRequestor());
 			Path path = new Path(request.getFileName());
+
+			log.fine("Receiving resource from"+ from.toString()+": " + request.getFileName() );
+			
 			InputStream in = request.accept().recieveFile();
 
 			boolean handledByInvitation = false;

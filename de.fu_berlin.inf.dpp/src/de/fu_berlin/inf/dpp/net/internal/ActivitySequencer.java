@@ -222,27 +222,32 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 		List<IActivity> result = new ArrayList<IActivity>(activities.size());
 
 		ITextSelection selection = null;
+		String source=null;
+		
 		for (IActivity activity : activities) {
+			source=null;
 			if (activity instanceof TextEditActivity) {
 				TextEditActivity textEdit = (TextEditActivity) activity;
 
 				textEdit = joinTextEdits(result, textEdit);
 
 				selection = new TextSelection(textEdit.offset + textEdit.text.length(), 0);
+				source=textEdit.getSource();
 				result.add(textEdit);
 
 			} else if (activity instanceof TextSelectionActivity) {
 				TextSelectionActivity textSelection = (TextSelectionActivity) activity;
 
 				selection = new TextSelection(textSelection.getOffset(), textSelection.getLength());
+				source=textSelection.getSource();
 
 			} else {
-				selection = addSelection(result, selection);
+				selection = addSelection(result, selection,null);
 				result.add(activity);
 			}
+			
+			selection = addSelection(result, selection, source);
 		}
-
-		selection = addSelection(result, selection);
 
 		return result;
 	}
@@ -254,18 +259,21 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 		IActivity lastActivity = result.get(result.size() - 1);
 		if (lastActivity instanceof TextEditActivity) {
 			TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
-
-			if (textEdit.offset == lastTextEdit.offset + lastTextEdit.text.length()) {
+			
+			if ( (lastTextEdit.getSource()==null || lastTextEdit.getSource().equals(textEdit.getSource()) ) &&
+				textEdit.offset == lastTextEdit.offset + lastTextEdit.text.length()) {
 				result.remove(lastTextEdit);
-				textEdit = new TextEditActivity(lastTextEdit.offset, lastTextEdit.text
-					+ textEdit.text, lastTextEdit.replace + textEdit.replace);
+				textEdit = new TextEditActivity(lastTextEdit.offset, 
+						lastTextEdit.text + textEdit.text, 
+						lastTextEdit.replace + textEdit.replace);
+				textEdit.setSource(lastTextEdit.getSource());
 			}
 		}
 
 		return textEdit;
 	}
 
-	private ITextSelection addSelection(List<IActivity> result, ITextSelection selection) {
+	private ITextSelection addSelection(List<IActivity> result, ITextSelection selection,String source) {
 		if (selection == null)
 			return null;
 
@@ -282,10 +290,15 @@ public class ActivitySequencer implements IActivitySequencer, IActivityManager {
 			}
 		}
 
-		result.add(new TextSelectionActivity(selection.getOffset(), selection.getLength()));
+		TextSelectionActivity newSel=new TextSelectionActivity(
+				selection.getOffset(), 
+				selection.getLength()
+				);
+		newSel.setSource(source);		
+		result.add(newSel);
 
 		selection = null;
 		return selection;
 	}
-		
+
 }

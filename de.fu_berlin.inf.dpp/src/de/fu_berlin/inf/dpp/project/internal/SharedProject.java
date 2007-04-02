@@ -63,6 +63,10 @@ public class SharedProject implements ISharedProject {
 
 	private ActivitySequencer activitySequencer = new ActivitySequencer();
 
+	private static final int MAX_USERCOLORS = 5;
+	private int colorlist[] = new int[MAX_USERCOLORS +1];
+
+	
 	public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
 		this.transmitter = transmitter;
 
@@ -84,7 +88,9 @@ public class SharedProject implements ISharedProject {
 		this.driver = new User(driver);
 
 		for (JID jid : allParticipants) { // HACK
-			participants.add(new User(jid));
+			User user=new User(jid);
+			participants.add(user);
+			assignColorId(user);
 		}
 
 		this.project = project;
@@ -185,6 +191,9 @@ public class SharedProject implements ISharedProject {
 
 		participants.add(user);
 
+		// find free color and assign it to user
+		assignColorId(user);
+		
 		for (ISharedProjectListener listener : listeners) {
 			listener.userJoined(user.getJid());
 		}
@@ -199,6 +208,9 @@ public class SharedProject implements ISharedProject {
 	 */
 	public void removeUser(User user) {
 		participants.remove(user);
+
+		// free colorid
+		colorlist[user.getColorID()]=0;
 
 		if (driver.equals(user)) {
 			// TODO make sure all users have the participants
@@ -326,5 +338,22 @@ public class SharedProject implements ISharedProject {
 		}
 
 		return null;
+	}
+
+	boolean assignColorId(User user){
+		
+		// already has a color assigned
+		if (user.getColorID()==-1)
+			return true;
+		
+		for (int i=0;i<MAX_USERCOLORS;i++){
+			if (colorlist[i]==0) {
+				user.setColorID(i);
+				colorlist[user.getColorID()]=1;
+				return true;
+			}
+		}
+		
+		return false;		
 	}
 }

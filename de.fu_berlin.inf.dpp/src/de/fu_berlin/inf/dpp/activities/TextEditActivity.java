@@ -26,7 +26,9 @@ package de.fu_berlin.inf.dpp.activities;
  */
 public class TextEditActivity implements IActivity {
 	public final int offset;
-
+	
+	private String source; 
+	
 	/**
 	 * This string only uses \n as line delimiter. Keep this in mind when adding
 	 * it to an IDocument with probably other line delimiters.
@@ -42,18 +44,32 @@ public class TextEditActivity implements IActivity {
 	 *            the text that was inserted.
 	 * @param replace
 	 *            the length of text that was replaced by this activity.
+	 * @param source
+	 *            the source ID of this activity
 	 */
 	public TextEditActivity(int offset, String text, int replace) {
 		this.offset = offset;
 		this.text = text;
 		this.replace = replace;
+		this.source = null;
+	}
+
+
+	public String getSource() {
+		return source;
+	}
+	public void setSource(String source) {
+		this.source=source;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TextEditActivity) {
 			TextEditActivity other = (TextEditActivity) obj;
-			return offset == other.offset && text.equals(other.text) && replace == other.replace;
+			return	offset == other.offset && 
+					text.equals(other.text) && 
+					replace == other.replace &&
+					source == other.source;
 		}
 
 		return false;

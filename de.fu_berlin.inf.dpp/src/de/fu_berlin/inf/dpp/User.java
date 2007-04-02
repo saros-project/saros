@@ -27,6 +27,7 @@ public class User {
 	private UserConnectionState presence = UserConnectionState.UNKNOWN;
 	
 	private JID jid;
+	private int colorid=0;
 	private long offlineTime=0;
 
 	public User(JID jid) {
@@ -51,6 +52,14 @@ public class User {
 		}
 
 		return false;
+	}
+	
+	public int getColorID(){
+		return colorid;
+	}
+	
+	public void setColorID(int c) {
+		colorid=c;
 	}
 	
 	

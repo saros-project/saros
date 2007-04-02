@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -180,6 +181,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		sendDriverEditors();
 
 		transmitter.removeInvitationProcess(this); // HACK
+
+		transmitter.sendUserListTo(from, sharedProject.getParticipants());
 	}
 
 	/*

@@ -21,8 +21,8 @@ public class TimedActivity {
 	 *            the timestamp that belongs to the activity.
 	 */
 	public TimedActivity(IActivity activity, int timestamp) {
-		this.activity = activity;
-		this.timestamp = timestamp;
+		this.activity 	= activity;
+		this.timestamp 	= timestamp;
 	}
 
 	/**
@@ -31,7 +31,7 @@ public class TimedActivity {
 	public IActivity getActivity() {
 		return activity;
 	}
-
+	
 	/**
 	 * @return the timestamp of the activiy.
 	 */

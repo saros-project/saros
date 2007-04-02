@@ -114,7 +114,6 @@ public class SessionView extends ViewPart implements ISessionListener {
 
 	private class SessionLabelProvider extends LabelProvider implements ITableLabelProvider {
 		private Image userImage = SarosUI.getImage("icons/user.png");
-
 		private Image driverImage = SarosUI.getImage("icons/user_edit.png");
 
 		public String getColumnText(Object obj, int index) {
@@ -131,6 +130,18 @@ public class SessionView extends ViewPart implements ISessionListener {
 		@Override
 		public Image getImage(Object obj) {
 			User user = (User) obj;
+			
+/*
+		    Display display = new Display();
+		    Color red = display.getSystemColor(SWT.COLOR_RED);
+			
+		    Image image = new Image(display, 10, 10);
+		    GC gc = new GC(image);
+		    gc.setBackground(red);
+		    gc.fillRectangle(0, 0, 10, 10);
+		    gc.dispose();
+		    return image;
+*/
 			return user.equals(sharedProject.getDriver()) ? driverImage : userImage;
 		}
 

@@ -57,7 +57,7 @@ public interface IEditorAPI {
 	/**
 	 * Sets the text selection in given editor.
 	 */
-	public void setSelection(IEditorPart editorPart, ITextSelection selection);
+	public void setSelection(IEditorPart editorPart, ITextSelection selection, String source);
 
 	/**
 	 * Returns the current text selection for given editor.

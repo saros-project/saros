@@ -25,6 +25,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -143,6 +144,15 @@ public interface ITransmitter {
 	 * Sends queued messages.
 	 */	
 	public void sendRemainingMessages();
+	
+	/**
+	 * Sends a list of users to given recipient 
+	 * @param to
+	 * 			Receipient of this list
+	 * @param participants
+	 * 			List of Users, of current shared project participants 
+	 */
+	public void sendUserListTo(JID to, List<User> participants);
 	
 	/**
 	 * Sets my XMPP connection to the given connection - for changing the current connection (like after reconnect).

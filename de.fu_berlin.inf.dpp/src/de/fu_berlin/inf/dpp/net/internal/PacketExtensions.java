@@ -24,6 +24,10 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.net.JID;
+import java.util.List;
+
 /**
  * Holds various simple helper methods to create and parse simple Smack packet
  * extensions.
@@ -45,6 +49,8 @@ public class PacketExtensions {
 	private static final String REQUEST_FOR_LIST = "requestList";
 	
 	private static final String REQUEST_FOR_ACTIVITY = "requestActivity";
+	
+	private static final String USER_LIST = "userList";
 
 	// attributes
 	public static final String DESCRIPTION = "description";
@@ -112,6 +118,19 @@ public class PacketExtensions {
 	public static PacketExtension createLeaveExtension() {
 		return createExtension(LEAVE);
 	}
+	
+	public static PacketExtension createUserListExtension(List<User> list) {
+		DefaultPacketExtension extension = new DefaultPacketExtension(USER_LIST, NAMESPACE);
+		
+		int count=0;
+		for (User participant : list ) {
+			JID jid = participant.getJid();
+			String id="User" + new Integer(count++).toString();
+			extension.setValue( id , jid.toString() );
+		}
+		
+		return extension;
+	}
 
 	/**
 	 * Tries to create an default packet extension from given message. The
@@ -136,6 +155,11 @@ public class PacketExtensions {
 	public static DefaultPacketExtension getLeaveExtension(Message message) {
 		return getExtension(LEAVE, message);
 	}
+	
+	public static DefaultPacketExtension getUserlistExtension(Message message) {
+		return getExtension(USER_LIST, message);
+	}
+	
 	
 	public static DefaultPacketExtension getRequestActivityExtension(Message message) {
 		return getExtension(REQUEST_FOR_ACTIVITY, message);

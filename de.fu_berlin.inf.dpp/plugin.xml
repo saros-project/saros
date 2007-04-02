@@ -125,8 +125,20 @@
             markerType="de.fu_berlin.inf.dpp.annotations.contribution"
             name="de.fu_berlin.inf.dpp.annotations.contribution"/>
       <type
-            markerType="de.fu_berlin.inf.dpp.annotations.selection"
-            name="de.fu_berlin.inf.dpp.annotations.selection"/>
+            markerType="de.fu_berlin.inf.dpp.annotations.selection.1"
+            name="de.fu_berlin.inf.dpp.annotations.selection.1"/>
+      <type
+            markerType="de.fu_berlin.inf.dpp.annotations.selection.2"
+            name="de.fu_berlin.inf.dpp.annotations.selection.2"/>
+      <type
+            markerType="de.fu_berlin.inf.dpp.annotations.selection.3"
+            name="de.fu_berlin.inf.dpp.annotations.selection.3"/>
+      <type
+            markerType="de.fu_berlin.inf.dpp.annotations.selection.4"
+            name="de.fu_berlin.inf.dpp.annotations.selection.4"/>
+      <type
+            markerType="de.fu_berlin.inf.dpp.annotations.selection.5"
+            name="de.fu_berlin.inf.dpp.annotations.selection.5"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
@@ -166,23 +178,96 @@
             textStylePreferenceValue="NONE"
             verticalRulerPreferenceValue="false"/>
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.selection"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color"
+            annotationType="de.fu_berlin.inf.dpp.annotations.selection.1"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.1"
             colorPreferenceValue="255,0,0"
             contributesToHeader="false"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
-            label="Selection of other user"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview"
-            overviewRulerPreferenceValue="false"
+            label="DPP Selection of remote user 1"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.1"
+            overviewRulerPreferenceValue="true"
             presentationLayer="8"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.1"
             textPreferenceValue="true"
-            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.1"
             textStylePreferenceValue="BOX"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.1"
             verticalRulerPreferenceValue="false"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.selection.2"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.2"
+            colorPreferenceValue="0,255,0"
+            contributesToHeader="false"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="DPP Selection of remote user 2"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.2"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.2"
+            textPreferenceValue="true"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.2"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.2"
+            verticalRulerPreferenceValue="false"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.selection.3"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.3"
+            colorPreferenceValue="0,0,255"
+            contributesToHeader="false"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="DPP Selection of remote user 3"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.3"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.3"
+            textPreferenceValue="true"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.3"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.3"
+            verticalRulerPreferenceValue="false"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.selection.4"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.4"
+            colorPreferenceValue="255,255,0"
+            contributesToHeader="false"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="DPP Selection of remote user 4"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.4"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.4"
+            textPreferenceValue="true"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.4"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.4"
+            verticalRulerPreferenceValue="false"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.selection.5"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.5"
+            colorPreferenceValue="0,255,255"
+            contributesToHeader="false"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
+            highlightPreferenceValue="true"
+            includeOnPreferencePage="true"
+            label="DPP Selection of remote user 5"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.overview.5"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.text.5"
+            textPreferenceValue="true"
+            textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.textstyle.5"
+            textStylePreferenceValue="BOX"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.ruler.5"
+            verticalRulerPreferenceValue="false"/>
+
    </extension>
    <extension
          id="de.fu_berlin.inf.dpp.modelProvider"

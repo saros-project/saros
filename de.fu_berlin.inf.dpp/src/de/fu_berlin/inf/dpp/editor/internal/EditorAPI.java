@@ -240,13 +240,6 @@ public class EditorAPI implements IEditorAPI {
 							null);
 					Toolkit.getDefaultToolkit().beep();
 				}
-
-/*			
-				MessageDialog.openInformation(Display.getDefault().getActiveShell(),
-					"You're not the driver",
-					"You're not allowed to change the text while not being "
-						+ "the driver of the session.");
-*/						
 			}
 		}
 	};
@@ -396,13 +389,12 @@ public class EditorAPI implements IEditorAPI {
 	 * 
 	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
 	 */
-	public void setSelection(IEditorPart editorPart, ITextSelection selection) {
+	public void setSelection(IEditorPart editorPart, ITextSelection selection, String source) {
 
 		if (!(editorPart instanceof ITextEditor))
 			return;
 
 		ITextEditor textEditor = (ITextEditor) editorPart;
-
 		IAnnotationModel model = textEditor.getDocumentProvider().getAnnotationModel(
 			textEditor.getEditorInput());
 
@@ -411,12 +403,13 @@ public class EditorAPI implements IEditorAPI {
 			for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 				Annotation annotation = (Annotation) it.next();
 
-				if (annotation.getType().equals(SelectionAnnotation.TYPE))
+				if ( annotation.getType().startsWith(SelectionAnnotation.TYPE) && 
+					annotation.getText().equals(source)	)
 					model.removeAnnotation(annotation);
 			}
 
 			Position position = new Position(selection.getOffset(), selection.getLength());
-			Annotation annotation = new SelectionAnnotation();
+			Annotation annotation = new SelectionAnnotation(source);
 			model.addAnnotation(annotation, position);
 		}
 	}

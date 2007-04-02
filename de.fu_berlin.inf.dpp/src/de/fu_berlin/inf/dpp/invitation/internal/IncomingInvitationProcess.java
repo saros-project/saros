@@ -246,6 +246,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = workspaceRoot.getProject(newProjectName);
+		
+		//project.clearHistory(null);
+		//project.refreshLocal(IProject.DEPTH_INFINITE, null);
 
 		if (baseProject == null) {
 			project.create(new NullProgressMonitor());

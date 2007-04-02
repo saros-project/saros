@@ -23,10 +23,13 @@ public class TextSelectionActivity implements IActivity {
 	private int offset;
 
 	private int length;
+	
+	private String source;
 
 	public TextSelectionActivity(int offset, int length) {
 		this.offset = offset;
 		this.length = length;
+		this.source = null;
 	}
 
 	public int getLength() {
@@ -37,11 +40,20 @@ public class TextSelectionActivity implements IActivity {
 		return offset;
 	}
 
+	public String getSource() {
+		return source;
+	}
+	public void setSource(String source) {
+		this.source=source;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof TextSelectionActivity) {
 			TextSelectionActivity activity = (TextSelectionActivity) obj;
-			return offset == activity.offset && length == activity.length;
+			return  offset == activity.offset && 
+					length == activity.length &&
+					source == activity.source;
 		}
 
 		return false;
