@@ -92,6 +92,7 @@ public interface ISharedProject {
 	 *            the user that is to be added.
 	 */
 	public void addUser(User user);
+	public void addUser(User user, int index);
 
 	/**
 	 * Removes the user.

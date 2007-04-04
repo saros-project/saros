@@ -543,7 +543,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				}
 			}
 			if (!iAmInviter && project!=null)
-				project.addUser(new User(fromJID));
+				project.addUser(new User(fromJID));	// a new user joined this session
 				
 		}
 
@@ -584,27 +584,26 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 		DefaultPacketExtension userlistExtension = PacketExtensions.getUserlistExtension(message);
 		if (userlistExtension != null ) {
-			
-			System.out.println( Saros.getDefault().getMyJID()+ "received user list from "+fromJID);
-			
+			// My inviter sent a list of all session participants
+			// I need to adapt the order for later case of driver leaving the session
+			log.fine( Saros.getDefault().getMyJID()+ "received user list from "+fromJID);
+	
 			int count=0;
-			while( true ){
+			while( true ) {
 				String jidS=userlistExtension.getValue( "User" + new Integer(count++).toString() );
 				if (jidS==null)
 					break;
-				System.out.println("   *:"+jidS);
+				log.fine("   *:"+jidS);
 				
 				JID jid=new JID(jidS);
 				User user=new User( jid);
-
-				if (project.getParticipant(jid) == null) {
-					project.addUser(user);
+				
+				if (project.getParticipant(jid) == null) 
 					sendMessage(jid, PacketExtensions.createJoinExtension());
-				}
+
+				project.addUser(user, count-1 );
+
 			}
-			
-			
-			
 		}
 		
 		DefaultPacketExtension inviteExtension = PacketExtensions.getInviteExtension(message);

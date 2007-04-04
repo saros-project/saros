@@ -186,8 +186,16 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProject
 	 */
 	public void addUser(User user) {
-		if (participants.contains(user))
+		addUser(user,-1);
+	}
+	public void addUser(User user, int index) {
+		if (participants.contains(user)) {
+			if (index>=0 && participants.indexOf(user)!=index) {
+				participants.remove(user);
+				participants.add(index, user);				
+			}
 			return;
+		}
 
 		participants.add(user);
 
@@ -213,8 +221,6 @@ public class SharedProject implements ISharedProject {
 		colorlist[user.getColorID()]=0;
 
 		if (driver.equals(user)) {
-			// TODO make sure all users have the participants
-			// list in the same order
 			setDriver(participants.get(0), true);
 		}
 
