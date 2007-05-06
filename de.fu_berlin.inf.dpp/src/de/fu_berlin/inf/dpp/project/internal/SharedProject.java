@@ -27,8 +27,14 @@ import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -40,6 +46,7 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;;
 
 public class SharedProject implements ISharedProject {
 	private static Logger log = Logger.getLogger(SharedProject.class.getName());
@@ -286,6 +293,8 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProject
 	 */
 	public void start() {
+		
+
 		flushTimer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -361,5 +370,20 @@ public class SharedProject implements ISharedProject {
 		}
 		
 		return false;		
+	}
+	
+	public void startInvitationWizard() {
+		Display.getDefault().asyncExec(new Runnable() {
+			public void run() {
+				try {
+					Shell shell = Display.getDefault().getActiveShell();
+					new WizardDialog(shell, new InvitationWizard()).open();
+				} catch (Exception e) {
+					Saros.getDefault().getLog().log(
+						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+							"Error while running invitation wizard", e));
+				}
+			}
+		});		
 	}
 }

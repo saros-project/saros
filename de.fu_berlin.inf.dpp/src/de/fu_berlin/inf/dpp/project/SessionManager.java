@@ -78,11 +78,13 @@ public class SessionManager implements IConnectionListener {
 		JID myJID = Saros.getDefault().getMyJID();
 		sharedProject = new SharedProject(transmitter, project, myJID);
 		sharedProject.start();
-
+		
 		for (ISessionListener listener : listeners) {
 			listener.sessionStarted(sharedProject);
 		}
 
+		sharedProject.startInvitationWizard();
+		
 		log.info("Session started");
 	}
 

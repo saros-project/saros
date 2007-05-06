@@ -29,9 +29,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import javax.sound.midi.Transmitter;
-import javax.swing.text.DefaultEditorKit.BeepAction;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -53,7 +50,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 
@@ -190,7 +186,6 @@ public class Saros extends AbstractUIPlugin {
 				}
 			});
 		}
-		
 	}
 
 	/**

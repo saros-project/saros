@@ -38,20 +38,13 @@ import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 
 /**
- * A wizard that guides the user through an incoming invitiation process.
+ * A wizard to configure Saros.
  * 
- * Todo: - Enhance Usability of this dialog: - Automatically switch to follow
- * mode - Make a suggestion for the name of the project - Suggest if the project
- * is a CVS project that the user checks it out and offers an option to transfer
- * the settings
- * 
- * @author rdjemili
  */
 public class ConfigurationWizard extends Wizard {
 	
 	/**
-	 * A wizard page that displays the name of the inviter and the description
-	 * provided with the invitation.
+	 * 
 	 */
 	private class FirstPage extends WizardPage implements IWizardPage2 {
 		

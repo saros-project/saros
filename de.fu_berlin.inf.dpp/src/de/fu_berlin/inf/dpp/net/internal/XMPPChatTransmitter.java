@@ -601,7 +601,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				if (project.getParticipant(jid) == null) 
 					sendMessage(jid, PacketExtensions.createJoinExtension());
 
-				project.addUser(user, count-1 );
+				project.addUser(user, count-1 ); // add user to internal user list, maintaining the received order
 
 			}
 		}
