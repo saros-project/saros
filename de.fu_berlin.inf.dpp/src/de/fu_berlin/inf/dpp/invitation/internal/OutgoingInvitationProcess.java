@@ -27,7 +27,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -47,43 +46,56 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 public class OutgoingInvitationProcess extends InvitationProcess implements
 	IOutgoingInvitationProcess, IFileTransferCallback {
 
+	private ISharedProject sharedProject;
+
+	private int progress_done;
+	private int progress_max;
+	private String progress_info;
+	
+	private FileList remoteFileList;
+
+	private List<IPath> toSend;
+	
+	public int getProgressCurrent() {
+		return progress_done+1;
+	}
+	public int getProgressMax() {
+		return progress_max;
+	}
+	public String getProgressInfo() {
+		return progress_info;
+	}
+	
+	
 	/**
 	 * A simple runnable that calls
 	 * {@link IOutgoingInvitationProcess#startSynchronization(IProgressMonitor)}
 	 */
-	private class SynchronizationRunnable implements IRunnableWithProgress {
+	private class SynchronizationRunnable implements Runnable {
 		private final OutgoingInvitationProcess process;
 
 		public SynchronizationRunnable(OutgoingInvitationProcess process) {
 			this.process = process;
 		}
 
-		public void run(IProgressMonitor monitor) {
-			process.startSynchronization(monitor);
+		public void run() {
+			process.startSynchronization();
 		}
 	}
-
-	private ISharedProject sharedProject;
-
-	private int worked;
-
-	private FileList remoteFileList;
-
-	private IProgressMonitor progressMonitor;
-
-	private IInvitationUI invitationUI;
-
-	private List<IPath> toSend;
-
+	
 	public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
-		ISharedProject sharedProject, String description) {
+		ISharedProject sharedProject, String description, boolean startNow, IInvitationUI inviteUI) {
 
 		super(transmitter, to, description);
 
+		this.invitationUI  = inviteUI;
 		this.sharedProject = sharedProject;
 
-		transmitter.sendInviteMessage(sharedProject, to, description);
-		state = State.INVITATION_SENT;
+		if (startNow) {
+			transmitter.sendInviteMessage(sharedProject, to, description);
+			setState(State.INVITATION_SENT);
+		} else
+			setState(State.INITIALIZED);
 	}
 
 	/*
@@ -91,20 +103,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * 
 	 * @see de.fu_berlin.inf.dpp.IOutgoingInvitationProcess
 	 */
-	public void setInvitationUI(IInvitationUI invitationUI) {
-		this.invitationUI = invitationUI;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.IOutgoingInvitationProcess
-	 */
-	public void startSynchronization(IProgressMonitor monitor) {
+	public void startSynchronization() {
 		assertState(State.GUEST_FILELIST_SENT);
 
-		state = State.SYNCHRONIZING;
-		progressMonitor = monitor;
+		setState(State.SYNCHRONIZING);
 
 		try {
 			FileList local = new FileList(sharedProject.getProject());
@@ -115,18 +117,18 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 			toSend = new ArrayList<IPath>(added.size() + altered.size());
 			toSend.addAll(added);
 			toSend.addAll(altered);
-
-			progressMonitor.beginTask("Synchronizing shared project", toSend.size());
+			
+			progress_max = toSend.size();
+			progress_done= 0;
+			
 			sendNext();
 
-			if (!blockUntilFilesSent(monitor) || !blockUntilJoinReceived(monitor))
+			if (!blockUntilFilesSent() || !blockUntilJoinReceived())
 				cancel(null, false);
 
 		} catch (CoreException e) {
 			failed(e);
 
-		} finally {
-			progressMonitor.done();
 		}
 	}
 
@@ -135,7 +137,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * 
 	 * @see de.fu_berlin.inf.dpp.InvitationProcess
 	 */
-	public void fileListRequested(JID from) {
+	public void invitationAccepted(JID from) {
 		assertState(State.INVITATION_SENT);
 
 		// HACK add resource specifier to jid
@@ -144,7 +146,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		try {
 			transmitter.sendFileList(peer, sharedProject.getFileList());
-			state = State.HOST_FILELIST_SENT;
+			setState(State.HOST_FILELIST_SENT);
 		} catch (Exception e) {
 			failed(e);
 		}
@@ -159,11 +161,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		assertState(State.HOST_FILELIST_SENT);
 
 		remoteFileList = fileList;
-		state = State.GUEST_FILELIST_SENT;
+		setState(State.GUEST_FILELIST_SENT);
+		
+		invitationUI.runGUIAsynch(new SynchronizationRunnable(this));
 
-		if (invitationUI != null) {
-			invitationUI.runWithProgressBar(new SynchronizationRunnable(this));
-		}
 	}
 
 	/*
@@ -175,7 +176,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		assertState(State.SYNCHRONIZING_DONE);
 
 		sharedProject.addUser(new User(from));
-		state = State.DONE;
+		setState(State.DONE);
 
 		sendDriverEditors();
 
@@ -208,20 +209,21 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback
 	 */
 	public void fileSent(IPath path) {
-		worked++;
+		progress_done++;
 		sendNext();
-
-		// we dont call monitor.worked() directly from here, because then
-		// we would need to call it from inside a Display runnable
 	}
 
 	private void sendNext() {
 		if (toSend.size() == 0) {
-			state = State.SYNCHRONIZING_DONE;
+			setState(State.SYNCHRONIZING_DONE);
 			return;
 		}
 
 		IPath path = toSend.remove(0);
+		progress_info=path.toFile().getName();
+
+		invitationUI.updateInvitationProgress(peer);
+
 		transmitter.sendFile(peer, path, this);
 	}
 
@@ -234,17 +236,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * @return <code>true</code> if all files have been synchronized.
 	 *         <code>false</code> if the user chose to cancel.
 	 */
-	private boolean blockUntilFilesSent(IProgressMonitor monitor) {
+	private boolean blockUntilFilesSent() {
 		while (state != State.SYNCHRONIZING_DONE && state != State.DONE) {
-			if (monitor.isCanceled() || getState() == State.CANCELED)
+			if (getState() == State.CANCELED)
 				return false;
-
-			if (worked > 0) {
-				monitor.worked(worked);
-				monitor.subTask("Files left: " + toSend.size());
-
-				worked = 0;
-			}
 
 			try {
 				Thread.sleep(500);
@@ -258,16 +253,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	/**
 	 * Blocks until the join message has been received or the user cancelled.
 	 * 
-	 * @param monitor
-	 *            the progress monitor for the file synchronization.
 	 * @return <code>true</code> if the join message has been received.
 	 *         <code>false</code> if the user chose to cancel.
 	 */
-	private boolean blockUntilJoinReceived(IProgressMonitor monitor) {
-		monitor.subTask("Waiting for confirmation");
+	private boolean blockUntilJoinReceived() {
+		progress_info="Waiting for confirmation";
 
 		while (state != State.DONE) {
-			if (monitor.isCanceled() || getState() == State.CANCELED)
+			if (getState() == State.CANCELED)
 				return false;
 
 			try {
@@ -275,7 +268,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 			} catch (InterruptedException e) {
 			}
 		}
-
+		progress_info="";
+		
 		return true;
 	}
 
@@ -301,4 +295,5 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	public String getProjectName() {
 		return sharedProject.getProject().getName();
 	}
+
 }

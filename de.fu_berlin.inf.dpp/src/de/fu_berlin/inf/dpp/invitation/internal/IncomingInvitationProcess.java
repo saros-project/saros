@@ -57,7 +57,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	private int filesLeftToSynchronize;
 
 	private IProgressMonitor progressMonitor;
-
+	
 	protected String projectName;
 
 	public IncomingInvitationProcess(ITransmitter transmitter, JID from, String projectName,
@@ -66,7 +66,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		super(transmitter, from, description);
 
 		this.projectName = projectName;
-		this.state = State.INVITATION_SENT;
+		this.setState(State.INVITATION_SENT);
 	}
 
 	/*
@@ -81,7 +81,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			cancel("Failed to receive remote file list", false);
 		else {
 			remoteFileList = fileList;
-			state = State.HOST_FILELIST_SENT;
+			setState(State.HOST_FILELIST_SENT);
 		}
 	}
 
@@ -96,7 +96,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		monitor.beginTask("Requesting remote file list", IProgressMonitor.UNKNOWN);
 
 		transmitter.sendRequestForFileListMessage(peer);
-		state = State.HOST_FILELIST_REQUESTED;
+		setState(State.HOST_FILELIST_REQUESTED);
 
 		while (remoteFileList == null && state != State.CANCELED) {
 			if (monitor.isCanceled()) {
@@ -139,7 +139,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 			progressMonitor = monitor;
 			progressMonitor.beginTask("Synchronizing...", filesLeftToSynchronize);
-			state = State.SYNCHRONIZING;
+			setState(State.SYNCHRONIZING);
 
 			transmitter.sendFileList(peer, new FileList(localProject));
 
@@ -161,7 +161,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * 
 	 * @see de.fu_berlin.inf.dpp.InvitationProcess
 	 */
-	public void fileListRequested(JID from) {
+	public void invitationAccepted(JID from) {
 		failState();
 	}
 
@@ -180,6 +180,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * @see de.fu_berlin.inf.dpp.InvitationProcess
 	 */
 	public void resourceReceived(JID from, IPath path, InputStream in) {
+		if (localProject==null)
+			return; // we dont have started the new project yet, so received ressources are not welcomed
+		
 		try {
 			IFile file = localProject.getFile(path);
 			if (file.exists()) {
@@ -247,8 +250,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = workspaceRoot.getProject(newProjectName);
 		
-		//project.clearHistory(null);
-		//project.refreshLocal(IProject.DEPTH_INFINITE, null);
+		project.clearHistory(null);
+		project.refreshLocal(IProject.DEPTH_INFINITE, null);
 
 		if (baseProject == null) {
 			project.create(new NullProgressMonitor());
@@ -350,10 +353,15 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		transmitter.sendJoinMessage(sharedProject);
 		transmitter.removeInvitationProcess(this); // HACK
 
-		state = State.DONE;
+		setState(State.DONE);
 	}
 
 	public String getProjectName() {
 		return this.projectName;
 	}
+
+	public void updateInvitationProgress(JID jid) {
+		// ignored, not needed atm		
+	}
+
 }

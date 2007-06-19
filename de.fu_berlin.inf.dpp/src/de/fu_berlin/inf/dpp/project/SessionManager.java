@@ -83,7 +83,7 @@ public class SessionManager implements IConnectionListener {
 			listener.sessionStarted(sharedProject);
 		}
 
-		sharedProject.startInvitationWizard();
+		sharedProject.startInvitation(null);
 		
 		log.info("Session started");
 	}

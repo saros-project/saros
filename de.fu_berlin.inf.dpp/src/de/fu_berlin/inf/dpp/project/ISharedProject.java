@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -110,9 +111,11 @@ public interface ISharedProject {
 	 * @param description
 	 *            a description that will be shown to the invited user before he
 	 *            makes the decision to accept or decline the invitation.
+	 * @param inviteUI
+	 *            user interface of the invitation for feedback calls.
 	 * @return the outgoing invitation process.
 	 */
-	public IOutgoingInvitationProcess invite(JID jid, String description);
+	public IOutgoingInvitationProcess invite(JID jid, String description, boolean inactive, IInvitationUI inviteUI);
 
 	/**
 	 * Adds the given shared project listener. This call is ignored if the
@@ -161,6 +164,13 @@ public interface ISharedProject {
 	 */
 	public IActivityManager getActivityManager();
 
+	/**
+	 * Starts the invitation wizard to invite users.
+	 * @param jid
+	 *            the JID of a user to invite without manual selection
+	 */
+	public void startInvitation(JID jid);
+	
 	/**
 	 * Activates sending of activities. The reason that this isn't done
 	 * automatically are unit tests.

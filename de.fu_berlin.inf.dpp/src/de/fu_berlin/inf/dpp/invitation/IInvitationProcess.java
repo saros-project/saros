@@ -18,12 +18,21 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author rdjemili
  */
 public interface IInvitationProcess {
-
+	/**
+	 * This class contains untestable UI code which is needed by the invitation
+	 * process.
+	 */
+	public interface IInvitationUI {
+		public void cancel(String errorMsg, boolean replicated);
+		public void updateInvitationProgress(final JID jid);
+		public void runGUIAsynch(final Runnable runnable) ;
+	}
+	
 	/**
 	 * All states that an invitiation process can possibly have.
 	 */
 	public static enum State {
-		INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
+		INITIALIZED, INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
 	}
 
 	public static final String USER_CANCEL_MSG = "Invitation was cancelled by user";
@@ -83,9 +92,7 @@ public interface IInvitationProcess {
 
 	public void fileListReceived(JID from, FileList fileList);
 
-	public void fileListRequested(JID from); // TODO rename to
-
-	// invitationAccepted
-
+	public void invitationAccepted(JID from);
+	
 	public void joinReceived(JID from);
 }

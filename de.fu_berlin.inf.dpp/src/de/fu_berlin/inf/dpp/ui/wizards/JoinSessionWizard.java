@@ -30,6 +30,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
@@ -39,12 +41,16 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
+import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A wizard that guides the user through an incoming invitiation process.
@@ -56,14 +62,18 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
  * 
  * @author rdjemili
  */
-public class JoinSessionWizard extends Wizard {
+public class JoinSessionWizard extends Wizard implements IInvitationUI {
 	private static Logger log = Logger.getLogger(JoinSessionWizard.class.getName());
 
 	private ShowDescriptionPage descriptionPage;
-
+	
+    private WizardDialogAccessable myWizardDlg;
+	
 	private EnterNamePage namePage;
 
 	private final IIncomingInvitationProcess process;
+	
+	private Display display = null;
 
 	/**
 	 * A wizard page that displays the name of the inviter and the description
@@ -131,6 +141,10 @@ public class JoinSessionWizard extends Wizard {
 		 * @see org.eclipse.jface.dialogs.IDialogPage
 		 */
 		public void createControl(Composite parent) {
+
+			if ( process.getState()==State.CANCELED)
+				return;
+
 			requestRemoteFileList();
 			
 			if (process.getRemoteFileList() == null)
@@ -290,6 +304,7 @@ public class JoinSessionWizard extends Wizard {
 		setWindowTitle("Session Invitation");
 		setHelpAvailable(false);
 		setNeedsProgressMonitor(true);
+		display=Display.getCurrent();
 	}
 
 	public boolean projectIsUnique(String name) {
@@ -362,6 +377,10 @@ public class JoinSessionWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
+		
+		if ( process.getState()==State.CANCELED)
+			return true;
+		
 		final IProject project = namePage.getLocalProject();
 		final String newProjectName = namePage.getNewProjectName();
 
@@ -387,5 +406,41 @@ public class JoinSessionWizard extends Wizard {
 		process.cancel(null, false);
 
 		return super.performCancel();
+	}
+
+	public void cancel(final String errorMsg, final boolean replicated) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				cancelRunASync(errorMsg, replicated);
+		}} );	
+	}
+
+	private void cancelRunASync(String errorMsg, boolean replicated){
+		if (replicated) {
+			if (errorMsg != null) {
+				MessageDialog.openError(getShell(), "Invitation aborted",
+					"Could not complete invitation. ("+ errorMsg + ")");
+
+			} else {
+				MessageDialog.openInformation(getShell(), "Invitation cancelled",
+					"Invitation was cancelled by peer.");
+			}
+		}
+		myWizardDlg.setWizardButtonEnabled(IDialogConstants.BACK_ID, false);
+		myWizardDlg.setWizardButtonEnabled(IDialogConstants.NEXT_ID, false);
+		myWizardDlg.setWizardButtonEnabled(IDialogConstants.FINISH_ID, false);
+	}
+
+	public void updateInvitationProgress(JID jid) {
+		// ignored, not needed atm
+	}
+
+	public void setWizardDlg(WizardDialogAccessable wd) {
+    	myWizardDlg=wd;
+	}
+
+	public void runGUIAsynch(Runnable runnable) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.editor.annotations;
 import org.eclipse.jface.text.source.Annotation;
 import de.fu_berlin.inf.dpp.*;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
 /**
  * Marks text selected by both driver and observer.

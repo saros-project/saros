@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +73,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+
 
 /**
  * An ITransmitter implementation which uses Smack Chat objects. It currently
@@ -578,7 +577,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		if (PacketExtensions.getRequestExtension(message) != null) {
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(fromJID))
-					process.fileListRequested(fromJID);
+					process.invitationAccepted(fromJID);
 			}
 		}
 

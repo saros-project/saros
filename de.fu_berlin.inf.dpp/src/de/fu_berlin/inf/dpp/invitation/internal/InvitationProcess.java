@@ -19,10 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.invitation.internal;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -39,6 +35,8 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	private Exception exception;
 
 	protected JID peer;
+
+	protected IInvitationUI invitationUI=null;
 
 	protected String description;
 
@@ -66,6 +64,13 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	 */
 	public State getState() {
 		return state;
+	}
+	
+	public void setState(State newstate) {
+		state = newstate;
+		
+		if (invitationUI!=null)
+			invitationUI.updateInvitationProgress(peer);
 	}
 
 	/*
@@ -95,7 +100,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 		if (state == State.CANCELED)
 			return;
 
-		state = State.CANCELED;
+		setState(State.CANCELED);
 
 		System.out.println("Invitation was cancelled. " + errorMsg);
 
@@ -103,21 +108,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 			transmitter.sendCancelInvitationMessage(peer, errorMsg);
 		}
 
-		// TODO move to ui package
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				Shell shell = Display.getDefault().getActiveShell();
-
-				if (errorMsg != null) {
-					MessageDialog.openError(shell, "Invitation aborted",
-						"Could not complete invitation. ("+ errorMsg + ")");
-
-				} else if (replicated) {
-					MessageDialog.openInformation(shell, "Invitation cancelled",
-						"Invitation was cancelled by peer.");
-				}
-			}
-		});
+		invitationUI.cancel(errorMsg, replicated);
 
 		transmitter.removeInvitationProcess(this);
 	}
@@ -152,4 +143,9 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	protected void failState() {
 		throw new IllegalStateException("Bad input while in state " + state);
 	}
+	
+	public void setInvitationUI(IInvitationUI inviteUI){
+		this.invitationUI = inviteUI;
+	}
+
 }

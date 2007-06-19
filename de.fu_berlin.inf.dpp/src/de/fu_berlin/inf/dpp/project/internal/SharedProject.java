@@ -25,18 +25,26 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -46,7 +54,8 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;;
+import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 
 public class SharedProject implements ISharedProject {
 	private static Logger log = Logger.getLogger(SharedProject.class.getName());
@@ -243,8 +252,8 @@ public class SharedProject implements ISharedProject {
 	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProject
 	 */
-	public IOutgoingInvitationProcess invite(JID jid, String description) {
-		return new OutgoingInvitationProcess(transmitter, jid, this, description);
+	public IOutgoingInvitationProcess invite(JID jid, String description, boolean inactive, IInvitationUI inviteUI) {
+		return new OutgoingInvitationProcess(transmitter, jid, this, description, inactive, inviteUI);
 	}
 
 	/*
@@ -312,8 +321,8 @@ public class SharedProject implements ISharedProject {
 				if ( activitySequencer.getQueuedActivities()>0) {
 					queuedsince++;
 
-					// if i am missing activities for X seconds, ask all (because I dont know the origin)
-					// to send it to me.
+					// if i am missing activities for REQUEST_ACTIVITY_ON_AGE seconds, ask all (because I dont know the origin)
+					// to send it to me again.
 					if (queuedsince >= REQUEST_ACTIVITY_ON_AGE ) {
 
 						transmitter.sendRequestForActivity( SharedProject.this, 
@@ -372,13 +381,38 @@ public class SharedProject implements ISharedProject {
 		return false;		
 	}
 	
-	public void startInvitationWizard() {
+	public void startInvitation(final JID jid) {
+		
+		Shell shell = Display.getDefault().getActiveShell();
+		
+		if (isModifiedDirty())
+		{
+			if (MessageDialog.openQuestion(shell, "Unsaved file changes alert",
+					"Before inviting users and therefore synchronizing files, "+
+					"this project needs to be saved to disk. "+
+					"Do you want to save all unsaved editors now?")) {
+				
+				// save
+				PlatformUI.getWorkbench().saveAllEditors(false);
+				
+			} else
+				return;
+		}
+		
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				try {
 					Shell shell = Display.getDefault().getActiveShell();
-					new WizardDialog(shell, new InvitationWizard()).open();
+					InvitationWizard iw = new InvitationWizard(jid);
+
+					WizardDialogAccessable wd=
+						new WizardDialogAccessable(shell, iw );
+					
+					iw.setWizardDlg(wd);					
+					wd.open();
+					
 				} catch (Exception e) {
+					System.out.println(e.getStackTrace());
 					Saros.getDefault().getLog().log(
 						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
 							"Error while running invitation wizard", e));
@@ -386,4 +420,38 @@ public class SharedProject implements ISharedProject {
 			}
 		});		
 	}
+
+	boolean isModifiedDirty() {
+		
+		IResource[] resources=null;
+		try {
+			resources = getProject().members();
+	
+			IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
+			for (IWorkbenchWindow window : wbWindows) {
+				IWorkbenchPage activePage = window.getActivePage();
+				IEditorReference[] editorRefs = activePage.getEditorReferences();
+				for (IEditorReference editorRef : editorRefs) {
+					if (editorRef.isDirty() && editorRef.getEditorInput() instanceof IFileEditorInput) {
+							
+						IFile f = ((IFileEditorInput)editorRef.getEditorInput()).getFile();
+	
+						// is that dirty file in my project?
+						for (int i = 0; i < resources.length; i++) {
+							if (resources[i] instanceof IFile) {
+								IFile file = (IFile) resources[i];
+								if (file.equals(f))
+									return true;
+							}
+						}
+					}
+				}
+			}
+		} catch (CoreException e1) {
+			System.out.println(e1.getMessage());
+		}
+			
+		return false;
+	}
+	
 }

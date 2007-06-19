@@ -19,22 +19,12 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import java.lang.reflect.InvocationTargetException;
-
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.SelectionProviderAction;
-import org.eclipse.ui.progress.IProgressService;
 import org.jivesoftware.smack.RosterEntry;
-
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -44,8 +34,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 /**
  * @author rdjemili
  */
-public class InviteAction extends SelectionProviderAction implements ISessionListener,
-	IInvitationUI {
+public class InviteAction extends SelectionProviderAction implements ISessionListener {
 
 	private RosterEntry selectedEntry;
 
@@ -65,9 +54,7 @@ public class InviteAction extends SelectionProviderAction implements ISessionLis
 		SessionManager sessionManager = Saros.getDefault().getSessionManager();
 		ISharedProject project = sessionManager.getSharedProject();
 
-		String name = project.getProject().getName();
-		IOutgoingInvitationProcess process = project.invite(jid, name);
-		process.setInvitationUI(this);
+		project.startInvitation(jid);
 	}
 
 	@Override
@@ -106,29 +93,6 @@ public class InviteAction extends SelectionProviderAction implements ISessionLis
 	 */
 	public void invitationReceived(IIncomingInvitationProcess process) {
 		// ignore
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
-	 */
-	public void runWithProgressBar(final IRunnableWithProgress runnable) {
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				try {
-					IWorkbench wb = PlatformUI.getWorkbench();
-					IProgressService ps = wb.getProgressService();
-					ps.run(true, true, runnable);
-
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		});
 	}
 
 	private void updateEnablement() {

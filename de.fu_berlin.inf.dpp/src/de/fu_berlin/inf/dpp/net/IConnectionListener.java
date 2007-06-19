@@ -36,7 +36,7 @@ public interface IConnectionListener {
 	 * Is fired when the state of the connection changes.
 	 * 
 	 * @param connection
-	 *            TODO
+	 *            The affected XMPP-connection tht changed its state
 	 * @param newState
 	 *            the new state of the connection. If the new state is
 	 *            <code>ERROR</code>, you can use

@@ -27,7 +27,6 @@ import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaDocumentSetupParticipant;
 import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -51,6 +50,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
+import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 
 public class SarosUI implements ISessionListener {
 
@@ -82,7 +82,12 @@ public class SarosUI implements ISessionListener {
 			public void run() {
 				try {
 					Shell shell = Display.getDefault().getActiveShell();
-					new WizardDialog(shell, new JoinSessionWizard(process)).open();
+					JoinSessionWizard jsw = new JoinSessionWizard(process);
+					WizardDialogAccessable wd=
+						new WizardDialogAccessable(shell, jsw );
+					jsw.setWizardDlg(wd);
+					process.setInvitationUI(jsw);
+					wd.open();
 				} catch (Exception e) {
 					Saros.getDefault().getLog().log(
 						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
