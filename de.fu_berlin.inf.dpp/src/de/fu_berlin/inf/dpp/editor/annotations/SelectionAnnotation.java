@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
-import org.eclipse.jface.text.source.Annotation;
 import de.fu_berlin.inf.dpp.*;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -11,24 +10,23 @@ import de.fu_berlin.inf.dpp.net.JID;
  * 
  * @author coezbek
  */
-public class SelectionAnnotation extends Annotation  {
+public class SelectionAnnotation extends AnnotationSaros  {
 
 	// base TYPE name, will be extended for different remote users
 	public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 	
 	public SelectionAnnotation() {
-		this(null);
+		this(null,null);
 	}
 
-	public SelectionAnnotation(String username) {
-		super(TYPE, false, username);
-
+	public SelectionAnnotation(String label, String username) {
+		super(TYPE, false, label,username);
+		
 		// TODO: improve color assingment and dynamic handling 
 		int colorid=getColorIdForUser(username) +1;
 		String mytype=TYPE + "." + new Integer(colorid).toString();
 		
-		setType(mytype);
-		
+		setType(mytype);		
 	}
 
 	int getColorIdForUser(String username){

@@ -24,22 +24,28 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.texteditor.AnnotationPreference;
+import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -48,8 +54,10 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
+
 
 public class SessionView extends ViewPart implements ISessionListener {
 	private TableViewer viewer;
@@ -112,7 +120,9 @@ public class SessionView extends ViewPart implements ISessionListener {
 		}
 	}
 
-	private class SessionLabelProvider extends LabelProvider implements ITableLabelProvider {
+	private class SessionLabelProvider extends LabelProvider 
+		implements ITableLabelProvider, IColorProvider {
+		
 		private Image userImage = SarosUI.getImage("icons/user.png");
 		private Image driverImage = SarosUI.getImage("icons/user_edit.png");
 
@@ -130,23 +140,41 @@ public class SessionView extends ViewPart implements ISessionListener {
 		@Override
 		public Image getImage(Object obj) {
 			User user = (User) obj;
-			
-/*
-		    Display display = new Display();
-		    Color red = display.getSystemColor(SWT.COLOR_RED);
-			
-		    Image image = new Image(display, 10, 10);
-		    GC gc = new GC(image);
-		    gc.setBackground(red);
-		    gc.fillRectangle(0, 0, 10, 10);
-		    gc.dispose();
-		    return image;
-*/
 			return user.equals(sharedProject.getDriver()) ? driverImage : userImage;
 		}
 
 		public Image getColumnImage(Object obj, int index) {
 			return getImage(obj);
+		}
+
+		public Color getBackground(Object element) {
+			// TODO Auto-generated method stub
+			User user = (User) element;
+			
+			if (user.getJid().equals( Saros.getDefault().getMyJID() ))
+				return null;
+			
+			int colorid=user.getColorID();
+			String mytype=SelectionAnnotation.TYPE  + "." + new Integer(colorid+1).toString();
+			
+			
+			AnnotationPreferenceLookup lookup=  org.eclipse.ui.editors.text.EditorsUI.getAnnotationPreferenceLookup();
+			AnnotationPreference ap = lookup.getAnnotationPreference(mytype);
+			
+			if (ap==null)
+				return null;
+			
+			Display d=Display.getCurrent();
+			RGB rgb=ap.getColorPreferenceValue();
+			if (rgb==null)
+				return null;
+			
+			Color c = new Color(d, rgb);
+			return c;
+		}
+
+		public Color getForeground(Object element) {
+			return null;
 		}
 	}
 
@@ -223,6 +251,7 @@ public class SessionView extends ViewPart implements ISessionListener {
 		IActionBars bars = getViewSite().getActionBars();
 		IToolBarManager toolBar = bars.getToolBarManager();
 
+		toolBar.add(new OpenInviteInterface());
 		toolBar.add(new TakeDriverRoleAction());
 		toolBar.add(new FollowModeAction());
 		toolBar.add(new LeaveSessionAction());

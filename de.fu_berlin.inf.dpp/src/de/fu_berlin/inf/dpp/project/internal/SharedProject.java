@@ -25,6 +25,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -425,8 +426,8 @@ public class SharedProject implements ISharedProject {
 		
 		IResource[] resources=null;
 		try {
-			resources = getProject().members();
-	
+			resources = getProject().members(); //IContainer.INCLUDE_PHANTOMS | IContainer.INCLUDE_TEAM_PRIVATE_MEMBERS
+
 			IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 			for (IWorkbenchWindow window : wbWindows) {
 				IWorkbenchPage activePage = window.getActivePage();
@@ -435,7 +436,7 @@ public class SharedProject implements ISharedProject {
 					if (editorRef.isDirty() && editorRef.getEditorInput() instanceof IFileEditorInput) {
 							
 						IFile f = ((IFileEditorInput)editorRef.getEditorInput()).getFile();
-	
+						
 						// is that dirty file in my project?
 						for (int i = 0; i < resources.length; i++) {
 							if (resources[i] instanceof IFile) {

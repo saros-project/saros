@@ -109,7 +109,9 @@ public class Saros extends AbstractUIPlugin {
 	
 					public void run() {
 						
-						int offlineAtTS=sessionManager.getSharedProject().getSequencer().getTimestamp();
+						int offlineAtTS = 0;
+						if (sessionManager.getSharedProject()==null)
+							offlineAtTS = sessionManager.getSharedProject().getSequencer().getTimestamp();
 						
 						try {
 							do {

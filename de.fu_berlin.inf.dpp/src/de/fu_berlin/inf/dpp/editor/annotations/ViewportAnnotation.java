@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.editor.annotations;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationPresentation;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -24,7 +23,7 @@ import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
  * 
  * @author rdjemili
  */
-public class ViewportAnnotation extends Annotation implements IAnnotationPresentation,
+public class ViewportAnnotation extends AnnotationSaros implements IAnnotationPresentation,
 	IPropertyChangeListener {
 
 	public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
@@ -41,8 +40,8 @@ public class ViewportAnnotation extends Annotation implements IAnnotationPresent
 
 	private static Color fillColor;
 
-	public ViewportAnnotation(String text) {
-		super(TYPE, false, text);
+	public ViewportAnnotation(String label, String source) {
+		super(TYPE, false, label, source );
 	}
 
 	/*

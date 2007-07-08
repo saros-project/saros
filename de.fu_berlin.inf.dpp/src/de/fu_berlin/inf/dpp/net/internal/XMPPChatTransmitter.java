@@ -671,7 +671,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 						sharedProject.removeUser(user);
 					} else {
 						queueMessage(participant.getJid(),extension);
-						System.out.println("User known as offline - Message queued!");
+						log.info("User known as offline - Message queued!");
 					}
 					
 					continue;
@@ -804,8 +804,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	private FileList receiveFileList(FileTransferRequest request) {
 		log.fine("Receiving file list");
 
-		FileList fileList = null;
-
+		FileList fileList 	= null;
 		try {
 			final IncomingFileTransfer transfer = request.accept();
 
@@ -830,6 +829,8 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 		} catch (Exception e) {
 			Saros.log("Exception while receiving file list", e);
+			// TODO retry? but we dont catch any exception here, 
+			// smack might not throw them up
 		}
 
 		return fileList;

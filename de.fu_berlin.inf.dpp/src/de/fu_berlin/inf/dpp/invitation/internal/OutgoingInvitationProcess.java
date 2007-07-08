@@ -214,6 +214,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	}
 
 	private void sendNext() {
+		
+		if (getState() == State.CANCELED) {
+			toSend.clear();
+			return;
+		}
+		
 		if (toSend.size() == 0) {
 			setState(State.SYNCHRONIZING_DONE);
 			return;

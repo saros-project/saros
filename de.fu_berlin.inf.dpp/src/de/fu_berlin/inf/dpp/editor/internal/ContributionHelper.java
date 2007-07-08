@@ -6,6 +6,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 
+import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 
 /**
@@ -34,7 +35,7 @@ public class ContributionHelper {
 
 		if (length > 0) {
 			Position position = new Position(offset, length);
-			Annotation annotation = new ContributionAnnotation();
+			AnnotationSaros annotation = new ContributionAnnotation();
 			model.addAnnotation(annotation, position);
 		}
 	}

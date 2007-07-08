@@ -102,7 +102,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
 		setState(State.CANCELED);
 
-		System.out.println("Invitation was cancelled. " + errorMsg);
+		System.out.println("Invitation was canceled. " + errorMsg);
 
 		if (!replicated) {
 			transmitter.sendCancelInvitationMessage(peer, errorMsg);

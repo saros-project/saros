@@ -57,8 +57,10 @@ import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 
@@ -403,13 +405,19 @@ public class EditorAPI implements IEditorAPI {
 			for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 				Annotation annotation = (Annotation) it.next();
 
-				if ( annotation.getType().startsWith(SelectionAnnotation.TYPE) && 
-					annotation.getText().equals(source)	)
+				if ( annotation.getType().startsWith(SelectionAnnotation.TYPE)==false)
+					continue;
+
+				AnnotationSaros anns=(AnnotationSaros)annotation;
+				if (anns.getSource().equals(source)	)
 					model.removeAnnotation(annotation);
 			}
 
+			JID sourceJid=new JID(source);
+			String label="Selection of "+sourceJid.getName();
+
 			Position position = new Position(selection.getOffset(), selection.getLength());
-			Annotation annotation = new SelectionAnnotation(source);
+			AnnotationSaros annotation = new SelectionAnnotation(label,source);	// BG:was source
 			model.addAnnotation(annotation, position);
 		}
 	}
@@ -485,10 +493,10 @@ public class EditorAPI implements IEditorAPI {
 	 * 
 	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
 	 */
-	public void setViewport(IEditorPart editorPart, boolean jumpTo, int top, int bottom, String text) {
+	public void setViewport(IEditorPart editorPart, boolean jumpTo, int top, int bottom, String source) {
 
 		ITextViewer viewer = getViewer(editorPart);
-		updateViewportAnnotation(viewer, top, bottom, text);
+		updateViewportAnnotation(viewer, top, bottom, source);
 
 		if (jumpTo)
 			viewer.setTopIndex(top);
@@ -503,7 +511,7 @@ public class EditorAPI implements IEditorAPI {
 		return new LineRange(top, bottom - top);
 	}
 
-	private void updateViewportAnnotation(ITextViewer viewer, int top, int bottom, String text) {
+	private void updateViewportAnnotation(ITextViewer viewer, int top, int bottom, String source) {
 
 		if (!(viewer instanceof ISourceViewer))
 			return;
@@ -522,7 +530,10 @@ public class EditorAPI implements IEditorAPI {
 			int start = document.getLineOffset(top);
 			int end = document.getLineOffset(bottom);
 
-			Annotation annotation = new ViewportAnnotation(text);
+			JID jid=new JID(source);
+			String text = "Visible scope of " + jid.getName();
+
+			AnnotationSaros annotation = new ViewportAnnotation(text, source);
 			Position position = new Position(start, end - start);
 			model.addAnnotation(annotation, position);
 		} catch (BadLocationException e) {

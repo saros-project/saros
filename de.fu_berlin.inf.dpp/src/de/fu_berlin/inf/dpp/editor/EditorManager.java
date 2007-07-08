@@ -63,6 +63,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
@@ -265,7 +266,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 */
 	public void sessionEnded(ISharedProject session) {
 		setAllEditorsToEditable();
-		removeAllAnnotations(null);
+		removeAllAnnotations(null,null);
 
 		sharedProject.removeListener(this);
 		sharedProject.getActivityManager().removeProvider(this);
@@ -372,6 +373,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	public void driverChanged(JID driver, boolean replicated) {
 		isDriver = sharedProject.isDriver();
 		activateOpenEditors();
+		
+		removeAllAnnotations(null, ContributionAnnotation.TYPE );
 	}
 
 	/*
@@ -389,7 +392,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
 	 */
 	public void userLeft(JID user) {
-		removeAllAnnotations(user.toString());
+		removeAllAnnotations(user.toString(), null);
 	}
 
 	/* ---------- etc --------- */
@@ -517,13 +520,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 				int top = viewport.getTopIndex();
 				int bottom = viewport.getBottomIndex();
-				String user = sharedProject.getDriver().toString();
-				String text = "Visible scope of " + user;
 
 				IPath driverEditor = getActiveDriverEditor();
 				Set<IEditorPart> editors = editorPool.getEditors(driverEditor);
 				for (IEditorPart editorPart : editors) {
-					editorAPI.setViewport(editorPart, isFollowing, top, bottom, text);
+					editorAPI.setViewport(editorPart, isFollowing, top, bottom, 
+							sharedProject.getDriver().getJid().toString());
 				}
 			}
 		});
@@ -841,7 +843,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	/**
 	 * Removes all contribution and viewport annotations.
 	 */
-	private void removeAllAnnotations(String forUserID) {
+	private void removeAllAnnotations(String forUserID, String typeAnnotation) {
 		
 		for (IEditorPart editor : editorPool.getAllEditors()) {
 			IEditorInput input = editor.getEditorInput();
@@ -854,14 +856,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 				Annotation annotation = (Annotation) it.next();
 				String type = annotation.getType();
-				boolean isfromuser=(forUserID==null || 
-						(forUserID!=null && annotation.getText().endsWith(forUserID)) );
 				
 				boolean isContribution = type.equals(ContributionAnnotation.TYPE);
 				boolean isViewport = type.equals(ViewportAnnotation.TYPE);
 				boolean isTextSelection = type.startsWith(SelectionAnnotation.TYPE);				
+			
+				if ( (typeAnnotation==null && !isContribution && !isViewport && !isTextSelection) ||
+					 (typeAnnotation!=null && typeAnnotation.equals(type)==false) )
+					continue;
 				
-				if (isfromuser && (isContribution || isViewport || isTextSelection))
+				AnnotationSaros anns=(AnnotationSaros)annotation;
+				boolean isfromuser=forUserID==null || 
+						(forUserID!=null && anns.getSource().equals(forUserID) ) ;
+				
+				if (isfromuser )
 					model.removeAnnotation(annotation);
 			}
 		}

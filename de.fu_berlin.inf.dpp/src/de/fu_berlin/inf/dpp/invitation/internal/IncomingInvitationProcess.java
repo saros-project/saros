@@ -78,7 +78,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		assertState(State.HOST_FILELIST_REQUESTED);
 
 		if (fileList == null)
-			cancel("Failed to receive remote file list", false);
+			cancel("Failed to receive remote file list.", false);
 		else {
 			remoteFileList = fileList;
 			setState(State.HOST_FILELIST_SENT);
