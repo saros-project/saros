@@ -42,4 +42,9 @@ public class PreferenceConstants {
 	public static final String DEBUG = "debug";
 
 	public static final String FILE_TRANSFER_PORT = "port";
+
+	public static final String FORCE_FILETRANSFER_BY_CHAT = "chatfiletransfer";
+	
+	public static final String CHATFILETRANSFER_CHUNKSIZE = "chatfiletransfer_chunksize";
+	
 }

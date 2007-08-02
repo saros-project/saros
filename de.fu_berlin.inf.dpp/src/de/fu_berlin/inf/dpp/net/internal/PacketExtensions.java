@@ -52,6 +52,9 @@ public class PacketExtensions {
 	
 	private static final String USER_LIST = "userList";
 
+	private static final String DATATRANSFER = "DataTransfer";
+
+	
 	// attributes
 	public static final String DESCRIPTION = "description";
 
@@ -59,6 +62,15 @@ public class PacketExtensions {
 
 	public static final String ERROR = "error";
 
+	public static final String DT_NAME = "DTNAME";
+
+	public static final String DT_DESC = "DTDESC";
+
+	public static final String DT_SPLIT = "DTSPLIT";
+
+	public static final String DT_DATA = "DATA_BASE64";
+
+	
 	public static void hookExtensionProviders() {
 		ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
 			new ActivitiesProvider());
@@ -102,6 +114,19 @@ public class PacketExtensions {
 		
 		if (andup)
 			extension.setValue("ANDUP",  "true" );
+
+		return extension;
+	}
+	
+	public static PacketExtension createDataTransferExtension(String name, String desc, int index, int count, String data) {
+		
+		DefaultPacketExtension extension = new DefaultPacketExtension(DATATRANSFER, NAMESPACE);
+		extension.setValue(DT_NAME,  name );
+		extension.setValue(DT_DESC,  desc );
+		extension.setValue(DT_DATA,  data );
+
+		String split= index+"/" + count;
+		extension.setValue(DT_SPLIT,  split );
 
 		return extension;
 	}
@@ -167,6 +192,10 @@ public class PacketExtensions {
 
 	public static DefaultPacketExtension getRequestExtension(Message message) {
 		return getExtension(REQUEST_FOR_LIST, message);
+	}
+
+	public static DefaultPacketExtension getDataTransferExtension(Message message) {
+		return getExtension(DATATRANSFER, message);
 	}
 
 	public static ActivitiesPacketExtension getActvitiesExtension(Message message) {

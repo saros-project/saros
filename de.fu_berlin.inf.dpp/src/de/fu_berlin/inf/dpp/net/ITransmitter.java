@@ -160,7 +160,7 @@ public interface ITransmitter {
 	 * @param connection
 	 *            the new XMPPConnection 
 	 */
-	public void SetXMPPConnection(XMPPConnection connection);
+	public void setXMPPConnection(XMPPConnection connection);
 
 	/**
 	 * Sends a request for activities to all users.

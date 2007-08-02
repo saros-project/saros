@@ -35,6 +35,12 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
 		addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
 			"Show Jabber debug window (needs restart).", getFieldEditorParent()));
+
+		addField(new BooleanFieldEditor(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT , 
+				"Avoid direct file transfer connection", getFieldEditorParent()));
+
+		addField(new IntegerFieldEditor(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE , 
+				"Chunk size for chat data transfer", getFieldEditorParent()));
 	}
 
 	/*

@@ -43,5 +43,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
 		store.setDefault(PreferenceConstants.DEBUG, false);
 		store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
+		store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, true);
+		store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
 	}
 }

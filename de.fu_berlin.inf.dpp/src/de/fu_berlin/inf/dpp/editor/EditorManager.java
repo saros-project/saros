@@ -741,6 +741,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			FileEditorInput input = new FileEditorInput(file);
 
 			try {
+				file.setReadOnly(false);
 				IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
 				// save not necessary, if we have no modified document
@@ -748,7 +749,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 					return;
 
 				IDocument doc = provider.getDocument(input);
-
+				
 				IAnnotationModel model = provider.getAnnotationModel(input);
 				model.connect(doc);
 

@@ -25,11 +25,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -86,12 +86,13 @@ public class SharedProject implements ISharedProject {
 	
 	public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
 		this.transmitter = transmitter;
-
+ 
 		this.myID = myID;
 		driver = host = new User(myID);
 		participants.add(driver);
 
 		this.project = project;
+		setProjectReadonly(false);
 	}
 
 	public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
@@ -103,7 +104,7 @@ public class SharedProject implements ISharedProject {
 
 		this.host = new User(host);
 		this.driver = new User(driver);
-
+		
 		for (JID jid : allParticipants) { // HACK
 			User user=new User(jid);
 			participants.add(user);
@@ -154,6 +155,8 @@ public class SharedProject implements ISharedProject {
 			return;
 
 		this.driver = driver;
+		
+		setProjectReadonly(!isDriver());
 
 		JID jid = driver.getJid();
 		for (ISharedProjectListener listener : listeners) {
@@ -303,7 +306,6 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProject
 	 */
 	public void start() {
-		
 
 		flushTimer.schedule(new TimerTask() {
 			@Override
@@ -386,15 +388,16 @@ public class SharedProject implements ISharedProject {
 		
 		Shell shell = Display.getDefault().getActiveShell();
 		
-		if (isModifiedDirty())
+		if (searchUnsavedChangesInProject(false))
 		{
-			if (MessageDialog.openQuestion(shell, "Unsaved file changes alert",
+			if (MessageDialog.openQuestion(shell, "Unsaved file modifications",
 					"Before inviting users and therefore synchronizing files, "+
 					"this project needs to be saved to disk. "+
-					"Do you want to save all unsaved editors now?")) {
+					"Do you want to save all unsaved files of this projet now?")) {
 				
 				// save
-				PlatformUI.getWorkbench().saveAllEditors(false);
+				// PlatformUI.getWorkbench().saveAllEditors(false);	// saves all editors
+				searchUnsavedChangesInProject(true);
 				
 			} else
 				return;
@@ -422,12 +425,19 @@ public class SharedProject implements ISharedProject {
 		});		
 	}
 
-	boolean isModifiedDirty() {
+	boolean searchUnsavedChangesInProject(boolean save) {
+		FileList flist=null;
 		
-		IResource[] resources=null;
 		try {
-			resources = getProject().members(); //IContainer.INCLUDE_PHANTOMS | IContainer.INCLUDE_TEAM_PRIVATE_MEMBERS
-
+			flist = new FileList(getProject());
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+		
+		try {
 			IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench().getWorkbenchWindows();
 			for (IWorkbenchWindow window : wbWindows) {
 				IWorkbenchPage activePage = window.getActivePage();
@@ -435,15 +445,15 @@ public class SharedProject implements ISharedProject {
 				for (IEditorReference editorRef : editorRefs) {
 					if (editorRef.isDirty() && editorRef.getEditorInput() instanceof IFileEditorInput) {
 							
-						IFile f = ((IFileEditorInput)editorRef.getEditorInput()).getFile();
+						IPath fp = ((IFileEditorInput)editorRef.getEditorInput()).
+									getFile().getProjectRelativePath();
 						
 						// is that dirty file in my project?
-						for (int i = 0; i < resources.length; i++) {
-							if (resources[i] instanceof IFile) {
-								IFile file = (IFile) resources[i];
-								if (file.equals(f))
-									return true;
-							}
+						if (flist.getPaths().contains(fp)) {
+							if (save)
+								editorRef.getEditor(false).doSave(null);
+							else 
+								return true;
 						}
 					}
 				}
@@ -454,5 +464,28 @@ public class SharedProject implements ISharedProject {
 			
 		return false;
 	}
+
+	public void setProjectReadonly(boolean readonly) {
+		FileList flist=null;
+
+		try {
+			flist = new FileList( project );
+			ResourceAttributes attributes = new ResourceAttributes();
+			attributes.setReadOnly(readonly);
+			attributes.setArchive (readonly);
 	
+			for (int i=0;i<flist.getPaths().size(); i++) {
+				IPath path = flist.getPaths().get(i);
+				path = path.makeAbsolute();
+				IFile file = getProject().getFile(path);
+				if (file!=null && file.exists()) {
+					file.setResourceAttributes(attributes);
+				}
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+	}
 }

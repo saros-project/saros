@@ -312,6 +312,9 @@ public class Saros extends AbstractUIPlugin {
 		setConnectionState(ConnectionState.DISCONNECTING, error);
 
 		if (connection != null) {
+			// leave running session before disconnecting
+			getSessionManager().leaveSession();
+			
 			connection.removeConnectionListener(smackConnectionListener);
 			connection.close();
 			connection = null;

@@ -186,11 +186,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		try {
 			IFile file = localProject.getFile(path);
 			if (file.exists()) {
+				file.setReadOnly(false);
 				file.setContents(in, IResource.FORCE, new NullProgressMonitor());
 			} else {
 				file.create(in, true, new NullProgressMonitor());
 			}
-
 		} catch (Exception e) {
 			failed(e);
 		}
@@ -352,6 +352,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 		transmitter.sendJoinMessage(sharedProject);
 		transmitter.removeInvitationProcess(this); // HACK
+		
+		sharedProject.setProjectReadonly(true);
 
 		setState(State.DONE);
 	}

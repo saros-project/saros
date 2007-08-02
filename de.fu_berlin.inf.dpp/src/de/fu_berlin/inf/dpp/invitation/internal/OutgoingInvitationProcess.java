@@ -288,14 +288,24 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		IPath activeDriverEditor = editorManager.getActiveDriverEditor();
 		driverEditors.remove(activeDriverEditor);
 
+		FileList filelist;
+		try {
+			filelist = sharedProject.getFileList();
+		} catch (CoreException e) {
+			filelist = null;
+		}
 		// HACK
 		for (IPath path : driverEditors) {
+			if (filelist!=null && filelist.getPaths().contains(path)==false)
+				continue;
+			
 			sharedProject.getSequencer().activityCreated(
 				new EditorActivity(EditorActivity.Type.Activated, path));
 		}
 
-		sharedProject.getSequencer().activityCreated(
-			new EditorActivity(EditorActivity.Type.Activated, activeDriverEditor));
+		if (filelist!=null && filelist.getPaths().contains(activeDriverEditor)==true)
+			sharedProject.getSequencer().activityCreated(
+				new EditorActivity(EditorActivity.Type.Activated, activeDriverEditor));
 	}
 
 	public String getProjectName() {

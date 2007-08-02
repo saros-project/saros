@@ -24,14 +24,21 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +46,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
@@ -59,12 +67,17 @@ import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
 
 
-public class SessionView extends ViewPart implements ISessionListener {
+public class SessionView extends ViewPart 
+				implements ISessionListener, IPropertyChangeListener {
+	
 	private TableViewer viewer;
 
 	private ISharedProject sharedProject;
 
 	private GiveDriverRoleAction giveDriverRoleAction;
+
+	private IPreferenceStore store = null;
+
 
 	private class SessionContentProvider implements IStructuredContentProvider,
 		ISharedProjectListener {
@@ -121,10 +134,11 @@ public class SessionView extends ViewPart implements ISessionListener {
 	}
 
 	private class SessionLabelProvider extends LabelProvider 
-		implements ITableLabelProvider, IColorProvider {
+		implements ITableLabelProvider, IColorProvider, ITableFontProvider {
 		
 		private Image userImage = SarosUI.getImage("icons/user.png");
 		private Image driverImage = SarosUI.getImage("icons/user_edit.png");
+		private Font boldFont=null;
 
 		public String getColumnText(Object obj, int index) {
 			User participant = (User) obj;
@@ -147,8 +161,8 @@ public class SessionView extends ViewPart implements ISessionListener {
 			return getImage(obj);
 		}
 
+		// TODO getting current color doesnt uses when default was changed.
 		public Color getBackground(Object element) {
-			// TODO Auto-generated method stub
 			User user = (User) element;
 			
 			if (user.getJid().equals( Saros.getDefault().getMyJID() ))
@@ -156,25 +170,48 @@ public class SessionView extends ViewPart implements ISessionListener {
 			
 			int colorid=user.getColorID();
 			String mytype=SelectionAnnotation.TYPE  + "." + new Integer(colorid+1).toString();
-			
-			
-			AnnotationPreferenceLookup lookup=  org.eclipse.ui.editors.text.EditorsUI.getAnnotationPreferenceLookup();
+
+  			AnnotationPreferenceLookup lookup=  org.eclipse.ui.editors.text.EditorsUI.getAnnotationPreferenceLookup();
 			AnnotationPreference ap = lookup.getAnnotationPreference(mytype);
-			
 			if (ap==null)
 				return null;
 			
-			Display d=Display.getCurrent();
-			RGB rgb=ap.getColorPreferenceValue();
-			if (rgb==null)
-				return null;
+			IPreferenceStore store = EditorsUI.getPreferenceStore();
+			RGB rgb = PreferenceConverter.getColor(store, ap.getColorPreferenceKey());
+
+			return new Color(Display.getDefault(), rgb);			
 			
-			Color c = new Color(d, rgb);
-			return c;
+			
 		}
 
 		public Color getForeground(Object element) {
 			return null;
+		}
+
+		public Font getFont(Object element, int columnIndex) {
+			if (boldFont==null) {
+				Display disp = viewer.getControl().getDisplay(); 
+				FontData[] data = disp.getSystemFont().getFontData(); 
+				for (FontData fontData : data) { 
+					fontData.setStyle(SWT.BOLD); 
+				} 
+				boldFont = new Font(disp, data);
+			}			
+			
+			User user = (User) element;
+			if (user.getJid().equals( Saros.getDefault().getMyJID() ))
+				return boldFont;
+			return null;
+		}
+		
+		@Override
+		public void dispose() {
+			if (boldFont!=null) {
+				boldFont.dispose();
+				boldFont=null;
+			}
+			
+			super.dispose();
 		}
 	}
 
@@ -182,8 +219,16 @@ public class SessionView extends ViewPart implements ISessionListener {
 	 * The constructor.
 	 */
 	public SessionView() {
+		store = EditorsUI.getPreferenceStore();
+		store.addPropertyChangeListener(this);
 	}
 
+	@Override
+	protected void finalize() throws Throwable {
+		store.removePropertyChangeListener(this);
+		super.finalize();
+	}
+	
 	public void sessionStarted(final ISharedProject session) {
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
@@ -277,5 +322,10 @@ public class SessionView extends ViewPart implements ISessionListener {
 
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+	}
+
+	public void propertyChange(PropertyChangeEvent event) {
+		viewer.refresh();
+		
 	}
 }

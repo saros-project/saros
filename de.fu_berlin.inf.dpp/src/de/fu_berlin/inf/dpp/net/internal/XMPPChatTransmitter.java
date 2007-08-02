@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -76,8 +77,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 
 
 /**
- * An ITransmitter implementation which uses Smack Chat objects. It currently
- * only supports two users at max.
+ * An ITransmitter implementation which uses Smack Chat objects.
  * 
  * @author rdjemili
  */
@@ -106,27 +106,38 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	// TODO use ListenerList instead
 	private List<IInvitationProcess> processes = new CopyOnWriteArrayList<IInvitationProcess>();
 
-	private List<FileTransfer>	  fileTransferQueue    = new LinkedList<FileTransfer>();
-	private List<MessageTransfer> messageTransferQueue = new LinkedList<MessageTransfer>();
-
+	private List<FileTransfer>	  fileTransferQueue		= new LinkedList<FileTransfer>();
+	private List<MessageTransfer> messageTransferQueue	= new LinkedList<MessageTransfer>();
+	private Map<String, IncomingFile> incomingFiles		= new HashMap<String,IncomingFile>();
 	private int runningFileTransfers = 0;
+	
+	private boolean m_bFileTransferByChat = false;	// to switch to chat-filetransfer as fallback 
+	
 
 	/**
 	 * A simple struct that is used to queue file transfers.
 	 */
 	private class FileTransfer {
 		public JID recipient;
-
 		public IPath path;
-
 		public int timestamp;
-
 		public IFileTransferCallback callback;
-
 		public int retries = 0;
-		
 		public byte[] 	content;
 		public long 	filesize;
+	}
+	
+	/**
+	 * A simple struct that is used to manage incoming chunked files via chat-file transfer
+	 */
+	private class IncomingFile {
+		String	name;
+		int		receivedChunks;
+		int		chunkCount;
+		List<String>	messageBuffer;
+
+		IncomingFile() 		{ messageBuffer = new LinkedList<String>(); }
+		boolean isComplete(){ return (receivedChunks==chunkCount); }
 	}
 
 	/**
@@ -134,15 +145,14 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 */
 	private class MessageTransfer {
 		public JID receipient;
-		
 		public PacketExtension packetextension;
 	}
 	
 	public XMPPChatTransmitter(XMPPConnection connection) {
-		SetXMPPConnection(connection);
+		setXMPPConnection(connection);
 	}
 	
-	public void SetXMPPConnection(XMPPConnection connection) {
+	public void setXMPPConnection(XMPPConnection connection) {
 		this.connection = connection;
 		fileTransferManager = new FileTransferManager(connection);
 		fileTransferManager.addFileTransferListener(this);
@@ -279,45 +289,254 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 * @see de.fu_berlin.inf.dpp.ITransmitter
 	 */
 	public void sendFileList(JID recipient, FileList fileList) throws XMPPException {
-		log.fine("Establishing file list transfer");
-
+		
 		String xml = fileList.toXML();
-
 		String to = recipient.toString();
+
+		if ( getFileTransferModeViaChat()) {
+
+			if (sendChatTransfer(FILELIST_TRANSFER_DESCRIPTION, "", xml.getBytes(), recipient))
+				log.fine("Sent file list via ChatTransfer");
+			else
+				log.fine("Error sending file list via ChatTransfer");
+		}
+		else {
+			log.fine("Establishing file list transfer");
+
+			int attempts = MAX_TRANSFER_RETRIES;
+			while (true) {
+				
+				try {
+					OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(to);
 		
-		int attempts = MAX_TRANSFER_RETRIES;
+					OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
+							FILELIST_TRANSFER_DESCRIPTION);
 		
-		while (true) {
-			
-			try {
-				OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(to);
+					log.fine("Sending file list");
+		
+					if (out == null) {
+						if (attempts-- > 0)
+							continue;
+						throw new XMPPException(transfer.getException());
+					}
+						
+					BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
+					writer.write(xml);
+					writer.flush();
+					writer.close();
+					
+					log.info("File list sent");
+					
+					break;
 	
-				OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
-						FILELIST_TRANSFER_DESCRIPTION);
-	
-				log.fine("Sending file list");
-	
-				if (out == null) {
+				} catch (IOException e) {
 					if (attempts-- > 0)
 						continue;
-					throw new XMPPException(transfer.getException());
-				}
 					
-				BufferedWriter writer = new BufferedWriter(new PrintWriter(out));
-				writer.write(xml);
-				writer.flush();
-				writer.close();
-				break;
+					m_bFileTransferByChat = true;
+					sendChatTransfer(FILELIST_TRANSFER_DESCRIPTION, "", xml.getBytes(), recipient);
+					// TODO errorhandling
 
-			} catch (IOException e) {
-				if (attempts-- > 0)
-					continue;
-				throw new XMPPException(e);
+					log.info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
+				}
 			}
 		}
-		log.info("Sent file list");
+		
 	}
 
+	/**
+	 * Sends a data buffer to a recipient using chat messages.
+	 * The buffer is transmitted Base64 encoded and split into blocks of size MAX_MSG_LENGTH. 
+	 * 
+	 * @param name
+	 *            name of the data buffer. e.g. the filename of the transmitted file
+	 * @param desc
+	 * 			  description String of the transfer. e.g. encoded timestamp for file activity
+	 * @param data
+	 * 			  a byte buffer to be transmitted. it will be base64 encoded
+	 * @param recipient
+	 * 			  JID of the user to send this data to
+	 * 
+	 * @return <code>true</code> if the message was send successfully
+	 */
+	boolean sendChatTransfer(String name, String desc, byte[] data, JID recipient) {
+
+		final int maxMsgLen = Saros.getDefault().getPreferenceStore()
+		.getInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE); 
+
+		// Convert byte array to base64 string
+		String data64 = new sun.misc.BASE64Encoder().encode(data);
+			
+		// send large data sets in several messages
+		int tosend=data64.length();
+		int pcount = (tosend/maxMsgLen) + ((tosend % maxMsgLen ==0)?0:1);
+		int start = 0;
+		try {
+			for (int i=1;i<=pcount;i++) {
+				int psize = Math.min(tosend, maxMsgLen);
+				int end   = start + psize;
+		
+				PacketExtension extension = 
+					PacketExtensions.createDataTransferExtension(
+						name, desc, i, pcount, 
+						data64.substring(start, end));
+	
+				sendMessage(recipient, extension);
+
+				start=end;
+				tosend-=psize;
+				
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Receives a data buffer sent by a chat message.
+	 * The data will be decoded from base64 encoding.
+	 * Splitted transfer will be buffered until all chunks are received. Then the file
+	 * will be reconstructed and processed as a whole.
+	 * 
+	 * @param message
+	 *            Message containing the data as extension.
+	 * 
+	 * @return <code>true</code> if the message was handled successfully.
+	 */
+	boolean receiveChatTransfer(Message message) {
+		DefaultPacketExtension dt=PacketExtensions.getDataTransferExtension(message);
+		String sName = dt.getValue(PacketExtensions.DT_NAME);
+		String sData = dt.getValue(PacketExtensions.DT_DATA);
+
+		String sSplit = dt.getValue(PacketExtensions.DT_SPLIT);
+		try {		
+			// is this a multipart transfer?
+			if (sSplit!=null && sSplit.equals("1/1")==false) {
+				// parse split information (index and chunk count)
+				int i=sSplit.indexOf('/');
+				int cur = Integer.parseInt( sSplit.substring(0, i) );
+				int max = Integer.parseInt( sSplit.substring(i+1) );
+
+				log.fine("Received chunk "+cur+" of " + max + " of file "+sName);
+	
+				// check for previous chunks
+				IncomingFile ifile = incomingFiles.get(sName);
+				if (ifile==null) {
+					// this is the first received chunk->create incoming file object
+					ifile = new IncomingFile();
+					ifile.receivedChunks++;
+					ifile.chunkCount=max;
+					ifile.name=sName;
+					for (i=0;i<max;i++)	ifile.messageBuffer.add(null);
+					ifile.messageBuffer.set(cur-1, sData);
+					incomingFiles.put(sName, ifile);
+					return true;
+				} else {
+					// this is a following chunk
+					ifile.receivedChunks++;
+					ifile.messageBuffer.set(cur-1, sData);				
+					
+					if (ifile.isComplete()==false)
+						return true;
+					
+					// join the buffers to restore the file from chunks
+					sData = "";
+					for (i=0;i<max;i++)
+						sData += ifile.messageBuffer.get(i);
+					incomingFiles.remove(ifile);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+			
+		}
+		
+		byte[] dataOrg=null;
+		try {
+			dataOrg = new sun.misc.BASE64Decoder().decodeBuffer(sData);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		
+		// File list received
+		if (sName.equals(FILELIST_TRANSFER_DESCRIPTION)) {
+			FileList fileList=null;
+			IInvitationProcess myProcess=null;
+			try {
+				JID fromJID = new JID(message.getFrom());
+				for (IInvitationProcess process : processes) {
+					if (process.getPeer().equals(fromJID)) {
+						myProcess = process;
+						fileList = new FileList(new String(dataOrg) );
+						process.fileListReceived(fromJID, fileList);
+					}
+				}
+				log.info("Received file list via ChatTransfer");
+			} catch (Exception e) {
+				if(myProcess!=null)
+					myProcess.cancel("Error receiving file list",false);
+			}
+		
+		} else { 
+			// receiving file (resource)
+						
+			try {
+
+				JID from = new JID(message.getFrom());
+				Path path = new Path(sName);
+				
+				ByteArrayInputStream in = new ByteArrayInputStream(dataOrg);
+
+				log.fine("Receiving resource from "+ from.toString()+": " + sName + " (ChatTransfer)");
+				
+				boolean handledByInvitation = false;
+				for (IInvitationProcess process : processes) {
+					if (process.getPeer().equals(from)) {
+						process.resourceReceived(from, path, in);
+						handledByInvitation = true;
+					}
+				}
+
+				if (!handledByInvitation) {
+					
+					if (Saros.getDefault().getSessionManager().getSharedProject()==null) {
+						// receiving resource without a running session? not accepted
+						return false;
+					}
+
+					
+					FileActivity activity = new FileActivity(FileActivity.Type.Created, path, in);
+
+					int time;
+					String description = dt.getValue(PacketExtensions.DT_DESC);
+					try {
+						time = Integer.parseInt(description.substring(RESOURCE_TRANSFER_DESCRIPTION
+							.length() + 1));
+					} catch (Exception e) {
+						Saros.log("Could not parse time from description: " + description, e);
+						time = 0; // HACK
+					}
+
+					TimedActivity timedActivity = new TimedActivity(activity, time);
+
+					SessionManager sm = Saros.getDefault().getSessionManager();
+					sm.getSharedProject().getSequencer().exec(timedActivity);
+				}
+
+				log.info("Received resource " + sName);
+
+			} catch (Exception e) {
+				log.log(Level.WARNING, "Failed to receive " + sName, e);
+			}
+		}
+		
+		return true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -327,6 +546,33 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		sendFile(to, path, -1, callback);
 	}
 
+	/**
+	 * Reads a files content into a buffer.
+	 * 
+	 * @param transfer
+	 *            Object containing file path and a buffer (among other) to read from and to.
+	 *            
+	 * @return <code>true</code> if the file was read successfully
+	 */
+	boolean readFile(FileTransfer transfer) {
+		SessionManager sm = Saros.getDefault().getSessionManager();
+		IProject project = sm.getSharedProject().getProject();
+		
+		File f=new File(project.getFile(transfer.path).getLocation().toOSString());
+		transfer.filesize = f.length();
+		transfer.content = new byte[(int) transfer.filesize];
+		
+		try {
+			InputStream in = project.getFile(transfer.path).getContents();
+			in.read(transfer.content, 0, (int)transfer.filesize);
+		} catch (Exception e) {
+			e.printStackTrace();
+			transfer.content = null;
+			return false;
+		}
+		return true;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -343,27 +589,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		
 		// if transfer will be delayed, we need to buffer the file 
 		// to not send modified versions later
-		if (!connection.isConnected()) {
-			SessionManager sm = Saros.getDefault().getSessionManager();
-			IProject project = sm.getSharedProject().getProject();
-			
-			File f=new File(project.getFile(path).getLocation().toOSString());
-			transfer.filesize=f.length();
-			transfer.content=new byte[(int)transfer.filesize];
-			
-			try {
-				InputStream in = project.getFile(path).getContents();
-				in.read(transfer.content, 0, (int)transfer.filesize);
-			} catch (CoreException e) {
-				e.printStackTrace();
-				transfer.content=null;
-			} catch (IOException e) {
-				e.printStackTrace();
-				transfer.content=null;
-			}
-			
-		
-		} else 
+		if (!connection.isConnected())
+			readFile(transfer);		
+		else 
 			transfer.content=null;
 
 		fileTransferQueue.add(transfer);
@@ -546,12 +774,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				
 		}
 
-		if (PacketExtensions.getLeaveExtension(message) != null) {
+		else if (PacketExtensions.getLeaveExtension(message) != null) {
 			if (project != null)
 				project.removeUser(new User(fromJID)); // HACK
 		}
 
-		if (PacketExtensions.getRequestActivityExtension(message) != null && isProjectParticipant) {
+		else if (PacketExtensions.getRequestActivityExtension(message) != null && isProjectParticipant) {
 			DefaultPacketExtension rae=PacketExtensions.getRequestActivityExtension(message);
 			String sID = rae.getValue("ID");
 			String sIDandup = rae.getValue("ANDUP");
@@ -573,19 +801,24 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				log.info(info);
 			}
 		}
+		
+		else if (PacketExtensions.getDataTransferExtension(message)!=null) {
+			receiveChatTransfer(message);
+		}
 
-		if (PacketExtensions.getRequestExtension(message) != null) {
+		else if (PacketExtensions.getRequestExtension(message) != null) {
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(fromJID))
 					process.invitationAccepted(fromJID);
 			}
 		}
-
-		DefaultPacketExtension userlistExtension = PacketExtensions.getUserlistExtension(message);
-		if (userlistExtension != null ) {
+		
+		else if (PacketExtensions.getUserlistExtension(message) != null ) {
+			DefaultPacketExtension userlistExtension = PacketExtensions.getUserlistExtension(message);
+			
 			// My inviter sent a list of all session participants
 			// I need to adapt the order for later case of driver leaving the session
-			log.fine( Saros.getDefault().getMyJID()+ "received user list from "+fromJID);
+			log.fine( "Received user list from "+fromJID);
 	
 			int count=0;
 			while( true ) {
@@ -605,9 +838,8 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			}
 		}
 		
-		DefaultPacketExtension inviteExtension = PacketExtensions.getInviteExtension(message);
-
-		if (inviteExtension != null) {
+		else if (PacketExtensions.getInviteExtension(message) != null) {
+			DefaultPacketExtension inviteExtension = PacketExtensions.getInviteExtension(message);
 			String desc = inviteExtension.getValue(PacketExtensions.DESCRIPTION);
 			String pName = inviteExtension.getValue(PacketExtensions.PROJECTNAME);
 
@@ -615,10 +847,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			sm.invitationReceived(fromJID, pName, desc);
 		}
 
-		DefaultPacketExtension cancelInviteExtension = PacketExtensions
-			.getCancelInviteExtension(message);
+		else if (PacketExtensions.getCancelInviteExtension(message) != null) {
+			DefaultPacketExtension cancelInviteExtension = PacketExtensions.getCancelInviteExtension(message);
 
-		if (cancelInviteExtension != null) {
 			String errorMsg = cancelInviteExtension.getValue(PacketExtensions.ERROR);
 
 			for (IInvitationProcess process : processes) {
@@ -697,11 +928,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		}
 		
 		try {
-			Chat chat = getChat(jid);
 
+			Chat chat = getChat(jid);
 			Message message;
 			message = chat.createMessage();
 			message.addExtension(extension);
+			
 			chat.sendMessage(message);
 
 		} catch (Exception e) {
@@ -710,7 +942,6 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 			Saros.getDefault().getLog().log(
 				new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, "Could not send message, message queued", e));
 		}
-		
 	}
 
 	private void receiveResource(FileTransferRequest request) {
@@ -761,42 +992,61 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		IOException {
 
 		log.fine("Sending file " + transferData.path);
-
+		
 		JID recipient = transferData.recipient;
 
 		SessionManager sm = Saros.getDefault().getSessionManager();
 		IProject project = sm.getSharedProject().getProject();
-		
-		OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(recipient
-			.toString());
-
 		String description = RESOURCE_TRANSFER_DESCRIPTION;
 		if (transferData.timestamp >= 0) {
 			description = description + ':' + transferData.timestamp;
 		}
+	
+		if (getFileTransferModeViaChat()) {
 
-		// HACK file size
-		OutputStream out = transfer.sendFile(transferData.path.toString(), 1, description);
+			if (transferData.content==null)
+				readFile(transferData);
+			
+			sendChatTransfer(transferData.path.toString(),
+					description,
+					transferData.content, 
+					recipient);
 
-		if (out == null || transfer.getException() != null)
-			throw new XMPPException(transfer.getException());
+			log.info("Sent file " + transferData.path + " (by ChatTransfer)");
 
-		if (transferData.content==null) {
-			byte[] buffer = new byte[1000];
-			int length = -1;
-			InputStream in = project.getFile(transferData.path).getContents();
-			while ((length = in.read(buffer)) >= 0) {
-				out.write(buffer, 0, length);
-			}
-			in.close();
 		} else {
-			out.write(transferData.content, 0, (int)transferData.filesize);
+			
+			try {
+			
+			OutgoingFileTransfer transfer = fileTransferManager.createOutgoingFileTransfer(recipient
+				.toString());
+		
+			// HACK file size
+			OutputStream out = transfer.sendFile(transferData.path.toString(), 1, description);
+	
+			if (out == null || transfer.getException() != null)
+				throw new XMPPException(transfer.getException());
+	
+			if (transferData.content==null) {
+				byte[] buffer = new byte[1000];
+				int length = -1;
+				InputStream in = project.getFile(transferData.path).getContents();
+				while ((length = in.read(buffer)) >= 0) {
+					out.write(buffer, 0, length);
+				}
+				in.close();
+			} else {
+				out.write(transferData.content, 0, (int)transferData.filesize);
+			}
+	
+			out.close();
+	
+			log.info("Sent file " + transferData.path);
+	
+			} catch (Exception e) {
+				
+			}
 		}
-
-		out.close();
-
-		log.info("Sent file " + transferData.path);
-
 		if (transferData.callback != null)
 			transferData.callback.fileSent(transferData.path);
 	}
@@ -837,8 +1087,10 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	}
 
 	private void putIncomingChat(JID jid, String thread) {
-		if (!chats.containsKey(jid))
+		if (!chats.containsKey(jid)){
 			chats.put(jid, new Chat(connection, jid.toString(), thread));
+		}
+
 	}
 
 	private Chat getChat(JID jid) {
@@ -848,6 +1100,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		Chat chat = chats.get(jid);
 
 		if (chat == null) {
+
 			chat = new Chat(connection, jid.toString());
 			chats.put(jid, chat);
 		}
@@ -862,5 +1115,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
 			preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
 
+	}
+	
+	private boolean getFileTransferModeViaChat() {
+		return m_bFileTransferByChat || 
+			Saros.getDefault().getPreferenceStore().
+				getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+	
 	}
 }

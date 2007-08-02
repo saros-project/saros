@@ -30,9 +30,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import de.fu_berlin.inf.dpp.PreferenceConstants;
-import de.fu_berlin.inf.dpp.Saros;
-
 /**
  * A wizard to configure Saros.
  * 

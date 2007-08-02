@@ -480,7 +480,7 @@ public class InvitationWizard extends Wizard implements IInvitationUI {
 		"Filelist of inviter sent",
 		"Filelist of invitee sent",
 		"Synchornizing project files. Transfering files...",
-		"Synchornizing done", 
+		"Files sent. Waiting for invitee...", 
 		"Invitiation completed",
 		"Invitation canceled"
 	};

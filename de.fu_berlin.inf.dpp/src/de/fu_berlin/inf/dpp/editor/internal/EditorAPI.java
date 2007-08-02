@@ -10,8 +10,6 @@ import java.awt.Toolkit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourceAttributes;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -61,7 +59,6 @@ import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 
 /**
@@ -283,6 +280,7 @@ public class EditorAPI implements IEditorAPI {
 				e.printStackTrace();
 			}
 		}
+		
 
 		return null;
 	}
@@ -571,7 +569,9 @@ public class EditorAPI implements IEditorAPI {
 		return PlatformUI.getWorkbench().getWorkbenchWindows();
 	}
 
+/*
 	private void makeAllProjectResourcesReadOnly(ISharedProject sharedProject) {
+		
 		try {
 			ResourceAttributes attributes = new ResourceAttributes();
 			attributes.setReadOnly(!sharedProject.isDriver());
@@ -594,4 +594,5 @@ public class EditorAPI implements IEditorAPI {
 			e.printStackTrace();
 		}
 	}
+*/
 }

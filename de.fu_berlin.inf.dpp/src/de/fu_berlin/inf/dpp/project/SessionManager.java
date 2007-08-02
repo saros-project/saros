@@ -127,9 +127,10 @@ public class SessionManager implements IConnectionListener {
 		if (sharedProject == null)
 			return;
 
-		sharedProject.stop();
-
 		transmitter.sendLeaveMessage(sharedProject);
+		sharedProject.setProjectReadonly(false);	// set ressources writeable again
+
+		sharedProject.stop();
 
 		ISharedProject closedProject = sharedProject;
 		sharedProject = null;
@@ -212,7 +213,7 @@ public class SessionManager implements IConnectionListener {
 				attachRosterListener();
 			}
 			else
-				transmitter.SetXMPPConnection(connection);
+				transmitter.setXMPPConnection(connection);
 			
 			
 
@@ -260,6 +261,9 @@ public class SessionManager implements IConnectionListener {
 	
 	public void OnReconnect(int oldtimestamp){
 
+		if (sharedProject==null)
+			return;
+		
 		transmitter.sendRemainingFiles();
 		transmitter.sendRemainingMessages();
 

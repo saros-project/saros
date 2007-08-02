@@ -183,4 +183,11 @@ public interface ISharedProject {
 	public void stop();
 
 	public User getParticipant(JID jid);
+
+	/**
+	 * Sets all resources of the project to a readonly state 
+	 * on the local file system.
+	 * @param The readonly state to set the file to. 
+	 */
+	public void setProjectReadonly(boolean readonly);
 }
