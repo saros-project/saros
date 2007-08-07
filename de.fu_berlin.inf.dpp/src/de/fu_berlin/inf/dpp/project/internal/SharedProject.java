@@ -393,7 +393,7 @@ public class SharedProject implements ISharedProject {
 			if (MessageDialog.openQuestion(shell, "Unsaved file modifications",
 					"Before inviting users and therefore synchronizing files, "+
 					"this project needs to be saved to disk. "+
-					"Do you want to save all unsaved files of this projet now?")) {
+					"Do you want to save all unsaved files of this project now?")) {
 				
 				// save
 				// PlatformUI.getWorkbench().saveAllEditors(false);	// saves all editors
