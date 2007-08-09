@@ -96,7 +96,10 @@ public class InviteAction extends SelectionProviderAction implements ISessionLis
 	}
 
 	private void updateEnablement() {
-		setEnabled(getSharedProject() != null && selectedEntry != null
+		JID jid = (selectedEntry==null)?null:new JID(selectedEntry.getUser());
+		
+		setEnabled(getSharedProject() != null && selectedEntry != null &&
+				getSharedProject().getParticipant(jid)==null
 			&& (getSharedProject().isHost() || getSharedProject().isDriver()) );
 	}
 
