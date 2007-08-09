@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorReference;
@@ -55,8 +56,7 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
-import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
+import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 
 public class SharedProject implements ISharedProject {
 	private static Logger log = Logger.getLogger(SharedProject.class.getName());
@@ -402,27 +402,21 @@ public class SharedProject implements ISharedProject {
 			} else
 				return;
 		}
-		
+
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
 				try {
 					Shell shell = Display.getDefault().getActiveShell();
-					InvitationWizard iw = new InvitationWizard(jid);
-
-					WizardDialogAccessable wd=
-						new WizardDialogAccessable(shell, iw );
-					
-					iw.setWizardDlg(wd);					
-					wd.open();
-					
+					Window iw = new InvitationDialog(shell,jid);
+					iw.open();
 				} catch (Exception e) {
-					System.out.println(e.getStackTrace());
 					Saros.getDefault().getLog().log(
 						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-							"Error while running invitation wizard", e));
+							"Error while running invitation helper", e));
 				}
 			}
-		});		
+		});
+
 	}
 
 	boolean searchUnsavedChangesInProject(boolean save) {
