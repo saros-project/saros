@@ -21,31 +21,25 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
-import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.MessageEventManager;
 import org.jivesoftware.smackx.MessageEventNotificationListener;
-import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -142,7 +136,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		}
 
 		public void processPacket(Packet packet) {
-			logCH.log(Level.FINE, "processPacket called");
+			logCH.debug("processPacket called");
 
 			final Message message = (Message) packet;
 
@@ -164,7 +158,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		public void processMessage(Chat chat, Message message) {
 			// TODO: new Method for messagelistener
 
-			logCH.log(Level.FINE, "processMessage called.");
+			logCH.debug("processMessage called.");
 			processPacket(message);
 
 		}
@@ -254,7 +248,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		public MultiChatSession(MultiUserChat muc) {
 			this.muc = muc;
-			this.name = "Multi User Chat";
+			this.name = "Multi User Chat ("+Saros.getDefault().getMyJID().getName()+")";
 			muc.addMessageListener(this);
 			
 			Display.getDefault().syncExec(new Runnable() {
@@ -294,7 +288,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		}
 
 		public void processPacket(Packet packet) {
-			logCH.log(Level.FINE, "processPacket called");
+			logCH.debug("processPacket called");
 
 			final Message message = (Message) packet;
 
@@ -322,7 +316,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		public void processMessage(Chat chat, Message message) {
 			// TODO: new Method for messagelistener
 
-			logCH.log(Level.FINE, "processMessage called.");
+			logCH.debug("processMessage called.");
 			processPacket(message);
 
 		}
@@ -482,7 +476,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 	 * @see org.jivesoftware.smack.PacketListener
 	 */
 	public void processPacket(Packet packet) {
-		log.log(Level.FINE, "messagePacket called");
+		log.debug("messagePacket called");
 		final Message message = (Message) packet;
 		final JID jid = new JID(message.getFrom());
 
@@ -527,7 +521,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	public void processMessage(Chat chat, Message message) {
 		// TODO new method for message notify
-		log.log(Level.FINE, "processMessage called.");
+		log.debug("processMessage called.");
 		processPacket(message);
 
 	}

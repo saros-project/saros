@@ -295,14 +295,16 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 
 		log.info("Sent activities: " + timedActivities);
 
-		if (timedActivities != null ) {
-			sendMessageToAll(sharedProject, new ActivitiesPacketExtension(timedActivities));
-		}
-		
 		//muc
 		if(mucmanager != null){
 			mucmanager.sendActivities(sharedProject, timedActivities);
 		}
+		
+		if (timedActivities != null ) {
+			sendMessageToAll(sharedProject, new ActivitiesPacketExtension(timedActivities));
+		}
+		
+
 	}
 
 	/*

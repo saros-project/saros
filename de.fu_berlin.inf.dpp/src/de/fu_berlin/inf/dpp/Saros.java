@@ -23,13 +23,10 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -55,6 +52,7 @@ import org.osgi.framework.BundleContext;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPMultiChatTransmitter;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -69,7 +67,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
  * @author coezbek
  */
 public class Saros extends AbstractUIPlugin {
-
+	
 	public static enum ConnectionState {
 		NOT_CONNECTED, CONNECTING, CONNECTED, DISCONNECTING, ERROR
 	};
@@ -92,6 +90,8 @@ public class Saros extends AbstractUIPlugin {
 	private MessagingManager messagingManager;
 
 	private SessionManager sessionManager;
+	
+	private static Logger logger = Logger.getLogger(Saros.class.getName());
 
 	// TODO use ListenerList instead
 	private List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
@@ -100,7 +100,7 @@ public class Saros extends AbstractUIPlugin {
 	private ConnectionListener smackConnectionListener = new XMPPConnectionListener(); 
 	
 	static {
-		PacketExtensions.hookExtensionProviders();
+			PacketExtensions.hookExtensionProviders();
 	}
 
 	/**
@@ -115,7 +115,6 @@ public class Saros extends AbstractUIPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-
 		XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(PreferenceConstants.DEBUG);
 
 		setupLoggers();
@@ -445,13 +444,17 @@ public class Saros extends AbstractUIPlugin {
 
 	private void setupLoggers() {
 		try {
-			Logger sarosRootLogger = Logger.getLogger("de.fu_berlin.inf.dpp");
-			sarosRootLogger.setLevel(Level.ALL);
+			
+			PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
+			Logger logger = Logger.getLogger("de.fu_berlin.inf.dpp");
+			
+//			Logger sarosRootLogger = Logger.getLogger("de.fu_berlin.inf.dpp");
+//			sarosRootLogger.setLevel(Level.ALL);
 
 //			Handler handler = new FileHandler("saros.log", 10 * 1024 * 1024, 1, true);
-			Handler handler = new ConsoleHandler();
-			handler.setFormatter(new SimpleFormatter());
-			sarosRootLogger.addHandler(handler);
+//			Handler handler = new ConsoleHandler();
+//			handler.setFormatter(new SimpleFormatter());
+//			sarosRootLogger.addHandler(handler);
 
 //			 handler = new ConsoleHandler();
 //			 sarosRootLogger.addHandler(handler);

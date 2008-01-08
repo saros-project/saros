@@ -1,12 +1,8 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -18,23 +14,16 @@ import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.Form;
-import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.muc.Affiliate;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.InvitationRejectionListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.muc.Occupant;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.Saros.ConnectionState;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -56,7 +45,7 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 	private XMPPConnection connection;
 
 	public XMPPMultiChatTransmitter() {
-
+		
 	}
 
 	public void initMUC(XMPPConnection connection, String user)
@@ -127,7 +116,7 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 			// System.out.println(owners.size());
 			// System.out.println(owner.size());
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.debug("configure room: ", e);
 		}
 		return submitForm;
 	}
@@ -261,6 +250,9 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 			Message newMessage = muc.createMessage();
 			/* add packet extension. */
 			newMessage.addExtension(new ActivitiesPacketExtension(activities));
+			/* add jid property */
+			newMessage.setProperty("jid", Saros.getDefault().getMyJID().toString());
+			
 //			newMessage.setBody("test");
 			muc.sendMessage(newMessage);
 			
@@ -383,7 +375,7 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 			Message msg = (Message) packet;
 //			System.out.println("from " + msg.getFrom().replace(Room + "/", "")
 //					+ " text: " + msg.getBody());
-			log.info("received message : +"+msg);
+			log.info("received message : +"+msg+" from "+msg.getProperty("jid"));
 		}
 		else{
 			System.out.println("other formated message received. ");

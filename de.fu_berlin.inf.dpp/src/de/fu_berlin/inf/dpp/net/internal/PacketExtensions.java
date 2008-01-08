@@ -73,10 +73,10 @@ public class PacketExtensions {
 	
 	public static void hookExtensionProviders() {
 		
-		//TODO: An dieser Stelle erzeugt er die Erweiterung, um sein eigenes XML-Format zu erzeugen.
 		ProviderManager providermanager = ProviderManager.getInstance();
 		providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
-			new ActivitiesProvider());
+				new ActivitiesProvider());
+		
 		//TODO: Änderung für Smack 3
 //		ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
 //			new ActivitiesProvider());

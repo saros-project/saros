@@ -25,7 +25,10 @@ Eclipse-AutoStart: true
 Bundle-ClassPath: bin/,
  lib/smack.jar,
  lib/smackx.jar,
- lib/smackx-debug.jar
+ lib/smackx-debug.jar,
+ lib/smackx-jingle.jar,
+ lib/log4j-1.2.15.jar,
+ .
 Export-Package: de.fu_berlin.inf.dpp,
  de.fu_berlin.inf.dpp.activities,
  de.fu_berlin.inf.dpp.editor,
