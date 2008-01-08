@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -62,7 +62,7 @@ public class SharedProject implements ISharedProject {
 	private static Logger log = Logger.getLogger(SharedProject.class.getName());
 
 	private static final int REQUEST_ACTIVITY_ON_AGE = 5;
-	protected static final int MILLIS_UPDATE = 1000;
+	protected static final int MILLIS_UPDATE = 50;
 
 	protected JID myID;
 
@@ -86,6 +86,7 @@ public class SharedProject implements ISharedProject {
 	
 	public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
 		this.transmitter = transmitter;
+		
  
 		this.myID = myID;
 		driver = host = new User(myID);

@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -44,6 +44,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Chat;
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -81,7 +83,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * 
  * @author rdjemili
  */
-public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTransferListener {
+public class XMPPChatTransmitter implements ITransmitter, PacketListener, MessageListener, FileTransferListener {
 	private static Logger log = Logger.getLogger(XMPPChatTransmitter.class.getName());
 
 	private static final int MAX_PARALLEL_SENDS = 10;
@@ -98,6 +100,10 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	private static final String FILELIST_TRANSFER_DESCRIPTION = "filelist";
 
 	private XMPPConnection connection;
+	
+	private ChatManager chatmanager;
+	
+	private XMPPMultiChatTransmitter mucmanager;
 
 	private Map<JID, Chat> chats = new HashMap<JID, Chat>();
 
@@ -154,15 +160,25 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	
 	public void setXMPPConnection(XMPPConnection connection) {
 		this.connection = connection;
+		this.chatmanager = connection.getChatManager();
 		fileTransferManager = new FileTransferManager(connection);
-		fileTransferManager.addFileTransferListener(this);
+		//TODO: aktuell noch nicht angesprochen
+//		fileTransferManager.addFileTransferListener(this);
 		
 		chats.clear();
 
 		setProxyPort(connection);
 
 		// TODO always preserve threads
-		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.CHAT)); // HACK
+		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.chat)); // HACK
+		
+		/* an dieser Stelle wird der MUC Transmitter initialisiert, um die Kapselung 
+		 * des Systems mit dem Fassadenmuster nicht zu verletzten.
+		 * TODO: Später überlegen, wie wir es trennen. Alle Methoden rufen momentan ITransmitter Methoden
+		 * des MUC Transmitter auf, soweit diese implementiert sind.
+		 * */
+		this.mucmanager = new XMPPMultiChatTransmitter();
+		mucmanager.setXMPPConnection(connection);
 	}
 
 	public void addInvitationProcess(IInvitationProcess process) {
@@ -260,6 +276,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 						// TODO use callback
 						int time = timedActivity.getTimestamp();
+						/* send file with other send method. */
 						sendFile(jid, fileAdd.getPath(), time, null);
 					}
 
@@ -280,6 +297,11 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 		if (timedActivities != null ) {
 			sendMessageToAll(sharedProject, new ActivitiesPacketExtension(timedActivities));
+		}
+		
+		//muc
+		if(mucmanager != null){
+			mucmanager.sendActivities(sharedProject, timedActivities);
 		}
 	}
 
@@ -659,7 +681,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	
 				Chat chat = getChat(pex.receipient);
 				Message message;
-				message = chat.createMessage();
+				//TODO: Änderung für Smack 3
+				message = new Message();
+//				message = chat.createMessage();
 				message.addExtension(pex.packetextension);
 				chat.sendMessage(message);
 				log.info("Resending message");
@@ -704,6 +728,18 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		return sent;
 	}
 
+	
+	public void processMessage(Chat chat, Message message) {
+		//TODO: new method für smack 3
+		System.out.println("ProcessMessage in XMPPChatTransmitter called.");
+//		processPacket(message);
+		
+	}
+	
+	public void processPacket(Chat chat, Packet packet){
+		
+	}
+	
 	// TODO replace dependencies by more generic listener interfaces
 	/*
 	 * (non-Javadoc)
@@ -712,8 +748,10 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	 */
 	public void processPacket(Packet packet) {
 		Message message = (Message) packet;
+		
 
 		JID fromJID = new JID(message.getFrom());
+		//Change the input method to get the right chats
 		putIncomingChat(fromJID, message.getThread());
 		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
 
@@ -931,7 +969,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 			Chat chat = getChat(jid);
 			Message message;
-			message = chat.createMessage();
+			//Änderung für Smack 3
+			message = new Message();
+//			message = chat.createMessage();
 			message.addExtension(extension);
 			
 			chat.sendMessage(message);
@@ -1088,7 +1128,11 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 
 	private void putIncomingChat(JID jid, String thread) {
 		if (!chats.containsKey(jid)){
-			chats.put(jid, new Chat(connection, jid.toString(), thread));
+			
+			//TODO: Änderung für Smack 3
+//			Chat chat = this.chatmanager.createChat(jid.toString(), thread, this);
+			Chat chat = this.chatmanager.getThreadChat(thread);
+			chats.put(jid, chat);
 		}
 
 	}
@@ -1100,8 +1144,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 		Chat chat = chats.get(jid);
 
 		if (chat == null) {
-
-			chat = new Chat(connection, jid.toString());
+			
+//			ChatManager chatmanager = connection.getChatManager();
+//			chat = new Chat(connection, jid.toString());
+			
+			//TODO: Änderung für Smack 3 : Listener angeben
+			chat = this.chatmanager.createChat(jid.toString(), this);
 			chats.put(jid, chat);
 		}
 
@@ -1111,9 +1159,9 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 	private void setProxyPort(XMPPConnection connection) {
 
 		IPreferenceStore preferenceStore = Saros.getDefault().getPreferenceStore();
- 
-		fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
-			preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
+		//TODO: Änderung für smack 3 : filetransfer have to be implements new
+//		fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
+//			preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
 
 	}
 	
@@ -1123,4 +1171,6 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, FileTr
 				getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
 	
 	}
+
+
 }

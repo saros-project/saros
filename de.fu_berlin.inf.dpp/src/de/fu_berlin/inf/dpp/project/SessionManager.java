@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -231,10 +231,10 @@ public class SessionManager implements IConnectionListener {
 			public void entriesAdded(Collection addresses) {
 			}
 
-			public void entriesUpdated(Collection addresses) {
+			public void entriesUpdated(Collection<String> addresses) {
 			}
 
-			public void entriesDeleted(Collection addresses) {
+			public void entriesDeleted(Collection<String> addresses) {
 			}
 
 			public void presenceChanged(String XMPPAddress) {
@@ -254,6 +254,13 @@ public class SessionManager implements IConnectionListener {
 					} else
 						user.setPresence( User.UserConnectionState.ONLINE );
 				}
+			}
+
+			
+			public void presenceChanged(Presence presence) {
+				//TODO: new Method for Smack 3
+				presenceChanged(presence.getFrom());
+				
 			}
 
 		});

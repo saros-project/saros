@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -45,7 +45,8 @@ public class MessagingAction extends SelectionProviderAction {
 	public void run() {
 		try {
 			MessagingManager mm = Saros.getDefault().getMessagingManager();
-			mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
+//			mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
+			mm.showMultiChatMessagingWindow(new JID(rosterEntry.getUser()), null);
 
 		} catch (XMPPException e) {
 			e.printStackTrace();

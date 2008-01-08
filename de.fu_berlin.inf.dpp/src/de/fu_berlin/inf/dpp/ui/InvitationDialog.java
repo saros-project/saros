@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -408,20 +408,27 @@ public class InvitationDialog extends Dialog implements IInvitationUI,IConnectio
 	
 	private void attachRosterListener() {
 		roster.addRosterListener(new RosterListener() {
-			public void entriesAdded(Collection addresses) {
+			public void entriesAdded(Collection<String> addresses) {
 				refreshRosterList();
 			}
 
-			public void entriesUpdated(Collection addresses) {
+			public void entriesUpdated(Collection<String> addresses) {
 				refreshRosterList();
 			}
 
-			public void entriesDeleted(Collection addresses) {
+			public void entriesDeleted(Collection<String> addresses) {
 				refreshRosterList();
 			}
 
 			public void presenceChanged(String XMPPAddress) {
 				refreshRosterList();
+			}
+			
+			
+			public void presenceChanged(Presence presence) {
+				//TODO: new Method for Smack 3
+				presenceChanged(presence.getFrom());
+				
 			}
 		});
 	}
@@ -458,16 +465,23 @@ public class InvitationDialog extends Dialog implements IInvitationUI,IConnectio
 		if (roster==null)
 			return;
 		
-		Iterator iter = roster.getEntries();
+		//TODO: Änderung für smack 3
+//		Iterator iter = roster.getEntries();
+		Collection<RosterEntry> users = roster.getEntries();
 		int index=-1;
-	    while (iter.hasNext()) {
-	        RosterEntry entry = (RosterEntry) iter.next();
+//	    while (iter.hasNext()) {
+//	        RosterEntry entry = (RosterEntry) iter.next();
+		for(RosterEntry entry : users){
+			
 	        String username = entry.getUser();
 	        Presence presence = roster.getPresence(username); 
 
 	        User user = Saros.getDefault().getSessionManager().
 	        	getSharedProject().getParticipant(new JID(entry.getUser()));
-	        if (presence != null && user==null )
+	        /*TODO: Änderung: presence.type available hinzugefügt.
+	         * 		Es ist hier jedoch zu prüfen, inwieweit auch offline user eingeladen werden könnten.
+	         * */
+	        if (presence != null && presence.getType().equals(Presence.Type.available)&& user==null )
 	        {
 	        	inviterdata invdat = new inviterdata();
 	        	invdat.jid= new JID(entry.getUser());

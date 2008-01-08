@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -72,8 +72,14 @@ public class PacketExtensions {
 
 	
 	public static void hookExtensionProviders() {
-		ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
+		
+		//TODO: An dieser Stelle erzeugt er die Erweiterung, um sein eigenes XML-Format zu erzeugen.
+		ProviderManager providermanager = ProviderManager.getInstance();
+		providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
 			new ActivitiesProvider());
+		//TODO: Änderung für Smack 3
+//		ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
+//			new ActivitiesProvider());
 	}
 
 	/**

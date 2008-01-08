@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -23,6 +23,7 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -38,16 +39,23 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.MessageEventManager;
+import org.jivesoftware.smackx.MessageEventNotificationListener;
+import org.jivesoftware.smackx.muc.InvitationListener;
+import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.osgi.framework.BundleContext;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.XMPPMultiChatTransmitter;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -61,6 +69,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
  * @author coezbek
  */
 public class Saros extends AbstractUIPlugin {
+
 	public static enum ConnectionState {
 		NOT_CONNECTED, CONNECTING, CONNECTED, DISCONNECTING, ERROR
 	};
@@ -88,56 +97,7 @@ public class Saros extends AbstractUIPlugin {
 	private List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
 	// Smack (XMPP) connection listener 
-	private ConnectionListener smackConnectionListener = new ConnectionListener() {
-		public void connectionClosed() {
-			// self inflicted, controlled disconnect
-		}
-		
-		public void connectionClosedOnError(Exception e) { 
-			Toolkit.getDefaultToolkit().beep();
-			System.out.println("XMPP Connection Error: "+e.toString());
-			
-			if (connection != null) {
-				connection.removeConnectionListener(smackConnectionListener);
-				connection.close();
-			}
-			
-			if (getConnectionState()!=ConnectionState.ERROR) {
-				setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
-				
-				new Thread(new Runnable() {
-	
-					public void run() {
-						
-						int offlineAtTS = 0;
-						if (sessionManager.getSharedProject()!=null)
-							offlineAtTS = sessionManager.getSharedProject().getSequencer().getTimestamp();
-						
-						try {
-							do {
-								connect(true);
-								
-								if (!connection.isConnected())
-									Thread.sleep(5000);
-	
-							} while (!connection.isConnected());
-							
-							if (connection.isConnected()) {
-								sessionManager.OnReconnect(offlineAtTS);
-								System.out.println("XMPP reconnected");
-							}						
-							
-						} catch (InterruptedException e) {
-	
-							e.printStackTrace();
-						}
-					}
-				}).start();		
-				
-			}
-
-		} 
-	}; 
+	private ConnectionListener smackConnectionListener = new XMPPConnectionListener(); 
 	
 	static {
 		PacketExtensions.hookExtensionProviders();
@@ -267,18 +227,27 @@ public class Saros extends AbstractUIPlugin {
 			if (!reconnect) {
 				if (isConnected())
 					disconnect(null);
-
-				setConnectionState(ConnectionState.CONNECTING, null);
+				//TODO:Debug
+//				setConnectionState(ConnectionState.CONNECTING, null);
 			} else  if (isConnected()) {
-				connection.close();
+//				connection.close();
+				connection.disconnect();
 				connection.removeConnectionListener(smackConnectionListener);
 			}
 
-			connection = new XMPPConnection(server);
+			//TODO: for testing reconnection
+			ConnectionConfiguration conConfig = new ConnectionConfiguration(server);
+			conConfig.setReconnectionAllowed(true);
+
+//			connection = new XMPPConnection(server);
+			connection = new XMPPConnection(conConfig);
+			connection.connect();
 			connection.login(username, password);
 			
-			connection.addConnectionListener(smackConnectionListener);
 			
+			
+			//TODO: ConnectionListener
+			connection.addConnectionListener(smackConnectionListener);
 			setConnectionState(ConnectionState.CONNECTED, null);
 			
 			myjid=new JID(connection.getUser());
@@ -300,6 +269,8 @@ public class Saros extends AbstractUIPlugin {
 		}
 	}
 
+
+	
 	/**
 	 * Disconnects. This is a blocking method.
 	 * 
@@ -316,7 +287,9 @@ public class Saros extends AbstractUIPlugin {
 			getSessionManager().leaveSession();
 			
 			connection.removeConnectionListener(smackConnectionListener);
-			connection.close();
+//			connection.close();
+			//TODO: Änderung für Smack 3
+			connection.disconnect();
 			connection = null;
 		}
 
@@ -353,7 +326,9 @@ public class Saros extends AbstractUIPlugin {
 		connection.getAccountManager().createAccount(username, password);
 		monitor.worked(1);
 
-		connection.close();
+//		connection.close();
+		//TODO: Änderung für Smack 3
+		connection.disconnect();
 		monitor.done();
 	}
 
@@ -390,6 +365,30 @@ public class Saros extends AbstractUIPlugin {
 	}
 
 	public boolean isConnected() {
+//		
+//		new Thread(new Runnable() {
+//			public void run() {
+//				int counter = 0;
+//				while(counter < 30){
+//					if(connection != null && connection.isConnected()){
+//						System.out.println(".");
+//					}
+//					else{
+//						System.out.println("-");
+//					}
+//					try {
+//						Thread.sleep(1000);
+//					} catch (InterruptedException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//					counter++;
+//				}
+//			}
+//		}).start();
+//		
+//		System.out.println("reconnect enable: "+connection.isConnected());
+//		connection.disconnect();
 		return connection != null && connection.isConnected();
 	}
 
@@ -449,18 +448,20 @@ public class Saros extends AbstractUIPlugin {
 			Logger sarosRootLogger = Logger.getLogger("de.fu_berlin.inf.dpp");
 			sarosRootLogger.setLevel(Level.ALL);
 
-			Handler handler = new FileHandler("saros.log", 10 * 1024 * 1024, 1, true);
+//			Handler handler = new FileHandler("saros.log", 10 * 1024 * 1024, 1, true);
+			Handler handler = new ConsoleHandler();
 			handler.setFormatter(new SimpleFormatter());
 			sarosRootLogger.addHandler(handler);
 
-			// handler = new ConsoleHandler();
-			// sarosRootLogger.addHandler(handler);
+//			 handler = new ConsoleHandler();
+//			 sarosRootLogger.addHandler(handler);
 
 		} catch (SecurityException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		} 
+//			catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
@@ -478,5 +479,93 @@ public class Saros extends AbstractUIPlugin {
 		Saros.getDefault().getLog().log(
 			new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message, e));
 	}
+	
+	private class XMPPConnectionListener implements ConnectionListener {
+		
+        // Variables to support listener notifications verification
+        private boolean connectionClosed = false;
+        private boolean connectionClosedOnError = false;
+        private boolean reconnected = false;
+        private boolean reconnectionFailed = false;
+        private int remainingSeconds = 0;
+        private int attemptsNotifications = 0;
+        private boolean reconnectionCanceled = false;
+		
+		public void connectionClosed() {
+			
+			// self inflicted, controlled disconnect
+			connectionClosed = true;
+		}
+
+		public void connectionClosedOnError(Exception e) { 
+			
+			connectionClosedOnError = true;
+			
+			Toolkit.getDefaultToolkit().beep();
+			System.out.println("XMPP Connection Error: "+e.toString());
+			
+			if (connection != null) {
+				connection.removeConnectionListener(smackConnectionListener);
+				connection.disconnect();
+				//TODO: Änderung
+//				connection.close();
+			}
+			
+			if (getConnectionState()!=ConnectionState.ERROR) {
+				setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
+				
+				new Thread(new Runnable() {
+	
+					public void run() {
+						
+						int offlineAtTS = 0;
+						if (sessionManager.getSharedProject()!=null)
+							offlineAtTS = sessionManager.getSharedProject().getSequencer().getTimestamp();
+						
+						try {
+							do {
+								connect(true);
+								
+								if (!connection.isConnected())
+									Thread.sleep(5000);
+	
+							} while (!connection.isConnected());
+							
+							if (connection.isConnected()) {
+								sessionManager.OnReconnect(offlineAtTS);
+								System.out.println("XMPP reconnected");
+							}						
+							
+						} catch (InterruptedException e) {
+	
+							e.printStackTrace();
+						}
+					}
+				}).start();		
+				
+			}
+
+		}
+
+		public void reconnectingIn(int seconds) {
+			// TODO Auto-generated method stub
+			System.out.println("saros reconnectingIn");
+            attemptsNotifications = attemptsNotifications + 1;
+            remainingSeconds = seconds;
+		}
+
+		public void reconnectionFailed(Exception e) {
+			// TODO Auto-generated method stub
+			System.out.println("saros reconnectionFailed");
+			reconnectionFailed = true;
+		}
+
+		public void reconnectionSuccessful() {
+			// TODO Auto-generated method stub
+			System.out.println("saros reconnectionSuccessful");
+			reconnected = true;
+		}
+	}
+
 
 }

@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universit�t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -168,11 +168,17 @@ public class RosterView extends ViewPart implements IConnectionListener {
 		public Object[] getElements(Object parent) {
 			if (parent.equals(getViewSite()) && roster != null) {
 				List<TreeItem> groups = new LinkedList<TreeItem>();
-
-				for (Iterator it = roster.getGroups(); it.hasNext();) {
-					GroupItem item = new GroupItem((RosterGroup) it.next());
+				//TODO: Änderung für Smack 3 
+				for(RosterGroup rg : roster.getGroups()){
+					GroupItem item = new GroupItem(rg);
 					groups.add(item);
 				}
+				
+				
+//				for (Iterator it = roster.getGroups(); it.hasNext();) {
+//					GroupItem item = new GroupItem((RosterGroup) it.next());
+//					groups.add(item);
+//				}
 
 				groups.add(new UnfiledGroupItem());
 
@@ -344,14 +350,30 @@ public class RosterView extends ViewPart implements IConnectionListener {
 		});
 	}
 	
+	public static Object[] getChildren(Collection<RosterEntry> entries){
+		//TODO: new method for smack 3
+		
+		List<RosterEntry> users = new LinkedList<RosterEntry>();
+		
+		for(RosterEntry entry : entries){
+			if (entry.getType() == RosterPacket.ItemType.both || 
+					entry.getType() == RosterPacket.ItemType.to) {
+						users.add(entry);
+				}
+		}
+		
+		return users.toArray();
+	}
+	
+	@Deprecated
 	public static Object[] getChildren(Iterator iterator) {
 		List<RosterEntry> users = new LinkedList<RosterEntry>();
 
 		while(iterator.hasNext()) {
 			RosterEntry entry = (RosterEntry) iterator.next();
 			
-			if (entry.getType() == RosterPacket.ItemType.BOTH || 
-				entry.getType() == RosterPacket.ItemType.TO) {
+			if (entry.getType() == RosterPacket.ItemType.both || 
+				entry.getType() == RosterPacket.ItemType.to) {
 					users.add(entry);
 			}
 		}
@@ -376,20 +398,27 @@ public class RosterView extends ViewPart implements IConnectionListener {
 
 	private void attachRosterListener() {
 		roster.addRosterListener(new RosterListener() {
-			public void entriesAdded(Collection addresses) {
+			public void entriesAdded(Collection<String> addresses) {
 				refreshRosterTree(true);
 			}
 
-			public void entriesUpdated(Collection addresses) {
+			public void entriesUpdated(Collection<String> addresses) {
 				refreshRosterTree(false);
 			}
 
-			public void entriesDeleted(Collection addresses) {
+			public void entriesDeleted(Collection<String> addresses) {
 				refreshRosterTree(false);
 			}
 
 			public void presenceChanged(String XMPPAddress) {
 				refreshRosterTree(true);
+			}
+			
+			
+			public void presenceChanged(Presence presence) {
+				//TODO: new Method for Smack 3
+				presenceChanged(presence.getFrom());
+				
 			}
 		});
 	}
