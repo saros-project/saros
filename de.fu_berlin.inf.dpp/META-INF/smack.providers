@@ -180,13 +180,13 @@
         <className>org.jivesoftware.smackx.provider.IBBProviders$Data</className>
     </extensionProvider>
     
-        <!-- Photo -->
+        <!-- Photo 
     <extensionProvider>
         <elementName>x</elementName>
         <namespace>vcard-temp:x:update</namespace>
         <className>org.jivesoftware.smackx.provider.VCardTempXUpdateProvider</className> 
     </extensionProvider>
-
+-->
     
 
 </smackProviders>

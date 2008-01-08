@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.XMPPMultiChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.MUCConnectionManager;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;

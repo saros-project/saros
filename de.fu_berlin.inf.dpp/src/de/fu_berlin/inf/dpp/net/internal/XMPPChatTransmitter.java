@@ -33,9 +33,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -54,6 +53,7 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
@@ -103,7 +103,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 	
 	private ChatManager chatmanager;
 	
-	private XMPPMultiChatTransmitter mucmanager;
+	private MUCConnectionManager mucmanager;
 
 	private Map<JID, Chat> chats = new HashMap<JID, Chat>();
 
@@ -163,7 +163,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 		this.chatmanager = connection.getChatManager();
 		fileTransferManager = new FileTransferManager(connection);
 		//TODO: aktuell noch nicht angesprochen
-//		fileTransferManager.addFileTransferListener(this);
+		fileTransferManager.addFileTransferListener(this);
 		
 		chats.clear();
 
@@ -171,14 +171,15 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 
 		// TODO always preserve threads
 		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.chat)); // HACK
+//		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.groupchat));
 		
 		/* an dieser Stelle wird der MUC Transmitter initialisiert, um die Kapselung 
 		 * des Systems mit dem Fassadenmuster nicht zu verletzten.
 		 * TODO: Später überlegen, wie wir es trennen. Alle Methoden rufen momentan ITransmitter Methoden
 		 * des MUC Transmitter auf, soweit diese implementiert sind.
 		 * */
-		this.mucmanager = new XMPPMultiChatTransmitter();
-		mucmanager.setXMPPConnection(connection);
+		this.mucmanager = new MUCConnectionManager();
+		mucmanager.setMUCConnection(connection);
 	}
 
 	public void addInvitationProcess(IInvitationProcess process) {
@@ -320,12 +321,12 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 		if ( getFileTransferModeViaChat()) {
 
 			if (sendChatTransfer(FILELIST_TRANSFER_DESCRIPTION, "", xml.getBytes(), recipient))
-				log.fine("Sent file list via ChatTransfer");
+				log.debug("Sent file list via ChatTransfer");
 			else
-				log.fine("Error sending file list via ChatTransfer");
+				log.warn("Error sending file list via ChatTransfer");
 		}
 		else {
-			log.fine("Establishing file list transfer");
+			log.debug("Establishing file list transfer");
 
 			int attempts = MAX_TRANSFER_RETRIES;
 			while (true) {
@@ -336,7 +337,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 					OutputStream out = transfer.sendFile(FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
 							FILELIST_TRANSFER_DESCRIPTION);
 		
-					log.fine("Sending file list");
+					log.info("Sending file list");
 		
 					if (out == null) {
 						if (attempts-- > 0)
@@ -443,7 +444,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 				int cur = Integer.parseInt( sSplit.substring(0, i) );
 				int max = Integer.parseInt( sSplit.substring(i+1) );
 
-				log.fine("Received chunk "+cur+" of " + max + " of file "+sName);
+				log.debug("Received chunk "+cur+" of " + max + " of file "+sName);
 	
 				// check for previous chunks
 				IncomingFile ifile = incomingFiles.get(sName);
@@ -515,7 +516,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 				
 				ByteArrayInputStream in = new ByteArrayInputStream(dataOrg);
 
-				log.fine("Receiving resource from "+ from.toString()+": " + sName + " (ChatTransfer)");
+				log.debug("Receiving resource from "+ from.toString()+": " + sName + " (ChatTransfer)");
 				
 				boolean handledByInvitation = false;
 				for (IInvitationProcess process : processes) {
@@ -554,7 +555,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 				log.info("Received resource " + sName);
 
 			} catch (Exception e) {
-				log.log(Level.WARNING, "Failed to receive " + sName, e);
+				log.warn("Failed to receive " + sName, e);
 			}
 		}
 		
@@ -645,7 +646,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 
 				} catch (Exception e) {
 					if (transfer.retries >= MAX_TRANSFER_RETRIES) {
-						log.log(Level.WARNING, "Failed to send " + transfer.path, e);
+						log.warn("Failed to send " + transfer.path, e);
 						if (transfer.callback != null)
 							transfer.callback.fileTransferFailed(transfer.path, e);
 
@@ -664,7 +665,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 	}
 	
 	public void sendUserListTo(JID to, List<User> participants) {
-		log.fine("Sending user list to "+to.toString());
+		log.debug("Sending user list to "+to.toString());
 
 		sendMessage(to, PacketExtensions.createUserListExtension(participants) );		
 	}
@@ -733,7 +734,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 	
 	public void processMessage(Chat chat, Message message) {
 		//TODO: new method für smack 3
-		System.out.println("ProcessMessage in XMPPChatTransmitter called.");
+		log.debug("incomming message : "+message.getBody());
 //		processPacket(message);
 		
 	}
@@ -751,6 +752,10 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 	public void processPacket(Packet packet) {
 		Message message = (Message) packet;
 		
+		if(message.getType().equals(Type.groupchat)){
+			log.debug("groupchat");
+			return;
+		}
 
 		JID fromJID = new JID(message.getFrom());
 		//Change the input method to get the right chats
@@ -858,14 +863,14 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 			
 			// My inviter sent a list of all session participants
 			// I need to adapt the order for later case of driver leaving the session
-			log.fine( "Received user list from "+fromJID);
+			log.debug( "Received user list from "+fromJID);
 	
 			int count=0;
 			while( true ) {
 				String jidS=userlistExtension.getValue( "User" + new Integer(count++).toString() );
 				if (jidS==null)
 					break;
-				log.fine("   *:"+jidS);
+				log.debug("   *:"+jidS);
 				
 				JID jid=new JID(jidS);
 				User user=new User( jid);
@@ -906,7 +911,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 	 */
 	public void fileTransferRequest(FileTransferRequest request) {
 		String fileDescription = request.getDescription();
-
+		log.debug("incomming file transfer "+request.getFileName());
 		if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
 			FileList fileList = receiveFileList(request);
 			JID fromJID = new JID(request.getRequestor());
@@ -992,7 +997,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 			JID from = new JID(request.getRequestor());
 			Path path = new Path(request.getFileName());
 
-			log.fine("Receiving resource from"+ from.toString()+": " + request.getFileName() );
+			log.debug("Receiving resource from"+ from.toString()+": " + request.getFileName() );
 			
 			InputStream in = request.accept().recieveFile();
 
@@ -1026,14 +1031,14 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 			log.info("Received resource " + request.getFileName());
 
 		} catch (Exception e) {
-			log.log(Level.WARNING, "Failed to receive " + request.getFileName(), e);
+			log.warn("Failed to receive " + request.getFileName(), e);
 		}
 	}
 
 	private void transferFile(FileTransfer transferData) throws CoreException, XMPPException,
 		IOException {
 
-		log.fine("Sending file " + transferData.path);
+		log.info("Sending file " + transferData.path);
 		
 		JID recipient = transferData.recipient;
 
@@ -1094,7 +1099,7 @@ public class XMPPChatTransmitter implements ITransmitter, PacketListener, Messag
 	}
 
 	private FileList receiveFileList(FileTransferRequest request) {
-		log.fine("Receiving file list");
+		log.info("Receiving file list");
 
 		FileList fileList 	= null;
 		try {

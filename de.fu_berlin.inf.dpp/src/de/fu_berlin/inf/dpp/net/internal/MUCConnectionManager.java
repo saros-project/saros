@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jivesoftware.smack.PacketListener;
@@ -20,20 +19,14 @@ import org.jivesoftware.smackx.muc.InvitationRejectionListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
-import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
-public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
+public class MUCConnectionManager implements PacketListener,
 		InvitationListener, InvitationRejectionListener {
 
-	private static Logger log = Logger.getLogger(XMPPMultiChatTransmitter.class
+	private static Logger log = Logger.getLogger(MUCConnectionManager.class
 			.getName());
 
 	public static String Room = "ori2007@conference.jabber.org";
@@ -44,7 +37,7 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 	/* current xmppconnection for transfer. */
 	private XMPPConnection connection;
 
-	public XMPPMultiChatTransmitter() {
+	public MUCConnectionManager() {
 		
 	}
 
@@ -70,11 +63,11 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 				}
 			} else {
 				joinMuc(muc, user);
-				try {
-					muc.sendConfigurationForm(getConfigForm(user));
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+//				try {
+//					muc.sendConfigurationForm(getConfigForm(user));
+//				} catch (Exception e) {
+//					log.debug("");
+//				}
 			}
 		}
 
@@ -204,43 +197,9 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 		return muc;
 	}
 
-	public boolean initIndicateForm(XMPPConnection connection, String user)
-			throws XMPPException {
-		// Create a MultiUserChat using an XMPPConnection for a roomacknowledge
-		MultiUserChat muc = new MultiUserChat(connection, Room);
 
-		if (isJoined(muc, user)) {
 
-			if (!isRoomExist(connection, Room)) {
-				// Create the room
-				muc.create(user);
 
-				// Send an empty room configuration form which indicates that we
-				// want
-				// an instant room
-				muc.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
-			}
-			// else{
-			// return joinMuc(connection, user, Room);
-			// }
-		}
-		this.muc = muc;
-		return true;
-	}
-
-	@Override
-	public void addInvitationProcess(IInvitationProcess invitation) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void removeInvitationProcess(IInvitationProcess invitation) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void sendActivities(ISharedProject sharedProject,
 			List<TimedActivity> activities) {
 
@@ -265,84 +224,7 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 
 	}
 
-	@Override
-	public void sendCancelInvitationMessage(JID jid, String errorMsg) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendFile(JID recipient, IPath path,
-			IFileTransferCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendFile(JID recipient, IPath path, int timestamp,
-			IFileTransferCallback callback) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendFileList(JID jid, FileList fileList) throws XMPPException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-			String description) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendJoinMessage(ISharedProject sharedProject) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendLeaveMessage(ISharedProject sharedProject) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendRemainingFiles() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendRemainingMessages() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendRequestForActivity(ISharedProject sharedProject,
-			int timestamp, boolean andup) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendRequestForFileListMessage(JID recipient) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendUserListTo(JID to, List<User> participants) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void setXMPPConnection(XMPPConnection connection) {
+	public void setMUCConnection(XMPPConnection connection){
 		/**
 		 * this method implements the connection to the muc room. To control
 		 * creation and destroy process of muc room should be implements in
@@ -363,12 +245,12 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 		} catch(Exception e){
 			e.printStackTrace();
 		}
-
+		
 		// TODO always preserve threads
 		// this.connection.addPacketListener(this, new
 		// MessageTypeFilter(Message.Type.chat)); // HACK
 	}
-
+	
 	@Override
 	public void processPacket(Packet packet) {
 		if (packet instanceof Message) {
@@ -386,7 +268,7 @@ public class XMPPMultiChatTransmitter implements ITransmitter, PacketListener,
 	public void invitationReceived(XMPPConnection conn, String room,
 			String inviter, String reason, String password, Message message) {
 		/* init xmpp and muc connection. */
-		setXMPPConnection(conn);
+		setMUCConnection(conn);
 		// TODO: Später besser ausbauen. Momantan wird nur ein fester Room
 		// akzeptiert.
 
