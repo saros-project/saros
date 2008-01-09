@@ -20,16 +20,21 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.RoomInfo;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.IChatManager;
+import de.fu_berlin.inf.dpp.net.IReceiver;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
-public class MUCConnectionManager implements PacketListener,
-		InvitationListener, InvitationRejectionListener {
+public class MultiUserChatManager implements InvitationListener,
+		InvitationRejectionListener, IChatManager {
 
-	private static Logger log = Logger.getLogger(MUCConnectionManager.class
+	private static Logger log = Logger.getLogger(MultiUserChatManager.class
 			.getName());
 
 	public static String Room = "ori2007@conference.jabber.org";
+
+	public static String JID_PROPERTY = "jid";
 
 	/* current muc connection. */
 	private MultiUserChat muc;
@@ -37,8 +42,12 @@ public class MUCConnectionManager implements PacketListener,
 	/* current xmppconnection for transfer. */
 	private XMPPConnection connection;
 
-	public MUCConnectionManager() {
-		
+	private IReceiver receiver;
+	
+	private String currentJID;
+
+	public MultiUserChatManager() {
+
 	}
 
 	public void initMUC(XMPPConnection connection, String user)
@@ -63,11 +72,11 @@ public class MUCConnectionManager implements PacketListener,
 				}
 			} else {
 				joinMuc(muc, user);
-//				try {
-//					muc.sendConfigurationForm(getConfigForm(user));
-//				} catch (Exception e) {
-//					log.debug("");
-//				}
+				// try {
+				// muc.sendConfigurationForm(getConfigForm(user));
+				// } catch (Exception e) {
+				// log.debug("");
+				// }
 			}
 		}
 
@@ -197,9 +206,6 @@ public class MUCConnectionManager implements PacketListener,
 		return muc;
 	}
 
-
-
-
 	public void sendActivities(ISharedProject sharedProject,
 			List<TimedActivity> activities) {
 
@@ -210,11 +216,12 @@ public class MUCConnectionManager implements PacketListener,
 			/* add packet extension. */
 			newMessage.addExtension(new ActivitiesPacketExtension(activities));
 			/* add jid property */
-			newMessage.setProperty("jid", Saros.getDefault().getMyJID().toString());
-			
-//			newMessage.setBody("test");
+			newMessage.setProperty(JID_PROPERTY, Saros.getDefault().getMyJID()
+					.toString());
+
+			// newMessage.setBody("test");
 			muc.sendMessage(newMessage);
-			
+
 		} catch (XMPPException e) {
 
 			Saros.getDefault().getLog().log(
@@ -224,7 +231,7 @@ public class MUCConnectionManager implements PacketListener,
 
 	}
 
-	public void setMUCConnection(XMPPConnection connection){
+	public void setMUCConnection(XMPPConnection connection) {
 		/**
 		 * this method implements the connection to the muc room. To control
 		 * creation and destroy process of muc room should be implements in
@@ -236,30 +243,95 @@ public class MUCConnectionManager implements PacketListener,
 			initMUC(connection, Saros.getDefault().getConnection().getUser());
 			/* init listener for muc messages. */
 			muc.addMessageListener(this);
-			MultiUserChat.addInvitationListener(connection,this);
-			/* der listener im muc reagiert nur auf chat messages, die packet extension muss über
-			 * einen listener der XMPPConnection erfolgen. */
-			connection.addPacketListener(this, new MessageTypeFilter(Message.Type.groupchat));
+			MultiUserChat.addInvitationListener(connection, this);
+			/*
+			 * der listener im muc reagiert nur auf chat messages, die packet
+			 * extension muss über einen listener der XMPPConnection erfolgen.
+			 */
+			connection.addPacketListener(this, new MessageTypeFilter(
+					Message.Type.groupchat));
 		} catch (XMPPException xe) {
 			xe.printStackTrace();
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		// TODO always preserve threads
 		// this.connection.addPacketListener(this, new
 		// MessageTypeFilter(Message.Type.chat)); // HACK
 	}
-	
+
+	/**
+	 * This method check sender of packet.
+	 * 
+	 * @param packet
+	 *            incoming packet
+	 * @param jid
+	 * @return true if given jid is sender of packet.
+	 */
+	private boolean isMessageFromJID(Packet packet, JID jid) {
+		if (packet instanceof Message) {
+			Message message = (Message) packet;
+			/* replace room */
+			String sender = message.getFrom();
+			/* replace room info */
+			sender = sender.replace(MultiUserChatManager.Room + "/", "");
+			if (sender.equals(jid.toString())) {
+				message.setFrom(sender);
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public void processPacket(Packet packet) {
+		log.debug("incoming packet");
+
+		if (packet instanceof Message) {
+
+			Message message = (Message) packet;
+
+			/**
+			 * 1. check getFrom JID. Host can send muc message and shouldn't
+			 * receive the message again.
+			 */
+			if (isMessageFromJID(message, new JID(currentJID))) {
+				log.debug("Own group message. Do nothing.");
+				return;
+			} else {
+
+				/**
+				 * 2. check message property. Observer can send muc messages and
+				 * shouldn't receive the message again.
+				 */
+				String property = (String) message.getProperty(JID_PROPERTY);
+				if(property.equals(currentJID)){
+					log.debug("Own group message with property. Do nothing");
+					return;
+				}
+				else{
+					log.debug("Received group message with property");
+					message.setFrom(property);
+					
+				}
+				receiver.processPacket(message);
+				return;
+			}
+
+
+		}
+
 		if (packet instanceof Message) {
 			Message msg = (Message) packet;
-//			System.out.println("from " + msg.getFrom().replace(Room + "/", "")
-//					+ " text: " + msg.getBody());
-			log.info("received message : +"+msg+" from "+msg.getProperty("jid"));
-		}
-		else{
+			// System.out.println("from " + msg.getFrom().replace(Room + "/",
+			// "")
+			// + " text: " + msg.getBody());
+			log.info("received message : +" + msg.getBody() + " from "
+					+ msg.getProperty("jid"));
+		} else {
 			System.out.println("other formated message received. ");
 		}
 	}
@@ -279,6 +351,47 @@ public class MUCConnectionManager implements PacketListener,
 		// TODO: use case für ablehung aufstellen und umsetzen.
 		System.out.println("Invitation declined: " + invitee + "with reason : "
 				+ reason);
+	}
+
+	@Override
+	public void setConnection(XMPPConnection connection, IReceiver receiver) {
+		/**
+		 * this method implements the connection to the muc room. To control
+		 * creation and destroy process of muc room should be implements in
+		 * separate class.
+		 */
+		this.connection = connection;
+		this.currentJID = connection.getUser();
+		try {
+			/* init multi user chat connection. */
+			initMUC(connection, Saros.getDefault().getConnection().getUser());
+			/* init listener for muc messages. */
+			muc.addMessageListener(this);
+			MultiUserChat.addInvitationListener(connection, this);
+			/*
+			 * der listener im muc reagiert nur auf chat messages, die packet
+			 * extension muss über einen listener der XMPPConnection erfolgen.
+			 */
+			connection.addPacketListener(this, new MessageTypeFilter(
+					Message.Type.groupchat));
+		} catch (XMPPException xe) {
+			xe.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		setReceiver(receiver);
+
+		// TODO always preserve threads
+		// this.connection.addPacketListener(this, new
+		// MessageTypeFilter(Message.Type.chat)); // HACK
+
+	}
+
+	@Override
+	public void setReceiver(IReceiver receiver) {
+		this.receiver = receiver;
+
 	}
 
 }

@@ -46,7 +46,7 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.MUCConnectionManager;
+import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.ui.MessagingWindow;
 
 /**
@@ -64,7 +64,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	MUCListener mucl = new MUCListener();
 
-	MUCConnectionManager multitrans = null;
+	MultiUserChatManager multitrans = null;
 
 	public class ChatLine {
 		public String sender;
@@ -307,7 +307,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					openWindow();
-					String from = message.getFrom().replace(MUCConnectionManager.Room+"/", "").replace("/Smack", "");
+					String from = message.getFrom().replace(MultiUserChatManager.Room+"/", "").replace("/Smack", "");
 					addChatLine(from, message.getBody());
 				}
 			});
@@ -404,7 +404,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	public MessagingManager() {
 		Saros.getDefault().addListener(this);
-		this.multitrans = new MUCConnectionManager();
+		this.multitrans = new MultiUserChatManager();
 	}
 
 	/*
@@ -484,7 +484,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 			return;
 
 		/* check for multi or single chat. */
-		if (message.getFrom().contains(MUCConnectionManager.Room)) {
+		if (message.getFrom().contains(MultiUserChatManager.Room)) {
 			
 			if(multiSession == null){
 				multiSession = new MultiChatSession(multitrans.getMUC());
