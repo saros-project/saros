@@ -1,5 +1,5 @@
 /*
- * DPP - Serious Distributed Pair Programming (c) Freie Universit�t Berlin -
+ * DPP - Serious Distributed Pair Programming (c) Freie Universitaet Berlin -
  * Fachbereich Mathematik und Informatik - 2006 (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify it under
