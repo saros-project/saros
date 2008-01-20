@@ -382,7 +382,6 @@ public class MultiUserChatManager implements InvitationListener,
 		}
 	}
 
-	@Override
 	public void invitationReceived(XMPPConnection conn, String room,
 			String inviter, String reason, String password, Message message) {
 		/* init xmpp and muc connection. */
@@ -392,7 +391,6 @@ public class MultiUserChatManager implements InvitationListener,
 
 	}
 
-	@Override
 	public void invitationDeclined(String invitee, String reason) {
 		// TODO: use case für ablehung aufstellen und umsetzen.
 		System.out.println("Invitation declined: " + invitee + "with reason : "
