@@ -62,7 +62,7 @@ public class SharedProject implements ISharedProject {
 	private static Logger log = Logger.getLogger(SharedProject.class.getName());
 
 	private static final int REQUEST_ACTIVITY_ON_AGE = 5;
-	protected static final int MILLIS_UPDATE = 100;
+	protected static final int MILLIS_UPDATE = 1000;
 
 	protected JID myID;
 

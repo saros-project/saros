@@ -19,7 +19,7 @@ public class PrivateChatManager implements IChatManager{
 	
 	private IReceiver receiver;
 	
-	@Override
+	
 	public void setConnection(XMPPConnection connection, IReceiver receiver) {
 		this.connection = connection;
 		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.chat));
@@ -27,7 +27,7 @@ public class PrivateChatManager implements IChatManager{
 		
 	}
 
-	@Override
+	
 	public void processPacket(Packet packet) {
 		log.debug("incoming packet");
 		receiver.processPacket(packet);
@@ -36,7 +36,7 @@ public class PrivateChatManager implements IChatManager{
 
 	
 	
-	@Override
+	
 	public void setReceiver(IReceiver receiver) {
 		this.receiver = receiver;
 		

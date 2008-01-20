@@ -20,7 +20,7 @@
 		</fileset>
 	</path>
 	<property name="bootclasspath" refid="path_bootclasspath"/>
-	<property name="bundleJavacSource" value="${javacShome/troll/download/Eclipse/eclipseource}"/>
+	<property name="bundleJavacSource" value="${javacSource}"/>
 	<property name="bundleJavacTarget" value="${javacTarget}"/>
 	<property name="bundleBootClasspath" value="${bootclasspath}"/>
 	
