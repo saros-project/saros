@@ -23,9 +23,12 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -125,8 +128,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private int runningFileTransfers = 0;
 
 	private boolean m_bFileTransferByChat = false; // to switch to
-													// chat-filetransfer as
-													// fallback
+
+	// chat-filetransfer as
+	// fallback
 
 	/**
 	 * A simple struct that is used to queue file transfers.
@@ -357,48 +361,100 @@ public class XMPPChatTransmitter implements ITransmitter,
 			log.debug("Establishing file list transfer");
 
 			int attempts = MAX_TRANSFER_RETRIES;
-			while (true) {
 
-				try {
-					OutgoingFileTransfer transfer = fileTransferManager
-							.createOutgoingFileTransfer(to);
-
-					OutputStream out = transfer.sendFile(
-							FILELIST_TRANSFER_DESCRIPTION,
-							xml.getBytes().length,
-							FILELIST_TRANSFER_DESCRIPTION);
-
-					log.info("Sending file list");
-
-					if (out == null) {
-						if (attempts-- > 0)
-							continue;
-						throw new XMPPException(transfer.getException());
-					}
-
-					BufferedWriter writer = new BufferedWriter(new PrintWriter(
-							out));
-					writer.write(xml);
-					writer.flush();
-					writer.close();
-
-					log.info("File list sent");
-
-					break;
-
-				} catch (IOException e) {
-					if (attempts-- > 0)
-						continue;
-
-					m_bFileTransferByChat = true;
-					sendChatTransfer(FILELIST_TRANSFER_DESCRIPTION, "", xml
-							.getBytes(), recipient);
-					// TODO errorhandling
-
-					log
-							.info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
+			/* Write xml datas to temp file for transfering. */
+			try {
+				File newfile = new File(FILELIST_TRANSFER_DESCRIPTION);
+				if (newfile.exists()) {
+					newfile.delete();
 				}
+				log.debug("file : " + newfile.getAbsolutePath());
+
+				FileWriter writer = new FileWriter(
+						FILELIST_TRANSFER_DESCRIPTION);
+				writer.append(xml);
+				writer.close();
+
+				// } catch (IOException e1) {
+				// // TODO Auto-generated catch block
+				// e1.printStackTrace();
+				// }
+
+				// while (true) {
+
+				// try {
+				OutgoingFileTransfer transfer = fileTransferManager
+						.createOutgoingFileTransfer(to);
+
+				// OutputStream out = transfer.sendFile(
+				// FILELIST_TRANSFER_DESCRIPTION,
+				// xml.getBytes().length,
+				// FILELIST_TRANSFER_DESCRIPTION);
+
+				log.info("Sending file list");
+				transfer.sendFile(new File(FILELIST_TRANSFER_DESCRIPTION),
+						FILELIST_TRANSFER_DESCRIPTION);
+
+				while (!transfer.isDone()) {
+					if (transfer
+							.getStatus()
+							.equals(
+									org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
+						log.error("ERROR!!! " + transfer.getError());
+					} else {
+						log.debug("Status : " + transfer.getStatus());
+						log.debug("Progress : " + transfer.getProgress());
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				if (!transfer
+						.getStatus()
+						.equals(
+								org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)) {
+					log.warn("file list transfer incomplete!");
+					throw new XMPPException("file list transfer incomplete");
+				}
+				
+				/* delete temp file. */
+				File list = new File(FILELIST_TRANSFER_DESCRIPTION);
+				if(list.exists()){
+					list.exists();
+				}
+
+				// if (out == null) {
+				// if (attempts-- > 0)
+				// continue;
+				// throw new XMPPException(transfer.getException());
+				// }
+				//
+				// BufferedWriter writer = new BufferedWriter(new PrintWriter(
+				// out));
+				// writer.write(xml);
+				// writer.flush();
+				// writer.close();
+
+				log.info("File list sent");
+
+				// break;
+
+			} catch (IOException e) {
+				// if (attempts-- > 0)
+				// continue;
+
+				m_bFileTransferByChat = true;
+				sendChatTransfer(FILELIST_TRANSFER_DESCRIPTION, "", xml
+						.getBytes(), recipient);
+				// TODO errorhandling
+
+				log.info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
 			}
+			// }
 		}
 
 	}
@@ -795,8 +851,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	}
 
-
-
 	// TODO replace dependencies by more generic listener interfaces
 	/*
 	 * (non-Javadoc)
@@ -870,7 +924,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			}
 			if (!iAmInviter && project != null)
 				project.addUser(new User(fromJID)); // a new user joined this
-													// session
+			// session
 
 		}
 
@@ -940,8 +994,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 					sendMessage(jid, PacketExtensions.createJoinExtension());
 
 				project.addUser(user, count - 1); // add user to internal user
-													// list, maintaining the
-													// received order
+				// list, maintaining the
+				// received order
 
 			}
 		}
@@ -978,20 +1032,55 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * @see org.jivesoftware.smackx.filetransfer.FileTransferListener
 	 */
 	public void fileTransferRequest(FileTransferRequest request) {
-		String fileDescription = request.getDescription();
-		log.debug("incomming file transfer " + request.getFileName());
-		if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
-			FileList fileList = receiveFileList(request);
-			JID fromJID = new JID(request.getRequestor());
+		/* for testing file transfer. */
+		IncomingFileTransfer transfer = request.accept();
+		File newfile = null;
+		try {
+			 newfile = new File(FILELIST_TRANSFER_DESCRIPTION+1);
+			transfer.recieveFile(newfile);
+			
+			String fileDescription = request.getDescription();
+			log.debug("incomming file transfer " + request.getFileName());
+			if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
+				
+				/* change file list receiver*/
+				FileList fileList = receiveFileList(newfile);
+				
+				
+				JID fromJID = new JID(request.getRequestor());
 
-			for (IInvitationProcess process : processes) {
-				if (process.getPeer().equals(fromJID))
-					process.fileListReceived(fromJID, fileList);
+				for (IInvitationProcess process : processes) {
+					if (process.getPeer().equals(fromJID))
+						process.fileListReceived(fromJID, fileList);
+				}
+			} else{
+				if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
+					receiveResource(request);
+				}
 			}
-
-		} else if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
-			receiveResource(request);
+			
+			
+			log.debug("incomming file complete");
+		} catch (XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		/* end for testing file transfer. */
+
+//		String fileDescription = request.getDescription();
+//		log.debug("incomming file transfer " + request.getFileName());
+//		if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
+//			FileList fileList = receiveFileList(request);
+//			JID fromJID = new JID(request.getRequestor());
+//
+//			for (IInvitationProcess process : processes) {
+//				if (process.getPeer().equals(fromJID))
+//					process.fileListReceived(fromJID, fileList);
+//			}
+//
+//		} else if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
+//			receiveResource(request);
+//		}
 	}
 
 	private void sendMessageToAll(ISharedProject sharedProject,
@@ -1174,6 +1263,33 @@ public class XMPPChatTransmitter implements ITransmitter,
 			transferData.callback.fileSent(transferData.path);
 	}
 
+	private FileList receiveFileList(File file) {
+		log.info("Receiving file list");
+
+		FileList fileList = null;
+		try {
+
+			LineNumberReader reader = new LineNumberReader(new FileReader(file));
+			String sb = "";
+			String line = null;
+			while((line = reader.readLine()) != null){
+				sb += line;
+			}
+			fileList = new FileList(sb.toString());
+
+			log.info("Received file list");
+
+		} catch (Exception e) {
+			Saros.log("Exception while receiving file list", e);
+			// TODO retry? but we dont catch any exception here,
+			// smack might not throw them up
+		}
+
+		return fileList;
+	}
+	
+
+	@Deprecated
 	private FileList receiveFileList(FileTransferRequest request) {
 		log.info("Receiving file list");
 
@@ -1189,6 +1305,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			try {
 				String line = null;
 				while ((line = reader.readLine()) != null) {
+					System.out.println(line);
 					sb.append(line + "\n");
 				}
 			} catch (Exception e) {
@@ -1209,7 +1326,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		return fileList;
 	}
-
 	private void putIncomingChat(JID jid, String thread) {
 		if (!chats.containsKey(jid)) {
 
