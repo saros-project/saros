@@ -424,7 +424,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 				/* delete temp file. */
 				File list = new File(FILELIST_TRANSFER_DESCRIPTION);
 				if(list.exists()){
-					list.exists();
+					list.delete();
 				}
 
 				// if (out == null) {
@@ -1032,16 +1032,23 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * @see org.jivesoftware.smackx.filetransfer.FileTransferListener
 	 */
 	public void fileTransferRequest(FileTransferRequest request) {
+		
 		/* for testing file transfer. */
-		IncomingFileTransfer transfer = request.accept();
+		
 		File newfile = null;
 		try {
-			 newfile = new File(FILELIST_TRANSFER_DESCRIPTION+1);
-			transfer.recieveFile(newfile);
 			
 			String fileDescription = request.getDescription();
 			log.debug("incomming file transfer " + request.getFileName());
 			if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
+				
+				IncomingFileTransfer transfer = request.accept();
+				
+				log.debug(request.getFileName()+" with filepath "+transfer.getFilePath());
+				
+				/* receive file. */
+				newfile = new File(request.getFileName());
+				transfer.recieveFile(newfile);
 				
 				/* change file list receiver*/
 				FileList fileList = receiveFileList(newfile);
@@ -1055,15 +1062,19 @@ public class XMPPChatTransmitter implements ITransmitter,
 				}
 			} else{
 				if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
+//					/* receive file. */
+//					newfile = new File(request.getFileName());
+//					transfer.recieveFile(newfile);
+
 					receiveResource(request);
 				}
 			}
 			
 			
 			log.debug("incomming file complete");
-		} catch (XMPPException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error(e);
 		}
 		/* end for testing file transfer. */
 
@@ -1161,6 +1172,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			InputStream in = request.accept().recieveFile();
 
+//			IncomingFileTransfer transfer = request.accept();
+			
 			boolean handledByInvitation = false;
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(from)) {
@@ -1198,7 +1211,58 @@ public class XMPPChatTransmitter implements ITransmitter,
 			log.warn("Failed to receive " + request.getFileName(), e);
 		}
 	}
+	
 
+	@Deprecated
+	private void receiveResourceOld(FileTransferRequest request) {
+		try {
+
+			JID from = new JID(request.getRequestor());
+			Path path = new Path(request.getFileName());
+
+			log.debug("Receiving resource from" + from.toString() + ": "
+					+ request.getFileName());
+
+			InputStream in = request.accept().recieveFile();
+
+			boolean handledByInvitation = false;
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(from)) {
+					process.resourceReceived(from, path, in);
+					handledByInvitation = true;
+				}
+			}
+
+			if (!handledByInvitation) {
+				FileActivity activity = new FileActivity(
+						FileActivity.Type.Created, path, in);
+
+				int time;
+				String description = request.getDescription();
+				try {
+					time = Integer
+							.parseInt(description
+									.substring(RESOURCE_TRANSFER_DESCRIPTION
+											.length() + 1));
+				} catch (NumberFormatException e) {
+					Saros.log("Could not parse time from description: "
+							+ description, e);
+					time = 0; // HACK
+				}
+
+				TimedActivity timedActivity = new TimedActivity(activity, time);
+
+				SessionManager sm = Saros.getDefault().getSessionManager();
+				sm.getSharedProject().getSequencer().exec(timedActivity);
+			}
+
+			log.info("Received resource " + request.getFileName());
+
+		} catch (Exception e) {
+			log.warn("Failed to receive " + request.getFileName(), e);
+		}
+	}
+	
 	private void transferFile(FileTransfer transferData) throws CoreException,
 			XMPPException, IOException {
 
@@ -1218,6 +1282,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 			if (transferData.content == null)
 				readFile(transferData);
 
+			File sendFile = new File(transferData.path.toString());
+			if(!sendFile.exists()){
+				log.error("File not exist");
+			}
+			
 			sendChatTransfer(transferData.path.toString(), description,
 					transferData.content, recipient);
 
@@ -1226,34 +1295,69 @@ public class XMPPChatTransmitter implements ITransmitter,
 		} else {
 
 			try {
-
+				
 				OutgoingFileTransfer transfer = fileTransferManager
 						.createOutgoingFileTransfer(recipient.toString());
+				
+				
+				/* get file from project. */
+				File f = new File(project.getFile(transferData.path).getLocation().toOSString());
 
-				// HACK file size
-				OutputStream out = transfer.sendFile(transferData.path
-						.toString(), 1, description);
-
-				if (out == null || transfer.getException() != null)
-					throw new XMPPException(transfer.getException());
-
-				if (transferData.content == null) {
-					byte[] buffer = new byte[1000];
-					int length = -1;
-					InputStream in = project.getFile(transferData.path)
-							.getContents();
-					while ((length = in.read(buffer)) >= 0) {
-						out.write(buffer, 0, length);
-					}
-					in.close();
-				} else {
-					out.write(transferData.content, 0,
-							(int) transferData.filesize);
+				if(f.exists()){
+					log.debug("file exists and will be send :"+f.getName());
+					/* set file infos*/
+					
+					/* send file*/
+					transfer.sendFile(f,description);
 				}
+				else{
+					log.warn("file NOT exists. "+f.getPath());
+				}
+				
 
-				out.close();
+		while (!transfer.isDone()) {
+			if (transfer.getStatus().equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error)) {
+				log.error("ERROR!!! " + transfer.getError());
+			} else {
+				log.debug("Status : " + transfer.getStatus());
+				log.debug("Progress : " + transfer.getProgress());
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		if(transfer.getStatus().equals(org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)){
+			log.debug("transfer complete");
+		}
+				
+//				// HACK file size
+//				OutputStream out = transfer.sendFile(transferData.path
+//						.toString(), 1, description);
+//
+//				if (out == null || transfer.getException() != null)
+//					throw new XMPPException(transfer.getException());
+//
+//				if (transferData.content == null) {
+//					byte[] buffer = new byte[1000];
+//					int length = -1;
+//					InputStream in = project.getFile(transferData.path)
+//							.getContents();
+//					while ((length = in.read(buffer)) >= 0) {
+//						out.write(buffer, 0, length);
+//					}
+//					in.close();
+//				} else {
+//					out.write(transferData.content, 0,
+//							(int) transferData.filesize);
+//				}
+//
+//				out.close();
 
-				log.info("Sent file " + transferData.path);
+//				log.info("Sent file " + transferData.path);
 
 			} catch (Exception e) {
 
@@ -1264,7 +1368,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	}
 
 	private FileList receiveFileList(File file) {
-		log.info("Receiving file list");
+		log.info("Receiving "+file.getName());
 
 		FileList fileList = null;
 		try {
@@ -1277,8 +1381,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 			}
 			fileList = new FileList(sb.toString());
 
-			log.info("Received file list");
+			log.info("Received "+file.getName());
 
+			/* delete transfered file. */
+			file.delete();
+			
 		} catch (Exception e) {
 			Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,
