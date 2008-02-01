@@ -218,6 +218,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 *         <code>false</code> if operation was canceled by user.
 	 */
 	private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
+		//TODO: deadlock abfangen.
 		while (filesLeftToSynchronize > 0) {
 			if (monitor.isCanceled() || getState() == State.CANCELED) {
 				return false;

@@ -408,7 +408,7 @@ public class MultiUserChatManager implements InvitationListener,
 		this.currentJID = connection.getUser();
 		try {
 			/* init multi user chat connection. */
-			initMUC(connection, Saros.getDefault().getConnection().getUser());
+			initMUC(connection, connection.getUser());
 			/* init listener for muc messages. */
 			muc.addMessageListener(this);
 			MultiUserChat.addInvitationListener(connection, this);
