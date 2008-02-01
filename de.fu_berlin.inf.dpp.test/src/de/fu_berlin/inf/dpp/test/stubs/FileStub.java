@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -155,4 +155,11 @@ public class FileStub implements IFile {
     public Object getAdapter(Class adapter) {return null;}
     public boolean contains(ISchedulingRule rule) {return false;}
     public boolean isConflicting(ISchedulingRule rule) {return false;}
+
+	@Override
+	public int findMaxProblemSeverity(String type, boolean includeSubtypes,
+			int depth) throws CoreException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

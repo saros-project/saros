@@ -87,4 +87,22 @@ public class IncomingInvitationProcessStub implements IIncomingInvitationProcess
         
         monitor.done();
     }
+
+	@Override
+	public void setInvitationUI(IInvitationUI inviteUI) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public String getProjectName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void invitationAccepted(JID from) {
+		// TODO Auto-generated method stub
+		
+	}
 }

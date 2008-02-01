@@ -1,9 +1,7 @@
 package de.fu_berlin.inf.dpp.test.stubs;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,7 +14,6 @@ import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.StatusTextEditor;
 
@@ -58,11 +55,11 @@ public class EditorAPIStub implements IEditorAPI {
 
     public IEditorPart openEditor(IFile file) {
         //activeEditor = // TODO;
-        
+        //TODO: Fehler überprüfen.
         StatusTextEditor statusTextEditor = new StatusTextEditor();
-        FileEditorInput input = new FileEditorInput(file);
-        statusTextEditor.setInput(input);
-        openEditors.add(statusTextEditor); // HACK
+//        FileEditorInput input = new FileEditorInput(file);
+//        statusTextEditor.setInput(input);
+//        openEditors.add(statusTextEditor); // HACK
         
         return activeEditor;
     }
@@ -90,4 +87,11 @@ public class EditorAPIStub implements IEditorAPI {
 
     public void setEditorManager(EditorManager editorManager) {
     }
+
+	@Override
+	public void setSelection(IEditorPart editorPart, ITextSelection selection,
+			String source) {
+		// TODO Auto-generated method stub
+		
+	}
 }

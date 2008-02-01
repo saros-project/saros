@@ -74,7 +74,7 @@ public class EditorAPITest extends TestCase {
     public void testSetGetSelection() {
         IEditorPart part = editorAPI.openEditor(file);
         TextSelection selection = new TextSelection(1, 3);
-        editorAPI.setSelection(part, selection);
+        editorAPI.setSelection(part, selection,file.getName());
         
         ITextSelection selection2 = editorAPI.getSelection(part);
         assertEquals(selection.getOffset(), selection2.getOffset());
