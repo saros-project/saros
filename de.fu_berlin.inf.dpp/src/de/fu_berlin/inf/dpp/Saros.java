@@ -322,6 +322,9 @@ public class Saros extends AbstractUIPlugin {
 		XMPPConnection connection = new XMPPConnection(server);
 		monitor.worked(1);
 
+		connection.connect();
+		monitor.worked(1);
+		
 		connection.getAccountManager().createAccount(username, password);
 		monitor.worked(1);
 
