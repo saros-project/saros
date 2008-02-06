@@ -20,6 +20,7 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -112,19 +113,21 @@ public interface ITransmitter {
 	 * 
 	 * @param recipient
 	 *            the Jabber ID of the recipient.
+	 * @param project TODO
 	 * @param path
 	 *            the project-relative path of the resource that is to be sent.
 	 * @param callback
 	 *            an callback for the file transfer state. Can be
 	 *            <code>null</code>.
 	 */
-	public void sendFile(JID recipient, IPath path, IFileTransferCallback callback);
+	public void sendFile(JID recipient, IProject project, IPath path, IFileTransferCallback callback);
 
 	/**
 	 * Sends given file to given recipient with given timestamp.
 	 * 
 	 * @param recipient
 	 *            the Jabber ID of the recipient.
+	 * @param project TODO
 	 * @param path
 	 *            the project-relative path of the resource that is to be sent.
 	 * @param timestamp
@@ -133,8 +136,8 @@ public interface ITransmitter {
 	 *            an callback for the file transfer state. Can be
 	 *            <code>null</code>.
 	 */
-	public void sendFile(JID recipient, IPath path, int timestamp, IFileTransferCallback callback);
-
+	public void sendFile(JID recipient, IProject project, IPath path, int timestamp, IFileTransferCallback callback);
+	
 	/**
 	 * Sends queued file transfers.
 	 */

@@ -230,7 +230,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		invitationUI.updateInvitationProgress(peer);
 
-		transmitter.sendFile(peer, path, this);
+		transmitter.sendFile(peer, sharedProject.getProject(), path, this);
 	}
 
 	/**

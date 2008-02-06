@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -143,6 +144,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		public int retries = 0;
 		public byte[] content;
 		public long filesize;
+		public IProject project;
 	}
 
 	/**
@@ -308,7 +310,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 						// TODO use callback
 						int time = timedActivity.getTimestamp();
 						/* send file with other send method. */
-						sendFile(jid, fileAdd.getPath(), time, null);
+						sendFile(jid, sharedProject.getProject(), fileAdd.getPath(), time, null);
 					}
 
 					// TODO remove activity and let this be handled by
@@ -364,14 +366,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			/* Write xml datas to temp file for transfering. */
 			try {
-				 File newfile = new File(FILELIST_TRANSFER_DESCRIPTION);
+				 File newfile = new File(FILELIST_TRANSFER_DESCRIPTION+"."+new JID(connection.getUser()).getName());
 				 if (newfile.exists()) {
-				 newfile.delete();
+					 newfile.delete();
 				 }
 				 log.debug("file : " + newfile.getAbsolutePath());
 				
 				 FileWriter writer = new FileWriter(
-				 FILELIST_TRANSFER_DESCRIPTION);
+				 FILELIST_TRANSFER_DESCRIPTION+"."+new JID(connection.getUser()).getName());
 				 writer.append(xml);
 				 writer.close();
 
@@ -406,7 +408,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 //				}
 
 				log.info("Sending file list");
-				 transfer.sendFile(new File(FILELIST_TRANSFER_DESCRIPTION),
+				 transfer.sendFile(newfile,
 				 FILELIST_TRANSFER_DESCRIPTION);
 
 				int time = 0;
@@ -445,9 +447,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 				}
 
 				/* delete temp file. */
-				 File list = new File(FILELIST_TRANSFER_DESCRIPTION);
-				 if (list.exists()) {
-				 list.delete();
+//				 File list = new File(FILELIST_TRANSFER_DESCRIPTION);
+				 if (newfile.exists()) {
+				 newfile.delete();
 				 }
 				log.info("File list sent");
 
@@ -680,8 +682,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * 
 	 * @see de.fu_berlin.inf.dpp.net.ITransmitter
 	 */
-	public void sendFile(JID to, IPath path, IFileTransferCallback callback) {
-		sendFile(to, path, -1, callback);
+	public void sendFile(JID to, IProject project, IPath path, IFileTransferCallback callback) {
+		sendFile(to, project, path, -1, callback);
 	}
 
 	/**
@@ -694,16 +696,16 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * @return <code>true</code> if the file was read successfully
 	 */
 	boolean readFile(FileTransfer transfer) {
-		SessionManager sm = Saros.getDefault().getSessionManager();
-		IProject project = sm.getSharedProject().getProject();
+//		SessionManager sm = Saros.getDefault().getSessionManager();
+//		IProject project = sm.getSharedProject().getProject();
 
-		File f = new File(project.getFile(transfer.path).getLocation()
+		File f = new File(transfer.project.getFile(transfer.path).getLocation()
 				.toOSString());
 		transfer.filesize = f.length();
 		transfer.content = new byte[(int) transfer.filesize];
 
 		try {
-			InputStream in = project.getFile(transfer.path).getContents();
+			InputStream in = transfer.project.getFile(transfer.path).getContents();
 			in.read(transfer.content, 0, (int) transfer.filesize);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -718,14 +720,15 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * 
 	 * @see de.fu_berlin.inf.dpp.net.ITransmitter
 	 */
-	public void sendFile(JID to, IPath path, int timestamp,
-			IFileTransferCallback callback) {
+	public void sendFile(JID to, IProject project, IPath path,
+			int timestamp, IFileTransferCallback callback) {
 
 		FileTransfer transfer = new FileTransfer();
 		transfer.recipient = to;
 		transfer.path = path;
 		transfer.timestamp = timestamp;
 		transfer.callback = callback;
+		transfer.project = project;
 
 		// if transfer will be delayed, we need to buffer the file
 		// to not send modified versions later
@@ -744,7 +747,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 //				|| Saros.getDefault().getConnectionState() != Saros.ConnectionState.CONNECTED
 				)
 		{
-			log.debug("Couldn't send next file");
+			log.debug("non file to send in queue.");
 			return;
 		}
 
@@ -979,6 +982,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			receiveChatTransfer(message);
 		}
 
+		/* invitee request for project file list (state.INVITATION_SEND */
 		else if (PacketExtensions.getRequestExtension(message) != null) {
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(fromJID))
@@ -1058,6 +1062,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 			log.debug("incomming file transfer " + request.getFileName());
 			if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
 
+				/*
+				 * Create file list file
+				 */
 				IncomingFileTransfer transfer = request.accept();
 
 				log.debug(request.getFileName() + " with filepath "
@@ -1070,6 +1077,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 				/* change file list receiver */
 				FileList fileList = receiveFileList(newfile);
 
+//				FileList fileList = receiveFileList(request);
+				
 				JID fromJID = new JID(request.getRequestor());
 
 				for (IInvitationProcess process : processes) {
@@ -1183,7 +1192,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		try {
 
 			JID from = new JID(request.getRequestor());
-			Path path = new Path(request.getFileName());
+			Path path = new Path(request.getDescription().substring(RESOURCE_TRANSFER_DESCRIPTION.length()+1));
 
 			log.debug("Receiving resource from" + from.toString() + ": "
 					+ request.getFileName());
@@ -1292,8 +1301,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		JID recipient = transferData.recipient;
 
-		SessionManager sm = Saros.getDefault().getSessionManager();
-		IProject project = sm.getSharedProject().getProject();
+//		SessionManager sm = Saros.getDefault().getSessionManager();
+//		IProject project = sm.getSharedProject().getProject();
+		
 		String description = RESOURCE_TRANSFER_DESCRIPTION;
 		if (transferData.timestamp >= 0) {
 			description = description + ':' + transferData.timestamp;
@@ -1318,23 +1328,29 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			try {
 
+				OutgoingFileTransfer.setResponseTimeout(MAX_TRANSFER_RETRIES*1000);
 				OutgoingFileTransfer transfer = fileTransferManager
 						.createOutgoingFileTransfer(recipient.toString());
 
 				/* get file from project. */
-				File f = new File(project.getFile(transferData.path)
-						.getLocation().toOSString());
-
+//				File f = new File(transferData.project.getFile(transferData.path)
+//						.getLocation().toOSString());
+//				File f = transferData.project.getFile(transferData.path).getProjectRelativePath().toFile();
+				IFile f = transferData.project.getFile(transferData.path);
+				
 				if (f.exists()) {
-					log.debug("file exists and will be send :" + f.getName());
-					/* set file infos */
-
-					/* send file */
-					transfer.sendFile(f, description);
+					log.debug("file exists and will be send :" + f.getName()+ " "+f.getLocation());
+					/* set path in description */
+					description = description + ":"+transferData.path;
+					/* send file */ 
+					transfer.sendFile(new File(f.getLocation().toString()), description);
 				} else {
-					log.warn("file NOT exists. " + f.getPath());
+					log.warn("file NOT exists. " + f.getLocation());
+					//TODO: bessere exception auslösen. nur zum aktuellen test
+					throw new Exception("File not exists.");
 				}
 
+				int time = 0;
 				while (!transfer.isDone()) {
 					if (transfer
 							.getStatus()
@@ -1346,7 +1362,15 @@ public class XMPPChatTransmitter implements ITransmitter,
 						log.debug("Progress : " + transfer.getProgress());
 					}
 					try {
-						Thread.sleep(1000);
+						/* check response time out. */
+						if (time < OutgoingFileTransfer.getResponseTimeout()) {
+							Thread.sleep(1000);
+							time += 1000;
+						}
+						else{
+							log.error("File transfer response error.");
+							throw new XMPPException("File transfer response error.");
+						}
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1394,7 +1418,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	}
 
 	private FileList receiveFileList(File file) {
-		log.info("Receiving " + file.getName());
+		log.info("Receiving " + file.getName()+" path "+file.getAbsolutePath());
 
 		FileList fileList = null;
 		try {
@@ -1413,7 +1437,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 			file.delete();
 
 		} catch (Exception e) {
-			Saros.log("Exception while receiving file list", e);
+			log.error(e.getStackTrace());
+//			Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,
 			// smack might not throw them up
 		}
@@ -1436,11 +1461,13 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			try {
 				String line = null;
+				/* TODO: an dieser Stelle kommt es zu einem DeadLock.*/
 				while ((line = reader.readLine()) != null) {
 					System.out.println(line);
 					sb.append(line + "\n");
 				}
 			} catch (Exception e) {
+				log.error(e.getMessage());
 				Saros.log("Error while receiving file list", e);
 			} finally {
 				reader.close();
@@ -1451,6 +1478,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			log.info("Received file list");
 
 		} catch (Exception e) {
+			log.error(e.getMessage());
 			Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,
 			// smack might not throw them up
@@ -1495,6 +1523,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		IPreferenceStore preferenceStore = Saros.getDefault()
 				.getPreferenceStore();
 		// TODO: Änderung für smack 3 : filetransfer have to be implements new
+		
 		// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
 		// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
 
@@ -1506,5 +1535,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 						PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
 
 	}
+
+
 
 }
