@@ -21,8 +21,11 @@ public class Test extends TestCase {
 		IProject project = ResourceHelper.createDefaultProject();
 //		IFile file = ResourceHelper.createFile(project, "testfile.txt", "dies ist ein Testfile");
 		logger.log(Level.ALL, "logtest");
+		
 		assertTrue(project.exists());
 //		file.delete(true, new NullProgressMonitor());
 //		assertFalse(file.exists());
 	}
+	
+	
 }

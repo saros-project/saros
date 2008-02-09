@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.test.net.mock;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -45,15 +46,15 @@ public class StubXMPPTransmitter implements ITransmitter, FileTransferListener{
 	}
 
 	@Override
-	public void sendFile(JID recipient, IPath path,
-			IFileTransferCallback callback) {
+	public void sendFile(JID recipient, IProject project,
+			IPath path, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void sendFile(JID recipient, IPath path, int timestamp,
-			IFileTransferCallback callback) {
+	public void sendFile(JID recipient, IProject project, IPath path,
+			int timestamp, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}

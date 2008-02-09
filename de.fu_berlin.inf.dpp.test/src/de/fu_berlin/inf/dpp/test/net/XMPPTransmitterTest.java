@@ -36,6 +36,7 @@ import junit.framework.TestCase;
 
 public class XMPPTransmitterTest extends TestCase implements
 		FileTransferListener, ITransmitter, IFileTransferCallback {
+	
 	static {
 		XMPPConnection.DEBUG_ENABLED = true;
 	}
@@ -84,21 +85,37 @@ public class XMPPTransmitterTest extends TestCase implements
 	}
 	
 	public void xtestSendFileList() throws CoreException, XMPPException{
+//		transferManager2.addFileTransferListener(new ReceivedSingleFileListener());
 		transferManager2.addFileTransferListener(new ReceiveFileListFileTransferListener());
 		
 		ITransmitter transfer = new XMPPChatTransmitter(connection1);
 		FileList list = FileListHelper.createFileListForDefaultProject();
 		transfer.sendFileList(new JID(connection2.getUser()), list);
+		
 	}
 	
-	public void testSingleFile() throws CoreException, XMPPException{
-		transferManager2.addFileTransferListener(new ReceiveFileListFileTransferListener());
+	public void testTransferFileFunction() throws CoreException, XMPPException{
+		transferManager2.addFileTransferListener(new ReceivedSingleFileListener());
 		
 		ITransmitter transfer = new XMPPChatTransmitter(connection1);
-		transfer.sendFile(new JID(connection2.getUser()), ResourceHelper.getDefaultFile().getProjectRelativePath(), this);
+		//TODO: project initialisieren
+//		transfer.sendFile(new JID(connection2.getUser()), ResourceHelper.getDefaultProject(), ResourceHelper.getDefaultFile().getProjectRelativePath(), null);
+		transfer.sendFile(new JID(connection2.getUser()), ResourceHelper.getDefaultProject(), ResourceHelper.getFile("src/First.java").getProjectRelativePath(), null);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void xtestReceivedFileList() throws CoreException, XMPPException{
+//		transferManager2.addFileTransferListener(new ReceiveFileListFileTransferListener());
 		
-//		FileList list = FileListHelper.createFileListForDefaultProject();
-//		transfer.sendFileList(new JID(connection2.getUser()), list);
+		ITransmitter transfer = new XMPPChatTransmitter(connection1);
+
+		FileList list = FileListHelper.createFileListForDefaultProject();
+		transfer.sendFileList(new JID(connection2.getUser()), list);
 	}
 	
 	/*
@@ -218,15 +235,15 @@ public class XMPPTransmitterTest extends TestCase implements
 	}
 
 	@Override
-	public void sendFile(JID recipient, IPath path,
-			IFileTransferCallback callback) {
+	public void sendFile(JID recipient, IProject project,
+			IPath path, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void sendFile(JID recipient, IPath path, int timestamp,
-			IFileTransferCallback callback) {
+	public void sendFile(JID recipient, IProject project, IPath path,
+			int timestamp, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}

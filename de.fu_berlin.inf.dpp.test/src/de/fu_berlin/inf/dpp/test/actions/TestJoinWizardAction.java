@@ -5,7 +5,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import de.fu_berlin.inf.dpp.test.stubs.IncomingInvitationProcessStub;
+import de.fu_berlin.inf.dpp.test.invitation.internal.mock.IncomingInvitationProcessStub;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 
 public class TestJoinWizardAction extends Action {

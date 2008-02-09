@@ -23,6 +23,8 @@ public class ResourceHelper {
 	public static Logger logger = Logger.getLogger(ResourceHelper.class.toString());
 	
 	public static String TEST_PROJECT = "JUnitTestProject";
+	public static String RECEIVED_TEST_PROJECT = "JUnitReceivedTestProject";
+	
 	
 	private static void initProject(IProject localProject) throws CoreException{
 		IFile file = createFile(localProject, "First.java", "public class First{ /* erste Testklasse*/ }");
@@ -72,7 +74,21 @@ public class ResourceHelper {
     }
     
     public static IFile getDefaultFile() throws CoreException{
-    	IFile file = getDefaultProject().getFile("First.java");
+    	IProject project = getDefaultProject();
+    	IFile file = project.getFile("First.java");
+    	if(!file.exists()){
+    		initProject(project);
+    		file = project.getFile("First.java");
+    	}
+    	return file;
+    }
+    
+    public static IFile getFile(String path) throws CoreException{
+    	IProject project = getDefaultProject();
+    	IFile file = project.getFile(path);
+    	if(!file.exists()){
+    		return null;
+    	}
     	return file;
     }
     
@@ -92,6 +108,7 @@ public class ResourceHelper {
     IFile file = project.getFile(new Path(path));
 //    ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
     file.create(input, true, null);
+    
     
     return file;
 }

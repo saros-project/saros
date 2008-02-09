@@ -1,11 +1,8 @@
 package de.fu_berlin.inf.dpp.test.net;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IFile;
@@ -16,72 +13,47 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 
 import de.fu_berlin.inf.dpp.test.util.ResourceHelper;
 
-public class ReceiveFileListFileTransferListener implements
-		FileTransferListener {
+public class ReceivedSingleFileListener implements FileTransferListener {
 
-	private static Logger logger = Logger.getLogger(ReceiveFileListFileTransferListener.class.toString());
-	
+	private static Logger logger = Logger.getLogger(ReceivedSingleFileListener.class.toString());
+	private static final String RESOURCE_TRANSFER_DESCRIPTION = "resourceAddActivity";
 	@Override
 	public void fileTransferRequest(FileTransferRequest request) {
-
 		IncomingFileTransfer transfer = request.accept();
-		String filename = request.getFileName()
-				+ "."
-				+ request.getRequestor().substring(0,
-						request.getRequestor().indexOf("@"));
+		
+
 		try {
-			logger.info("Received File list: "+request.getFileName());
+			logger.info("received file: "+transfer.getFilePath() + " "+transfer.getFileName()+ " desc: "+request.getDescription());
+			
 			// transfer.recieveFile(new File(filename));
 			
 
-				final InputStream input = transfer.recieveFile();
+				InputStream input = transfer.recieveFile();
 				IProject project = ResourceHelper.getProject(ResourceHelper.RECEIVED_TEST_PROJECT);
-				final IFile file = project.getFile(request.getFileName());
+				
+				String path = request.getDescription().substring(RESOURCE_TRANSFER_DESCRIPTION.length()+1);
+				System.out.println("Path : "+path);
+				IFile file = project.getFile(path);
 				if (file.exists()) {
 					// file.setReadOnly(false);
-					System.out.println("file exist file");
-					new Thread(new Runnable(){
-
-						@Override
-						public void run() {
-							try {
-								file.setContents(input, IResource.FORCE,
-										new NullProgressMonitor());
-							} catch (CoreException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-						
-					}).start();
-					
+					logger.info("file already exists and will be update.");
+					file.setContents(input, IResource.FORCE,
+							new NullProgressMonitor());
 					
 				} else {
-					System.out.println("create new file");
-					new Thread(new Runnable(){
-
-						@Override
-						public void run() {
-							try {
-								file.create(input, false, new NullProgressMonitor());
-							} catch (CoreException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							
-						}
-						
-					}).start();
+					if(!file.getParent().exists()){
+						logger.info("create dir: "+new File(file.getParent().getFullPath().toString()).mkdirs());
+					}
+					IResource re = file.getParent();
 					
-					
+					file.create(input, true, new NullProgressMonitor());
+					logger.info("new file will be create.");
 				}
 				
-				logger.info("receiving finished.");
 				/* 2. Test with direct writing file. */
 //				java.io.File file = new File("Testfile");
 //				System.out.println(file.getAbsolutePath());
@@ -108,7 +80,7 @@ public class ReceiveFileListFileTransferListener implements
 		// // new File("Testfile2.txt").deleteOnExit();
 		// logger.debug("File exists and will delete.");
 		// }
-
+		
 	}
 
 }

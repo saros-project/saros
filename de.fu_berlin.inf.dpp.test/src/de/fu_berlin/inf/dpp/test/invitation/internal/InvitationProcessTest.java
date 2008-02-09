@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.test.invitation.internal;
 
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 
 public class InvitationProcessTest {
 

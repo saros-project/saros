@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.stubs;
+package de.fu_berlin.inf.dpp.test.invitation.internal.mock;
 
 import java.io.InputStream;
 

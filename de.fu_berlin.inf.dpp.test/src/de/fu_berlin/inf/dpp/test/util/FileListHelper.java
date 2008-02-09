@@ -10,4 +10,8 @@ public class FileListHelper {
 		return new FileList(ResourceHelper.createDefaultProject());
 	}
 	
+	public static FileList createFielListForProject(String projectname) throws CoreException{
+		return new FileList(ResourceHelper.createProject(projectname));
+	}
+	
 }
