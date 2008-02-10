@@ -33,9 +33,8 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 		this.roster = roster;
 	}
 
-	@Override
 	public void entriesAdded(Collection<String> addresses) {
-		logger.info("entriesAdded ");
+		logger.info("entriesAdded on "+connection.getUser());
 		for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
 			String address = it.next();
 			RosterEntry entry = roster.getEntry(address);
@@ -45,26 +44,26 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 				if (entry != null
 						&& entry.getType() == RosterPacket.ItemType.none) {
 
-					logger.info("added with type none "+connection.getUser());
+					logger.info("added with type none " + connection.getUser());
 					String name = entry.getName();
-					if(entry.getName() == null){
+					if (entry.getName() == null) {
 						name = new JID(entry.getUser()).getName();
 					}
 					// addUser(entry.getUser(), entry.getName());
-//					connection.getRoster().createEntry(entry.getUser(),
-//							name, new String[0]);
+					// connection.getRoster().createEntry(entry.getUser(),
+					// name, new String[0]);
 
 				}
 				if (entry != null
 						&& entry.getType() == RosterPacket.ItemType.from) {
-					logger.info("added with type from "+connection.getUser());
-					
-					String name = entry.getName();
-					if(entry.getName() == null){
-						name = new JID(entry.getUser()).getName();
-					}
-					connection.getRoster().createEntry(entry.getUser(),
-							name, new String[0]);
+					logger.info("added with type from " + connection.getUser());
+
+//					String name = entry.getName();
+//					if (entry.getName() == null) {
+//						name = new JID(entry.getUser()).getName();
+//					}
+					roster.createEntry(entry.getUser(), entry.getUser(),
+							new String[0]);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -73,13 +72,11 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 
 	}
 
-	@Override
 	public void entriesDeleted(Collection<String> addresses) {
 		logger.info("entries delete " + connection.getUser());
 
 	}
 
-	@Override
 	public void entriesUpdated(Collection<String> addresses) {
 		// TODO Auto-generated method stub
 		logger.info("entries update " + connection.getUser());
@@ -87,42 +84,71 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 			RosterEntry entry = connection.getRoster().getEntry(address);
 			if (entry.getType().equals(RosterPacket.ItemType.to)) {
 				System.out.println("to");
+//
+//				Presence presence = new Presence(Presence.Type.subscribed);
+//				presence.setTo(entry.getUser());
+//				presence.setFrom(connection.getUser());
+//
+//				connection.sendPacket(presence);
 				
 				/* wir kommen hier in eine endlosschleife. */
-//				 RosterPacket.Item rosterItem = new RosterPacket.Item(
-//				 entry.getUser(), entry.getUser());
-//				 ;
-//				 rosterItem.setItemType(ItemType.both);
-//				 rosterItem.setName(entry.getUser());
-//				
-//				 RosterPacket rosterPacket = new RosterPacket();
-//				 rosterPacket.setType(IQ.Type.SET);
-//				 rosterPacket.addRosterItem(rosterItem);
-//				 connection.sendPacket(rosterPacket);
+				// RosterPacket.Item rosterItem = new RosterPacket.Item(
+				// entry.getUser(), entry.getUser());
+				// ;
+				// rosterItem.setItemType(ItemType.both);
+				// rosterItem.setName(entry.getUser());
+				//				
+				// RosterPacket rosterPacket = new RosterPacket();
+				// rosterPacket.setType(IQ.Type.SET);
+				// rosterPacket.addRosterItem(rosterItem);
+				// connection.sendPacket(rosterPacket);
 			}
 			if (entry.getType().equals(RosterPacket.ItemType.from)) {
 				System.out.println("from");
 				try {
-					if(roster.getEntry(entry.getUser()) == null){
-					connection.getRoster().createEntry(entry.getUser(),
-							entry.getName(), new String[0]);
-					}
+					// RosterPacket.Item rosterItem = new RosterPacket.Item(
+					// connection.getUser(), connection.getUser());
+					// ;
+					// rosterItem.setItemType(ItemType.both);
+					// rosterItem.setName(entry.getUser());
+					//					
+					// RosterPacket rosterPacket = new RosterPacket();
+					// rosterPacket.setType(IQ.Type.SET);
+					// rosterPacket.addRosterItem(rosterItem);
+					// connection.sendPacket(rosterPacket);
+
+					// if(roster.getEntry(entry.getUser()) == null){
+					roster.createEntry(entry.getUser(),
+							entry.getUser(), new String[0]);
+					// }
 				} catch (XMPPException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
-//			if (entry.getType().equals(RosterPacket.ItemType.none)) {
-//				System.out.println("none");
-//			}
-			if(entry.getStatus() != null && entry.getStatus().equals(RosterPacket.ItemStatus.SUBSCRIPTION_PENDING)){
+			// if (entry.getType().equals(RosterPacket.ItemType.none)) {
+			// System.out.println("none");
+			// }
+			if (entry.getStatus() != null
+					&& entry.getStatus().equals(
+							RosterPacket.ItemStatus.SUBSCRIPTION_PENDING)) {
 				logger.info("subscripe");
-				Presence presence = new Presence(Presence.Type.subscribed);
-				presence.setTo(entry.getUser());
-				presence.setFrom(connection.getUser());
 
-				connection.sendPacket(presence);
-//				addUser(entry.getUser(),new JID(entry.getUser()).getName());
+				if (entry.getUser().equals(connection.getUser())) {
+					Presence presence = new Presence(Presence.Type.unsubscribed);
+					presence.setTo(entry.getUser());
+					presence.setFrom(connection.getUser());
+
+					connection.sendPacket(presence);
+				} else {
+					Presence presence = new Presence(Presence.Type.subscribed);
+					presence.setTo(entry.getUser());
+					presence.setFrom(connection.getUser());
+
+					connection.sendPacket(presence);
+				}
+				
+				// addUser(entry.getUser(),new JID(entry.getUser()).getName());
 			}
 			// addUser(entry.getUser(), entry.getName());
 			// System.out.println(entry.getStatus());
@@ -130,10 +156,11 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 		}
 	}
 
-	@Override
 	public void presenceChanged(Presence presence) {
 		// TODO Auto-generated method stub
-		 logger.info("presence changed user" + connection.getUser()+" status :"+presence.getType()+" from: "+presence.getFrom());
+		logger.info("presence changed user" + connection.getUser()
+				+ " status :" + presence.getType() + " from: "
+				+ presence.getFrom());
 	}
 
 	public void addUser(String user, String name) {
@@ -144,7 +171,7 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 		RosterPacket rosterPacket = new RosterPacket();
 		rosterPacket.setType(IQ.Type.SET);
 		rosterPacket.addRosterItem(rosterItem);
-//		 rosterPacket.toXML();
+		// rosterPacket.toXML();
 
 		connection.sendPacket(rosterPacket);
 
@@ -155,7 +182,6 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 		connection.sendPacket(presence);
 	}
 
-	@Override
 	public void processPacket(Packet packet) {
 		// TODO Auto-generated method stub
 		logger.info("Packet called. " + packet.getFrom());
@@ -174,28 +200,43 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 				/* this states handled by roster listener. */
 				if (p.getType().equals(Presence.Type.unavailable)
 						|| p.getType().equals(Presence.Type.available)) {
-					logger.info("Presence "+p.getFrom()+" "+p.getType());
+					logger.info("Presence " + p.getFrom() + " " + p.getType());
 					return;
+				}
+
+				if (p.getType() == Presence.Type.subscribed) {
+					logger.info("subcriped form " + p.getFrom());
 				}
 
 				/* Anfrage für eine Kontakthinzufügung. */
 				if (p.getType().equals(Presence.Type.subscribe)) {
 					RosterEntry e = roster.getEntry(packet.getFrom());
-					logger.info("subscribe from "+p.getFrom());
+					logger.info("subscribe from " + p.getFrom());
 					if (e == null) {
 						try {
-							 roster.createEntry(packet.getFrom(),
-									 new JID(packet.getFrom()).getName(),null);
-//							RosterPacket.Item rosterItem = new RosterPacket.Item(
-//									packet.getFrom(), new JID(packet.getFrom()).getName());
-//							;
-//							rosterItem.setItemType(ItemType.both);
-//							rosterItem.setName(new JID(packet.getFrom()).getName());
-//							
-//							RosterPacket rosterPacket = new RosterPacket();
-//							rosterPacket.setType(IQ.Type.SET);
-//							rosterPacket.addRosterItem(rosterItem);
-//							connection.sendPacket(rosterPacket);
+//							Presence presence = new Presence(
+//									Presence.Type.subscribe);
+//							presence.setTo(packet.getFrom());
+//							presence.setFrom(connection.getUser());
+//
+//							connection.sendPacket(presence);
+
+							roster.createEntry(packet.getFrom(), packet.getFrom(), null);
+							/* allow presence. */
+
+							// RosterPacket.Item rosterItem = new
+							// RosterPacket.Item(
+							// packet.getFrom(), new
+							// JID(packet.getFrom()).getName());
+							// ;
+							// rosterItem.setItemType(ItemType.both);
+							// rosterItem.setName(new
+							// JID(packet.getFrom()).getName());
+							//							
+							// RosterPacket rosterPacket = new RosterPacket();
+							// rosterPacket.setType(IQ.Type.SET);
+							// rosterPacket.addRosterItem(rosterItem);
+							// connection.sendPacket(rosterPacket);
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();

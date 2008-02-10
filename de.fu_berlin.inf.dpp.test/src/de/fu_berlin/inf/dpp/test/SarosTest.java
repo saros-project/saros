@@ -39,7 +39,11 @@ public class SarosTest extends TestCase {
 	public XMPPConnection connection = null;
 	public XMPPConnection received_connection = null;
 
-	private String server = "jabber.org";
+	
+	public static  String server = "jabber.org";
+	public static String User1 = "ori78@"+server;
+	public static String User2 = "ori79@"+server;
+	
 	
 	// public FileTransferManager transferManager1 = null;
 
@@ -90,26 +94,35 @@ public class SarosTest extends TestCase {
 		Roster re_roster = received_connection.getRoster();
 		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
 				re_roster);
-//		re_roster.addRosterListener(list2);
 		received_connection.addPacketListener(list2, null);
-		re_roster.reload();
+		
 		
 		Roster roster = connection.getRoster();
 		RosterListenerImpl list1 = new RosterListenerImpl(connection,
 				roster);
-//		roster.addRosterListener(list1);
-//		connection.addPacketListener(list1, null);
-		roster.reload();
+		connection.addPacketListener(list1, null);
 		
+		/* delete lists.*/
 		emptyUserList(roster);
 		Thread.sleep(1000);
 		emptyUserList(re_roster);
 		
+		
+		
+		roster.addRosterListener(list1);
+		roster.reload();
 		re_roster.addRosterListener(list2);
+		re_roster.reload();
 		
 		Thread.sleep(1000);
+//		Presence presence = new Presence(
+//				Presence.Type.subscribe);
+//		presence.setTo(received_connection.getUser());
+//		presence.setFrom(connection.getUser());
+//		connection.sendPacket(presence);
+		
 		/*2. neue Verbindung erstellen. */
-		roster.createEntry(received_connection.getUser(), new JID(received_connection.getUser()).getName(), null);
+		roster.createEntry(User2, User2, null);
 		
 		Thread.sleep(1000);
 		
@@ -122,34 +135,57 @@ public class SarosTest extends TestCase {
 			}
 		}
 		
+		entries = re_roster.getEntries();
+		for(RosterEntry entry : entries){
+			
+			Presence p = roster.getPresence(entry.getUser());
+			if(p != null){
+				System.out.println(p.getType());
+			}
+		}
+		
+	}
+	
+	public void xtestCreateAccount() throws XMPPException, InterruptedException{
+		XMPPConnection connection = new XMPPConnection(server);
+		connection.connect();
+		connection.getAccountManager().createAccount("ori78", "123456");
+		Thread.sleep(1000);
+		connection.getAccountManager().createAccount("ori79", "123456");
+	}
+	
+	public void xtestDeleteAccount() throws XMPPException{
+		connection.getAccountManager().deleteAccount();
+		received_connection.getAccountManager().deleteAccount();
 	}
 	
 	public void testPresence() throws InterruptedException, XMPPException{
 		Roster re_roster = received_connection.getRoster();
 		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
 				re_roster);
-//		re_roster.addRosterListener(list2);
-//		received_connection.addPacketListener(list2, null);
+		re_roster.addRosterListener(list2);
+		received_connection.addPacketListener(list2, null);
 		re_roster.reload();
 		
 		Roster roster = connection.getRoster();
 		RosterListenerImpl list1 = new RosterListenerImpl(connection,
 				roster);
-//		roster.addRosterListener(list1);
-//		connection.addPacketListener(list1, null);
+		roster.addRosterListener(list1);
+		connection.addPacketListener(list1, null);
 		roster.reload();
 		
 		Thread.sleep(2000);
-//		Collection<RosterEntry> entries = roster.getEntries();
-//		for(RosterEntry entry : entries){
-//			
-//			Presence p = roster.getPresence(entry.getUser());
-//			if(p != null){
-//				System.out.println(p.getType());
-//			}
-//		}
+		Collection<RosterEntry> entries = roster.getEntries();
+		for(RosterEntry entry : entries){
+			
+			System.out.println("entry : "+entry.getUser());
+			Presence p = roster.getPresence(entry.getUser());
+			if(p != null){
+				System.out.println(p.getType());
+			}
+		}
 		
-		Collection<RosterEntry> entries = re_roster.getEntries();
+		entries = re_roster.getEntries();
 		for(RosterEntry entry : entries){
 			
 			Presence p = re_roster.getPresence(entry.getUser());
