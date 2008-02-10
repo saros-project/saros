@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import junit.framework.TestCase;
 
 import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
@@ -21,6 +22,7 @@ import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.RosterPacket.ItemType;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.invitation.internal.XMPPChatTransmitterFileTransferTest;
 import de.fu_berlin.inf.dpp.test.net.RosterListenerImpl;
 
@@ -37,6 +39,8 @@ public class SarosTest extends TestCase {
 	public XMPPConnection connection = null;
 	public XMPPConnection received_connection = null;
 
+	private String server = "jabber.org";
+	
 	// public FileTransferManager transferManager1 = null;
 
 	public SarosTest() {
@@ -46,13 +50,14 @@ public class SarosTest extends TestCase {
 	@Override
 	public void setUp() throws XMPPException {
 		ConnectionConfiguration conConfig = new ConnectionConfiguration(
-				"jabber.org");
+				"jabber.cc");
 		// conConfig.setSocketFactory(SocketFactory.getDefault());
 
 		conConfig.setReconnectionAllowed(true);
 		// try{
-		connection = new XMPPConnection("jabber.org");
-		received_connection = new XMPPConnection("jabber.org");
+		connection = new XMPPConnection(server);
+		received_connection = new XMPPConnection(server);
+		
 		// connection1 = new XMPPConnection(conConfig);
 
 		// while (!connection1.isAuthenticated()) {
@@ -60,7 +65,7 @@ public class SarosTest extends TestCase {
 		connection.connect();
 		received_connection.connect();
 
-		connection.login("ori80", "123456");
+		connection.login("ori78", "123456");
 		received_connection.login("ori79", "123456");
 		logger.info("connection established.");
 	}
@@ -71,13 +76,83 @@ public class SarosTest extends TestCase {
 		received_connection.disconnect();
 	}
 
-	public void testPresence() throws InterruptedException{
-		Roster roster = received_connection.getRoster();
-		Thread.sleep(2000);
-		Collection<RosterEntry> entries = roster.getEntries();
+	
+	/**
+	 * 1. Löschen der Entry Listen
+	 * 2. Hinzufügen von RosterListener zu B
+	 * 3. A.CreateEntry(B)
+	 * 
+	 * B hat Presence von A.
+	 * @throws XMPPException
+	 * @throws InterruptedException
+	 */
+	public void xtestCreateEntryA() throws XMPPException, InterruptedException{
+		Roster re_roster = received_connection.getRoster();
+		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
+				re_roster);
+//		re_roster.addRosterListener(list2);
+		received_connection.addPacketListener(list2, null);
+		re_roster.reload();
+		
+		Roster roster = connection.getRoster();
+		RosterListenerImpl list1 = new RosterListenerImpl(connection,
+				roster);
+//		roster.addRosterListener(list1);
+//		connection.addPacketListener(list1, null);
+		roster.reload();
+		
+		emptyUserList(roster);
+		Thread.sleep(1000);
+		emptyUserList(re_roster);
+		
+		re_roster.addRosterListener(list2);
+		
+		Thread.sleep(1000);
+		/*2. neue Verbindung erstellen. */
+		roster.createEntry(received_connection.getUser(), new JID(received_connection.getUser()).getName(), null);
+		
+		Thread.sleep(1000);
+		
+		Collection<RosterEntry> entries = re_roster.getEntries();
 		for(RosterEntry entry : entries){
 			
-			Presence p = roster.getPresence(entry.getUser());
+			Presence p = re_roster.getPresence(entry.getUser());
+			if(p != null){
+				System.out.println(p.getType());
+			}
+		}
+		
+	}
+	
+	public void testPresence() throws InterruptedException, XMPPException{
+		Roster re_roster = received_connection.getRoster();
+		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
+				re_roster);
+//		re_roster.addRosterListener(list2);
+//		received_connection.addPacketListener(list2, null);
+		re_roster.reload();
+		
+		Roster roster = connection.getRoster();
+		RosterListenerImpl list1 = new RosterListenerImpl(connection,
+				roster);
+//		roster.addRosterListener(list1);
+//		connection.addPacketListener(list1, null);
+		roster.reload();
+		
+		Thread.sleep(2000);
+//		Collection<RosterEntry> entries = roster.getEntries();
+//		for(RosterEntry entry : entries){
+//			
+//			Presence p = roster.getPresence(entry.getUser());
+//			if(p != null){
+//				System.out.println(p.getType());
+//			}
+//		}
+		
+		Collection<RosterEntry> entries = re_roster.getEntries();
+		for(RosterEntry entry : entries){
+			
+			Presence p = re_roster.getPresence(entry.getUser());
 			if(p != null){
 				System.out.println(p.getType());
 			}
@@ -117,17 +192,17 @@ public class SarosTest extends TestCase {
 		}
 		Thread.sleep(1000);
 		/*2. neue Verbindung erstellen. */
-		roster.createEntry(received_connection.getUser(), received_connection.getUser(), null);
+		roster.createEntry(received_connection.getUser(), new JID(received_connection.getUser()).getName(), null);
 		
 		/*3. setzen, dass man von dem user interesse hat. */
-//        RosterPacket.Item rosterItem = new RosterPacket.Item(received_connection.getUser(),received_connection.getUser());;
-//        rosterItem.setItemType(ItemType.both);
-//        rosterItem.setName(received_connection.getUser());
-//        
-//        RosterPacket rosterPacket = new RosterPacket();
-//        rosterPacket.setType(IQ.Type.SET);
-//        rosterPacket.addRosterItem(rosterItem);
-//        connection.sendPacket(rosterPacket);
+        RosterPacket.Item rosterItem = new RosterPacket.Item(received_connection.getUser(),new JID(received_connection.getUser()).getName());;
+        rosterItem.setItemType(ItemType.both);
+        rosterItem.setName(received_connection.getUser());
+        
+        RosterPacket rosterPacket = new RosterPacket();
+        rosterPacket.setType(IQ.Type.SET);
+        rosterPacket.addRosterItem(rosterItem);
+        connection.sendPacket(rosterPacket);
         Thread.sleep(1000);
 //		/*aktiviere */
 //		Presence presence = new Presence(Presence.Type.subscribed);
@@ -234,15 +309,16 @@ public class SarosTest extends TestCase {
 		received_connection.addPacketListener(list2, null);
 		
 		
+		Thread.sleep(1000);
 		
 		
 		emptyUserList(roster);
-		
+		emptyUserList(re_roster);
 		
 //		Collection<RosterPacket.Item> items = roster.
 //		assertEquals(0, roster.getUnfiledEntryCount());
-		list1.addUser(received_connection.getUser(), received_connection.getUser());
-		roster.createEntry(received_connection.getUser(), received_connection.getUser(),
+//		list1.addUser(received_connection.getUser(), received_connection.getUser());
+		roster.createEntry(received_connection.getUser(), new JID(received_connection.getUser()).getName(),
 				new String[0]);
 
 		Thread.sleep(500);
