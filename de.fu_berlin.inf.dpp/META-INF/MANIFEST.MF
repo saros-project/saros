@@ -2,20 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Saros Plug-in
 Bundle-SymbolicName: de.fu_berlin.inf.dpp;singleton:=true
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.3
 Bundle-Activator: de.fu_berlin.inf.dpp.Saros
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.ui,
- org.eclipse.jdt,
  org.eclipse.jdt.core,
- org.eclipse.jdt.debug,
- org.eclipse.jdt.debug.ui,
- org.eclipse.jdt.doc.user,
- org.eclipse.jdt.junit,
- org.eclipse.jdt.junit.runtime,
- org.eclipse.jdt.launching,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.jface.text,
  org.eclipse.ui.editors,
@@ -114,3 +107,4 @@ Export-Package: com.jcraft.jzlib,
  org.xmlpull.mxp1,
  org.xmlpull.v1
 Bundle-Vendor: FU-Berlin
+Import-Package: org.apache.log4j
