@@ -52,12 +52,14 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.internal.RosterListenerImpl;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
@@ -71,11 +73,13 @@ import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
  * 
  * @author rdjemili
  */
-public class RosterView extends ViewPart implements IConnectionListener {
+public class RosterView extends ViewPart implements IConnectionListener, IRosterTree {
 	private TreeViewer viewer;
 
 	private Roster roster;
 
+	private XMPPConnection connection;
+	
 	// actions
 	private Action messagingAction;
 
@@ -333,7 +337,9 @@ public class RosterView extends ViewPart implements IConnectionListener {
 	 */
 	public void connectionStateChanged(XMPPConnection connection, final ConnectionState newState) {
 		if (newState == ConnectionState.CONNECTED) {
-			roster = Saros.getDefault().getRoster();
+//			roster = Saros.getDefault().getRoster();
+			roster = connection.getRoster();
+			this.connection = connection;
 			attachRosterListener();
 
 		} else if (newState == ConnectionState.NOT_CONNECTED) {
@@ -397,30 +403,46 @@ public class RosterView extends ViewPart implements IConnectionListener {
 	}
 
 	private void attachRosterListener() {
-		roster.addRosterListener(new RosterListener() {
-			public void entriesAdded(Collection<String> addresses) {
-				refreshRosterTree(true);
-			}
-
-			public void entriesUpdated(Collection<String> addresses) {
-				refreshRosterTree(false);
-			}
-
-			public void entriesDeleted(Collection<String> addresses) {
-				refreshRosterTree(false);
-			}
-
-			public void presenceChanged(String XMPPAddress) {
-				refreshRosterTree(true);
-			}
-			
-			
-			public void presenceChanged(Presence presence) {
-				//TODO: new Method for Smack 3
-				presenceChanged(presence.getFrom());
-				
-			}
-		});
+		roster.addRosterListener(new RosterListenerImpl(connection,this));
+		
+//		roster.addRosterListener(new RosterListener() {
+//			public void entriesAdded(Collection<String> addresses) {
+//				for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
+//					String address = it.next();
+//					RosterEntry entry = roster.getEntry(address);
+//					//When the entry is only from the other user, then send a subscription request
+//					if (entry != null && entry.getType() == RosterPacket.ItemType.from) {
+//						try {
+//							System.out.println("Creating entry to: " + entry.getUser());
+//							connection.getRoster().createEntry(entry.getUser(), entry.getUser(), null);
+//						} catch (XMPPException e) {
+//							e.printStackTrace();
+//						}
+//					}
+//				}
+//				
+//				refreshRosterTree(true);
+//			}
+//
+//			public void entriesUpdated(Collection<String> addresses) {
+//				refreshRosterTree(false);
+//			}
+//
+//			public void entriesDeleted(Collection<String> addresses) {
+//				refreshRosterTree(false);
+//			}
+//
+//			public void presenceChanged(String XMPPAddress) {
+//				refreshRosterTree(true);
+//			}
+//			
+//			
+//			public void presenceChanged(Presence presence) {
+//				//TODO: new Method for Smack 3
+//				presenceChanged(presence.getFrom());
+//				
+//			}
+//		});
 	}
 
 	/**
@@ -430,7 +452,7 @@ public class RosterView extends ViewPart implements IConnectionListener {
 	 *            <code>true</code> if item labels (might) have changed.
 	 *            <code>false</code> otherwise.
 	 */
-	private void refreshRosterTree(final boolean updateLabels) {
+	public void refreshRosterTree(final boolean updateLabels) {
 		if (viewer.getControl().isDisposed())
 			return;
 		

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -50,6 +51,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 public class IncomingInvitationProcess extends InvitationProcess implements
 	IIncomingInvitationProcess {
 
+	private static Logger logger = Logger.getLogger(IncomingInvitationProcess.class);
+	
 	private FileList remoteFileList;
 
 	private IProject localProject;
@@ -59,7 +62,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	private IProgressMonitor progressMonitor;
 	
 	protected String projectName;
-
+	
 	public IncomingInvitationProcess(ITransmitter transmitter, JID from, String projectName,
 		String description) {
 
@@ -180,6 +183,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * @see de.fu_berlin.inf.dpp.InvitationProcess
 	 */
 	public void resourceReceived(JID from, IPath path, InputStream in) {
+		logger.debug("new file received: "+path);
 		if (localProject==null)
 			return; // we dont have started the new project yet, so received ressources are not welcomed
 		
@@ -190,6 +194,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 				file.setContents(in, IResource.FORCE, new NullProgressMonitor());
 			} else {
 				file.create(in, true, new NullProgressMonitor());
+				logger.debug("New File created: "+file.getName());
 			}
 		} catch (Exception e) {
 			failed(e);
@@ -197,8 +202,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 		progressMonitor.worked(1);
 		progressMonitor.subTask("Files left: " + filesLeftToSynchronize);
-
+		
 		filesLeftToSynchronize--;
+		logger.debug("file counter: "+filesLeftToSynchronize);
 	}
 
 	/*

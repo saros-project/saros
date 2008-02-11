@@ -93,7 +93,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			.getName());
 
 	private static final int MAX_PARALLEL_SENDS = 10;
-	private static final int MAX_TRANSFER_RETRIES = 5;
+	private static final int MAX_TRANSFER_RETRIES = 15;
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
 	/*
@@ -1192,6 +1192,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		try {
 
 			JID from = new JID(request.getRequestor());
+			/* file path exists in description. */
 			Path path = new Path(request.getDescription().substring(RESOURCE_TRANSFER_DESCRIPTION.length()+1));
 
 			log.debug("Receiving resource from" + from.toString() + ": "

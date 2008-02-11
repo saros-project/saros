@@ -42,6 +42,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.MessageEventManager;
 import org.jivesoftware.smackx.MessageEventNotificationListener;
@@ -101,6 +102,7 @@ public class Saros extends AbstractUIPlugin {
 	
 	static {
 			PacketExtensions.hookExtensionProviders();
+			Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
 	}
 
 	/**
