@@ -1077,6 +1077,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 				newfile = new File(request.getFileName());
 				transfer.recieveFile(newfile);
 
+				/* wait for complete transfer. */
+				while(!transfer.isDone()){
+					Thread.sleep(100);
+					log.debug("wait for complete transfer. Current status: "+transfer.getStatus());
+				}
+				
 				/* change file list receiver */
 				FileList fileList = receiveFileList(newfile);
 
@@ -1201,10 +1207,18 @@ public class XMPPChatTransmitter implements ITransmitter,
 			log.debug("Receiving resource from" + from.toString() + ": "
 					+ request.getFileName());
 
-			InputStream in = request.accept().recieveFile();
+//			InputStream in = request.accept().recieveFile();
 
-			// IncomingFileTransfer transfer = request.accept();
+			IncomingFileTransfer transfer = request.accept();
 
+			/* wait for complete transfer. */
+			while(!transfer.isDone()){
+				Thread.sleep(100);
+				log.debug("wait for complete transfer. Current status: "+transfer.getStatus());
+			}
+			 
+			 
+			InputStream in = transfer.recieveFile();
 			/* 1. Wenn es innerhalb des Invitation processes stattfindet. */
 			boolean handledByInvitation = false;
 			for (IInvitationProcess process : processes) {
@@ -1441,7 +1455,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			file.delete();
 
 		} catch (Exception e) {
-			log.error(e.getStackTrace());
+			log.error(e.getStackTrace().toString());
 //			Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,
 			// smack might not throw them up
