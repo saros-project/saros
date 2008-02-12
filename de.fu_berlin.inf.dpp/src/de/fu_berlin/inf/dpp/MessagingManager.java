@@ -65,6 +65,8 @@ public class MessagingManager implements PacketListener, MessageListener,
 	MUCListener mucl = new MUCListener();
 
 	MultiUserChatManager multitrans = null;
+	
+	private String CHAT_ROOM = "ori2008@conference.jabber.org";
 
 	public class ChatLine {
 		public String sender;
@@ -404,7 +406,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	public MessagingManager() {
 		Saros.getDefault().addListener(this);
-		this.multitrans = new MultiUserChatManager("ori2007MessageRoom@conference.jabber.org");
+		this.multitrans = new MultiUserChatManager(CHAT_ROOM);
 	}
 
 	/*
@@ -548,9 +550,12 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		MultiUserChat muc = multitrans.getMUC();
 		if (muc == null) {
-			multitrans.initMUC(Saros.getDefault().getConnection(), Saros
-					.getDefault().getConnection().getUser());
-			muc = multitrans.getMUC();
+//			muc = multitrans.getMUC();
+//			if(muc == null){
+				multitrans.initMUC(Saros.getDefault().getConnection(), Saros
+						.getDefault().getConnection().getUser());
+				muc = multitrans.getMUC();
+//			}
 		}
 		// else{
 		// //for testing
@@ -563,7 +568,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		 */
 
 		Presence remoteUserPresence = muc
-				.getOccupantPresence("ori2007@conference.jabber.org/"
+				.getOccupantPresence(CHAT_ROOM+"/"
 						+ remoteUser.toString() + "/Smack");
 		if (remoteUserPresence == null) {
 			muc.invite(remoteUser.toString(), "Testing");

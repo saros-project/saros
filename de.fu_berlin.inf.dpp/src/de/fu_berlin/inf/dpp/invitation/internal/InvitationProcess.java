@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.invitation.internal;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -28,6 +30,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public abstract class InvitationProcess implements IInvitationProcess {
 
+	private static Logger logger = Logger.getLogger(InvitationProcess.class);
+	
 	protected final ITransmitter transmitter;
 
 	protected State state;
@@ -102,7 +106,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
 		setState(State.CANCELED);
 
-		System.out.println("Invitation was canceled. " + errorMsg);
+		logger.error("Invitation was canceled. " + errorMsg);
 
 		if (!replicated) {
 			transmitter.sendCancelInvitationMessage(peer, errorMsg);
