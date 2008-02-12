@@ -438,13 +438,16 @@ public class XMPPChatTransmitter implements ITransmitter,
 					}
 				}
 
-				if (!transfer
-						.getStatus()
-						.equals(
-								org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)) {
-					log.warn("file list transfer incomplete!");
-					throw new XMPPException("file list transfer incomplete");
-				}
+				/*TODO: es kommt momentan zu einer file not found exception, obwohl die
+				* Datei übertragen wurde.
+				*/
+//				if (!transfer
+//						.getStatus()
+//						.equals(
+//								org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)) {
+//					log.warn("file list transfer incomplete!");
+//					throw new XMPPException("file list transfer incomplete");
+//				}
 
 				/* delete temp file. */
 //				 File list = new File(FILELIST_TRANSFER_DESCRIPTION);

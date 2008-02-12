@@ -41,7 +41,7 @@ public class MultiUserChatManager implements InvitationListener,
 	private static Logger log = Logger.getLogger(MultiUserChatManager.class
 			.getName());
 
-	public static String Room = "ori2007@conference.jabber.org";
+	public String Room = "ori2007@conference.jabber.org";
 
 	public static String JID_PROPERTY = "jid";
 
@@ -57,6 +57,10 @@ public class MultiUserChatManager implements InvitationListener,
 
 	public MultiUserChatManager() {
 
+	}
+	
+	public MultiUserChatManager(String conference_room_name){
+		Room = conference_room_name;
 	}
 
 	public void initMUC(XMPPConnection connection, String user)
@@ -180,10 +184,9 @@ public class MultiUserChatManager implements InvitationListener,
 					return true;
 				}
 			}
-//			e.printStackTrace();
-			System.out.println(e.getMessage());
-			// TODO Auto-generated catch block
-//			System.out.println("no room exist.");
+
+			log.warn(e);
+
 			return false;
 		}
 	}
@@ -321,7 +324,7 @@ public class MultiUserChatManager implements InvitationListener,
 			/* replace room */
 			String sender = message.getFrom();
 			/* replace room info */
-			sender = sender.replace(MultiUserChatManager.Room + "/", "");
+			sender = sender.replace(Room + "/", "");
 			if (sender.equals(jid.toString())) {
 				message.setFrom(sender);
 				return true;
@@ -435,6 +438,10 @@ public class MultiUserChatManager implements InvitationListener,
 	public void setReceiver(IReceiver receiver) {
 		this.receiver = receiver;
 
+	}
+	
+	public String getRoomName(){
+		return this.Room;
 	}
 
 }

@@ -307,7 +307,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 			Display.getDefault().syncExec(new Runnable() {
 				public void run() {
 					openWindow();
-					String from = message.getFrom().replace(MultiUserChatManager.Room+"/", "").replace("/Smack", "");
+					String from = message.getFrom().replace(multitrans.getRoomName()+"/", "").replace("/Smack", "");
 					addChatLine(from, message.getBody());
 				}
 			});
@@ -404,7 +404,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	public MessagingManager() {
 		Saros.getDefault().addListener(this);
-		this.multitrans = new MultiUserChatManager();
+		this.multitrans = new MultiUserChatManager("ori2007MessageRoom@conference.jabber.org");
 	}
 
 	/*
@@ -484,7 +484,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 			return;
 
 		/* check for multi or single chat. */
-		if (message.getFrom().contains(MultiUserChatManager.Room)) {
+		if (message.getFrom().contains(multitrans.getRoomName())) {
 			
 			if(multiSession == null){
 				multiSession = new MultiChatSession(multitrans.getMUC());
