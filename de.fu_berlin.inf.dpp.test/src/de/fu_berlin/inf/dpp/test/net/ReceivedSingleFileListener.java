@@ -21,7 +21,7 @@ public class ReceivedSingleFileListener implements FileTransferListener {
 
 	private static Logger logger = Logger.getLogger(ReceivedSingleFileListener.class.toString());
 	private static final String RESOURCE_TRANSFER_DESCRIPTION = "resourceAddActivity";
-	@Override
+	
 	public void fileTransferRequest(FileTransferRequest request) {
 		IncomingFileTransfer transfer = request.accept();
 		

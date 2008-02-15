@@ -26,7 +26,7 @@ public class ReceiveFileListFileTransferListener implements
 
 	private static Logger logger = Logger.getLogger(ReceiveFileListFileTransferListener.class.toString());
 	
-	@Override
+
 	public void fileTransferRequest(FileTransferRequest request) {
 
 		IncomingFileTransfer transfer = request.accept();
@@ -47,7 +47,6 @@ public class ReceiveFileListFileTransferListener implements
 					System.out.println("file exist file");
 					new Thread(new Runnable(){
 
-						@Override
 						public void run() {
 							try {
 								file.setContents(input, IResource.FORCE,
@@ -65,7 +64,7 @@ public class ReceiveFileListFileTransferListener implements
 					System.out.println("create new file");
 					new Thread(new Runnable(){
 
-						@Override
+						
 						public void run() {
 							try {
 								file.create(input, false, new NullProgressMonitor());

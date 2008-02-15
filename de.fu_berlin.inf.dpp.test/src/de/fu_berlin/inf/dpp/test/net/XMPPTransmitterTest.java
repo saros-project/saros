@@ -128,7 +128,7 @@ public class XMPPTransmitterTest extends TestCase implements
 	
 
 	/* file transfer methods */
-	@Override
+
 	public void fileTransferRequest(FileTransferRequest request) {
 		
 		IncomingFileTransfer transfer = request.accept();
@@ -209,114 +209,112 @@ public class XMPPTransmitterTest extends TestCase implements
 	
 	
 
-	@Override
+	
 	public void addInvitationProcess(IInvitationProcess invitation) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void removeInvitationProcess(IInvitationProcess invitation) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void sendActivities(ISharedProject sharedProject,
 			List<TimedActivity> activities) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void sendCancelInvitationMessage(JID jid, String errorMsg) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendFile(JID recipient, IProject project,
 			IPath path, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendFile(JID recipient, IProject project, IPath path,
 			int timestamp, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendFileList(JID jid, FileList fileList) throws XMPPException {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendInviteMessage(ISharedProject sharedProject, JID jid,
 			String description) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendJoinMessage(ISharedProject sharedProject) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendLeaveMessage(ISharedProject sharedProject) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
 	public void sendRemainingFiles() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void sendRemainingMessages() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendRequestForActivity(ISharedProject sharedProject,
 			int timestamp, boolean andup) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendRequestForFileListMessage(JID recipient) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void sendUserListTo(JID to, List<User> participants) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void setXMPPConnection(XMPPConnection connection) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void fileSent(IPath path) {
 		logger.log(Level.FINE,"File sent "+path);
 		
 	}
 
-	@Override
+
 	public void fileTransferFailed(IPath path, Exception e) {
 		logger.log(Level.WARNING,"File transfer failed: "+e.getMessage());
 		

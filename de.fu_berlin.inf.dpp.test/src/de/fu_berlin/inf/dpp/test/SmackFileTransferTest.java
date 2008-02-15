@@ -38,7 +38,7 @@ public class SmackFileTransferTest extends TestCase {
 
 	protected class FileTransferListenerImpl implements FileTransferListener {
 
-		@Override
+		
 		public void fileTransferRequest(FileTransferRequest request) {
 			// Check to see if the request should be accepted
 			// if(shouldAccept(request)) {

@@ -33,25 +33,24 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
+
 	public int getProgressCurrent() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public String getProgressInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+
 	public int getProgressMax() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
+	
 	public void startSynchronization() {
 		assertState(State.GUEST_FILELIST_SENT);
 
@@ -83,7 +82,7 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 		
 	}
 
-	@Override
+	
 	public void fileListReceived(JID from, FileList fileList) {
 		logger.info("file list received.");
 		setState(State.HOST_FILELIST_SENT);
@@ -98,7 +97,7 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 		/* start synchronisation .*/
 		new Thread(new Runnable(){
 
-			@Override
+			
 			public void run() {
 				logger.info("start sync.");
 				process.startSynchronization();
@@ -108,37 +107,36 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 		}).start();
 	}
 
-	@Override
+	
 	public String getProjectName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+	
 	public void invitationAccepted(JID from) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void joinReceived(JID from) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void resourceReceived(JID from, IPath path, InputStream input) {
 		logger.info("resource received.");
 		
 	}
 
-	@Override
 	public void fileSent(IPath path) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+	
 	public void fileTransferFailed(IPath path, Exception e) {
 		// TODO Auto-generated method stub
 		

@@ -156,7 +156,6 @@ public class FileStub implements IFile {
     public boolean contains(ISchedulingRule rule) {return false;}
     public boolean isConflicting(ISchedulingRule rule) {return false;}
 
-	@Override
 	public int findMaxProblemSeverity(String type, boolean includeSubtypes,
 			int depth) throws CoreException {
 		// TODO Auto-generated method stub

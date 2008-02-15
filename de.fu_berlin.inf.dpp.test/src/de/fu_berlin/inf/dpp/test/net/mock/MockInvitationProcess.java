@@ -45,61 +45,60 @@ public class MockInvitationProcess implements IInvitationProcess{
 		transmitter.addInvitationProcess(this);
 	}
 	
-	@Override
+
 	public void cancel(String errorMsg, boolean replicated) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void fileListReceived(JID from, FileList fileList) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public String getDescription() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+
 	public Exception getException() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+
 	public JID getPeer() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+
 	public String getProjectName() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+
 	public State getState() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
 	public void invitationAccepted(JID from) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void joinReceived(JID from) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	@Override
+
 	public void resourceReceived(JID from, IPath path, InputStream input) {
 		logger.log(Level.FINE,"received method");
 		try {

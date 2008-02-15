@@ -88,7 +88,6 @@ public class EditorAPIStub implements IEditorAPI {
     public void setEditorManager(EditorManager editorManager) {
     }
 
-	@Override
 	public void setSelection(IEditorPart editorPart, ITextSelection selection,
 			String source) {
 		// TODO Auto-generated method stub
