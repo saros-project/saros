@@ -37,9 +37,9 @@ public class FileTransferProcessMonitor extends Thread {
 	public void run() {
 		int time = 0;
 
-		while (!closeMonitor) {
+		while (!closeMonitor ) {
 			try {
-				while (!transfer.isDone()) {
+				while (!transfer.isDone() && (transfer.getProgress()<1.0)) {
 
 					/* check negotiator process */
 					System.out.println("Status: " + transfer.getStatus()

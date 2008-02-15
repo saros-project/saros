@@ -13,6 +13,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 
 /**
  * this test class received xmpp file transfer data.
@@ -36,6 +37,8 @@ public class TestXMPPFileTranserReceiver extends TestCase implements
 	private final String SERVER = "jabber.org";
 	
 	private final String SENDER_JID = "ori78@"+SERVER;
+	
+	private final int MAX_TRANSFER_RETRIES = 10000; 
 	
 	private boolean incommingFile = false;
 
@@ -72,7 +75,7 @@ public class TestXMPPFileTranserReceiver extends TestCase implements
 		assertNotNull(p);
 		
 		while(!incommingFile){
-//			System.out.print(".");
+			System.out.print(".");
 			Thread.sleep(200);
 		}
 		
@@ -81,6 +84,7 @@ public class TestXMPPFileTranserReceiver extends TestCase implements
 	}
 	
 	public void fileTransferRequest(FileTransferRequest request)  {
+		logger.info("INCOMMING FILE");
 		
 		IncomingFileTransfer transfer = request.accept();
 		
@@ -92,15 +96,31 @@ public class TestXMPPFileTranserReceiver extends TestCase implements
 		try {
 			logger.info("start receiving file");
 			
+			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(transfer);
 			/*receive file*/
 			transfer.recieveFile(infile);
+			monitor.start();
+			
+			System.out.println("wait for incomming datas ...");
+			while(monitor.isAlive() && monitor.isRunning()){
+				Thread.sleep(500);
+				System.out.print(".");
+			}
+			
+			monitor.closeMonitor(true);
+			
+			
 		} catch (XMPPException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		incommingFile = true;
+		
 		logger.info("receiving finished.");
+		incommingFile = true;
 	}
 
 }
