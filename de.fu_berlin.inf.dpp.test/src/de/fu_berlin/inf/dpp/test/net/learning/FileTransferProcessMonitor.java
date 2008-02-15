@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.test.net.learning;
 
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
+import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 
 /**
  * for information on monitoring the process of a file tranfer
@@ -22,7 +23,7 @@ public class FileTransferProcessMonitor extends Thread {
 	}
 
 	public boolean isRunning() throws XMPPException {
-		return true;
+		return this.running;
 	}
 
 	public String getException() {
@@ -43,6 +44,11 @@ public class FileTransferProcessMonitor extends Thread {
 					/* check negotiator process */
 					System.out.println("Status: " + transfer.getStatus()
 							+ " Progress : " + transfer.getProgress());
+					
+					if(transfer instanceof OutgoingFileTransfer){
+						OutgoingFileTransfer out = (OutgoingFileTransfer) transfer;
+						
+					}
 					// if (transfer
 					// .getStatus()
 					// .equals(
