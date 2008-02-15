@@ -29,7 +29,7 @@ public class RosterListenerImpl implements RosterListener, PacketListener{
 		this.rtree = rtree;
 	}
 	
-	@Override
+	
 	public void entriesAdded(Collection<String> addresses) {
 		logger.debug("entriesAdded called.");
 		for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
@@ -62,14 +62,14 @@ public class RosterListenerImpl implements RosterListener, PacketListener{
 		
 	}
 
-	@Override
+	
 	public void entriesDeleted(Collection<String> addresses) {
 		logger.debug("entry delete");
 		
 		rtree.refreshRosterTree(false);
 	}
 
-	@Override
+	
 	public void entriesUpdated(Collection<String> addresses) {
 		logger.debug("entries update " + connection.getUser());
 		for (String address : addresses) {
@@ -115,7 +115,6 @@ public class RosterListenerImpl implements RosterListener, PacketListener{
 		rtree.refreshRosterTree(false);
 	}
 
-	@Override
 	public void presenceChanged(Presence presence) {
 
 		logger.debug("presence changed user" + connection.getUser()
@@ -125,7 +124,6 @@ public class RosterListenerImpl implements RosterListener, PacketListener{
 		rtree.refreshRosterTree(true);
 	}
 
-	@Override
 	public void processPacket(Packet packet) {
 		
 //		logger.info("Packet called. " + packet.getFrom());
