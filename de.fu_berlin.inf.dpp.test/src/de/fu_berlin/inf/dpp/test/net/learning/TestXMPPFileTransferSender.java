@@ -15,7 +15,9 @@ import org.jivesoftware.smack.util.StringUtils;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.net.XMPPTransmitterTest;
@@ -34,10 +36,12 @@ public class TestXMPPFileTransferSender extends TestCase implements PacketListen
 
 	private final String SERVER = "jabber.org";
 	
+	private final String RESOURCE = "/Smack";
+	
 	private final String RECEIVER_JID = "ori79@"+SERVER;
 	
 	
-	private static final int MAX_TRANSFER_RETRIES = 5000;
+	private static final int MAX_TRANSFER_RETRIES = 10000;
 	
 	private boolean send = false;
 
@@ -55,7 +59,8 @@ public class TestXMPPFileTransferSender extends TestCase implements PacketListen
 		logger.info("connection 1 established.");
 		Thread.sleep(1000);
 
-		
+		transferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,"50010");transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40690");
+		transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40960");
 //		mock = new MockInvitationProcess(this, null, null);
 	}
 	
@@ -82,6 +87,9 @@ public class TestXMPPFileTransferSender extends TestCase implements PacketListen
 		/*wait for receiver online status*/
 		logger.info("wait for receiver online state.");
 		while(!send){
+			if(p.getMode() == Presence.Mode.available){
+				send = true;
+			}
 			System.out.print(".");
 			Thread.sleep(200);
 		}
@@ -92,7 +100,10 @@ public class TestXMPPFileTransferSender extends TestCase implements PacketListen
 		logger.info("file sended. ");
 	}
 
-	private void sendFile() throws XMPPException{
+	private void sendFile() throws XMPPException, InterruptedException{
+		
+		Thread.sleep(1000);
+		
 		String filename = "lib/smack.jar";
 		File file = new File(filename);
 		
@@ -100,12 +111,24 @@ public class TestXMPPFileTransferSender extends TestCase implements PacketListen
 		
 		/*create output stream */
 		OutgoingFileTransfer.setResponseTimeout(MAX_TRANSFER_RETRIES);
-		OutgoingFileTransfer transfer = transferManager.createOutgoingFileTransfer(RECEIVER_JID);
+		OutgoingFileTransfer transfer = transferManager.createOutgoingFileTransfer(RECEIVER_JID+RESOURCE);
+		
+		FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(transfer);
 		/* send file. */
 		transfer.sendFile(file, "Smack lib");
+		monitor.start();
 		
+		logger.info("SEND FILE ...");
 		/* wait for transfer file finished.*/
+		System.out.println("wait ...");
+		while(monitor.isAlive() && monitor.isRunning()){
+			Thread.sleep(500);
+			System.out.print(".");
+		}
 		
+		monitor.closeMonitor(true);
+		
+		logger.info("TRANSFER COMPLETED.");
 	}
 
 	public void processPacket(Packet packet) {

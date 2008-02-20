@@ -12,8 +12,10 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 
 /**
  * this test class received xmpp file transfer data.
@@ -55,7 +57,8 @@ public class TestXMPPFileTranserReceiver extends TestCase implements
 		// }
 		logger.info("connection 1 established.");
 		transferManager = new FileTransferManager(connection);
-
+		transferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,"50012");
+		transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40690");
 		Thread.sleep(1000);
 	}
 
