@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.jingle;
+package de.fu_berlin.inf.dpp.net.jingle.transmitter;
 
 import java.awt.Robot;
 import java.io.BufferedInputStream;
@@ -26,6 +26,12 @@ import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 
+import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
+import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData.FileTransferType;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
+import de.fu_berlin.inf.dpp.net.jingle.IFileTransferTransmitter;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
+
 public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 		Runnable {
 
@@ -37,8 +43,12 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 	private boolean on = true;
 	private boolean transmit = false;
 
-	public FileTransferSocks5Transmitter(int localPort, InetAddress remoteHost,
-			int remotePort) {
+	/* transfer information */
+	private JingleFileTransferData[] transferData;
+	private JingleFileTransferProcessMonitor monitor;
+
+	private FileTransferSocks5Transmitter(int localPort,
+			InetAddress remoteHost, int remotePort) {
 
 		this.localPort = localPort;
 		this.remoteHost = remoteHost;
@@ -46,6 +56,18 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 
 		transmit = true;
 
+	}
+
+	public FileTransferSocks5Transmitter(int localPort, InetAddress remoteHost,
+			int remotePort, JingleFileTransferData[] transferData, JingleFileTransferProcessMonitor monitor) {
+
+		this.localPort = localPort;
+		this.remoteHost = remoteHost;
+		this.remotePort = remotePort;
+
+		transmit = true;
+		this.transferData = transferData;
+		this.monitor = monitor;
 	}
 
 	public void run() {
@@ -59,39 +81,67 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 		while (on) {
 			if (transmit) {
 				try {
+
 					/* Übertragung zwischen zwei Partnern. */
 					socket = new Socket(remoteHost, remotePort);
-
 					
-					sendFile(socket, "lib/smack.jar");
+					/*send file number.*/
+					OutputStream os = socket.getOutputStream();
+					os.write(transferData.length);
+					
+					for (int i = 0; i < transferData.length; i++) {
 
+						/*testing. only*/
+//						 sendFile(socket, "/home/troll/Saros_DPP_1.0.2.jar");
+						
+						/* send file meta data */
+						sendMetaData(socket, transferData[i]);
+						
+						if(transferData[i].type == FileTransferType.FILELIST_TRANSFER){
+							sendFileListData(socket, transferData[i].file_list_content);
+						}
+						if(transferData[i].type == FileTransferType.RESOURCE_TRANSFER){
+							sendFile(socket, transferData[i].file);
+						}
+						
+					}
+					
+					socket.close();
+					
+					/*set monitor status complete :) */
+					monitor.setComplete(true);
+					
 					// Thread.sleep(2000);
 					transmit = false;
 					// socket.close();
 					on = false;
 				} catch (Exception e1) {
-
 					e1.printStackTrace();
+					return;
 				}
 			}
 		}
 	}
 
-	private void sendString(Socket socket) throws IOException, ClassNotFoundException{
-		ObjectOutputStream oo = new ObjectOutputStream(socket
-				.getOutputStream());
-		ObjectInputStream ii = new ObjectInputStream(socket
-				.getInputStream());
+	private void sendFileListData(Socket socket, String file_list_content) throws IOException {
+		ObjectOutputStream oo = new ObjectOutputStream(socket.getOutputStream());
 
-		oo.writeObject("Test-String");
+		oo.writeObject(file_list_content);
 		oo.flush();
-		System.out.println((String) ii.readObject());
-
-		socket.close();
-		ii.close();
-		oo.close();
 	}
-	
+
+	private void sendMetaData(Socket socket, JingleFileTransferData data)
+			throws IOException {
+		ObjectOutputStream oo = new ObjectOutputStream(socket.getOutputStream());
+		// ObjectInputStream ii = new ObjectInputStream(socket
+		// .getInputStream());
+
+		oo.writeObject(data);
+		oo.flush();
+	}
+
+
+
 	private void readByteArray(InputStream input, OutputStream output)
 			throws IOException {
 		ObjectOutputStream oos = new ObjectOutputStream(output);
@@ -103,26 +153,57 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 
 	private void sendFile(Socket socket, String fileName) throws IOException {
 
-		
 		OutputStream output = socket.getOutputStream();
 		File file = new File(fileName);
 		int length = (int) file.length();
-		System.out.println("File length: "+length);
+		System.out.println("File length: " + length);
 		FileInputStream fis = new FileInputStream(file);
 		BufferedInputStream bis = new BufferedInputStream(fis);
 		byte[] buffer = new byte[1024];
 		int bytesRead;
-		while ((bytesRead = bis.read(buffer,0,1024)) != -1) {
-			output.write(buffer,0,1024);
+		while ((bytesRead = bis.read(buffer, 0, 1024)) != -1) {
+			output.write(buffer, 0, 1024);
 			output.flush();
 		}
 		System.out.println("File has send");
 
 		fis.close();
-		output.close();
-		socket.close();
+//		output.close();
 	}
 
+	private void sendFile(Socket socket, File file) throws IOException {
+		OutputStream output = socket.getOutputStream();
+		int length = (int) file.length();
+		System.out.println("File length: " + length);
+		FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+		BufferedInputStream bis = new BufferedInputStream(fis);
+		byte[] buffer = new byte[1024];
+		int bytesRead;
+		while ((bytesRead = bis.read(buffer, 0, 1024)) != -1) {
+			output.write(buffer, 0, 1024);
+			output.flush();
+		}
+
+		fis.close();
+//		output.close();
+	}
+
+	
+	@Deprecated
+	private void sendString(Socket socket) throws IOException,
+			ClassNotFoundException {
+		ObjectOutputStream oo = new ObjectOutputStream(socket.getOutputStream());
+		ObjectInputStream ii = new ObjectInputStream(socket.getInputStream());
+
+		oo.writeObject("Test-String");
+		oo.flush();
+		System.out.println((String) ii.readObject());
+
+//		socket.close();
+//		ii.close();
+//		oo.close();
+	}
+	
 	@Deprecated
 	private void startByteFileTransfer() {
 

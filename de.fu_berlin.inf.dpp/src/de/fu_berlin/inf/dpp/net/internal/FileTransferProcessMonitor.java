@@ -19,6 +19,7 @@ public class FileTransferProcessMonitor extends Thread {
 
 	public FileTransferProcessMonitor(FileTransfer transfer) {
 		this.transfer = transfer;
+		start();
 	}
 
 	public boolean isRunning() throws XMPPException {

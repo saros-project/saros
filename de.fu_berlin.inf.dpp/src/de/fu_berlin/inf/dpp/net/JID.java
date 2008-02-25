@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.net;
 
+import java.io.Serializable;
+
 import org.jivesoftware.smack.util.StringUtils;
 
 /**
@@ -26,7 +28,7 @@ import org.jivesoftware.smack.util.StringUtils;
  * 
  * @author rdjemili
  */
-public class JID {
+public class JID implements Serializable{
 	private final String jid;
 
 	/**
