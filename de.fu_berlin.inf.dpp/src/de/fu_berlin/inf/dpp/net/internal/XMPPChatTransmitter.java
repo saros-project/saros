@@ -1185,8 +1185,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 		
 		new Thread(new Runnable(){
 
-			@Override
 			public void run() {
+				try{
 				String fileDescription = request.getDescription();
 				log.debug("1. incomming file transfer " + request.getFileName());
 				if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
@@ -1201,6 +1201,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 				} else if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
 					receiveResource(request);
+				}
+				}catch(Exception e){
+					log.error("Incomming File Transfer Thread: ",e);
 				}
 				
 			}
@@ -1558,8 +1561,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 
 		} catch (Exception e) {
-//			log.error(e.getMessage());
-			e.printStackTrace();
+			log.error(e.getMessage());
+//			e.printStackTrace();
 //			Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,
 			// smack might not throw them up
