@@ -1561,7 +1561,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 
 		} catch (Exception e) {
-			log.error(e.getMessage());
+			log.error("Error in Incoming File List: ",e);
+			return null;
 //			e.printStackTrace();
 //			Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,

@@ -12,6 +12,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransfer;
 public class FileTransferProcessMonitor extends Thread {
 
 	FileTransfer transfer;
+	private int TIMEOUT = 10000;
 
 	private boolean running = true;
 
@@ -49,7 +50,12 @@ public class FileTransferProcessMonitor extends Thread {
 					Thread.sleep(500);
 				}
 				this.running = false;
-
+				time = time + 500;
+				
+				if(time>TIMEOUT){
+					closeMonitor = true;
+					return;
+				}
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
