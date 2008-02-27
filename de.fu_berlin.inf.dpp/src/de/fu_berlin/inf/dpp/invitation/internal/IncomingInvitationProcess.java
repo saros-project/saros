@@ -79,7 +79,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 */
 	public void fileListReceived(JID from, FileList fileList) {
 		assertState(State.HOST_FILELIST_REQUESTED);
-
+		
 		if (fileList == null)
 			cancel("Failed to receive remote file list.", false);
 		else {
