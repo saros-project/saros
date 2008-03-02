@@ -30,9 +30,11 @@ import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.IFileTransferTransmitter;
+import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
+import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
-public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
+public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		Runnable {
 
 	private InetAddress localHost;
@@ -46,19 +48,20 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 	/* transfer information */
 	private JingleFileTransferData[] transferData;
 	private JingleFileTransferProcessMonitor monitor;
+	private IJingleFileTransferListener listener;
 
-	private FileTransferSocks5Transmitter(int localPort,
-			InetAddress remoteHost, int remotePort) {
+//	private FileTransferTCPTransmitter(int localPort,
+//			InetAddress remoteHost, int remotePort) {
+//
+//		this.localPort = localPort;
+//		this.remoteHost = remoteHost;
+//		this.remotePort = remotePort;
+//
+//		transmit = true;
+//
+//	}
 
-		this.localPort = localPort;
-		this.remoteHost = remoteHost;
-		this.remotePort = remotePort;
-
-		transmit = true;
-
-	}
-
-	public FileTransferSocks5Transmitter(int localPort, InetAddress remoteHost,
+	public FileTransferTCPTransmitter(int localPort, InetAddress remoteHost,
 			int remotePort, JingleFileTransferData[] transferData, JingleFileTransferProcessMonitor monitor) {
 
 		this.localPort = localPort;
@@ -77,16 +80,23 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 	public void start() {
 
 		Socket socket = null;
-
+		try {
+			
+			try{
+				//TODO: Socket create methode mit time out einfügen
+				
+			/* Übertragung zwischen zwei Partnern. */
+			socket = new Socket(remoteHost, remotePort);
+			} catch(SocketException se){
+				Thread.sleep(500);
+				socket = new Socket(remoteHost, remotePort);
+			}
+	
 		while (on) {
 			if (transmit) {
-				try {
-
-					/* Übertragung zwischen zwei Partnern. */
-					socket = new Socket(remoteHost, remotePort);
-					
+				
 					/*send file number.*/
-					OutputStream os = socket.getOutputStream();
+					OutputStream os = socket.getOutputStream();					
 					os.write(transferData.length);
 					
 					for (int i = 0; i < transferData.length; i++) {
@@ -106,20 +116,22 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 						
 					}
 					
-					socket.close();
-					
 					/*set monitor status complete :) */
 					monitor.setComplete(true);
 					
 					// Thread.sleep(2000);
 					transmit = false;
-					// socket.close();
-					on = false;
-				} catch (Exception e1) {
-					e1.printStackTrace();
-					return;
-				}
 			}
+		}
+		
+		socket.close();
+		
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			if(listener != null){
+				listener.exceptionOccured(new JingleSessionException(e1.getMessage()));
+			}
+			return;
 		}
 	}
 
@@ -303,5 +315,24 @@ public class FileTransferSocks5Transmitter implements IFileTransferTransmitter,
 	public void stop() {
 		this.transmit = false;
 		this.on = false;
+	}
+
+	@Override
+	public void sendFileData(JingleFileTransferData[] transferData) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addJingleFileTransferListener(
+			IJingleFileTransferListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void removeJingleFileTransferListener(
+			IJingleFileTransferListener listener) {
+		this.listener = null;
+		
 	}
 }

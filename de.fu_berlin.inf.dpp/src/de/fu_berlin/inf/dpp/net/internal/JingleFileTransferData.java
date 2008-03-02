@@ -22,6 +22,7 @@ public class JingleFileTransferData implements Serializable{
 	
 	public String file_list_content;
 	public JID recipient;
+	public JID sender;
 	public String project_name;
 	public String file_project_path;
 	public int timestamp;

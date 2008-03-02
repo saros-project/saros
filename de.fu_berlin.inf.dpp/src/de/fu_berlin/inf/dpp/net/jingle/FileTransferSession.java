@@ -22,14 +22,14 @@ import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
-import de.fu_berlin.inf.dpp.net.jingle.receiver.FileTransferSocks5Receiver;
-import de.fu_berlin.inf.dpp.net.jingle.transmitter.FileTransferSocks5Transmitter;
+import de.fu_berlin.inf.dpp.net.jingle.receiver.FileTransferTCPReceiver;
+import de.fu_berlin.inf.dpp.net.jingle.transmitter.FileTransferTCPTransmitter;
 
 public class FileTransferSession extends JingleMediaSession {
 
 	private IFileTransferTransmitter transmitter = null;
 	private IFileTransferReceiver receiver = null;
-	private XMPPConnection connection;
+//	private XMPPConnection connection;
 
 	/* transfer information */
 	private JingleFileTransferData[] transferData;
@@ -61,15 +61,16 @@ public class FileTransferSession extends JingleMediaSession {
 		if (this.getJingleSession() instanceof IncomingJingleSession) {
 			try {
 
-				receiver = new FileTransferSocks5Receiver(InetAddress
-						.getByName("0.0.0.0"), getRemote().getPort(),
+				receiver = new FileTransferTCPReceiver(InetAddress
+						.getByName(getRemote().getIp()), getRemote().getPort(),
 						getLocal().getPort());
-				/* call listener. */
-				if (listener != null) {
-					listener
-							.incommingFileTransfer(((FileTransferSocks5Receiver) receiver)
-									.getMonitor());
-				}
+				receiver.addJingleFileTransferListener(listener);
+//				/* call listener. */
+//				if (listener != null) {
+//					listener
+//							.incommingFileTransfer(((FileTransferTCPReceiver) receiver)
+//									.getMonitor());
+//				}
 				System.out.println("Receiving on:" + receiver.getLocalPort());
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
@@ -82,9 +83,10 @@ public class FileTransferSession extends JingleMediaSession {
 
 				InetAddress remote = InetAddress.getByName(getRemote().getIp());
 				System.out.println("local Port: " + getLocal().getPort());
-				transmitter = new FileTransferSocks5Transmitter(getLocal()
+				transmitter = new FileTransferTCPTransmitter(getLocal()
 						.getPort(), remote, getRemote().getPort(),
 						transferData, monitor);
+				transmitter.addJingleFileTransferListener(listener);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -172,6 +174,26 @@ public class FileTransferSession extends JingleMediaSession {
 		return this.monitor;
 	}
 
+	/**
+	 * send new data with current session
+	 */
+	public void sendFileData(JingleFileTransferData[] transferData) throws JingleSessionException{
+		IJingleFileTransferConnection conn = null;
+		if(receiver != null){
+			conn = receiver;
+		}
+		if(transmitter != null){
+			conn = transmitter;
+		}
+		
+		if(conn != null){
+			throw new JingleSessionException("connection stream not exists.");
+		}
+		
+		/* send data with existing streams*/
+		conn.sendFileData(transferData);
+	}
+	
 	/*
 	 * TODO: 1. Diese beiden Methoden auslagern 
 	 * 		2. Listener Liste umsetzen.
@@ -180,10 +202,22 @@ public class FileTransferSession extends JingleMediaSession {
 	public void addJingleFileTransferListener(
 			IJingleFileTransferListener listener) {
 		this.listener = listener;
+		if(receiver != null){
+			receiver.addJingleFileTransferListener(listener);
+		}
+		if(transmitter != null){
+			transmitter.addJingleFileTransferListener(listener);
+		}
 	}
 	
 	public void removeJingleFileTransferListener(IJingleFileTransferListener listener){
 		this.listener = null;
+		if(receiver != null){
+			removeJingleFileTransferListener(listener);
+		}
+		if(transmitter != null){
+			removeJingleFileTransferListener(listener);
+		}
 	}
 
 }

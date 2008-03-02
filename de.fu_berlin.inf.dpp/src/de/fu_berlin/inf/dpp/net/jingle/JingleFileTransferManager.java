@@ -67,6 +67,12 @@ public class JingleFileTransferManager {
 	
 	}
 	
+	/**
+	 * intiate a jingle session
+	 * @param jid
+	 * @param transferData
+	 * @param monitor
+	 */
 	public void createOutgoingJingleFileTransfer(JID jid, JingleFileTransferData[] transferData, JingleFileTransferProcessMonitor monitor){
 		if (outgoing != null) return;
         try {
@@ -79,6 +85,14 @@ public class JingleFileTransferManager {
         catch (XMPPException e1) {
             e1.printStackTrace();
         }
+	}
+	
+	/**
+	 * send datas with active jingle session.
+	 * @param transferData
+	 */
+	public void sendFileDatas(JingleFileTransferData[] transferData){
+		
 	}
 	
 	public void terminateJingleSession(){

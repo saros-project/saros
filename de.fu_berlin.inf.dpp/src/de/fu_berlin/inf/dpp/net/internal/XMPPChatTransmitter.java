@@ -65,6 +65,7 @@ import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
 import org.jivesoftware.smackx.jingle.JingleManager;
+import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -83,6 +84,7 @@ import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData.FileTransferType
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
+import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
@@ -101,7 +103,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final int MAX_TRANSFER_RETRIES = 5;
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
-	private static boolean jingle = false;
+	private static boolean jingle = true;
 	private JingleFileTransferManager jingleManager;
 	private JingleFileTransferProcessMonitor monitor;
 
@@ -223,9 +225,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 		this.privatechatmanager = new PrivateChatManager();
 		privatechatmanager.setConnection(connection, this);
 
-		if (jingleManager == null) {
+		if (jingle && jingleManager == null) {
 			/* try to connect with jingle */
-			// jingleManager = new JingleFileTransferManager(connection, this);
+			 jingleManager = new JingleFileTransferManager(connection, this);
 		}
 	}
 
@@ -370,6 +372,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 		/* only for testing. */
 		data.file_list_content = fileListContent;
 		data.type = FileTransferType.FILELIST_TRANSFER;
+		data.recipient =recipient;
+		data.sender = new JID(connection.getUser());
 
 		jingleManager.createOutgoingJingleFileTransfer(recipient,
 				new JingleFileTransferData[] { data }, monitor);
@@ -1675,6 +1679,32 @@ public class XMPPChatTransmitter implements ITransmitter,
 		}
 
 		jingleManager.terminateJingleSession();
+	}
+
+	public void incommingFileList(String fileList_content,JID recipient) {
+		FileList fileList = null;
+		log.info("incoming file list");
+		try {
+			fileList = new FileList(fileList_content);
+		} catch (XmlPullParserException e) {
+			
+			e.printStackTrace();
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		for (IInvitationProcess process : processes) {
+			if (process.getPeer().equals(recipient))
+				process.fileListReceived(recipient, fileList);
+		}
+		
+	}
+
+	@Override
+	public void exceptionOccured(JingleSessionException exception) {
+		//TODO: exception weiter geben oder für Fallback verwenden!
+		log.error("Jingle Session Exception");
+		
 	}
 
 }

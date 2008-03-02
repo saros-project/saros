@@ -23,6 +23,7 @@ public class FileTransferMediaManager extends JingleMediaManager{
 	
 	private final XMPPConnection connection;
 	private IJingleFileTransferListener listener;
+	private FileTransferSession session;
 	
 	/* tranfer data*/
 	private JingleFileTransferData[] transferData;
@@ -46,6 +47,7 @@ public class FileTransferMediaManager extends JingleMediaManager{
 			session = new FileTransferSession(payloadType,remote,local,"FileTransfer",jingleSession, transferData, monitor);
 		}
 		session.addJingleFileTransferListener(listener);
+		this.session = session;
 		return session;
 	}
 	
@@ -79,12 +81,25 @@ public class FileTransferMediaManager extends JingleMediaManager{
 		this.monitor = monitor;
 	}
 	
+	
+	public void sendFileData() throws JingleSessionException {
+		if(session == null){
+			throw new JingleSessionException("Jingle Session not exist.");
+		}
+		
+		
+	}
+	
 	public void addJingleFileTransferListener(IJingleFileTransferListener listener){
 		this.listener = listener;
+		if(session != null){
+			session.addJingleFileTransferListener(listener);
+		}
 	}
 	
 	public void removeJingleFileTransferListener(IJingleFileTransferListener listener){
 		this.listener = null;
+		session.removeJingleFileTransferListener(listener);
 	}
 
 }

@@ -19,6 +19,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -32,10 +33,14 @@ import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.IFileTransferReceiver;
+import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
+import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
-public class FileTransferSocks5Receiver implements IFileTransferReceiver {
+public class FileTransferTCPReceiver implements IFileTransferReceiver {
 
+	private static Logger logger = Logger.getLogger(FileTransferTCPReceiver.class);
+	
 	private InetAddress localHost;
 	private InetAddress remoteHost;
 	private int localPort;
@@ -48,10 +53,11 @@ public class FileTransferSocks5Receiver implements IFileTransferReceiver {
 	private JingleFileTransferData transferData;
 
 	private ServerSocket serverSocket = null;
-	
-	private final JingleFileTransferProcessMonitor monitor;
 
-	public FileTransferSocks5Receiver(final InetAddress remoteHost,
+	private final JingleFileTransferProcessMonitor monitor;
+	private IJingleFileTransferListener listener;
+
+	public FileTransferTCPReceiver(final InetAddress remoteHost,
 			final int remotePort, final int localPort) throws IOException {
 		// try {
 
@@ -70,68 +76,80 @@ public class FileTransferSocks5Receiver implements IFileTransferReceiver {
 
 		/* init process monitor. */
 		monitor = new JingleFileTransferProcessMonitor();
-		
+
 		new Thread(new Runnable() {
 
 			public void run() {
-				// TODO Auto-generated method stub
-				while (true) {
-					if (transmit) {
-						try {
-							final Socket socket = serverSocket.accept();
+
+				try {
+					final Socket socket = serverSocket.accept();
+
+					while (on) {
+						if (transmit) {
 
 							/* get number of file to be transfer. */
 							InputStream input = socket.getInputStream();
 							int fileNumber = input.read();
 
-							System.out.println("incomming file numbers: "+fileNumber);
-							
+							System.out.println("incomming file numbers: "
+									+ fileNumber);
+
 							for (int i = 0; i < fileNumber; i++) {
 								/* receive file meta data */
 								receiveMetaData(socket);
 
-								if(transferData.type == FileTransferType.FILELIST_TRANSFER){
+								if (transferData.type == FileTransferType.FILELIST_TRANSFER) {
 									receiveFileListData(socket);
+									// TODO: Stream offen halten
 								}
-								if(transferData.type == FileTransferType.RESOURCE_TRANSFER){
+								if (transferData.type == FileTransferType.RESOURCE_TRANSFER) {
 									/* receive file. */
 									receiveFile(socket);
 								}
 
 							}
-							
-							socket.close();
 
 							monitor.setComplete(true);
-							
-						}
-						catch (SocketException se) {
-							
-							se.printStackTrace();
-							return;
-						}
-						catch (Exception e1) {
-							e1.printStackTrace();
-							return;
+
 						}
 					}
+					
+					socket.close();
+
+				}
+
+				catch (SocketException se) {
+					if(listener != null){
+						listener.exceptionOccured(new JingleSessionException(se.getMessage()));
+					}
+					se.printStackTrace();
+					return;
+				} catch (Exception e1) {
+					if(listener != null){
+						listener.exceptionOccured(new JingleSessionException(e1.getMessage()));
+					}
+					e1.printStackTrace();
+					return;
 				}
 			}
-
-
 		}).start();
 
 		System.out.println("receiver started.");
 	}
 
-
-	private void receiveFileListData(Socket socket)throws IOException, ClassNotFoundException {
+	private void receiveFileListData(Socket socket) throws IOException,
+			ClassNotFoundException {
+		logger.debug("receive file List");
 		ObjectInputStream ii = new ObjectInputStream(socket.getInputStream());
 
 		String fileListData = (String) ii.readObject();
-		System.out.println("File List Data : "+fileListData.toString());
+		
+		/* inform listener. */
+		listener.incommingFileList(fileListData, transferData.sender);
+
+		//		System.out.println("File List Data : " + fileListData.toString());
 	}
-	
+
 	private void receiveMetaData(Socket socket) throws IOException,
 			ClassNotFoundException {
 		// ObjectOutputStream oo = new ObjectOutputStream(
@@ -141,7 +159,7 @@ public class FileTransferSocks5Receiver implements IFileTransferReceiver {
 		JingleFileTransferData meta = (JingleFileTransferData) ii.readObject();
 		this.transferData = meta;
 
-//		ii.close();
+		// ii.close();
 
 	}
 
@@ -149,18 +167,20 @@ public class FileTransferSocks5Receiver implements IFileTransferReceiver {
 		InputStream input = socket.getInputStream();
 
 		byte[] buffer = new byte[1024];
-//		System.out.println("Binded");
+		// System.out.println("Binded");
 
-//		FileOutputStream fos = new FileOutputStream(transferData.path.toFile());
-		FileOutputStream fos = new FileOutputStream(new File(transferData.filePath));
+		// FileOutputStream fos = new
+		// FileOutputStream(transferData.path.toFile());
+		FileOutputStream fos = new FileOutputStream(new File(
+				transferData.filePath));
 		while (input.read(buffer, 0, 1024) != -1) {
 			fos.write(buffer);
 			fos.flush();
 		}
 
 		fos.close();
-//		input.close();
-//		socket.close();
+		// input.close();
+		// socket.close();
 
 	}
 
@@ -275,8 +295,22 @@ public class FileTransferSocks5Receiver implements IFileTransferReceiver {
 		this.on = false;
 		// socket.close();
 	}
-	
-	public JingleFileTransferProcessMonitor getMonitor(){
+
+	public JingleFileTransferProcessMonitor getMonitor() {
 		return this.monitor;
+	}
+
+	public void sendFileData(JingleFileTransferData[] transferData) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public void addJingleFileTransferListener(IJingleFileTransferListener listener){
+		this.listener = listener;
+		
+	}
+	
+	public void removeJingleFileTransferListener(IJingleFileTransferListener listener){
+		this.listener = null;
 	}
 }

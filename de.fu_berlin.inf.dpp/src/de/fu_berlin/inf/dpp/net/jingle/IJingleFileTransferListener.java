@@ -17,4 +17,7 @@ public interface IJingleFileTransferListener {
 	 */
 	public void incommingFileTransfer(JingleFileTransferProcessMonitor monitor);
 
+	public void incommingFileList(String fileList_content, JID sender);
+	
+	public void exceptionOccured(JingleSessionException exception);
 }
