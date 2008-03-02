@@ -77,18 +77,29 @@ public class FileTransferMediaManager extends JingleMediaManager{
 		this.monitor = monitor;
 	}
 	
+	/**
+	 * send new transfer data over existing stream.
+	 * @param transferData
+	 */
+	public void setTransferFile(JingleFileTransferData[] transferData) throws JingleSessionException{
+		this.transferData = transferData;
+		if(session != null){
+			session.sendFileData(transferData);
+		}
+	}
+	
 	public void setTransferMonitor(JingleFileTransferProcessMonitor monitor){
 		this.monitor = monitor;
 	}
 	
 	
-	public void sendFileData() throws JingleSessionException {
-		if(session == null){
-			throw new JingleSessionException("Jingle Session not exist.");
-		}
-		
-		
-	}
+//	public void sendFileData() throws JingleSessionException {
+//		if(session == null){
+//			throw new JingleSessionException("Jingle Session not exist.");
+//		}
+//		
+//		
+//	}
 	
 	public void addJingleFileTransferListener(IJingleFileTransferListener listener){
 		this.listener = listener;

@@ -159,9 +159,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 		public long filesize;
 		public IProject project;
 
-		/* for testing only */
-		public File file;
-		public String filePath;
+//		/* for testing only */
+//		public File file;
+//		public String filePath;
 	}
 
 	/**
@@ -227,7 +227,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		if (jingle && jingleManager == null) {
 			/* try to connect with jingle */
-			 jingleManager = new JingleFileTransferManager(connection, this);
+			jingleManager = new JingleFileTransferManager(connection, this);
 		}
 	}
 
@@ -372,8 +372,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 		/* only for testing. */
 		data.file_list_content = fileListContent;
 		data.type = FileTransferType.FILELIST_TRANSFER;
-		data.recipient =recipient;
+		data.recipient = recipient;
 		data.sender = new JID(connection.getUser());
+		data.file_project_path = FileTransferType.FILELIST_TRANSFER.toString();
 
 		jingleManager.createOutgoingJingleFileTransfer(recipient,
 				new JingleFileTransferData[] { data }, monitor);
@@ -511,7 +512,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 					// }
 					/* delete temp file. */
 					// File list = new File(FILELIST_TRANSFER_DESCRIPTION);
-
 					if (newfile.exists()) {
 						newfile.delete();
 					}
@@ -802,6 +802,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		transfer.timestamp = timestamp;
 		transfer.callback = callback;
 		transfer.project = project;
+		transfer.filesize = project.getFile(path).getLocation().toFile().length();
 
 		// if transfer will be delayed, we need to buffer the file
 		// to not send modified versions later
@@ -1184,36 +1185,37 @@ public class XMPPChatTransmitter implements ITransmitter,
 		// log.error(e);
 		// }
 		/* end for testing file transfer. */
-		
+
 		final FileTransferRequest request = incommingRequest;
-		
-		new Thread(new Runnable(){
+
+		new Thread(new Runnable() {
 
 			public void run() {
-				try{
-				String fileDescription = request.getDescription();
-				log.debug("1. incomming file transfer " + request.getFileName());
-				if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
-					FileList fileList = receiveFileListBufferByteArray(request);
-					JID fromJID = new JID(request.getRequestor());
+				try {
+					String fileDescription = request.getDescription();
+					log.debug("1. incomming file transfer "
+							+ request.getFileName());
+					if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
+						FileList fileList = receiveFileListBufferByteArray(request);
+						JID fromJID = new JID(request.getRequestor());
 
-					log.debug("2. inform invitation process...");
-					for (IInvitationProcess process : processes) {
-						if (process.getPeer().equals(fromJID))
-							process.fileListReceived(fromJID, fileList);
+						log.debug("2. inform invitation process...");
+						for (IInvitationProcess process : processes) {
+							if (process.getPeer().equals(fromJID))
+								process.fileListReceived(fromJID, fileList);
+						}
+
+					} else if (fileDescription.startsWith(
+							RESOURCE_TRANSFER_DESCRIPTION, 0)) {
+						receiveResource(request);
 					}
+				} catch (Exception e) {
+					log.error("Incomming File Transfer Thread: ", e);
+				}
 
-				} else if (fileDescription.startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
-					receiveResource(request);
-				}
-				}catch(Exception e){
-					log.error("Incomming File Transfer Thread: ",e);
-				}
-				
 			}
-			
-		}
-				).start();
+
+		}).start();
 
 	}
 
@@ -1284,6 +1286,28 @@ public class XMPPChatTransmitter implements ITransmitter,
 		}
 	}
 
+	
+	private void receiveResource(JingleFileTransferData data, InputStream input) {
+		try{
+			JID from = data.sender;
+			Path path = new Path(data.file_project_path);
+			
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(from)) {
+					process.resourceReceived(from, path, input);
+					
+				}
+			}
+			
+		} catch(Exception e){
+			log.error("Error during receive file",e);
+		}
+	}
+	
+	/**
+	 * receive resource with file transfer.
+	 * @param request
+	 */
 	private void receiveResource(FileTransferRequest request) {
 		try {
 
@@ -1299,9 +1323,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			IncomingFileTransfer transfer = request.accept();
 
-//			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-//					transfer);
-			
+			// FileTransferProcessMonitor monitor = new
+			// FileTransferProcessMonitor(
+			// transfer);
 
 			InputStream in = transfer.recieveFile();
 			/* 1. Wenn es innerhalb des Invitation processes stattfindet. */
@@ -1339,13 +1363,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 				SessionManager sm = Saros.getDefault().getSessionManager();
 				sm.getSharedProject().getSequencer().exec(timedActivity);
 			}
-			
-//			/* wait for complete transfer. */
-//			while (monitor.isAlive() && monitor.isRunning()) {
-//				Thread.sleep(500);
-//			}
-//			monitor.closeMonitor(true);
-			
+
+			// /* wait for complete transfer. */
+			// while (monitor.isAlive() && monitor.isRunning()) {
+			// Thread.sleep(500);
+			// }
+			// monitor.closeMonitor(true);
 
 			log.info("Received resource " + request.getFileName());
 
@@ -1438,73 +1461,96 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			try {
 
-				OutgoingFileTransfer
-						.setResponseTimeout(MAX_TRANSFER_RETRIES * 1000);
-				OutgoingFileTransfer transfer = fileTransferManager
-						.createOutgoingFileTransfer(recipient.toString());
+				if (jingle) {
 
-				/* get file from project. */
-				// File f = new
-				// File(transferData.project.getFile(transferData.path)
-				// .getLocation().toOSString());
-				// File f =
-				// transferData.project.getFile(transferData.path).getProjectRelativePath().toFile();
-				IFile f = transferData.project.getFile(transferData.path);
+					JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
+					/* create file transfer. */
+					JingleFileTransferData data = new JingleFileTransferData();
 
-				if (f.exists()) {
-					log.debug("file exists and will be send :" + f.getName()
-							+ " " + f.getLocation());
-					/* set path in description */
-					description = description + ":" + transferData.path;
-					/* send file */
-					transfer.sendFile(new File(f.getLocation().toString()),
-							description);
+					/* only for testing. */
+//					transferData.path.toString();
+					data.file_project_path = transferData.path.toString();
+					data.project_name = transferData.project.getName();
+					data.type = FileTransferType.RESOURCE_TRANSFER;
+					data.recipient = recipient;
+					data.sender = new JID(connection.getUser());
+					data.filesize = transferData.filesize;
+					
+
+					jingleManager.createOutgoingJingleFileTransfer(recipient,
+							new JingleFileTransferData[] { data }, monitor);
+					
 				} else {
-					log.warn("file NOT exists. " + f.getLocation());
-					// TODO: bessere exception auslösen. nur zum aktuellen test
-					throw new Exception("File not exists.");
+
+					OutgoingFileTransfer
+							.setResponseTimeout(MAX_TRANSFER_RETRIES * 1000);
+					OutgoingFileTransfer transfer = fileTransferManager
+							.createOutgoingFileTransfer(recipient.toString());
+
+					/* get file from project. */
+					// File f = new
+					// File(transferData.project.getFile(transferData.path)
+					// .getLocation().toOSString());
+					// File f =
+					// transferData.project.getFile(transferData.path).getProjectRelativePath().toFile();
+					IFile f = transferData.project.getFile(transferData.path);
+
+					if (f.exists()) {
+						log.debug("file exists and will be send :"
+								+ f.getName() + " " + f.getLocation());
+						/* set path in description */
+						description = description + ":" + transferData.path;
+						/* send file */
+						transfer.sendFile(new File(f.getLocation().toString()),
+								description);
+					} else {
+						log.warn("file NOT exists. " + f.getLocation());
+						// TODO: bessere exception auslösen. nur zum aktuellen
+						// test
+						throw new Exception("File not exists.");
+					}
+
+					FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
+							transfer);
+					/* wait for complete transfer. */
+					while (monitor.isAlive() && monitor.isRunning()) {
+						Thread.sleep(500);
+					}
+					monitor.closeMonitor(true);
+
+					if (transfer
+							.getStatus()
+							.equals(
+									org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)) {
+						log.debug("transfer complete");
+					}
+
+					// // HACK file size
+					// OutputStream out = transfer.sendFile(transferData.path
+					// .toString(), 1, description);
+					//
+					// if (out == null || transfer.getException() != null)
+					// throw new XMPPException(transfer.getException());
+					//
+					// if (transferData.content == null) {
+					// byte[] buffer = new byte[1000];
+					// int length = -1;
+					// InputStream in = project.getFile(transferData.path)
+					// .getContents();
+					// while ((length = in.read(buffer)) >= 0) {
+					// out.write(buffer, 0, length);
+					// }
+					// in.close();
+					// } else {
+					// out.write(transferData.content, 0,
+					// (int) transferData.filesize);
+					// }
+					//
+					// out.close();
+
+					// log.info("Sent file " + transferData.path);
+
 				}
-
-				FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-						transfer);
-				/* wait for complete transfer. */
-				while (monitor.isAlive() && monitor.isRunning()) {
-					Thread.sleep(500);
-				}
-				monitor.closeMonitor(true);
-
-				if (transfer
-						.getStatus()
-						.equals(
-								org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)) {
-					log.debug("transfer complete");
-				}
-
-				// // HACK file size
-				// OutputStream out = transfer.sendFile(transferData.path
-				// .toString(), 1, description);
-				//
-				// if (out == null || transfer.getException() != null)
-				// throw new XMPPException(transfer.getException());
-				//
-				// if (transferData.content == null) {
-				// byte[] buffer = new byte[1000];
-				// int length = -1;
-				// InputStream in = project.getFile(transferData.path)
-				// .getContents();
-				// while ((length = in.read(buffer)) >= 0) {
-				// out.write(buffer, 0, length);
-				// }
-				// in.close();
-				// } else {
-				// out.write(transferData.content, 0,
-				// (int) transferData.filesize);
-				// }
-				//
-				// out.close();
-
-				// log.info("Sent file " + transferData.path);
-
 			} catch (Exception e) {
 
 			}
@@ -1543,39 +1589,36 @@ public class XMPPChatTransmitter implements ITransmitter,
 		return fileList;
 	}
 
-	private FileList receiveFileListBufferByteArray(FileTransferRequest request){
+	private FileList receiveFileListBufferByteArray(FileTransferRequest request) {
 		FileList fileList = null;
 		try {
 			final IncomingFileTransfer transfer = request.accept();
 
 			InputStream in = transfer.recieveFile();
-			
-			
+
 			byte[] buffer = new byte[1024];
 			int bytesRead;
 			String sb = new String();
 			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
-				sb += new String(buffer,0,buffer.length).toString();
-				System.out.println("incomming: "+sb);
+				sb += new String(buffer, 0, buffer.length).toString();
+				System.out.println("incomming: " + sb);
 			}
 			in.close();
 			log.debug("Close input stream");
 			fileList = new FileList(sb.toString());
-			
-
 
 		} catch (Exception e) {
-			log.error("Error in Incoming File List: ",e);
+			log.error("Error in Incoming File List: ", e);
 			return null;
-//			e.printStackTrace();
-//			Saros.log("Exception while receiving file list", e);
+			// e.printStackTrace();
+			// Saros.log("Exception while receiving file list", e);
 			// TODO retry? but we dont catch any exception here,
 			// smack might not throw them up
 		}
 
 		return fileList;
 	}
-	
+
 	@Deprecated
 	private FileList receiveFileList(FileTransferRequest request) {
 		log.info("Receiving file list");
@@ -1681,30 +1724,37 @@ public class XMPPChatTransmitter implements ITransmitter,
 		jingleManager.terminateJingleSession();
 	}
 
-	public void incommingFileList(String fileList_content,JID recipient) {
+	public void incommingFileList(String fileList_content, JID recipient) {
 		FileList fileList = null;
 		log.info("incoming file list");
 		try {
 			fileList = new FileList(fileList_content);
 		} catch (XmlPullParserException e) {
-			
+
 			e.printStackTrace();
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
 		for (IInvitationProcess process : processes) {
 			if (process.getPeer().equals(recipient))
 				process.fileListReceived(recipient, fileList);
 		}
-		
+
 	}
 
-	@Override
 	public void exceptionOccured(JingleSessionException exception) {
-		//TODO: exception weiter geben oder für Fallback verwenden!
+		// TODO: exception weiter geben oder für Fallback verwenden!
 		log.error("Jingle Session Exception");
-		
+		// Beenden der Socket Verbindung
+		jingleManager.terminateJingleSession();
+	}
+
+	
+	public void incomingResourceFile(JingleFileTransferData data,
+			InputStream input) {
+		log.debug("incoming file");
+		receiveResource(data, input);
 	}
 
 }

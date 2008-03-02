@@ -186,7 +186,7 @@ public class FileTransferSession extends JingleMediaSession {
 			conn = transmitter;
 		}
 		
-		if(conn != null){
+		if(conn == null){
 			throw new JingleSessionException("connection stream not exists.");
 		}
 		

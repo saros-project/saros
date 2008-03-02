@@ -20,6 +20,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
@@ -37,6 +44,9 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		Runnable {
 
+	private static Logger logger = Logger
+			.getLogger(FileTransferTCPTransmitter.class);
+
 	private InetAddress localHost;
 	private InetAddress remoteHost;
 	private int localPort;
@@ -44,25 +54,30 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 	public static final int tileWidth = 25;
 	private boolean on = true;
 	private boolean transmit = false;
+	private boolean receive = false;
 
 	/* transfer information */
 	private JingleFileTransferData[] transferData;
 	private JingleFileTransferProcessMonitor monitor;
 	private IJingleFileTransferListener listener;
 
-//	private FileTransferTCPTransmitter(int localPort,
-//			InetAddress remoteHost, int remotePort) {
-//
-//		this.localPort = localPort;
-//		this.remoteHost = remoteHost;
-//		this.remotePort = remotePort;
-//
-//		transmit = true;
-//
-//	}
+	/* transfer information */
+	private JingleFileTransferData receiveTransferData;
+
+	// private FileTransferTCPTransmitter(int localPort,
+	// InetAddress remoteHost, int remotePort) {
+	//
+	// this.localPort = localPort;
+	// this.remoteHost = remoteHost;
+	// this.remotePort = remotePort;
+	//
+	// transmit = true;
+	//
+	// }
 
 	public FileTransferTCPTransmitter(int localPort, InetAddress remoteHost,
-			int remotePort, JingleFileTransferData[] transferData, JingleFileTransferProcessMonitor monitor) {
+			int remotePort, JingleFileTransferData[] transferData,
+			JingleFileTransferProcessMonitor monitor) {
 
 		this.localPort = localPort;
 		this.remoteHost = remoteHost;
@@ -81,70 +96,118 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 
 		Socket socket = null;
 		try {
-			
-			try{
-				//TODO: Socket create methode mit time out einfügen
-				
-			/* Übertragung zwischen zwei Partnern. */
-			socket = new Socket(remoteHost, remotePort);
-			} catch(SocketException se){
+
+			try {
+				// TODO: Socket create methode mit time out einfügen
+
+				/* Übertragung zwischen zwei Partnern. */
+				socket = new Socket(remoteHost, remotePort);
+			} catch (SocketException se) {
 				Thread.sleep(500);
 				socket = new Socket(remoteHost, remotePort);
 			}
-	
-		while (on) {
-			if (transmit) {
+
+			InputStream input = socket.getInputStream();
+			OutputStream output = socket.getOutputStream();
+
+			while (on) {
 				
-					/*send file number.*/
-					OutputStream os = socket.getOutputStream();					
-					os.write(transferData.length);
-					
+				/**
+				 * Time out für offen verbindung ohne daten einbauen. 
+				 */
+				if (transmit) {
+
+					/* send file number. */
+					// OutputStream os = socket.getOutputStream();
+					if (transferData.length > 0) {
+						logger.debug("send transfer number : "
+								+ transferData.length);
+						output.write(transferData.length);
+					}
 					for (int i = 0; i < transferData.length; i++) {
 
-						/*testing. only*/
-//						 sendFile(socket, "/home/troll/Saros_DPP_1.0.2.jar");
-						
+						/* testing. only */
+						// sendFile(socket, "/home/troll/Saros_DPP_1.0.2.jar");
 						/* send file meta data */
-						sendMetaData(socket, transferData[i]);
-						
-						if(transferData[i].type == FileTransferType.FILELIST_TRANSFER){
-							sendFileListData(socket, transferData[i].file_list_content);
+						logger.debug("send meta data for : "
+								+ transferData[i].file_project_path);
+						sendMetaData(output, transferData[i]);
+
+						if (transferData[i].type == FileTransferType.FILELIST_TRANSFER) {
+							sendFileListData(output,
+									transferData[i].file_list_content);
+							/*
+							 * if file list send, we expect remote file list to
+							 * receive.
+							 */
+							receive = true;
+							transmit = false;
 						}
-						if(transferData[i].type == FileTransferType.RESOURCE_TRANSFER){
-							sendFile(socket, transferData[i].file);
+						if (transferData[i].type == FileTransferType.RESOURCE_TRANSFER) {
+							logger.debug("send file : "
+									+ transferData[i].file_project_path);
+							sendFile(output, transferData[i]);
+
 						}
-						
+
 					}
-					
-					/*set monitor status complete :) */
+					transferData = new JingleFileTransferData[0];
+					/* set monitor status complete :) */
 					monitor.setComplete(true);
-					
+
 					// Thread.sleep(2000);
-					transmit = false;
+
+				}
+				if (receive) {
+					/* get number of file to be transfer. */
+					// InputStream input = socket.getInputStream();
+					int fileNumber = input.read();
+
+					System.out.println("incomming file numbers: " + fileNumber);
+
+					for (int i = 0; i < fileNumber; i++) {
+						/* receive file meta data */
+						receiveMetaData(input);
+
+						if (receiveTransferData.type == FileTransferType.FILELIST_TRANSFER) {
+							receiveFileListData(input);
+						}
+						// if (receiveTransferData.type ==
+						// FileTransferType.RESOURCE_TRANSFER) {
+						// /* receive file. */
+						// receiveFile(socket);
+						// }
+
+					}
+
+					receive = false;
+				}
 			}
-		}
-		
-		socket.close();
-		
+			output.close();
+			input.close();
+			socket.close();
+
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			if(listener != null){
-				listener.exceptionOccured(new JingleSessionException(e1.getMessage()));
+			if (listener != null) {
+				listener.exceptionOccured(new JingleSessionException(e1
+						.getMessage()));
 			}
 			return;
 		}
 	}
 
-	private void sendFileListData(Socket socket, String file_list_content) throws IOException {
-		ObjectOutputStream oo = new ObjectOutputStream(socket.getOutputStream());
+	private void sendFileListData(OutputStream output, String file_list_content)
+			throws IOException {
+		ObjectOutputStream oo = new ObjectOutputStream(output);
 
 		oo.writeObject(file_list_content);
 		oo.flush();
 	}
 
-	private void sendMetaData(Socket socket, JingleFileTransferData data)
+	private void sendMetaData(OutputStream output, JingleFileTransferData data)
 			throws IOException {
-		ObjectOutputStream oo = new ObjectOutputStream(socket.getOutputStream());
+		ObjectOutputStream oo = new ObjectOutputStream(output);
 		// ObjectInputStream ii = new ObjectInputStream(socket
 		// .getInputStream());
 
@@ -152,7 +215,31 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		oo.flush();
 	}
 
+	private void receiveFileListData(InputStream input) throws IOException,
+			ClassNotFoundException {
+		logger.debug("receive file List");
+		ObjectInputStream ii = new ObjectInputStream(input);
 
+		String fileListData = (String) ii.readObject();
+
+		/* inform listener. */
+		listener.incommingFileList(fileListData, receiveTransferData.sender);
+
+		// System.out.println("File List Data : " + fileListData.toString());
+	}
+
+	private void receiveMetaData(InputStream input) throws IOException,
+			ClassNotFoundException {
+		// ObjectOutputStream oo = new ObjectOutputStream(
+		// socket.getOutputStream());
+		ObjectInputStream ii = new ObjectInputStream(input);
+
+		JingleFileTransferData meta = (JingleFileTransferData) ii.readObject();
+		this.receiveTransferData = meta;
+
+		// ii.close();
+
+	}
 
 	private void readByteArray(InputStream input, OutputStream output)
 			throws IOException {
@@ -163,11 +250,45 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 
 	}
 
-	private void sendFile(Socket socket, String fileName) throws IOException {
+	private void sendFile(OutputStream output, File file) throws IOException {
 
-		OutputStream output = socket.getOutputStream();
+		// OutputStream output = socket.getOutputStream();
+		// File file = new File(fileName);
+		// int length = (int) file.length();
+
+		FileInputStream fis = new FileInputStream(file);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+
+		int readSize = 1024;
+		byte[] buffer = new byte[readSize];
+		int length = 0;
+		long filesize = file.length();
+		long currentSize = 0;
+
+		/* zuvor informationen schicken, wie groß die Datei ist. */
+		while (currentSize < filesize) {
+
+			/* check end of file */
+			if ((currentSize + readSize) >= filesize) {
+				readSize = (int) (filesize - currentSize);
+			}
+
+			if ((length = bis.read(buffer, 0, readSize)) != 0) {
+				output.write(buffer, 0, readSize);
+				currentSize += readSize;
+			}
+		}
+
+	}
+
+	@Deprecated
+	private void sendFileOld(OutputStream output, String fileName)
+			throws IOException {
+
+		// OutputStream output = socket.getOutputStream();
 		File file = new File(fileName);
 		int length = (int) file.length();
+
 		System.out.println("File length: " + length);
 		FileInputStream fis = new FileInputStream(file);
 		BufferedInputStream bis = new BufferedInputStream(fis);
@@ -180,27 +301,48 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		System.out.println("File has send");
 
 		fis.close();
-//		output.close();
+		// output.close();
 	}
 
-	private void sendFile(Socket socket, File file) throws IOException {
-		OutputStream output = socket.getOutputStream();
-		int length = (int) file.length();
-		System.out.println("File length: " + length);
-		FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-		BufferedInputStream bis = new BufferedInputStream(fis);
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-		while ((bytesRead = bis.read(buffer, 0, 1024)) != -1) {
-			output.write(buffer, 0, 1024);
-			output.flush();
+	private void sendFile(OutputStream output, JingleFileTransferData fileData) {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+		IProject project = root.getProject(fileData.project_name);
+		// System.out.println("send single file");
+		// logger.info("send file: "+fileData.file_project_path);
+		if (project.exists()) {
+			IFile file = project.getFile(new Path(fileData.file_project_path));
+			try {
+				sendFile(output, file.getLocation().toFile());
+			} catch (IOException e) {
+				logger.error("Error during file transfer: ", e);
+				// e.printStackTrace();
+			}
+		} else {
+			// TODO: exception weiterreichen.
+			logger.error("Project not found.");
 		}
-
-		fis.close();
-//		output.close();
 	}
 
-	
+	// private void sendFile(OutputStream output, File file) throws IOException
+	// {
+	// // OutputStream output = socket.getOutputStream();
+	// // int length = (int) file.length();
+	// // System.out.println("File length: " + length);
+	//	
+	// FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+	// BufferedInputStream bis = new BufferedInputStream(fis);
+	// byte[] buffer = new byte[1024];
+	// int bytesRead;
+	// while ((bytesRead = bis.read(buffer, 0, 1024)) != -1) {
+	// output.write(buffer, 0, 1024);
+	// output.flush();
+	// }
+	//
+	// fis.close();
+	// // output.close();
+	// }
+
 	@Deprecated
 	private void sendString(Socket socket) throws IOException,
 			ClassNotFoundException {
@@ -211,11 +353,11 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		oo.flush();
 		System.out.println((String) ii.readObject());
 
-//		socket.close();
-//		ii.close();
-//		oo.close();
+		// socket.close();
+		// ii.close();
+		// oo.close();
 	}
-	
+
 	@Deprecated
 	private void startByteFileTransfer() {
 
@@ -317,10 +459,10 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		this.on = false;
 	}
 
-	@Override
 	public void sendFileData(JingleFileTransferData[] transferData) {
-		// TODO Auto-generated method stub
-		
+
+		this.transferData = transferData;
+		transmit = true;
 	}
 
 	@Override
@@ -333,6 +475,6 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 	public void removeJingleFileTransferListener(
 			IJingleFileTransferListener listener) {
 		this.listener = null;
-		
+
 	}
 }

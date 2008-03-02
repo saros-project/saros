@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.IncomingJingleSession;
@@ -19,6 +20,8 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 
 public class JingleFileTransferManager {
 
+	private static Logger logger = Logger.getLogger(JingleFileTransferManager.class);
+	
 	private XMPPConnection xmppConnection;
 	private IJingleFileTransferListener transmitter;
 	private JingleManager jm;
@@ -74,7 +77,27 @@ public class JingleFileTransferManager {
 	 * @param monitor
 	 */
 	public void createOutgoingJingleFileTransfer(JID jid, JingleFileTransferData[] transferData, JingleFileTransferProcessMonitor monitor){
-		if (outgoing != null) return;
+		if(incoming != null){
+			/* an incoming session already exist.*/
+			try{
+				logger.debug("Incoming stream exists. Send data with current stream.");
+				mediaManager.setTransferFile(transferData);
+			}catch(JingleSessionException jse){
+				jse.printStackTrace();
+			}
+			return;
+		}
+		
+		
+		if (outgoing != null) {
+			/* send new data with current connection. */
+			try{
+				mediaManager.setTransferFile(transferData);
+			}catch(JingleSessionException jse){
+				jse.printStackTrace();
+			}
+			return;
+		}
         try {
         	//Set file info for media manager
         	
@@ -87,13 +110,13 @@ public class JingleFileTransferManager {
         }
 	}
 	
-	/**
-	 * send datas with active jingle session.
-	 * @param transferData
-	 */
-	public void sendFileDatas(JingleFileTransferData[] transferData){
-		
-	}
+//	/**
+//	 * send datas with active jingle session.
+//	 * @param transferData
+//	 */
+//	public void sendFileDatas(JingleFileTransferData[] transferData){
+//		
+//	}
 	
 	public void terminateJingleSession(){
 		if (outgoing != null)
