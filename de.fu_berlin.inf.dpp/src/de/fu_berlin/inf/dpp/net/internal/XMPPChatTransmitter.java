@@ -1462,7 +1462,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 			try {
 
 				if (jingle) {
-
+					log.info("Sent file " + transferData.path +" (with Jingle)");
+					
 					JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
 					/* create file transfer. */
 					JingleFileTransferData data = new JingleFileTransferData();

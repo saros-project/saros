@@ -86,6 +86,7 @@ public class FileTransferSession extends JingleMediaSession {
 				transmitter = new FileTransferTCPTransmitter(getLocal()
 						.getPort(), remote, getRemote().getPort(),
 						transferData, monitor);
+				transmitter.sendFileData(transferData);
 				transmitter.addJingleFileTransferListener(listener);
 
 			} catch (Exception e) {

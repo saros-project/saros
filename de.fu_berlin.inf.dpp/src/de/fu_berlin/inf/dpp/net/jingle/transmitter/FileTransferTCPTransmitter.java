@@ -19,6 +19,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -58,6 +60,7 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 
 	/* transfer information */
 	private JingleFileTransferData[] transferData;
+	private List<JingleFileTransferData> transferList = new Vector<JingleFileTransferData>();
 	private JingleFileTransferProcessMonitor monitor;
 	private IJingleFileTransferListener listener;
 
@@ -84,10 +87,14 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		this.remotePort = remotePort;
 
 		transmit = true;
-		this.transferData = transferData;
+		
+// this.transferData = transferData;
+		
 		this.monitor = monitor;
 	}
 
+
+	
 	public void run() {
 		start();
 	}
@@ -106,56 +113,22 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 				Thread.sleep(500);
 				socket = new Socket(remoteHost, remotePort);
 			}
-
+			
+			
+			
 			InputStream input = socket.getInputStream();
 			OutputStream output = socket.getOutputStream();
 
 			while (on) {
 				
 				/**
-				 * Time out für offen verbindung ohne daten einbauen. 
+				 * Time out für offen verbindung ohne daten einbauen.
 				 */
 				if (transmit) {
 
 					/* send file number. */
-					// OutputStream os = socket.getOutputStream();
-					if (transferData.length > 0) {
-						logger.debug("send transfer number : "
-								+ transferData.length);
-						output.write(transferData.length);
-					}
-					for (int i = 0; i < transferData.length; i++) {
+					transferData(output);
 
-						/* testing. only */
-						// sendFile(socket, "/home/troll/Saros_DPP_1.0.2.jar");
-						/* send file meta data */
-						logger.debug("send meta data for : "
-								+ transferData[i].file_project_path);
-						sendMetaData(output, transferData[i]);
-
-						if (transferData[i].type == FileTransferType.FILELIST_TRANSFER) {
-							sendFileListData(output,
-									transferData[i].file_list_content);
-							/*
-							 * if file list send, we expect remote file list to
-							 * receive.
-							 */
-							receive = true;
-							transmit = false;
-						}
-						if (transferData[i].type == FileTransferType.RESOURCE_TRANSFER) {
-							logger.debug("send file : "
-									+ transferData[i].file_project_path);
-							sendFile(output, transferData[i]);
-
-						}
-
-					}
-					transferData = new JingleFileTransferData[0];
-					/* set monitor status complete :) */
-					monitor.setComplete(true);
-
-					// Thread.sleep(2000);
 
 				}
 				if (receive) {
@@ -197,6 +170,8 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		}
 	}
 
+
+	
 	private void sendFileListData(OutputStream output, String file_list_content)
 			throws IOException {
 		ObjectOutputStream oo = new ObjectOutputStream(output);
@@ -447,7 +422,7 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 	 * @param transmit
 	 *            boolean Enabled/Disabled
 	 */
-	public void setTransmit(boolean transmit) {
+	public synchronized void setTransmit(boolean transmit) {
 		this.transmit = transmit;
 	}
 
@@ -459,10 +434,91 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		this.on = false;
 	}
 
+	/**
+	 * add new data to transfer.
+	 * 
+	 * @param transferData
+	 *            new data to send
+	 */
 	public void sendFileData(JingleFileTransferData[] transferData) {
-
-		this.transferData = transferData;
+// this.transferData = transferData;
+		
+		addNewData(transferData);
 		transmit = true;
+	}
+	
+	private synchronized void transferData(OutputStream output) throws IOException{
+		/* if no jobs in queue. */
+		while(transferList.size() == 0){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+				
+			logger.debug("send transfer number : "
+					+ transferList.size());
+			output.write(transferList.size());
+
+		for (JingleFileTransferData data : transferList) {
+
+			/* testing. only */
+			// sendFile(socket, "/home/troll/Saros_DPP_1.0.2.jar");
+			/* send file meta data */
+			logger.debug("send meta data for : "
+					+ data.file_project_path);
+			sendMetaData(output, data);
+
+			if (data.type == FileTransferType.FILELIST_TRANSFER) {
+				sendFileListData(output,
+						data.file_list_content);
+				/*
+				 * if file list send, we expect remote file list to receive.
+				 */
+				receive = true;
+				transmit = false;
+			}
+			if (data.type == FileTransferType.RESOURCE_TRANSFER) {
+				logger.debug("send file : "
+						+ data.file_project_path);
+				sendFile(output, data);
+
+			}
+			
+		}
+		
+
+		/* remove from queue */
+		transferList.clear();
+		
+		/* set monitor status complete :) */
+//		monitor.setComplete(true);
+		
+		notifyAll();
+	}
+	
+	/**
+	 * add new transfer data to transfer queue
+	 * 
+	 * @param transferData
+	 */
+	private synchronized void addNewData(JingleFileTransferData[] transferData){
+		/* if job in queue. */
+		while(transferList.size() > 0){
+			try {
+				wait();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		/* add new jobs. */
+		for(JingleFileTransferData d : transferData){
+			this.transferList.add(d);
+		}
+		
+		notifyAll();
 	}
 
 	@Override
