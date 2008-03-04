@@ -200,6 +200,46 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 		System.out.println("receiver started.");
 	}
 
+	private void receiveFileObject(InputStream input, OutputStream output) throws IOException {
+//		InputStream input = socket.getInputStream();
+
+		/* on the first receive data into stream. */
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectInputStream ois = new ObjectInputStream(input);
+		try {
+			File file = (File) ois.readObject();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+//		 byte[] buffer = new byte[1024];
+//		 int length = 0;
+//		 long filesize = receiveTransferData.filesize;
+//		 long currentSize = 0;
+//		 int readSize = 1024;
+//		 /* zuvor informationen schicken, wie groß die Datei ist.*/
+//		 while(currentSize < filesize){
+//			 
+//			 /* check end of file*/
+//			 if((currentSize + readSize)>= filesize){
+//				readSize = (int)(filesize - currentSize); 
+//			 }
+//			 
+//			 if((length = input.read(buffer, 0, readSize))!= 0){
+//				 bos.write(buffer, 0, readSize);
+//				 currentSize += readSize;
+//			 }
+////		 System.out.println(new String(buffer,0,length));
+//		 }
+		
+		 /* inform listener */
+		listener.incomingResourceFile(receiveTransferData, new ByteArrayInputStream(bos.toByteArray()));
+		
+		output.write(1);
+		output.flush();
+	}
+	
 	private void receiveFile(InputStream input, OutputStream output) throws IOException {
 //		InputStream input = socket.getInputStream();
 
@@ -218,7 +258,7 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 				readSize = (int)(filesize - currentSize); 
 			 }
 			 
-			 if((length = input.read(buffer, 0, readSize))!= 0){
+			 if((length = input.read(buffer, 0, readSize)) >= 0){
 				 bos.write(buffer, 0, readSize);
 				 currentSize += readSize;
 			 }

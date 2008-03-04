@@ -226,6 +226,41 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 
 	}
 
+	private void sendFileObject(OutputStream output, File file) throws IOException {
+
+		// OutputStream output = socket.getOutputStream();
+		// File file = new File(fileName);
+		// int length = (int) file.length();
+
+		FileInputStream fis = new FileInputStream(file);
+		BufferedInputStream bis = new BufferedInputStream(fis);
+//
+//		ObjectOutputStream oos = new ObjectOutputStream(output);
+//		oos.writeObject();
+//		oos.flush();
+		int readSize = 1024;
+		byte[] buffer = new byte[readSize];
+		int length = 0;
+		long filesize = file.length();
+		long currentSize = 0;
+
+		/* zuvor informationen schicken, wie groß die Datei ist. */
+		while (currentSize < filesize) {
+
+			/* check end of file */
+			if ((currentSize + readSize) >= filesize) {
+				readSize = (int) (filesize - currentSize);
+			}
+
+			if ((length = bis.read(buffer, 0, readSize)) != 0) {
+				output.write(buffer, 0, readSize);
+				currentSize += readSize;
+			}
+		}
+		output.flush();
+
+	}
+	
 	private void sendFile(OutputStream output, File file) throws IOException {
 
 		// OutputStream output = socket.getOutputStream();
@@ -249,11 +284,13 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 				readSize = (int) (filesize - currentSize);
 			}
 
-			if ((length = bis.read(buffer, 0, readSize)) != 0) {
+			if ((length = bis.read(buffer, 0, readSize)) >= 0) {
 				output.write(buffer, 0, readSize);
 				currentSize += readSize;
 			}
 		}
+		bis.close();
+		fis.close();
 		output.flush();
 
 	}
@@ -291,6 +328,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 			IFile file = project.getFile(new Path(fileData.file_project_path));
 			try {
 				sendFile(output, file.getLocation().toFile());
+//				sendFileObject(output, file.getLocation().toFile());
 			} catch (IOException e) {
 				logger.error("Error during file transfer: ", e);
 				// e.printStackTrace();
