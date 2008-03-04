@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 
 /**
  * An incoming invitation process.
@@ -152,6 +153,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 				cancel(null, false);
 
 		} catch (Exception e) {
+			ErrorMessageDialog.showErrorMessage(new Exception("Exception during create project."));
 			failed(e);
 
 		} finally {
