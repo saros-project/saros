@@ -289,6 +289,8 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 				currentSize += readSize;
 			}
 		}
+
+		
 		bis.close();
 		fis.close();
 		output.flush();
@@ -339,6 +341,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 		}
 	}
 
+	
 	/**
 	 * Return given file as byte array representation.
 	 */
@@ -405,10 +408,10 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 			int ack = 1;
 		for (JingleFileTransferData data : transferList) {
 
-			if(ack == 0){
-				logger.error("wrong acknoledge... ");
-				listener.exceptionOccured(new JingleSessionException("Wrong ack for send file."));
-			}
+//			if(ack == 0){
+//				logger.error("wrong acknoledge... ");
+//				listener.exceptionOccured(new JingleSessionException("Wrong ack for send file."));
+//			}
 			/* if no init state*/
 //			if(ack != -1)
 //				ack = input.read();
@@ -430,9 +433,9 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 			if (data.type == FileTransferType.RESOURCE_TRANSFER) {
 				logger.debug("send file : "
 						+ data.file_project_path);
-				sendFile(output, data);
-				logger.debug("wait for ack...");
-				ack = input.read();
+//				sendFile(output, data);
+//				logger.debug("wait for ack...");
+//				ack = input.read();
 			}
 			
 		}

@@ -27,7 +27,7 @@ public class JingleFileTransferData implements Serializable{
 	public String file_project_path;
 	public int timestamp;
 	public long filesize;
-//	public byte[] content;
+	public byte[] content;
 	
 	/*for testing only */
 	public File file;

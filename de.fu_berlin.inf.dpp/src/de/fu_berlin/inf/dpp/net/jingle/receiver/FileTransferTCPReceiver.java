@@ -122,9 +122,10 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 								if (receiveTransferData.type == FileTransferType.RESOURCE_TRANSFER) {
 									/* receive file. */
 									logger.info("File incoming: "+receiveTransferData.file_project_path);
-									receiveFile(input,output);
+//									receiveFile(input,output);
+
 //									logger.info("File incoming: "+receiveTransferData.file_project_path);
-//									listener.incomingResourceFile(receiveTransferData, input);
+									listener.incomingResourceFile(receiveTransferData, new ByteArrayInputStream(receiveTransferData.content));
 									
 								}
 

@@ -790,7 +790,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		}
 		return true;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -1478,7 +1478,23 @@ public class XMPPChatTransmitter implements ITransmitter,
 					data.type = FileTransferType.RESOURCE_TRANSFER;
 					data.recipient = recipient;
 					data.sender = new JID(connection.getUser());
-					data.filesize = transferData.filesize;
+//					data.filesize = transferData.filesize;
+					
+					/* read content data. */
+					File f = new File(transferData.project.getFile(transferData.path).getLocation()
+							.toOSString());
+					data.filesize = f.length();
+					data.content = new byte[(int) data.filesize];
+
+					try {
+						InputStream in = transferData.project.getFile(transferData.path)
+								.getContents();
+						in.read(data.content, 0, (int) data.filesize);
+					} catch (Exception e) {
+						e.printStackTrace();
+						data.content = null;
+						log.error("Error during read file content for transfer!");
+					}
 					
 
 					jingleManager.createOutgoingJingleFileTransfer(recipient,
