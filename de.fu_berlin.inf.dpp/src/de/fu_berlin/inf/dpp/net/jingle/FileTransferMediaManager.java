@@ -109,6 +109,7 @@ public class FileTransferMediaManager extends JingleMediaManager {
 			if (session != null) {
 				session.sendFileData(transferData);
 			} else {
+				/* incoming session registered to sender. */
 				session = sessions.get(data.sender);
 				if (session != null) {
 					session.sendFileData(transferData);

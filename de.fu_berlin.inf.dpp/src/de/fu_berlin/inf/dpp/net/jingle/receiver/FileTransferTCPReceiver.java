@@ -122,7 +122,7 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 								if (receiveTransferData.type == FileTransferType.RESOURCE_TRANSFER) {
 									/* receive file. */
 									logger.info("File incoming: "+receiveTransferData.file_project_path);
-									receiveFile(input);
+									receiveFile(input,output);
 //									logger.info("File incoming: "+receiveTransferData.file_project_path);
 //									listener.incomingResourceFile(receiveTransferData, input);
 									
@@ -200,7 +200,7 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 		System.out.println("receiver started.");
 	}
 
-	private void receiveFile(InputStream input) throws IOException {
+	private void receiveFile(InputStream input, OutputStream output) throws IOException {
 //		InputStream input = socket.getInputStream();
 
 		/* on the first receive data into stream. */
@@ -227,7 +227,9 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 		
 		 /* inform listener */
 		listener.incomingResourceFile(receiveTransferData, new ByteArrayInputStream(bos.toByteArray()));
-
+		
+		output.write(1);
+		output.flush();
 	}
 	
 	@Deprecated

@@ -128,7 +128,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 				if (transmit) {
 
 					/* send file number. */
-					transferData(output);
+					transferData(output,input);
 
 
 				}
@@ -254,6 +254,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 				currentSize += readSize;
 			}
 		}
+		output.flush();
 
 	}
 
@@ -348,7 +349,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 		transmit = true;
 	}
 	
-	private synchronized void transferData(OutputStream output) throws IOException{
+	private synchronized void transferData(OutputStream output, InputStream input) throws IOException{
 		/* if no jobs in queue. */
 		while(transferList.size() == 0){
 			try {
@@ -362,8 +363,18 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 					+ transferList.size());
 			output.write(transferList.size());
 
+			/* init state. */
+			int ack = 1;
 		for (JingleFileTransferData data : transferList) {
 
+			if(ack == 0){
+				logger.error("wrong acknoledge... ");
+				listener.exceptionOccured(new JingleSessionException("Wrong ack for send file."));
+			}
+			/* if no init state*/
+//			if(ack != -1)
+//				ack = input.read();
+			
 			/* send file meta data */
 			logger.debug("send meta data for : "
 					+ data.file_project_path);
@@ -382,7 +393,8 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 				logger.debug("send file : "
 						+ data.file_project_path);
 				sendFile(output, data);
-
+				logger.debug("wait for ack...");
+				ack = input.read();
 			}
 			
 		}
@@ -420,13 +432,11 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 		notifyAll();
 	}
 
-	@Override
 	public void addJingleFileTransferListener(
 			IJingleFileTransferListener listener) {
 		this.listener = listener;
 	}
 
-	@Override
 	public void removeJingleFileTransferListener(
 			IJingleFileTransferListener listener) {
 		this.listener = null;
