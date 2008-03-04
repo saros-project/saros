@@ -41,9 +41,10 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.IFileTransferTransmitter;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferTCPConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
-public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
+public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection implements IFileTransferTransmitter,
 		Runnable {
 
 	private static Logger logger = Logger
@@ -62,10 +63,10 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 	private JingleFileTransferData[] transferData;
 	private List<JingleFileTransferData> transferList = new Vector<JingleFileTransferData>();
 	private JingleFileTransferProcessMonitor monitor;
-	private IJingleFileTransferListener listener;
+//	private IJingleFileTransferListener listener;
 
 	/* transfer information */
-	private JingleFileTransferData receiveTransferData;
+//	private JingleFileTransferData receiveTransferData;
 
 	// private FileTransferTCPTransmitter(int localPort,
 	// InetAddress remoteHost, int remotePort) {
@@ -161,10 +162,9 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 			socket.close();
 
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			logger.error(e1);
 			if (listener != null) {
-				listener.exceptionOccured(new JingleSessionException(e1
-						.getMessage()));
+				listener.exceptionOccured(new JingleSessionException("Error during Jingle file transfer."));
 			}
 			return;
 		}
@@ -172,50 +172,51 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 
 
 	
-	private void sendFileListData(OutputStream output, String file_list_content)
-			throws IOException {
-		ObjectOutputStream oo = new ObjectOutputStream(output);
+//	private void sendFileListData(OutputStream output, String file_list_content)
+//			throws IOException {
+//		ObjectOutputStream oo = new ObjectOutputStream(output);
+//
+//		oo.writeObject(file_list_content);
+//		oo.flush();
+//	}
 
-		oo.writeObject(file_list_content);
-		oo.flush();
-	}
+//	private void sendMetaData(OutputStream output, JingleFileTransferData data)
+//			throws IOException {
+//		ObjectOutputStream oo = new ObjectOutputStream(output);
+//		// ObjectInputStream ii = new ObjectInputStream(socket
+//		// .getInputStream());
+//
+//		oo.writeObject(data);
+//		oo.flush();
+//	}
 
-	private void sendMetaData(OutputStream output, JingleFileTransferData data)
-			throws IOException {
-		ObjectOutputStream oo = new ObjectOutputStream(output);
-		// ObjectInputStream ii = new ObjectInputStream(socket
-		// .getInputStream());
+//	private void receiveFileListData(InputStream input) throws IOException,
+//			ClassNotFoundException {
+//		logger.debug("receive file List");
+//		ObjectInputStream ii = new ObjectInputStream(input);
+//
+//		String fileListData = (String) ii.readObject();
+//
+//		/* inform listener. */
+//		listener.incommingFileList(fileListData, receiveTransferData.sender);
+//
+//		// System.out.println("File List Data : " + fileListData.toString());
+//	}
 
-		oo.writeObject(data);
-		oo.flush();
-	}
+//	private void receiveMetaData(InputStream input) throws IOException,
+//			ClassNotFoundException {
+//		// ObjectOutputStream oo = new ObjectOutputStream(
+//		// socket.getOutputStream());
+//		ObjectInputStream ii = new ObjectInputStream(input);
+//
+//		JingleFileTransferData meta = (JingleFileTransferData) ii.readObject();
+//		this.receiveTransferData = meta;
+//
+//		// ii.close();
+//
+//	}
 
-	private void receiveFileListData(InputStream input) throws IOException,
-			ClassNotFoundException {
-		logger.debug("receive file List");
-		ObjectInputStream ii = new ObjectInputStream(input);
-
-		String fileListData = (String) ii.readObject();
-
-		/* inform listener. */
-		listener.incommingFileList(fileListData, receiveTransferData.sender);
-
-		// System.out.println("File List Data : " + fileListData.toString());
-	}
-
-	private void receiveMetaData(InputStream input) throws IOException,
-			ClassNotFoundException {
-		// ObjectOutputStream oo = new ObjectOutputStream(
-		// socket.getOutputStream());
-		ObjectInputStream ii = new ObjectInputStream(input);
-
-		JingleFileTransferData meta = (JingleFileTransferData) ii.readObject();
-		this.receiveTransferData = meta;
-
-		// ii.close();
-
-	}
-
+	@Deprecated
 	private void readByteArray(InputStream input, OutputStream output)
 			throws IOException {
 		ObjectOutputStream oos = new ObjectOutputStream(output);
@@ -299,105 +300,6 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 		}
 	}
 
-	// private void sendFile(OutputStream output, File file) throws IOException
-	// {
-	// // OutputStream output = socket.getOutputStream();
-	// // int length = (int) file.length();
-	// // System.out.println("File length: " + length);
-	//	
-	// FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-	// BufferedInputStream bis = new BufferedInputStream(fis);
-	// byte[] buffer = new byte[1024];
-	// int bytesRead;
-	// while ((bytesRead = bis.read(buffer, 0, 1024)) != -1) {
-	// output.write(buffer, 0, 1024);
-	// output.flush();
-	// }
-	//
-	// fis.close();
-	// // output.close();
-	// }
-
-	@Deprecated
-	private void sendString(Socket socket) throws IOException,
-			ClassNotFoundException {
-		ObjectOutputStream oo = new ObjectOutputStream(socket.getOutputStream());
-		ObjectInputStream ii = new ObjectInputStream(socket.getInputStream());
-
-		oo.writeObject("Test-String");
-		oo.flush();
-		System.out.println((String) ii.readObject());
-
-		// socket.close();
-		// ii.close();
-		// oo.close();
-	}
-
-	@Deprecated
-	private void startByteFileTransfer() {
-
-		// System.out.println("Angemeldet: ");
-		//		
-		// // input = (ByteArrayInputStream) socket.getInputStream();
-		// output = (ByteArrayOutputStream)socket.getOutputStream();
-		//		
-		// File file = new File("/home/troll/test.txt");
-		// FileInputStream fileInputStream = new FileInputStream(file);
-		// byte[] buffer = new byte[256];
-		// for (int len = fileInputStream.read(buffer); len > 0; len =
-		// fileInputStream
-		// .read(buffer)) {
-		// output.write(buffer, 0, len);
-		// }
-		// fileInputStream.close();
-
-	}
-
-	@Deprecated
-	private void testNumberTransfer() {
-		Socket socket = null;
-		// ByteArrayInputStream input = null;
-		// ByteArrayOutputStream output = null;
-		while (on) {
-			if (transmit) {
-				try {
-					/* Übertragung zwischen zwei Partnern. */
-					socket = new Socket(remoteHost, remotePort);
-
-					InputStream input = socket.getInputStream();
-					OutputStream output = socket.getOutputStream();
-
-					output.write(5);
-					output.write(23);
-					output.flush();
-
-					System.out.println("Server antwort: " + input.read());
-					socket.close();
-					input.close();
-					output.close();
-
-					// Thread.sleep(2000);
-					transmit = false;
-					// socket.close();
-					on = false;
-				} catch (Exception e1) {
-
-					e1.printStackTrace();
-				}
-			}
-		}
-	}
-
-	// private static void method0(File file) throws Exception, IOException,
-	// UnsupportedEncodingException {
-	//
-	// FileInputStream fileInputStream = new FileInputStream(file);
-	// byte[] data = new byte[(int) file.length()];
-	// fileInputStream.read(data);
-	// fileInputStream.close();
-	// System.out.println(new String(data, "UTF-8"));
-	// }
-
 	/**
 	 * Return given file as byte array representation.
 	 */
@@ -441,8 +343,7 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 	 *            new data to send
 	 */
 	public void sendFileData(JingleFileTransferData[] transferData) {
-// this.transferData = transferData;
-		
+	
 		addNewData(transferData);
 		transmit = true;
 	}
@@ -463,8 +364,6 @@ public class FileTransferTCPTransmitter implements IFileTransferTransmitter,
 
 		for (JingleFileTransferData data : transferList) {
 
-			/* testing. only */
-			// sendFile(socket, "/home/troll/Saros_DPP_1.0.2.jar");
 			/* send file meta data */
 			logger.debug("send meta data for : "
 					+ data.file_project_path);

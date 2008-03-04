@@ -87,6 +87,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 
 /**
  * An ITransmitter implementation which uses Smack Chat objects.
@@ -104,6 +105,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
 	private static boolean jingle = true;
+	private boolean JingleError = false;
 	private JingleFileTransferManager jingleManager;
 	private JingleFileTransferProcessMonitor monitor;
 
@@ -226,6 +228,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		privatechatmanager.setConnection(connection, this);
 
 		if (jingle && jingleManager == null) {
+//			JingleError = false;
 			/* try to connect with jingle */
 			jingleManager = new JingleFileTransferManager(connection, this);
 		}
@@ -402,7 +405,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		} else {
 
 			/* send with jingle file transfer */
-			if (jingle) {
+			if (jingle && !JingleError) {
 
 				sendFileListWithJingle(recipient, xml);
 			} else {
@@ -1461,7 +1464,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			try {
 
-				if (jingle) {
+				if (jingle && !JingleError) {
 					log.info("Sent file " + transferData.path +" (with Jingle)");
 					
 					JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
@@ -1710,6 +1713,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	}
 
+	@Deprecated
 	public void incommingFileTransfer(JingleFileTransferProcessMonitor monitor) {
 		log.info("Incomming Jingle File Transfer");
 		this.monitor = monitor;
@@ -1722,7 +1726,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			}
 		}
 
-		jingleManager.terminateJingleSession();
+//		jingleManager.terminateJingleSession();
 	}
 
 	public void incommingFileList(String fileList_content, JID recipient) {
@@ -1747,8 +1751,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 	public void exceptionOccured(JingleSessionException exception) {
 		// TODO: exception weiter geben oder für Fallback verwenden!
 		log.error("Jingle Session Exception");
-		// Beenden der Socket Verbindung
-		jingleManager.terminateJingleSession();
+		
+		this.JingleError = true;
+		
+		ErrorMessageDialog.showErrorMessage(exception);
+		// TODO: Beenden der Socket Verbindung
+		jingleManager.terminateAllJingleSessions();
 	}
 
 	

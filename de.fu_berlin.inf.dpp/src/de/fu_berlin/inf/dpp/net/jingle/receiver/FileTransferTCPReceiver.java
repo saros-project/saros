@@ -36,9 +36,10 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.IFileTransferReceiver;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferTCPConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
-public class FileTransferTCPReceiver implements IFileTransferReceiver {
+public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection implements IFileTransferReceiver {
 
 	private static Logger logger = Logger
 			.getLogger(FileTransferTCPReceiver.class);
@@ -54,7 +55,7 @@ public class FileTransferTCPReceiver implements IFileTransferReceiver {
 
 	
 	/* transfer information */
-	private JingleFileTransferData receiveTransferData;
+//	private JingleFileTransferData receiveTransferData;
 
 	/* transmit transfer data */
 	private JingleFileTransferData[] transferData;
@@ -62,7 +63,7 @@ public class FileTransferTCPReceiver implements IFileTransferReceiver {
 	private ServerSocket serverSocket = null;
 
 	private final JingleFileTransferProcessMonitor monitor;
-	private IJingleFileTransferListener listener;
+//	private IJingleFileTransferListener listener;
 
 	public FileTransferTCPReceiver(final InetAddress remoteHost,
 			final int remotePort, final int localPort) throws IOException {
@@ -199,50 +200,6 @@ public class FileTransferTCPReceiver implements IFileTransferReceiver {
 		System.out.println("receiver started.");
 	}
 
-	private void sendFileListData(OutputStream output, String file_list_content)
-			throws IOException {
-		ObjectOutputStream oo = new ObjectOutputStream(output);
-
-		oo.writeObject(file_list_content);
-		oo.flush();
-	}
-
-	private void sendMetaData(OutputStream output, JingleFileTransferData data)
-			throws IOException {
-		ObjectOutputStream oo = new ObjectOutputStream(output);
-		// ObjectInputStream ii = new ObjectInputStream(socket
-		// .getInputStream());
-
-		oo.writeObject(data);
-		oo.flush();
-	}
-
-	private void receiveFileListData(InputStream input) throws IOException,
-			ClassNotFoundException {
-		logger.debug("receive file List");
-		ObjectInputStream ii = new ObjectInputStream(input);
-
-		String fileListData = (String) ii.readObject();
-
-		/* inform listener. */
-		listener.incommingFileList(fileListData, receiveTransferData.sender);
-
-		// System.out.println("File List Data : " + fileListData.toString());
-	}
-
-	private void receiveMetaData(InputStream input) throws IOException,
-			ClassNotFoundException {
-		// ObjectOutputStream oo = new ObjectOutputStream(
-		// socket.getOutputStream());
-		ObjectInputStream ii = new ObjectInputStream(input);
-
-		JingleFileTransferData meta = (JingleFileTransferData) ii.readObject();
-		this.receiveTransferData = meta;
-
-		// ii.close();
-
-	}
-
 	private void receiveFile(InputStream input) throws IOException {
 //		InputStream input = socket.getInputStream();
 
@@ -271,42 +228,6 @@ public class FileTransferTCPReceiver implements IFileTransferReceiver {
 		 /* inform listener */
 		listener.incomingResourceFile(receiveTransferData, new ByteArrayInputStream(bos.toByteArray()));
 
-		//		byte[] buffer = new byte[1024];
-//		// System.out.println("Binded");
-//
-//		
-//		
-//		// FileOutputStream fos = new
-//		// FileOutputStream(transferData.path.toFile());
-//		FileOutputStream fos = new FileOutputStream(new File(
-//				receiveTransferData.filePath));
-//		while (input.read(buffer, 0, 1024) != -1) {
-//			fos.write(buffer);
-//			fos.flush();
-//		}
-//
-//		fos.close();
-		// input.close();
-		// socket.close();
-
-	}
-
-	/**
-	 * Return given file as byte array representation.
-	 */
-	private static byte[] readFile(File file) throws Exception {
-		
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		FileInputStream fileInputStream = new FileInputStream(file);
-		byte[] buffer = new byte[256];
-		for (int len = fileInputStream.read(buffer); len > 0; len = fileInputStream
-				.read(buffer)) {
-			byteArrayOutputStream.write(buffer, 0, len);
-		}
-		fileInputStream.close();
-		// System.out.println(new String(byteArrayOutputStream.toByteArray(),
-		// "UTF-8"));
-		return byteArrayOutputStream.toByteArray();
 	}
 	
 	@Deprecated
@@ -324,42 +245,6 @@ public class FileTransferTCPReceiver implements IFileTransferReceiver {
 	}
 
 	@Deprecated
-	private void receiveInt(Socket socket) throws IOException {
-		InputStream input = socket.getInputStream();
-		OutputStream output = socket.getOutputStream();
-
-		int zahl1 = input.read();
-		int zahl2 = input.read();
-
-		output.write(zahl1 + zahl2);
-		output.flush();
-		input.close();
-		output.close();
-	}
-
-	@Deprecated
-	private void startByteReceiver() {
-		// /* Übertragung zwischen zwei Partnern. */
-		// final Socket socket = serverSocket.accept();
-		// // System.out.println("Angemeldet: ");
-		//		
-		// System.out.println("Incomming Message: ");
-		// ByteArrayInputStream input = (ByteArrayInputStream)
-		// socket.getInputStream();
-		// byte[] buffer = new byte[256];
-		// int length = 0;
-		// /* zuvor informationen schicken, wie groß die Datei ist.*/
-		// while((length = input.read(buffer, 0, 256))!= 0){
-		// System.out.println(new String(buffer,0,length));
-		// }
-		// on = false;
-		//		
-		// Thread.sleep(2000);
-		// transmit = false;
-		// socket.close();
-	}
-
-	@Deprecated
 	private void printContent(byte[] data) throws Exception {
 
 		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
@@ -369,35 +254,6 @@ public class FileTransferTCPReceiver implements IFileTransferReceiver {
 		String str = new String(buffer, 0, len);
 
 		System.out.println(str);
-	}
-
-	/**
-	 * Return given file as byte array representation.
-	 */
-	private static void writeFile(byte[] data) throws Exception {
-
-		/* testing area */
-		File f = new File("/home/troll/text.txt");
-		if (f.exists()) {
-			f.delete();
-		}
-		/* end of testing area */
-
-		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(
-				data);
-		// FileOutputStream fileOutputStream = new
-		// FileOutputStream(f.getAbsolutePath());
-		byte[] buffer = new byte[4000];
-		int len = byteArrayInputStream.read(buffer, 0, 4000);
-		String str = new String(buffer, 0, len);
-
-		System.out.println(str);
-		// fileOutputStream.write(buffer);
-
-		// fileOutputStream.close();
-		// System.out.println(new String(byteArrayOutputStream.toByteArray(),
-		// "UTF-8"));
-
 	}
 
 	public InetAddress getLocalHost() {
