@@ -85,6 +85,7 @@ import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
@@ -104,7 +105,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final int MAX_TRANSFER_RETRIES = 5;
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
-	private static boolean jingle = true;
+	private static boolean jingle = false;
 	private boolean JingleError = false;
 	private JingleFileTransferManager jingleManager;
 	private JingleFileTransferProcessMonitor monitor;
@@ -367,10 +368,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	}
 
-	private void sendFileListWithJingle(JID recipient, String fileListContent) {
-		JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
+	private JingleConnectionState sendFileListWithJingle(final JID recipient, String fileListContent) {
+		final JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
 		/* create file transfer. */
-		JingleFileTransferData data = new JingleFileTransferData();
+		final JingleFileTransferData data = new JingleFileTransferData();
 
 		/* only for testing. */
 		data.file_list_content = fileListContent;
@@ -379,9 +380,21 @@ public class XMPPChatTransmitter implements ITransmitter,
 		data.sender = new JID(connection.getUser());
 		data.file_project_path = FileTransferType.FILELIST_TRANSFER.toString();
 
-		jingleManager.createOutgoingJingleFileTransfer(recipient,
-				new JingleFileTransferData[] { data }, monitor);
+		new Thread(new Runnable(){
 
+			public void run() {
+				// TODO Auto-generated method stub
+				jingleManager.createOutgoingJingleFileTransferUnsync(recipient,
+						new JingleFileTransferData[] { data }, monitor);
+			}}).start();
+//		jingleManager.createOutgoingJingleFileTransferUnsync(recipient,
+//				new JingleFileTransferData[] { data }, monitor);
+		return JingleConnectionState.INIT;
+		
+//		jingleManager.createOutgoingJingleFileTransfer(recipient,
+//				new JingleFileTransferData[] { data }, monitor);
+//		return jingleManager.getState(recipient);
+		
 	}
 
 	/*
@@ -407,7 +420,23 @@ public class XMPPChatTransmitter implements ITransmitter,
 			/* send with jingle file transfer */
 			if (jingle && !JingleError) {
 
-				sendFileListWithJingle(recipient, xml);
+				JingleConnectionState currentState = sendFileListWithJingle(recipient, xml);
+				
+				while(currentState == null || currentState == JingleConnectionState.INIT){
+					try {
+						Thread.sleep(500);
+						currentState = jingleManager.getState(recipient);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				if(currentState != JingleConnectionState.ESTABLISHED){
+					/*fall back to XEP-0096 file transfer*/
+					JingleError = true;
+					log.warn("Jingle negotiation error: FALLBACK to XEP-0096 File Transfer");
+					sendFileList(recipient, fileList);
+				}
 			} else {
 
 				log.debug("Establishing file list transfer");
@@ -1747,6 +1776,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	public void incommingFileList(String fileList_content, JID recipient) {
 		FileList fileList = null;
+		/* if incoming jingle session called. */
+		jingle = true;
+		
 		log.info("incoming file list");
 		try {
 			fileList = new FileList(fileList_content);

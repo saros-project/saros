@@ -100,14 +100,11 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 						if (receive) {
 
 							/* get number of file to be transfer. */
-//							InputStream input = socket.getInputStream();
 							int fileNumber = input.read();
 
 							if(fileNumber > 0){
 								logger.debug("file number: "+fileNumber);
 							}
-//							System.out.println("incomming file numbers: "
-//									+ fileNumber);
 
 							for (int i = 0; i < fileNumber; i++) {
 								/* receive file meta data */
@@ -122,29 +119,24 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 								if (receiveTransferData.type == FileTransferType.RESOURCE_TRANSFER) {
 									/* receive file. */
 									logger.info("File incoming: "+receiveTransferData.file_project_path);
+									/* received by meta data. */
 //									receiveFile(input,output);
 
-//									logger.info("File incoming: "+receiveTransferData.file_project_path);
 									listener.incomingResourceFile(receiveTransferData, new ByteArrayInputStream(receiveTransferData.content));
 									
 								}
 
 							}
-//							input.close();
 
 							monitor.setComplete(true);
 							
 						}
 						if (transmit) {
 							/* send file number. */
-//							OutputStream os = socket.getOutputStream();
 							output.write(transferData.length);
 
 							for (int i = 0; i < transferData.length; i++) {
 
-								/* testing. only */
-								// sendFile(socket,
-								// "/home/troll/Saros_DPP_1.0.2.jar");
 								/* send file meta data */
 								sendMetaData(output, transferData[i]);
 
@@ -167,12 +159,9 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 							/* set monitor status complete :) */
 							monitor.setComplete(true);
 
-							// Thread.sleep(2000);
 							transmit = false;
-//							os.close();
 
 						}
-//						Thread.sleep(100);
 					}
 					output.close();
 					input.close();
@@ -198,49 +187,9 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 			}
 		}).start();
 
-		System.out.println("receiver started.");
-	}
-
-	private void receiveFileObject(InputStream input, OutputStream output) throws IOException {
-//		InputStream input = socket.getInputStream();
-
-		/* on the first receive data into stream. */
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectInputStream ois = new ObjectInputStream(input);
-		try {
-			File file = (File) ois.readObject();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-//		 byte[] buffer = new byte[1024];
-//		 int length = 0;
-//		 long filesize = receiveTransferData.filesize;
-//		 long currentSize = 0;
-//		 int readSize = 1024;
-//		 /* zuvor informationen schicken, wie groß die Datei ist.*/
-//		 while(currentSize < filesize){
-//			 
-//			 /* check end of file*/
-//			 if((currentSize + readSize)>= filesize){
-//				readSize = (int)(filesize - currentSize); 
-//			 }
-//			 
-//			 if((length = input.read(buffer, 0, readSize))!= 0){
-//				 bos.write(buffer, 0, readSize);
-//				 currentSize += readSize;
-//			 }
-////		 System.out.println(new String(buffer,0,length));
-//		 }
-		
-		 /* inform listener */
-		listener.incomingResourceFile(receiveTransferData, new ByteArrayInputStream(bos.toByteArray()));
-		
-		output.write(1);
-		output.flush();
 	}
 	
+	@Deprecated
 	private void receiveFile(InputStream input, OutputStream output) throws IOException {
 //		InputStream input = socket.getInputStream();
 

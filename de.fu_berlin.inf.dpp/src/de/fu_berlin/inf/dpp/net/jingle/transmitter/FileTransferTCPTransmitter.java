@@ -404,17 +404,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 					+ transferList.size());
 			output.write(transferList.size());
 
-			/* init state. */
-			int ack = 1;
 		for (JingleFileTransferData data : transferList) {
-
-//			if(ack == 0){
-//				logger.error("wrong acknoledge... ");
-//				listener.exceptionOccured(new JingleSessionException("Wrong ack for send file."));
-//			}
-			/* if no init state*/
-//			if(ack != -1)
-//				ack = input.read();
 			
 			/* send file meta data */
 			logger.debug("send meta data for : "
@@ -433,9 +423,8 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 			if (data.type == FileTransferType.RESOURCE_TRANSFER) {
 				logger.debug("send file : "
 						+ data.file_project_path);
+				/* file has been send by meta data object. */
 //				sendFile(output, data);
-//				logger.debug("wait for ack...");
-//				ack = input.read();
 			}
 			
 		}

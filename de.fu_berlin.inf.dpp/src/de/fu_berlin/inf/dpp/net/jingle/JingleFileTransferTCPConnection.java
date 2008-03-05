@@ -31,9 +31,6 @@ public abstract class JingleFileTransferTCPConnection {
 	protected void sendMetaData(OutputStream output, JingleFileTransferData data)
 			throws IOException {
 		ObjectOutputStream oo = new ObjectOutputStream(output);
-		// ObjectInputStream ii = new ObjectInputStream(socket
-		// .getInputStream());
-
 		oo.writeObject(data);
 		oo.flush();
 	}
@@ -47,20 +44,14 @@ public abstract class JingleFileTransferTCPConnection {
 
 		/* inform listener. */
 		listener.incommingFileList(fileListData, receiveTransferData.sender);
-
-		// System.out.println("File List Data : " + fileListData.toString());
 	}
 
 	protected void receiveMetaData(InputStream input) throws IOException,
 			ClassNotFoundException {
-		// ObjectOutputStream oo = new ObjectOutputStream(
-		// socket.getOutputStream());
 		ObjectInputStream ii = new ObjectInputStream(input);
 
 		JingleFileTransferData meta = (JingleFileTransferData) ii.readObject();
 		this.receiveTransferData = meta;
-
-		// ii.close();
 
 	}
 }
