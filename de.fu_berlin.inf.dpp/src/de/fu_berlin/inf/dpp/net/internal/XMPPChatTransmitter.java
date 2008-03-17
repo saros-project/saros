@@ -60,10 +60,13 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.packet.Message.Type;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
+import org.jivesoftware.smackx.filetransfer.FileTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
+import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 import org.jivesoftware.smackx.jingle.JingleManager;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -1744,10 +1747,17 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		IPreferenceStore preferenceStore = Saros.getDefault()
 				.getPreferenceStore();
+		
 		// TODO: Änderung für smack 3 : filetransfer have to be implements new
-
-		// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
-		// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
+		
+		/* set proxy port for socks5 transfer.*/
+		 fileTransferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,
+		 preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
+		 /* set Chunk size for ibb transfer packets. */
+		 fileTransferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, preferenceStore.getInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE)+"");
+		 
+		 /* set only IBB transfer. */
+		 fileTransferManager.getProperties().setProperty(FileTransferNegotiator.AVOID_SOCKS5, "true");
 
 	}
 
