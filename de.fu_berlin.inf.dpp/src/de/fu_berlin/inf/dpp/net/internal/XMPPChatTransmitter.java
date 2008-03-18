@@ -1246,10 +1246,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 					}
 				} catch (Exception e) {
 					log.error("Incomming File Transfer Thread: ", e);
+					/* process exception. */
+					processFileTransferException(request, e);		
 				}
-
 			}
-
 		}).start();
 
 	}
@@ -1343,8 +1343,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * receive resource with file transfer.
 	 * @param request
 	 */
-	private void receiveResource(FileTransferRequest request) {
-		try {
+	private void receiveResource(FileTransferRequest request) throws Exception{
+//		try {
 
 			JID from = new JID(request.getRequestor());
 			/* file path exists in description. */
@@ -1407,9 +1407,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			log.info("Received resource " + request.getFileName());
 
-		} catch (Exception e) {
-			log.warn("Failed to receive " + request.getFileName(), e);
-		}
+//		} catch (Exception e) {
+//			log.warn("Failed to receive " + request.getFileName(), e);
+			
+//		}
 	}
 
 	@Deprecated
@@ -1459,6 +1460,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		} catch (Exception e) {
 			log.warn("Failed to receive " + request.getFileName(), e);
+			
 		}
 	}
 
@@ -1824,4 +1826,26 @@ public class XMPPChatTransmitter implements ITransmitter,
 		receiveResource(data, input);
 	}
 
+	/**
+	 * an exception during file transfer has occured.
+	 * @param request incoming request object
+	 */
+	private void processFileTransferException(FileTransferRequest request, Exception e){
+		JID from = new JID(request.getRequestor());
+		for (IInvitationProcess process : processes) {
+			if (process.getPeer().equals(from)) {
+				/* cancel process and inform remote site. */
+				process.cancel(e.getMessage()+ " file transfer. Cancel invite process.", false);
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void processFileTransferException(JingleFileTransferData data){
+		
+	}
+	
+	
 }

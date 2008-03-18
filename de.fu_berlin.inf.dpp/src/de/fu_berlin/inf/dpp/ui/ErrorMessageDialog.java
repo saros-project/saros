@@ -21,4 +21,17 @@ public class ErrorMessageDialog {
 			}
 		});
 	}
+	
+	/**
+	 * show error message dialog.
+	 * @param exception 
+	 */
+	public static void showErrorMessage(final String exceptionMessage){
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openError(Display.getDefault().getActiveShell(),
+					"Exception", exceptionMessage);
+			}
+		});
+	}
 }
