@@ -68,6 +68,7 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 import org.jivesoftware.smackx.jingle.JingleManager;
+import org.osgi.service.startlevel.StartLevel;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -108,7 +109,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final int MAX_TRANSFER_RETRIES = 5;
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
-	private static boolean jingle = false;
+	private static boolean jingle = true;
 	private boolean JingleError = false;
 	private JingleFileTransferManager jingleManager;
 	private JingleFileTransferProcessMonitor monitor;
@@ -147,6 +148,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	private boolean m_bFileTransferByChat = false; // to switch to
 
+	
 	// chat-filetransfer as
 	// fallback
 
@@ -423,23 +425,32 @@ public class XMPPChatTransmitter implements ITransmitter,
 			/* send with jingle file transfer */
 			if (jingle && !JingleError) {
 
-				JingleConnectionState currentState = sendFileListWithJingle(recipient, xml);
+				final JID rep = recipient;
+				final String x = xml;
 				
-				while(currentState == null || currentState == JingleConnectionState.INIT){
-					try {
-						Thread.sleep(500);
-						currentState = jingleManager.getState(recipient);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
+				new Thread(new Runnable(){
+
+					public void run() {
+							sendJingleThreadFileListTest(rep, x);	
+					}}).start();
 				
-				if(currentState != JingleConnectionState.ESTABLISHED){
-					/*fall back to XEP-0096 file transfer*/
-					JingleError = true;
-					log.warn("Jingle negotiation error: FALLBACK to XEP-0096 File Transfer");
-					sendFileList(recipient, fileList);
-				}
+//				JingleConnectionState currentState = sendFileListWithJingle(recipient, xml);
+//				
+//				while(currentState == null || currentState == JingleConnectionState.INIT){
+//					try {
+//						Thread.sleep(500);
+//						currentState = jingleManager.getState(recipient);
+//					} catch (InterruptedException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				
+//				if(currentState != JingleConnectionState.ESTABLISHED){
+//					/*fall back to XEP-0096 file transfer*/
+//					JingleError = true;
+//					log.warn("Jingle negotiation error: FALLBACK to XEP-0096 File Transfer");
+//					sendFileList(recipient, fileList);
+//				}
 			} else {
 
 				log.debug("Establishing file list transfer");
@@ -1247,7 +1258,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 				} catch (Exception e) {
 					log.error("Incomming File Transfer Thread: ", e);
 					/* process exception. */
-					processFileTransferException(request, e);		
+					processFileTransferException(request, e);	
 				}
 			}
 		}).start();
@@ -1343,7 +1354,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * receive resource with file transfer.
 	 * @param request
 	 */
-	private void receiveResource(FileTransferRequest request) throws Exception{
+	private synchronized void receiveResource(FileTransferRequest request) throws Exception{
 //		try {
 
 			JID from = new JID(request.getRequestor());
@@ -1357,10 +1368,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 			// InputStream in = request.accept().recieveFile();
 
 			IncomingFileTransfer transfer = request.accept();
-
-			// FileTransferProcessMonitor monitor = new
-			// FileTransferProcessMonitor(
-			// transfer);
+			
+			/* create process monitor process monitor. */
+//			 FileTransferProcessMonitor monitor = new
+//			 FileTransferProcessMonitor(
+//			 transfer);
 
 			InputStream in = transfer.recieveFile();
 			/* 1. Wenn es innerhalb des Invitation processes stattfindet. */
@@ -1400,11 +1412,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 			}
 
 			// /* wait for complete transfer. */
-			// while (monitor.isAlive() && monitor.isRunning()) {
-			// Thread.sleep(500);
-			// }
-			// monitor.closeMonitor(true);
-
+//			 while (monitor.isAlive() && monitor.isRunning()) {
+//			 Thread.sleep(500);
+//			 }
+//			 monitor.closeMonitor(true);
+			 
+			 
 			log.info("Received resource " + request.getFileName());
 
 //		} catch (Exception e) {
@@ -1606,11 +1619,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 				}
 			} catch (Exception e) {
-
+				log.error("Error during transfer file. ",e);
 			}
 		}
-		if (transferData.callback != null)
+		
+		/*  */
+		if (transferData.callback != null){
 			transferData.callback.fileSent(transferData.path);
+		}
 	}
 
 	private FileList receiveFileList(File file) {
@@ -1847,5 +1863,39 @@ public class XMPPChatTransmitter implements ITransmitter,
 		
 	}
 	
-	
+	/**
+	 * send jingle file list
+	 */
+	private void sendJingleThreadFileListTest(final JID recipient, final String xml){
+		JingleConnectionState currentState = sendFileListWithJingle(recipient, xml);
+		int time_out = 10000;
+		int counter = 0;
+		while(currentState == null || currentState == JingleConnectionState.INIT){
+			try {
+				Thread.sleep(500);
+				currentState = jingleManager.getState(recipient);
+				if(counter < time_out){
+					counter += 500;
+				}
+				else{
+					log.error("time out during jingle session initiation. ");
+					JingleError = true;
+					/* outgoing process inform. */
+				}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		if(currentState == JingleConnectionState.ESTABLISHED){
+			log.info("Jingle connection established.");
+		}
+		
+		if(currentState != JingleConnectionState.ESTABLISHED){
+			/*fall back to XEP-0096 file transfer*/
+			JingleError = true;
+			log.warn("Jingle negotiation error: FALLBACK to XEP-0096 File Transfer");
+//			sendFileList(recipient, fileList);
+		}
+	}
 }

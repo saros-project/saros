@@ -206,7 +206,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback
+	 * @see de.fu_berlin.inf.dpp.net.IFileTrafnsferCallback
 	 */
 	public void fileSent(IPath path) {
 		progress_done++;
