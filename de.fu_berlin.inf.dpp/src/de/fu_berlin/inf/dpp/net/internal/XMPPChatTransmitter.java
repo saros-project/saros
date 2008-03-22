@@ -228,8 +228,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		this.privatechatmanager = new PrivateChatManager();
 		privatechatmanager.setConnection(connection, this);
 
-		if (jingle && jingleManager == null) {
-			// JingleError = false;
+		if (jingle) {
 			/* try to connect with jingle */
 			jingleManager = new JingleFileTransferManager(connection, this);
 		}
