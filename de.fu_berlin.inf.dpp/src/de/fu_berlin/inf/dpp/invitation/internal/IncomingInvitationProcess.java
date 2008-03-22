@@ -375,4 +375,12 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		// ignored, not needed atm		
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
+	 */
+	public TransferMode getTransferMode() {
+		return tmode;
+	}
+
 }

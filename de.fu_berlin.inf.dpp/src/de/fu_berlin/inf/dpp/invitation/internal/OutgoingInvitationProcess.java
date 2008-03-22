@@ -44,29 +44,30 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * @author rdjemili
  */
 public class OutgoingInvitationProcess extends InvitationProcess implements
-	IOutgoingInvitationProcess, IFileTransferCallback {
+		IOutgoingInvitationProcess, IFileTransferCallback {
 
 	private ISharedProject sharedProject;
 
 	private int progress_done;
 	private int progress_max;
 	private String progress_info;
-	
+
 	private FileList remoteFileList;
 
 	private List<IPath> toSend;
-	
+
 	public int getProgressCurrent() {
-		return progress_done+1;
+		return progress_done + 1;
 	}
+
 	public int getProgressMax() {
 		return progress_max;
 	}
+
 	public String getProgressInfo() {
 		return progress_info;
 	}
-	
-	
+
 	/**
 	 * A simple runnable that calls
 	 * {@link IOutgoingInvitationProcess#startSynchronization(IProgressMonitor)}
@@ -82,13 +83,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 			process.startSynchronization();
 		}
 	}
-	
+
 	public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
-		ISharedProject sharedProject, String description, boolean startNow, IInvitationUI inviteUI) {
+			ISharedProject sharedProject, String description, boolean startNow,
+			IInvitationUI inviteUI) {
 
 		super(transmitter, to, description);
 
-		this.invitationUI  = inviteUI;
+		this.invitationUI = inviteUI;
 		this.sharedProject = sharedProject;
 
 		if (startNow) {
@@ -108,27 +110,33 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		setState(State.SYNCHRONIZING);
 
-		try {
-			FileList local = new FileList(sharedProject.getProject());
-			FileList diff = remoteFileList.diff(local);
+		if (tmode == TransferMode.JINGLE || tmode == TransferMode.DEFAULT) {
+			try {
+				FileList local = new FileList(sharedProject.getProject());
+				FileList diff = remoteFileList.diff(local);
 
-			List<IPath> added = diff.getAddedPaths();
-			List<IPath> altered = diff.getAlteredPaths();
-			toSend = new ArrayList<IPath>(added.size() + altered.size());
-			toSend.addAll(added);
-			toSend.addAll(altered);
-			
-			progress_max = toSend.size();
-			progress_done= 0;
-			
-			sendNext();
+				List<IPath> added = diff.getAddedPaths();
+				List<IPath> altered = diff.getAlteredPaths();
+				toSend = new ArrayList<IPath>(added.size() + altered.size());
+				toSend.addAll(added);
+				toSend.addAll(altered);
 
-			if (!blockUntilFilesSent() || !blockUntilJoinReceived())
-				cancel(null, false);
+				progress_max = toSend.size();
+				progress_done = 0;
 
-		} catch (CoreException e) {
-			failed(e);
+				sendNext();
 
+				if (!blockUntilFilesSent() || !blockUntilJoinReceived())
+					cancel(null, false);
+
+			} catch (CoreException e) {
+				failed(e);
+
+			}
+		}
+		/* transfer all data with archive. */
+		if (tmode == TransferMode.IBB) {
+			sendArchive();
 		}
 	}
 
@@ -162,7 +170,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		remoteFileList = fileList;
 		setState(State.GUEST_FILELIST_SENT);
-		
+
 		invitationUI.runGUIAsynch(new SynchronizationRunnable(this));
 
 	}
@@ -214,23 +222,41 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	}
 
 	private void sendNext() {
-		
+
 		if (getState() == State.CANCELED) {
 			toSend.clear();
 			return;
 		}
-		
+
 		if (toSend.size() == 0) {
 			setState(State.SYNCHRONIZING_DONE);
 			return;
 		}
 
 		IPath path = toSend.remove(0);
-		progress_info=path.toFile().getName();
+		progress_info = path.toFile().getName();
 
 		invitationUI.updateInvitationProgress(peer);
 
 		transmitter.sendFile(peer, sharedProject.getProject(), path, this);
+	}
+
+	/**
+	 * send all project data with archive.
+	 */
+	private void sendArchive() {
+		if (getState() == State.CANCELED) {
+			toSend.clear();
+			return;
+		}
+
+		if (toSend.size() == 0) {
+			setState(State.SYNCHRONIZING_DONE);
+			return;
+		}
+
+		// TODO: Status für den Versand der einzelnen großen Datei anzeigen.
+
 	}
 
 	/**
@@ -263,7 +289,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 *         <code>false</code> if the user chose to cancel.
 	 */
 	private boolean blockUntilJoinReceived() {
-		progress_info="Waiting for confirmation";
+		progress_info = "Waiting for confirmation";
 
 		while (state != State.DONE) {
 			if (getState() == State.CANCELED)
@@ -274,8 +300,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 			} catch (InterruptedException e) {
 			}
 		}
-		progress_info="";
-		
+		progress_info = "";
+
 		return true;
 	}
 
@@ -296,20 +322,47 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		}
 		// HACK
 		for (IPath path : driverEditors) {
-			if (filelist!=null && filelist.getPaths().contains(path)==false)
+			if (filelist != null && filelist.getPaths().contains(path) == false)
 				continue;
-			
+
 			sharedProject.getSequencer().activityCreated(
-				new EditorActivity(EditorActivity.Type.Activated, path));
+					new EditorActivity(EditorActivity.Type.Activated, path));
 		}
 
-		if (filelist!=null && filelist.getPaths().contains(activeDriverEditor)==true)
+		if (filelist != null
+				&& filelist.getPaths().contains(activeDriverEditor) == true)
 			sharedProject.getSequencer().activityCreated(
-				new EditorActivity(EditorActivity.Type.Activated, activeDriverEditor));
+					new EditorActivity(EditorActivity.Type.Activated,
+							activeDriverEditor));
 	}
 
 	public String getProjectName() {
 		return sharedProject.getProject().getName();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback#jingleFallback()
+	 */
+	public void jingleFallback() {
+		System.out.println("Fallback");
+		tmode = TransferMode.IBB;
+		try {
+			/* TODO: send file list another one. */
+			transmitter.sendFileList(peer, sharedProject.getFileList());
+		} catch (Exception e) {
+			failed(e);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
+	 */
+	public TransferMode getTransferMode() {
+		return tmode;
 	}
 
 }

@@ -36,6 +36,9 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	protected final ITransmitter transmitter;
 
 	protected State state;
+	
+	/** mode of file transfer.*/
+	protected TransferMode tmode;
 
 	private Exception exception;
 
@@ -50,6 +53,8 @@ public abstract class InvitationProcess implements IInvitationProcess {
 		this.peer = peer;
 		this.description = description;
 
+		tmode = TransferMode.JINGLE;
+		
 		transmitter.addInvitationProcess(this);
 	}
 

@@ -34,6 +34,10 @@ public interface IInvitationProcess {
 	public static enum State {
 		INITIALIZED, INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
 	}
+	
+	public static enum TransferMode {
+		JINGLE, IBB, DEFAULT
+	}
 
 	public static final String USER_CANCEL_MSG = "Invitation was cancelled by user";
 
@@ -48,6 +52,11 @@ public interface IInvitationProcess {
 	 */
 	public State getState();
 
+	/**
+	 * @return the current transfer mode.
+	 */
+	public TransferMode getTransferMode();
+	
 	/**
 	 * @return the peer that is participating with us in this process. For an
 	 *         incoming invitation this is the inviter. For an outgoing

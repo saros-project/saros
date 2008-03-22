@@ -1,9 +1,6 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPConnection;
@@ -23,12 +20,8 @@ import org.jivesoftware.smackx.jingle.media.PayloadType;
 import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.Saros.ConnectionState;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 
 public class JingleFileTransferManager {
 
@@ -42,7 +35,7 @@ public class JingleFileTransferManager {
 	private HashMap<JID, IncomingJingleSession> incomingSessions = null;
 	private HashMap<JID, OutgoingJingleSession> outgoingSessions = null;
 	
-	public static int JINGLE_TIME_OUT = 7000;
+	public static int JINGLE_TIME_OUT = 1000;
 
 	/**
 	 * this map contains for all incoming and outgoing jingle sessions the
@@ -88,7 +81,7 @@ public class JingleFileTransferManager {
 							logger.error("Time out for : "+jid + " with current state : "+getState(jid));
 							connectionStates.remove(jid);
 							connectionStates.put(jid, JingleConnectionState.ERROR);
-							transmitter.exceptionOccured(new JingleSessionException("Time out Exception"));
+							transmitter.exceptionOccured(new JingleSessionException("Time out Exception",jid));
 							return;
 						}
 					} catch (InterruptedException e) {
