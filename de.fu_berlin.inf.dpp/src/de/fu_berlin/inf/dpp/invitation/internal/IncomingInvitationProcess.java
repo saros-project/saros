@@ -383,4 +383,13 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		return tmode;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#jingleFallback()
+	 */
+	public void jingleFallback() {
+		logger.warn("jingle fallback");
+		
+	}
+
 }

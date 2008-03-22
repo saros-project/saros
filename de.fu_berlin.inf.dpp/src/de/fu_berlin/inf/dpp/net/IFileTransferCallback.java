@@ -27,8 +27,4 @@ public interface IFileTransferCallback {
 	 */
 	public void fileTransferFailed(IPath path, Exception e);
 	
-	/**
-	 * Is fired if jingle connection couldn't be established.
-	 */
-	public void jingleFallback();
 }

@@ -1463,11 +1463,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			log.info("Sent file " + transferData.path + " (by ChatTransfer)");
 
-		} else {
+		} 
 
 			// try {
 
-			if (jingle && !JingleError) {
+			if (jingle && (jingleManager.getState(recipient) != JingleConnectionState.ERROR)) {
 				log.info("Sent file " + transferData.path + " (with Jingle)");
 
 				JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
@@ -1581,7 +1581,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			// catch (Exception e) {
 			//
 			// }
-		}
+		
 		if (transferData.callback != null)
 			transferData.callback.fileSent(transferData.path);
 	}
@@ -1779,7 +1779,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 		/* jingle exception with given jid */
 		if (exception.getJID() != null) {
 			/* inform invitation process. */
-
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(exception.getJID()))
+					process.jingleFallback();
+			}
 		}
 		ErrorMessageDialog.showErrorMessage(exception);
 		// TODO: Beenden der Socket Verbindung

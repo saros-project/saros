@@ -110,7 +110,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		setState(State.SYNCHRONIZING);
 
-		if (tmode == TransferMode.JINGLE || tmode == TransferMode.DEFAULT) {
+		if (tmode == TransferMode.JINGLE || tmode == TransferMode.DEFAULT || tmode == TransferMode.IBB) {
 			try {
 				FileList local = new FileList(sharedProject.getProject());
 				FileList diff = remoteFileList.diff(local);
@@ -134,10 +134,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 			}
 		}
-		/* transfer all data with archive. */
-		if (tmode == TransferMode.IBB) {
-			sendArchive();
-		}
+//		/* transfer all data with archive. */
+//		if (tmode == TransferMode.IBB) {
+//			sendArchive();
+//		}
 	}
 
 	/*

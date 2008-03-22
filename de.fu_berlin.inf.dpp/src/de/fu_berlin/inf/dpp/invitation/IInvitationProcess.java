@@ -104,4 +104,9 @@ public interface IInvitationProcess {
 	public void invitationAccepted(JID from);
 	
 	public void joinReceived(JID from);
+	
+	/**
+	 * Is fired if jingle connection couldn't be established.
+	 */
+	public void jingleFallback();
 }

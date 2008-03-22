@@ -35,7 +35,7 @@ public class JingleFileTransferManager {
 	private HashMap<JID, IncomingJingleSession> incomingSessions = null;
 	private HashMap<JID, OutgoingJingleSession> outgoingSessions = null;
 	
-	public static int JINGLE_TIME_OUT = 1000;
+	public static int JINGLE_TIME_OUT = 10000;
 
 	/**
 	 * this map contains for all incoming and outgoing jingle sessions the
@@ -314,7 +314,7 @@ public class JingleFileTransferManager {
 		}
 
 		/* reset connection state list */
-		connectionStates.clear();
+//		connectionStates.clear();
 	}
 
 	/**
@@ -351,7 +351,7 @@ public class JingleFileTransferManager {
 		}
 
 //		if(connectionStates.get(jid) != JingleConnectionState.ERROR){
-			connectionStates.remove(jid);
+//			connectionStates.remove(jid);
 //		}
 	}
 
