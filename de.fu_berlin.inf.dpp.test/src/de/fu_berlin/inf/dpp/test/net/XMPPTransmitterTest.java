@@ -84,7 +84,7 @@ public class XMPPTransmitterTest extends TestCase implements
 		connection2.disconnect();
 	}
 	
-	public void xtestSendFileList() throws CoreException, XMPPException{
+	public void testSendFileList() throws CoreException, XMPPException{
 //		transferManager2.addFileTransferListener(new ReceivedSingleFileListener());
 		transferManager2.addFileTransferListener(new ReceiveFileListFileTransferListener());
 		
@@ -94,7 +94,8 @@ public class XMPPTransmitterTest extends TestCase implements
 		
 	}
 	
-	public void testTransferFileFunction() throws CoreException, XMPPException{
+	
+	public void xtestTransferFileFunction() throws CoreException, XMPPException{
 		transferManager2.addFileTransferListener(new ReceivedSingleFileListener());
 		
 		ITransmitter transfer = new XMPPChatTransmitter(connection1);

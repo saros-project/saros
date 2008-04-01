@@ -124,8 +124,12 @@ public class SarosTest extends TestCase {
 		/*2. neue Verbindung erstellen. */
 		roster.createEntry(User2, User2, null);
 		
-		Thread.sleep(1000);
+		Thread.sleep(2000);
 		
+		roster.reload();
+		re_roster.reload();
+		
+		Thread.sleep(2000);
 		Collection<RosterEntry> entries = re_roster.getEntries();
 		for(RosterEntry entry : entries){
 			
@@ -144,6 +148,10 @@ public class SarosTest extends TestCase {
 			}
 		}
 		
+//		Thread.sleep(500);
+//		assertEquals(1, roster.getEntryCount());
+//		assertEquals(1,re_roster.getEntryCount());
+		
 	}
 	
 	public void xtestCreateAccount() throws XMPPException, InterruptedException{
@@ -159,7 +167,28 @@ public class SarosTest extends TestCase {
 		received_connection.getAccountManager().deleteAccount();
 	}
 	
-	public void testPresence() throws InterruptedException, XMPPException{
+	public void testDeleteAllEntries() throws XMPPException, InterruptedException {
+		Roster re_roster = received_connection.getRoster();
+		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
+				re_roster);
+		received_connection.addPacketListener(list2, null);
+		
+		
+		Roster roster = connection.getRoster();
+		RosterListenerImpl list1 = new RosterListenerImpl(connection,
+				roster);
+		connection.addPacketListener(list1, null);
+		
+		/* delete lists.*/
+		emptyUserList(roster);
+		Thread.sleep(1000);
+		emptyUserList(re_roster);
+		
+		
+		
+	}
+	
+	public void xtestPresence() throws InterruptedException, XMPPException{
 		Roster re_roster = received_connection.getRoster();
 		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
 				re_roster);
@@ -196,66 +225,6 @@ public class SarosTest extends TestCase {
 		
 	}
 	
-	/**
-	 * FINAL SOLUTIONS
-	 * diese methode testet die unterschiedlichen methoden informationen
-	 * aus dem roster auszulesen
-	 * @throws XMPPException 
-	 * @throws InterruptedException 
-	 */
-	public void xtestRosterPacketInformation() throws XMPPException, InterruptedException{
-		Roster re_roster = received_connection.getRoster();
-		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
-				re_roster);
-		re_roster.addRosterListener(list2);
-		received_connection.addPacketListener(list2, null);
-		re_roster.reload();
-		
-		Roster roster = connection.getRoster();
-		RosterListenerImpl list1 = new RosterListenerImpl(connection,
-				roster);
-		roster.addRosterListener(list1);
-		connection.addPacketListener(list1, null);
-		roster.reload();
-		
-		emptyUserList(roster);
-		emptyUserList(re_roster);
-		
-		/*1. bisherige Einträge auslesen. */
-		Collection<RosterEntry> entries = roster.getEntries();
-		for(RosterEntry entry:entries){
-			System.out.println("user: "+entry.getUser()+" name : "+entry.getName()+" status: "+entry.getStatus()+" type: "+entry.getType());
-		}
-		Thread.sleep(1000);
-		/*2. neue Verbindung erstellen. */
-		roster.createEntry(received_connection.getUser(), new JID(received_connection.getUser()).getName(), null);
-		
-		/*3. setzen, dass man von dem user interesse hat. */
-        RosterPacket.Item rosterItem = new RosterPacket.Item(received_connection.getUser(),new JID(received_connection.getUser()).getName());;
-        rosterItem.setItemType(ItemType.both);
-        rosterItem.setName(received_connection.getUser());
-        
-        RosterPacket rosterPacket = new RosterPacket();
-        rosterPacket.setType(IQ.Type.SET);
-        rosterPacket.addRosterItem(rosterItem);
-        connection.sendPacket(rosterPacket);
-        Thread.sleep(1000);
-//		/*aktiviere */
-//		Presence presence = new Presence(Presence.Type.subscribed);
-//		presence.setFrom(received_connection.getUser());
-//		presence.setTo(connection.getUser());
-//		received_connection.sendPacket(presence);
-		Thread.sleep(2000);
-		
-		entries = roster.getEntries();
-		for(RosterEntry entry:entries){
-			Presence p = roster.getPresence(entry.getUser());
-			System.out.println("user: "+entry.getUser()+" name : "+entry.getName()+" status: "+entry.getStatus()+" type: "+entry.getType());
-		}
-		
-		System.out.println("Ende");
-	}
-	
 	
 	private void emptyUserList(Roster roster) throws XMPPException {
 		logger.info("empty list");
@@ -279,143 +248,7 @@ public class SarosTest extends TestCase {
 
 	}
 
-	/**
-	 * both user are connected and entry will added with listener.
-	 * 
-	 * @throws XMPPException
-	 * @throws InterruptedException
-	 */
-	public void xtestCreateNewEntry() throws XMPPException,
-			InterruptedException {
-		/* add listener. */
 
-		Roster roster = connection.getRoster();
-		Roster re_roster = received_connection.getRoster();
-		RosterListenerImpl list1 = new RosterListenerImpl(connection, roster);
-		connection.getRoster().addRosterListener(list1);
-		
-		
-		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
-				re_roster);
-		received_connection.getRoster().addRosterListener(list2);
 
-		emptyUserList(roster);
-		assertEquals(0, roster.getUnfiledEntryCount());
-
-		roster.createEntry(received_connection.getUser(), "ori79",
-				new String[] { "default" });
-		roster.createGroup("default");
-		// RosterGroup gr = roster.getGroup("default");
-		// if(gr == null){
-
-		// }
-		Thread.sleep(500);
-		assertEquals(1, connection.getRoster().getEntryCount());
-
-		// Collection<RosterEntry> entries = roster.getEntries();
-		// roster.reload();
-
-		// assertEquals(0,roster.getUnfiledEntryCount());
-		// Thread.sleep(500);
-		// connection.getRoster().getEntries();
-		// assertEquals(0,roster.getUnfiledEntryCount());
-		assertEquals(1, roster.getEntryCount());
-		// assertEquals(1, roster.getGroupCount());
-	}
-
-	/**
-	 * both user are connected and entry will added with listener.
-	 * 
-	 * @throws XMPPException
-	 * @throws InterruptedException
-	 */
-	public void xtestCreateNewEntry2() throws XMPPException,
-			InterruptedException {
-		/* add listener. */
-
-		Roster roster = connection.getRoster();
-		RosterListenerImpl list1 = new RosterListenerImpl(connection, roster);
-		roster.addRosterListener(list1);
-		connection.addPacketListener(list1, null);
-		
-		Roster re_roster = received_connection.getRoster();
-		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
-				re_roster);
-		re_roster.addRosterListener(list2);
-		received_connection.addPacketListener(list2, null);
-		
-		
-		Thread.sleep(1000);
-		
-		
-		emptyUserList(roster);
-		emptyUserList(re_roster);
-		
-//		Collection<RosterPacket.Item> items = roster.
-//		assertEquals(0, roster.getUnfiledEntryCount());
-//		list1.addUser(received_connection.getUser(), received_connection.getUser());
-		roster.createEntry(received_connection.getUser(), new JID(received_connection.getUser()).getName(),
-				new String[0]);
-
-		Thread.sleep(500);
-		assertEquals(1, roster.getEntryCount());
-		assertEquals(1,re_roster.getEntryCount());
-
-	}
-	
-	/**
-	 * entries überprüfen und presence checken
-	 */
-	public void xtestUpdateExistEntry() {
-		/* add listener. */
-		Roster roster = connection.getRoster();
-		Roster re_roster = received_connection.getRoster();
-		RosterListenerImpl list1 = new RosterListenerImpl(connection, roster);
-		connection.getRoster().addRosterListener(list1);
-		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
-				re_roster);
-		received_connection.getRoster().addRosterListener(list2);
-
-		RosterGroup gr = roster.getGroup("default");
-		Collection<RosterEntry> entries = null;
-		if (gr != null) {
-			gr.getEntries();
-			roster.createGroup("default");
-		}
-		else{
-			entries = roster.getEntries();
-		}
-		System.out.println(" Entry count: "+roster.getEntryCount());
-		for (RosterEntry entry : entries) {
-			
-			
-			System.out.println(entry.getType());
-			Presence p = roster.getPresence(entry.getUser());
-			System.out.println(p.getStatus());
-			list1.addUser(entry.getUser(), entry.getName());
-		}
-	}
-
-	public void xtestCreateNewRosterEntry() {
-		XMPPConnection conn = connection;
-		Roster roster = conn.getRoster();
-
-		Collection<RosterEntry> unfiled = roster.getUnfiledEntries();
-		for (RosterEntry ent : unfiled) {
-			RosterPacket packet = new RosterPacket();
-
-			System.out.println(ent.getUser());
-		}
-		// roster.setSubscriptionMode(SubscriptionMode.accept_all);
-
-		Collection<RosterEntry> entries = conn.getRoster().getEntries();
-		for (RosterEntry en : entries) {
-			// Presence.Type.subscribe
-
-			System.out.println(roster.getPresence(en.getUser()));
-			System.out.println(conn.getUser() + " " + en.getUser());
-
-		}
-	}
 
 }

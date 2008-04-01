@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.test.net;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jivesoftware.smack.PacketListener;
@@ -26,18 +27,19 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 
 	private XMPPConnection connection;
 
-	private Roster roster;
+//	private Roster roster;
 
 	public RosterListenerImpl(XMPPConnection conn, Roster roster) {
 		this.connection = conn;
-		this.roster = roster;
+//		this.roster = roster;
 	}
 
 	public void entriesAdded(Collection<String> addresses) {
 		logger.info("entriesAdded on "+connection.getUser());
 		for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
 			String address = it.next();
-			RosterEntry entry = roster.getEntry(address);
+//			RosterEntry entry = roster.getEntry(address);
+			RosterEntry entry = connection.getRoster().getEntry(address);
 			// When the entry is only from the other user, then send a
 			// subscription request
 			try {
@@ -62,8 +64,11 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 //					if (entry.getName() == null) {
 //						name = new JID(entry.getUser()).getName();
 //					}
-					roster.createEntry(entry.getUser(), entry.getUser(),
+					
+					connection.getRoster().createEntry(entry.getUser(), entry.getUser(),
 							new String[0]);
+//					roster.createEntry(entry.getUser(), entry.getUser(),
+//							new String[0]);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -78,7 +83,6 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 	}
 
 	public void entriesUpdated(Collection<String> addresses) {
-		// TODO Auto-generated method stub
 		logger.info("entries update " + connection.getUser());
 		for (String address : addresses) {
 			RosterEntry entry = connection.getRoster().getEntry(address);
@@ -118,12 +122,19 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 					// connection.sendPacket(rosterPacket);
 
 					// if(roster.getEntry(entry.getUser()) == null){
-					roster.createEntry(entry.getUser(),
+					
+					
+					connection.getRoster().createEntry(entry.getUser(),
 							entry.getUser(), new String[0]);
+//					roster.createEntry(entry.getUser(),
+//							entry.getUser(), new String[0]);
+					
+					
+					
 					// }
 				} catch (XMPPException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.info(e.getStackTrace().toString());
+//					e.printStackTrace();
 				}
 			}
 			// if (entry.getType().equals(RosterPacket.ItemType.none)) {
@@ -157,12 +168,13 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 	}
 
 	public void presenceChanged(Presence presence) {
-		// TODO Auto-generated method stub
+
 		logger.info("presence changed user" + connection.getUser()
 				+ " status :" + presence.getType() + " from: "
 				+ presence.getFrom());
 	}
 
+	@Deprecated
 	public void addUser(String user, String name) {
 		RosterPacket.Item rosterItem = new RosterPacket.Item(user, name);
 		rosterItem.setItemType(ItemType.both);
@@ -210,8 +222,14 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 
 				/* Anfrage für eine Kontakthinzufügung. */
 				if (p.getType().equals(Presence.Type.subscribe)) {
-					RosterEntry e = roster.getEntry(packet.getFrom());
+					
+					//TODO: Änderung ohne roster object
+					RosterEntry e = connection.getRoster().getEntry(packet.getFrom());
 					logger.info("subscribe from " + p.getFrom());
+//					RosterEntry e = roster.getEntry(packet.getFrom());
+//					logger.info("subscribe from " + p.getFrom());
+					
+					
 					if (e == null) {
 						try {
 //							Presence presence = new Presence(
@@ -221,7 +239,9 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 //
 //							connection.sendPacket(presence);
 
-							roster.createEntry(packet.getFrom(), packet.getFrom(), null);
+							//TODO: Änderung ohne Roster object
+							connection.getRoster().createEntry(packet.getFrom(), packet.getFrom(), null);
+//							roster.createEntry(packet.getFrom(), packet.getFrom(), null);
 							/* allow presence. */
 
 							// RosterPacket.Item rosterItem = new
@@ -237,9 +257,8 @@ public class RosterListenerImpl implements RosterListener, PacketListener {
 							// rosterPacket.setType(IQ.Type.SET);
 							// rosterPacket.addRosterItem(rosterItem);
 							// connection.sendPacket(rosterPacket);
-						} catch (Exception e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
+						} catch (XMPPException e1) {
+							logger.log(Level.WARNING, e1.getStackTrace().toString());
 						}
 					}
 

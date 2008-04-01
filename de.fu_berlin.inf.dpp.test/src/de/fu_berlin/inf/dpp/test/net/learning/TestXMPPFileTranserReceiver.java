@@ -57,8 +57,8 @@ public class TestXMPPFileTranserReceiver extends TestCase implements
 		// }
 		logger.info("connection 1 established.");
 		transferManager = new FileTransferManager(connection);
-		transferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,"50012");
-		transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40690");
+//		transferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,"7777");
+//		transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40690");
 		Thread.sleep(1000);
 	}
 

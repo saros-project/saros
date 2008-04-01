@@ -59,8 +59,8 @@ public class TestXMPPFileTransferSender extends TestCase implements PacketListen
 		logger.info("connection 1 established.");
 		Thread.sleep(1000);
 
-		transferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,"50010");transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40690");
-		transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40960");
+//		transferManager.getProperties().setProperty(Socks5TransferNegotiatorManager.PROPERTIES_PORT,"50010");transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40690");
+//		transferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, "40960");
 //		mock = new MockInvitationProcess(this, null, null);
 	}
 	

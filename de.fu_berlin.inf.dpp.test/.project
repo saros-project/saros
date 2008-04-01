@@ -3,6 +3,7 @@
 	<name>Saros Test</name>
 	<comment></comment>
 	<projects>
+		<project>Saros Update Site</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
