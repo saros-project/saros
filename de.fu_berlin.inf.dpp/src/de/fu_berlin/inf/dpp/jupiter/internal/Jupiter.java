@@ -27,6 +27,8 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.jupiter.*;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.*;
 
@@ -34,6 +36,8 @@ import de.fu_berlin.inf.dpp.jupiter.internal.text.*;
  * This class implements the client-side core of the Jupiter control algorithm.
  */
 public class Jupiter implements Algorithm {
+	
+	private static Logger logger = Logger.getLogger(Jupiter.class);
 	
 	/**
 	 * The inclusion transformation function used to transform operations.
@@ -109,7 +113,7 @@ public class Jupiter implements Algorithm {
 		if (!(timestamp instanceof JupiterVectorTime)) {
 			throw new IllegalArgumentException("Jupiter expects timestamps of type JupiterVectorTime");
 		}
-		
+		//TODO: check preconditions
 		checkPreconditions((JupiterVectorTime) timestamp);
 		discardAcknowledgedOperations((JupiterVectorTime) timestamp);
 

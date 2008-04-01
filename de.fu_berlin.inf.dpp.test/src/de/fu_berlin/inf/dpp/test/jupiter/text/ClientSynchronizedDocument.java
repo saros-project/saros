@@ -36,6 +36,13 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		this.connection = con;
 	}
 	
+	public ClientSynchronizedDocument(String content, NetworkConnection con, JID jid){
+		this.doc = new Document(content);
+		this.algorithm = new Jupiter(false);
+		this.connection = con;
+		this.jid = jid;
+	}
+	
 	public JID getJID() {
 		return this.jid;
 	}
@@ -44,32 +51,7 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		this.jid = jid;
 	}
 
-	public Operation receiveOperation() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void sendOperation(Operation op) {
-		/* 1. execute locally*/
-		doc.execOperation(op);
-		/* 2. transform operation. */
-		Request req = algorithm.generateRequest(op);
-		/* 3. send operation. */
-		connection.sendOperation(server_jid, req,0);
-	}
-	
-	
-	public void sendOperation(Operation op, int delay) {
-		/* 1. execute locally*/
-		doc.execOperation(op);
-		/* 2. transform operation. */
-		Request req = algorithm.generateRequest(op);
-		/* 3. send operation. */
-		connection.sendOperation(server_jid, req, delay);
-	}
-
-	public void receiveNetworkEvent(Request req) {
-		logger.info("receive operation : "+req.getOperation().toString());
+	public Operation receiveOperation(Request req) {
 		Operation op = null;
 		try {
 			/* 1. transform operation. */
@@ -80,6 +62,30 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return op;
+	}
+
+	public void sendOperation(Operation op) {
+		sendOperation(server_jid, op, 0);
+	}
+	
+	
+	public void sendOperation(Operation op, int delay) {
+		sendOperation(server_jid, op, delay);
+	}
+
+	public void sendOperation(JID remoteJid, Operation op, int delay) {
+		/* 1. execute locally*/
+		doc.execOperation(op);
+		/* 2. transform operation. */
+		Request req = algorithm.generateRequest(op);
+		/* 3. send operation. */
+		connection.sendOperation(remoteJid, req, delay);
+	}
+	
+	public void receiveNetworkEvent(Request req) {
+		logger.info("receive operation : "+req.getOperation().toString());
+		receiveOperation(req);
 	}
 
 	public String getDocument() {

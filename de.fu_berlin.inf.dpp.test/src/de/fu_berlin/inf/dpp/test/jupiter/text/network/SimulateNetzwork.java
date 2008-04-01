@@ -26,8 +26,8 @@ public class SimulateNetzwork implements NetworkConnection{
 		
 	}
 	
-	@Deprecated
-	public void sendOperation(JID jid, Request req){
+	
+	private void sendOperation(JID jid, Request req){
 		if(clients.containsKey(jid)){
 			clients.get(jid).receiveNetworkEvent(req);
 		}
@@ -37,7 +37,7 @@ public class SimulateNetzwork implements NetworkConnection{
 		
 			new Thread(new Runnable(){
 				public void run() {
-					logger.debug("Delay in send operation process of "+delay+" millis");
+					logger.debug("Delay in send operation "+req.getOperation().toString()+" of "+delay+" millis");
 					try {
 					Thread.sleep(delay);
 					sendOperation(jid, req);

@@ -14,7 +14,6 @@ public class SimulatedNetworkTest extends TestCase {
 
 	static {
 		PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
-		Logger logger = Logger.getLogger("de.fu_berlin.inf.dpp");
 	}
 	private SimulateNetzwork network;
 

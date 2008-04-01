@@ -8,5 +8,5 @@ public interface SynchronizedQueue {
 	
 	public void sendOperation(Operation op);
 
-	public Operation receiveOperation();
+	public Operation receiveOperation(Request req);
 }
