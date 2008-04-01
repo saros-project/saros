@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.test.jupiter.text;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.jupiter.Operation;
 import de.fu_berlin.inf.dpp.jupiter.Request;
@@ -10,7 +12,10 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
+
 public class ServerSynchronizedDocument implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
+	
+	private static Logger logger = Logger.getLogger(ServerSynchronizedDocument.class);
 	
 	private Document doc;
 	private Algorithm algorithm;
@@ -39,7 +44,7 @@ public class ServerSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		return null;
 	}
 
-	
+	@Deprecated
 	public void sendOperation(Operation op) {
 		
 	}
@@ -55,11 +60,21 @@ public class ServerSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		/* 2. transform operation. */
 		Request req = algorithm.generateRequest(op);
 		/*sent to client*/
-		connection.sendOperation(jid, req);
+		connection.sendOperation(jid, req,0);
+	}
+	
+	public void sendOperation(JID jid, Operation op, int delay) {
+		/* 1. execute locally*/
+		doc.execOperation(op);
+		/* 2. transform operation. */
+		Request req = algorithm.generateRequest(op);
+		/*sent to client*/
+		connection.sendOperation(jid, req,delay);
+		
 	}
 
 	public void receiveNetworkEvent(Request req) {
-		System.out.println("network request received.");
+		logger.info("receive operation : "+req.getOperation().toString());
 		Operation op = null;
 		try {
 			/* 1. transform operation. */
@@ -77,5 +92,7 @@ public class ServerSynchronizedDocument implements SynchronizedQueue, NetworkEve
 	public String getDocument() {
 		return doc.getDocument();
 	}
+
+
 
 }
