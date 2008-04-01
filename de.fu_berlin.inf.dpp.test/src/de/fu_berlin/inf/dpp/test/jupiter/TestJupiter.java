@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.test.jupiter;
 
-public class TestJupiter {
+import junit.framework.TestCase;
+
+public class TestJupiter extends TestCase{
 
 }

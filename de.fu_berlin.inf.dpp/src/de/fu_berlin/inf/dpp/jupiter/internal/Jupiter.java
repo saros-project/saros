@@ -59,7 +59,7 @@ public class Jupiter implements Algorithm {
 	 * corresponds to the 'outgoing' list in the Jupiter pseudo code
 	 * description.
 	 */
-	private List ackRequestList;
+	private List<OperationWrapper> ackRequestList;
 
 	/**
 	 * Class constructor that creates a new Jupiter algorithm.
@@ -70,11 +70,11 @@ public class Jupiter implements Algorithm {
 		this.inclusion = new GOTOInclusionTransformation();
 		this.vectorTime = new JupiterVectorTime(0, 0);
 		this.isClientSide = isClientSide;
-		ackRequestList = new ArrayList();
+		ackRequestList = new ArrayList<OperationWrapper>();
 	}
 	
 	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#generateRequest(ch.iserver.ace.algorithm.Operation)
+	 * @see  de.fu_berlin.inf.dpp.jupiter.Algorithm#generateRequest( de.fu_berlin.inf.dpp.jupiter.Operation)
 	 */
 	public Request generateRequest(Operation op) {
 		// send(op, myMsgs, otherMsgs);
@@ -102,7 +102,7 @@ public class Jupiter implements Algorithm {
 	}
 	
 	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#receiveRequest(ch.iserver.ace.algorithm.Request)
+	 * @see de.fu_berlin.inf.dpp.jupiter.Algorithm#receiveRequest(de.fu_berlin.inf.dpp.jupiter.Request)
 	 */
 	public Operation receiveRequest(Request req) throws TransformationException {
 		Timestamp timestamp = req.getTimestamp();
@@ -120,14 +120,14 @@ public class Jupiter implements Algorithm {
 	}
 	
 	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#acknowledge(int, ch.iserver.ace.algorithm.Timestamp)
+	 * @see de.fu_berlin.inf.dpp.jupiter.Algorithm#acknowledge(int, de.fu_berlin.inf.dpp.jupiter.Timestamp)
 	 */
 	public void acknowledge(int siteId, Timestamp timestamp) throws TransformationException {
 		discardAcknowledgedOperations((JupiterVectorTime) timestamp);
 	}
 	
 	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#transformIndices(ch.iserver.ace.algorithm.Timestamp, int[])
+	 * @see de.fu_berlin.inf.dpp.jupiter.Algorithm#transformIndices(de.fu_berlin.inf.dpp.jupiter.Timestamp, int[])
 	 */
 	public int[] transformIndices(Timestamp timestamp, int[] indices) throws TransformationException {
 		checkPreconditions((JupiterVectorTime) timestamp);
@@ -297,7 +297,7 @@ public class Jupiter implements Algorithm {
 	 * Throws a CannotUndoException because undo is not supported by this
 	 * implementation.
 	 * 
-	 * @see ch.iserver.ace.algorithm.Algorithm#undo()
+	 * @see de.fu_berlin.inf.dpp.jupiter.Algorithm#undo()
 	 */
 	public Request undo() {
 		throw new CannotUndoException();
@@ -307,7 +307,7 @@ public class Jupiter implements Algorithm {
 	 * Throws a CannotRedoException because undo is not supported by this
 	 * implementation.
 	 * 
-	 * @see ch.iserver.ace.algorithm.Algorithm#redo()
+	 * @see de.fu_berlin.inf.dpp.jupiter.Algorithm#redo()
 	 */
 	public Request redo() {
 		throw new CannotRedoException();
@@ -330,14 +330,14 @@ public class Jupiter implements Algorithm {
 	}
 
 	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#getSiteId()
+	 * @see  de.fu_berlin.inf.dpp.jupiter.Algorithm#getSiteId()
 	 */
 	public int getSiteId() {
 		return isClientSide() ? 1 : 0;
 	}
 	
 	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#getTimestamp()
+	 * @see de.fu_berlin.inf.dpp.jupiter.Algorithm#getTimestamp()
 	 */
 	public synchronized Timestamp getTimestamp() {
 		return (Timestamp) vectorTime.clone();
@@ -350,20 +350,6 @@ public class Jupiter implements Algorithm {
 	 */
 	public boolean isClientSide() {
 		return isClientSide;
-	}
-
-	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#canUndo()
-	 */
-	public boolean canUndo() {
-		return false;
-	}
-
-	/**
-	 * @see ch.iserver.ace.algorithm.Algorithm#canRedo()
-	 */
-	public boolean canRedo() {
-		return false;
 	}
 	
 }

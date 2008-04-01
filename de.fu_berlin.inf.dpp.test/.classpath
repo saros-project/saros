@@ -11,6 +11,6 @@
 	<classpathentry kind="lib" path="lib/xpp.jar"/>
 	<classpathentry kind="lib" path="lib/smack.jar"/>
 	<classpathentry kind="lib" path="lib/smackx.jar"/>
-	<classpathentry kind="lib" path="/Saros/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Saros"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
