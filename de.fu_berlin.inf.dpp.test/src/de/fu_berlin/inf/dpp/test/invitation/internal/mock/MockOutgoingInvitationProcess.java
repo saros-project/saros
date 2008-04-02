@@ -143,14 +143,12 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 	}
 
 
-	@Override
 	public TransferMode getTransferMode() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
-	@Override
 	public void jingleFallback() {
 		// TODO Auto-generated method stub
 		

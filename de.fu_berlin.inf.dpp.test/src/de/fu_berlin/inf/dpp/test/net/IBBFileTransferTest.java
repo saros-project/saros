@@ -77,7 +77,6 @@ public class IBBFileTransferTest extends TestCase implements FileTransferListene
 		transfer.sendFileList(new JID(connection2.getUser()), list);		
 	}
 
-	@Override
 	public void fileTransferRequest(FileTransferRequest request) {
 		String fileDescription = request.getDescription();
 		
