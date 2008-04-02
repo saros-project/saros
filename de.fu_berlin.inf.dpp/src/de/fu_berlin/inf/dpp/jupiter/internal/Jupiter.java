@@ -114,7 +114,7 @@ public class Jupiter implements Algorithm {
 			throw new IllegalArgumentException("Jupiter expects timestamps of type JupiterVectorTime");
 		}
 		//TODO: check preconditions
-		checkPreconditions((JupiterVectorTime) timestamp);
+//		checkPreconditions((JupiterVectorTime) timestamp);
 		discardAcknowledgedOperations((JupiterVectorTime) timestamp);
 
 		Operation newOp = transform(req.getOperation());
