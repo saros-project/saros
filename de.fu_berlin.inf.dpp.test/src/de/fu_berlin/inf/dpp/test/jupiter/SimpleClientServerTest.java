@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.jupiter.text;
+package de.fu_berlin.inf.dpp.test.jupiter;
 
 import junit.framework.TestCase;
 
@@ -7,20 +7,13 @@ import org.apache.log4j.PropertyConfigurator;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
-public class SimpleClientServerTest extends TestCase{
+public class SimpleClientServerTest extends JupiterTestCase{
 
-	static {
-		PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
-	}
-	
-	private SimulateNetzwork network;
 
-	public void setUp() {
-		network = new SimulateNetzwork();
-
-	}
 	
 	/**
 	 * simple test scenario between server and client.
@@ -59,7 +52,7 @@ public class SimpleClientServerTest extends TestCase{
 		
 		s1.sendOperation(c1.getJID(),new DeleteOperation(0,"a"),0);
 		/*short delay. */
-		Thread.sleep(100);
+		Thread.sleep(500);
 		assertEquals("xebc",c1.getDocument());
 		Thread.sleep(2000);
 		assertEquals("xebc",s1.getDocument());
@@ -86,9 +79,9 @@ public class SimpleClientServerTest extends TestCase{
 		network.addClient(c1);
 		network.addClient(s1);
 		
-		c1.sendOperation(new InsertOperation(3, "x"),0);
+		c1.sendOperation(new InsertOperation(3, "x"),1000);
 		s1.sendOperation(c1.getJID(),new DeleteOperation(1,"bcde"),2000);
-		Thread.sleep(100);
+		Thread.sleep(1100);
 		assertEquals("abcxdefg", c1.getDocument());
 		
 		Thread.sleep(4000);

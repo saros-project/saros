@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.NetworkRequest;
 
 /**
  * this class simulate a network.
@@ -27,17 +28,40 @@ public class SimulateNetzwork implements NetworkConnection{
 	}
 	
 	
+	
+	
+	private void sendOperation(NetworkRequest req){
+		if(clients.containsKey(req.getTo())){
+			logger.debug("send message to "+req.getTo());
+			clients.get(req.getTo()).receiveNetworkEvent(req);
+		}
+	}
+	
+	public void sendOperation(final NetworkRequest req, final int delay){
+		new Thread(new Runnable(){
+			public void run() {
+				logger.debug("Delay in send operation "+req.getRequest().getOperation().toString()+" of "+delay+" millis");
+				try {
+				Thread.sleep(delay);
+				sendOperation(req);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}}).start();
+	}
+	
 	private void sendOperation(JID jid, Request req){
 		if(clients.containsKey(jid)){
 			clients.get(jid).receiveNetworkEvent(req);
 		}
 	}
 	
+	@Deprecated
 	public void sendOperation(final JID jid, final Request req, final int delay) {
 		
 			new Thread(new Runnable(){
 				public void run() {
-					logger.debug("Delay in send operation "+req.getOperation().toString()+" of "+delay+" millis");
+					logger.debug("Delay in send operation "+req.getOperation().toString()+" of "+delay+" millis to "+jid);
 					try {
 					Thread.sleep(delay);
 					sendOperation(jid, req);

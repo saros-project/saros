@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.jupiter.text;
+package de.fu_berlin.inf.dpp.test.jupiter;
 /**
  * This test class represent local execution of document changes and 
  * appropriate jupiter operations.
@@ -8,19 +8,13 @@ import de.fu_berlin.inf.dpp.jupiter.Operation;
 import de.fu_berlin.inf.dpp.jupiter.Request;
 import de.fu_berlin.inf.dpp.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.test.jupiter.text.Document;
 import junit.framework.TestCase;
 
 
-public class SimpleJupiterDocumentTest extends TestCase{
+public class SimpleJupiterDocumentTest extends JupiterTestCase{
 
-	public void setUp(){
 		
-	}
-	
-	public void tearDown(){
-		
-	}
-	
 	/**
 	 * simple test to generate local operations and
 	 * compute the requests for other sides.

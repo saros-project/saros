@@ -54,6 +54,7 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 	public Operation receiveOperation(Request req) {
 		Operation op = null;
 		try {
+			logger.debug("Client: "+jid+ " receive "+req.getOperation().toString());
 			/* 1. transform operation. */
 			op = algorithm.receiveRequest(req);
 			/* 2. execution on server document*/
@@ -80,16 +81,30 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		/* 2. transform operation. */
 		Request req = algorithm.generateRequest(op);
 		/* 3. send operation. */
-		connection.sendOperation(remoteJid, req, delay);
+//		connection.sendOperation(remoteJid, req, delay);
+		connection.sendOperation(new NetworkRequest(this.jid, remoteJid,req), delay);
 	}
 	
 	public void receiveNetworkEvent(Request req) {
-		logger.info("receive operation : "+req.getOperation().toString());
+		logger.info(this.jid+ " receive operation : "+req.getOperation().toString());
 		receiveOperation(req);
 	}
 
 	public String getDocument() {
 		return doc.getDocument();
+	}
+
+
+	@Deprecated
+	public void sendTransformedOperation(Operation op, JID toJID) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void receiveNetworkEvent(NetworkRequest req) {
+		logger.info(this.jid+ " receive operation : "+req.getRequest().getOperation().toString());
+		receiveOperation(req.getRequest());
+		
 	}
 
 
