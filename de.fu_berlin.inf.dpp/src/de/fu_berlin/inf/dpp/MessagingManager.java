@@ -437,6 +437,9 @@ public class MessagingManager implements PacketListener, MessageListener,
 		messageEventManager
 				.addMessageEventNotificationListener(new MessageEventListener());
 
+		/* set chat room name with connection domain. */
+		CHAT_ROOM = "ori2008@conference."+new JID(connection.getUser()).getDomain();
+		
 	}
 
 	private class MessageEventListener implements

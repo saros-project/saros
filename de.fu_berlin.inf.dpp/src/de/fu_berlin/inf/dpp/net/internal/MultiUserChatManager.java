@@ -68,6 +68,12 @@ public class MultiUserChatManager implements InvitationListener,
 		this.muc = null;
 		this.connection = connection;
 		// Create a MultiUserChat using an XMPPConnection for a roomacknowledge
+		new JID(connection.getUser()).getDomain();
+		
+		//TODO: Room name should be configured by settings.
+		/* create room name with */
+		Room = "ori2007@conference."+new JID(connection.getUser()).getDomain();
+		System.out.println("Roomname = "+Room);
 		MultiUserChat muc = new MultiUserChat(connection, Room);
 
 		if(isRoomExist(muc, Room)){
