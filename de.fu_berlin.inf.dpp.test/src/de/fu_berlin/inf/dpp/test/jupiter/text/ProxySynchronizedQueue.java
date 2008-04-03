@@ -29,7 +29,7 @@ public class ProxySynchronizedQueue implements SynchronizedQueue{
 	
 	public ProxySynchronizedQueue(JID jid, NetworkConnection con){
 		this.jid = jid;
-		this.algorithm = new Jupiter(false);
+		this.algorithm = new Jupiter(true);
 		this.connection = con;
 	}
 	
@@ -61,7 +61,7 @@ public class ProxySynchronizedQueue implements SynchronizedQueue{
 		}
 		return op;
 	}
-
+	
 	/**
 	 * send a transformed operation to client side.
 	 * @param op operation has transformed and only send to
@@ -72,16 +72,21 @@ public class ProxySynchronizedQueue implements SynchronizedQueue{
 				algorithm.getSiteId(), 
 				algorithm.getTimestamp(), 
 				op);
-		
-		connection.sendOperation(jid, send_req, 0);
+		connection.sendOperation(new NetworkRequest(this.jid,jid,send_req), 0);
+//		connection.sendOperation(jid, send_req, 0);
 	}
 	
 	public void sendOperation(Operation op) {
 		/* 1. transform operation. */
 		Request req = algorithm.generateRequest(op);
 		/* 2. opertion to client. */
-		connection.sendOperation(jid, req, 0);
+		connection.sendOperation(new NetworkRequest(this.jid,jid,req), 0);
+//		connection.sendOperation(jid, req, 0);
 //		connection
+	}
+
+	public Algorithm getAlgorithm() {
+		return algorithm;
 	}
 
 }

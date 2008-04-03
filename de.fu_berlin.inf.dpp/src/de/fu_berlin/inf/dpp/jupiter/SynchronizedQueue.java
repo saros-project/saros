@@ -16,4 +16,6 @@ public interface SynchronizedQueue {
 	 * client side.
 	 */
 	public void sendTransformedOperation(Operation op, JID toJID);
+	
+	public Algorithm getAlgorithm();
 }

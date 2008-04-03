@@ -13,7 +13,8 @@ public class MultiUserChatManagerTest extends TestCase {
         XMPPConnection.DEBUG_ENABLED = true;
     }
 	
-	private String server = "jabber.cc";
+	private String server = "jabber.org";
+//	private String server = "localhost";
 	
 	private XMPPConnection conn1;
 	private String user1 = "ori79";

@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.test.jupiter.text;
 
+import java.util.List;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.jupiter.Algorithm;
@@ -13,50 +16,55 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
 
-/**
- * test document to simulate the client site.
- * @author orieger
- *
- */
-
-public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
-
-	private static Logger logger = Logger.getLogger(ClientSynchronizedDocument.class);
+public class TwoWayJupiterServerDocument implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
+	
+	private static Logger logger = Logger.getLogger(TwoWayJupiterServerDocument.class);
 	
 	private Document doc;
+	/* sync algorithm with ack-operation list. */
 	private Algorithm algorithm;
 	
 	private JID jid;
-	private JID server_jid = new JID("ori78@jabber.cc");
 	private NetworkConnection connection;
 	
-	public ClientSynchronizedDocument(String content, NetworkConnection con){
-		this.doc = new Document(content);
-		this.algorithm = new Jupiter(false);
-		this.connection = con;
-	}
+	private List<SynchronizedQueue> proxyQueues;
 	
-	public ClientSynchronizedDocument(String content, NetworkConnection con, JID jid){
-		this.doc = new Document(content);
-		this.algorithm = new Jupiter(false);
-		this.connection = con;
+	public TwoWayJupiterServerDocument(String content, NetworkConnection con){
+		init(content,con);
+	}
+
+	public TwoWayJupiterServerDocument(String content, NetworkConnection con, JID jid){		
 		this.jid = jid;
+		init(content,con);
 	}
 	
-	public JID getJID() {
-		return this.jid;
+	/* init proxy queue and all necessary objects. */
+	private void init(String content, NetworkConnection con){
+		this.doc = new Document(content);
+		this.algorithm = new Jupiter(true);
+		this.connection = con;
+		this.proxyQueues = new Vector<SynchronizedQueue>();
 	}
 	
 	public void setJID(JID jid){
 		this.jid = jid;
 	}
+	
+	public JID getJID() {
+		return jid;
+	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Operation receiveOperation(Request req) {
 		Operation op = null;
 		try {
-			logger.debug("Client: "+jid+ " receive "+req.getOperation().toString());
+			logger.debug("Operation before OT:"+req.getOperation().toString());
 			/* 1. transform operation. */
 			op = algorithm.receiveRequest(req);
+			
+			logger.debug("Operation after OT: "+op.toString());
 			/* 2. execution on server document*/
 			doc.execOperation(op);
 		} catch (TransformationException e) {
@@ -66,29 +74,35 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		return op;
 	}
 
+	@Deprecated
 	public void sendOperation(Operation op) {
-		sendOperation(server_jid, op, 0);
+		
 	}
 	
-	
-	public void sendOperation(Operation op, int delay) {
-		logger.info("send "+op.toString());
-		sendOperation(server_jid, op, delay);
+	/**
+	 * send operation to special jid.
+	 * @param jid
+	 * @param op
+	 */
+	public void sendOperation(JID jid, Operation op){
+		sendOperation(jid, op, 0);
 	}
-
-	public void sendOperation(JID remoteJid, Operation op, int delay) {
+	
+	public void sendOperation(JID jid, Operation op, int delay) {
 		/* 1. execute locally*/
 		doc.execOperation(op);
 		/* 2. transform operation. */
 		Request req = algorithm.generateRequest(op);
-		/* 3. send operation. */
-//		connection.sendOperation(remoteJid, req, delay);
-		connection.sendOperation(new NetworkRequest(this.jid, remoteJid,req), delay);
+		/*sent to client*/
+		connection.sendOperation(new NetworkRequest(this.jid,jid,req), delay);
+//		connection.sendOperation(jid, req,delay);
+		
 	}
-	
+
 	public void receiveNetworkEvent(Request req) {
-		logger.info(this.jid+ " receive operation : "+req.getOperation().toString());
-		receiveOperation(req);
+		logger.info("receive operation : "+req.getOperation().toString());
+		receiveOperation(req);	
+
 	}
 
 	public String getDocument() {
@@ -96,23 +110,25 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 	}
 
 
-	@Deprecated
+	public Algorithm getAlgorithm() {
+		return this.algorithm;
+	}
+
+
+	
 	public void sendTransformedOperation(Operation op, JID toJID) {
 		// TODO Auto-generated method stub
 		
 	}
 
+
+	/**
+	 * receive network request.
+	 */
 	public void receiveNetworkEvent(NetworkRequest req) {
-		logger.info(this.jid+ " receive operation : "+req.getRequest().getOperation().toString());
 		receiveOperation(req.getRequest());
-		
-	}
-
-	public Algorithm getAlgorithm() {
-		return algorithm;
 	}
 
 
 
-	
 }

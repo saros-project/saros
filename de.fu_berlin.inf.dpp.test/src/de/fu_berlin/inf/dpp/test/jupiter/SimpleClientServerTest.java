@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.TwoWayJupiterServerDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
 public class SimpleClientServerTest extends JupiterTestCase{
@@ -27,7 +28,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abc",
+		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abc",
 				network);
 		s1.setJID(new JID("ori78@jabber.cc"));
 
@@ -72,7 +73,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
+		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abcdefg",
 				network);
 		s1.setJID(new JID("ori78@jabber.cc"));
 		
@@ -99,7 +100,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
+		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abcdefg",
 				network);
 		s1.setJID(new JID("ori78@jabber.cc"));
 		

@@ -32,7 +32,7 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	private JID jid;
 	private NetworkConnection connection;
 	
-	private HashMap<JID,SynchronizedQueue> proxyQueues;
+	private HashMap<JID,ProxySynchronizedQueue> proxyQueues;
 	
 	public ServerSynchronizedDocument(String content, NetworkConnection con){
 		init(content,con);
@@ -48,7 +48,7 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 		this.doc = new Document(content);
 		this.algorithm = new Jupiter(true);
 		this.connection = con;
-		this.proxyQueues = new HashMap<JID,SynchronizedQueue>();
+		this.proxyQueues = new HashMap<JID,ProxySynchronizedQueue>();
 	}
 	
 	public void setJID(JID jid){
@@ -60,23 +60,17 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Receive operation between server and client as two-way protocol.
 	 */
 	public Operation receiveOperation(Request req) {
 		Operation op = null;
 		try {
-			logger.debug("Operation before OT:"+req.getOperation().toString());
+			logger.debug("Operation before OT:"+req.getOperation().toString()+" "+algorithm.getTimestamp());
 			/* 1. transform operation. */
 			op = algorithm.receiveRequest(req);
-			logger.debug("Operation after OT: "+op.toString());
+			logger.debug("Operation after OT: "+op.toString()+" "+algorithm.getTimestamp());			
 			
-			/* 2 sync with proxy queues. */
-			for(JID jid : proxyQueues.keySet()){
-				proxyQueues.get(jid).receiveOperation(req);
-			}
-			
-			
-			/* 3. execution on server document*/
+			/* 2. execution on server document*/
 			doc.execOperation(op);
 		} catch (TransformationException e) {
 			// TODO Auto-generated catch block
@@ -91,25 +85,40 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	private Operation receiveOperation(Request req, JID jid) {
 		Operation op = null;
 		try {
-			logger.debug("Incoming Request from : "+jid.toString());
-			logger.debug("Operation before OT:"+req.getOperation().toString());
-			/* 1. transform operation. */
-			op = algorithm.receiveRequest(req);
-			logger.debug("Operation after OT: "+op.toString());
 			
-			/* 2. execution on server document*/
-			doc.execOperation(op);
+//			logger.debug("Incoming Request from : "+jid.toString());
+//			logger.debug("Operation before OT:"+req.getOperation().toString()+" "+algorithm.getTimestamp());
+//			/* 1. transform operation. */
+//			op = algorithm.receiveRequest(req);
+//			logger.debug("Operation after OT: "+op.toString()+" "+algorithm.getTimestamp());
+//			
+//			/* 2. execution on server document*/
+//			doc.execOperation(op);
 			
 			/* 3 sync with proxy queues. */
 			for(JID j : proxyQueues.keySet()){
-				SynchronizedQueue q =  proxyQueues.get(j);
-				/* 3.1 create transformed operation. */
-				op = q.receiveOperation(req);
+				ProxySynchronizedQueue q =  proxyQueues.get(j);
 				
-				/* 3.2. send operation */
+				logger.debug(j.toString()+" : vector "+q.getAlgorithm().getTimestamp());
+				
+				/* 1. Wenn ein anderer Client eine Operation ausführt*/
 				if(!j.toString().equals(jid.toString())){
-					q.sendTransformedOperation(op,j);
+					/* Änderung muss als Fremd-Änderung markiert werden. */
+					op = q.getAlgorithm().receiveRequest(req);
+					/* Änderung muss an den anderen Client kommuniziert werden. */
+					q.sendTransformedOperation(op, j);
 				}
+				/* 2. Wenn die Operation vom Remote Client kommt.*/
+				if(j.toString().equals(jid.toString())){
+					/* Änderung muss als Eigene Änderung markiert werden.*/
+					q.getAlgorithm().generateRequest(req.getOperation());
+				}
+				logger.debug(j.toString()+" : vector after receive "+q.getAlgorithm().getTimestamp());
+				
+//				/* 3.2. send operation */
+//				if(!j.toString().equals(jid.toString())){
+//					q.sendTransformedOperation(op,j);
+//				}
 			}
 			
 		} catch (TransformationException e) {
@@ -138,6 +147,12 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 		sendOperation(jid, op, 0);
 	}
 	
+	/**
+	 * send operation only for two-way protocol test. 
+	 * @param jid
+	 * @param op
+	 * @param delay
+	 */
 	public void sendOperation(JID jid, Operation op, int delay) {
 		/* 1. execute locally*/
 		doc.execOperation(op);
@@ -164,7 +179,7 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 
 	
 	public void addProxyClient(JID jid) {
-		SynchronizedQueue queue = new ProxySynchronizedQueue(jid, this.connection);
+		ProxySynchronizedQueue queue = new ProxySynchronizedQueue(jid, this.connection);
 		proxyQueues.put(jid,queue);
 	}
 
@@ -181,6 +196,10 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	public void receiveNetworkEvent(NetworkRequest req) {
 		logger.debug("receive network event with networtrequest from "+req.getFrom());
 		receiveOperation(req.getRequest(), req.getFrom());
+	}
+
+	public Algorithm getAlgorithm() {
+		return algorithm;
 	}
 
 
