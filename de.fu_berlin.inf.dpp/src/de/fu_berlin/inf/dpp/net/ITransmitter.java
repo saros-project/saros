@@ -18,6 +18,7 @@
 
 package de.fu_berlin.inf.dpp.net;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -121,7 +122,7 @@ public interface ITransmitter {
 	 *            <code>null</code>.
 	 */
 	public void sendFile(JID recipient, IProject project, IPath path, IFileTransferCallback callback);
-
+	
 	/**
 	 * Sends given file to given recipient with given timestamp.
 	 * 
@@ -137,6 +138,22 @@ public interface ITransmitter {
 	 *            <code>null</code>.
 	 */
 	public void sendFile(JID recipient, IProject project, IPath path, int timestamp, IFileTransferCallback callback);
+	
+	/**
+	 * Sends given archive file to given recipient.
+	 * (Fallback of jingle file transfer to achieve better transfer
+	 * with IBB.)
+	 * 
+	 * @param recipient
+	 *            the Jabber ID of the recipient.
+	 * @param project TODO
+	 * @param archive
+	 *            the project-relative path of the resource that is to be sent.
+	 * @param callback
+	 *            an callback for the file transfer state. Can be
+	 *            <code>null</code>.
+	 */
+	public void sendProjectArchive(JID recipient, IProject project, File archive, IFileTransferCallback callback);
 	
 	/**
 	 * Sends queued file transfers.

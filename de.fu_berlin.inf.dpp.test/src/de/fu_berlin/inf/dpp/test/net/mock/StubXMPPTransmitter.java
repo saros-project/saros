@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.test.net.mock;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -120,6 +121,13 @@ public class StubXMPPTransmitter implements ITransmitter, FileTransferListener{
 
 
 	public void fileTransferRequest(FileTransferRequest request) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void sendProjectArchive(JID recipient, IProject project,
+			File archive, IFileTransferCallback callback) {
 		// TODO Auto-generated method stub
 		
 	}

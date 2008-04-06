@@ -27,4 +27,11 @@ public interface IFileTransferCallback {
 	 */
 	public void fileTransferFailed(IPath path, Exception e);
 	
+	/**
+	 * Is fired part of file has transfered..
+	 * 
+	 * @param transfered
+	 *            current transfered size.
+	 */
+	public void transferProgress(int transfered);
 }

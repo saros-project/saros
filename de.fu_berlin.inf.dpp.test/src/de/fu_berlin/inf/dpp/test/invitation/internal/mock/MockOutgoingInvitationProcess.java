@@ -154,5 +154,11 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 		
 	}
 
+
+	public void transferProgress(int transfered) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }

@@ -19,11 +19,13 @@
  */
 package de.fu_berlin.inf.dpp.invitation.internal;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.FileZipper;
 
 /**
  * An outgoing invitation process.
@@ -45,6 +48,9 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  */
 public class OutgoingInvitationProcess extends InvitationProcess implements
 		IOutgoingInvitationProcess, IFileTransferCallback {
+
+	private static Logger logger = Logger
+			.getLogger(OutgoingInvitationProcess.class);
 
 	private ISharedProject sharedProject;
 
@@ -56,12 +62,29 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 	private List<IPath> toSend;
 
+	/** size of project archive file */
+	private long fileSize = 100;
+	private File archive;
+	/** size of current transfered part of archive file. */
+	private long transferedFileSize = 0;
+
 	public int getProgressCurrent() {
-		return progress_done + 1;
+		if (tmode == TransferMode.IBB) {
+			//TODO Änderung
+			return (int) (fileSize - transferedFileSize);
+		} else {
+			return progress_done + 1;
+		}
 	}
 
 	public int getProgressMax() {
-		return progress_max;
+		if (tmode == TransferMode.IBB) {
+			//TODO Änderung
+			return (int) (fileSize);
+		} else {
+			return progress_max;
+		}
+
 	}
 
 	public String getProgressInfo() {
@@ -110,7 +133,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 		setState(State.SYNCHRONIZING);
 
-		if (tmode == TransferMode.JINGLE || tmode == TransferMode.DEFAULT || tmode == TransferMode.IBB) {
+		if (tmode == TransferMode.JINGLE || tmode == TransferMode.DEFAULT
+				|| tmode == TransferMode.IBB) {
 			try {
 				FileList local = new FileList(sharedProject.getProject());
 				FileList diff = remoteFileList.diff(local);
@@ -124,7 +148,13 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 				progress_max = toSend.size();
 				progress_done = 0;
 
-				sendNext();
+				/* transfer all data with archive. */
+				if (tmode == TransferMode.IBB) {
+					sendArchive();
+				} else {
+					/* send separate files. */
+					sendNext();
+				}
 
 				if (!blockUntilFilesSent() || !blockUntilJoinReceived())
 					cancel(null, false);
@@ -134,10 +164,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
 			}
 		}
-//		/* transfer all data with archive. */
-//		if (tmode == TransferMode.IBB) {
-//			sendArchive();
-//		}
+
 	}
 
 	/*
@@ -158,6 +185,9 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		} catch (Exception e) {
 			failed(e);
 		}
+		
+		//TODO: For testing only
+		tmode = TransferMode.IBB;
 	}
 
 	/*
@@ -217,8 +247,25 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * @see de.fu_berlin.inf.dpp.net.IFileTrafnsferCallback
 	 */
 	public void fileSent(IPath path) {
-		progress_done++;
-		sendNext();
+		if (tmode == TransferMode.IBB) {
+			//TODO Änderung
+			setState(State.SYNCHRONIZING_DONE);
+		} else {
+			progress_done++;
+			sendNext();
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback#transferProgress(int)
+	 */
+	public void transferProgress(int transfered) {
+		//TODO Änderung
+		transferedFileSize = transfered;
+		/* update ui */
+		invitationUI.updateInvitationProgress(peer);
 	}
 
 	private void sendNext() {
@@ -242,9 +289,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	}
 
 	/**
-	 * send all project data with archive.
+	 * send all project data with archive file.
 	 */
 	private void sendArchive() {
+		//TODO Änderung
 		if (getState() == State.CANCELED) {
 			toSend.clear();
 			return;
@@ -255,8 +303,22 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 			return;
 		}
 
-		// TODO: Status für den Versand der einzelnen großen Datei anzeigen.
+		archive = new File("./Project.zip");
+		logger.debug("Project archive file has to be send. "
+				+ archive.getAbsolutePath() + " length: " + archive.length());
+		try {
+			/* create project zip archive. */
+			FileZipper.createProjectZipArchive(toSend, archive.getAbsolutePath(), sharedProject.getProject());
+			/* send data. */
+			transmitter.sendProjectArchive(peer, sharedProject.getProject(),
+					archive, this);
+		} catch (Exception e) {
+			failed(e);
+		}
 
+		progress_info = "Transfer project tar file";
+
+		// fileSize = archive.length();
 	}
 
 	/**

@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.net.internal;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 
+import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
+
 /**
  * for information on monitoring the process of a file tranfer
  * 
@@ -12,14 +14,22 @@ import org.jivesoftware.smackx.filetransfer.FileTransfer;
 public class FileTransferProcessMonitor extends Thread {
 
 	FileTransfer transfer;
-	private int TIMEOUT = 10000;
+	private int TIMEOUT = 100000;
 
 	private boolean running = true;
 
 	private boolean closeMonitor = false;
+	
+	private IFileTransferCallback callback;
 
 	public FileTransferProcessMonitor(FileTransfer transfer) {
 		this.transfer = transfer;
+		start();
+	}
+	
+	public FileTransferProcessMonitor(FileTransfer transfer, IFileTransferCallback callback) {
+		this.transfer = transfer;
+		this.callback = callback;
 		start();
 	}
 
@@ -45,7 +55,9 @@ public class FileTransferProcessMonitor extends Thread {
 					/* check negotiator process */
 					System.out.println("Status: " + transfer.getStatus()
 							+ " Progress : " + transfer.getProgress());
-
+					if(callback != null){
+						callback.transferProgress((int)(transfer.getProgress()*100));
+					}
 
 					Thread.sleep(500);
 				}

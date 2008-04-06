@@ -38,6 +38,7 @@ public class ResourceHelper {
 	}
 	
     public static IProject createProject(String name) throws CoreException {
+    	
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
         IProject project = root.getProject(name);
         if(!project.exists()){

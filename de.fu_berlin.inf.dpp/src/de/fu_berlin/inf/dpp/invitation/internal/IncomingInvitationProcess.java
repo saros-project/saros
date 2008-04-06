@@ -201,7 +201,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		} catch (Exception e) {
 			failed(e);
 		}
-
+		
 		progressMonitor.worked(1);
 		progressMonitor.subTask("Files left: " + filesLeftToSynchronize);
 		

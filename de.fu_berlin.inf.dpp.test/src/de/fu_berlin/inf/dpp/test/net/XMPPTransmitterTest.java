@@ -320,4 +320,15 @@ public class XMPPTransmitterTest extends TestCase implements
 		logger.log(Level.WARNING,"File transfer failed: "+e.getMessage());
 		
 	}
+
+	public void sendProjectArchive(JID recipient, IProject project,
+			File archive, IFileTransferCallback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void transferProgress(int transfered) {
+		// TODO Auto-generated method stub
+		
+	}
 }
