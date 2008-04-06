@@ -71,9 +71,8 @@ public class MultiUserChatManager implements InvitationListener,
 		new JID(connection.getUser()).getDomain();
 		
 		//TODO: Room name should be configured by settings.
-		/* create room name with */
+		/* create room domain of current connection. */
 		Room = "ori2007@conference."+new JID(connection.getUser()).getDomain();
-		System.out.println("Roomname = "+Room);
 		MultiUserChat muc = new MultiUserChat(connection, Room);
 
 		if(isRoomExist(muc, Room)){

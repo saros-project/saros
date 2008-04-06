@@ -10,6 +10,14 @@ public class JupiterTestCase extends TestCase{
 		PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
 	}
 	
+	public JupiterTestCase(){
+		
+	}
+	
+	public JupiterTestCase(String method){
+		super(method);
+	}
+	
 	protected SimulateNetzwork network;
 
 	public void setUp() {

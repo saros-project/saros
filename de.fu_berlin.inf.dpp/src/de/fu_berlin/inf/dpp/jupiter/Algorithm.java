@@ -57,4 +57,5 @@ public interface Algorithm {
 	 */
 	int[] transformIndices(Timestamp timestamp, int[] indices) throws TransformationException;
 	
+	public Operation receiveTransformedRequest(Request req) throws TransformationException;
 }

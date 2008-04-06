@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.test.jupiter;
 
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
 import org.apache.log4j.PropertyConfigurator;
 
@@ -15,6 +17,44 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 public class SimpleClientServerTest extends JupiterTestCase{
 
 
+	public SimpleClientServerTest(String method){
+		super(method);
+	}
+	
+	public void setUp() {
+		network = new SimulateNetzwork();
+
+	}
+	
+	public void tearDown(){
+		network = null;
+	}
+	
+	public void testLastTestCase() throws Exception{
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
+				network);
+		c1.setJID(new JID("ori79@jabber.cc"));
+		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abc",
+				network);
+		s1.setJID(new JID("ori78@jabber.cc"));
+
+		network.addClient(c1);
+		network.addClient(s1);
+		
+		s1.sendOperation(c1.getJID(),new InsertOperation(2, "w"),2000);
+		
+		c1.sendOperation(new InsertOperation(0, "e"),0);
+		
+		c1.sendOperation(new InsertOperation(2, "e"),0);
+		
+		c1.sendOperation(new InsertOperation(2, "f"),0);
+		/*short delay. */
+		Thread.sleep(3000);
+		
+		assertEquals(c1.getDocument(), s1.getDocument());
+		System.out.println(c1.getDocument());
+	}
+	
 	
 	/**
 	 * simple test scenario between server and client.
@@ -116,5 +156,16 @@ public class SimpleClientServerTest extends JupiterTestCase{
 		assertEquals(c1.getDocument(), s1.getDocument());
 		assertEquals("axfg",c1.getDocument());
 		
+	}
+	
+	public static Test suite() {
+		TestSuite suite = new TestSuite("Test for simple client server test cases.");
+		//$JUnit-BEGIN$
+//		suite.addTest(new SimpleClientServerTest("testInsertStringWithConcurentDelete"));
+//		suite.addTest(new SimpleClientServerTest("test2WayProtocol"));
+//		suite.addTest(new SimpleClientServerTest("testDeleteStringWithConcurentInsert"));
+		suite.addTest(new SimpleClientServerTest("testLastTestCase"));
+		//$JUnit-END$
+		return suite;
 	}
 }

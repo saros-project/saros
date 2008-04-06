@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
  *
  */
 
-public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
+public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
 
 	private static Logger logger = Logger.getLogger(ClientSynchronizedDocument.class);
 	
@@ -30,13 +30,13 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 	private JID server_jid = new JID("ori78@jabber.cc");
 	private NetworkConnection connection;
 	
-	public ClientSynchronizedDocument(String content, NetworkConnection con){
+	public ClientSynchronizedDocument2(String content, NetworkConnection con){
 		this.doc = new Document(content);
 		this.algorithm = new Jupiter(true);
 		this.connection = con;
 	}
 	
-	public ClientSynchronizedDocument(String content, NetworkConnection con, JID jid){
+	public ClientSynchronizedDocument2(String content, NetworkConnection con, JID jid){
 		this.doc = new Document(content);
 		this.algorithm = new Jupiter(false);
 		this.connection = con;
@@ -56,9 +56,10 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		try {
 			logger.debug("Client: "+jid+ " receive "+req.getOperation().toString());
 			/* 1. transform operation. */
-			op = algorithm.receiveRequest(req);
-//			op = algorithm.receiveTransformedRequest(req);
+//			op = algorithm.receiveRequest(req);
+			op = algorithm.receiveTransformedRequest(req);
 			/* 2. execution on server document*/
+			logger.info("execute op: "+op.toString());
 			doc.execOperation(op);
 		} catch (TransformationException e) {
 			// TODO Auto-generated catch block

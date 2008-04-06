@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.jupiter.SynchronizedQueue;
 import de.fu_berlin.inf.dpp.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.jupiter.internal.Jupiter;
+import de.fu_berlin.inf.dpp.jupiter.internal.JupiterTimestampFactory;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
@@ -29,7 +30,7 @@ public class ProxySynchronizedQueue implements SynchronizedQueue{
 	
 	public ProxySynchronizedQueue(JID jid, NetworkConnection con){
 		this.jid = jid;
-		this.algorithm = new Jupiter(true);
+		this.algorithm = new Jupiter(false);
 		this.connection = con;
 	}
 	
@@ -68,10 +69,17 @@ public class ProxySynchronizedQueue implements SynchronizedQueue{
 	 * client side.
 	 */
 	public void sendTransformedOperation(Operation op, JID jid){
+		Timestamp time = algorithm.getTimestamp();
+		logger.debug("timestamp before : "+time.toString());
+		/* current timestemp have to be decrement to achieve the preconditions.*/
+//		int[] t = time.getComponents();
+//		--t[1];
+//		time = new JupiterTimestampFactory().createTimestamp(t);
 		Request send_req = new RequestImpl(
 				algorithm.getSiteId(), 
-				algorithm.getTimestamp(), 
+				time, 
 				op);
+		logger.debug("timestamp after : "+time.toString());
 		connection.sendOperation(new NetworkRequest(this.jid,jid,send_req), 0);
 //		connection.sendOperation(jid, send_req, 0);
 	}

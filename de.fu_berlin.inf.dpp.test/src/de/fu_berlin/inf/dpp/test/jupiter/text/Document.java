@@ -33,6 +33,7 @@ public class Document {
 	 * @param op
 	 */
 	public void execOperation(Operation op){
+		try{
 		/* execute insert operation */
 		if (op instanceof InsertOperation) {
 			InsertOperation iop = (InsertOperation) op;
@@ -50,6 +51,9 @@ public class Document {
 			SplitOperation sop = (SplitOperation) op;
 			execOperation(sop.getSecond());
 			execOperation(sop.getFirst());
+		}
+		}catch(Exception e){
+			System.out.println(e.getMessage()+ " : "+" doc "+doc.toString()+" | op : "+op.toString());
 		}
 	}
 }

@@ -114,13 +114,25 @@ public class Jupiter implements Algorithm {
 			throw new IllegalArgumentException("Jupiter expects timestamps of type JupiterVectorTime");
 		}
 		//TODO: check preconditions
-//		checkPreconditions((JupiterVectorTime) timestamp);
+		checkPreconditions((JupiterVectorTime) timestamp);
 		discardAcknowledgedOperations((JupiterVectorTime) timestamp);
 
 		Operation newOp = transform(req.getOperation());
 		vectorTime.incrementRemoteRequestCount();
 		
 		return newOp;
+	}
+	
+	public Operation receiveTransformedRequest(Request req) throws TransformationException{
+		Timestamp timestamp = req.getTimestamp();
+		if (!(timestamp instanceof JupiterVectorTime)) {
+			throw new IllegalArgumentException("Jupiter expects timestamps of type JupiterVectorTime");
+		}
+		//TODO: check preconditions
+		checkPreconditions((JupiterVectorTime) timestamp);
+		discardAcknowledgedOperations((JupiterVectorTime) timestamp);
+		vectorTime.incrementRemoteRequestCount();
+		return req.getOperation();
 	}
 	
 	/**

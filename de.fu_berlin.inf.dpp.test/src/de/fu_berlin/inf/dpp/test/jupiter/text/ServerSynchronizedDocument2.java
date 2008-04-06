@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
 
-public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
+public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
 	
 	private static Logger logger = Logger.getLogger(ServerSynchronizedDocument.class);
 	
@@ -33,13 +33,15 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	private JID jid;
 	private NetworkConnection connection;
 	
+	private boolean accessDenied = false;
+	
 	private HashMap<JID,ProxySynchronizedQueue> proxyQueues;
 	
-	public ServerSynchronizedDocument(String content, NetworkConnection con){
+	public ServerSynchronizedDocument2(String content, NetworkConnection con){
 		init(content,con);
 	}
 
-	public ServerSynchronizedDocument(String content, NetworkConnection con, JID jid){		
+	public ServerSynchronizedDocument2(String content, NetworkConnection con, JID jid){		
 		this.jid = jid;
 		init(content,con);
 	}
@@ -83,7 +85,19 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	/**
 	 * {@inheritDoc}
 	 */
-	private Operation receiveOperation(Request req, JID jid) {
+	private synchronized Operation receiveOperation(Request req, JID jid) {
+		while(accessDenied){
+			try {
+				logger.debug("wait for semaphore.");
+				wait();
+			} catch (InterruptedException e) {
+				logger.error(e.getMessage());
+			}
+		}
+		
+		/* get semaphore*/
+		accessDenied = true;
+		
 		Operation op = null;
 		try {
 			
@@ -109,8 +123,8 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 					op = q.getAlgorithm().receiveRequest(req);
 					
 					/* create new request to send to remote side.*/
-//					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),op);
-					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),req.getOperation());
+					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),op);
+//					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),req.getOperation());
 					/* Änderung muss an den anderen Client kommuniziert werden. */
 					connection.sendOperation(new NetworkRequest(jid,j,req), 0);
 //					q.sendTransformedOperation(op, j);
@@ -124,17 +138,18 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 					logger.debug(j.toString()+" sender : vector after receive "+q.getAlgorithm().getTimestamp()+" op after: "+re.getOperation());
 				}
 				
-				
-//				/* 3.2. send operation */
-//				if(!j.toString().equals(jid.toString())){
-//					q.sendTransformedOperation(op,j);
-//				}
 			}
 			
 		} catch (TransformationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
+		}finally{
+			logger.debug("end of lock and clear semaphore.");
+			accessDenied = false;
+			notifyAll();
 		}
+		
 		return op;
 	}
 	
@@ -204,7 +219,7 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 
 	
 	public void receiveNetworkEvent(NetworkRequest req) {
-		logger.debug("receive network event with networtrequest from "+req.getFrom());
+//		logger.debug("receive network event with networtrequest from "+req.getFrom());
 		receiveOperation(req.getRequest(), req.getFrom());
 	}
 
