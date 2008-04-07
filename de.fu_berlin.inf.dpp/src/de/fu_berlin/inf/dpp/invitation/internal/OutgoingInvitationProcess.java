@@ -304,7 +304,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 			return;
 		}
 
-		archive = new File("./Project.zip");
+		archive = new File("./"+getPeer().getName()+"_Project.zip");
 		logger.debug("Project archive file has to be send. "
 				+ archive.getAbsolutePath() + " length: " + archive.length());
 		try {

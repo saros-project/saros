@@ -66,7 +66,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	MultiUserChatManager multitrans = null;
 	
-	private String CHAT_ROOM = "ori2008@conference.jabber.org";
+	private String CHAT_ROOM = "ori2008";
 
 	public class ChatLine {
 		public String sender;
@@ -406,6 +406,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	public MessagingManager() {
 		Saros.getDefault().addListener(this);
+		
 		this.multitrans = new MultiUserChatManager(CHAT_ROOM);
 	}
 

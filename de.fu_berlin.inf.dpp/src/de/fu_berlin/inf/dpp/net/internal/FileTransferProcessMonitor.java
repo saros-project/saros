@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 
@@ -13,6 +14,8 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
  */
 public class FileTransferProcessMonitor extends Thread {
 
+	private static Logger logger = Logger.getLogger(FileTransferProcessMonitor.class);
+	
 	FileTransfer transfer;
 	private int TIMEOUT = 10000;
 
@@ -53,7 +56,7 @@ public class FileTransferProcessMonitor extends Thread {
 				while (!transfer.isDone() && (transfer.getProgress()<1.0)) {
 
 					/* check negotiator process */
-					System.out.println("Status: " + transfer.getStatus()
+					logger.debug("Status: " + transfer.getStatus()
 							+ " Progress : " + transfer.getProgress());
 					if(callback != null){
 						callback.transferProgress((int)(transfer.getProgress()*100));

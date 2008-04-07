@@ -13,8 +13,8 @@ public class MultiUserChatManagerTest extends TestCase {
         XMPPConnection.DEBUG_ENABLED = true;
     }
 	
-	private String server = "jabber.org";
-//	private String server = "localhost";
+//	private String server = "jabber.org";
+	private String server = "teppic.local";
 	
 	private XMPPConnection conn1;
 	private String user1 = "ori79";
@@ -31,9 +31,9 @@ public class MultiUserChatManagerTest extends TestCase {
 		conn1.connect();
 		conn1.login(user1, password);
 		
-		conn2 = new XMPPConnection(server);
-		conn2.connect();
-		conn2.login(user2, password);
+//		conn2 = new XMPPConnection(server);
+//		conn2.connect();
+//		conn2.login(user2, password);
 		
 	}
 	
@@ -44,10 +44,11 @@ public class MultiUserChatManagerTest extends TestCase {
 	
 	public void testRoomExistConnection() throws Exception {
 		MultiUserChatManager mucManager = new MultiUserChatManager();
-		mucManager.initMUC(conn1, user1);
+		mucManager.initMUC(conn1, user1,"ori2007@conference.teppic");
 		
-		MultiUserChatManager mucMananagerUser2 = new MultiUserChatManager();
-		mucMananagerUser2.initMUC(conn2, user2);
+//		MultiUserChatManager mucMananagerUser2 = new MultiUserChatManager();
+//		mucMananagerUser2.initMUC(conn2, user2);
+		System.out.println("connected.");
 	}
 	
 }

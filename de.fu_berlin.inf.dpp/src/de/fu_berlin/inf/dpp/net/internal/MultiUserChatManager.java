@@ -41,7 +41,7 @@ public class MultiUserChatManager implements InvitationListener,
 	private static Logger log = Logger.getLogger(MultiUserChatManager.class
 			.getName());
 
-	public String Room = "ori2007@conference.jabber.org";
+	public String Room = "ori2007";
 
 	public static String JID_PROPERTY = "jid";
 
@@ -63,6 +63,11 @@ public class MultiUserChatManager implements InvitationListener,
 		Room = conference_room_name;
 	}
 
+	public void initMUC(XMPPConnection connection, String user, String room) throws XMPPException{
+		Room = room;
+		initMUC(connection, user);
+	}
+	
 	public void initMUC(XMPPConnection connection, String user)
 			throws XMPPException {
 		this.muc = null;
@@ -72,7 +77,7 @@ public class MultiUserChatManager implements InvitationListener,
 		
 		//TODO: Room name should be configured by settings.
 		/* create room domain of current connection. */
-		Room = "ori2007@conference."+new JID(connection.getUser()).getDomain();
+		Room = Room + "@conference."+new JID(connection.getUser()).getDomain();
 		MultiUserChat muc = new MultiUserChat(connection, Room);
 
 		if(isRoomExist(muc, Room)){
@@ -189,8 +194,13 @@ public class MultiUserChatManager implements InvitationListener,
 					return true;
 				}
 			}
+			//HACK
+			if(e.getMessage().endsWith("No response from server.")){
+				/* in some case there are no response from existing room.*/
+				return true;
+			}
 
-			log.warn(e);
+			log.warn("room exists failure",e);
 
 			return false;
 		}

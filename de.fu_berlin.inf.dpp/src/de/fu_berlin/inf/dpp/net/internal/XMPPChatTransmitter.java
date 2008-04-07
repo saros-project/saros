@@ -861,6 +861,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 				log.debug("transfer complete");
 				callback.fileSent(new Path(archive.getName()));
 			}
+			
+			/* delete temp archive file. */
+			archive.delete();
 
 		} catch (Exception e) {
 			
@@ -1309,7 +1312,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 //			e.printStackTrace();
 //			System.out.println("Exception");
 //		}
-		System.out.println("File archive unzipped :)");
+		archive.delete();
 	}
 	
 	private void sendMessageToAll(ISharedProject sharedProject,
@@ -1716,17 +1719,21 @@ public class XMPPChatTransmitter implements ITransmitter,
 			final IncomingFileTransfer transfer = request.accept();
 			
 			IFileTransferCallback callback = null;
-			/*monitoring of transfer process*/
+			
+			/* get IInvitationprocess for monitoring. */
 			JID fromJID = new JID(request.getRequestor());
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(fromJID)){
+					/* set callback. */
 					callback = process;
 				}
 			}
 			
+			/*monitoring of transfer process*/
 			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
 					transfer,callback);
-				
+			
+			/* receive file. */
 			transfer.recieveFile(archiveFile);
 			
 			/* wait for complete transfer. */
@@ -1877,7 +1884,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 				.getPreferenceStore();
 		// TODO: Änderung für smack 3 : filetransfer have to be implements new
 		fileTransferManager.getProperties().setProperty(FileTransferNegotiator.AVOID_SOCKS5, "true");
-//		fileTransferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, preferenceStore.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
+		fileTransferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, preferenceStore.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
 		// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
 		// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
 
