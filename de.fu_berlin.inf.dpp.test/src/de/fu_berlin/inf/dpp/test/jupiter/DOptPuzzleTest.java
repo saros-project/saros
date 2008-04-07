@@ -165,7 +165,7 @@ public class DOptPuzzleTest extends JupiterTestCase{
 		//$JUnit-BEGIN$
 //		suite.addTest(new DOptPuzzleTest("testTwoConcurrentInsertOperations"));
 //		suite.addTest(new DOptPuzzleTest("testTwoConcurrentDeleteOperations"));
-		suite.addTest(new DOptPuzzleTest("testThreeConcurrentInsertOperations"));
+//		suite.addTest(new DOptPuzzleTest("testThreeConcurrentInsertOperations"));
 		//$JUnit-END$
 		return suite;
 	}

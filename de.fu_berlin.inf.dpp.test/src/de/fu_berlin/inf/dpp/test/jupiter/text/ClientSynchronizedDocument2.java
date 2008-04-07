@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.test.jupiter.text;
 
+import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.jupiter.Algorithm;
@@ -29,6 +31,8 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 	private JID jid;
 	private JID server_jid = new JID("ori78@jabber.cc");
 	private NetworkConnection connection;
+	
+	private HashMap<String, JupiterDocumentListener> documentListener = new HashMap<String, JupiterDocumentListener>();
 	
 	public ClientSynchronizedDocument2(String content, NetworkConnection con){
 		this.doc = new Document(content);
@@ -86,11 +90,14 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 		/* 3. send operation. */
 //		connection.sendOperation(remoteJid, req, delay);
 		connection.sendOperation(new NetworkRequest(this.jid, remoteJid,req), delay);
+		
+		informListener();
 	}
 	
 	public void receiveNetworkEvent(Request req) {
 		logger.info(this.jid+ " receive operation : "+req.getOperation().toString());
 		receiveOperation(req);
+		informListener();
 	}
 
 	public String getDocument() {
@@ -107,12 +114,28 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 	public void receiveNetworkEvent(NetworkRequest req) {
 		logger.info(this.jid+ " receive operation : "+req.getRequest().getOperation().toString()+" timestamp : "+req.getRequest().getTimestamp());
 		receiveOperation(req.getRequest());
-		
+		informListener();
 	}
 
 	public Algorithm getAlgorithm() {
 		return algorithm;
 	}
+
+	private void informListener(){
+		for(String key : documentListener.keySet()){
+			documentListener.get(key).documentAction(jid);
+		}
+	}
+	
+	public void addJupiterDocumentListener(JupiterDocumentListener jdl) {
+		documentListener.put(jdl.getID(), jdl);
+	}
+
+	public void removeJupiterDocumentListener(String id) {
+		documentListener.remove(id);
+	}
+
+
 
 
 

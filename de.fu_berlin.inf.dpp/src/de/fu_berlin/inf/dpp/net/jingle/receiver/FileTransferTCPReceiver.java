@@ -209,8 +209,8 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 			 }
 			 
 			 if((length = input.read(buffer, 0, readSize)) >= 0){
-				 bos.write(buffer, 0, readSize);
-				 currentSize += readSize;
+				 bos.write(buffer, 0, length);
+				 currentSize += length;
 			 }
 //		 System.out.println(new String(buffer,0,length));
 		 }

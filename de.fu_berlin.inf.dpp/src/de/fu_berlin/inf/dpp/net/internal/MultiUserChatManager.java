@@ -155,9 +155,14 @@ public class MultiUserChatManager implements InvitationListener,
 		DiscussionHistory history = new DiscussionHistory();
 		history.setSeconds(2);
 
-		muc.join(user, null, history, SmackConfiguration
-				.getPacketReplyTimeout());
+		try{
+//		muc.join(user, null, history, SmackConfiguration
+//				.getPacketReplyTimeout());
+		muc.join(user);
 
+		}catch(Exception e){
+			log.error("join room.",e);
+		}
 		boolean isjoined = muc.isJoined();
 
 		if (isjoined) {

@@ -214,6 +214,18 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 
 
 
+	public void addJupiterDocumentListener(JupiterDocumentListener jdl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeJupiterDocumentListener(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
 
 
 }

@@ -114,6 +114,17 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 	}
 
 
+	public void addJupiterDocumentListener(JupiterDocumentListener jdl) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void removeJupiterDocumentListener(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 	
 }

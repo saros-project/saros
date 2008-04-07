@@ -8,4 +8,8 @@ package de.fu_berlin.inf.dpp.test.jupiter.text;
 public interface DocumentTestChecker {
 
 	public String getDocument();
+	
+	public void addJupiterDocumentListener(JupiterDocumentListener jdl);
+	
+	public void removeJupiterDocumentListener(String id);
 }
