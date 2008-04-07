@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.util.FileZipper;
  * @author rdjemili
  */
 public class OutgoingInvitationProcess extends InvitationProcess implements
-		IOutgoingInvitationProcess, IFileTransferCallback {
+		IOutgoingInvitationProcess {
 
 	private static Logger logger = Logger
 			.getLogger(OutgoingInvitationProcess.class);
@@ -71,7 +71,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	public int getProgressCurrent() {
 		if (tmode == TransferMode.IBB) {
 			//TODO Änderung
-			return (int) (fileSize - transferedFileSize);
+			return (int) (transferedFileSize);
 		} else {
 			return progress_done + 1;
 		}
@@ -249,6 +249,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	public void fileSent(IPath path) {
 		if (tmode == TransferMode.IBB) {
 			//TODO Änderung
+			
 			setState(State.SYNCHRONIZING_DONE);
 		} else {
 			progress_done++;

@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -59,6 +60,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	private IProject localProject;
 
 	private int filesLeftToSynchronize;
+	
+	/** size of current transfered part of archive file. */
+	private int transferedFileSize = 0;
+
 
 	private IProgressMonitor progressMonitor;
 	
@@ -71,6 +76,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
 		this.projectName = projectName;
 		this.setState(State.INVITATION_SENT);
+		
 	}
 
 	/*
@@ -115,6 +121,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		}
 
 		monitor.done();
+		
+		//TODO: for testing
+		tmode = TransferMode.IBB;
 
 		return remoteFileList;
 	}
@@ -142,7 +151,12 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			filesLeftToSynchronize = handleDiff(localProject, remoteFileList);
 
 			progressMonitor = monitor;
-			progressMonitor.beginTask("Synchronizing...", filesLeftToSynchronize);
+			if(tmode == TransferMode.IBB){
+				progressMonitor.beginTask("Transfer archive file ...", 100);
+			}else{
+				
+				progressMonitor.beginTask("Synchronizing...", filesLeftToSynchronize);
+			}
 			setState(State.SYNCHRONIZING);
 
 			transmitter.sendFileList(peer, new FileList(localProject));
@@ -200,6 +214,14 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			}
 		} catch (Exception e) {
 			failed(e);
+		}
+		
+		/* archive file for transfering data finished.
+		 * Unzip separate files.
+		 * */
+		if(tmode == TransferMode.IBB){
+			tmode = TransferMode.DEFAULT;
+			progressMonitor.beginTask("Files left: ", filesLeftToSynchronize);
 		}
 		
 		progressMonitor.worked(1);
@@ -389,7 +411,22 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 */
 	public void jingleFallback() {
 		logger.warn("jingle fallback");
+		tmode = TransferMode.IBB;
+	}
+
+	public void fileSent(IPath path) {
+		// do nothing
 		
+	}
+
+	public void fileTransferFailed(IPath path, Exception e) {
+		failed(e);
+		
+	}
+
+	public void transferProgress(int transfered) {
+		progressMonitor.worked(transfered - transferedFileSize);
+		transferedFileSize = transfered;
 	}
 
 }

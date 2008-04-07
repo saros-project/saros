@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 public class FileTransferProcessMonitor extends Thread {
 
 	FileTransfer transfer;
-	private int TIMEOUT = 100000;
+	private int TIMEOUT = 10000;
 
 	private boolean running = true;
 
@@ -58,7 +58,9 @@ public class FileTransferProcessMonitor extends Thread {
 					if(callback != null){
 						callback.transferProgress((int)(transfer.getProgress()*100));
 					}
-
+					if(closeMonitor){
+						return;
+					}
 					Thread.sleep(500);
 				}
 				this.running = false;

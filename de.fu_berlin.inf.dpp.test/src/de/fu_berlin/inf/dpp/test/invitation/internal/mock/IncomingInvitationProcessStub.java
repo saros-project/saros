@@ -115,4 +115,19 @@ public class IncomingInvitationProcessStub implements IIncomingInvitationProcess
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void fileSent(IPath path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void fileTransferFailed(IPath path, Exception e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void transferProgress(int transfered) {
+		// TODO Auto-generated method stub
+		
+	}
 }

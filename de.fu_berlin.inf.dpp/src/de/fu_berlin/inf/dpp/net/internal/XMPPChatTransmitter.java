@@ -60,6 +60,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
@@ -842,7 +843,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			transfer.sendFile(archive, PROJECT_ARCHIVE_DESCRIPTION);
 			
 			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-					transfer);
+					transfer,callback);
 			/* wait for complete transfer. */
 			while (monitor.isAlive() && monitor.isRunning()) {
 				try {
@@ -1703,27 +1704,61 @@ public class XMPPChatTransmitter implements ITransmitter,
 		return fileList;
 	}
 
+	/**
+	 * Receive file and save temporary.
+	 * @param request transfer request of incoming file.
+	 * @return File object of received file
+	 */
 	private File receiveFile(FileTransferRequest request){
 		File archiveFile = new File("./incoming_archive.zip");
 		log.debug("Archive file: "+archiveFile.getAbsolutePath());
 		try {
 			final IncomingFileTransfer transfer = request.accept();
-			FileOutputStream out = new FileOutputStream(archiveFile.getName());
 			
-			InputStream in = transfer.recieveFile();
-
-			byte[] buffer = new byte[1024];
-			int bytesRead = 0;
-			
-			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
-				out.write(buffer, 0, bytesRead);
+			IFileTransferCallback callback = null;
+			/*monitoring of transfer process*/
+			JID fromJID = new JID(request.getRequestor());
+			for (IInvitationProcess process : processes) {
+				if (process.getPeer().equals(fromJID)){
+					callback = process;
+				}
 			}
-			in.close();
-			out.close();
-			log.debug("Close input stream");
+			
+			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
+					transfer,callback);
+				
+			transfer.recieveFile(archiveFile);
+			
+			/* wait for complete transfer. */
+			while (monitor.isAlive() && monitor.isRunning()) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			monitor.closeMonitor(true);
+			/* read file.  */
+			
+//			FileOutputStream out = new FileOutputStream(archiveFile.getName());
+//				
+//			InputStream in = transfer.recieveFile();
+//
+//			byte[] buffer = new byte[1024];
+//			int bytesRead = 0;
+//			
+//			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
+//				out.write(buffer, 0, bytesRead);
+//			}
+//			in.close();
+//			out.close();
+//			log.debug("Close input stream");
 
+			
+			
 		} catch (Exception e) {
-			log.error("Error in Incoming File List: ", e);
+			log.error("Error in Incoming File: ", e);
 			return null;
 			// e.printStackTrace();
 			// Saros.log("Exception while receiving file list", e);
@@ -1745,7 +1780,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			int bytesRead;
 			String sb = new String();
 			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
-				sb += new String(buffer, 0, buffer.length).toString();
+				sb += new String(buffer, 0, bytesRead).toString();
 				System.out.println("incomming: " + sb);
 			}
 			in.close();
@@ -1842,6 +1877,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 				.getPreferenceStore();
 		// TODO: Änderung für smack 3 : filetransfer have to be implements new
 		fileTransferManager.getProperties().setProperty(FileTransferNegotiator.AVOID_SOCKS5, "true");
+//		fileTransferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, preferenceStore.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
 		// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
 		// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
 
