@@ -123,8 +123,8 @@ public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQ
 					op = q.getAlgorithm().receiveRequest(req);
 					
 					/* create new request to send to remote side.*/
-					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),op);
-//					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),req.getOperation());
+//					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),op);
+					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),req.getOperation());
 					/* Änderung muss an den anderen Client kommuniziert werden. */
 					connection.sendOperation(new NetworkRequest(jid,j,req), 0);
 //					q.sendTransformedOperation(op, j);

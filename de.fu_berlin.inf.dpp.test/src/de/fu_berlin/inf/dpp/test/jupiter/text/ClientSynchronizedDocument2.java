@@ -60,8 +60,8 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 		try {
 			logger.debug("Client: "+jid+ " receive "+req.getOperation().toString());
 			/* 1. transform operation. */
-//			op = algorithm.receiveRequest(req);
-			op = algorithm.receiveTransformedRequest(req);
+			op = algorithm.receiveRequest(req);
+//			op = algorithm.receiveTransformedRequest(req);
 			/* 2. execution on server document*/
 			logger.info("execute op: "+op.toString());
 			doc.execOperation(op);
