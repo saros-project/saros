@@ -106,7 +106,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
 	private static boolean jingle = false;
-	private boolean JingleError = true;
+	private boolean JingleError = false;
 	private JingleFileTransferManager jingleManager;
 	private JingleFileTransferProcessMonitor monitor;
 
@@ -1883,7 +1883,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		IPreferenceStore preferenceStore = Saros.getDefault()
 				.getPreferenceStore();
 		// TODO: Änderung für smack 3 : filetransfer have to be implements new
-		fileTransferManager.getProperties().setProperty(FileTransferNegotiator.AVOID_SOCKS5, "true");
+//		fileTransferManager.getProperties().setProperty(FileTransferNegotiator.AVOID_SOCKS5, "true");
 		fileTransferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, preferenceStore.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
 		// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
 		// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));

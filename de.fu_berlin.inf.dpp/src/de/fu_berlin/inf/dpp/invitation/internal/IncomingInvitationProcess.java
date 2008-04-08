@@ -123,7 +123,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		monitor.done();
 		
 		//TODO: for testing
-		tmode = TransferMode.IBB;
+//		tmode = TransferMode.IBB;
 
 		return remoteFileList;
 	}

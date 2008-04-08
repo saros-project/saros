@@ -187,7 +187,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		}
 		
 		//TODO: For testing only
-		tmode = TransferMode.IBB;
+//		tmode = TransferMode.IBB;
 	}
 
 	/*
