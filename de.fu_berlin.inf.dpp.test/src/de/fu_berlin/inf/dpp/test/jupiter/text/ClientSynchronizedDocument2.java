@@ -78,7 +78,7 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 	
 	
 	public void sendOperation(Operation op, int delay) {
-		logger.info("send "+op.toString());
+		logger.info("send "+jid.getName()+" : "+op.toString());
 		sendOperation(server_jid, op, delay);
 	}
 

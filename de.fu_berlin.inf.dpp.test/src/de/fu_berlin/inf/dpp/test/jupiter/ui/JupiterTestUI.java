@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 public class JupiterTestUI extends javax.swing.JPanel {
 
 	private static Logger logger = Logger.getLogger(JupiterTestUI.class);
-	
+
 	public static String SIDE_1 = "side1";
 	public static String SIDE_2 = "side2";
 	public static String SIDE_3 = "side3";
@@ -38,14 +38,16 @@ public class JupiterTestUI extends javax.swing.JPanel {
 	public JupiterTestUI() {
 		actionListener = new JupiterActionListener();
 		initComponents();
+		initListener();
 		jupiter = new JupiterSimulater();
+		
+		jupiter.deactiveSide3();
 	}
 
-	public void update(){
-		System.out.println("update");
+	public void update() {
 		this.repaint();
 	}
-	
+
 	private void initComponents() {
 
 		jLabelInitialState = new javax.swing.JLabel();
@@ -96,9 +98,7 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jLabelInitialState.setName("jLabelInitialState"); // NOI18N
 
 		jTextFieldInitialState.setName("jTextFieldInitialState"); // NOI18N
-		jTextFieldInitialState.setText(resourceMap
-				.getString("jTextFieldInitialState.text"));
-		
+
 		// jLabelGlobalResult.setFont(resourceMap.getFont("jLabelGlobalResult.font"));
 		// // NOI18N
 		jLabelGlobalResult.setText(resourceMap
@@ -112,8 +112,8 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jRadioButtonInsert.setText(resourceMap
 				.getString("jRadioButtonInsert.text")); // NOI18N
 		jRadioButtonInsert.setName("jRadioButtonInsert"); // NOI18N
-		jRadioButtonInsert.setSelected(true);
-		
+		// jRadioButtonInsert.setSelected(true);
+
 		jRadioButtonDelete.setText(resourceMap
 				.getString("jRadioButtonDelete.text")); // NOI18N
 		jRadioButtonDelete.setName("jRadioButtonDelete"); // NOI18N
@@ -137,12 +137,10 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jLabelTextSide1.setName("jLabelTextSide1"); // NOI18N
 
 		jTextFieldResultSide1.setName("jTextFieldResultSide1"); // NOI18N
-		jTextFieldResultSide1.setText(resourceMap.getString("jTextFieldInitialState.text"));
 
 		jButtonExecuteSide1.setText(resourceMap
 				.getString("jButtonExecuteSide1.text")); // NOI18N
 		jButtonExecuteSide1.setName("jButtonExecuteSide1"); // NOI18N
-		jButtonExecuteSide1.addActionListener(actionListener);
 
 		org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(
 				jPanel1);
@@ -312,8 +310,8 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jRadioButtonInsertSide2.setText(resourceMap
 				.getString("jRadioButtonInsertSide2.text")); // NOI18N
 		jRadioButtonInsertSide2.setName("jRadioButtonInsertSide2"); // NOI18N
-		jRadioButtonInsertSide2.setSelected(true);
-		
+		// jRadioButtonInsertSide2.setSelected(true);
+
 		jRadioButtonDeleteSide2.setText(resourceMap
 				.getString("jRadioButtonDeleteSide2.text")); // NOI18N
 		jRadioButtonDeleteSide2.setName("jRadioButtonDeleteSide2"); // NOI18N
@@ -333,17 +331,15 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jLabelDelaySide2.setName("jLabelDelaySide2"); // NOI18N
 
 		jTextFieldTextSide2.setName("jTextFieldTextSide2"); // NOI18N
-		
+
 		jLabelTextSide2.setText(resourceMap.getString("jLabelTextSide2.text")); // NOI18N
 		jLabelTextSide2.setName("jLabelTextSide2"); // NOI18N
 
 		jTextFieldResultSide2.setName("jTextFieldResultSide2"); // NOI18N
-		jTextFieldResultSide2.setText(resourceMap.getString("jTextFieldInitialState.text"));
-		
+
 		jButtonExecuteSide2.setText(resourceMap
 				.getString("jButtonExecuteSide2.text")); // NOI18N
 		jButtonExecuteSide2.setName("jButtonExecuteSide2"); // NOI18N
-		jButtonExecuteSide2.addActionListener(actionListener);
 
 		org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(
 				jPanel2);
@@ -513,7 +509,7 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jRadioButtonInsertSide3.setText(resourceMap
 				.getString("jRadioButtonInsertSide3.text")); // NOI18N
 		jRadioButtonInsertSide3.setName("jRadioButtonInsertSide3"); // NOI18N
-		jRadioButtonInsertSide3.setSelected(true);
+		// jRadioButtonInsertSide3.setSelected(true);
 
 		jRadioButtonDeleteSide3.setText(resourceMap
 				.getString("jRadioButtonDeleteSide3.text")); // NOI18N
@@ -539,12 +535,10 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		jLabelTextSide3.setName("jLabelTextSide3"); // NOI18N
 
 		jTextFieldResultSide3.setName("jTextFieldResultSide3"); // NOI18N
-		jTextFieldResultSide3.setText(resourceMap.getString("jTextFieldInitialState.text"));
-		
+
 		jButtonExecuteSide3.setText(resourceMap
 				.getString("jButtonExecuteSide3.text")); // NOI18N
 		jButtonExecuteSide3.setName("jButtonExecuteSide3"); // NOI18N
-		jButtonExecuteSide3.addActionListener(actionListener);
 
 		org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(
 				jPanel3);
@@ -711,11 +705,9 @@ public class JupiterTestUI extends javax.swing.JPanel {
 
 		jButtonRun.setText(resourceMap.getString("jButtonRun.text")); // NOI18N
 		jButtonRun.setName("jButtonRun"); // NOI18N
-		jButtonRun.addActionListener(actionListener);
 
 		jButtonExit.setText(resourceMap.getString("jButtonExit.text")); // NOI18N
 		jButtonExit.setName("jButtonExit"); // NOI18N
-		jButtonExit.addActionListener(actionListener);
 
 		org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(
 				this);
@@ -887,8 +879,30 @@ public class JupiterTestUI extends javax.swing.JPanel {
 	private javax.swing.JTextField jTextFieldTextSide2;
 	private javax.swing.JTextField jTextFieldTextSide3;
 
-
 	// End of variables declaration
+
+	/**
+	 * this method init additional listener and component settings.
+	 */
+	private void initListener() {
+		/*set init document text. */
+		jTextFieldInitialState.setText(resourceMap
+				.getString("jTextFieldInitialState.text"));
+		jTextFieldResultSide1.setText(resourceMap
+				.getString("jTextFieldInitialState.text"));
+		jTextFieldResultSide2.setText(resourceMap
+				.getString("jTextFieldInitialState.text"));
+		jTextFieldResultSide3.setText(resourceMap
+				.getString("jTextFieldInitialState.text"));
+		
+		/* set action listener. */
+		jButtonExecuteSide1.addActionListener(actionListener);
+		jButtonExecuteSide2.addActionListener(actionListener);
+		jButtonExecuteSide3.addActionListener(actionListener);
+		
+		jButtonExit.addActionListener(actionListener);
+		jButtonRun.addActionListener(actionListener);
+	}
 
 	public class JupiterActionListener implements ActionListener {
 
@@ -929,23 +943,23 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		protected ClientSynchronizedDocument2 c2;
 		protected ClientSynchronizedDocument2 c3;
 		protected ServerSynchronizedDocument2 s1;
-		
+
 		JID jid_c1;
 		JID jid_c2;
 		JID jid_c3;
 
 		public JupiterSimulater() {
 			init();
-//			deactiveSide3();
+			// deactiveSide3();
 		}
 
-		private void deactiveSide3(){
+		public void deactiveSide3() {
 			network.removeClient(c3);
 			s1.removeProxyClient(jid_c3);
 			jPanel3.setVisible(false);
 			update();
 		}
-		
+
 		private void init() {
 
 			network = new SimulateNetzwork();
@@ -964,8 +978,8 @@ public class JupiterTestUI extends javax.swing.JPanel {
 			c3 = new ClientSynchronizedDocument2(jTextFieldInitialState
 					.getText(), network, jid_c3);
 			c3.addJupiterDocumentListener(this);
-			s1 = new ServerSynchronizedDocument2(
-					jTextFieldInitialState.getText(), network, jid_server);
+			s1 = new ServerSynchronizedDocument2(jTextFieldInitialState
+					.getText(), network, jid_server);
 
 			network.addClient(c1);
 			network.addClient(c2);
@@ -979,106 +993,105 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		}
 
 		public void simulate() {
-			System.out.println("Simulate");
-			try{
-			executeSide1();
-			executeSide2();
-			executeSide3();
-			}catch(Exception e){
+			try {
+				executeSide1();
+				executeSide2();
+				executeSide3();
+			} catch (Exception e) {
 				JOptionPane.showMessageDialog(new JFrame(), e.getMessage());
 			}
 		}
 
 		public void simulate(String side) {
-			try{
-			if (side.endsWith(SIDE_1)) {
-				executeSide1();
-			}
-			if (side.endsWith(SIDE_2)) {
-				executeSide2();
-			}
-			if (side.endsWith(SIDE_3)) {
-				executeSide3();
-			}
-			}catch(Exception e){
-				JOptionPane.showMessageDialog(new JFrame(),"Error");
+			try {
+				if (side.endsWith(SIDE_1)) {
+					executeSide1();
+				}
+				if (side.endsWith(SIDE_2)) {
+					executeSide2();
+				}
+				if (side.endsWith(SIDE_3)) {
+					executeSide3();
+				}
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(new JFrame(), "Error");
 			}
 		}
 
-		private void executeSide1() throws Exception{
+		private void executeSide1() throws Exception {
 			Operation operation = null;
-			try{
-			/* get op type */
-			if (jRadioButtonDelete.isSelected()) {
-				operation = new DeleteOperation(Integer
-						.parseInt(jTextFieldPosition.getText()),
-						jTextFieldTextSide1.getText());
-			}
-			if (jRadioButtonInsert.isSelected()) {
-				operation = new InsertOperation(Integer
-						.parseInt(jTextFieldPosition.getText()),
-						jTextFieldTextSide1.getText());
-			}
-			} catch(Exception e){
+			try {
+				/* get op type */
+				if (jRadioButtonDelete.isSelected()) {
+					operation = new DeleteOperation(Integer
+							.parseInt(jTextFieldPosition.getText()),
+							jTextFieldTextSide1.getText());
+				}
+				if (jRadioButtonInsert.isSelected()) {
+					operation = new InsertOperation(Integer
+							.parseInt(jTextFieldPosition.getText()),
+							jTextFieldTextSide1.getText());
+				}
+			} catch (Exception e) {
 				logger.error("Error in side 1 operation creation", e);
 			}
-			if(operation != null)
-			c1.sendOperation(operation, Integer.parseInt(jTextFieldDelay
-					.getText()));
+			if (operation != null)
+				c1.sendOperation(operation, Integer.parseInt(jTextFieldDelay
+						.getText()));
 		}
 
-		private void executeSide2() throws Exception{
+		private void executeSide2() throws Exception {
 			Operation operation = null;
-			try{
-			/* get op type */
-			if (jRadioButtonDeleteSide2.isSelected()) {
-				operation = new DeleteOperation(Integer
-						.parseInt(jTextFieldPositionSide2.getText()),
-						jTextFieldTextSide2.getText());
-			}
-			if (jRadioButtonInsertSide2.isSelected()) {
-				operation = new InsertOperation(Integer
-						.parseInt(jTextFieldPositionSide2.getText()),
-						jTextFieldTextSide2.getText());
-			}
+			try {
+				/* get op type */
+				if (jRadioButtonDeleteSide2.isSelected()) {
+					operation = new DeleteOperation(Integer
+							.parseInt(jTextFieldPositionSide2.getText()),
+							jTextFieldTextSide2.getText());
+				}
+				if (jRadioButtonInsertSide2.isSelected()) {
+					operation = new InsertOperation(Integer
+							.parseInt(jTextFieldPositionSide2.getText()),
+							jTextFieldTextSide2.getText());
+				}
 
-			} catch(Exception e){
+			} catch (Exception e) {
 				logger.error("Error in side 2 operation creation", e);
 			}
-			if(operation != null)
-			c2.sendOperation(operation, Integer.parseInt(jTextFieldDelaySide2
-					.getText()));
+			if (operation != null)
+				c2.sendOperation(operation, Integer
+						.parseInt(jTextFieldDelaySide2.getText()));
 		}
 
-		private void executeSide3()throws Exception {
+		private void executeSide3() throws Exception {
 			Operation operation = null;
-			try{
-			/* get op type */
-			if (jRadioButtonDeleteSide3.isSelected()) {
-				operation = new DeleteOperation(Integer
-						.parseInt(jTextFieldPositionSide3.getText()),
-						jTextFieldTextSide3.getText());
-			}
-			if (jRadioButtonInsertSide2.isSelected()) {
-				operation = new InsertOperation(Integer
-						.parseInt(jTextFieldPositionSide3.getText()),
-						jTextFieldTextSide3.getText());
-			}
-			}catch(Exception e){
+			try {
+				/* get op type */
+				if (jRadioButtonDeleteSide3.isSelected()) {
+					operation = new DeleteOperation(Integer
+							.parseInt(jTextFieldPositionSide3.getText()),
+							jTextFieldTextSide3.getText());
+				}
+				if (jRadioButtonInsertSide2.isSelected()) {
+					operation = new InsertOperation(Integer
+							.parseInt(jTextFieldPositionSide3.getText()),
+							jTextFieldTextSide3.getText());
+				}
+			} catch (Exception e) {
 				logger.error("Error in side 3 operation creation", e);
 			}
-			if(operation != null)
-			c3.sendOperation(operation, Integer.parseInt(jTextFieldDelaySide3
-					.getText()));
+			if (operation != null)
+				c3.sendOperation(operation, Integer
+						.parseInt(jTextFieldDelaySide3.getText()));
 		}
 
 		/**
 		 * update ui with new document state.
+		 * 
 		 * @param side
 		 */
 		public void documentAction(JID jid) {
 			if (jid.equals(jid_c1)) {
-				System.out.println("document one change.");
 				jTextFieldResultSide1.setText(c1.getDocument());
 				update();
 			}
@@ -1094,7 +1107,7 @@ public class JupiterTestUI extends javax.swing.JPanel {
 
 		public String getID() {
 			return "TEST";
-			
+
 		}
 	}
 }
