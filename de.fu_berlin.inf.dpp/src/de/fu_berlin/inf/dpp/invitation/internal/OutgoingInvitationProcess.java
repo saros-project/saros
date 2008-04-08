@@ -412,8 +412,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		System.out.println("Fallback");
 		tmode = TransferMode.IBB;
 		try {
+			if(getState() == State.HOST_FILELIST_SENT){
 			/* TODO: send file list another one. */
 			transmitter.sendFileList(peer, sharedProject.getFileList());
+			}
+			/* error during send single project file with jingle*/
+			if(getState() == State.SYNCHRONIZING){
+				sendArchive();
+			}
 		} catch (Exception e) {
 			failed(e);
 		}
@@ -426,6 +432,11 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 */
 	public TransferMode getTransferMode() {
 		return tmode;
+	}
+
+	public void setTransferMode(TransferMode mode) {
+		tmode = mode;
+		
 	}
 
 }

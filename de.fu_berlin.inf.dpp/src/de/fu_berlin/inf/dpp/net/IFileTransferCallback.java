@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.net;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
+
 /**
  * This is an simple callback listener for non-blocking file transfers.
  * 
@@ -34,4 +36,17 @@ public interface IFileTransferCallback {
 	 *            current transfered size.
 	 */
 	public void transferProgress(int transfered);
+	
+	/**
+	 * set transfer mode.
+	 * TransferMode.Jingle for Jingle transfer or TransferMode.IBB
+	 * for XMPP transfer.
+	 * @param mode
+	 */
+	public void setTransferMode(TransferMode mode);
+	
+	/**
+	 * Is fired if jingle connection couldn't be established.
+	 */
+	public void jingleFallback();
 }

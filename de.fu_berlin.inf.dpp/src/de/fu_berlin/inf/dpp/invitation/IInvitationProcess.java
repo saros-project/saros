@@ -106,8 +106,5 @@ public interface IInvitationProcess extends IFileTransferCallback {
 	
 	public void joinReceived(JID from);
 	
-	/**
-	 * Is fired if jingle connection couldn't be established.
-	 */
-	public void jingleFallback();
+
 }

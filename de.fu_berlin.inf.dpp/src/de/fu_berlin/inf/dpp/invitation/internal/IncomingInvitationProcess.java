@@ -34,6 +34,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.jivesoftware.smack.XMPPException;
+
+import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -412,6 +415,18 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	public void jingleFallback() {
 		logger.warn("jingle fallback");
 		tmode = TransferMode.IBB;
+		/* if send file list failed. */
+		if(getState() == State.SYNCHRONIZING){
+			logger.debug("send file list another one.");
+			try {
+				transmitter.sendFileList(peer, new FileList(localProject));
+			} catch (Exception e) {
+				ErrorMessageDialog.showErrorMessage(new Exception("Exception during create project."));
+				failed(e);
+			} finally{
+				progressMonitor.done();
+			}
+		}
 	}
 
 	public void fileSent(IPath path) {
@@ -427,6 +442,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	public void transferProgress(int transfered) {
 		progressMonitor.worked(transfered - transferedFileSize);
 		transferedFileSize = transfered;
+	}
+
+	public void setTransferMode(TransferMode mode) {
+		tmode = mode;
 	}
 
 }
