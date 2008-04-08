@@ -1263,8 +1263,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 						log.debug("2. inform invitation process...");
 						for (IInvitationProcess process : processes) {
-							if (process.getPeer().equals(fromJID))
+							if (process.getPeer().equals(fromJID)){
 								process.fileListReceived(fromJID, fileList);
+								/* incoming IBB transfer. cancel jingle transfer mode. */
+								process.setTransferMode(TransferMode.IBB);
+							}
 						}
 
 					} else if (fileDescription.startsWith(

@@ -224,7 +224,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		 * */
 		if(tmode == TransferMode.IBB){
 			tmode = TransferMode.DEFAULT;
-			progressMonitor.beginTask("Files left: ", filesLeftToSynchronize);
+			progressMonitor.beginTask("Files left: ",filesLeftToSynchronize);
 		}
 		
 		progressMonitor.worked(1);
@@ -423,9 +423,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			} catch (Exception e) {
 				ErrorMessageDialog.showErrorMessage(new Exception("Exception during create project."));
 				failed(e);
-			} finally{
-				progressMonitor.done();
-			}
+			} 
 		}
 	}
 
