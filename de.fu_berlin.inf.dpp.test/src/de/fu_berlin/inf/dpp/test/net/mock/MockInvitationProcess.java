@@ -164,4 +164,10 @@ public class MockInvitationProcess implements IInvitationProcess{
 		
 	}
 
+
+	public void setTransferMode(TransferMode mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

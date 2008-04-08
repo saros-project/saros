@@ -160,5 +160,11 @@ IOutgoingInvitationProcess, IFileTransferCallback {
 		
 	}
 
+
+	public void setTransferMode(TransferMode mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }

@@ -130,4 +130,9 @@ public class IncomingInvitationProcessStub implements IIncomingInvitationProcess
 		// TODO Auto-generated method stub
 		
 	}
+
+	public void setTransferMode(TransferMode mode) {
+		// TODO Auto-generated method stub
+		
+	}
 }
