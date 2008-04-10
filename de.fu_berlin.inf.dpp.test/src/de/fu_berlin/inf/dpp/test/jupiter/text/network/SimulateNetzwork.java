@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.NetworkRequest;
 
 /**

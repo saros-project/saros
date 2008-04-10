@@ -7,8 +7,8 @@ import org.apache.log4j.PropertyConfigurator;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument2;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -66,11 +66,11 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 		JID jid_c2 = new JID("ori80@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("X",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("X",
 				network,jid_c1);
-		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("X",
+		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("X",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("X",
+		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("X",
 				network,jid_server);
 
 		network.addClient(c1);
@@ -103,11 +103,11 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 		JID jid_c2 = new JID("ori80@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("X",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("X",
 				network,jid_c1);
-		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("X",
+		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("X",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("X",
+		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("X",
 				network,jid_server);
 
 		network.addClient(c1);
@@ -146,11 +146,11 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 		JID jid_c2 = new JID("ori80@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
 				network,jid_c1);
-		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abcdefg",
+		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("abcdefg",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
+		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abcdefg",
 				network,jid_server);
 
 		network.addClient(c1);
@@ -201,11 +201,11 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 		JID jid_c2 = new JID("ori80@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
 				network,jid_c1);
-		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abcdefg",
+		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("abcdefg",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
+		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abcdefg",
 				network,jid_server);
 
 		network.addClient(c1);

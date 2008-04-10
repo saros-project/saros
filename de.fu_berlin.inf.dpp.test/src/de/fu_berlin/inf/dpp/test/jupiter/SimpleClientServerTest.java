@@ -9,8 +9,8 @@ import org.apache.log4j.PropertyConfigurator;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument2;
 import de.fu_berlin.inf.dpp.test.jupiter.text.TwoWayJupiterServerDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
@@ -28,33 +28,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	
 	public void tearDown(){
 		network = null;
-	}
-	
-	public void testLastTestCase() throws Exception{
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
-				network);
-		c1.setJID(new JID("ori79@jabber.cc"));
-		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abc",
-				network);
-		s1.setJID(new JID("ori78@jabber.cc"));
-
-		network.addClient(c1);
-		network.addClient(s1);
-		
-		s1.sendOperation(c1.getJID(),new InsertOperation(2, "w"),2000);
-		
-		c1.sendOperation(new InsertOperation(0, "e"),0);
-		
-		c1.sendOperation(new InsertOperation(2, "e"),0);
-		
-		c1.sendOperation(new InsertOperation(2, "f"),0);
-		/*short delay. */
-		Thread.sleep(3000);
-		
-		assertEquals(c1.getDocument(), s1.getDocument());
-		System.out.println(c1.getDocument());
-	}
-	
+	}	
 	
 	/**
 	 * simple test scenario between server and client.
@@ -65,7 +39,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	 * has to converge the document states.
 	 */
 	public void test2WayProtocol() throws Exception{
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abc",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
 		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abc",
@@ -110,7 +84,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	 * @throws Exception
 	 */
 	public void testDeleteStringWithConcurentInsert() throws Exception{
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
 		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abcdefg",
@@ -119,6 +93,8 @@ public class SimpleClientServerTest extends JupiterTestCase{
 		
 		network.addClient(c1);
 		network.addClient(s1);
+		
+		
 		
 		c1.sendOperation(new InsertOperation(3, "x"),1000);
 		s1.sendOperation(c1.getJID(),new DeleteOperation(1,"bcde"),2000);
@@ -137,7 +113,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	 * @throws Exception
 	 */
 	public void testInsertStringWithConcurentDelete() throws Exception{
-		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
 		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abcdefg",
@@ -161,10 +137,10 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for simple client server test cases.");
 		//$JUnit-BEGIN$
-//		suite.addTest(new SimpleClientServerTest("testInsertStringWithConcurentDelete"));
-//		suite.addTest(new SimpleClientServerTest("test2WayProtocol"));
-//		suite.addTest(new SimpleClientServerTest("testDeleteStringWithConcurentInsert"));
-		suite.addTest(new SimpleClientServerTest("testLastTestCase"));
+		suite.addTest(new SimpleClientServerTest("testInsertStringWithConcurentDelete"));
+		suite.addTest(new SimpleClientServerTest("test2WayProtocol"));
+		suite.addTest(new SimpleClientServerTest("testDeleteStringWithConcurentInsert"));
+
 		//$JUnit-END$
 		return suite;
 	}

@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
 public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
 	
-	private static Logger logger = Logger.getLogger(ServerSynchronizedDocument.class);
+	private static Logger logger = Logger.getLogger(ServerSynchronizedDocument2.class);
 	
 	private Document doc;
 	/* sync algorithm with ack-operation list. */
@@ -81,7 +81,7 @@ public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQ
 		}
 		return op;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -97,49 +97,35 @@ public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQ
 		
 		/* get semaphore*/
 		accessDenied = true;
-		
+
+		/* transformed incoming operation of client jid.*/
 		Operation op = null;
 		try {
+
+			/* 1. transform client request in client proxy.*/
+			ProxySynchronizedQueue proxy = proxyQueues.get(jid);
+			if(proxy != null){
+				op = proxy.receiveOperation(req);
+			}
+			else{
+				throw new TransformationException("no proxy client queue for "+jid);
+			}
 			
-//			logger.debug("Incoming Request from : "+jid.toString());
-//			logger.debug("Operation before OT:"+req.getOperation().toString()+" "+algorithm.getTimestamp());
-//			/* 1. transform operation. */
-//			op = algorithm.receiveRequest(req);
-//			logger.debug("Operation after OT: "+op.toString()+" "+algorithm.getTimestamp());
-//			
-//			/* 2. execution on server document*/
-//			doc.execOperation(op);
-			
-			/* 3 sync with proxy queues. */
+			/* 2. submit transformed operation to other proxies. */
 			for(JID j : proxyQueues.keySet()){
-				ProxySynchronizedQueue q =  proxyQueues.get(j);
+				proxy =  proxyQueues.get(j);
 				
-				
-				
-				/* 1. Wenn ein anderer Client eine Operation ausführt*/
 				if(!j.toString().equals(jid.toString())){
-					logger.debug(j.toString()+" : proxy timestamp "+q.getAlgorithm().getTimestamp()+" op before : "+req.getOperation()+ " req timestamp: "+req.getTimestamp());
-					/* Änderung muss als Fremd-Änderung markiert werden. */
-					op = q.getAlgorithm().receiveRequest(req);
+					logger.debug(j.toString()+" : proxy timestamp "+proxy.getAlgorithm().getTimestamp()+" op before : "+req.getOperation()+ " req timestamp: "+req.getTimestamp());
 					
-					/* create new request to send to remote side.*/
-//					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),op);
-					req = new RequestImpl(algorithm.getSiteId(),req.getTimestamp(),req.getOperation());
-					/* Änderung muss an den anderen Client kommuniziert werden. */
-					connection.sendOperation(new NetworkRequest(jid,j,req), 0);
-//					q.sendTransformedOperation(op, j);
-					logger.debug(j.toString()+" : vector after receive "+q.getAlgorithm().getTimestamp()+" op after : "+op);
-				}
-				/* 2. Wenn die Operation vom Remote Client kommt.*/
-				if(j.toString().equals(jid.toString())){
-					logger.debug(j.toString()+" sender : proxy timestamp "+q.getAlgorithm().getTimestamp()+" op before: "+req.getOperation()+ " req timestamp: "+req.getTimestamp());
-					/* Änderung muss als Eigene Änderung markiert werden.*/
-					Request re = q.getAlgorithm().generateRequest(req.getOperation());
-					logger.debug(j.toString()+" sender : vector after receive "+q.getAlgorithm().getTimestamp()+" op after: "+re.getOperation());
+					/* 3. create submit op as local proxy operation and send to client. */
+					proxy.sendOperation(op);
+					
+					logger.debug(j.toString()+" : vector after receive "+proxy.getAlgorithm().getTimestamp()+" op after : "+op);
 				}
 				
 			}
-			
+	
 		} catch (TransformationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

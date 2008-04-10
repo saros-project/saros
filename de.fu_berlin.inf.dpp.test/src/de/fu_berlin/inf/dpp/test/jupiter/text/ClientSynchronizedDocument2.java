@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
 public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
 
-	private static Logger logger = Logger.getLogger(ClientSynchronizedDocument.class);
+	private static Logger logger = Logger.getLogger(ClientSynchronizedDocument2.class);
 	
 	private Document doc;
 	private Algorithm algorithm;
