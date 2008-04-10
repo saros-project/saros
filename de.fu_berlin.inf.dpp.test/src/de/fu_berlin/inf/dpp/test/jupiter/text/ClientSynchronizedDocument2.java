@@ -42,7 +42,7 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 	
 	public ClientSynchronizedDocument2(String content, NetworkConnection con, JID jid){
 		this.doc = new Document(content);
-		this.algorithm = new Jupiter(false);
+		this.algorithm = new Jupiter(true);
 		this.connection = con;
 		this.jid = jid;
 	}

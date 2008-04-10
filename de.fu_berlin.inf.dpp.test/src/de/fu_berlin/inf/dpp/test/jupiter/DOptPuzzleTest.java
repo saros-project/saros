@@ -31,13 +31,13 @@ public class DOptPuzzleTest extends JupiterTestCase{
 		JID jid_c3 = new JID("ori81@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("",
+		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcd",
 				network,jid_c1);
-		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("",
+		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("abcd",
 				network,jid_c2);
-		ClientSynchronizedDocument2 c3 = new ClientSynchronizedDocument2("",
+		ClientSynchronizedDocument2 c3 = new ClientSynchronizedDocument2("abcd",
 				network,jid_c3);
-		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("",
+		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abcd",
 				network,jid_server);
 
 		network.addClient(c1);
@@ -148,7 +148,8 @@ public class DOptPuzzleTest extends JupiterTestCase{
 		
 		Thread.sleep(1500);
 		c3.sendOperation(new InsertOperation(2,"x"),1000);
-		c2.sendOperation(new InsertOperation(3,"b"),100);
+		c2.sendOperation(new InsertOperation(2,"by"),100);
+		c1.sendOperation(new InsertOperation(1,"xxx"),600);
 		
 		Thread.sleep(4000);
 		assertEquals(c1.getDocument(),c2.getDocument());
@@ -162,9 +163,9 @@ public class DOptPuzzleTest extends JupiterTestCase{
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Test for dOPT puzzle.");
 		//$JUnit-BEGIN$
-		suite.addTest(new DOptPuzzleTest("testTwoConcurrentInsertOperations"));
+//		suite.addTest(new DOptPuzzleTest("testTwoConcurrentInsertOperations"));
 //		suite.addTest(new DOptPuzzleTest("testTwoConcurrentDeleteOperations"));
-//		suite.addTest(new DOptPuzzleTest("testThreeConcurrentInsertOperations"));
+		suite.addTest(new DOptPuzzleTest("testThreeConcurrentInsertOperations"));
 		//$JUnit-END$
 		return suite;
 	}
