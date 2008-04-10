@@ -21,9 +21,9 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
  *
  */
 
-public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
+public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
 
-	private static Logger logger = Logger.getLogger(ClientSynchronizedDocument2.class);
+	private static Logger logger = Logger.getLogger(ClientSynchronizedDocument.class);
 	
 	private Document doc;
 	private Algorithm algorithm;
@@ -34,13 +34,13 @@ public class ClientSynchronizedDocument2 implements SynchronizedQueue, NetworkEv
 	
 	private HashMap<String, JupiterDocumentListener> documentListener = new HashMap<String, JupiterDocumentListener>();
 	
-	public ClientSynchronizedDocument2(String content, NetworkConnection con){
+	public ClientSynchronizedDocument(String content, NetworkConnection con){
 		this.doc = new Document(content);
 		this.algorithm = new Jupiter(true);
 		this.connection = con;
 	}
 	
-	public ClientSynchronizedDocument2(String content, NetworkConnection con, JID jid){
+	public ClientSynchronizedDocument(String content, NetworkConnection con, JID jid){
 		this.doc = new Document(content);
 		this.algorithm = new Jupiter(true);
 		this.connection = con;

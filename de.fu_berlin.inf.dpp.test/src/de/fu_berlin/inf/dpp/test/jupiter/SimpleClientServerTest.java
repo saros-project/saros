@@ -9,8 +9,8 @@ import org.apache.log4j.PropertyConfigurator;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument2;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.TwoWayJupiterServerDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
@@ -39,7 +39,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	 * has to converge the document states.
 	 */
 	public void test2WayProtocol() throws Exception{
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abc",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
 		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abc",
@@ -84,7 +84,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	 * @throws Exception
 	 */
 	public void testDeleteStringWithConcurentInsert() throws Exception{
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
 		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abcdefg",
@@ -113,7 +113,7 @@ public class SimpleClientServerTest extends JupiterTestCase{
 	 * @throws Exception
 	 */
 	public void testInsertStringWithConcurentDelete() throws Exception{
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
 		TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abcdefg",

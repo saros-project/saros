@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.test.jupiter;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument2;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -31,13 +31,13 @@ public class DOptPuzzleTest extends JupiterTestCase{
 		JID jid_c3 = new JID("ori81@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcd",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcd",
 				network,jid_c1);
-		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("abcd",
+		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abcd",
 				network,jid_c2);
-		ClientSynchronizedDocument2 c3 = new ClientSynchronizedDocument2("abcd",
+		ClientSynchronizedDocument c3 = new ClientSynchronizedDocument("abcd",
 				network,jid_c3);
-		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abcd",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcd",
 				network,jid_server);
 
 		network.addClient(c1);
@@ -77,13 +77,13 @@ public class DOptPuzzleTest extends JupiterTestCase{
 		JID jid_c3 = new JID("ori81@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abcdefg",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abcdefg",
 				network,jid_c1);
-		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("abcdefg",
+		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abcdefg",
 				network,jid_c2);
-		ClientSynchronizedDocument2 c3 = new ClientSynchronizedDocument2("abcdefg",
+		ClientSynchronizedDocument c3 = new ClientSynchronizedDocument("abcdefg",
 				network,jid_c3);
-		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abcdefg",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
 				network,jid_server);
 
 		network.addClient(c1);
@@ -123,13 +123,13 @@ public class DOptPuzzleTest extends JupiterTestCase{
 		JID jid_c3 = new JID("ori81@jabber.cc");
 		JID jid_server = new JID("ori78@jabber.cc");
 		
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abc",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
 				network,jid_c1);
-		ClientSynchronizedDocument2 c2 = new ClientSynchronizedDocument2("abc",
+		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abc",
 				network,jid_c2);
-		ClientSynchronizedDocument2 c3 = new ClientSynchronizedDocument2("abc",
+		ClientSynchronizedDocument c3 = new ClientSynchronizedDocument("abc",
 				network,jid_c3);
-		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abc",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abc",
 				network,jid_server);
 
 		network.addClient(c1);

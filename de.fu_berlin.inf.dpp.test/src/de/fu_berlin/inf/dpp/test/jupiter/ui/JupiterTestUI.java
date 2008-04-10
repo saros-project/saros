@@ -12,9 +12,9 @@ import de.fu_berlin.inf.dpp.jupiter.Operation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterDocumentListener;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
 /**
@@ -939,10 +939,10 @@ public class JupiterTestUI extends javax.swing.JPanel {
 
 		protected SimulateNetzwork network;
 
-		protected ClientSynchronizedDocument2 c1;
-		protected ClientSynchronizedDocument2 c2;
-		protected ClientSynchronizedDocument2 c3;
-		protected ServerSynchronizedDocument2 s1;
+		protected ClientSynchronizedDocument c1;
+		protected ClientSynchronizedDocument c2;
+		protected ClientSynchronizedDocument c3;
+		protected ServerSynchronizedDocument s1;
 
 		JID jid_c1;
 		JID jid_c2;
@@ -969,16 +969,16 @@ public class JupiterTestUI extends javax.swing.JPanel {
 			jid_c3 = new JID("ori81@jabber.cc");
 			JID jid_server = new JID("ori78@jabber.cc");
 
-			c1 = new ClientSynchronizedDocument2(jTextFieldInitialState
+			c1 = new ClientSynchronizedDocument(jTextFieldInitialState
 					.getText(), network, jid_c1);
 			c1.addJupiterDocumentListener(this);
-			c2 = new ClientSynchronizedDocument2(jTextFieldInitialState
+			c2 = new ClientSynchronizedDocument(jTextFieldInitialState
 					.getText(), network, jid_c2);
 			c2.addJupiterDocumentListener(this);
-			c3 = new ClientSynchronizedDocument2(jTextFieldInitialState
+			c3 = new ClientSynchronizedDocument(jTextFieldInitialState
 					.getText(), network, jid_c3);
 			c3.addJupiterDocumentListener(this);
-			s1 = new ServerSynchronizedDocument2(jTextFieldInitialState
+			s1 = new ServerSynchronizedDocument(jTextFieldInitialState
 					.getText(), network, jid_server);
 
 			network.addClient(c1);

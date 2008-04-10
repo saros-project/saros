@@ -22,9 +22,9 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
 
-public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
+public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQueue, NetworkEventHandler, DocumentTestChecker{
 	
-	private static Logger logger = Logger.getLogger(ServerSynchronizedDocument2.class);
+	private static Logger logger = Logger.getLogger(ServerSynchronizedDocument.class);
 	
 	private Document doc;
 	/* sync algorithm with ack-operation list. */
@@ -37,11 +37,11 @@ public class ServerSynchronizedDocument2 implements JupiterServer, SynchronizedQ
 	
 	private HashMap<JID,ProxySynchronizedQueue> proxyQueues;
 	
-	public ServerSynchronizedDocument2(String content, NetworkConnection con){
+	public ServerSynchronizedDocument(String content, NetworkConnection con){
 		init(content,con);
 	}
 
-	public ServerSynchronizedDocument2(String content, NetworkConnection con, JID jid){		
+	public ServerSynchronizedDocument(String content, NetworkConnection con, JID jid){		
 		this.jid = jid;
 		init(content,con);
 	}

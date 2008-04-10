@@ -6,8 +6,8 @@ import org.apache.log4j.PropertyConfigurator;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument2;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument2;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 import junit.framework.TestCase;
 
 public class SimulatedNetworkTest extends TestCase {
@@ -30,10 +30,10 @@ public class SimulatedNetworkTest extends TestCase {
 	 * simple test of a two-site communication.
 	 */
 	public void testSimpleNetzworkMessage() throws Exception{
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abc",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
-		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abc",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abc",
 				network);
 		s1.setJID(new JID("ori78@jabber.cc"));
 
@@ -57,10 +57,10 @@ public class SimulatedNetworkTest extends TestCase {
 	}
 
 	public void testNetworkMessagesWithDelay() throws Exception{
-		ClientSynchronizedDocument2 c1 = new ClientSynchronizedDocument2("abc",
+		ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
 				network);
 		c1.setJID(new JID("ori79@jabber.cc"));
-		ServerSynchronizedDocument2 s1 = new ServerSynchronizedDocument2("abc",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abc",
 				network);
 		s1.setJID(new JID("ori78@jabber.cc"));
 
