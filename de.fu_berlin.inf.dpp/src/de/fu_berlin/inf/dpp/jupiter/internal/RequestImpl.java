@@ -19,7 +19,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package de.fu_berlin.inf.dpp.jupiter;
+package de.fu_berlin.inf.dpp.jupiter.internal;
+
+import de.fu_berlin.inf.dpp.jupiter.Operation;
+import de.fu_berlin.inf.dpp.jupiter.Request;
+import de.fu_berlin.inf.dpp.jupiter.Timestamp;
 
 
 /**
