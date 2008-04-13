@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.jupiter.Request;
 import de.fu_berlin.inf.dpp.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.test.jupiter.text.Document;
+import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 import junit.framework.TestCase;
 
 

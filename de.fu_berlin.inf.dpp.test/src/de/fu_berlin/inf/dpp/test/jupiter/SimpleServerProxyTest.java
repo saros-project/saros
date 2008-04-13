@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 import junit.framework.Test;
@@ -242,9 +243,9 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 		TestSuite suite = new TestSuite("Test for Proxy Test.");
 		//$JUnit-BEGIN$
 		suite.addTest(new SimpleServerProxyTest("testTwoConcurrentInsertOperations"));
-//		suite.addTest(new SimpleServerProxyTest("testTwoClientWithJupiterProxy"));
-//		suite.addTest(new SimpleServerProxyTest("testThreeConcurrentInsertOperations"));
-//		suite.addTest(new SimpleServerProxyTest("testTwoClientWithJupiterProxyDeleteInsertOperations"));
+		suite.addTest(new SimpleServerProxyTest("testTwoClientWithJupiterProxy"));
+		suite.addTest(new SimpleServerProxyTest("testThreeConcurrentInsertOperations"));
+		suite.addTest(new SimpleServerProxyTest("testTwoClientWithJupiterProxyDeleteInsertOperations"));
 		//$JUnit-END$
 		return suite;
 	}

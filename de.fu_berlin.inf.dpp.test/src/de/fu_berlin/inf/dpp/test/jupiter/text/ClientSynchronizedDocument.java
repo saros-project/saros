@@ -28,7 +28,7 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 	private Document doc;
 	private Algorithm algorithm;
 	
-	private JID jid;
+	protected JID jid;
 	private JID server_jid = new JID("ori78@jabber.cc");
 	private NetworkConnection connection;
 	

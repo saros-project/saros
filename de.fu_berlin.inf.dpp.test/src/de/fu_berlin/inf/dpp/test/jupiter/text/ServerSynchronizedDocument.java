@@ -37,19 +37,37 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	
 	private HashMap<JID,ProxySynchronizedQueue> proxyQueues;
 	
+	@Deprecated
 	public ServerSynchronizedDocument(String content, NetworkConnection con){
 		init(content,con);
 	}
 
+	@Deprecated
 	public ServerSynchronizedDocument(String content, NetworkConnection con, JID jid){		
 		this.jid = jid;
 		init(content,con);
+	}
+	
+	
+	public ServerSynchronizedDocument(NetworkConnection con, JID jid){
+		this.jid = jid;
+		/* init network connection. */
+		init(con);
 	}
 	
 	/* init proxy queue and all necessary objects. */
 	private void init(String content, NetworkConnection con){
 		this.doc = new Document(content);
 		this.algorithm = new Jupiter(true);
+		this.connection = con;
+		this.proxyQueues = new HashMap<JID,ProxySynchronizedQueue>();
+	}
+	
+	/**
+	 * init proxy queue and network connection. 
+	 * @param con
+	 */
+	private void init(NetworkConnection con){
 		this.connection = con;
 		this.proxyQueues = new HashMap<JID,ProxySynchronizedQueue>();
 	}

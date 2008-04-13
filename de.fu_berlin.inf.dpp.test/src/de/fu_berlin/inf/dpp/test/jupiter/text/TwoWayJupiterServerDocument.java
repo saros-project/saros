@@ -24,14 +24,17 @@ public class TwoWayJupiterServerDocument implements SynchronizedQueue, NetworkEv
 	/* sync algorithm with ack-operation list. */
 	private Algorithm algorithm;
 	
-	private JID jid;
+	private JID jid = new JID("ori78@jabber.cc");
+	private JID jid_client = new JID("ori79@jabber.cc");
 	private NetworkConnection connection;
 	
 	private List<SynchronizedQueue> proxyQueues;
 	
+	
 	public TwoWayJupiterServerDocument(String content, NetworkConnection con){
 		init(content,con);
 	}
+
 
 	public TwoWayJupiterServerDocument(String content, NetworkConnection con, JID jid){		
 		this.jid = jid;
@@ -97,6 +100,16 @@ public class TwoWayJupiterServerDocument implements SynchronizedQueue, NetworkEv
 		connection.sendOperation(new NetworkRequest(this.jid,jid,req), delay);
 //		connection.sendOperation(jid, req,delay);
 		
+	}
+	
+	/**
+	 * send operation to twowayjupiterclient
+	 * @param jid
+	 * @param op
+	 * @param delay
+	 */
+	public void sendOperation(Operation op, int delay) {
+		sendOperation(jid_client, op, delay);
 	}
 
 	public void receiveNetworkEvent(Request req) {

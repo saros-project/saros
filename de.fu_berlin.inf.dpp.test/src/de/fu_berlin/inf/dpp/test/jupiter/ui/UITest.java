@@ -1,10 +1,9 @@
-package de.fu_berlin.inf.dpp.test.jupiter;
+package de.fu_berlin.inf.dpp.test.jupiter.ui;
 
 import javax.swing.JFrame;
 
 import org.apache.log4j.PropertyConfigurator;
 
-import de.fu_berlin.inf.dpp.test.jupiter.ui.JupiterTestUI;
 
 public class UITest {
 	static {

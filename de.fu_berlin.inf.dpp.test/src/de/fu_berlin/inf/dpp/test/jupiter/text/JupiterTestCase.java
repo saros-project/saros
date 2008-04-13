@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.jupiter;
+package de.fu_berlin.inf.dpp.test.jupiter.text;
 
 import org.apache.log4j.PropertyConfigurator;
 
