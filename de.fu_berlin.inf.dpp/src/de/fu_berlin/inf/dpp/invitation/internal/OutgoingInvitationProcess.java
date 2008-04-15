@@ -409,7 +409,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	 * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback#jingleFallback()
 	 */
 	public void jingleFallback() {
-		System.out.println("Fallback");
+//		System.out.println("Fallback");
+		logger.info("Jingle Fallback to IBB.");
 		tmode = TransferMode.IBB;
 		try {
 			if(getState() == State.HOST_FILELIST_SENT){

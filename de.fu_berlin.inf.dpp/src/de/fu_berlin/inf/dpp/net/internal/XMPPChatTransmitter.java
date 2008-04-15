@@ -106,7 +106,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final int MAX_TRANSFER_RETRIES = 5;
 	private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
-	private static boolean jingle = false;
+	private static boolean jingle = true;
 	private boolean JingleError = false;
 	private JingleFileTransferManager jingleManager;
 	private JingleFileTransferProcessMonitor monitor;
@@ -1824,7 +1824,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			String sb = new String();
 			while ((bytesRead = in.read(buffer, 0, 1024)) != -1) {
 				sb += new String(buffer, 0, bytesRead).toString();
-				System.out.println("incomming: " + sb);
+//				System.out.println("incomming: " + sb);
 			}
 			in.close();
 			log.debug("Close input stream");

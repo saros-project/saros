@@ -35,14 +35,16 @@ public class InclusionTransformationTest extends JupiterTestCase {
 		server = new TwoWayJupiterServerDocument("abc",
 				network);
 
-		
-		
 		network.addClient(client);
 		network.addClient(server);
 
 	}
 	
-	public void testInsertInsertOp1() throws Exception{
+	/**
+	 * 
+	 * @throws Exception
+	 */
+	public void testCase1() throws Exception{
 		client.sendOperation(new InsertOperation(0,"x"), 100);
 		server.sendOperation(new InsertOperation(0,"y"), 200);
 		

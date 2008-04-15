@@ -71,7 +71,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 				network,jid_c1);
 		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("X",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("X",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(
 				network,jid_server);
 
 		network.addClient(c1);
@@ -108,7 +108,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 				network,jid_c1);
 		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("X",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("X",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(
 				network,jid_server);
 
 		network.addClient(c1);
@@ -151,7 +151,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 				network,jid_c1);
 		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abcdefg",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(
 				network,jid_server);
 
 		network.addClient(c1);
@@ -206,7 +206,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 				network,jid_c1);
 		ClientSynchronizedDocument c2 = new ClientSynchronizedDocument("abcdefg",
 				network,jid_c2);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abcdefg",
+		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(
 				network,jid_server);
 
 		network.addClient(c1);
