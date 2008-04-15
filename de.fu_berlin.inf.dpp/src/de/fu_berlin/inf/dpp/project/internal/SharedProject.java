@@ -19,10 +19,12 @@
  */
 package de.fu_berlin.inf.dpp.project.internal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IFile;
@@ -30,9 +32,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -460,27 +465,57 @@ public class SharedProject implements ISharedProject {
 		return false;
 	}
 
-	public void setProjectReadonly(boolean readonly) {
-		FileList flist=null;
-
-		try {
-			flist = new FileList( project );
-			ResourceAttributes attributes = new ResourceAttributes();
-			attributes.setReadOnly(readonly);
-			attributes.setArchive (readonly);
 	
-			for (int i=0;i<flist.getPaths().size(); i++) {
-				IPath path = flist.getPaths().get(i);
-				path = path.makeAbsolute();
-				IFile file = getProject().getFile(path);
-				if (file!=null && file.exists()) {
-					file.setResourceAttributes(attributes);
+	public void setProjectReadonly(final boolean readonly) {
+		
+		/* run project read only settings in progress monitor thread. */
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+				try {
+					dialog.run(true, false, new IRunnableWithProgress(){
+						public void run(IProgressMonitor monitor){
+							
+							FileList flist;
+							try {
+								flist = new FileList( project );
+							
+								monitor.beginTask("Project settings ... ", flist.getPaths().size());
+								
+							ResourceAttributes attributes = new ResourceAttributes();
+							attributes.setReadOnly(readonly);
+							attributes.setArchive (readonly);
+					
+							for (int i=0;i<flist.getPaths().size(); i++) {
+								IPath path = flist.getPaths().get(i);
+								path = path.makeAbsolute();
+								IFile file = getProject().getFile(path);
+								if (file!=null && file.exists()) {
+									file.setResourceAttributes(attributes);
+								}
+								
+								monitor.worked(1);
+							}
+							} catch (CoreException e) {
+								log.log(Level.WARNING, "",e);
+								monitor.done();
+							}
+							
+							monitor.done();
+
+						}
+						
+					});
+				} catch (InvocationTargetException e) {
+					log.log(Level.WARNING, "",e);
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					log.log(Level.WARNING, "",e);
+					e.printStackTrace();
 				}
+				
 			}
-		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
+		});
+
 	}
 }
