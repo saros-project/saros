@@ -403,7 +403,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 
 	@Override
 	public boolean performCancel() {
-		process.cancel(null, false);
+		process.cancel("Cancel Invitation Process!", false);
 
 		return super.performCancel();
 	}
