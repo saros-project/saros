@@ -311,6 +311,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 */
 	private int handleDiff(IProject localProject, FileList remoteFileList) throws CoreException {
 
+		//TODO: Thread 
 		FileList diff = new FileList(localProject).diff(remoteFileList);
 
 		removeUnneededResources(localProject, diff);

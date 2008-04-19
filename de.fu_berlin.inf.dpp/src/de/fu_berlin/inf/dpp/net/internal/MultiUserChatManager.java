@@ -97,11 +97,13 @@ public class MultiUserChatManager implements InvitationListener,
 			// an instant room
 			// muc.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
 			muc.sendConfigurationForm(getConfigForm(user, muc));
+			log.debug("create room and send configuration.");
 			
 		}
 		
 		if (muc.isJoined()) {
 			this.muc = muc;
+			log.debug("Has joined in muc room.");
 		}
 		else{
 			throw new XMPPException("Couldn't join with MUC room.");
@@ -161,7 +163,7 @@ public class MultiUserChatManager implements InvitationListener,
 		muc.join(user);
 
 		}catch(Exception e){
-			log.error("join room.",e);
+			log.error("try to join room. "+e.getMessage());
 		}
 		boolean isjoined = muc.isJoined();
 
@@ -202,6 +204,10 @@ public class MultiUserChatManager implements InvitationListener,
 			//HACK
 			if(e.getMessage().endsWith("No response from server.")){
 				/* in some case there are no response from existing room.*/
+				return true;
+			}
+			if(e.getMessage().endsWith("remote-server-not-found(404)")){
+				log.warn("try to check room: "+e.getMessage()+" for room : "+room);
 				return true;
 			}
 
@@ -254,12 +260,13 @@ public class MultiUserChatManager implements InvitationListener,
 				log.warn(xe.getMessage());
 			}
 			catch (IllegalStateException e) {
-				System.out.println("no logged in.");
+//				System.out.println("no logged in.");
 				log.warn(e.getMessage());
 				// muc = joinMuc(connection, user, Room);
 				// tmuc.changeNickname(user);
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.warn(e.getMessage());
+//				e.printStackTrace();
 			}
 		}
 		return isjoined;
@@ -320,9 +327,11 @@ public class MultiUserChatManager implements InvitationListener,
 			connection.addPacketListener(this, new MessageTypeFilter(
 					Message.Type.groupchat));
 		} catch (XMPPException xe) {
-			xe.printStackTrace();
+			log.warn("XMPPException during muc connection setting: ",xe);
+//			xe.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("XMPPException during muc connection setting: ",e);
+//			e.printStackTrace();
 		}
 
 		// TODO always preserve threads
@@ -442,9 +451,11 @@ public class MultiUserChatManager implements InvitationListener,
 			connection.addPacketListener(this, new MessageTypeFilter(
 					Message.Type.groupchat));
 		} catch (XMPPException xe) {
-			xe.printStackTrace();
+			log.error(xe.getMessage());
+//			xe.printStackTrace();
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.getMessage());
+//			e.printStackTrace();
 		}
 
 		setReceiver(receiver);
@@ -462,6 +473,17 @@ public class MultiUserChatManager implements InvitationListener,
 	
 	public String getRoomName(){
 		return this.Room;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.IChatManager#isConnected()
+	 */
+	public boolean isConnected() {
+		if(muc != null && muc.isJoined()){
+			return true;
+		}
+		return false;
 	}
 
 }

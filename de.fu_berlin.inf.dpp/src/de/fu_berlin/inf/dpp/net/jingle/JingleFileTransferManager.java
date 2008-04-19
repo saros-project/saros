@@ -81,6 +81,7 @@ public class JingleFileTransferManager {
 							logger.error("Time out for : "+jid + " with current state : "+getState(jid));
 							connectionStates.remove(jid);
 							connectionStates.put(jid, JingleConnectionState.ERROR);
+							terminateJingleSession(jid);
 							transmitter.exceptionOccured(new JingleSessionException("Time out Exception",jid));
 							return;
 						}
@@ -281,6 +282,8 @@ public class JingleFileTransferManager {
 	 */
 	public void terminateAllJingleSessions() {
 
+		logger.debug("Terminate all jingle sessions.");
+		
 		OutgoingJingleSession outgoing = null;
 		for (JID jid : outgoingSessions.keySet()) {
 			outgoing = outgoingSessions.get(jid);
@@ -328,12 +331,13 @@ public class JingleFileTransferManager {
 			try {
 				outgoing.terminate();
 			} catch (XMPPException e1) {
-				e1.printStackTrace();
+//				e1.printStackTrace();
+				logger.error("Error during terminate outgoing jingle session with JID : "+jid,e1);
 			} finally {
 				outgoing = null;
 				mediaManager.removeJingleSession(jid);
 				outgoingSessions.remove(jid);
-
+				logger.debug("Terminate outgoing jingle session with JID : "+jid);
 			}
 		}
 
@@ -342,11 +346,13 @@ public class JingleFileTransferManager {
 			try {
 				incoming.terminate();
 			} catch (XMPPException e1) {
-				e1.printStackTrace();
+//				e1.printStackTrace();
+				logger.error("Error during terminate incoming jingle session with JID : "+jid,e1);
 			} finally {
 				incoming = null;
 				mediaManager.removeJingleSession(jid);
 				incomingSessions.remove(jid);
+				logger.debug("Terminate incoming jingle session with JID : "+jid);
 			}
 		}
 

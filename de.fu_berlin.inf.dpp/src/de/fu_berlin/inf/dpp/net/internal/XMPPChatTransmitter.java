@@ -234,8 +234,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 		if (jingle) {
 			/* try to connect with jingle */
 			jingleManager = new JingleFileTransferManager(connection, this);
-		}else{
-			
 		}
 	}
 
@@ -255,6 +253,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 	public void sendCancelInvitationMessage(JID user, String errorMsg) {
 		sendMessage(user, PacketExtensions
 				.createCancelInviteExtension(errorMsg));
+		/* terminate jingle session. */
+		jingleManager.terminateJingleSession(user);
 	}
 
 	/*
@@ -360,15 +360,20 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		log.info("Sent activities: " + timedActivities);
 
-		// muc
-		if (mucmanager != null) {
+		/* send activities with muc chat messages. */
+		if (mucmanager != null && mucmanager.isConnected()) {
 			mucmanager.sendActivities(sharedProject, timedActivities);
 		}
+		else{
+			/* if no connection with muc room, send activities with 
+			 * private message */
+			 if (timedActivities != null ) {
+			 sendMessageToAll(sharedProject, new
+			 ActivitiesPacketExtension(timedActivities));
+			 }	
+		}
 
-		// if (timedActivities != null ) {
-		// sendMessageToAll(sharedProject, new
-		// ActivitiesPacketExtension(timedActivities));
-		// }
+		
 
 	}
 
@@ -1982,8 +1987,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 			}
 		} else {
 			ErrorMessageDialog.showErrorMessage(exception);
-			// TODO: Beenden der Socket Verbindung
-			jingleManager.terminateAllJingleSessions();
 		}
 	}
 

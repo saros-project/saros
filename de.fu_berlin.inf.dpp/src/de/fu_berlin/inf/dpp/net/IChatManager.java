@@ -14,4 +14,10 @@ public interface IChatManager extends PacketListener {
 	public void setConnection(XMPPConnection connection, IReceiver receiver);
 	
 	public void setReceiver(IReceiver receiver);
+	
+	/**
+	 * status of chat connection.
+	 * @return
+	 */
+	public boolean isConnected();
 }

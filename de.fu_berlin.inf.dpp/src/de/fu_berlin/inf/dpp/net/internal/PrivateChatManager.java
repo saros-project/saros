@@ -19,7 +19,10 @@ public class PrivateChatManager implements IChatManager{
 	
 	private IReceiver receiver;
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.IChatManager#setConnection(org.jivesoftware.smack.XMPPConnection, de.fu_berlin.inf.dpp.net.IReceiver)
+	 */
 	public void setConnection(XMPPConnection connection, IReceiver receiver) {
 		this.connection = connection;
 		this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.chat));
@@ -27,7 +30,10 @@ public class PrivateChatManager implements IChatManager{
 		
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.jivesoftware.smack.PacketListener#processPacket(org.jivesoftware.smack.packet.Packet)
+	 */
 	public void processPacket(Packet packet) {
 		log.debug("incoming packet");
 		receiver.processPacket(packet);
@@ -36,10 +42,25 @@ public class PrivateChatManager implements IChatManager{
 
 	
 	
-	
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.IChatManager#setReceiver(de.fu_berlin.inf.dpp.net.IReceiver)
+	 */
 	public void setReceiver(IReceiver receiver) {
 		this.receiver = receiver;
 		
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.IChatManager#isConnected()
+	 */
+	public boolean isConnected() {
+		if(connection.isConnected() && receiver != null){
+			return true;
+		}
+		return false;
 	}
 
 
