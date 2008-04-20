@@ -301,7 +301,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 				
 							try {
 				
-								monitor.beginTask("Project settings ... ",IProgressMonitor.UNKNOWN);
+								monitor.beginTask("Copy local resources ... ",IProgressMonitor.UNKNOWN);
 								
 								project.clearHistory(null);
 								project.refreshLocal(IProject.DEPTH_INFINITE, null);
