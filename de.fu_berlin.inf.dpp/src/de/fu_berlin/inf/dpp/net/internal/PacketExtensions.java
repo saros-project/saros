@@ -53,6 +53,8 @@ public class PacketExtensions {
 	private static final String USER_LIST = "userList";
 
 	private static final String DATATRANSFER = "DataTransfer";
+	
+	private static final String JINGLEERROR = "JingleError";
 
 	
 	// attributes
@@ -150,6 +152,10 @@ public class PacketExtensions {
 		return createExtension(LEAVE);
 	}
 	
+	public static PacketExtension createJingleErrorExtension(){
+		return createExtension(JINGLEERROR);
+	}
+	
 	public static PacketExtension createUserListExtension(List<User> list) {
 		DefaultPacketExtension extension = new DefaultPacketExtension(USER_LIST, NAMESPACE);
 		
@@ -185,6 +191,10 @@ public class PacketExtensions {
 
 	public static DefaultPacketExtension getLeaveExtension(Message message) {
 		return getExtension(LEAVE, message);
+	}
+	
+	public static DefaultPacketExtension getJingleErrorExtension(Message message){
+		return getExtension(JINGLEERROR, message);
 	}
 	
 	public static DefaultPacketExtension getUserlistExtension(Message message) {

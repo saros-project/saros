@@ -374,4 +374,21 @@ public class JingleFileTransferManager {
 		JingleConnectionState state = connectionStates.get(jid);
 		return state;
 	}
+	
+	/**
+	 * Terminate Jingle connection and set error state for given
+	 * peer.
+	 * @param jid
+	 */
+	public void setJingleErrorState(JID jid){
+		if(jid != null){
+		logger.debug("Terminate Jingle Session for "+jid);
+		terminateJingleSession(jid);
+		connectionStates.remove(jid);
+		connectionStates.put(jid, JingleConnectionState.ERROR);
+		}
+		else{
+			logger.warn("JID is null. Jingle error state couldn't be set.");
+		}
+	}
 }

@@ -35,6 +35,7 @@ import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
@@ -62,6 +63,9 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 	/* transfer information */
 	private JingleFileTransferData[] transferData;
 	private List<JingleFileTransferData> transferList = new Vector<JingleFileTransferData>();
+	
+	private JingleFileTransferData currentSending = null;
+	
 	private JingleFileTransferProcessMonitor monitor;
 //	private IJingleFileTransferListener listener;
 
@@ -164,13 +168,19 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 		} catch (Exception e1) {
 			logger.error(e1);
 			if (listener != null) {
-				listener.exceptionOccured(new JingleSessionException("Error during Jingle file transfer."));
+				listener.exceptionOccured(new JingleSessionException("Error during Jingle file transfer.",getRemoteJID()));
 			}
+			
 			return;
 		}
 	}
 
-
+	private JID getRemoteJID(){
+		if(currentSending != null){
+			return currentSending.recipient;
+		}
+		return null;
+	}
 	
 //	private void sendFileListData(OutputStream output, String file_list_content)
 //			throws IOException {
@@ -406,6 +416,9 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 
 		for (JingleFileTransferData data : transferList) {
 			
+			/* save current packet for error handling*/
+			currentSending = data;
+			
 			/* send file meta data */
 			logger.debug("send meta data for : "
 					+ data.file_project_path);
@@ -432,7 +445,7 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 
 		/* remove from queue */
 		transferList.clear();
-		
+		currentSending = null;
 		/* set monitor status complete :) */
 //		monitor.setComplete(true);
 		

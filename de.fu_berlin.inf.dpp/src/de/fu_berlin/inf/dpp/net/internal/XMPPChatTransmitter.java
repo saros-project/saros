@@ -243,6 +243,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	public void removeInvitationProcess(IInvitationProcess process) {
 		processes.remove(process);
+		/* terminate jingle session for states: done, cancel and joined.*/
+		jingleManager.terminateJingleSession(process.getPeer());
 	}
 
 	/*
@@ -1182,6 +1184,13 @@ public class XMPPChatTransmitter implements ITransmitter,
 					process.cancel(errorMsg, true);
 			}
 		}
+		
+		else if(PacketExtensions.getJingleErrorExtension(message) != null) {
+			log.debug("Receive jingle error messages from "+fromJID);
+			/* set error state for this peer in jingle connection states. */
+			jingleManager.setJingleErrorState(fromJID);
+			/*TODO: callback for other connections possible? */
+		}
 	}
 
 	/*
@@ -1982,9 +1991,17 @@ public class XMPPChatTransmitter implements ITransmitter,
 		if (exception.getJID() != null) {
 			/* inform invitation process. */
 			for (IInvitationProcess process : processes) {
-				if (process.getPeer().equals(exception.getJID()))
+				if (process.getPeer().equals(exception.getJID())){
+					/* fallback in invitation process*/
 					process.jingleFallback();
+					/* send error state to recipient.*/
+					sendMessage(exception.getJID(), PacketExtensions
+							.createJingleErrorExtension());
+					log.debug("jingle fallback. send error message to "+exception.getJID());
+				}
 			}
+			ErrorMessageDialog.showErrorMessage("Error during Jingle Transfer. Fallback to IBB.");
+			
 		} else {
 			ErrorMessageDialog.showErrorMessage(exception);
 		}
