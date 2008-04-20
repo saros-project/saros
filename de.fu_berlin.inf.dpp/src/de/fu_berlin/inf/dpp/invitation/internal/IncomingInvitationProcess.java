@@ -20,8 +20,10 @@
 package de.fu_berlin.inf.dpp.invitation.internal;
 
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -29,11 +31,15 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.XMPPException;
 
 import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
@@ -278,21 +284,65 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * @throws CoreException
 	 *             if something goes wrong while creating the new project.
 	 */
-	private IProject createNewProject(String newProjectName, IProject baseProject)
+	private IProject createNewProject(String newProjectName, final IProject baseProject)
 		throws CoreException {
 
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		IProject project = workspaceRoot.getProject(newProjectName);
+		final IProject project = workspaceRoot.getProject(newProjectName);
 		
-		project.clearHistory(null);
-		project.refreshLocal(IProject.DEPTH_INFINITE, null);
+		/* run project read only settings in progress monitor thread. */
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+				try {
+					dialog.run(true, false, new IRunnableWithProgress(){
+						public void run(IProgressMonitor monitor){
+							
+				
+							try {
+				
+								monitor.beginTask("Project settings ... ",IProgressMonitor.UNKNOWN);
+								
+								project.clearHistory(null);
+								project.refreshLocal(IProject.DEPTH_INFINITE, null);
+						
+								if (baseProject == null) {
+									project.create(new NullProgressMonitor());
+									project.open(new NullProgressMonitor());
+								} else {
+									baseProject.copy(project.getFullPath(), true, new NullProgressMonitor());
+								}
+				
+							} catch (CoreException e) {
+								logger.warn( "",e);
+								monitor.done();
+							}
+							
+							monitor.done();
 
-		if (baseProject == null) {
-			project.create(new NullProgressMonitor());
-			project.open(new NullProgressMonitor());
-		} else {
-			baseProject.copy(project.getFullPath(), true, new NullProgressMonitor());
-		}
+						}
+						
+					});
+				} catch (InvocationTargetException e) {
+					logger.warn( "",e);
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					logger.warn( "",e);
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		
+//		project.clearHistory(null);
+//		project.refreshLocal(IProject.DEPTH_INFINITE, null);
+//
+//		if (baseProject == null) {
+//			project.create(new NullProgressMonitor());
+//			project.open(new NullProgressMonitor());
+//		} else {
+//			baseProject.copy(project.getFullPath(), true, new NullProgressMonitor());
+//		}
 
 		return project;
 	}
