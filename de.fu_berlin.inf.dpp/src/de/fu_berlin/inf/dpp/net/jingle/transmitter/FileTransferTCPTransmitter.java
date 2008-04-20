@@ -179,6 +179,13 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 		if(currentSending != null){
 			return currentSending.recipient;
 		}
+		else{
+			/* error occured on the beginning. try to find out recipient jid
+			 * with transfer list. */
+			if(transferList != null && transferList.size() > 0){
+				return transferList.get(0).recipient;
+			}
+		}
 		return null;
 	}
 	

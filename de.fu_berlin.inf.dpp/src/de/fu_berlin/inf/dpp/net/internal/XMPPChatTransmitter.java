@@ -1992,6 +1992,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 			/* inform invitation process. */
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(exception.getJID())){
+					/* set jingle connection error. */
+					jingleManager.setJingleErrorState(exception.getJID());
 					/* fallback in invitation process*/
 					process.jingleFallback();
 					/* send error state to recipient.*/
@@ -2000,7 +2002,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 					log.debug("jingle fallback. send error message to "+exception.getJID());
 				}
 			}
-			ErrorMessageDialog.showErrorMessage("Error during Jingle Transfer. Fallback to IBB.");
+//			ErrorMessageDialog.showErrorMessage("Error during Jingle Transfer. Fallback to IBB.");
 			
 		} else {
 			ErrorMessageDialog.showErrorMessage(exception);
