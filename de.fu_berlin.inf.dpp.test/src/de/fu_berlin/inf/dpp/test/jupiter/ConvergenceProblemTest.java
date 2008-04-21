@@ -113,7 +113,6 @@ public class ConvergenceProblemTest extends JupiterTestCase{
 		
 		Thread.sleep(100);
 		
-		/* O3 || O2*/
 		c1.sendOperation(new DeleteOperation(1,"a"), 100);
 		c4.sendOperation(new InsertOperation(3,"x"), 1000);
 		c5.sendOperation(new DeleteOperation(3,"c"), 1100);

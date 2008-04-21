@@ -8,10 +8,10 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.jupiter.Operation;
 import de.fu_berlin.inf.dpp.jupiter.Request;
-import de.fu_berlin.inf.dpp.jupiter.SynchronizedQueue;
 import de.fu_berlin.inf.dpp.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.jupiter.SynchronizedQueue;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 
@@ -44,7 +44,7 @@ public class TwoWayJupiterServerDocument implements SynchronizedQueue, NetworkEv
 	/* init proxy queue and all necessary objects. */
 	private void init(String content, NetworkConnection con){
 		this.doc = new Document(content);
-		this.algorithm = new Jupiter(true);
+		this.algorithm = new Jupiter(false);
 		this.connection = con;
 		this.proxyQueues = new Vector<SynchronizedQueue>();
 	}

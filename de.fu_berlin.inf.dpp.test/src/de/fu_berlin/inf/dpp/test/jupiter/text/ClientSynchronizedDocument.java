@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.jupiter.Operation;
 import de.fu_berlin.inf.dpp.jupiter.Request;
-import de.fu_berlin.inf.dpp.jupiter.SynchronizedQueue;
 import de.fu_berlin.inf.dpp.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.jupiter.SynchronizedQueue;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 

@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
 
 /**
  * This class contains three test scenarios to verify transformation functions 
- * out of ""Providing Correctness of Transformation Functions in Real-Time 
+ * out of "Providing Correctness of Transformation Functions in Real-Time 
  * Groupware"
  * @author orieger
  *
@@ -104,7 +104,7 @@ public class CounterExampleTest extends JupiterTestCase{
 		
 		/* O3 || O2*/
 		c1.sendOperation(new InsertOperation(1,"x"),100);
-		c2.sendOperation(new DeleteOperation(1,"b"),100);
+		c2.sendOperation(new DeleteOperation(1,"b"),200);
 		c3.sendOperation(new InsertOperation(2,"y"),1000);
 	
 		Thread.sleep(2000);
@@ -164,9 +164,9 @@ public class CounterExampleTest extends JupiterTestCase{
 	public static Test suite() {
 	TestSuite suite = new TestSuite("Counter test scenarios.");
 	//$JUnit-BEGIN$
-	suite.addTest(new CounterExampleTest("testCounterExampleViolatingConditionC1"));
+//	suite.addTest(new CounterExampleTest("testCounterExampleViolatingConditionC1"));
 	suite.addTest(new CounterExampleTest("testCounterExampleViolatingConditionC2"));
-	suite.addTest(new CounterExampleTest("testCounterExample2ViolatingConditionC2"));
+//	suite.addTest(new CounterExampleTest("testCounterExample2ViolatingConditionC2"));
 	//$JUnit-END$
 	return suite;
 }

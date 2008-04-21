@@ -5,15 +5,18 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class JupiterServerImpl implements JupiterServer{
 
-	
+	/* TODO:
+	 * 1. Proxy client queue
+	 * 2. synchronized queue
+	 * 
+	 * 
+	 * */
 	
 	public void addProxyClient(JID jid) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public void removeProxyClient(JID jid) {
-		// TODO Auto-generated method stub
 		
 	}
 
