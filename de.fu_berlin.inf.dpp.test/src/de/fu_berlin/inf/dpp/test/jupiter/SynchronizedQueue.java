@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.test.jupiter;
 
-import de.fu_berlin.inf.dpp.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.jupiter.Operation;
-import de.fu_berlin.inf.dpp.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public interface SynchronizedQueue {

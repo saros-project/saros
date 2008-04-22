@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.test.jupiter;
 
-import de.fu_berlin.inf.dpp.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;

@@ -3,11 +3,11 @@ package de.fu_berlin.inf.dpp.test.jupiter;
  * This test class represent local execution of document changes and 
  * appropriate jupiter operations.
  */
-import de.fu_berlin.inf.dpp.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.jupiter.Operation;
-import de.fu_berlin.inf.dpp.jupiter.Request;
-import de.fu_berlin.inf.dpp.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.test.jupiter.text.Document;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 import junit.framework.TestCase;

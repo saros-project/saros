@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.test.jupiter.text;
 
-import de.fu_berlin.inf.dpp.jupiter.internal.text.*;
-import de.fu_berlin.inf.dpp.jupiter.*;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.*;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.*;
 /**
  * this class represent a document object for testing.
  * @author troll
