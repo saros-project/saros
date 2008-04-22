@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.jupiter.server.impl.ConcurrentManager;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterDocumentListener;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
@@ -41,7 +42,7 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		initListener();
 		jupiter = new JupiterSimulater();
 		
-		jupiter.deactiveSide3();
+//		jupiter.deactiveSide3();
 	}
 
 	public void update() {
@@ -942,7 +943,8 @@ public class JupiterTestUI extends javax.swing.JPanel {
 		protected ClientSynchronizedDocument c1;
 		protected ClientSynchronizedDocument c2;
 		protected ClientSynchronizedDocument c3;
-		protected ServerSynchronizedDocument s1;
+//		protected ServerSynchronizedDocument s1;
+		protected ConcurrentManager s1;
 
 		JID jid_c1;
 		JID jid_c2;
@@ -953,12 +955,12 @@ public class JupiterTestUI extends javax.swing.JPanel {
 			// deactiveSide3();
 		}
 
-		public void deactiveSide3() {
-			network.removeClient(c3);
-			s1.removeProxyClient(jid_c3);
-			jPanel3.setVisible(false);
-			update();
-		}
+//		public void deactiveSide3() {
+//			network.removeClient(c3);
+//			s1.removeProxyClient(jid_c3);
+//			jPanel3.setVisible(false);
+//			update();
+//		}
 
 		private void init() {
 
@@ -978,8 +980,9 @@ public class JupiterTestUI extends javax.swing.JPanel {
 			c3 = new ClientSynchronizedDocument(jTextFieldInitialState
 					.getText(), network, jid_c3);
 			c3.addJupiterDocumentListener(this);
-			s1 = new ServerSynchronizedDocument(jTextFieldInitialState
-					.getText(), network, jid_server);
+//			s1 = new ServerSynchronizedDocument(jTextFieldInitialState
+//					.getText(), network, jid_server);
+			s1 = new ConcurrentManager( network, jid_server);
 
 			network.addClient(c1);
 			network.addClient(c2);

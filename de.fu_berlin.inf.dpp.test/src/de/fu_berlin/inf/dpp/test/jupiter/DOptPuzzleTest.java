@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.test.jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.test.jupiter.server.impl.ConcurrentManager;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
@@ -42,7 +43,9 @@ public class DOptPuzzleTest extends JupiterTestCase{
 				network,jid_c2);
 		ClientSynchronizedDocument c3 = new ClientSynchronizedDocument("abcd",
 				network,jid_c3);
-		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(
+//		ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(
+//				network,jid_server);
+		ConcurrentManager s1 = new ConcurrentManager(
 				network,jid_server);
 
 		/* connect all with simulated network. */
