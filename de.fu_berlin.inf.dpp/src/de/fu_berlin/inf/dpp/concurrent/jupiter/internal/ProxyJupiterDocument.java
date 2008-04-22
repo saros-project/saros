@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.SynchronizedQueue;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class ProxyJupiterClient implements JupiterClient{
+public class ProxyJupiterDocument implements JupiterClient{
 
 	/**
 	 * 1. Outgoing queue
@@ -19,7 +19,7 @@ public class ProxyJupiterClient implements JupiterClient{
 	 * 
 	 */
 	
-	private static Logger logger = Logger.getLogger(ProxyJupiterClient.class);
+	private static Logger logger = Logger.getLogger(ProxyJupiterDocument.class);
 	
 	/** jid of remote client*/
 	private JID jid;
@@ -28,7 +28,7 @@ public class ProxyJupiterClient implements JupiterClient{
 	/** forwarder send request to client. */
 	private RequestForwarder forwarder;
 	
-	public ProxyJupiterClient(JID jid, RequestForwarder forwarder){
+	public ProxyJupiterDocument(JID jid, RequestForwarder forwarder){
 		this.jid = jid;
 		jupiter = new Jupiter(false);
 		this.forwarder = forwarder;
@@ -39,6 +39,7 @@ public class ProxyJupiterClient implements JupiterClient{
 		Request req = null;
 		logger.debug(jid.toString()+" proxy client generate request for "+op);
 		req = jupiter.generateRequest(op);
+		req.setJID(this.jid);
 		/* send request*/
 		forwarder.forwardOutgoingRequest(req);
 		

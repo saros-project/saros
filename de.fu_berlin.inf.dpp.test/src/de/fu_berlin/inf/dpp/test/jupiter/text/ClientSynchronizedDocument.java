@@ -87,6 +87,7 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 		doc.execOperation(op);
 		/* 2. transform operation. */
 		Request req = algorithm.generateRequest(op);
+		req.setJID(this.jid);
 		/* 3. send operation. */
 //		connection.sendOperation(remoteJid, req, delay);
 		connection.sendOperation(new NetworkRequest(this.jid, remoteJid,req), delay);

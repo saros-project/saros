@@ -64,5 +64,7 @@ public interface Request extends Serializable {
 	 * @return the jid of the client
 	 */
 	public JID getJID();
+	
+	public void setJID(JID jid);
 
 }

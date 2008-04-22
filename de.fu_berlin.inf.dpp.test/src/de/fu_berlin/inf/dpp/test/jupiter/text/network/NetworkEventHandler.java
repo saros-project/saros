@@ -14,6 +14,7 @@ public interface NetworkEventHandler {
 	/**
 	 * receive a remote document request.
 	 * @param req
+	 * @deprecated
 	 */
 	public void receiveNetworkEvent(Request req);
 	

@@ -4,23 +4,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.OperationSerializer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
+import de.fu_berlin.inf.dpp.concurrent.management.OutgoingMessageForwarder;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class JupiterDocumentServer implements JupiterServer{
+	
+	private static Logger logger = Logger.getLogger(JupiterDocumentServer.class);
 	
 	/**
 	 * List of proxy clients.
 	 */
 	private HashMap<JID, JupiterClient> proxies;
 	
-	public List<Request> requestList;
+	private List<Request> requestList;
 	
-	/** outgoing queue to transfer request to appropriate clients. */
+//	/** outgoing queue to transfer request to appropriate clients. */
 	public List<Request> outgoingQueue;
+//	private RequestForwarder outgoing;
 	
 	public OperationSerializer serializer;
 	
@@ -29,19 +36,33 @@ public class JupiterDocumentServer implements JupiterServer{
 //	/** counter for remove client synchronization.*/
 //	public int requestSyncCounter = 0;
 	
+	
 	public JupiterDocumentServer(){
 		proxies = new HashMap<JID, JupiterClient>();
 		requestList = new Vector<Request>();
-		serializer = new Serializer(this);
 		this.outgoingQueue = new Vector<Request>();
+
+//		this.outgoing = forwarder;
+		serializer = new Serializer(this);
 	}
 	
+	public JupiterDocumentServer(RequestForwarder forwarder){
+		proxies = new HashMap<JID, JupiterClient>();
+		requestList = new Vector<Request>();
+		this.outgoingQueue = new Vector<Request>();
+
+//		this.outgoing = forwarder;
+		serializer = new Serializer(this);
+	}
+	
+	
+	
 	public synchronized void addProxyClient(JID jid) {
-		JupiterClient proxy = new ProxyJupiterClient(jid,this);
+		JupiterClient proxy = new ProxyJupiterDocument(jid,this);
 //		/* add to serializer. */
 //		waitForSerializer = true;
 		//TODO: Sync with serializer before add action.
-		
+		logger.debug("add new proxy client : "+jid);
 		proxies.put(jid, proxy);
 	}
 
@@ -65,7 +86,7 @@ public class JupiterDocumentServer implements JupiterServer{
 		 * add request to serialized queue. 
 		 */
 		requestList.add(request);
-		
+		logger.debug("add new Request: "+request.getJID()+" "+request.getOperation());
 		notifyAll();
 	}
 
@@ -74,6 +95,7 @@ public class JupiterDocumentServer implements JupiterServer{
 		if(!(requestList.size() > 0)){
 			wait();
 		}
+		logger.debug("read out next request in queue!");
 		/*get next request. */
 		return requestList.remove(0);
 	}
@@ -91,13 +113,18 @@ public class JupiterDocumentServer implements JupiterServer{
 	
 	
 	/* start transfer section. */
+	
 	/**
 	 * proxies add generated request to outgoing queue.
 	 */
 	public synchronized void forwardOutgoingRequest(Request req) {
 		/* add request to outgoing queue. */
 		outgoingQueue.add(req);
+		
+		logger.debug("add request to outgoing queue : "+req.getJID()+" "+req.getOperation());
 		notifyAll();
+		
+//		outgoing.forwardOutgoingRequest(req);
 	}
 
 	/**
@@ -109,9 +136,13 @@ public class JupiterDocumentServer implements JupiterServer{
 		while(!(outgoingQueue.size() >0)){
 			wait();
 		}
-		//TODO: transfer action have to be implement.
+		/* remove first queue element. */
+		req = outgoingQueue.remove(0);
 		
+		logger.debug("read next request from outgoing queue: "+req.getJID()+" "+req.getOperation());
 		return req;
+		
+//		return outgoing.getNextOutgoingRequest();
 	}
 
 	/* end transfer section  */

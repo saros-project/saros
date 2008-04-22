@@ -50,7 +50,7 @@ public class RequestImpl implements Request {
 	/**
 	 * JID of appropriate client.
 	 */
-	private final JID jid;
+	private JID jid;
 	
 	/**
 	 * Creates a new instance of the RequestImpl class.
@@ -164,6 +164,10 @@ public class RequestImpl implements Request {
 	 */
 	public JID getJID() {
 		return jid;
+	}
+	
+	public void setJID(JID jid){
+		this.jid = jid;
 	}
 
 }
