@@ -1,9 +1,14 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class JupiterDocumentClient implements JupiterClient {
@@ -14,29 +19,55 @@ public class JupiterDocumentClient implements JupiterClient {
 	 * 
 	 */
 	
+	private static Logger logger = Logger.getLogger(JupiterDocumentClient.class.toString());
+	
 	/** jid of remote client*/
 	private JID jid;
 	/** jupiter sync algorithm. */
 	private Algorithm jupiter;
 	
-	public JupiterDocumentClient(JID jid){
+	private IPath editor;
+	
+	/** forwarder send request to server. */
+	private RequestForwarder forwarder;
+	
+	public JupiterDocumentClient(JID jid, RequestForwarder forwarder){
 		this.jid = jid;
 		this.jupiter = new Jupiter(true);
+		this.forwarder = forwarder;
 	}
 	
 	public Request generateRequest(Operation op) {
-		// TODO Auto-generated method stub
-		return null;
+		Request req = null;
+		logger.debug(jid.toString()+" client generate request for "+op);
+		req = jupiter.generateRequest(op);
+		req.setJID(this.jid);
+		/* send request*/
+		forwarder.forwardOutgoingRequest(req);
+		
+		return req;
 	}
 
-	public Operation receiveRequest(Request req) {
-		// TODO Auto-generated method stub
-		return null;
+	public Operation receiveRequest(Request req)throws TransformationException  {
+		Operation op = null;
+		logger.debug(jid.toString()+" client receive request "+req.getOperation());
+		/* receive request action */
+		op =  jupiter.receiveRequest(req);
+		logger.debug(jid.toString()+" client operation of IT: "+op);
+		return op;
 	}
 
 	public JID getJID() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.jid;
+	}
+
+	public IPath getEditor() {
+		return editor;
+	}
+
+	public void setEditor(IPath path) {
+		this.editor = path;
+		
 	}
 
 	

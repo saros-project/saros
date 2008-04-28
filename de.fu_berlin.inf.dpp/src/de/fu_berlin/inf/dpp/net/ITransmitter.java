@@ -28,6 +28,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -227,4 +228,18 @@ public interface ITransmitter {
 	 *            a list of timed activities.
 	 */
 	public void sendActivities(ISharedProject sharedProject, List<TimedActivity> activities);
+	
+	/**
+	 * Sends given list of activities with given timestamp to given participant
+	 * of given shared project.
+	 * 
+	 * @param sharedProject
+	 *            the shared project the activities refer to.
+	 * @param activity
+	 *            activity.
+	 * @param jid
+	 * 			  the recipient
+	 */
+	public void sendActivitiyTo(ISharedProject sharedProject, IActivity activity, JID jid);
+	
 }

@@ -486,4 +486,9 @@ public class MultiUserChatManager implements InvitationListener,
 		return false;
 	}
 
+	public void sendActivity() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

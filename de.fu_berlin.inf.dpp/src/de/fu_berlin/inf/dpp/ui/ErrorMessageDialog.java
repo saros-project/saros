@@ -29,9 +29,14 @@ public class ErrorMessageDialog {
 	public static void showErrorMessage(final String exceptionMessage){
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
-				MessageDialog.openError(Display.getDefault().getActiveShell(),
-					"Exception", exceptionMessage);
+				if(exceptionMessage == null || exceptionMessage.equals("")){
+					MessageDialog.openError(Display.getDefault().getActiveShell(),
+							"Exception", "Error occured.");
+				}else{
+					MessageDialog.openError(Display.getDefault().getActiveShell(),"Exception", exceptionMessage);
+				}
 			}
+					
 		});
 	}
 }

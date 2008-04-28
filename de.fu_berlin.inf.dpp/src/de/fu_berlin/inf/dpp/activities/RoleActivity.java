@@ -22,6 +22,9 @@ package de.fu_berlin.inf.dpp.activities;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class RoleActivity implements IActivity {
+	
+	private String source;
+	
 	private JID driver;
 
 	public RoleActivity(JID newDriver) {
@@ -46,5 +49,14 @@ public class RoleActivity implements IActivity {
 	@Override
 	public String toString() {
 		return "RoleActivity(driver:" + driver + ")";
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+		
 	}
 }

@@ -27,4 +27,8 @@ package de.fu_berlin.inf.dpp.activities;
  * @author rdjemili
  */
 public interface IActivity {
+	
+	public void setSource(String source);
+	
+	public String getSource();
 }

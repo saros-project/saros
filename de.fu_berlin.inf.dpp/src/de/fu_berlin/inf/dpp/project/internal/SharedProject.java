@@ -50,6 +50,8 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -88,15 +90,22 @@ public class SharedProject implements ISharedProject {
 	private static final int MAX_USERCOLORS = 5;
 	private int colorlist[] = new int[MAX_USERCOLORS +1];
 
+//	private ConcurrentManager concurrentManager;
 	
 	public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
 		this.transmitter = transmitter;
 		
- 
+//		concurrentManager = new ConcurrentDocumentManager();
+		
 		this.myID = myID;
 		driver = host = new User(myID);
-		participants.add(driver);
+//		host = new User(myID);
+		participants.add(host);
 
+		/* add host to driver list. */
+		activitySequencer.initConcurrentManager(ConcurrentManager.Side.HOST_SIDE,host, myID);
+		activitySequencer.getConcurrentManager().addDriver(host);
+		
 		this.project = project;
 		setProjectReadonly(false);
 	}
@@ -110,6 +119,8 @@ public class SharedProject implements ISharedProject {
 
 		this.host = new User(host);
 		this.driver = new User(driver);
+		
+		activitySequencer.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE,this.host,myID);
 		
 		for (JID jid : allParticipants) { // HACK
 			User user=new User(jid);
@@ -155,12 +166,34 @@ public class SharedProject implements ISharedProject {
 	public void setDriver(User driver, boolean replicated) {
 		assert driver != null;
 
-		// TODO if replicated=false check for privileges
-
-		if (driver.equals(this.driver))
-			return;
-
-		this.driver = driver;
+		/*TODO: 1. actual the host never lost the driver status 
+		 * and added new driver to driverlist*/
+		
+		//host
+		if(activitySequencer.getConcurrentManager() != null && activitySequencer.getConcurrentManager().isHost()){
+			// if replicated=false check for privileges
+			if (driver.equals(this.driver))
+				return;
+			
+			/* add new driver to list. */
+			activitySequencer.getConcurrentManager().addDriver(driver);
+		}
+		//client
+		else{
+			// if replicated=false check for privileges
+			if (driver.equals(this.driver))
+				return;
+			
+			/* set driver in client to observe driver actions 
+			 * or to set the local driver status. */
+			this.driver = driver;
+		}
+		
+//		// TODO if replicated=false check for privileges
+//		if (driver.equals(this.driver))
+//			return;
+//
+//		this.driver = driver;
 		
 		setProjectReadonly(!isDriver());
 
@@ -185,6 +218,9 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.ISharedProject
 	 */
 	public boolean isDriver() {
+		if(activitySequencer.getConcurrentManager() != null){
+			return activitySequencer.getConcurrentManager().isDriver(driver);
+		}
 		return driver.getJid().equals(myID);
 	}
 
@@ -214,6 +250,7 @@ public class SharedProject implements ISharedProject {
 	public void addUser(User user) {
 		addUser(user,-1);
 	}
+	
 	public void addUser(User user, int index) {
 		if (participants.contains(user)) {
 			if (index>=0 && participants.indexOf(user)!=index) {

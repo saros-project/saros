@@ -20,4 +20,6 @@ public interface IChatManager extends PacketListener {
 	 * @return
 	 */
 	public boolean isConnected();
+	
+	public void sendActivity();
 }

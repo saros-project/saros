@@ -63,6 +63,11 @@ public class PrivateChatManager implements IChatManager{
 		return false;
 	}
 
+	public void sendActivity() {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 
 }

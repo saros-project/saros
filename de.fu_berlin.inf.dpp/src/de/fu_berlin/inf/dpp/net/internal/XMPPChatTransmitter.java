@@ -379,6 +379,16 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendActivitiyTo(de.fu_berlin.inf.dpp.project.ISharedProject, java.util.List, de.fu_berlin.inf.dpp.net.JID)
+	 */
+	public void sendActivitiyTo(ISharedProject sharedProject,
+			IActivity activity, JID jid) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	private void sendFileListWithJingle(JID recipient, String fileListContent) {
 		JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
 		/* create file transfer. */
@@ -1047,14 +1057,15 @@ public class XMPPChatTransmitter implements ITransmitter,
 			for (TimedActivity timedActivity : timedActivities) {
 
 				IActivity activity = timedActivity.getActivity();
-
-				if (activity instanceof TextSelectionActivity) {
-					((TextSelectionActivity) activity).setSource(fromJID
-							.toString());
-				}
-				if (activity instanceof TextEditActivity) {
-					((TextEditActivity) activity).setSource(fromJID.toString());
-				}
+				activity.setSource(fromJID.toString());
+				
+//				if (activity instanceof TextSelectionActivity) {
+//					((TextSelectionActivity) activity).setSource(fromJID
+//							.toString());
+//				}
+//				if (activity instanceof TextEditActivity) {
+//					((TextEditActivity) activity).setSource(fromJID.toString());
+//				}
 
 				/*
 				 * incoming fileActivities that add files are only used as
@@ -1065,6 +1076,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 						|| !((FileActivity) activity).getType().equals(
 								FileActivity.Type.Created)) {
 
+					//TODO: Empfang der Aktivitäten und weiterleitung an den sequencer
 					project.getSequencer().exec(timedActivity);
 
 				}
@@ -2014,5 +2026,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 		log.debug("incoming file");
 		receiveResource(data, input);
 	}
+
+
 
 }

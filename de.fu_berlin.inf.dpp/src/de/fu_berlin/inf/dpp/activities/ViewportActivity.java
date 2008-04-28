@@ -4,6 +4,8 @@ public class ViewportActivity implements IActivity {
 	public final int topIndex;
 
 	public final int bottomIndex;
+	
+	private String source;
 
 	public ViewportActivity(int topIndex, int bottomIndex) {
 		this.topIndex = topIndex;
@@ -31,5 +33,13 @@ public class ViewportActivity implements IActivity {
 	@Override
 	public String toString() {
 		return "ViewportActivity(top:" + topIndex + ",bottom:" + bottomIndex + ")";
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

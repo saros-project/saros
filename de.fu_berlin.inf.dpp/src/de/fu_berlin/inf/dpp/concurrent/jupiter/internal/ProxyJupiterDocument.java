@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
@@ -60,6 +61,18 @@ public class ProxyJupiterDocument implements JupiterClient{
 	 */
 	public JID getJID() {
 		return jid;
+	}
+
+
+	public IPath getEditor() {
+		//implemented in jupiter server
+		return null;
+	}
+
+
+	public void setEditor(IPath path) {
+		//implemented in jupiter server
+		
 	}
 
 

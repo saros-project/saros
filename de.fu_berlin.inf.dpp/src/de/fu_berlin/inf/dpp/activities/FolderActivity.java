@@ -7,6 +7,8 @@ public class FolderActivity implements IActivity {
 		Created, Removed
 	};
 
+	private String source;
+	
 	private Type type;
 
 	private IPath path;
@@ -27,5 +29,14 @@ public class FolderActivity implements IActivity {
 	@Override
 	public String toString() {
 		return "FolderActivity(type:" + type + ", path:" + path + ")";
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
+		
 	}
 }

@@ -232,6 +232,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	private Set<IFile> connectedFiles = new HashSet<IFile>();
 
 	private List<ISharedEditorListener> editorListeners = new ArrayList<ISharedEditorListener>();
+	
+	/* this activity has arrived and will be execute now. */
+	private IActivity currentExecuteActivity;
 
 	public static EditorManager getDefault() {
 		if (instance == null)
@@ -354,7 +357,18 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		if (!isDriver)
 			return;
 
-		fireActivity(new TextEditActivity(offset, text, replace));
+		TextEditActivity newAct = new TextEditActivity(offset, text, replace);
+		/* check if text edit activity is executed by other driver activity recently. */
+		//TODO: check scenario of concurrent edit in same position.
+		if(newAct.sameLike(currentExecuteActivity)){
+			return;
+		}
+		
+		/* if activity is create be this client. */
+		TextEditActivity activity = new TextEditActivity(offset, text, replace);
+		activity.setEditor(this.activeDriverEditor);
+		
+		fireActivity(activity);
 
 		IEditorInput input = editorAPI.getActiveEditor().getEditorInput();
 		IDocumentProvider provider = editorAPI.getDocumentProvider(input);
@@ -446,6 +460,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 * @see de.fu_berlin.inf.dpp.IActivityProvider
 	 */
 	public void exec(final IActivity activity) {
+		
+		/* set current execute activity to avoid cirle executions. */
+		currentExecuteActivity = activity;
+		
 		if (activity instanceof EditorActivity) {
 			EditorActivity editorActivity = (EditorActivity) activity;
 
@@ -615,7 +633,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 		} else if (activity instanceof TextEditActivity) {
 			TextEditActivity textEditActivity = (TextEditActivity) activity;
-			return "<edit " + "offset=\"" + textEditActivity.offset + "\" " + "replace=\""
+			return "<edit " + "path=\"" + textEditActivity.getEditor() + "\" " +"offset=\"" + textEditActivity.offset + "\" " + "replace=\""
 				+ textEditActivity.replace + "\">" + "<![CDATA[" + textEditActivity.text + "]]>"
 				+ "</edit>";
 
@@ -636,7 +654,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	private IActivity parseTextEditActivity(XmlPullParser parser) throws XmlPullParserException,
 		IOException {
 
-		// TODO extract constants
+		// extract current editor for text edit.
+		String pathString = parser.getAttributeValue(null, "path");
+		Path path = pathString.equals("null") ? null : new Path(pathString);
+		
 		int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
 		int replace = Integer.parseInt(parser.getAttributeValue(null, "replace"));
 
@@ -645,7 +666,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			text = parser.getText();
 		}
 
-		return new TextEditActivity(offset, text, replace);
+		return new TextEditActivity(offset, text, replace,path);
 	}
 
 	private IActivity parseEditorActivity(XmlPullParser parser) {

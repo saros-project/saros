@@ -36,6 +36,8 @@ public class EditorActivity implements IActivity {
 
 	private IPath path;
 
+	private String source;
+	
 	/**
 	 * @param path
 	 *            a valid project-relative path or <code>null</code> if former
@@ -76,5 +78,13 @@ public class EditorActivity implements IActivity {
 	@Override
 	public String toString() {
 		return "EditorActivity(type:" + type + ", path:" + path + ")";
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

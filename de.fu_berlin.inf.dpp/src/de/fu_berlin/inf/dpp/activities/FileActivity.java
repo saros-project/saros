@@ -9,6 +9,8 @@ public class FileActivity implements IActivity {
 		Created, Removed
 	};
 
+	private String source;
+	
 	private Type type;
 
 	private IPath path;
@@ -55,5 +57,13 @@ public class FileActivity implements IActivity {
 		}
 
 		return false;
+	}
+
+	public String getSource() {
+		return this.source;
+	}
+
+	public void setSource(String source) {
+		this.source = source;
 	}
 }

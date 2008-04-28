@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
@@ -26,11 +27,12 @@ public class JupiterDocumentServer implements JupiterServer{
 	private List<Request> requestList;
 	
 //	/** outgoing queue to transfer request to appropriate clients. */
-	public List<Request> outgoingQueue;
+	private List<Request> outgoingQueue;
 //	private RequestForwarder outgoing;
 	
-	public OperationSerializer serializer;
+	private OperationSerializer serializer;
 	
+	private IPath editor;
 //	/** for add and remove client synchronization. */
 //	public boolean waitForSerializer = false;
 //	/** counter for remove client synchronization.*/
@@ -46,14 +48,14 @@ public class JupiterDocumentServer implements JupiterServer{
 		serializer = new Serializer(this);
 	}
 	
-	public JupiterDocumentServer(RequestForwarder forwarder){
-		proxies = new HashMap<JID, JupiterClient>();
-		requestList = new Vector<Request>();
-		this.outgoingQueue = new Vector<Request>();
-
-//		this.outgoing = forwarder;
-		serializer = new Serializer(this);
-	}
+//	public JupiterDocumentServer(RequestForwarder forwarder){
+//		proxies = new HashMap<JID, JupiterClient>();
+//		requestList = new Vector<Request>();
+//		this.outgoingQueue = new Vector<Request>();
+//
+////		this.outgoing = forwarder;
+//		serializer = new Serializer(this);
+//	}
 	
 	
 	
@@ -78,6 +80,9 @@ public class JupiterDocumentServer implements JupiterServer{
 		notifyAll();
 	}
 	
+	/**
+	 * add request from transmitter to request queue.
+	 */
 	public synchronized void addRequest(Request request) {
 		
 		/*TODO: Sync with serializer. */
@@ -90,6 +95,9 @@ public class JupiterDocumentServer implements JupiterServer{
 		notifyAll();
 	}
 
+	/**
+	 * next message in request queue.
+	 */
 	public synchronized Request getNextRequestInSynchronizedQueue() throws InterruptedException {
 		/* if queue is empty or proxy managing action is running. */
 		if(!(requestList.size() > 0)){
@@ -143,6 +151,22 @@ public class JupiterDocumentServer implements JupiterServer{
 		return req;
 		
 //		return outgoing.getNextOutgoingRequest();
+	}
+
+	public IPath getEditor() {
+		return editor;
+	}
+
+	public void setEditor(IPath path) {
+		this.editor = path;
+		
+	}
+
+	public boolean isExist(JID jid) {
+		if(proxies.containsKey(jid)){
+			return true;
+		}
+		return false;
 	}
 
 	/* end transfer section  */
