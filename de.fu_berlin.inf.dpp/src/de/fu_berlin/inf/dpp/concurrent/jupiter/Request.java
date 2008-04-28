@@ -23,6 +23,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import java.io.Serializable;
 
+import org.eclipse.core.runtime.IPath;
+
 import de.fu_berlin.inf.dpp.net.JID;
 
 
@@ -32,8 +34,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * sending site, an operation and a timestamp that specifies the definition
  * context of the operation.
  * 
- * @see ch.iserver.ace.algorithm.Operation
- * @see ch.iserver.ace.algorithm.Timestamp
+
  */
 public interface Request extends Serializable {
 
@@ -66,5 +67,9 @@ public interface Request extends Serializable {
 	public JID getJID();
 	
 	public void setJID(JID jid);
+	
+	public IPath getEditorPath();
+	
+	public void setEditorPath(IPath editor);
 
 }

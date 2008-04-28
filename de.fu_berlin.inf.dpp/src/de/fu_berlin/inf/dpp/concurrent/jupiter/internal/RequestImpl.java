@@ -21,6 +21,8 @@
 
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
+import org.eclipse.core.runtime.IPath;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -51,6 +53,11 @@ public class RequestImpl implements Request {
 	 * JID of appropriate client.
 	 */
 	private JID jid;
+	
+	/**
+	 * Path of the appropriate edior.
+	 */
+	private IPath editor;
 	
 	/**
 	 * Creates a new instance of the RequestImpl class.
@@ -168,6 +175,14 @@ public class RequestImpl implements Request {
 	
 	public void setJID(JID jid){
 		this.jid = jid;
+	}
+
+	public IPath getEditorPath() {
+		return this.editor;
+	}
+
+	public void setEditorPath(IPath editor) {
+		this.editor = editor;
 	}
 
 }

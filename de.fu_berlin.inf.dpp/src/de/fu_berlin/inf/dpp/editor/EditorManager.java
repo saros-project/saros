@@ -899,7 +899,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	private EditorManager() {
 		setEditorAPI(new EditorAPI());
-		Saros.getDefault().getSessionManager().addSessionListener(this);
+		if( Saros.getDefault() != null && Saros.getDefault().getSessionManager() != null){
+			Saros.getDefault().getSessionManager().addSessionListener(this);
+		}
 	}
 
 	/**

@@ -4,6 +4,7 @@ import java.util.List;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -11,12 +12,16 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author orieger
  *
  */
-public interface ConcurrentManager {
+public interface ConcurrentManager extends IRequestManager {
 
 	public static enum Side{
 		CLIENT_SIDE,
 		HOST_SIDE
 	}
+	
+	public void setRequestForwarder(RequestForwarder f);
+	
+	public RequestForwarder getRequestForwarder();
 	
 	public void addDriver(User jid);
 	
@@ -26,7 +31,9 @@ public interface ConcurrentManager {
 	
 	public boolean isDriver(User jid);
 	
-	public boolean isHost();
+	public boolean isHostSide();
+	
+	public boolean isHost(JID jid);
 	
 	public void setHost(User jid);
 	

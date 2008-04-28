@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="de.fu_berlin.inf.dpp" default="build.jars" basedir=".">
+<project name="de.fu_berlin.inf.dpp" default="build.update.jar" basedir=".">
 
 	<property name="basews" value="${ws}"/>
 	<property name="baseos" value="${os}"/>
@@ -12,8 +12,8 @@
 	<property name="javacVerbose" value="true"/>
 	<property name="logExtension" value=".log"/>
 	<property name="compilerArg" value=""/>
-	<property name="javacSource" value="1.6"/>
-	<property name="javacTarget" value="1.6"/>
+	<property name="javacSource" value="1.5"/>
+	<property name="javacTarget" value="1.5"/>
 	<path id="path_bootclasspath">
 		<fileset dir="${java.home}/lib">
 			<include name="*.jar"/>
@@ -36,7 +36,7 @@
 		<property name="temp.folder" value="${basedir}/temp.folder"/>
 		<property name="plugin.destination" value="${basedir}"/>
 		<property name="eclipse.dir" value="/home/troll/download/Eclipse/eclipse"/>
-		<property name="saros.version" value="1.0.2"/>
+		<property name="saros.version" value="1.0.x"/>
 	</target>
 
 	<target name="properties" if="eclipse.running">

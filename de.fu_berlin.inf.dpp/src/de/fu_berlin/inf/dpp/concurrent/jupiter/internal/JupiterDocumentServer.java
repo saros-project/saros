@@ -28,7 +28,8 @@ public class JupiterDocumentServer implements JupiterServer{
 	
 //	/** outgoing queue to transfer request to appropriate clients. */
 	private List<Request> outgoingQueue;
-//	private RequestForwarder outgoing;
+	
+	private RequestForwarder outgoing;
 	
 	private OperationSerializer serializer;
 	
@@ -39,6 +40,15 @@ public class JupiterDocumentServer implements JupiterServer{
 //	public int requestSyncCounter = 0;
 	
 	
+	public JupiterDocumentServer(RequestForwarder forwarder){
+		proxies = new HashMap<JID, JupiterClient>();
+		requestList = new Vector<Request>();
+		this.outgoingQueue = new Vector<Request>();
+
+		this.outgoing = forwarder;
+		serializer = new Serializer(this);
+	}
+	
 	public JupiterDocumentServer(){
 		proxies = new HashMap<JID, JupiterClient>();
 		requestList = new Vector<Request>();
@@ -47,15 +57,6 @@ public class JupiterDocumentServer implements JupiterServer{
 //		this.outgoing = forwarder;
 		serializer = new Serializer(this);
 	}
-	
-//	public JupiterDocumentServer(RequestForwarder forwarder){
-//		proxies = new HashMap<JID, JupiterClient>();
-//		requestList = new Vector<Request>();
-//		this.outgoingQueue = new Vector<Request>();
-//
-////		this.outgoing = forwarder;
-//		serializer = new Serializer(this);
-//	}
 	
 	
 	
@@ -127,12 +128,13 @@ public class JupiterDocumentServer implements JupiterServer{
 	 */
 	public synchronized void forwardOutgoingRequest(Request req) {
 		/* add request to outgoing queue. */
-		outgoingQueue.add(req);
-		
+		if(outgoing == null){
+			outgoingQueue.add(req);
+		}else{
+			outgoing.forwardOutgoingRequest(req);
+		}
 		logger.debug("add request to outgoing queue : "+req.getJID()+" "+req.getOperation());
 		notifyAll();
-		
-//		outgoing.forwardOutgoingRequest(req);
 	}
 
 	/**
@@ -140,14 +142,19 @@ public class JupiterDocumentServer implements JupiterServer{
 	 */
 	public synchronized Request getNextOutgoingRequest() throws InterruptedException {
 		Request req = null;
-		/* get next message and transfer to client.*/
-		while(!(outgoingQueue.size() >0)){
-			wait();
-		}
-		/* remove first queue element. */
-		req = outgoingQueue.remove(0);
+		if(outgoing == null){
+			/* get next message and transfer to client.*/
+			while(!(outgoingQueue.size() >0)){
+				wait();
+			}
+			/* remove first queue element. */
+			req = outgoingQueue.remove(0);
 		
-		logger.debug("read next request from outgoing queue: "+req.getJID()+" "+req.getOperation());
+			logger.debug("read next request from outgoing queue: "+req.getJID()+" "+req.getOperation());
+		}
+		else{
+			req = outgoing.getNextOutgoingRequest();
+		}
 		return req;
 		
 //		return outgoing.getNextOutgoingRequest();

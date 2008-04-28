@@ -170,7 +170,7 @@ public class SharedProject implements ISharedProject {
 		 * and added new driver to driverlist*/
 		
 		//host
-		if(activitySequencer.getConcurrentManager() != null && activitySequencer.getConcurrentManager().isHost()){
+		if(activitySequencer.getConcurrentManager() != null && activitySequencer.getConcurrentManager().isHostSide()){
 			// if replicated=false check for privileges
 			if (driver.equals(this.driver))
 				return;
@@ -218,9 +218,11 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.ISharedProject
 	 */
 	public boolean isDriver() {
-//		if(activitySequencer.getConcurrentManager() != null){
-//			return activitySequencer.getConcurrentManager().isDriver(driver);
-//		}
+		//HOST
+		if(activitySequencer.getConcurrentManager() != null && activitySequencer.getConcurrentManager().isHostSide()){
+			return activitySequencer.getConcurrentManager().isDriver(driver);
+		}
+		//CLIENT
 		return driver.getJid().equals(myID);
 	}
 
