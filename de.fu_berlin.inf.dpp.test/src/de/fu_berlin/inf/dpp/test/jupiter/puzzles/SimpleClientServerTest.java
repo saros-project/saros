@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.jupiter;
+package de.fu_berlin.inf.dpp.test.jupiter.puzzles;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

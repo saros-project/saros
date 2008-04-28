@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.jupiter;
+package de.fu_berlin.inf.dpp.test.jupiter.puzzles;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;

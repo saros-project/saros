@@ -12,6 +12,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -128,6 +129,13 @@ public class StubXMPPTransmitter implements ITransmitter, FileTransferListener{
 
 	public void sendProjectArchive(JID recipient, IProject project,
 			File archive, IFileTransferCallback callback) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void sendActivitiyTo(ISharedProject sharedProject,
+			IActivity activity, JID jid) {
 		// TODO Auto-generated method stub
 		
 	}

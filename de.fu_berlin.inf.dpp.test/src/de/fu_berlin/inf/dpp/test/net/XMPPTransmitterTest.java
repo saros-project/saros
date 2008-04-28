@@ -22,6 +22,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -339,6 +340,12 @@ public class XMPPTransmitterTest extends TestCase implements
 	}
 
 	public void setTransferMode(TransferMode mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sendActivitiyTo(ISharedProject sharedProject,
+			IActivity activity, JID jid) {
 		// TODO Auto-generated method stub
 		
 	}

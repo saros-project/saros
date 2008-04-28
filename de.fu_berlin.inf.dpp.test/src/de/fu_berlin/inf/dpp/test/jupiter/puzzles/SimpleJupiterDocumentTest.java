@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.test.jupiter;
+package de.fu_berlin.inf.dpp.test.jupiter.puzzles;
 /**
  * This test class represent local execution of document changes and 
  * appropriate jupiter operations.
