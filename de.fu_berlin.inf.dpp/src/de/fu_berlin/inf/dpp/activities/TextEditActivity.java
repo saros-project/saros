@@ -110,7 +110,7 @@ public class TextEditActivity implements IActivity {
 		if(obj instanceof TextEditActivity){
 			TextEditActivity other = (TextEditActivity) obj;
 			return	offset == other.offset && 
-					editor.equals(other.editor) &&
+					(editor != null && other.editor != null && editor.equals(other.editor)) &&
 					text.equals(other.text) && 
 					replace == other.replace ;
 		}

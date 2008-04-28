@@ -357,7 +357,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		if (!isDriver)
 			return;
 
-		TextEditActivity newAct = new TextEditActivity(offset, text, replace);
+		TextEditActivity newAct = new TextEditActivity(offset, text, replace,activeDriverEditor);
 		/* check if text edit activity is executed by other driver activity recently. */
 		//TODO: check scenario of concurrent edit in same position.
 		if(newAct.sameLike(currentExecuteActivity)){

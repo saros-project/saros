@@ -218,9 +218,9 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.ISharedProject
 	 */
 	public boolean isDriver() {
-		if(activitySequencer.getConcurrentManager() != null){
-			return activitySequencer.getConcurrentManager().isDriver(driver);
-		}
+//		if(activitySequencer.getConcurrentManager() != null){
+//			return activitySequencer.getConcurrentManager().isDriver(driver);
+//		}
 		return driver.getJid().equals(myID);
 	}
 
