@@ -380,14 +380,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendActivitiyTo(de.fu_berlin.inf.dpp.project.ISharedProject, java.util.List, de.fu_berlin.inf.dpp.net.JID)
-	 */
-	public void sendJupiterRequest(ISharedProject sharedProject,
-			Request request, JID jid) {
-		sendMessage(request.getJID(), new RequestPacketExtension(request));
-	}
+
 	
 	private void sendFileListWithJingle(JID recipient, String fileListContent) {
 		JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
@@ -1020,6 +1013,28 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendActivitiyTo(de.fu_berlin.inf.dpp.project.ISharedProject, java.util.List, de.fu_berlin.inf.dpp.net.JID)
+	 */
+	public void sendJupiterRequest(ISharedProject sharedProject,
+			Request request, JID jid) {
+		sendMessage(request.getJID(), new RequestPacketExtension(request));
+	}
+	
+	public void processRequest(Packet packet) {
+		Message message = (Message) packet;
+		
+		RequestPacketExtension packetExtension = PacketExtensions.getJupiterRequestExtension(message);
+		
+		if(packetExtension != null){
+			log.info("Received request : "+packetExtension.getRequest().toString());
+		}else{
+			log.error("Failure in request packet extension.");
+		}
+		
+	}
+	
 	// TODO replace dependencies by more generic listener interfaces
 	/*
 	 * (non-Javadoc)
@@ -2026,6 +2041,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 		log.debug("incoming file");
 		receiveResource(data, input);
 	}
+
+
 
 
 

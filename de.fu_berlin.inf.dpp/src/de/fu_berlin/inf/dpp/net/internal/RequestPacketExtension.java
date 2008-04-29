@@ -79,6 +79,7 @@ public class RequestPacketExtension  implements PacketExtension{
 
 		StringBuffer buf = new StringBuffer();
 		buf.append("<").append(getElementName());
+		buf.append(" xmlns=\"").append(getNamespace()+"\"");
 		
 //		buf.append(" xmlns=\"").append(getNamespace()).append("\">");
 		

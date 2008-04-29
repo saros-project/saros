@@ -372,6 +372,15 @@ public class MultiUserChatManager implements InvitationListener,
 		if (packet instanceof Message) {
 
 			Message message = (Message) packet;
+			
+			RequestPacketExtension packetExtension = (RequestPacketExtension)message.getExtension(RequestPacketExtension.ELEMENT,
+					RequestPacketExtension.NAMESPACE);
+			if(packetExtension != null){
+				log.error("Request packet in MUC room not allowed. "+packetExtension.getRequest());
+				return;
+			}
+			
+			
 			PacketProtokollLogger.getInstance().receivePacket(message);
 			/**
 			 * 1. check getFrom JID. Host can send muc message and shouldn't
@@ -403,16 +412,16 @@ public class MultiUserChatManager implements InvitationListener,
 
 		}
 
-		if (packet instanceof Message) {
-			Message msg = (Message) packet;
-			// System.out.println("from " + msg.getFrom().replace(Room + "/",
-			// "")
-			// + " text: " + msg.getBody());
-			log.info("received message : +" + msg.getBody() + " from "
-					+ msg.getProperty("jid"));
-		} else {
-			System.out.println("other formated message received. ");
-		}
+//		if (packet instanceof Message) {
+//			Message msg = (Message) packet;
+//			// System.out.println("from " + msg.getFrom().replace(Room + "/",
+//			// "")
+//			// + " text: " + msg.getBody());
+//			log.info("received message : +" + msg.getBody() + " from "
+//					+ msg.getProperty("jid"));
+//		} else {
+//			System.out.println("other formated message received. ");
+//		}
 	}
 
 	public void invitationReceived(XMPPConnection conn, String room,

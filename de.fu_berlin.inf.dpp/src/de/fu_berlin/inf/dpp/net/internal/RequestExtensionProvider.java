@@ -43,7 +43,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider{
 				if(parser.getName().equals(RequestPacketExtension.ELEMENT)){
 					parser.next();
 				}
-				
+
 				if (parser.getName().equals(RequestPacketExtension.PATH)) {
 					path = parsePath(parser);
 					parser.next();

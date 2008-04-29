@@ -79,6 +79,8 @@ public class PacketExtensions {
 		ProviderManager providermanager = ProviderManager.getInstance();
 		providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
 				new ActivitiesProvider());
+		providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT, RequestPacketExtension.NAMESPACE,
+				new RequestExtensionProvider());
 		
 		//TODO: Änderung für Smack 3
 //		ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
@@ -220,6 +222,11 @@ public class PacketExtensions {
 			NAMESPACE);
 	}
 
+	public static RequestPacketExtension getJupiterRequestExtension(Message message) {
+		return (RequestPacketExtension) message.getExtension(RequestPacketExtension.ELEMENT,
+			NAMESPACE);
+	}
+	
 	private static DefaultPacketExtension createExtension(String element) {
 		DefaultPacketExtension extension = new DefaultPacketExtension(element, NAMESPACE);
 		extension.setValue(element, "");

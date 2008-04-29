@@ -41,7 +41,15 @@ public class PrivateChatManager implements IChatManager{
 	 */
 	public void processPacket(Packet packet) {
 		log.debug("incoming packet");
-		receiver.processPacket(packet);
+		Message message = (Message) packet;
+		
+		RequestPacketExtension packetExtension = PacketExtensions.getJupiterRequestExtension(message);
+		
+		if(packetExtension != null){
+			receiver.processRequest(packet);
+		}else{
+			receiver.processPacket(packet);
+		}
 		
 	}
 
