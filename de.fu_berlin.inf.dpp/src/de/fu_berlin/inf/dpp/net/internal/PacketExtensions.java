@@ -71,6 +71,7 @@ public class PacketExtensions {
 	public static final String DT_SPLIT = "DTSPLIT";
 
 	public static final String DT_DATA = "DATA_BASE64";
+	
 
 	
 	public static void hookExtensionProviders() {

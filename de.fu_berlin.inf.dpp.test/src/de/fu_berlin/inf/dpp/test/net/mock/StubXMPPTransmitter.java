@@ -13,6 +13,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -136,6 +137,13 @@ public class StubXMPPTransmitter implements ITransmitter, FileTransferListener{
 
 	public void sendActivitiyTo(ISharedProject sharedProject,
 			IActivity activity, JID jid) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void sendJupiterRequest(ISharedProject sharedProject,
+			Request request, JID jid) {
 		// TODO Auto-generated method stub
 		
 	}

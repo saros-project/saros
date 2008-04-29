@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -383,10 +384,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * (non-Javadoc)
 	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendActivitiyTo(de.fu_berlin.inf.dpp.project.ISharedProject, java.util.List, de.fu_berlin.inf.dpp.net.JID)
 	 */
-	public void sendActivitiyTo(ISharedProject sharedProject,
-			IActivity activity, JID jid) {
-		// TODO Auto-generated method stub
-		
+	public void sendJupiterRequest(ISharedProject sharedProject,
+			Request request, JID jid) {
+		sendMessage(request.getJID(), new RequestPacketExtension(request));
 	}
 	
 	private void sendFileListWithJingle(JID recipient, String fileListContent) {

@@ -26,6 +26,7 @@ import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.packet.DiscoverItems.Item;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.IChatManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -486,7 +487,7 @@ public class MultiUserChatManager implements InvitationListener,
 		return false;
 	}
 
-	public void sendActivity() {
+	public void sendRequest(Request request) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -29,6 +29,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -240,6 +241,6 @@ public interface ITransmitter {
 	 * @param jid
 	 * 			  the recipient
 	 */
-	public void sendActivitiyTo(ISharedProject sharedProject, IActivity activity, JID jid);
+	public void sendJupiterRequest(ISharedProject sharedProject, Request request, JID jid);
 	
 }

@@ -1,11 +1,16 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.IChatManager;
 import de.fu_berlin.inf.dpp.net.IReceiver;
 
@@ -63,9 +68,28 @@ public class PrivateChatManager implements IChatManager{
 		return false;
 	}
 
-	public void sendActivity() {
+	public void sendRequest(Request request) {
 		// TODO Auto-generated method stub
-		
+//		log.info("Sent request: " + request);
+//		try {
+//			/* create new message for multi chat. */
+//			Message newMessage = muc.createMessage();
+//			/* add packet extension. */
+//			newMessage.addExtension(new ActivitiesPacketExtension(activities));
+//			/* add jid property */
+//			newMessage.setProperty(JID_PROPERTY, Saros.getDefault().getMyJID()
+//					.toString());
+//
+//			// newMessage.setBody("test");
+//			muc.sendMessage(newMessage);
+//			PacketProtokollLogger.getInstance().sendPacket(newMessage);
+//
+//		} catch (XMPPException e) {
+//
+//			Saros.getDefault().getLog().log(
+//					new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+//							"Could not send message, message queued", e));
+//		}
 	}
 
 
