@@ -62,6 +62,7 @@ public class JupiterDocumentServer implements JupiterServer{
 	
 	public synchronized void addProxyClient(JID jid) {
 		JupiterClient proxy = new ProxyJupiterDocument(jid,this);
+		proxy.setEditor(editor);
 //		/* add to serializer. */
 //		waitForSerializer = true;
 		//TODO: Sync with serializer before add action.

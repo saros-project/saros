@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
@@ -48,6 +49,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	private Side side;
 
 	private RequestForwarder forwarder;
+	
+	private IActivitySequencer sequencer;
 
 	public ConcurrentDocumentManager(Side side, User host, JID myJID) {
 
@@ -62,6 +65,10 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		this.myJID = myJID;
 	}
 
+	public void setActivitySequencer(IActivitySequencer sequencer){
+		this.sequencer = sequencer;
+	}
+	
 	public void setRequestForwarder(RequestForwarder f) {
 		this.forwarder = f;
 	}
@@ -88,12 +95,181 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		return drivers.contains(jid);
 	}
 
+	/**
+	 * 
+	 */
 	public IActivity activityCreated(IActivity activity) {
 
-		createdTextEditActivity(activity);
 		// editorActivitiy(activity, true);
+		
+		if(createdTextEditActivity(activity)){
+			/* handled by jupiter and is sended by request transmitting. */
+			return null;
+		}
+		return activity;
+	}
+
+
+
+	/**
+	 * handles text edit activities with jupiter. 
+	 * @param activity
+	 * @return true if activity is transformed with jupiter.
+	 */
+	private boolean createdTextEditActivity(IActivity activity) {
+
+		if (activity instanceof TextEditActivity) {
+			TextEditActivity textEdit = (TextEditActivity) activity;
+			// if (!isHostSide()) {
+			/**
+			 * lokal erzeugte operation beim client 1. Aufruf von
+			 * generateRequest beim client. Änderungen wurden bereits im Editor
+			 * geschrieben. 2. versenden der Änderungen an Server (später)
+			 */
+			JupiterClient jupClient = null;
+			/* no jupiter client already exists for this editor text edit */
+			if (!clientDocs.containsKey(textEdit.getEditor())) {
+				jupClient = new JupiterDocumentClient(this.myJID,
+						this.forwarder);
+				jupClient.setEditor(textEdit.getEditor());
+				clientDocs.put(textEdit.getEditor(), jupClient);
+			}
+
+			/* generate request. */
+			jupClient = clientDocs.get(textEdit.getEditor());
+			if (jupClient != null) {
+				Operation op = getOperation(textEdit);
+				/* sync with local jupiter client */
+				Request req = jupClient.generateRequest(op);
+				
+				
+				/* already set and forward inside of jup client.*/
+//				/* add appropriate Editor path. */
+//				req.setEditorPath(textEdit.getEditor());
+//				/* transmit request */
+//				forwarder.forwardOutgoingRequest(req);
+				return true;
+			}
+			// }
+		}
+		return false;
+	}
+
+	private TextEditActivity execTextEditActivity(Request request) {
+
+		// if (!isHostSide()) {
+		/**
+		 * lokal erzeugte operation beim client 1. Aufruf von generateRequest
+		 * beim client. Änderungen wurden bereits im Editor geschrieben. 2.
+		 * versenden der Änderungen an Server (später)
+		 */
+		JupiterClient jupClient = null;
+		/* no jupiter client already exists for this editor text edit */
+		if (!clientDocs.containsKey(request.getEditorPath())) {
+			jupClient = new JupiterDocumentClient(this.myJID, this.forwarder);
+			jupClient.setEditor(request.getEditorPath());
+			clientDocs.put(request.getEditorPath(), jupClient);
+		}
+
+		/* generate request. */
+		jupClient = clientDocs.get(request.getEditorPath());
+		if (jupClient != null) {
+			/* operational transformation. */
+			Operation op;
+			try {
+				op = jupClient.receiveRequest(request);
+			} catch (TransformationException e) {
+				logger.error("Error during transformation: ", e);
+				return null;
+			}
+
+			TextEditActivity textEdit = getTextEditActivity(op);
+			textEdit.setEditor(request.getEditorPath());
+			textEdit.setSource(request.getJID().toString());
+			/* execute activity in activity sequencer. */
+			sequencer.execTransformedActivity(textEdit);
+			return textEdit;
+		}
+		// }
+		return null;
+	}
+
+	public IActivity exec(IActivity activity) {
+
+		if(activity instanceof TextEditActivity){
+			//check for jupiter client documents
+			TextEditActivity text = (TextEditActivity) activity;
+			if(clientDocs.containsKey(text.getEditor())){
+				/* activity have to be transformed with jupiter on this client.*/
+				return null;
+			}
+		}
 
 		return activity;
+	}
+
+	public boolean isHostSide() {
+		if (side == Side.HOST_SIDE) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean isHost(JID jid) {
+		if (jid.equals(host.getJid())) {
+			return true;
+		}
+		return false;
+	}
+
+	public void setHost(User host) {
+		this.host = host;
+	}
+
+	/**
+	 * convert TextEditActivity to Operation op
+	 * 
+	 * @param text
+	 * @return
+	 */
+	public Operation getOperation(TextEditActivity text) {
+		Operation op = null;
+		// delete activity
+		if (text.replace > 0 && text.text.length() == 0) {
+			/* string placeholder in length of delete area. */
+			String placeholder = ((1 / 10) * (text.replace - text.offset)) + "";
+			op = new DeleteOperation(text.offset, placeholder);
+		}
+		// insert activity
+		if (text.replace == 0 && text.text.length() > 0) {
+			op = new InsertOperation(text.offset, text.text);
+		}
+		return op;
+	}
+
+	/**
+	 * convert Operation op to text edit activity
+	 * 
+	 * @param op
+	 * @return
+	 */
+	public TextEditActivity getTextEditActivity(Operation op) {
+		TextEditActivity textEdit = null;
+		if (op instanceof DeleteOperation) {
+			DeleteOperation del = (DeleteOperation) op;
+			textEdit = new TextEditActivity(del.getPosition(), del.getText(), del
+					.getTextLength());
+		}
+		if (op instanceof InsertOperation) {
+			InsertOperation ins = (InsertOperation) op;
+			textEdit = new TextEditActivity(ins.getPosition(), ins.getText(), 0);
+		}
+		if (op instanceof SplitOperation) {
+			// TODO: implements later:
+			logger.warn("Split Operation have to be implements.");
+		}
+
+		return textEdit;
 	}
 
 	private void editorActivitiy(IActivity activity, boolean local) {
@@ -176,147 +352,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 			}
 		}
 	}
-
-	private void createdTextEditActivity(IActivity activity) {
-
-		if (activity instanceof TextEditActivity) {
-			TextEditActivity textEdit = (TextEditActivity) activity;
-			// if (!isHostSide()) {
-			/**
-			 * lokal erzeugte operation beim client 1. Aufruf von
-			 * generateRequest beim client. Änderungen wurden bereits im Editor
-			 * geschrieben. 2. versenden der Änderungen an Server (später)
-			 */
-			JupiterClient jupClient = null;
-			/* no jupiter client already exists for this editor text edit */
-			if (!clientDocs.containsKey(textEdit.getEditor())) {
-				jupClient = new JupiterDocumentClient(this.myJID,
-						this.forwarder);
-				jupClient.setEditor(textEdit.getEditor());
-				clientDocs.put(textEdit.getEditor(), jupClient);
-			}
-
-			/* generate request. */
-			jupClient = clientDocs.get(textEdit.getEditor());
-			if (jupClient != null) {
-				Operation op = getOperation(textEdit);
-				/* sync with local jupiter client */
-				Request req = jupClient.generateRequest(op);
-				/* add appropriate Editor path. */
-				req.setEditorPath(textEdit.getEditor());
-				/* transmit request */
-				forwarder.forwardOutgoingRequest(req);
-			}
-			// }
-		}
-	}
-
-	private TextEditActivity execTextEditActivity(Request request) {
-
-		// if (!isHostSide()) {
-		/**
-		 * lokal erzeugte operation beim client 1. Aufruf von generateRequest
-		 * beim client. Änderungen wurden bereits im Editor geschrieben. 2.
-		 * versenden der Änderungen an Server (später)
-		 */
-		JupiterClient jupClient = null;
-		/* no jupiter client already exists for this editor text edit */
-		if (!clientDocs.containsKey(request.getEditorPath())) {
-			jupClient = new JupiterDocumentClient(this.myJID, this.forwarder);
-			jupClient.setEditor(request.getEditorPath());
-			clientDocs.put(request.getEditorPath(), jupClient);
-		}
-
-		/* generate request. */
-		jupClient = clientDocs.get(request.getEditorPath());
-		if (jupClient != null) {
-			/* operational transformation. */
-			Operation op;
-			try {
-				op = jupClient.receiveRequest(request);
-			} catch (TransformationException e) {
-				logger.error("Error during transformation: ", e);
-				return null;
-			}
-
-			TextEditActivity textEdit = getTextEditActivity(op);
-			return textEdit;
-		}
-		// }
-		return null;
-	}
-
-	public IActivity exec(IActivity activity) {
-
-		// editorActivitiy(activity, false);
-
-		return activity;
-	}
-
-	public boolean isHostSide() {
-		if (side == Side.HOST_SIDE) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isHost(JID jid) {
-		if (jid.equals(host.getJid())) {
-			return true;
-		}
-		return false;
-	}
-
-	public void setHost(User host) {
-		this.host = host;
-	}
-
-	/**
-	 * convert TextEditActivity to Operation op
-	 * 
-	 * @param text
-	 * @return
-	 */
-	public Operation getOperation(TextEditActivity text) {
-		Operation op = null;
-		// delete activity
-		if (text.replace > 0 && text.text.length() == 0) {
-			/* string placeholder in length of delete area. */
-			String placeholder = ((1 / 10) * (text.replace - text.offset)) + "";
-			op = new DeleteOperation(text.offset, placeholder);
-		}
-		// insert activity
-		if (text.replace == 0 && text.text.length() > 0) {
-			op = new InsertOperation(text.offset, text.text);
-		}
-		return op;
-	}
-
-	/**
-	 * convert Operation op to text edit activity
-	 * 
-	 * @param op
-	 * @return
-	 */
-	public TextEditActivity getTextEditActivity(Operation op) {
-		TextEditActivity textEdit = null;
-		if (op instanceof DeleteOperation) {
-			DeleteOperation del = (DeleteOperation) op;
-			textEdit = new TextEditActivity(del.getPosition(), "", del
-					.getTextLength());
-		}
-		if (op instanceof InsertOperation) {
-			InsertOperation ins = (InsertOperation) op;
-			textEdit = new TextEditActivity(ins.getPosition(), ins.getText(), 0);
-		}
-		if (op instanceof SplitOperation) {
-			// TODO: implements later:
-			logger.warn("Split Operation have to be implements.");
-		}
-
-		return textEdit;
-	}
-
 	/*
 	 * 1. hinzufügen und löschen von jupiter servern 2. list mit transmitter
 	 * threads, die Nachrichten aus den outgoing queues versenden. 3.

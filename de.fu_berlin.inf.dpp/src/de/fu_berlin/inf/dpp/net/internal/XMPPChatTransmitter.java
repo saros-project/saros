@@ -1019,7 +1019,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 */
 	public void sendJupiterRequest(ISharedProject sharedProject,
 			Request request, JID jid) {
-		sendMessage(request.getJID(), new RequestPacketExtension(request));
+		log.debug("send request to : "+jid+ " request: "+request);
+		sendMessage(jid, new RequestPacketExtension(request));
 	}
 	
 	public void processRequest(Packet packet) {
@@ -1028,7 +1029,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 		RequestPacketExtension packetExtension = PacketExtensions.getJupiterRequestExtension(message);
 		
 		if(packetExtension != null){
+			ISharedProject project = Saros.getDefault().getSessionManager()
+			.getSharedProject();
 			log.info("Received request : "+packetExtension.getRequest().toString());
+			project.getSequencer().receiveRequest(packetExtension.getRequest());
+			
 		}else{
 			log.error("Failure in request packet extension.");
 		}

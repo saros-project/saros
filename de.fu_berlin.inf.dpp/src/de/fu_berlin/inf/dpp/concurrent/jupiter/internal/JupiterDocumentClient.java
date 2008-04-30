@@ -42,6 +42,7 @@ public class JupiterDocumentClient implements JupiterClient {
 		logger.debug(jid.toString()+" client generate request for "+op);
 		req = jupiter.generateRequest(op);
 		req.setJID(this.jid);
+		req.setEditorPath(editor);
 		/* send request*/
 		forwarder.forwardOutgoingRequest(req);
 		

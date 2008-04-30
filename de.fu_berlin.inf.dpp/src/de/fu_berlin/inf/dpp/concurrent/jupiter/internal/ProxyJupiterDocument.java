@@ -29,6 +29,8 @@ public class ProxyJupiterDocument implements JupiterClient{
 	/** forwarder send request to client. */
 	private RequestForwarder forwarder;
 	
+	private IPath editor;
+	
 	public ProxyJupiterDocument(JID jid, RequestForwarder forwarder){
 		this.jid = jid;
 		jupiter = new Jupiter(false);
@@ -41,6 +43,7 @@ public class ProxyJupiterDocument implements JupiterClient{
 		logger.debug(jid.toString()+" proxy client generate request for "+op);
 		req = jupiter.generateRequest(op);
 		req.setJID(this.jid);
+		req.setEditorPath(editor);
 		/* send request*/
 		forwarder.forwardOutgoingRequest(req);
 		
@@ -65,13 +68,12 @@ public class ProxyJupiterDocument implements JupiterClient{
 
 
 	public IPath getEditor() {
-		//implemented in jupiter server
-		return null;
+		return this.editor;
 	}
 
 
 	public void setEditor(IPath path) {
-		//implemented in jupiter server
+		this.editor = path;
 		
 	}
 

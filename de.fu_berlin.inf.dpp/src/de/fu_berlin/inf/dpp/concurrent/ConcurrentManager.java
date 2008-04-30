@@ -5,6 +5,7 @@ import java.util.List;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
+import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -18,6 +19,8 @@ public interface ConcurrentManager extends IRequestManager {
 		CLIENT_SIDE,
 		HOST_SIDE
 	}
+	
+	public void setActivitySequencer(IActivitySequencer sequencer);
 	
 	public void setRequestForwarder(RequestForwarder f);
 	

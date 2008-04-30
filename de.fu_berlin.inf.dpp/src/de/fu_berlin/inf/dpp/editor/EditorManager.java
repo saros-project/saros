@@ -357,17 +357,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		if (!isDriver)
 			return;
 
-		TextEditActivity newAct = new TextEditActivity(offset, text, replace,activeDriverEditor);
+		TextEditActivity activity = new TextEditActivity(offset, text, replace,activeDriverEditor);
 		/* check if text edit activity is executed by other driver activity recently. */
 		//TODO: check scenario of concurrent edit in same position.
-		if(newAct.sameLike(currentExecuteActivity)){
+		if(activity.sameLike(currentExecuteActivity)){
+			/* if activity is execute from remote client activity, 
+			 * send this activity to all.*/
+//			fireActivity(currentExecuteActivity);
 			return;
 		}
 		
 		/* if activity is create be this client. */
-		TextEditActivity activity = new TextEditActivity(offset, text, replace);
-		activity.setEditor(this.activeDriverEditor);
-		
+//		TextEditActivity activity = new TextEditActivity(offset, text, replace);
+//		activity.setEditor(this.activeDriverEditor);
+//		
 		fireActivity(activity);
 
 		IEditorInput input = editorAPI.getActiveEditor().getEditorInput();
@@ -495,10 +498,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 					log.severe("Received text edit but have no driver editor");
 					return;
 				}
-
+				//TODO: change getActiveEditor to IActivity.getEditorPath()
 				IPath driverEditor = getActiveDriverEditor();
-				IFile file = sharedProject.getProject().getFile(driverEditor);
-
+				IFile file = null;
+				/* if concurrent driver edited another document, get the right file. */
+				if(textEdit.getEditor() != null && driverEditor.equals(textEdit.getEditor())){
+					file = sharedProject.getProject().getFile(driverEditor);
+				}else{
+					file = sharedProject.getProject().getFile(textEdit.getEditor());
+				}
 				String text = fixDelimiters(file, textEdit.text);
 				replaceText(file, textEdit.offset, textEdit.replace, text);
 

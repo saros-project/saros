@@ -51,7 +51,7 @@ public class PacketProtokollLogger {
 	public void sendPacket(Message msg){
 //		Date send = Calendar.getInstance().getTime();
 //		logger.info(msg.getFrom()+" "+msg.getThread()+" send : "+DateFormat.getDateTimeInstance().format(send));
-		logger.info(Saros.getDefault().getMyJID().getName()+" send : "+msg.getPacketID());
+//		logger.info(Saros.getDefault().getMyJID().getName()+" send : "+msg.getPacketID());
 	}
 	
 	/**
@@ -60,6 +60,6 @@ public class PacketProtokollLogger {
 	 */
 	public void receivePacket(Message msg){
 		
-		logger.info(Saros.getDefault().getMyJID().getName()+" receive : "+msg.getPacketID());
+//		logger.info(Saros.getDefault().getMyJID().getName()+" receive : "+msg.getPacketID());
 	}
 }

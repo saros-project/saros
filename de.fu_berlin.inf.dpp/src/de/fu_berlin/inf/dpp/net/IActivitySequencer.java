@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 
 /**
@@ -34,6 +35,8 @@ public interface IActivitySequencer extends IActivityListener {
 	 * @param activity
 	 */
 	public void exec(TimedActivity activity);
+	
+	public void execTransformedActivity(IActivity activity);
 
 	/**
 	 * @return the log of flushed activities.
@@ -48,4 +51,6 @@ public interface IActivitySequencer extends IActivityListener {
 	public List<TimedActivity> getActivityHistory();
 	
 	public int getQueuedActivities();
+	
+	public IActivity receiveRequest(Request request);
 }

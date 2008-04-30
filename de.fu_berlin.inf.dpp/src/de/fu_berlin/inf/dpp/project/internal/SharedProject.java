@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
@@ -344,6 +345,7 @@ public class SharedProject implements ISharedProject {
 	}
 
 	public Timer flushTimer = new Timer(true);
+	public Thread requestTransmitter = null;
 	private static int queuedsince=0;
 	/*
 	 * (non-Javadoc)
@@ -386,6 +388,19 @@ public class SharedProject implements ISharedProject {
 					queuedsince=0;
 			}
 		}, 0, MILLIS_UPDATE);
+		
+		/* 2. start thread for sending jupiter requests.*/
+		requestTransmitter = new Thread(new Runnable(){
+
+			public void run() {
+				while(true){
+					sendRequest();
+				}
+				
+			}
+			
+		});
+		requestTransmitter.start();
 	}
 
 	/*
@@ -395,6 +410,7 @@ public class SharedProject implements ISharedProject {
 	 */
 	public void stop() {
 		flushTimer.cancel();
+		requestTransmitter = null;
 	}
 
 	/*
@@ -556,5 +572,23 @@ public class SharedProject implements ISharedProject {
 			}
 		});
 
+	}
+	
+	public void sendRequest(){
+		try {
+//			Request request = outgoing.getNextOutgoingRequest();
+			Request request = activitySequencer.getNextOutgoingRequest();
+			if(isHost()){
+			/* send operation to client. */
+			transmitter.sendJupiterRequest(this, request, request.getJID());
+			}
+			else{
+				transmitter.sendJupiterRequest(this, request, host.getJid());
+			}
+//			connection.sendOperation(new NetworkRequest(this.jid,request.getJID(),request), 0);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
 	}
 }
