@@ -237,8 +237,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		// delete activity
 		if (text.replace > 0 && text.text.length() == 0) {
 			/* string placeholder in length of delete area. */
-			String placeholder = ((1 / 10) * (text.replace - text.offset)) + "";
-			op = new DeleteOperation(text.offset, placeholder);
+//			String placeholder = ((10) * (5)) + "";
+			op = new DeleteOperation(text.offset, text.replace+"");
 		}
 		// insert activity
 		if (text.replace == 0 && text.text.length() > 0) {
@@ -257,8 +257,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		TextEditActivity textEdit = null;
 		if (op instanceof DeleteOperation) {
 			DeleteOperation del = (DeleteOperation) op;
-			textEdit = new TextEditActivity(del.getPosition(), del.getText(), del
-					.getTextLength());
+			textEdit = new TextEditActivity(del.getPosition(), "", Integer.parseInt(del.getText()));
 		}
 		if (op instanceof InsertOperation) {
 			InsertOperation ins = (InsertOperation) op;
