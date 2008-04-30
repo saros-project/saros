@@ -1019,7 +1019,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 */
 	public void sendJupiterRequest(ISharedProject sharedProject,
 			Request request, JID jid) {
-		log.debug("send request to : "+jid+ " request: "+request);
+		log.info("send request to : "+jid+ " request: "+request);
 		sendMessage(jid, new RequestPacketExtension(request));
 	}
 	

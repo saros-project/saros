@@ -285,7 +285,7 @@ public class MultiUserChatManager implements InvitationListener,
 	public void sendActivities(ISharedProject sharedProject,
 			List<TimedActivity> activities) {
 
-		log.info("Sent muc activities: " + activities);
+//		log.info("Sent muc activities: " + activities);
 		try {
 			/* create new message for multi chat. */
 			Message newMessage = muc.createMessage();
