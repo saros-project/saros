@@ -271,86 +271,87 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		return textEdit;
 	}
 
-	private void editorActivitiy(IActivity activity, boolean local) {
-		if (!isHostSide() || local) {
-			if (activity instanceof EditorActivity) {
-				EditorActivity editor = (EditorActivity) activity;
-				/* if new editor opened */
-				if (editor.getType() == Type.Activated) {
-					/* no jupiter client exists for this editor */
-					if (!clientDocs.containsKey(editor.getPath())) {
-						// TODO: add Request forwarder
-						JupiterClient jupiter = new JupiterDocumentClient(
-								myJID, null);
-						jupiter.setEditor(editor.getPath());
-						/* add to current docs */
-						clientDocs.put(editor.getPath(), jupiter);
-					}
-					// send EditorActivity to project host.
-
-				}
-				if (editor.getType() == Type.Closed) {
-					/* remove editor form jupiter concurrent mechanism. */
-					if (clientDocs.containsKey(editor.getPath())) {
-						clientDocs.remove(editor.getPath());
-					}
-				}
-			}
-		}
-		/* managing of jupiter server documents. */
-		if (isHostSide()) {
-			/* Editor activities. */
-			if (activity instanceof EditorActivity) {
-				EditorActivity editor = (EditorActivity) activity;
-				/* if new editor opened */
-				if (editor.getType() == Type.Activated) {
-					/* create new jupiter document server. */
-					if (!concurrentDocuments.containsKey(editor.getPath())) {
-						JupiterDocumentServer jup = new JupiterDocumentServer(
-								forwarder);
-						jup.setEditor(editor.getPath());
-
-						/* create host proxy */
-						jup.addProxyClient(host.getJid());
-						/* create client proxy if remote activity. */
-						if (!local) {
-							jup.addProxyClient(new JID(editor.getSource()));
-						}
-						/* add to server list. */
-						concurrentDocuments.put(editor.getPath(), jup);
-
-						/*
-						 * create host jupiter client for local request
-						 * handling.
-						 */
-						if (!clientDocs.containsKey(editor.getPath())) {
-							JupiterClient jupiter = new JupiterDocumentClient(
-									myJID, null);
-							jupiter.setEditor(editor.getPath());
-						}
-
-					}
-				}
-				/* if document closed. */
-				if (editor.getType() == Type.Closed) {
-					if (!local) {
-						/* remove remote client from proxy list. */
-						JupiterDocumentServer serverDoc = concurrentDocuments
-								.get(editor.getPath());
-						if (serverDoc != null) {
-							/* remove remote client. */
-							serverDoc.removeProxyClient(new JID(editor
-									.getSource()));
-							/* TODO: if only host is exists. */
-							// if(serverDoc.getProxies().size() == 1){
-							//								
-							// }
-						}
-					}
-				}
-			}
-		}
-	}
+//	private void editorActivitiy(IActivity activity, boolean local) {
+//		if (!isHostSide() || local) {
+//			if (activity instanceof EditorActivity) {
+//				EditorActivity editor = (EditorActivity) activity;
+//				/* if new editor opened */
+//				if (editor.getType() == Type.Activated) {
+//					/* no jupiter client exists for this editor */
+//					if (!clientDocs.containsKey(editor.getPath())) {
+//						// TODO: add Request forwarder
+//						JupiterClient jupiter = new JupiterDocumentClient(
+//								myJID, null);
+//						jupiter.setEditor(editor.getPath());
+//						/* add to current docs */
+//						clientDocs.put(editor.getPath(), jupiter);
+//					}
+//					// send EditorActivity to project host.
+//
+//				}
+//				if (editor.getType() == Type.Closed) {
+//					/* remove editor form jupiter concurrent mechanism. */
+//					if (clientDocs.containsKey(editor.getPath())) {
+//						clientDocs.remove(editor.getPath());
+//					}
+//				}
+//			}
+//		}
+//		/* managing of jupiter server documents. */
+//		if (isHostSide()) {
+//			/* Editor activities. */
+//			if (activity instanceof EditorActivity) {
+//				EditorActivity editor = (EditorActivity) activity;
+//				/* if new editor opened */
+//				if (editor.getType() == Type.Activated) {
+//					/* create new jupiter document server. */
+//					if (!concurrentDocuments.containsKey(editor.getPath())) {
+//						JupiterDocumentServer jup = new JupiterDocumentServer(
+//								forwarder);
+//						jup.setEditor(editor.getPath());
+//
+//						/* create host proxy */
+//						jup.addProxyClient(host.getJid());
+//						/* create client proxy if remote activity. */
+//						if (!local) {
+//							jup.addProxyClient(new JID(editor.getSource()));
+//						}
+//						/* add to server list. */
+//						concurrentDocuments.put(editor.getPath(), jup);
+//
+//						/*
+//						 * create host jupiter client for local request
+//						 * handling.
+//						 */
+//						if (!clientDocs.containsKey(editor.getPath())) {
+//							JupiterClient jupiter = new JupiterDocumentClient(
+//									myJID, null);
+//							jupiter.setEditor(editor.getPath());
+//						}
+//
+//					}
+//				}
+//				/* if document closed. */
+//				if (editor.getType() == Type.Closed) {
+//					if (!local) {
+//						/* remove remote client from proxy list. */
+//						JupiterDocumentServer serverDoc = concurrentDocuments
+//								.get(editor.getPath());
+//						if (serverDoc != null) {
+//							/* remove remote client. */
+//							serverDoc.removeProxyClient(new JID(editor
+//									.getSource()));
+//							/* TODO: if only host is exists. */
+//							// if(serverDoc.getProxies().size() == 1){
+//							//								
+//							// }
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+	
 	/*
 	 * 1. hinzufügen und löschen von jupiter servern 2. list mit transmitter
 	 * threads, die Nachrichten aus den outgoing queues versenden. 3.
@@ -382,6 +383,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 			if (!concurrentDocuments.containsKey(request.getEditorPath())) {
 				/* create new document server. */
 				docServer = new JupiterDocumentServer(forwarder);
+//				docServer = new JupiterDocumentServer();
 				docServer.setEditor(request.getEditorPath());
 				/* create new local host document client. */
 				docServer.addProxyClient(host.getJid());

@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -34,21 +36,68 @@ public class JupiterDocumentServer implements JupiterServer{
 	private OperationSerializer serializer;
 	
 	private IPath editor;
+	/**
+	 * forward outgoing request to activity sequencer;
+	 */
+	private RequestTransmitter transmitter;
+	
 //	/** for add and remove client synchronization. */
 //	public boolean waitForSerializer = false;
 //	/** counter for remove client synchronization.*/
 //	public int requestSyncCounter = 0;
 	
+	class RequestTransmitter extends Thread{
+		
+		private final RequestForwarder rf;
+		private static final int MILLIS = 300;
+		
+		public RequestTransmitter(RequestForwarder forw){
+			this.rf = forw;
+		}
+		
+		public Timer flushTimer = new Timer(true);
+		
+		public void run(){
+			flushTimer.schedule(new TimerTask(){
+
+				@Override
+				public void run() {
+					/*forwarding */
+					try {
+						logger.debug("Forwarding requests to activity sequencer. ");
+						rf.forwardOutgoingRequest(getNextOutgoingRequest());
+						logger.debug("Forwarding is sended to activity sequencer. ");
+					} catch (InterruptedException e) {
+						logger.warn("Exception forwarding request.",e);
+					}
+					
+				}
+				
+			},0, MILLIS);
+		}
+		
+	}
 	
+	/**
+	 * this constructor init an external request forwarder.
+	 * The generate answer request of the proxy clients forwarding
+	 * to this forwarder.
+	 */
 	public JupiterDocumentServer(RequestForwarder forwarder){
 		proxies = new HashMap<JID, JupiterClient>();
 		requestList = new Vector<Request>();
 		this.outgoingQueue = new Vector<Request>();
-
-		this.outgoing = forwarder;
+		
+//		this.outgoing = forwarder;
 		serializer = new Serializer(this);
+		this.transmitter = new RequestTransmitter(forwarder);
+		transmitter.start();
 	}
 	
+	/**
+	 * default constructor. The server contains his own outgoing 
+	 * forwarding queue. 
+	 */
 	public JupiterDocumentServer(){
 		proxies = new HashMap<JID, JupiterClient>();
 		requestList = new Vector<Request>();
@@ -92,9 +141,9 @@ public class JupiterDocumentServer implements JupiterServer{
 		/**
 		 * add request to serialized queue. 
 		 */
-		requestList.add(request);
 		logger.debug("add new Request: "+request.getJID()+" "+request.getOperation());
-		notifyAll();
+		requestList.add(request);
+		notify();
 	}
 
 	/**
@@ -105,7 +154,7 @@ public class JupiterDocumentServer implements JupiterServer{
 		if(!(requestList.size() > 0)){
 			wait();
 		}
-		logger.debug("read out next request in queue!");
+		logger.debug("read out next request in queue! "+requestList.get(0).getJID()+requestList.get(0));
 		/*get next request. */
 		return requestList.remove(0);
 	}
@@ -117,7 +166,7 @@ public class JupiterDocumentServer implements JupiterServer{
 //		while(waitForSerializer && requestSyncCounter == 0){
 //			wait();
 //		}
-		
+		logger.debug("Get jupiter proxies.");
 		return proxies;
 	}
 	
@@ -129,13 +178,14 @@ public class JupiterDocumentServer implements JupiterServer{
 	 */
 	public synchronized void forwardOutgoingRequest(Request req) {
 		/* add request to outgoing queue. */
-		if(outgoing == null){
+//		if(outgoing == null){
 			outgoingQueue.add(req);
-		}else{
-			outgoing.forwardOutgoingRequest(req);
-		}
-		logger.debug("add request to outgoing queue : "+req.getJID()+" "+req.getOperation());
-		notifyAll();
+//		}else{
+//			/* forward request.*/
+//			outgoing.forwardOutgoingRequest(req);
+//		}
+		logger.debug("add request to outgoing queue : "+req.getJID()+" "+req);
+		notify();
 	}
 
 	/**
@@ -143,19 +193,19 @@ public class JupiterDocumentServer implements JupiterServer{
 	 */
 	public synchronized Request getNextOutgoingRequest() throws InterruptedException {
 		Request req = null;
-		if(outgoing == null){
+//		if(outgoing == null){
 			/* get next message and transfer to client.*/
 			while(!(outgoingQueue.size() >0)){
-				wait();
+				wait(200);
 			}
 			/* remove first queue element. */
 			req = outgoingQueue.remove(0);
-		
-			logger.debug("read next request from outgoing queue: "+req.getJID()+" "+req.getOperation());
-		}
-		else{
-			req = outgoing.getNextOutgoingRequest();
-		}
+//		}
+//		else{
+//			req = outgoing.getNextOutgoingRequest();
+//			
+//		}
+		logger.debug("read next request from outgoing queue: "+req.getJID()+" "+req);
 		return req;
 		
 //		return outgoing.getNextOutgoingRequest();

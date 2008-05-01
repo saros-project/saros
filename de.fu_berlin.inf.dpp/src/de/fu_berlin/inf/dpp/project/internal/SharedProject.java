@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourceAttributes;
@@ -552,7 +553,8 @@ public class SharedProject implements ISharedProject {
 								monitor.worked(1);
 							}
 							} catch (CoreException e) {
-								log.log(Level.WARNING, "",e);
+//								log.log(Level.WARNING, "",e);
+								log.warn("",e);
 								monitor.done();
 							}
 							
@@ -562,10 +564,12 @@ public class SharedProject implements ISharedProject {
 						
 					});
 				} catch (InvocationTargetException e) {
-					log.log(Level.WARNING, "",e);
+//					log.log(Level.WARNING, "",e);
+					log.warn("",e);
 					e.printStackTrace();
 				} catch (InterruptedException e) {
-					log.log(Level.WARNING, "",e);
+//					log.log(Level.WARNING, "",e);
+					log.warn("",e);
 					e.printStackTrace();
 				}
 				
@@ -578,11 +582,20 @@ public class SharedProject implements ISharedProject {
 		try {
 //			Request request = outgoing.getNextOutgoingRequest();
 			Request request = activitySequencer.getNextOutgoingRequest();
+			
 			if(isHost()){
-			/* send operation to client. */
-			transmitter.sendJupiterRequest(this, request, request.getJID());
+				/* if jupiter server request to has to execute locally on host side.*/
+				if(request.getJID().equals(host.getJid())){
+					log.debug("Send host request back for local execution: "+request);
+					activitySequencer.receiveRequest(request);
+				}else{
+					/* send operation to client. */
+					log.debug("Send request to client: "+request+request.getJID());
+					transmitter.sendJupiterRequest(this, request, request.getJID());
+				}
 			}
 			else{
+				log.debug("Send request to host : "+request);
 				transmitter.sendJupiterRequest(this, request, host.getJid());
 			}
 //			connection.sendOperation(new NetworkRequest(this.jid,request.getJID(),request), 0);

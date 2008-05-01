@@ -45,6 +45,7 @@ public class ProxyJupiterDocument implements JupiterClient{
 		req.setJID(this.jid);
 		req.setEditorPath(editor);
 		/* send request*/
+		logger.debug(jid.toString()+" proxy client forward request:  "+req);
 		forwarder.forwardOutgoingRequest(req);
 		
 		return req;
