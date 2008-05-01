@@ -211,7 +211,7 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 //			}
 			
 			/* activity is already managed by jupiter and execute now. */
-			if(executedJupiterActivity != null && ((TextEditActivity)activity).sameLike(executedJupiterActivity)){
+			if(executedJupiterActivity != null && concurrentManager.isHostSide() && ((TextEditActivity)activity).sameLike(executedJupiterActivity)){
 				/* Send message to all.*/
 				activities.add(activity);
 				return;
@@ -475,6 +475,10 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 			
 			for (IActivityProvider executor : providers) {
 				executor.exec(activity);
+			}
+			/* send activity to all observer. */
+			if(concurrentManager.isHostSide()){
+				activities.add(activity);
 			}
 		} catch (Exception e) {
 			log.error("Error while executing activity.", e);
