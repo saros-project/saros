@@ -51,6 +51,7 @@ import org.eclipse.ui.PlatformUI;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
@@ -100,8 +101,10 @@ public class SharedProject implements ISharedProject {
 //		concurrentManager = new ConcurrentDocumentManager();
 		
 		this.myID = myID;
-		driver = host = new User(myID);
-//		host = new User(myID);
+		User u = new User(myID);
+		u.setUserRole(UserRole.DRIVER);
+		driver = host = u;
+
 		participants.add(host);
 
 		/* add host to driver list. */
@@ -168,6 +171,9 @@ public class SharedProject implements ISharedProject {
 	public void setDriver(User driver, boolean replicated) {
 		assert driver != null;
 
+		/* set new driver status in participant list of sharedProject. */
+		getParticipant(driver.getJid()).setUserRole(UserRole.DRIVER);
+		
 		/*TODO: 1. actual the host never lost the driver status 
 		 * and added new driver to driverlist*/
 		
@@ -178,6 +184,8 @@ public class SharedProject implements ISharedProject {
 				return;
 			
 			/* add new driver to list. */
+			//TODO: durch hinzufügen von isharedprojectlistener zum concurrentmanager
+			//könnte dieser punkt ausgelagert werden.
 			activitySequencer.getConcurrentManager().addDriver(driver);
 		}
 		//client
@@ -205,6 +213,10 @@ public class SharedProject implements ISharedProject {
 		}
 	}
 
+	public void removeDriver(User driver, boolean replicated) {
+		
+		
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -228,6 +240,16 @@ public class SharedProject implements ISharedProject {
 		return driver.getJid().equals(myID);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISharedProject#isDriver(de.fu_berlin.inf.dpp.User)
+	 */
+	public boolean isDriver(User user) {
+		if(getParticipant(user.getJid()).getUserRole() == UserRole.DRIVER){
+			return true;
+		}
+		return false;
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -260,6 +282,12 @@ public class SharedProject implements ISharedProject {
 			if (index>=0 && participants.indexOf(user)!=index) {
 				participants.remove(user);
 				participants.add(index, user);				
+			}
+			/* update exists user. */
+			participants.remove(user);
+			participants.add(user);
+			for (ISharedProjectListener listener : listeners) {
+				listener.userJoined(user.getJid());
 			}
 			return;
 		}
@@ -604,4 +632,8 @@ public class SharedProject implements ISharedProject {
 			e.printStackTrace();
 		}
 	}
+
+
+
+
 }

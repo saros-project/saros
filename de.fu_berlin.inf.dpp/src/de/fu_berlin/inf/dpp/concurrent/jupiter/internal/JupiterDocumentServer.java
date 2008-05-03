@@ -49,7 +49,7 @@ public class JupiterDocumentServer implements JupiterServer{
 	class RequestTransmitter extends Thread{
 		
 		private final RequestForwarder rf;
-		private static final int MILLIS = 300;
+		private static final int MILLIS = 100;
 		
 		public RequestTransmitter(RequestForwarder forw){
 			this.rf = forw;

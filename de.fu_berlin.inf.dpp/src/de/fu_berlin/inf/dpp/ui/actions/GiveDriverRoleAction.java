@@ -116,7 +116,9 @@ public class GiveDriverRoleAction extends SelectionProviderAction implements
 	private void updateEnablemnet() {
 		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
 
-		setEnabled(project != null && (project.isDriver() /*|| project.isHost()*/)
-			&& selectedUser != null && !project.getDriver().equals(selectedUser));
+		boolean enabled = (project != null && selectedUser != null && project.isHost() && !project.isDriver(selectedUser));
+		setEnabled(enabled);
+//		setEnabled(project != null && (project.isDriver() /*|| project.isHost()*/)
+//			&& selectedUser != null && !project.getDriver().equals(selectedUser));
 	}
 }

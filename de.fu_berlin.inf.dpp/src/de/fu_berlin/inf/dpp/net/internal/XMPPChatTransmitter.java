@@ -1174,13 +1174,23 @@ public class XMPPChatTransmitter implements ITransmitter,
 			int count = 0;
 			while (true) {
 				String jidS = userlistExtension.getValue("User"
-						+ new Integer(count++).toString());
+						+ count);
 				if (jidS == null)
 					break;
 				log.debug("   *:" + jidS);
 
 				JID jid = new JID(jidS);
 				User user = new User(jid);
+				
+				String userRole = userlistExtension.getValue("UserRole"+count);
+				user.setUserRole(de.fu_berlin.inf.dpp.User.UserRole.valueOf(userRole));
+				
+				String color = userlistExtension.getValue("UserColor"+count);
+				try{
+					user.setColorID(Integer.parseInt(color));
+				}catch(NumberFormatException nfe){
+					log.warn("Exception during convert user color form userlist for user : "+user.getJid());
+				}
 
 				if (project.getParticipant(jid) == null)
 					sendMessage(jid, PacketExtensions.createJoinExtension());
@@ -1188,7 +1198,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 				project.addUser(user, count - 1); // add user to internal user
 				// list, maintaining the
 				// received order
-
+				count++;
 			}
 		}
 

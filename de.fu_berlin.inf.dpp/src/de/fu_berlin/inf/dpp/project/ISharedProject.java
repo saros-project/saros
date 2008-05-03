@@ -58,6 +58,18 @@ public interface ISharedProject {
 	 *            only replicated to this client.
 	 */
 	public void setDriver(User driver, boolean replicated);
+	
+	/**
+	 * Remove driver role for given User.
+	 * 
+	 * @param driver
+	 *            one current driver.
+	 * @param replicated
+	 *            <code>false</code> if this event was created by this client.
+	 *            <code>true</code> if it was created by another client and
+	 *            only replicated to this client.
+	 */
+	public void removeDriver(User driver, boolean replicated);
 
 	/**
 	 * The driver is the person that is currently allowed to edit the resources.
@@ -71,6 +83,12 @@ public interface ISharedProject {
 	 *         this shared project. <code>false</code> otherwise.
 	 */
 	public boolean isDriver();
+	
+	/**
+	 * @return <code>true</code> if the given user is one of the current driver of
+	 *         this shared project. <code>false</code> otherwise.
+	 */
+	public boolean isDriver(User user);
 
 	/**
 	 * The host is the person that initiated this SharedProject and holds all

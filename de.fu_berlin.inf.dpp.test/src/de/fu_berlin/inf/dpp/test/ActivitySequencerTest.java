@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -29,10 +29,13 @@ import java.util.List;
 import org.eclipse.core.runtime.Path;
 
 import junit.framework.TestCase;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -48,6 +51,7 @@ public class ActivitySequencerTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         sequencer = new ActivitySequencer();
+        sequencer.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE, new User(new JID("host@jabber.com")), new JID("user@jabber.com"));
         
         providerMock = createMock(IActivityProvider.class);
         sequencer.addProvider(providerMock);

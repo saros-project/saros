@@ -144,7 +144,9 @@ public class SessionView extends ViewPart
 			User participant = (User) obj;
 
 			StringBuffer sb = new StringBuffer(participant.getJid().getName());
-			if (participant.equals(sharedProject.getDriver())) {
+//			if (participant.equals(sharedProject.getDriver())) {
+			if(sharedProject.isDriver(participant)){
+				
 				sb.append(" (Driver)");
 			}
 
@@ -154,7 +156,11 @@ public class SessionView extends ViewPart
 		@Override
 		public Image getImage(Object obj) {
 			User user = (User) obj;
-			return user.equals(sharedProject.getDriver()) ? driverImage : userImage;
+			if(sharedProject.isDriver(user)){
+				return driverImage;
+			}
+//			return user.equals(sharedProject.getDriver()) ? driverImage : userImage;
+			return userImage;
 		}
 
 		public Image getColumnImage(Object obj, int index) {

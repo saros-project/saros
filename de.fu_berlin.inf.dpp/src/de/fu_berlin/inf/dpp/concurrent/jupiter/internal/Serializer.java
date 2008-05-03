@@ -38,10 +38,10 @@ public class Serializer extends Thread implements OperationSerializer{
 				request = server.getNextRequestInSynchronizedQueue();
 				
 				proxies = server.getProxies();
-				/* execute receive action at appropriate proxy client. */
+				/* 1. execute receive action at appropriate proxy client. */
 				proxy = proxies.get(request.getJID());
 				Operation op = proxy.receiveRequest(request);
-				/* execute generate action at other proxy clients. */
+				/* 2. execute generate action at other proxy clients. */
 				for(JID j : proxies.keySet()){
 					proxy =  proxies.get(j);
 					
@@ -57,7 +57,7 @@ public class Serializer extends Thread implements OperationSerializer{
 			} catch (TransformationException e) {
 				// TODO Auto-generated catch block
 				logger.error("Transformation Exception ",e);
-				e.printStackTrace();
+//				e.printStackTrace();
 			}
 		}
 	}

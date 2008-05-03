@@ -210,14 +210,14 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 //				return;
 //			}
 			
-			/* activity is already managed by jupiter and execute now. */
+			/* activity is already managed by jupiter and executed now. */
 			if(executedJupiterActivity != null && concurrentManager.isHostSide() && ((TextEditActivity)activity).sameLike(executedJupiterActivity)){
 				/* Send message to all.*/
 				activities.add(activity);
 				return;
 			}
 			else{
-				// /* sync with jupiter logic. */
+				/* new text edit activity has created and has to sync with jupiter logic. */
 				IActivity resultAC = concurrentManager.activityCreated(activity);
 				/**
 				 * host activity: put into outgoing queue and send to all if
@@ -469,7 +469,7 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 	 */
 	public void execTransformedActivity(IActivity activity) {
 		try {
-			
+			log.debug("execute transformed activity: "+activity);
 			//mark current execute activity
 			executedJupiterActivity = activity;
 			
@@ -478,6 +478,7 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 			}
 			/* send activity to all observer. */
 			if(concurrentManager.isHostSide()){
+				log.debug("send transformed activity: "+activity);
 				activities.add(activity);
 			}
 		} catch (Exception e) {

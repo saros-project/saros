@@ -24,11 +24,13 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class User {
 	public enum UserConnectionState {UNKNOWN,ONLINE,OFFLINE};
+	public enum UserRole {DRIVER,OBSERVER};
 	private UserConnectionState presence = UserConnectionState.UNKNOWN;
 	
 	private JID jid;
 	private int colorid=0;
 	private long offlineTime=0;
+	private UserRole role = UserRole.OBSERVER;
 
 	public User(JID jid) {
 		this.jid = jid;
@@ -38,6 +40,22 @@ public class User {
 		return jid;
 	}
 
+	/**
+	 * set the current user role of this user inside the
+	 * current project.
+	 * @param role (Driver, Observer)
+	 */
+	public void setUserRole(UserRole role){
+		this.role = role;
+	}
+	
+	/**
+	 * Gets current project role of this user.
+	 * @return role (Driver, Observer)
+	 */
+	public UserRole getUserRole(){
+		return this.role;
+	}
 
 	@Override
 	public String toString() {

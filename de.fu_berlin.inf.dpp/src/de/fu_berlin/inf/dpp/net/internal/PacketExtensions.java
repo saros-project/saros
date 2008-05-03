@@ -165,8 +165,13 @@ public class PacketExtensions {
 		int count=0;
 		for (User participant : list ) {
 			JID jid = participant.getJid();
-			String id="User" + new Integer(count++).toString();
+			String id="User" +count;
+			String role="UserRole"+count;
+			String color = "UserColor"+count;
 			extension.setValue( id , jid.toString() );
+			extension.setValue(role, participant.getUserRole().toString());
+			extension.setValue(color, participant.getColorID()+"");
+			count++;
 		}
 		
 		return extension;
