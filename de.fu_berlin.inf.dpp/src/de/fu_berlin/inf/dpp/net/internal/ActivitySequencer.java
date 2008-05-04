@@ -52,7 +52,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * 
  * @author rdjemili
  */
-public class ActivitySequencer implements IRequestManager, RequestForwarder,
+public class ActivitySequencer implements  RequestForwarder,
 		IActivitySequencer, IActivityManager {
 	// TODO separate into two classes!?
 
@@ -449,14 +449,14 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 	/**
 	 * Receive request from ITransmitter and transfer to concurrent control.
 	 */
-	public IActivity receiveRequest(Request request) {
+	public void receiveRequest(Request request) {
 		/*
 		 * sync with jupiter server on host side and transform operation with
 		 * jupiter client side.
 		 */
 		log.debug("Receive request : "+request+ " from "+request.getJID());
 		concurrentManager.receiveRequest(request);
-		return null;
+//		return null;
 //		IActivity activity = concurrentManager.receiveRequest(request);
 //		if (activity != null) {
 //			/* execute transformed activity */

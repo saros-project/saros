@@ -10,5 +10,5 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
  */
 public interface IRequestManager {
 
-	public IActivity receiveRequest(Request request);
+	public void receiveRequest(Request request);
 }

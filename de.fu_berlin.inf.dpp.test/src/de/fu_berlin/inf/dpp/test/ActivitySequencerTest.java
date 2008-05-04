@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
 public class ActivitySequencerTest extends TestCase {
     private ActivitySequencer sequencer;
@@ -51,7 +52,7 @@ public class ActivitySequencerTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         sequencer = new ActivitySequencer();
-        sequencer.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE, new User(new JID("host@jabber.com")), new JID("user@jabber.com"));
+        sequencer.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE, new User(new JID("host@jabber.com")), new JID("user@jabber.com"),new SharedProject(null, null, null));
         
         providerMock = createMock(IActivityProvider.class);
         sequencer.addProvider(providerMock);

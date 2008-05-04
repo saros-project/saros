@@ -158,7 +158,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		return false;
 	}
 
-	private TextEditActivity execTextEditActivity(Request request) {
+	private void execTextEditActivity(Request request) {
 
 		// if (!isHostSide()) {
 		/**
@@ -183,18 +183,19 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 				op = jupClient.receiveRequest(request);
 			} catch (TransformationException e) {
 				logger.error("Error during transformation: ", e);
-				return null;
+				return;
 			}
 
-			TextEditActivity textEdit = getTextEditActivity(op);
-			textEdit.setEditor(request.getEditorPath());
-			textEdit.setSource(request.getJID().toString());
-			/* execute activity in activity sequencer. */
-			sequencer.execTransformedActivity(textEdit);
-			return textEdit;
+			for(TextEditActivity textEdit : getTextEditActivity(op)){
+				textEdit.setEditor(request.getEditorPath());
+				textEdit.setSource(request.getJID().toString());
+				/* execute activity in activity sequencer. */
+				sequencer.execTransformedActivity(textEdit);
+			}
+//			return textEdit;
 		}
 		// }
-		return null;
+//		return null;
 	}
 
 	public IActivity exec(IActivity activity) {
@@ -256,22 +257,26 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	 * @param op
 	 * @return
 	 */
-	public TextEditActivity getTextEditActivity(Operation op) {
+	public List<TextEditActivity> getTextEditActivity(Operation op) {
+		List<TextEditActivity> result = new Vector<TextEditActivity>();
 		TextEditActivity textEdit = null;
 		if (op instanceof DeleteOperation) {
 			DeleteOperation del = (DeleteOperation) op;
 			textEdit = new TextEditActivity(del.getPosition(), "", Integer.parseInt(del.getText()));
+			result.add(textEdit);
 		}
 		if (op instanceof InsertOperation) {
 			InsertOperation ins = (InsertOperation) op;
 			textEdit = new TextEditActivity(ins.getPosition(), ins.getText(), 0);
+			result.add(textEdit);
 		}
 		if (op instanceof SplitOperation) {
-			// TODO: implements later:
-			logger.warn("Split Operation have to be implements.");
+			SplitOperation split =  (SplitOperation) op;
+			result.add(getTextEditActivity(split.getFirst()).get(0));
+			result.add(getTextEditActivity(split.getSecond()).get(0));
 		}
 
-		return textEdit;
+		return result;
 	}
 
 //	private void editorActivitiy(IActivity activity, boolean local) {
@@ -369,14 +374,16 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	 * client.
 	 * 
 	 */
-	public IActivity receiveRequest(Request request) {
+	public void receiveRequest(Request request) {
 
 		/* 1. Sync with jupiter server component. */
 		if (isHostSide()) {
 			/* if host side and server jupiter side of request */
 			if (isHost(request.getJID()) && request.getSiteId() == 0) {
 				/* request already has transformed and have to be execute. */
-				return execTextEditActivity(request);
+//				return execTextEditActivity(request);
+				execTextEditActivity(request);
+				return;
 			}
 
 			JupiterDocumentServer docServer = null;
@@ -409,14 +416,14 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 			/* sync request with jupiter document server. */
 			docServer.addRequest(request);
 
-			return null;
+			return;
 		} else {
 			/*
 			 * 2. receive request in local client component and return the
 			 * transformed operation as IActivity.
 			 */
-
-			return execTextEditActivity(request);
+			execTextEditActivity(request);
+//			return execTextEditActivity(request);
 		}
 	}
 
