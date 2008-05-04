@@ -29,10 +29,10 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
-public class TakeDriverRoleAction extends Action implements ISharedProjectListener,
+public class RemoveAllDriverRoleAction extends Action implements ISharedProjectListener,
 	ISessionListener {
 
-	public TakeDriverRoleAction() {
+	public RemoveAllDriverRoleAction() {
 		super("Take user driver role");
 		setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
 		setToolTipText("Take driver role");
@@ -104,7 +104,9 @@ public class TakeDriverRoleAction extends Action implements ISharedProjectListen
 
 	private void updateEnablement() {
 		ISharedProject project = getSharedProject();
-		setEnabled(project != null && project.isHost() && !project.isDriver());
+		boolean enabled = (project != null && project.isHost());
+		setEnabled(enabled);
+//		setEnabled(project != null && project.isHost() && !project.isDriver());
 	}
 
 	private ISharedProject getSharedProject() {

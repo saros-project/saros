@@ -24,11 +24,14 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class ConcurrentDocumentManager implements ConcurrentManager {
 
@@ -416,4 +419,32 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 			return execTextEditActivity(request);
 		}
 	}
+
+	public void driverChanged(JID driver, boolean replicated) {
+		/*
+		 * 1. check if driver exists.
+		 * 2. add new driver or remove driver.
+		 * 3. 
+		 */
+		//HOST
+		if(isHostSide()){
+			
+		}
+		//CLIENT
+		else{
+			
+		}
+		
+	}
+
+	public void userJoined(JID user) {
+		// do nothing
+		
+	}
+
+	public void userLeft(JID user) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

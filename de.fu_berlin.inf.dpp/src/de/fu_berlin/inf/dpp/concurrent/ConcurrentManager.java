@@ -7,13 +7,15 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
 /**
  * Interface for management controller class of all jupiter document server.
  * @author orieger
  *
  */
-public interface ConcurrentManager extends IRequestManager {
+public interface ConcurrentManager extends IRequestManager, ISharedProjectListener {
 
 	public static enum Side{
 		CLIENT_SIDE,

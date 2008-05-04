@@ -64,7 +64,7 @@ import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
-import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 
 
 public class SessionView extends ViewPart 
@@ -303,7 +303,7 @@ public class SessionView extends ViewPart
 		IToolBarManager toolBar = bars.getToolBarManager();
 
 		toolBar.add(new OpenInviteInterface());
-		toolBar.add(new TakeDriverRoleAction());
+		toolBar.add(new RemoveAllDriverRoleAction());
 		toolBar.add(new FollowModeAction());
 		toolBar.add(new LeaveSessionAction());
 	}

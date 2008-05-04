@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
@@ -44,6 +45,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * Implements {@link IActivitySequencer} and {@link IActivityManager}.
@@ -381,8 +383,9 @@ public class ActivitySequencer implements IRequestManager, RequestForwarder,
 
 	public void initConcurrentManager(
 			de.fu_berlin.inf.dpp.concurrent.ConcurrentManager.Side side,
-			de.fu_berlin.inf.dpp.User host, JID myJID) {
+			de.fu_berlin.inf.dpp.User host, JID myJID, ISharedProject sharedProject) {
 		concurrentManager = new ConcurrentDocumentManager(side, host, myJID);
+		sharedProject.addListener(concurrentManager);
 		concurrentManager.setRequestForwarder(this);
 		concurrentManager.setActivitySequencer(this);
 	}

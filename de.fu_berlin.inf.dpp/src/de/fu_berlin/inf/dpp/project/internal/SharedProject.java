@@ -108,7 +108,7 @@ public class SharedProject implements ISharedProject {
 		participants.add(host);
 
 		/* add host to driver list. */
-		activitySequencer.initConcurrentManager(ConcurrentManager.Side.HOST_SIDE,host, myID);
+		activitySequencer.initConcurrentManager(ConcurrentManager.Side.HOST_SIDE,host, myID, this);
 		activitySequencer.getConcurrentManager().addDriver(host);
 		
 		this.project = project;
@@ -125,7 +125,7 @@ public class SharedProject implements ISharedProject {
 		this.host = new User(host);
 		this.driver = new User(driver);
 		
-		activitySequencer.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE,this.host,myID);
+		activitySequencer.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE,this.host,myID, this);
 		
 		for (JID jid : allParticipants) { // HACK
 			User user=new User(jid);
