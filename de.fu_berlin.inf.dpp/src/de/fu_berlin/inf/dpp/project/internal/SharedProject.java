@@ -171,6 +171,9 @@ public class SharedProject implements ISharedProject {
 	public void setDriver(User driver, boolean replicated) {
 		assert driver != null;
 
+		/* if user has current role observr*/
+		if(getParticipant(driver.getJid()).getUserRole() == UserRole.OBSERVER){
+		
 		/* set new driver status in participant list of sharedProject. */
 		getParticipant(driver.getJid()).setUserRole(UserRole.DRIVER);
 		
@@ -207,6 +210,26 @@ public class SharedProject implements ISharedProject {
 		
 		setProjectReadonly(!isDriver());
 
+		
+		}
+		else{
+			/* changed state form observer to driver*/
+			if(getParticipant(driver.getJid()).getUserRole() == UserRole.DRIVER){
+				
+				/* set the local driver state to observer*/
+				if(isDriver(new User(myID))){
+					setProjectReadonly(true);
+					this.driver = host;
+				}
+				
+				/* set observer state. */
+				getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
+				
+				
+			}
+		}
+		
+		/* inform observer. */
 		JID jid = driver.getJid();
 		for (ISharedProjectListener listener : listeners) {
 			listener.driverChanged(jid, replicated);
@@ -214,7 +237,16 @@ public class SharedProject implements ISharedProject {
 	}
 
 	public void removeDriver(User driver, boolean replicated) {
+		/* set new observer status in participant list of sharedProject. */
+		getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
 		
+		/**
+		 * communicate driver role change to listener.
+		 */
+		JID jid = driver.getJid();
+		for (ISharedProjectListener listener : listeners) {
+			listener.driverChanged(jid, replicated);
+		}
 		
 	}
 	/*
@@ -232,12 +264,15 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.ISharedProject
 	 */
 	public boolean isDriver() {
+		//TODO: change driver status request to userrole request of participient list.
+		
 		//HOST
 		if(activitySequencer.getConcurrentManager() != null && activitySequencer.getConcurrentManager().isHostSide()){
 			return activitySequencer.getConcurrentManager().isDriver(driver);
 		}
 		//CLIENT
 		return driver.getJid().equals(myID);
+		
 	}
 
 	/*

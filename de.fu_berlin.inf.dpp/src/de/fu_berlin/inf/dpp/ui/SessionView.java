@@ -65,6 +65,7 @@ import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
 
 
 public class SessionView extends ViewPart 
@@ -75,6 +76,8 @@ public class SessionView extends ViewPart
 	private ISharedProject sharedProject;
 
 	private GiveDriverRoleAction giveDriverRoleAction;
+	
+	private TakeDriverRoleAction takeDriverRoleAction;
 
 	private IPreferenceStore store = null;
 
@@ -266,6 +269,7 @@ public class SessionView extends ViewPart
 		viewer.setInput(null);
 
 		giveDriverRoleAction = new GiveDriverRoleAction(viewer);
+		takeDriverRoleAction = new TakeDriverRoleAction(viewer);
 
 		contributeToActionBars();
 		hookContextMenu();
@@ -325,6 +329,7 @@ public class SessionView extends ViewPart
 
 	private void fillContextMenu(IMenuManager manager) {
 		manager.add(giveDriverRoleAction);
+		manager.add(takeDriverRoleAction);
 
 		// Other plug-ins can contribute there actions here
 		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

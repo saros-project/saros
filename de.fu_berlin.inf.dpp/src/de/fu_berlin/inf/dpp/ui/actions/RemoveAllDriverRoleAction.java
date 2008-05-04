@@ -22,20 +22,27 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
-
+/**
+ * this action remove all remote driver from project. Only the project host has 
+ * the driver role after this action is executed.
+ * @author orieger
+ *
+ */
 public class RemoveAllDriverRoleAction extends Action implements ISharedProjectListener,
 	ISessionListener {
 
 	public RemoveAllDriverRoleAction() {
-		super("Take user driver role");
+		super("Take remote user driver roles");
 		setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
-		setToolTipText("Take driver role");
+		setToolTipText("Take remote driver roles");
 
 		Saros.getDefault().getSessionManager().addSessionListener(this);
 		updateEnablement();
@@ -43,7 +50,14 @@ public class RemoveAllDriverRoleAction extends Action implements ISharedProjectL
 
 	@Override
 	public void run() {
-		getSharedProject().setDriver(getSharedProject().getHost(), false);
+//		getSharedProject().setDriver(getSharedProject().getHost(), false);
+		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
+		for(User user : project.getParticipants()){
+			
+			if(user.getUserRole() == UserRole.DRIVER && !project.getHost().equals(user)){
+				project.removeDriver(user, false);
+			}
+		}
 	}
 
 	/*
