@@ -53,6 +53,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
@@ -194,7 +195,7 @@ public class SharedProject implements ISharedProject {
 				// TODO: durch hinzufügen von isharedprojectlistener zum
 				// concurrentmanager
 				// könnte dieser punkt ausgelagert werden.
-				activitySequencer.getConcurrentManager().addDriver(driver.getJid());
+//				activitySequencer.getConcurrentManager().addDriver(driver.getJid());
 			}
 			// client
 			else {
@@ -681,6 +682,7 @@ public class SharedProject implements ISharedProject {
 			Request request = activitySequencer.getNextOutgoingRequest();
 
 			if (isHost()) {
+							
 				/*
 				 * if jupiter server request to has to execute locally on host
 				 * side.

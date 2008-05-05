@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -69,6 +70,14 @@ public class JupiterDocumentClient implements JupiterClient {
 	public void setEditor(IPath path) {
 		this.editor = path;
 		
+	}
+
+	public Timestamp getTimestamp() {
+		return jupiter.getTimestamp();
+	}
+
+	public void updateVectorTime(Timestamp timestamp) throws TransformationException {
+		jupiter.updateVectorTime(timestamp);
 	}
 
 	

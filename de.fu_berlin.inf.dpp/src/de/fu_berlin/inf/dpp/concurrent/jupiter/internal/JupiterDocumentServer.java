@@ -14,6 +14,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.OperationSerializer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.management.OutgoingMessageForwarder;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -229,6 +231,24 @@ public class JupiterDocumentServer implements JupiterServer{
 			return true;
 		}
 		return false;
+	}
+
+	public void updateVectorTime(JID source, JID dest) {
+		JupiterClient proxy = proxies.get(source);
+		if(proxy != null){
+			try {
+				Timestamp ts = proxy.getTimestamp();
+				getProxies().get(dest).updateVectorTime(new JupiterVectorTime(ts.getComponents()[1],ts.getComponents()[0]));
+			} catch (TransformationException e) {
+				logger.error("Error during update vector time for "+dest,e);
+			} catch (InterruptedException e) {
+				logger.error("Error during update vector time for "+dest,e);
+			}
+		}
+		else{
+			logger.error("No proxy found for given source jid: "+source);
+		}
+		
 	}
 
 	/* end transfer section  */

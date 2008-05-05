@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
@@ -160,6 +161,9 @@ public class RequestExtensionProvider implements PacketExtensionProvider{
 		}
 		if(parser.getName().equals(RequestPacketExtension.NO_OP)){
 			return new NoOperation();
+		}
+		if(parser.getName().equals(RequestPacketExtension.TIMESTAMP_OP)){
+			return new TimestampOperation();
 		}
 		return op;
 	}

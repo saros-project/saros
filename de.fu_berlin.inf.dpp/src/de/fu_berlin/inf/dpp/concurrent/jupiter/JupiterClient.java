@@ -13,4 +13,12 @@ public interface JupiterClient extends JupiterEditor{
 	 * @return
 	 */
 	public JID getJID();
+	
+	/**
+	 * get the current vector time.
+	 * @return
+	 */
+	public Timestamp getTimestamp();
+	
+	public void updateVectorTime(Timestamp timestamp) throws TransformationException;
 }

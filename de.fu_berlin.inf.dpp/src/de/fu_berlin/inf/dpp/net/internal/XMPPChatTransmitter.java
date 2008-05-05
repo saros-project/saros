@@ -1066,7 +1066,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			List<TimedActivity> timedActivities = activitiesPacket
 					.getActivities();
 
-			log.info("Received activities from " + fromJID.toString() + ": "
+			log.debug("Received activities from " + fromJID.toString() + ": "
 					+ timedActivities);
 
 			if (!isProjectParticipant) {
@@ -1598,7 +1598,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			description = description + ':' + transferData.timestamp;
 		}
 
-		if (getFileTransferModeViaChat()) {
+		if (getFileTransferModeViaChat() || transferData.callback == null) {
 
 			if (transferData.content == null)
 				readFile(transferData);
@@ -1612,11 +1612,13 @@ public class XMPPChatTransmitter implements ITransmitter,
 					transferData.content, recipient);
 
 			log.info("Sent file " + transferData.path + " (by ChatTransfer)");
-
+			return;
 		}
 
 		// try {
 
+		
+	
 		if (jingle
 				&& (jingleManager.getState(recipient) != JingleConnectionState.ERROR)) {
 			log.info("Sent file " + transferData.path + " (with Jingle)");

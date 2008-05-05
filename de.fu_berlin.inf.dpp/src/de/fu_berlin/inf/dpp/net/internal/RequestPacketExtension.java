@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 
 
 public class RequestPacketExtension  implements PacketExtension{
@@ -34,6 +35,8 @@ public class RequestPacketExtension  implements PacketExtension{
 	public static final String NO_OP = "no_op";
 	
 	public static final String SPLIT_OP = "split";
+	
+	public static final String TIMESTAMP_OP = "time";
 	
 	
 	public static final String LOCAL_TIME = "localtime";
@@ -129,6 +132,9 @@ public class RequestPacketExtension  implements PacketExtension{
 		if(op instanceof NoOperation){
 //			NoOperation no = (NoOperation) op;
 			xml += "<"+NO_OP+ "/>";
+		}
+		if(op instanceof TimestampOperation){
+			xml += "<"+TIMESTAMP_OP+ "/>";
 		}
 		if(op instanceof SplitOperation){
 			SplitOperation split = (SplitOperation) op;

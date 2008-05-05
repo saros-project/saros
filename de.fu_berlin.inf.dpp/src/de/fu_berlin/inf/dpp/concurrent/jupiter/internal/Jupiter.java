@@ -127,22 +127,6 @@ public class Jupiter implements Algorithm {
 		return newOp;
 	}
 	
-	public Operation receiveTransformedRequest(Request req) throws TransformationException{
-		Timestamp timestamp = req.getTimestamp();
-		if (!(timestamp instanceof JupiterVectorTime)) {
-			throw new IllegalArgumentException("Jupiter expects timestamps of type JupiterVectorTime");
-		}
-		//TODO: check preconditions
-//		try{
-		checkPreconditions((JupiterVectorTime) timestamp);
-//		}catch(TransformationException e){
-//			logger.warn(e);
-//		}
-		discardAcknowledgedOperations((JupiterVectorTime) timestamp);
-		vectorTime.incrementRemoteRequestCount();
-		return req.getOperation();
-	}
-	
 	/**
 	 * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#acknowledge(int, de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp)
 	 */
@@ -374,6 +358,16 @@ public class Jupiter implements Algorithm {
 	 */
 	public boolean isClientSide() {
 		return isClientSide;
+	}
+
+	public void updateVectorTime(Timestamp timestamp) throws TransformationException{
+		if(ackRequestList.size()> 0){
+			throw new TransformationException("ackRequestList have entries. Update Vector time failed.");
+		}
+		int local = timestamp.getComponents()[0];
+		int remote = timestamp.getComponents()[1];
+		this.vectorTime = new JupiterVectorTime(local, remote);
+		
 	}
 	
 }

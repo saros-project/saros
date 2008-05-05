@@ -25,5 +25,8 @@ public interface JupiterServer extends SynchronizedQueue, RequestForwarder, Jupi
 	 * @return
 	 */
 	public boolean isExist(JID jid);
+	
+	
+	public void updateVectorTime(JID source, JID dest);
 
 }
