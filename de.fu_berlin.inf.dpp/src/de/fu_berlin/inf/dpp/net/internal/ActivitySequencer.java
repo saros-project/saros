@@ -79,8 +79,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 		public synchronized boolean checkCreatedActivity(IActivity activity){
 			if(currentExecutedActivity != null){
 				if(activity instanceof TextEditActivity && currentExecutedActivity.sameLike(activity)){
-//					logger.debug("TextEditActivity "+activity+ " is executed.");
-					System.out.println("Check");
+					logger.debug("TextEditActivity "+activity+ " is executed.");
+//					System.out.println("Check");
 					executed = true;
 					notify();
 				}

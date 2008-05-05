@@ -274,8 +274,16 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		}
 		if (op instanceof SplitOperation) {
 			SplitOperation split =  (SplitOperation) op;
-			result.add(getTextEditActivity(split.getFirst()).get(0));
-			result.add(getTextEditActivity(split.getSecond()).get(0));
+			TextEditActivity op1 = getTextEditActivity(split.getFirst()).get(0);
+			TextEditActivity op2 = getTextEditActivity(split.getSecond()).get(0);
+			
+			/* if operation one is delete operation the offset of second
+			 * operation has to modified.*/
+			if(op1.replace > 0 && op1.text.length() == 0){
+				op2 = new TextEditActivity(op2.offset-op1.replace,"",op2.replace);
+			}
+			result.add(op1);
+			result.add(op2);
 		}
 
 		return result;

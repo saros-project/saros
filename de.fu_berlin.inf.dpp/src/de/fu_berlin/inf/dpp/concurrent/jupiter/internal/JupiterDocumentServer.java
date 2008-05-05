@@ -155,7 +155,7 @@ public class JupiterDocumentServer implements JupiterServer{
 	 */
 	public synchronized Request getNextRequestInSynchronizedQueue() throws InterruptedException {
 		/* if queue is empty or proxy managing action is running. */
-		if(!(requestList.size() > 0)){
+		while(!(requestList.size() > 0)){
 			wait();
 		}
 		logger.debug("read out next request in queue! "+requestList.get(0).getJID()+requestList.get(0));
