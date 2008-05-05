@@ -549,6 +549,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 				else{
 					/* if no jupiter client exists.*/
 					JupiterClient client = new JupiterDocumentClient(this.myJID, this.forwarder);
+					client.setEditor(request.getEditorPath());
 					try {
 						client.updateVectorTime(request.getTimestamp());
 						clientDocs.put(request.getEditorPath(), client);
