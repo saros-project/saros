@@ -28,19 +28,19 @@ public interface ConcurrentManager extends IRequestManager, ISharedProjectListen
 	
 	public RequestForwarder getRequestForwarder();
 	
-	public void addDriver(User jid);
+	public void addDriver(JID jid);
 	
-	public void removeDriver(User jid);
+	public void removeDriver(JID jid);
 	
-	public List<User> getDriver();
+	public List<JID> getDriver();
 	
-	public boolean isDriver(User jid);
+	public boolean isDriver(JID jid);
 	
 	public boolean isHostSide();
 	
 	public boolean isHost(JID jid);
 	
-	public void setHost(User jid);
+	public void setHost(JID jid);
 	
 	public IActivity activityCreated(IActivity activity);
 	

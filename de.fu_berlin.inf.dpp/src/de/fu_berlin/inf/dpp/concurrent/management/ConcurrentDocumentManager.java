@@ -43,9 +43,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	/** current open editor at client side. */
 	private HashMap<IPath, JupiterClient> clientDocs;
 
-	private List<User> drivers;
+	private List<JID> drivers;
 
-	private User host;
+	private JID host;
 
 	private JID myJID;
 
@@ -62,9 +62,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		}
 
 		this.clientDocs = new HashMap<IPath, JupiterClient>();
-		drivers = new Vector<User>();
+		drivers = new Vector<JID>();
 		this.side = side;
-		this.host = host;
+		this.host = host.getJid();
 		this.myJID = myJID;
 	}
 
@@ -80,21 +80,20 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		return this.forwarder;
 	}
 
-	public void addDriver(User jid) {
+	public void addDriver(JID jid) {
 		drivers.add(jid);
-
 	}
 
-	public void removeDriver(User jid) {
+	public void removeDriver(JID jid) {
 		drivers.remove(jid);
 	}
 
-	public List<User> getDriver() {
+	public List<JID> getDriver() {
 
 		return drivers;
 	}
 
-	public boolean isDriver(User jid) {
+	public boolean isDriver(JID jid) {
 		return drivers.contains(jid);
 	}
 
@@ -220,13 +219,13 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	}
 
 	public boolean isHost(JID jid) {
-		if (jid.equals(host.getJid())) {
+		if (jid.equals(host)) {
 			return true;
 		}
 		return false;
 	}
 
-	public void setHost(User host) {
+	public void setHost(JID host) {
 		this.host = host;
 	}
 
@@ -399,7 +398,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 //				docServer = new JupiterDocumentServer();
 				docServer.setEditor(request.getEditorPath());
 				/* create new local host document client. */
-				docServer.addProxyClient(host.getJid());
+				docServer.addProxyClient(host);
 				if(!isHost(request.getJID())){
 					docServer.addProxyClient(request.getJID());
 				}
@@ -438,11 +437,20 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		 */
 		//HOST
 		if(isHostSide()){
-			
+			/* if driver changed to observer*/
+			if(drivers.contains(driver)){
+				userLeft(driver);
+			}
+			/* new driver added to project. */
+			else{
+				drivers.add(driver);
+			}
 		}
 		//CLIENT
 		else{
-			
+			if(driver.equals(myJID)){
+				clientDocs = new HashMap<IPath, JupiterClient>();
+			}
 		}
 		
 	}
@@ -453,8 +461,18 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	}
 
 	public void userLeft(JID user) {
-		// TODO Auto-generated method stub
+		/* remove user from driver list*/
+		drivers.remove(user);
 		
+		/* remove user proxies from jupiter server.*/
+		for(JupiterServer server : concurrentDocuments.values()){
+			if(server.isExist(user)){
+				server.removeProxyClient(user);
+				
+				/* if only host has an proxy*/
+				
+			}
+		}
 	}
 
 }

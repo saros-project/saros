@@ -1004,7 +1004,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	public void processMessage(Chat chat, Message message) {
 		// TODO: new method für smack 3
-		log.debug("incomming message : " + message.getBody());
+//		log.debug("incomming message : " + message.getBody());
 		// processPacket(message);
 
 	}

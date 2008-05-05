@@ -109,7 +109,7 @@ public class SharedProject implements ISharedProject {
 		/* add host to driver list. */
 		activitySequencer.initConcurrentManager(
 				ConcurrentManager.Side.HOST_SIDE, host, myID, this);
-		activitySequencer.getConcurrentManager().addDriver(host);
+		activitySequencer.getConcurrentManager().addDriver(host.getJid());
 
 		this.project = project;
 		setProjectReadonly(false);
@@ -194,7 +194,7 @@ public class SharedProject implements ISharedProject {
 				// TODO: durch hinzufügen von isharedprojectlistener zum
 				// concurrentmanager
 				// könnte dieser punkt ausgelagert werden.
-				activitySequencer.getConcurrentManager().addDriver(driver);
+				activitySequencer.getConcurrentManager().addDriver(driver.getJid());
 			}
 			// client
 			else {
@@ -280,7 +280,7 @@ public class SharedProject implements ISharedProject {
 		// HOST
 		if (activitySequencer.getConcurrentManager() != null
 				&& activitySequencer.getConcurrentManager().isHostSide()) {
-			return activitySequencer.getConcurrentManager().isDriver(driver);
+			return activitySequencer.getConcurrentManager().isDriver(driver.getJid());
 		}
 		// CLIENT
 		return (getParticipant(myID).getUserRole() == UserRole.DRIVER);
