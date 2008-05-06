@@ -227,7 +227,7 @@ public class SharedProject implements ISharedProject {
 			if (getParticipant(driver.getJid()).getUserRole() == UserRole.DRIVER) {
 
 				/* set the local driver state to observer */
-				if (isDriver(new User(myID))) {
+				if (driver.getJid().equals(myID) && isDriver(new User(myID))) {
 					setProjectReadonly(true);
 					this.driver = host;
 				}
