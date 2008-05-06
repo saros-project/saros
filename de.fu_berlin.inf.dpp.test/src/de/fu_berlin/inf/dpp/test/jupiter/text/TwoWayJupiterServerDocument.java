@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -150,6 +151,12 @@ public class TwoWayJupiterServerDocument implements SynchronizedQueue, NetworkEv
 	}
 
 	public void removeJupiterDocumentListener(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	public void updateVectorTime(Timestamp timestamp) {
 		// TODO Auto-generated method stub
 		
 	}

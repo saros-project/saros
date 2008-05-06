@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.test.jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public interface SynchronizedQueue {
@@ -21,4 +22,6 @@ public interface SynchronizedQueue {
 	public void sendTransformedOperation(Operation op, JID toJID);
 	
 	public Algorithm getAlgorithm();
+	
+	public void updateVectorTime(Timestamp timestamp);
 }

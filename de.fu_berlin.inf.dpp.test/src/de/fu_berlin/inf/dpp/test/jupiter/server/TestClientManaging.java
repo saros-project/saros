@@ -19,6 +19,7 @@ public class TestClientManaging extends JupiterTestCase {
 		super(name);
 	}
 
+	
 	public void testConcurrentJupiterDocumentServer() throws Exception{
 		JID jid_c1 = new JID("ori79@jabber.cc");
 		JID jid_c2 = new JID("ori80@jabber.cc");

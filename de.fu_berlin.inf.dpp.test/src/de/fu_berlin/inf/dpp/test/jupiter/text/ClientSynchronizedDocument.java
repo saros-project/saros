@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -134,6 +135,15 @@ public class ClientSynchronizedDocument implements SynchronizedQueue, NetworkEve
 
 	public void removeJupiterDocumentListener(String id) {
 		documentListener.remove(id);
+	}
+
+	public void updateVectorTime(Timestamp timestamp) {
+		try {
+			getAlgorithm().updateVectorTime(timestamp);
+		} catch (TransformationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 

@@ -97,4 +97,9 @@ public class ProxySynchronizedQueue implements SynchronizedQueue{
 		return algorithm;
 	}
 
+	public void updateVectorTime(Timestamp timestamp) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

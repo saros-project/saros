@@ -43,6 +43,15 @@ public class ConcurrentManager implements NetworkEventHandler{
 		}).start();
 	}
 
+	/**
+	 * Update vector time.
+	 * @param source
+	 * @param dest
+	 */
+	public void updateVectorTime(JID source, JID dest){
+		server.updateVectorTime(source, dest);
+	}
+	
 	public void addProxyClient(JID jid){
 		/* if client not in proxy list*/
 		try {

@@ -13,6 +13,7 @@ import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
@@ -238,6 +239,11 @@ public class ServerSynchronizedDocument implements JupiterServer, SynchronizedQu
 	}
 
 	public void removeJupiterDocumentListener(String id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void updateVectorTime(Timestamp timestamp) {
 		// TODO Auto-generated method stub
 		
 	}
