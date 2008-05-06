@@ -162,7 +162,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 				if (!concurrentManager.isHostSide()
 						&& concurrentManager.exec(activity) != null) {
 					// CLIENT SIDE
-					// TODO: siehe 6
+					logger.debug("Execute received activity (without jupiter): "+activity);
 					for (IActivityProvider executor : providers) {
 						executor.exec(activity);
 					}
