@@ -333,6 +333,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	 * @return
 	 */
 	public Operation getOperation(TextEditActivity text) {
+		
 		Operation op = null;
 		// delete activity
 		if (text.replace > 0 && text.text.length() == 0) {
@@ -346,6 +347,15 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		// insert activity
 		if (text.replace == 0 && text.text.length() > 0) {
 			op = new InsertOperation(text.offset, text.text);
+		}
+		// replace operation has to split into delete and insert operation
+		if(text.replace > 0 && text.text.length() > 0){
+			/* string placeholder in length of delete area. */
+			String placeholder = "";
+			for (int i = 0; i < text.replace; i++) {
+				placeholder += 1;
+			}
+			op = new SplitOperation(new DeleteOperation(text.offset,placeholder),new InsertOperation(text.offset,text.text));
 		}
 		return op;
 	}
