@@ -381,7 +381,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 			 * if operation one is delete operation the offset of second
 			 * operation has to modified.
 			 */
-			if (op1.replace > 0 && op1.text.length() == 0) {
+			if (op1.replace > 0 && op1.text.length() == 0 && op2.replace > 0 && op2.text.length() == 0) {
 				op2 = new TextEditActivity(op2.offset - op1.replace, "",
 						op2.replace);
 			}
