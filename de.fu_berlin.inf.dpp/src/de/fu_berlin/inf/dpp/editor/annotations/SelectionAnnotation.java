@@ -20,24 +20,9 @@ public class SelectionAnnotation extends AnnotationSaros  {
 	}
 
 	public SelectionAnnotation(String label, String username) {
-		super(TYPE, false, label,username);
+		super(TYPE, false, label,username);	
 		
-		// TODO: improve color assingment and dynamic handling 
-		int colorid=getColorIdForUser(username) +1;
-		String mytype=TYPE + "." + new Integer(colorid).toString();
-		
-		setType(mytype);		
 	}
 
-	int getColorIdForUser(String username){
-		User user= Saros.getDefault().getSessionManager().getSharedProject().
-					getParticipant(new JID(username));
 	
-		int colorid=1;
-		if (user!=null) {
-			colorid=user.getColorID();
-		}
-		
-		return colorid;
-	}	
 }

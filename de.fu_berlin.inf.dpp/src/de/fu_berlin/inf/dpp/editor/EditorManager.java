@@ -508,8 +508,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 					file = sharedProject.getProject().getFile(textEdit.getEditor());
 				}
 				String text = fixDelimiters(file, textEdit.text);
-				replaceText(file, textEdit.offset, textEdit.replace, text);
-
+				replaceText(file, textEdit.offset, textEdit.replace, text,textEdit.getSource());
+				
 				Set<IEditorPart> editors = editorPool.getEditors(driverEditor);
 				for (IEditorPart editorPart : editors) {
 					editorAPI.setSelection(editorPart, 
@@ -705,7 +705,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		return (sharedProject != null && resource.getProject() == sharedProject.getProject());
 	}
 
-	private void replaceText(IFile file, int offset, int replace, String text) {
+	private void replaceText(IFile file, int offset, int replace, String text, String source) {
 		FileEditorInput input = new FileEditorInput(file);
 		IDocumentProvider provider = editorAPI.getDocumentProvider(input);
 
@@ -719,7 +719,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			doc.replace(offset, replace, text);
 
 			IAnnotationModel model = provider.getAnnotationModel(input);
-			ContributionHelper.insertAnnotation(model, offset, text.length());
+			ContributionHelper.insertAnnotation(model, offset, text.length(),source);
 
 			// Don't disconnect from provider yet, because otherwise the text
 			// changes would be lost. We only disconnect when the document is

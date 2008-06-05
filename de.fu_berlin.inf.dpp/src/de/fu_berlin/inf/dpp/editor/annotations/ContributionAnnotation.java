@@ -14,5 +14,6 @@ public class ContributionAnnotation extends AnnotationSaros {
 
 	public ContributionAnnotation(String label, String source) {
 		super(TYPE, false, label, source);
+		
 	}
 }
