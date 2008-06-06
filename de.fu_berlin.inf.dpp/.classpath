@@ -7,6 +7,6 @@
 	<classpathentry kind="lib" path="lib/smack.jar" sourcepath="/Smack3Jingle/src"/>
 	<classpathentry kind="lib" path="lib/smackx.jar" sourcepath="/Smack3Jingle/src"/>
 	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-jingle.jar"/>
+	<classpathentry kind="lib" path="lib/smackx-jingle_3.5.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
