@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smackx.jingle.IncomingJingleSession;
+import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
@@ -58,7 +58,9 @@ public class FileTransferSession extends JingleMediaSession {
 
 	@Override
 	public void initialize() {
-		if (this.getJingleSession() instanceof IncomingJingleSession) {
+		JingleSession session = getJingleSession();
+		if (!((session != null) && (session.getInitiator().equals(session.getConnection().getUser())))) {
+//		if (this.getJingleSession() instanceof JingleSession) {
 			try {
 
 				receiver = new FileTransferTCPReceiver(InetAddress

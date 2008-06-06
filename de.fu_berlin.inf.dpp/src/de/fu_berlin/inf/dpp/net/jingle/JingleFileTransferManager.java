@@ -1,21 +1,24 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.jingle.IncomingJingleSession;
+//import org.jivesoftware.smackx.jingle.IncomingJingleSession;
 import org.jivesoftware.smackx.jingle.JingleManager;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.JingleSessionRequest;
-import org.jivesoftware.smackx.jingle.OutgoingJingleSession;
-import org.jivesoftware.smackx.jingle.JingleNegotiator.JingleException;
-import org.jivesoftware.smackx.jingle.JingleNegotiator.State;
+//import org.jivesoftware.smackx.jingle.OutgoingJingleSession;
+import org.jivesoftware.smackx.jingle.JingleException;
+import org.jivesoftware.smackx.jingle.JingleNegotiatorState;
 import org.jivesoftware.smackx.jingle.listeners.JingleMediaListener;
 import org.jivesoftware.smackx.jingle.listeners.JingleSessionRequestListener;
-import org.jivesoftware.smackx.jingle.listeners.JingleSessionStateListener;
+//import org.jivesoftware.smackx.jingle.listeners.JingleSessionStateListener;
 import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
+import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
 import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
@@ -32,10 +35,10 @@ public class JingleFileTransferManager {
 	private IJingleFileTransferListener transmitter;
 	private JingleManager jm;
 
-	private HashMap<JID, IncomingJingleSession> incomingSessions = null;
-	private HashMap<JID, OutgoingJingleSession> outgoingSessions = null;
+	private HashMap<JID, JingleSession> incomingSessions = null;
+	private HashMap<JID, JingleSession> outgoingSessions = null;
 	
-	public static int JINGLE_TIME_OUT = 10000;
+	public static int JINGLE_TIME_OUT = 1000000;
 
 	/**
 	 * this map contains for all incoming and outgoing jingle sessions the
@@ -53,8 +56,8 @@ public class JingleFileTransferManager {
 			IJingleFileTransferListener transmitter) {
 		this.xmppConnection = connection;
 		this.transmitter = transmitter;
-		incomingSessions = new HashMap<JID, IncomingJingleSession>();
-		outgoingSessions = new HashMap<JID, OutgoingJingleSession>();
+		incomingSessions = new HashMap<JID, JingleSession>();
+		outgoingSessions = new HashMap<JID, JingleSession>();
 		connectionStates = new HashMap<JID, JingleConnectionState>();
 		logger.debug("initialized jingle file transfer manager.");
 		initialize();
@@ -117,24 +120,25 @@ public class JingleFileTransferManager {
 			}
 		});
 
-		/* add state listener. */
-		js.addStateListener(new JingleSessionStateListener() {
+//		/* add state listener. */
+//		js.addStateListener(new JingleSessionStateListener() {
+//
+//			public void afterChanged(State old, State newOne) {
+//				// logger.debug("session state after change new state :
+//				// "+newOne.toString()+" JID: "+jid_string);
+//
+//			}
+//
+//			public void beforeChange(State old, State newOne)
+//					throws JingleException {
+//				// logger.debug("session state before change :
+//				// "+old.toString()+" new : "+newOne.toString()+" JID:
+//				// "+jid_string);
+//
+//			}
+//		});
 
-			public void afterChanged(State old, State newOne) {
-				// logger.debug("session state after change new state :
-				// "+newOne.toString()+" JID: "+jid_string);
-
-			}
-
-			public void beforeChange(State old, State newOne)
-					throws JingleException {
-				// logger.debug("session state before change :
-				// "+old.toString()+" new : "+newOne.toString()+" JID:
-				// "+jid_string);
-
-			}
-		});
-
+		
 		/* transport events */
 		js.addTransportListener(new JingleTransportListener() {
 
@@ -174,17 +178,20 @@ public class JingleFileTransferManager {
 		ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
 				"jivesoftware.com", 3478);
 
-		mediaManager = new FileTransferMediaManager();
+		mediaManager = new FileTransferMediaManager(icetm0);
 		mediaManager.addJingleFileTransferListener(transmitter);
 
-		jm = new JingleManager(xmppConnection, icetm0, mediaManager);
+		List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
+		medias.add(mediaManager);
+		
+		jm = new JingleManager(xmppConnection, medias);
 		jm.addCreationListener(icetm0);
 
 		jm.addJingleSessionRequestListener(new JingleSessionRequestListener() {
 			public void sessionRequested(JingleSessionRequest request) {
 
 				JID jid = new JID(request.getFrom());
-				IncomingJingleSession incoming = incomingSessions.get(jid);
+				JingleSession incoming = incomingSessions.get(jid);
 
 				if (incoming != null)
 					return;
@@ -199,7 +206,7 @@ public class JingleFileTransferManager {
 					/* put to current session list. */
 					incomingSessions.put(jid, incoming);
 					// Start the call
-					incoming.start();
+					incoming.startIncoming();
 				} catch (XMPPException e) {
 					e.printStackTrace();
 				}
@@ -222,7 +229,7 @@ public class JingleFileTransferManager {
 
 		final String jid_string = jid.toString();
 
-		IncomingJingleSession incoming = incomingSessions.get(jid);
+		JingleSession incoming = incomingSessions.get(jid);
 		if (incoming != null) {
 			/* an incoming session already exist. */
 			try {
@@ -235,7 +242,7 @@ public class JingleFileTransferManager {
 			return;
 		}
 
-		OutgoingJingleSession outgoing = outgoingSessions.get(jid);
+		JingleSession outgoing = outgoingSessions.get(jid);
 		if (outgoing != null) {
 			/* send new data with current connection. */
 			try {
@@ -255,7 +262,7 @@ public class JingleFileTransferManager {
 
 			/* add to outgoing session list. */
 			outgoingSessions.put(jid, outgoing);
-			outgoing.start();
+			outgoing.startOutgoing();
 		} catch (XMPPException e1) {
 			e1.printStackTrace();
 		}
@@ -284,7 +291,7 @@ public class JingleFileTransferManager {
 
 		logger.debug("Terminate all jingle sessions.");
 		
-		OutgoingJingleSession outgoing = null;
+		JingleSession outgoing = null;
 		for (JID jid : outgoingSessions.keySet()) {
 			outgoing = outgoingSessions.get(jid);
 			if (outgoing != null) {
@@ -300,7 +307,7 @@ public class JingleFileTransferManager {
 			}
 		}
 
-		IncomingJingleSession incoming = null;
+		JingleSession incoming = null;
 		for (JID jid : incomingSessions.keySet()) {
 			incoming = incomingSessions.get(jid);
 			if (incoming != null) {
@@ -326,7 +333,7 @@ public class JingleFileTransferManager {
 	 * @param jid
 	 */
 	public void terminateJingleSession(JID jid) {
-		OutgoingJingleSession outgoing = outgoingSessions.get(jid);
+		JingleSession outgoing = outgoingSessions.get(jid);
 		if (outgoing != null) {
 			try {
 				outgoing.terminate();
@@ -341,7 +348,7 @@ public class JingleFileTransferManager {
 			}
 		}
 
-		IncomingJingleSession incoming = incomingSessions.get(jid);
+		JingleSession incoming = incomingSessions.get(jid);
 		if (incoming != null) {
 			try {
 				incoming.terminate();

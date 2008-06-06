@@ -12,6 +12,7 @@ import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
+import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -30,18 +31,34 @@ public class FileTransferMediaManager extends JingleMediaManager {
 	private final XMPPConnection connection;
 	private IJingleFileTransferListener listener;
 	private HashMap<JID, FileTransferSession> sessions;
+	private JingleTransportManager transportManager;
 	// private FileTransferSession session;
 
 	/* tranfer data */
 	private JingleFileTransferData[] transferData;
 	private JingleFileTransferProcessMonitor monitor;
 
-	public FileTransferMediaManager() {
+//	@Deprecated
+//	public FileTransferMediaManager() {
+//		setupPayloads();
+//		this.connection = null;
+//		sessions = new HashMap<JID, FileTransferSession>();
+//	}
+	
+	public FileTransferMediaManager(JingleTransportManager transportManager) {
+		
+		super(transportManager);
+		this.transportManager = transportManager;
 		setupPayloads();
 		this.connection = null;
 		sessions = new HashMap<JID, FileTransferSession>();
 	}
 
+	@Override
+	public JingleTransportManager getTransportManager(){
+		return this.transportManager;
+	}
+	
 	@Override
 	public JingleMediaSession createMediaSession(PayloadType payloadType,
 			TransportCandidate remote, TransportCandidate local,
