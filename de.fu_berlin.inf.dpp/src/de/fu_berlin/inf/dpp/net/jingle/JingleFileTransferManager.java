@@ -15,6 +15,7 @@ import org.jivesoftware.smackx.jingle.JingleSessionRequest;
 import org.jivesoftware.smackx.jingle.JingleException;
 import org.jivesoftware.smackx.jingle.JingleNegotiatorState;
 import org.jivesoftware.smackx.jingle.listeners.JingleMediaListener;
+import org.jivesoftware.smackx.jingle.listeners.JingleSessionListener;
 import org.jivesoftware.smackx.jingle.listeners.JingleSessionRequestListener;
 //import org.jivesoftware.smackx.jingle.listeners.JingleSessionStateListener;
 import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
@@ -38,7 +39,7 @@ public class JingleFileTransferManager {
 	private HashMap<JID, JingleSession> incomingSessions = null;
 	private HashMap<JID, JingleSession> outgoingSessions = null;
 	
-	public static int JINGLE_TIME_OUT = 1000000;
+	public static int JINGLE_TIME_OUT = 10000;
 
 	/**
 	 * this map contains for all incoming and outgoing jingle sessions the
@@ -138,6 +139,42 @@ public class JingleFileTransferManager {
 //			}
 //		});
 
+		js.addListener( new JingleSessionListener(){
+
+			public void sessionClosed(String arg0, JingleSession arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void sessionClosedOnError(XMPPException arg0,
+					JingleSession arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void sessionDeclined(String arg0, JingleSession arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void sessionEstablished(PayloadType arg0,
+					TransportCandidate arg1, TransportCandidate arg2,
+					JingleSession arg3) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void sessionMediaReceived(JingleSession arg0, String arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void sessionRedirected(String arg0, JingleSession arg1) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
 		
 		/* transport events */
 		js.addTransportListener(new JingleTransportListener() {

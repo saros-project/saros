@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.invitation.internal;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -290,6 +291,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		final IProject project = workspaceRoot.getProject(newProjectName);
 		
+		File projectDir = new File(workspaceRoot.getLocation().toString() + File.separator +newProjectName);
+		if(projectDir.exists()){
+			projectDir.delete();
+		}
+		
 		/* run project read only settings in progress monitor thread. */
 		Display.getDefault().syncExec(new Runnable() {
 			public void run() {
@@ -305,8 +311,15 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 								
 								project.clearHistory(null);
 								project.refreshLocal(IProject.DEPTH_INFINITE, null);
-						
-								if (baseProject == null) {
+								
+								if(!project.exists() && new File(project.getFullPath().toOSString()).exists()){
+									/* delete project with content*/
+									new File(project.getFullPath().toOSString()).delete();
+//									project.delete(true, true, null);
+								}
+								
+								
+								if (baseProject == null) {									
 									project.create(new NullProgressMonitor());
 									project.open(new NullProgressMonitor());
 								} else {
@@ -314,7 +327,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 								}
 				
 							} catch (CoreException e) {
-								logger.warn( "",e);
+								logger.warn( "Exception during copy local ressources",e);
 								monitor.done();
 							}
 							
