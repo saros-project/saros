@@ -36,6 +36,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -53,6 +54,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
 import org.eclipse.ui.internal.wizards.datatransfer.WizardProjectsImportPage;
+import org.eclipse.ui.wizards.datatransfer.WizardExternalProjectImportPage;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -60,6 +62,7 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * A wizard that guides the user through an incoming invitiation process.
@@ -97,6 +100,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			setTitle("Session Invitation");
 			setDescription("You have been invited to join on a session for a "
 				+ "shared project. Click next if you want to accept the invitation.");
+			setImageDescriptor(SarosUI.getImageDescriptor("icons/start_invitation.png"));
 		}
 
 		/*
@@ -134,23 +138,25 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 	 */
 	private class EnterNamePage extends WizardPage {
 
+		private String COPY_CHECKBOX_MESSAGE = "Copy files from existing project";
+		
 		private Label newProjectNameLabel;
 		private Button projCopy;
 		private Text newProjectNameText;
 		private Button copyCheckbox;
+		private Button browseCreateProjectButton;
 		
 		private Button projUpd;
 		private Text updateProjectText;
 		private Button browseUpdateProjectButton;
 		
-		private Label updateProjectStatusLabel;
+		
 		private Label updateProjectStatusResult;
 		private Label updateProjectNameLabel;
 		
-		private Label scanDescriptionLabel;
-		private Button scanWorkspaceProjectsButton;
-		private boolean avoidCopy = false;
 		
+		private Button scanWorkspaceProjectsButton;
+				
 		private IProject simularProject;
 		private boolean scanRun;
 		
@@ -158,21 +164,27 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		protected EnterNamePage() {
 			super("namePage");
 			setPageComplete(false);
-
-			setTitle("Session Invitation");
-			setDescription("Enter the name of the new project.");
+			
+			setTitle("Select local project.");
+			
+			if(process.getTransferMode() == TransferMode.IBB){
+				setDescription("Attention: No direct connection avialable!");
+				setImageDescriptor(SarosUI.getImageDescriptor("icons/ibb_connection.png"));
+			}else{
+				setDescription("P2P Connection with Jingle available.");
+				setImageDescriptor(SarosUI.getImageDescriptor("icons/jingle_connection.png"));
+			}
 		}
 
 		protected void setUpdateProject(IProject project){
 			this.simularProject = project;
-
 		}
 		
 
 		private void createNewProjectGroup(Composite workArea){
 			Composite projectGroup = new Composite(workArea, SWT.NONE);
 			GridLayout layout = new GridLayout();
-			layout.numColumns = 2;
+			layout.numColumns = 3;
 			layout.makeColumnsEqualWidth = false;
 			layout.marginWidth = 0;
 			projectGroup.setLayout(layout);
@@ -195,7 +207,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 			Composite optionsGroup = new Composite(workArea, SWT.NONE);
 			GridLayout layout = new GridLayout();
-			layout.numColumns = 1;
+			layout.numColumns = 2;
 			layout.marginLeft = 20;
 			layout.makeColumnsEqualWidth = false;
 			layout.marginWidth = 0;
@@ -205,15 +217,27 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 			copyCheckbox = new Button(optionsGroup, SWT.CHECK);
 			copyCheckbox
-					.setText("Copy files from existing project");
+					.setText(COPY_CHECKBOX_MESSAGE);
 			copyCheckbox.setSelection(true);
 			copyCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			copyCheckbox.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					avoidCopy = copyCheckbox.getSelection();
-				}
-			});
 			copyCheckbox.setEnabled(false);
+			
+			browseCreateProjectButton = new Button(optionsGroup, SWT.PUSH);
+			browseCreateProjectButton.setText("Browse");
+			setButtonLayoutData(browseCreateProjectButton);
+			browseCreateProjectButton.setEnabled(true);
+			browseCreateProjectButton.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetS
+				 *      elected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				public void widgetSelected(SelectionEvent e) {
+					getProjectForCopyResourcesButtonPressed();
+				}
+
+			});
 			
 		}
 		
@@ -257,39 +281,76 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 					handleLocationProjectButtonPressed();
 				}
 
-				private void handleLocationProjectButtonPressed() {
-					DirectoryDialog dialog = new DirectoryDialog(updateProjectText.getShell());
-					dialog.setMessage("Select project for update.");
-
-					String dirName = updateProjectText.getText().trim();
-					
-
-					if (dirName.length() == 0) {
-						dialog.setFilterPath(IDEWorkbenchPlugin.getPluginWorkspace()
-								.getRoot().getLocation().toOSString());
-					} else {
-						File path = new File(dirName);
-						if (path.exists()) {
-							dialog.setFilterPath(new Path(dirName).toOSString());
-						}
-					}
-
-					String selectedDirectory = dialog.open();
-					if (selectedDirectory != null) {
-//						previouslyBrowsedDirectory = selectedDirectory;
-						updateProjectText.setText(selectedDirectory.substring(selectedDirectory.lastIndexOf(File.separator)+1));
-//						updateProjectsList(selectedDirectory);
-					}
-					
-				}
-
 			});
-			
-			
-
 
 		}
 
+		
+		/**
+		 * browse dialog to select project.
+		 */
+		private void handleLocationProjectButtonPressed() {
+			DirectoryDialog dialog = new DirectoryDialog(updateProjectText.getShell());
+			dialog.setMessage("Select project for update.");
+
+			String dirName = updateProjectText.getText().trim();
+			
+
+			if (dirName.length() == 0) {
+				dialog.setFilterPath(IDEWorkbenchPlugin.getPluginWorkspace()
+						.getRoot().getLocation().toOSString());
+			} else {
+				File path = new File(dirName);
+				if (path.exists()) {
+					dialog.setFilterPath(new Path(dirName).toOSString());
+				}
+			}
+
+			String selectedDirectory = dialog.open();
+			if (selectedDirectory != null) {
+//				previouslyBrowsedDirectory = selectedDirectory;
+				updateProjectText.setText(selectedDirectory.substring(selectedDirectory.lastIndexOf(File.separator)+1));
+//				updateProjectsList(selectedDirectory);
+			}
+			
+		}
+		
+		/**
+		 * browse dialog to select project.
+		 */
+		private void getProjectForCopyResourcesButtonPressed() {
+			DirectoryDialog dialog = new DirectoryDialog(updateProjectText.getShell());
+			dialog.setMessage("Select project for copy.");
+
+//			String dirName = updateProjectText.getText().trim();
+			String dirName = "";
+
+			if (dirName.length() == 0) {
+				dialog.setFilterPath(IDEWorkbenchPlugin.getPluginWorkspace()
+						.getRoot().getLocation().toOSString());
+			} else {
+				File path = new File(dirName);
+				if (path.exists()) {
+					dialog.setFilterPath(new Path(dirName).toOSString());
+				}
+			}
+
+			String selectedDirectory = dialog.open();
+			if (selectedDirectory != null) {
+				updateBaseProject(selectedDirectory.substring(selectedDirectory.lastIndexOf(File.separator)+1));
+//				updateProjectText.setText(selectedDirectory.substring(selectedDirectory.lastIndexOf(File.separator)+1));
+
+			}
+			
+		}
+		
+		private void updateBaseProject(String project){
+			setUpdateProject(ResourcesPlugin.getWorkspace().getRoot().getProject(project));
+			if(simularProject != null){
+				copyCheckbox.setText(COPY_CHECKBOX_MESSAGE+" ("+simularProject.getName()+")");
+				copyCheckbox.setEnabled(true);
+			}
+		}
 		
 		private void createScanStatusProject(Composite workArea){
 			Composite projectGroup = new Composite(workArea, SWT.NONE);
@@ -380,9 +441,12 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 				}
 			}
 			
+			/* update check box settings. */
 			if(simularProject != null){
-				copyCheckbox.setText(copyCheckbox.getText()+" ("+simularProject.getName()+")");
-				copyCheckbox.setEnabled(true);
+				copyCheckbox.setText(COPY_CHECKBOX_MESSAGE+" ("+simularProject.getName()+")");
+				if(!projUpd.getSelection()){
+					copyCheckbox.setEnabled(true);
+				}
 			}
 				
 		}
@@ -391,6 +455,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			if(projUpd.getSelection()){
 				newProjectNameText.setEnabled(false);
 				newProjectNameLabel.setEnabled(false);
+				browseCreateProjectButton.setEnabled(false);
 //				updateProjectStatusLabel.setEnabled(true);
 //				updateProjectStatusResult.setEnabled(true);
 				updateProjectText.setEnabled(true);
@@ -402,12 +467,14 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			else{
 				newProjectNameText.setEnabled(true);
 				newProjectNameLabel.setEnabled(true);
+				browseCreateProjectButton.setEnabled(true);
 //				updateProjectStatusLabel.setEnabled(false);
 //				updateProjectStatusResult.setEnabled(false);
 				updateProjectText.setEnabled(false);
 				browseUpdateProjectButton.setEnabled(false);
 //				scanWorkspaceProjectsButton.setEnabled(false);
 				updateProjectNameLabel.setEnabled(false);
+				
 				if(simularProject != null){
 					this.copyCheckbox.setEnabled(true);
 				}
@@ -444,10 +511,11 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 //			 */
 //			IProject project = getLocalProject();
 
-			Label helpLabel = new Label(composite, SWT.WRAP);
-			//TODO: Information about transfer mode
-			helpLabel.setText(getHelpText());
+//			Label helpLabel = new Label(composite, SWT.WRAP);
+//			//TODO: Information about transfer mode
+//			helpLabel.setText(getHelpText());
 
+			
 			projCopy = new Button(composite, SWT.RADIO);
 			projCopy.setText("Create new project copy");
 			projCopy.setSelection(true);
@@ -728,7 +796,6 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		descriptionPage = new ShowDescriptionPage();
 		namePage = new EnterNamePage();
 		
-//		addPage(new WizardProjectsImportPage());
 		addPage(descriptionPage);
 		addPage(namePage);
 
