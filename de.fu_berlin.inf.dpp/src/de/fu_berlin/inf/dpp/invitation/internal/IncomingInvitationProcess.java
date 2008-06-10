@@ -51,8 +51,8 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 
 /**
@@ -143,7 +143,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * 
 	 * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
 	 */
-	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor) {
+	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor, boolean copy) {
 
 		if (newProjectName == null && baseProject == null)
 			throw new IllegalArgumentException(
@@ -153,7 +153,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			assertState(State.HOST_FILELIST_SENT);
 
 			if (newProjectName != null) {
-				localProject = createNewProject(newProjectName, baseProject);
+				localProject = createNewProject(newProjectName, baseProject,copy);
 			} else {
 				localProject = baseProject;
 			}
@@ -281,17 +281,19 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * @param baseProject
 	 *            if not <code>null</code> all files of the baseProject will
 	 *            be copied into the new project after having created it.
+	 * @param copy
+	 * 				copy files of existing project
 	 * @return the new project.
 	 * @throws CoreException
 	 *             if something goes wrong while creating the new project.
 	 */
-	private IProject createNewProject(String newProjectName, final IProject baseProject)
+	private IProject createNewProject(String newProjectName, final IProject baseProject,final boolean copy)
 		throws CoreException {
 
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 		final IProject project = workspaceRoot.getProject(newProjectName);
 		
-		File projectDir = new File(workspaceRoot.getLocation().toString() + File.separator +newProjectName);
+		final File projectDir = new File(workspaceRoot.getLocation().toString() + File.separator +newProjectName);
 		if(projectDir.exists()){
 			projectDir.delete();
 		}
@@ -312,14 +314,14 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 								project.clearHistory(null);
 								project.refreshLocal(IProject.DEPTH_INFINITE, null);
 								
-								if(!project.exists() && new File(project.getFullPath().toOSString()).exists()){
-									/* delete project with content*/
-									new File(project.getFullPath().toOSString()).delete();
-//									project.delete(true, true, null);
-								}
+//								if(!project.exists() && new File(project.getFullPath().toOSString()).exists()){
+//									/* delete project with content*/
+//									new File(project.getFullPath().toOSString()).delete();
+////									project.delete(true, true, null);
+//								}
 								
 								
-								if (baseProject == null) {									
+								if (baseProject == null || !copy) {									
 									project.create(new NullProgressMonitor());
 									project.open(new NullProgressMonitor());
 								} else {
@@ -444,7 +446,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		users.add(host);
 		users.add(Saros.getDefault().getMyJID());
 
-		SessionManager sessionManager = Saros.getDefault().getSessionManager();
+		ISessionManager sessionManager = Saros.getDefault().getSessionManager();
 		ISharedProject sharedProject = sessionManager
 			.joinSession(localProject, host, driver, users);
 

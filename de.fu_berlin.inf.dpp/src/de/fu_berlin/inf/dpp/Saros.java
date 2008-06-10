@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
@@ -90,7 +91,7 @@ public class Saros extends AbstractUIPlugin {
 
 	private MessagingManager messagingManager;
 
-	private SessionManager sessionManager;
+	private ISessionManager sessionManager;
 	
 	private static Logger logger = Logger.getLogger(Saros.class.getName());
 
@@ -199,7 +200,7 @@ public class Saros extends AbstractUIPlugin {
 	/**
 	 * @return the SessionManager. Is never <code>null</code>.
 	 */
-	public SessionManager getSessionManager() {
+	public ISessionManager getSessionManager() {
 		return sessionManager;
 	}
 

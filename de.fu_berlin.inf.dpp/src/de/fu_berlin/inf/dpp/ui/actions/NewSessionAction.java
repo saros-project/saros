@@ -32,7 +32,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 
 /**
  * Start to share a project (a "session").
@@ -55,7 +55,7 @@ public class NewSessionAction implements IObjectActionDelegate {
 	 */
 	public void run(IAction action) {
 		try {
-			SessionManager sm = Saros.getDefault().getSessionManager();
+			ISessionManager sm = Saros.getDefault().getSessionManager();
 			sm.startSession(selectedProject);
 		} catch (final XMPPException e) {
 			Display.getDefault().syncExec(new Runnable() {
@@ -74,7 +74,7 @@ public class NewSessionAction implements IObjectActionDelegate {
 	public void selectionChanged(IAction action, ISelection selection) {
 		selectedProject = getProject(selection);
 
-		SessionManager sm = Saros.getDefault().getSessionManager();
+		ISessionManager sm = Saros.getDefault().getSessionManager();
 		boolean running = sm.getSharedProject() != null;
 		boolean connected = Saros.getDefault().isConnected();
 

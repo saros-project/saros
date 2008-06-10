@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.Status;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This model provider is responsible for keeping an session observer from
@@ -66,7 +66,7 @@ public class SharedModelProvider extends ModelProvider implements ISessionListen
 
 	@Override
 	protected void initialize() {
-		SessionManager sm = Saros.getDefault().getSessionManager();
+		ISessionManager sm = Saros.getDefault().getSessionManager();
 
 		sm.addSessionListener(this);
 		sharedProject = sm.getSharedProject();

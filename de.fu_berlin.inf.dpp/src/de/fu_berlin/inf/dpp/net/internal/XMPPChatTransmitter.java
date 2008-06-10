@@ -88,8 +88,8 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 
 /**
@@ -754,7 +754,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 					TimedActivity timedActivity = new TimedActivity(activity,
 							time);
 
-					SessionManager sm = Saros.getDefault().getSessionManager();
+					ISessionManager sm = Saros.getDefault().getSessionManager();
 					sm.getSharedProject().getSequencer().exec(timedActivity);
 				}
 
@@ -1210,7 +1210,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			String pName = inviteExtension
 					.getValue(PacketExtensions.PROJECTNAME);
 
-			SessionManager sm = Saros.getDefault().getSessionManager();
+			ISessionManager sm = Saros.getDefault().getSessionManager();
 			sm.invitationReceived(fromJID, pName, desc);
 		}
 
@@ -1516,7 +1516,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 				TimedActivity timedActivity = new TimedActivity(activity, time);
 
-				SessionManager sm = Saros.getDefault().getSessionManager();
+				ISessionManager sm = Saros.getDefault().getSessionManager();
 				sm.getSharedProject().getSequencer().exec(timedActivity);
 			}
 
@@ -1572,7 +1572,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 				TimedActivity timedActivity = new TimedActivity(activity, time);
 
-				SessionManager sm = Saros.getDefault().getSessionManager();
+				ISessionManager sm = Saros.getDefault().getSessionManager();
 				sm.getSharedProject().getSequencer().exec(timedActivity);
 			}
 

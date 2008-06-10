@@ -8,9 +8,9 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 
 public class SharedDocumentProvider extends TextFileDocumentProvider implements ISessionListener,
 	ISharedProjectListener {
@@ -20,7 +20,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements 
 	private boolean isDriver;
 
 	public SharedDocumentProvider() {
-		SessionManager sm = Saros.getDefault().getSessionManager();
+		ISessionManager sm = Saros.getDefault().getSessionManager();
 		if (sm.getSharedProject() != null)
 			sessionStarted(sm.getSharedProject());
 

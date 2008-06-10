@@ -27,8 +27,8 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
@@ -51,7 +51,7 @@ public class InviteAction extends SelectionProviderAction implements ISessionLis
 	@Override
 	public void run() {
 		JID jid = new JID(selectedEntry.getUser());
-		SessionManager sessionManager = Saros.getDefault().getSessionManager();
+		ISessionManager sessionManager = Saros.getDefault().getSessionManager();
 		ISharedProject project = sessionManager.getSharedProject();
 
 		project.startInvitation(jid);

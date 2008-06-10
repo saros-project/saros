@@ -47,8 +47,8 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 
@@ -58,7 +58,7 @@ public class SarosUI implements ISessionListener {
 
 	private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
-	public SarosUI(SessionManager sessionManager) {
+	public SarosUI(ISessionManager sessionManager) {
 		setupCompilationUnitDocumentProvider();
 		sessionManager.addSessionListener(this);
 	}

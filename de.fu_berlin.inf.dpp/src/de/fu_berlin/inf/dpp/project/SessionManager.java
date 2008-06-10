@@ -48,7 +48,7 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
  * 
  * @author rdjemili
  */
-public class SessionManager implements IConnectionListener {
+public class SessionManager implements IConnectionListener, ISessionManager {
 	private static Logger log = Logger.getLogger(SessionManager.class.getName());
 
 	private SharedProject sharedProject;
@@ -62,13 +62,8 @@ public class SessionManager implements IConnectionListener {
 		Saros.getDefault().addListener(this);
 	}
 
-	/**
-	 * Starts a new shared project with the local user as only participant.
-	 * 
-	 * @param project
-	 *            the local Eclipse project which should become shared.
-	 * @throws XMPPException
-	 *             if this method is called with no established XMPP-connection.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#startSession(org.eclipse.core.resources.IProject)
 	 */
 	public void startSession(IProject project) throws XMPPException {
 		if (!Saros.getDefault().isConnected()) {
@@ -88,19 +83,8 @@ public class SessionManager implements IConnectionListener {
 		log.info("Session started");
 	}
 
-	/**
-	 * Joins an remotly already running shared project.
-	 * 
-	 * @param project
-	 *            the local Eclipse project which should be used to replicate
-	 *            the remote shared project.
-	 * @param host
-	 *            the host of the remotly shared project.
-	 * @param driver
-	 *            the driver of the shared project.
-	 * @param users
-	 *            the participants of the shared project.
-	 * @return the shared project.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#joinSession(org.eclipse.core.resources.IProject, de.fu_berlin.inf.dpp.net.JID, de.fu_berlin.inf.dpp.net.JID, java.util.List)
 	 */
 	public ISharedProject joinSession(IProject project, JID host, JID driver, List<JID> users) {
 
@@ -117,11 +101,8 @@ public class SessionManager implements IConnectionListener {
 		return sharedProject;
 	}
 
-	/**
-	 * Leaves the currently active session. If the local user is the host, this
-	 * will close the session for everybody.
-	 * 
-	 * Has no effect if there is no currently shared project.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#leaveSession()
 	 */
 	public void leaveSession() {
 		if (sharedProject == null)
@@ -142,20 +123,15 @@ public class SessionManager implements IConnectionListener {
 		log.info("Session left");
 	}
 
-	/**
-	 * @return the active SharedProject object or <code>null</code> if there
-	 *         is no active project.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#getSharedProject()
 	 */
 	public ISharedProject getSharedProject() {
 		return sharedProject;
 	}
 
-	/**
-	 * Add the given session listener. Is ignored if the listener is already
-	 * listening.
-	 * 
-	 * @param listener
-	 *            the listener that is to be added.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#addSessionListener(de.fu_berlin.inf.dpp.project.ISessionListener)
 	 */
 	public void addSessionListener(ISessionListener listener) {
 		if (!listeners.contains(listener)) {
@@ -163,27 +139,15 @@ public class SessionManager implements IConnectionListener {
 		}
 	}
 
-	/**
-	 * Removes the given session listener. Is ignored if the given listener
-	 * wasn't listening.
-	 * 
-	 * @param listener
-	 *            the listener that is to be removed.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#removeSessionListener(de.fu_berlin.inf.dpp.project.ISessionListener)
 	 */
 	public void removeSessionListener(ISessionListener listener) {
 		listeners.remove(listener);
 	}
 
-	/**
-	 * Is fired when an incoming invitation is received.
-	 * 
-	 * @param from
-	 *            the sender of this invitation.
-	 * @param description
-	 *            the informal description text that can be given with
-	 *            invitations.
-	 * @return the process that represents the invitation and which handles the
-	 *         further interaction with the invitation.
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#invitationReceived(de.fu_berlin.inf.dpp.net.JID, java.lang.String, java.lang.String)
 	 */
 	public IIncomingInvitationProcess invitationReceived(JID from, String projectName,
 		String description) {
@@ -204,6 +168,9 @@ public class SessionManager implements IConnectionListener {
 	 * (non-Javadoc)
 	 * 
 	 * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+	 */
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#connectionStateChanged(org.jivesoftware.smack.XMPPConnection, de.fu_berlin.inf.dpp.Saros.ConnectionState)
 	 */
 	public void connectionStateChanged(XMPPConnection connection, ConnectionState newState) {
 
@@ -266,6 +233,9 @@ public class SessionManager implements IConnectionListener {
 		});
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#OnReconnect(int)
+	 */
 	public void OnReconnect(int oldtimestamp){
 
 		if (sharedProject==null)

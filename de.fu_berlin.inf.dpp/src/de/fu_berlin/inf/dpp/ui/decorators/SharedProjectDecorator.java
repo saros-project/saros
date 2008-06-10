@@ -36,8 +36,8 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
@@ -58,7 +58,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator, ISess
 	private List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
 	public SharedProjectDecorator() {
-		SessionManager sessionManager = Saros.getDefault().getSessionManager();
+		ISessionManager sessionManager = Saros.getDefault().getSessionManager();
 		sessionManager.addSessionListener(this);
 
 		if (sessionManager.getSharedProject() != null) {

@@ -24,8 +24,8 @@ import org.eclipse.jface.action.Action;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
@@ -84,7 +84,7 @@ public class LeaveSessionAction extends Action implements ISessionListener {
 		setEnabled(getSessionManager().getSharedProject() != null);
 	}
 
-	private static SessionManager getSessionManager() {
+	private static ISessionManager getSessionManager() {
 		return Saros.getDefault().getSessionManager();
 	}
 }

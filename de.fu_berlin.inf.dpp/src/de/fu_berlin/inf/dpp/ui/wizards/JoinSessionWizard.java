@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,26 +31,34 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.ui.internal.ide.IDEWorkbenchPlugin;
+import org.eclipse.ui.internal.wizards.datatransfer.WizardProjectsImportPage;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -75,6 +84,8 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 	
 	private Display display = null;
 
+	
+	
 	/**
 	 * A wizard page that displays the name of the inviter and the description
 	 * provided with the invitation.
@@ -116,15 +127,32 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			setControl(composite);
 		}
 	}
-
+	
 	/**
 	 * A wizard page that allows to enter the new project name or to choose to
 	 * overwrite the project selected by the {@link ProjectSelectionPage}.
 	 */
 	private class EnterNamePage extends WizardPage {
 
+		private Label newProjectNameLabel;
+		private Button projCopy;
 		private Text newProjectNameText;
+		private Button copyCheckbox;
+		
 		private Button projUpd;
+		private Text updateProjectText;
+		private Button browseUpdateProjectButton;
+		
+		private Label updateProjectStatusLabel;
+		private Label updateProjectStatusResult;
+		private Label updateProjectNameLabel;
+		
+		private Label scanDescriptionLabel;
+		private Button scanWorkspaceProjectsButton;
+		private boolean avoidCopy = false;
+		
+		private IProject simularProject;
+		private boolean scanRun;
 		
 		
 		protected EnterNamePage() {
@@ -135,67 +163,338 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			setDescription("Enter the name of the new project.");
 		}
 
+		protected void setUpdateProject(IProject project){
+			this.simularProject = project;
+
+		}
+		
+
+		private void createNewProjectGroup(Composite workArea){
+			Composite projectGroup = new Composite(workArea, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 2;
+			layout.makeColumnsEqualWidth = false;
+			layout.marginWidth = 0;
+			projectGroup.setLayout(layout);
+			projectGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			
+			newProjectNameLabel = new Label(projectGroup, SWT.NONE);
+			newProjectNameLabel.setText("Project name");
+//			newProjectNameLabel.setLayoutData(new GridData(
+//					GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+
+			newProjectNameText = new Text(projectGroup, SWT.BORDER);
+			newProjectNameText.setLayoutData(new GridData(
+					GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+			newProjectNameText.setFocus();
+			newProjectNameText.setText(findProjectNameProposal());
+			
+		}
+		
+		private void createOptionArea(Composite workArea) {
+			
+			Composite optionsGroup = new Composite(workArea, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 1;
+			layout.marginLeft = 20;
+			layout.makeColumnsEqualWidth = false;
+			layout.marginWidth = 0;
+			
+			optionsGroup.setLayout(layout);
+			optionsGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			
+			copyCheckbox = new Button(optionsGroup, SWT.CHECK);
+			copyCheckbox
+					.setText("Copy files from existing project");
+			copyCheckbox.setSelection(true);
+			copyCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			copyCheckbox.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					avoidCopy = copyCheckbox.getSelection();
+				}
+			});
+			copyCheckbox.setEnabled(false);
+			
+		}
+		
+		
+		private void createUpdateProjectGroup(Composite workArea) {
+			Composite projectGroup = new Composite(workArea, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 4;
+			layout.makeColumnsEqualWidth = false;
+			layout.marginWidth = 0;
+			projectGroup.setLayout(layout);
+			GridData data = new GridData(GridData.FILL_HORIZONTAL);
+			data.verticalIndent = 10;
+			projectGroup.setLayoutData(data);
+			
+			updateProjectNameLabel = new Label(projectGroup, SWT.NONE);
+			updateProjectNameLabel.setText("Project name");
+//			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
+//			gridData.verticalIndent = 3;
+			updateProjectNameLabel.setEnabled(false);
+
+			updateProjectText = new Text(projectGroup, SWT.BORDER);
+			updateProjectText.setLayoutData(new GridData(
+					GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+			updateProjectText.setFocus();
+			updateProjectText.setEnabled(false);
+			updateProjectText.setText("");
+			
+			browseUpdateProjectButton = new Button(projectGroup, SWT.PUSH);
+			browseUpdateProjectButton.setText("Browse");
+			setButtonLayoutData(browseUpdateProjectButton);
+			browseUpdateProjectButton.setEnabled(false);
+			browseUpdateProjectButton.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetS
+				 *      elected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				public void widgetSelected(SelectionEvent e) {
+					handleLocationProjectButtonPressed();
+				}
+
+				private void handleLocationProjectButtonPressed() {
+					DirectoryDialog dialog = new DirectoryDialog(updateProjectText.getShell());
+					dialog.setMessage("Select project for update.");
+
+					String dirName = updateProjectText.getText().trim();
+					
+
+					if (dirName.length() == 0) {
+						dialog.setFilterPath(IDEWorkbenchPlugin.getPluginWorkspace()
+								.getRoot().getLocation().toOSString());
+					} else {
+						File path = new File(dirName);
+						if (path.exists()) {
+							dialog.setFilterPath(new Path(dirName).toOSString());
+						}
+					}
+
+					String selectedDirectory = dialog.open();
+					if (selectedDirectory != null) {
+//						previouslyBrowsedDirectory = selectedDirectory;
+						updateProjectText.setText(selectedDirectory.substring(selectedDirectory.lastIndexOf(File.separator)+1));
+//						updateProjectsList(selectedDirectory);
+					}
+					
+				}
+
+			});
+			
+			
+
+
+		}
+
+		
+		private void createScanStatusProject(Composite workArea){
+			Composite projectGroup = new Composite(workArea, SWT.NONE);
+			GridLayout layout = new GridLayout();
+			layout.numColumns = 2;
+			layout.makeColumnsEqualWidth = false;
+			layout.marginWidth = 10;
+			projectGroup.setLayout(layout);
+			GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL);
+			data.verticalIndent = 1;
+			projectGroup.setLayoutData(data);	
+			
+			
+			scanWorkspaceProjectsButton = new Button(projectGroup, SWT.PUSH);
+			scanWorkspaceProjectsButton.setText("Scan");
+			setButtonLayoutData(scanWorkspaceProjectsButton);
+			
+			scanWorkspaceProjectsButton.addSelectionListener(new SelectionAdapter(){
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionAdapter#widgetS
+				 *      elected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				public void widgetSelected(SelectionEvent e) {
+					scanProjectButtonPressed();
+					
+					updateProjectStatusResult.setText(getStatusText(simularProject));
+					if(simularProject != null){
+						updateProjectText.setText(simularProject.getName());
+					}
+					updatePageComplete();
+				}
+
+				
+			});	
+			
+			updateProjectStatusResult = new Label(projectGroup, SWT.NONE);
+			updateProjectStatusResult.setText("No scan results.");
+			updateProjectStatusResult.setLayoutData(new GridData(
+					GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL ));
+			
+			
+		}
+		
+		private void scanProjectButtonPressed() {
+			/**
+			 * Match all workspace project list and get the best
+			 */
+
+			scanRun = true;
+			/* run project read only settings in progress monitor thread. */
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+							Display.getDefault().getActiveShell());
+					try {
+						dialog.run(true, false, new IRunnableWithProgress() {
+							public void run(IProgressMonitor monitor) {
+								
+								monitor.beginTask("Project scanning ... ",0);
+								final IProject project = getLocalProject();
+								monitor.done();
+								setUpdateProject(project);
+								scanRun = false;
+							}
+
+						});
+					} catch (InvocationTargetException e) {
+						 log.log(Level.WARNING, "",e);
+//						log.warn("", e);
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						 log.log(Level.WARNING, "",e);
+//						log.warn("", e);
+						e.printStackTrace();
+					}
+
+				}
+			});
+			
+			while(scanRun){
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			if(simularProject != null){
+				copyCheckbox.setText(copyCheckbox.getText()+" ("+simularProject.getName()+")");
+				copyCheckbox.setEnabled(true);
+			}
+				
+		}
+		
+		private void copyRadioSelected() {
+			if(projUpd.getSelection()){
+				newProjectNameText.setEnabled(false);
+				newProjectNameLabel.setEnabled(false);
+//				updateProjectStatusLabel.setEnabled(true);
+//				updateProjectStatusResult.setEnabled(true);
+				updateProjectText.setEnabled(true);
+				browseUpdateProjectButton.setEnabled(true);
+//				scanWorkspaceProjectsButton.setEnabled(true);
+				updateProjectNameLabel.setEnabled(true);
+				this.copyCheckbox.setEnabled(false);
+			}
+			else{
+				newProjectNameText.setEnabled(true);
+				newProjectNameLabel.setEnabled(true);
+//				updateProjectStatusLabel.setEnabled(false);
+//				updateProjectStatusResult.setEnabled(false);
+				updateProjectText.setEnabled(false);
+				browseUpdateProjectButton.setEnabled(false);
+//				scanWorkspaceProjectsButton.setEnabled(false);
+				updateProjectNameLabel.setEnabled(false);
+				if(simularProject != null){
+					this.copyCheckbox.setEnabled(true);
+				}
+			}
+			updatePageComplete();
+		}
+		
 		/*
 		 * (non-Javadoc)
 		 * 
 		 * @see org.eclipse.jface.dialogs.IDialogPage
 		 */
 		public void createControl(Composite parent) {
-
+			
+			
 			if ( process.getState()==State.CANCELED)
 				return;
 
+			/* wait for getting project file list. */
 			requestRemoteFileList();
 			
 			if (process.getRemoteFileList() == null)
 				getShell().close();
 
 			Composite composite = new Composite(parent, SWT.NONE);
-			composite.setLayout(new GridLayout(2, false));
+			composite.setLayout(new GridLayout());
+			GridData gridData = new GridData(GridData.FILL_VERTICAL);
+			gridData.verticalIndent = 20;
+			composite.setLayoutData(gridData);
 
-			GridData gridData;
 			
-			IProject project = getLocalProject();
+//			/**
+//			 * Match all workspace project list and get the best
+//			 */
+//			IProject project = getLocalProject();
 
 			Label helpLabel = new Label(composite, SWT.WRAP);
-			helpLabel.setText(getHelpText(project));
-			helpLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, false, false, 2, 1));
+			//TODO: Information about transfer mode
+			helpLabel.setText(getHelpText());
 
-			Button projCopy = new Button(composite, SWT.RADIO);
+			projCopy = new Button(composite, SWT.RADIO);
 			projCopy.setText("Create new project copy");
 			projCopy.setSelection(true);
-			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false,2,1);
-			gridData.verticalIndent = 20;
-			projCopy.setLayoutData(gridData);
-			
-			Label newProjectNameLabel = new Label(composite, SWT.NONE);
-			newProjectNameLabel.setText("Project name");
-			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false);
-			gridData.verticalIndent = 3;
-			newProjectNameLabel.setLayoutData(gridData);
 
-			newProjectNameText = new Text(composite, SWT.BORDER);
-			gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
-			gridData.verticalIndent = 1;
-			newProjectNameText.setLayoutData(gridData);
-			newProjectNameText.setFocus();
-			newProjectNameText.setText(findProjectNameProposal());
+			projCopy.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				public void widgetSelected(SelectionEvent e) {
+					copyRadioSelected();
+				}
+	
+			});
+			
+			createNewProjectGroup(composite);
+			createOptionArea(composite);
 			
 			projUpd = new Button(composite, SWT.RADIO);
 			projUpd.setText("Update and use existing project");
-			if (project==null)
-				projUpd.setEnabled(false);
-			else
-				projUpd.setText("Update and use existing project ("+ project.getName() +")");
-			gridData = new GridData(SWT.FILL, SWT.BEGINNING, false, false,2,1);
-			gridData.verticalIndent = 20;
-			projUpd.setLayoutData(gridData);
 
+			
+			projUpd.addSelectionListener(new SelectionAdapter() {
+				/*
+				 * (non-Javadoc)
+				 * 
+				 * @see org.eclipse.swt.events.SelectionListener#widgetSelected(org.eclipse.swt.events.SelectionEvent)
+				 */
+				public void widgetSelected(SelectionEvent e) {
+					copyRadioSelected();
+				}
+	
+			});
+
+			createUpdateProjectGroup(composite);
+			
+			createScanStatusProject(composite);
+
+			
 			attachListeners();
 			setControl(composite);
 
 			updatePageComplete();
 		}
+
+		
 
 		/**
 		 * @return the project name of the project that should be created or
@@ -205,7 +504,24 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		public String getNewProjectName() {
 			return projUpd.getSelection()?null:newProjectNameText.getText();
 		}
+		
+		/**
+		 * 
+		 * @return the selection value of copyCheckbox of false if copyCheckbox
+		 * not enabled.
+		 */
+		public boolean getCopyValue(){
+			boolean result = false;
+			if(copyCheckbox.isEnabled()){
+				result = copyCheckbox.getSelection();
+			}
+			return result;
+		}
 
+		/**
+		 * match all project from workspace with remote project list.
+		 * @return
+		 */
 		private IProject getLocalProject() {
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			IProject[] projects = workspace.getRoot().getProjects();
@@ -223,7 +539,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 					selectedProject = projects[i];
 				}
 			}
-
+			
 			return selectedProject;
 		}
 
@@ -255,11 +571,22 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			}
 		}
 
-		private String getHelpText(IProject project) {
+		private String getHelpText(){
+			String text = null;
+			if(process.getTransferMode() == TransferMode.IBB){
+				text = "No direct communication available!";
+			}
+			else{
+				text = "Direct communication available.";
+			}
+			return text;
+		}
+		
+		private String getStatusText(IProject project) {
 			if (project == null) {
 				return "Project replication will start from scratch.";
 			}
-
+			
 			return "It has been detected that one of your local projects (" + project.getName()
 				+ ") has an identicallness of " + getMatch(project) + "%.\n"
 				+ "This fact will used to shorten the process of "
@@ -272,30 +599,66 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 					updatePageComplete();
 				}
 			});
+			updateProjectText.addModifyListener(new ModifyListener() {
+				public void modifyText(ModifyEvent e) {
+					updatePageComplete();
+				}
+			});
 		}
 
+		/**
+		 * check for page status.
+		 */
 		private void updatePageComplete() {
 
-			String newText = newProjectNameText.getText();
-
-			if (newText.length() == 0) {
-				setMessage(null);
-				setErrorMessage("Please set a project name");
-				setPageComplete(false);
+			String newText = null;
+			
+			if(!projUpd.getSelection()){
+				newText = newProjectNameText.getText();	
+			
 				
-			} else {
-				if (projectIsUnique(newText)) {
+				if (newText.length() == 0) {
 					setMessage(null);
-					setErrorMessage(null);
-					setPageComplete(true);
+					setErrorMessage("Please set a project name");
+					setPageComplete(false);
 					
 				} else {
+					if (projectIsUnique(newText)) {
+						setMessage(null);
+						setErrorMessage(null);
+						setPageComplete(true);
+						
+					} else {
+						setMessage(null);
+						setErrorMessage("A project with this name already exists");
+						setPageComplete(false);
+					}
+				}
+				
+			}else{
+				newText = updateProjectText.getText();
+				
+				if (newText.length() == 0) {
 					setMessage(null);
-					setErrorMessage("A project with this name already exists");
+					setErrorMessage("Please set a project name");
 					setPageComplete(false);
+					
+				} else {
+					if (!projectIsUnique(newText)) {
+						setMessage(null);
+						setErrorMessage(null);
+						setPageComplete(true);
+						
+					} else {
+						setMessage(null);
+						setErrorMessage("No update project exists with this name");
+						setPageComplete(false);
+					}
 				}
 			}
 		}
+		
+		
 	}
 
 	public JoinSessionWizard(IIncomingInvitationProcess process) {
@@ -364,9 +727,11 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 	public void addPages() {
 		descriptionPage = new ShowDescriptionPage();
 		namePage = new EnterNamePage();
-
+		
+//		addPage(new WizardProjectsImportPage());
 		addPage(descriptionPage);
 		addPage(namePage);
+
 	}
 
 	@Override
@@ -383,13 +748,14 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		
 		final IProject project = namePage.getLocalProject();
 		final String newProjectName = namePage.getNewProjectName();
+		final boolean copyValue = namePage.getCopyValue();
 
 		try {
 			getContainer().run(true, true, new IRunnableWithProgress() {
 				public void run(IProgressMonitor monitor) throws InvocationTargetException,
 					InterruptedException {
-
-					process.accept(project, newProjectName, monitor);
+					
+					process.accept(project, newProjectName, monitor, copyValue );
 				}
 			});
 		} catch (InvocationTargetException e) {
@@ -444,3 +810,4 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		
 	}
 }
+
