@@ -153,11 +153,11 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		
 		private Label updateProjectStatusResult;
 		private Label updateProjectNameLabel;
-		
-		
 		private Button scanWorkspaceProjectsButton;
-				
+		
+		/* project for update or base project for copy into new project*/
 		private IProject simularProject;
+		/* variable for scan process. */
 		private boolean scanRun;
 		
 		
@@ -167,21 +167,39 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 			setTitle("Select local project.");
 			
-			if(process.getTransferMode() == TransferMode.IBB){
-				setDescription("Attention: No direct connection avialable!");
-				setImageDescriptor(SarosUI.getImageDescriptor("icons/ibb_connection.png"));
-			}else{
-				setDescription("P2P Connection with Jingle available.");
-				setImageDescriptor(SarosUI.getImageDescriptor("icons/jingle_connection.png"));
-			}
+			/*
+			 * set connection status information.
+			 */
+			checkConnectionStatus();
 		}
 
 		protected void setUpdateProject(IProject project){
 			this.simularProject = project;
 		}
 		
-
+		/**
+		 * get transfer mode and set header information of the wizard.
+		 */
+		private void checkConnectionStatus(){
+			if(process.getTransferMode() == TransferMode.IBB){
+				setDescription("Attention: No direct connection avialable!"+'\n'+ "Suggestion: Update an existing project or copy resources from another project.");
+				setImageDescriptor(SarosUI.getImageDescriptor("icons/ibb_connection.png"));
+			}else{
+				setDescription("P2P Connection with Jingle available.");
+				setImageDescriptor(SarosUI.getImageDescriptor("icons/jingle_connection.png"));
+			}
+		}
+		
+		/**
+		 * create components of create new project area for enternamepage wizard.
+		 * @param workArea composite of appropriate wizard
+		 */
 		private void createNewProjectGroup(Composite workArea){
+			/*
+			 * set connection status information.
+			 */
+			checkConnectionStatus();
+			
 			Composite projectGroup = new Composite(workArea, SWT.NONE);
 			GridLayout layout = new GridLayout();
 			layout.numColumns = 3;
@@ -203,6 +221,10 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 		}
 		
+		/**
+		 * create components of option area for enternamepage wizard.
+		 * @param workArea composite of appropriate wizard
+		 */
 		private void createOptionArea(Composite workArea) {
 			
 			Composite optionsGroup = new Composite(workArea, SWT.NONE);
@@ -224,6 +246,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 			browseCreateProjectButton = new Button(optionsGroup, SWT.PUSH);
 			browseCreateProjectButton.setText("Browse");
+			browseCreateProjectButton.setToolTipText("Select project for copy local resources into new project.");
 			setButtonLayoutData(browseCreateProjectButton);
 			browseCreateProjectButton.setEnabled(true);
 			browseCreateProjectButton.addSelectionListener(new SelectionAdapter() {
@@ -241,7 +264,10 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 		}
 		
-		
+		/**
+		 * create components of update area for enternamepage wizard.
+		 * @param workArea composite of appropriate wizard
+		 */
 		private void createUpdateProjectGroup(Composite workArea) {
 			Composite projectGroup = new Composite(workArea, SWT.NONE);
 			GridLayout layout = new GridLayout();
@@ -287,7 +313,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 
 		
 		/**
-		 * browse dialog to select project.
+		 * browse dialog to select project to update.
 		 */
 		private void handleLocationProjectButtonPressed() {
 			DirectoryDialog dialog = new DirectoryDialog(updateProjectText.getShell());
@@ -308,21 +334,18 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 
 			String selectedDirectory = dialog.open();
 			if (selectedDirectory != null) {
-//				previouslyBrowsedDirectory = selectedDirectory;
 				updateProjectText.setText(selectedDirectory.substring(selectedDirectory.lastIndexOf(File.separator)+1));
-//				updateProjectsList(selectedDirectory);
 			}
 			
 		}
 		
 		/**
-		 * browse dialog to select project.
+		 * browse dialog to select project for copy.
 		 */
 		private void getProjectForCopyResourcesButtonPressed() {
 			DirectoryDialog dialog = new DirectoryDialog(updateProjectText.getShell());
 			dialog.setMessage("Select project for copy.");
 
-//			String dirName = updateProjectText.getText().trim();
 			String dirName = "";
 
 			if (dirName.length() == 0) {
@@ -344,6 +367,10 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 		}
 		
+		/**
+		 * set selected project for copy and set appropiate checkbox information.
+		 * @param project selected project for copy
+		 */
 		private void updateBaseProject(String project){
 			setUpdateProject(ResourcesPlugin.getWorkspace().getRoot().getProject(project));
 			if(simularProject != null){
@@ -352,6 +379,10 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			}
 		}
 		
+		/**
+		 * create scan elements for enternamepage wizard.
+		 * @param workArea composite of appropriate wizard page
+		 */
 		private void createScanStatusProject(Composite workArea){
 			Composite projectGroup = new Composite(workArea, SWT.NONE);
 			GridLayout layout = new GridLayout();
@@ -365,7 +396,8 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 			
 			scanWorkspaceProjectsButton = new Button(projectGroup, SWT.PUSH);
-			scanWorkspaceProjectsButton.setText("Scan");
+			scanWorkspaceProjectsButton.setText("Scan workspace");
+			scanWorkspaceProjectsButton.setToolTipText("Scan workspace for simular projects.");
 			setButtonLayoutData(scanWorkspaceProjectsButton);
 			
 			scanWorkspaceProjectsButton.addSelectionListener(new SelectionAdapter(){
@@ -396,6 +428,9 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			
 		}
 		
+		/**
+		 * action method for scan button.
+		 */
 		private void scanProjectButtonPressed() {
 			/**
 			 * Match all workspace project list and get the best
@@ -411,7 +446,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 						dialog.run(true, false, new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) {
 								
-								monitor.beginTask("Project scanning ... ",0);
+								monitor.beginTask("Scanning workspace projects ... ",0);
 								final IProject project = getLocalProject();
 								monitor.done();
 								setUpdateProject(project);
@@ -451,16 +486,17 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 				
 		}
 		
+		/**
+		 * select and unselect gui components depending on 
+		 * selected option.
+		 */
 		private void copyRadioSelected() {
 			if(projUpd.getSelection()){
 				newProjectNameText.setEnabled(false);
 				newProjectNameLabel.setEnabled(false);
 				browseCreateProjectButton.setEnabled(false);
-//				updateProjectStatusLabel.setEnabled(true);
-//				updateProjectStatusResult.setEnabled(true);
 				updateProjectText.setEnabled(true);
 				browseUpdateProjectButton.setEnabled(true);
-//				scanWorkspaceProjectsButton.setEnabled(true);
 				updateProjectNameLabel.setEnabled(true);
 				this.copyCheckbox.setEnabled(false);
 			}
@@ -468,11 +504,8 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 				newProjectNameText.setEnabled(true);
 				newProjectNameLabel.setEnabled(true);
 				browseCreateProjectButton.setEnabled(true);
-//				updateProjectStatusLabel.setEnabled(false);
-//				updateProjectStatusResult.setEnabled(false);
 				updateProjectText.setEnabled(false);
 				browseUpdateProjectButton.setEnabled(false);
-//				scanWorkspaceProjectsButton.setEnabled(false);
 				updateProjectNameLabel.setEnabled(false);
 				
 				if(simularProject != null){
@@ -504,16 +537,6 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			GridData gridData = new GridData(GridData.FILL_VERTICAL);
 			gridData.verticalIndent = 20;
 			composite.setLayoutData(gridData);
-
-			
-//			/**
-//			 * Match all workspace project list and get the best
-//			 */
-//			IProject project = getLocalProject();
-
-//			Label helpLabel = new Label(composite, SWT.WRAP);
-//			//TODO: Information about transfer mode
-//			helpLabel.setText(getHelpText());
 
 			
 			projCopy = new Button(composite, SWT.RADIO);
@@ -552,7 +575,6 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			});
 
 			createUpdateProjectGroup(composite);
-			
 			createScanStatusProject(composite);
 
 			
@@ -637,17 +659,6 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 			} catch (InterruptedException e) {
 				log.log(Level.FINE, "Request of remote file list canceled/interrupted", e);
 			}
-		}
-
-		private String getHelpText(){
-			String text = null;
-			if(process.getTransferMode() == TransferMode.IBB){
-				text = "No direct communication available!";
-			}
-			else{
-				text = "Direct communication available.";
-			}
-			return text;
 		}
 		
 		private String getStatusText(IProject project) {

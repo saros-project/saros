@@ -117,8 +117,12 @@ public abstract class InvitationProcess implements IInvitationProcess {
 		if (!replicated) {
 			transmitter.sendCancelInvitationMessage(peer, errorMsg);
 			
+			String message = errorMsg;
 			/* inform user. */
-			ErrorMessageDialog.showErrorMessage(errorMsg);
+			if(errorMsg == null){
+				message = "Invitation canceled.";
+			}
+			ErrorMessageDialog.showErrorMessage(message);
 		}
 
 		invitationUI.cancel(errorMsg, replicated);
