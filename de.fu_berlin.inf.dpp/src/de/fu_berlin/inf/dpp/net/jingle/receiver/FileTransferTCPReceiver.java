@@ -132,6 +132,22 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 							
 						}
 						if (transmit) {
+							
+//							if(transferData == null){
+//								throw new JingleSessionException("No Transfer Data for sending remote filelist.");
+//							}
+							
+							int waitcount = 5;
+							while(transferData == null){
+								/* wait for transferData*/
+								logger.info("No TransferData available. Try again.");
+								Thread.sleep(50);
+								waitcount--;
+								if(waitcount < 1 && transferData == null){
+									throw new JingleSessionException("No Transfer Data for sending remote filelist.");
+								}
+							}
+							
 							/* send file number. */
 							output.write(transferData.length);
 
@@ -174,14 +190,23 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 						listener.exceptionOccured(new JingleSessionException(se
 								.getMessage()));
 					}
+					logger.error("Socket Exception",se);
 					se.printStackTrace();
 					return;
-				} catch (Exception e1) {
+				} 
+				catch(JingleSessionException jse){
+					if (listener != null) {
+						listener.exceptionOccured(jse);
+					}
+					logger.error("JingleSessionException",jse);
+					return;
+				}
+				catch (Exception e1) {
 					if (listener != null) {
 						listener.exceptionOccured(new JingleSessionException(e1
 								.getMessage()));
 					}
-					e1.printStackTrace();
+					logger.error("Exception",e1);
 					return;
 				}
 			}
