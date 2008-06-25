@@ -11,6 +11,8 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.JingleManager;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.JingleSessionRequest;
+import org.jivesoftware.smackx.jingle.JingleSessionState;
+import org.jivesoftware.smackx.jingle.JingleSessionStatePending;
 //import org.jivesoftware.smackx.jingle.OutgoingJingleSession;
 import org.jivesoftware.smackx.jingle.JingleException;
 import org.jivesoftware.smackx.jingle.JingleNegotiatorState;
@@ -142,13 +144,26 @@ public class JingleFileTransferManager {
 		js.addListener( new JingleSessionListener(){
 
 			public void sessionClosed(String arg0, JingleSession arg1) {
-				// TODO Auto-generated method stub
+				logger.info("session closed : " + jid.toString());
+				
+				/* if session closed during pending process, fallback to XEP-0096 transfer*/
+				if(arg1.getNegotiatorState() == JingleNegotiatorState.PENDING && (connectionStates.get(jid) != JingleConnectionState.ESTABLISHED && connectionStates.get(jid) != JingleConnectionState.ERROR)){
+					logger.error("Session closed during pending process : "+jid + " with current state : "+getState(jid));
+					connectionStates.remove(jid);
+					connectionStates.put(jid, JingleConnectionState.ERROR);
+					transmitter.exceptionOccured(new JingleSessionException("Session closed during establishing process",jid));
+					
+				}
+				connectionStates.remove(jid);
+				connectionStates.put(jid, JingleConnectionState.CLOSED);
 				
 			}
 
 			public void sessionClosedOnError(XMPPException arg0,
 					JingleSession arg1) {
-				// TODO Auto-generated method stub
+				logger.error("session closed on error : " + jid.toString());
+				connectionStates.remove(jid);
+				connectionStates.put(jid, JingleConnectionState.ERROR);
 				
 			}
 
@@ -160,7 +175,9 @@ public class JingleFileTransferManager {
 			public void sessionEstablished(PayloadType arg0,
 					TransportCandidate arg1, TransportCandidate arg2,
 					JingleSession arg3) {
-				// TODO Auto-generated method stub
+				logger.debug("session established : " + jid.toString());
+				connectionStates.remove(jid);
+				connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
 				
 			}
 
@@ -206,7 +223,7 @@ public class JingleFileTransferManager {
 		});
 
 		/* time out. */
-		timeOutCheck(jid, JINGLE_TIME_OUT);
+//		timeOutCheck(jid, JINGLE_TIME_OUT);
 	}
 
 	public void initialize() {
@@ -380,6 +397,7 @@ public class JingleFileTransferManager {
 			} finally {
 				outgoing = null;
 				mediaManager.removeJingleSession(jid);
+				outgoingSessions.get(jid).close();
 				outgoingSessions.remove(jid);
 				logger.debug("Terminate outgoing jingle session with JID : "+jid);
 			}
