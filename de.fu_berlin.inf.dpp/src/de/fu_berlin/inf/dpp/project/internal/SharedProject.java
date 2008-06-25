@@ -52,9 +52,11 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.DriverDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -87,6 +89,8 @@ public class SharedProject implements ISharedProject {
 	private User host;
 
 	private final ITransmitter transmitter;
+	
+	private IDriverDocumentManager driverManager;
 
 	private ActivitySequencer activitySequencer = new ActivitySequencer();
 
@@ -110,7 +114,13 @@ public class SharedProject implements ISharedProject {
 		/* add host to driver list. */
 		activitySequencer.initConcurrentManager(
 				ConcurrentManager.Side.HOST_SIDE, host, myID, this);
-		activitySequencer.getConcurrentManager().addDriver(host.getJid());
+		
+		/* init driver manager */
+		driverManager = DriverDocumentManager.getInstance();
+		this.addListener(driverManager);
+		driverManager.addDriver(host.getJid());
+		
+//		activitySequencer.getConcurrentManager().addDriver(host.getJid());
 
 		this.project = project;
 		setProjectReadonly(false);
@@ -207,8 +217,9 @@ public class SharedProject implements ISharedProject {
 				 * set driver in client to observer driver actions or to set the
 				 * local driver status.
 				 */
-//				if()
-				this.driver = driver;
+				
+				/* currently, no other driver than host can be followed. */
+//				this.driver = driver;
 			}
 
 			// // TODO if replicated=false check for privileges
@@ -245,6 +256,7 @@ public class SharedProject implements ISharedProject {
 		}
 	}
 
+	
 	public void removeDriver(User driver, boolean replicated) {
 		/* set new observer status in participant list of sharedProject. */
 		getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
@@ -279,10 +291,11 @@ public class SharedProject implements ISharedProject {
 		// participient list.
 
 		// HOST
-		if (activitySequencer.getConcurrentManager() != null
-				&& activitySequencer.getConcurrentManager().isHostSide()) {
-			return activitySequencer.getConcurrentManager().isDriver(driver.getJid());
-		}
+		/* TODO: change to driver document manager. */
+//		if (activitySequencer.getConcurrentManager() != null
+//				&& activitySequencer.getConcurrentManager().isHostSide()) {
+//			return activitySequencer.getConcurrentManager().isDriver(driver.getJid());
+//		}
 		// CLIENT
 		return (getParticipant(myID).getUserRole() == UserRole.DRIVER);
 //		return driver.getJid().equals(myID);
@@ -295,6 +308,11 @@ public class SharedProject implements ISharedProject {
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProject#isDriver(de.fu_berlin.inf.dpp.User)
 	 */
 	public boolean isDriver(User user) {
+		//HOST 
+		if(driverManager != null){
+			return driverManager.isDriver(user.getJid());
+		}
+		//CLIENT
 		if (getParticipant(user.getJid()).getUserRole() == UserRole.DRIVER) {
 			return true;
 		}

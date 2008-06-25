@@ -13,6 +13,8 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.IDriverManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -48,7 +50,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	/** current open editor at client side. */
 	private HashMap<IPath, JupiterClient> clientDocs;
 
-	private List<JID> drivers;
+//	private List<JID> drivers;
 
 	private JID host;
 
@@ -59,6 +61,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	private RequestForwarder forwarder;
 
 	private IActivitySequencer sequencer;
+	
+	private IDriverDocumentManager driverManager;
 
 	public ConcurrentDocumentManager(Side side, User host, JID myJID) {
 
@@ -67,7 +71,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		}
 
 		this.clientDocs = new HashMap<IPath, JupiterClient>();
-		drivers = new Vector<JID>();
+//		drivers = new Vector<JID>();
+		this.driverManager = DriverDocumentManager.getInstance();
 		this.side = side;
 		this.host = host.getJid();
 		this.myJID = myJID;
@@ -85,22 +90,26 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		return this.forwarder;
 	}
 
-	public void addDriver(JID jid) {
-		drivers.add(jid);
-	}
-
-	public void removeDriver(JID jid) {
-		drivers.remove(jid);
-	}
-
-	public List<JID> getDriver() {
-
-		return drivers;
-	}
-
-	public boolean isDriver(JID jid) {
-		return drivers.contains(jid);
-	}
+//	@Deprecated
+//	public void addDriver(JID jid) {
+//		drivers.add(jid);
+//	}
+//
+//	@Deprecated
+//	public void removeDriver(JID jid) {
+//		drivers.remove(jid);
+//	}
+//
+//	@Deprecated
+//	public List<JID> getDriver() {
+//
+//		return drivers;
+//	}
+//
+//	@Deprecated
+//	public boolean isDriver(JID jid) {
+//		return drivers.contains(jid);
+//	}
 
 	/**
 	 * 
@@ -228,8 +237,12 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 			if (isHostSide()) {
 				JID sourceJID = new JID(editorAc.getSource());
 
+				/* inform driver document manager */
+				driverManager.receiveActivity(activity);
+				
 				/* if one driver activate a new editor. */
-				if (drivers.contains(sourceJID)
+//				if (drivers.contains(sourceJID)
+				if(driverManager.isDriver(sourceJID)
 						&& (editorAc.getType() == Type.Activated || editorAc
 								.getType() == Type.Closed)) {
 					/* start jupiter proxy for this driver. */
@@ -522,6 +535,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 				/* create new local host document client. */
 				docServer.addProxyClient(host);
 				if (!isHost(request.getJID())) {
+					//
+					driverManager.addDriverToDocument(request.getEditorPath(), request.getJID());
 					docServer.addProxyClient(request.getJID());
 				}
 				concurrentDocuments.put(request.getEditorPath(), docServer);
@@ -589,14 +604,15 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 		// HOST
 		if (isHostSide()) {
 			/* if driver changed to observer */
-			if (drivers.contains(driver)) {
+//			if (drivers.contains(driver)) {
+			if(driverManager.isDriver(driver)){
 				userLeft(driver);
 			}
-			/* new driver added to project. */
-			else {
-				drivers.add(driver);
-				//TODO: add driver to current open document proxy ?
-			}
+//			/* new driver added to project. */
+//			else {
+//				drivers.add(driver);
+//				//TODO: add driver to current open document proxy ?
+//			}
 		}
 		// CLIENT
 		else {
@@ -615,7 +631,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	public void userLeft(JID user) {
 		if (isHostSide()) {
 			/* remove user from driver list */
-			drivers.remove(user);
+//			drivers.remove(user);
 
 			/* remove user proxies from jupiter server. */
 			for (JupiterServer server : concurrentDocuments.values()) {

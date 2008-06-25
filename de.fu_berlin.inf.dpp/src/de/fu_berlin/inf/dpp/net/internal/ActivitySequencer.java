@@ -505,6 +505,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 		 */
 		log.debug("Receive request : " + request + " from " + request.getJID());
 		concurrentManager.receiveRequest(request);
+		
 		// return null;
 		// IActivity activity = concurrentManager.receiveRequest(request);
 		// if (activity != null) {
