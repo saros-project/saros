@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
+import java.util.List;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -22,5 +24,11 @@ public interface IDriverManager {
 	 * @return
 	 */
 	public boolean exclusiveDriver();
+	
+	/**
+	 * get all active driver
+	 * @return list of active driver.
+	 */
+	public List<JID> getActiveDriver();
 		
 }

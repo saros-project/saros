@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.IRequestManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
@@ -48,6 +49,7 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
  * Implements {@link IActivitySequencer} and {@link IActivityManager}.
@@ -142,6 +144,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 	private IActivity executedJupiterActivity;
 	
 	private ExecuterQueue executer;
+	
+	private ISharedProject sharedProject;
 
 	public ActivitySequencer(){
 		executer = new ExecuterQueue();
@@ -180,6 +184,12 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 				for (IActivityProvider executor : providers) {
 					executor.exec(activity);
 				}
+				
+				//Check for file checksum after incoming save file activity.
+				if (activity instanceof EditorActivity && ((EditorActivity)activity).getType() == EditorActivity.Type.Saved) {
+					checkSavedFile((EditorActivity) activity);					
+				}
+				
 			}
 
 		} catch (Exception e) {
@@ -187,6 +197,42 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 		}
 	}
 
+	/**
+	 * this class check the match of local and remote file checksum.
+	 * @param editor incoming editor activity with type saved
+	 */
+	private void checkSavedFile(EditorActivity editor){
+		/* 1. reset appropriate jupiter document. */
+		concurrentManager.resetJupiterDocument(editor.getPath());
+
+		/* check match of file checksums. */
+		
+		if( !isHostSide() && editor.getType() == Type.Saved){
+			long checksum = FileUtil.checksum(sharedProject.getProject().getFile(editor.getPath()));
+			System.out.println("Checksumme on client side : "+checksum+ " for path : "+editor.getPath().toOSString());
+			if(checksum != editor.getChecksum()){
+				System.out.println("Problem!");
+			}
+			/**
+			 * if checksum on client side failed.
+			 * 1. send error message to host
+			 * 2. get new file
+			 */
+		}
+		if(isHostSide()){
+			/**
+			 * if check of remote client checksum failed. 
+			 * 1. create new editor saved activity
+			 * 2. send activity to all driver
+			 */
+			long checksum = FileUtil.checksum(sharedProject.getProject().getFile(editor.getPath()));
+			System.out.println("Checksumme on host Host side : "+checksum+ " for path : "+editor.getPath().toOSString());
+			if(checksum != editor.getChecksum()){
+				System.out.println("Problem!");
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -471,7 +517,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 			de.fu_berlin.inf.dpp.concurrent.ConcurrentManager.Side side,
 			de.fu_berlin.inf.dpp.User host, JID myJID,
 			ISharedProject sharedProject) {
-		concurrentManager = new ConcurrentDocumentManager(side, host, myJID);
+		concurrentManager = new ConcurrentDocumentManager(side, host, myJID, sharedProject);
+		this.sharedProject = sharedProject;
 		sharedProject.addListener(concurrentManager);
 		concurrentManager.setRequestForwarder(this);
 		concurrentManager.setActivitySequencer(this);

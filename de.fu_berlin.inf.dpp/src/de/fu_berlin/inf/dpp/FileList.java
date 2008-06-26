@@ -43,6 +43,8 @@ import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import de.fu_berlin.inf.dpp.util.FileUtil;
+
 /**
  * A FileList is a list of resources - files and folders - which can be compared
  * to other file lists. Folders are denoted by a trailing separator.
@@ -328,7 +330,7 @@ public class FileList {
 				if (file.exists()==false)
 					continue;
 				
-				Long checksum=checksum(file);
+				Long checksum=FileUtil.checksum(file);
 				if (checksum!=-1)
 					members.put(file.getProjectRelativePath(), checksum);
 
@@ -343,38 +345,6 @@ public class FileList {
 				addMembers(folder.members(), members, ignoreDerived);
 			}
 		}
-	}
-
-	private Long checksum(IFile file) { // HACK
-		InputStream contents = null;
-
-		try {
-			// Adler-32 checksum
-			contents = file.getContents();
-			CheckedInputStream cis = new CheckedInputStream(contents, new Adler32());
-
-			byte[] tempBuf = new byte[128];
-			while (cis.read(tempBuf) >= 0) {
-			}
-			long checksum = cis.getChecksum().getValue();
-			return new Long(checksum);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-
-		} catch (CoreException e) {
-			e.printStackTrace();
-
-		} finally {
-			try {
-				if (contents != null)
-					contents.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return new Long(-1);
 	}
 
 	private void appendFileGroup(StringBuilder sb, String element, Map<IPath, Long> map) {

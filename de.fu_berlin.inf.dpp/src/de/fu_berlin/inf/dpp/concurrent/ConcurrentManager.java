@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
@@ -28,14 +30,6 @@ public interface ConcurrentManager extends IRequestManager, ISharedProjectListen
 	
 	public RequestForwarder getRequestForwarder();
 	
-//	public void addDriver(JID jid);
-//	
-//	public void removeDriver(JID jid);
-//	
-//	public List<JID> getDriver();
-//	
-//	public boolean isDriver(JID jid);
-	
 	public boolean isHostSide();
 	
 	public boolean isHost(JID jid);
@@ -45,4 +39,10 @@ public interface ConcurrentManager extends IRequestManager, ISharedProjectListen
 	public IActivity activityCreated(IActivity activity);
 	
 	public IActivity exec(IActivity activity);
+	
+	/**
+	 * reset jupter state vector an init with [0,0]
+	 * @param path of document under jupiter control.
+	 */
+	public void resetJupiterDocument(IPath path);
 }

@@ -32,10 +32,18 @@ public class JupiterDocumentClient implements JupiterClient {
 	/** forwarder send request to server. */
 	private RequestForwarder forwarder;
 	
+	@Deprecated
 	public JupiterDocumentClient(JID jid, RequestForwarder forwarder){
 		this.jid = jid;
 		this.jupiter = new Jupiter(true);
 		this.forwarder = forwarder;
+	}
+	
+	public JupiterDocumentClient(JID jid, RequestForwarder forwarder, IPath editor){
+		this.jid = jid;
+		this.jupiter = new Jupiter(true);
+		this.forwarder = forwarder;
+		this.editor = editor;
 	}
 	
 	public Request generateRequest(Operation op) {

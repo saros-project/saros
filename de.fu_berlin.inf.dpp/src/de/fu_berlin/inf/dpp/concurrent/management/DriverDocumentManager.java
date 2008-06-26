@@ -6,6 +6,8 @@ package de.fu_berlin.inf.dpp.concurrent.management;
  * actions.
  */
 import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -34,7 +36,7 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 			.getLogger(DriverDocumentManager.class);
 
 	/* list of all active driver. */
-	private HashMap<JID, JID> activDriver;
+	private List<JID> activeDriver;
 
 	/* list of documents with appropriate drivers. */
 	private HashMap<IPath, DriverDocument> documents;
@@ -45,7 +47,7 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 	 * private constructor for singleton pattern.
 	 */
 	private DriverDocumentManager() {
-		this.activDriver = new HashMap<JID, JID>();
+		this.activeDriver = new Vector<JID>();
 		this.documents = new HashMap<IPath, DriverDocument>();
 	}
 
@@ -68,16 +70,36 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 	 * @return true if driver exists in active driver list, false otherwise
 	 */
 	public boolean isDriver(JID jid) {
-		return activDriver.containsKey(jid);
+		return activeDriver.contains(jid);
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager#getDriverForDocument(org.eclipse.core.runtime.IPath)
+	 */
+	public List<JID> getDriverForDocument(IPath path){
+		if(documents.containsKey(path)){
+			List<JID> drivers = documents.get(path).getActiveDriver();
+			return drivers;
+		}
+		return null;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
+	 */
+	public List<JID> getActiveDriver(){
+		return activeDriver;
+	}
+	
 	public void addDriver(JID jid) {
 //		if (user.getUserRole() == UserRole.OBSERVER) {
 //			logger.error("User " + user.getJid() + " has not driver status! ");
 //		}
 		logger.debug("add driver for jid: "+jid);
-		if(!this.activDriver.containsKey(jid)){
-			this.activDriver.put(jid, jid);
+		if(!this.activeDriver.contains(jid)){
+			this.activeDriver.add( jid);
 		}
 	}
 	
@@ -106,11 +128,8 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 			removeDriverFromDocument(path, jid);
 		}
 		
-		JID j = this.activDriver.remove(jid);
-		if (j == null) {
-			logger.error("This jid : " + jid
-					+ " not exists in activer driver list");
-		}
+		this.activeDriver.remove(jid);
+		
 	}
 
 	/**
@@ -211,7 +230,7 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 	 */
 	public boolean exclusiveDriver() {
 		boolean result = true;
-		if(activDriver.size() > 1){
+		if(activeDriver.size() > 1){
 			result = false;
 		}
 		return result;

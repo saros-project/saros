@@ -38,6 +38,8 @@ public class EditorActivity implements IActivity {
 
 	private String source;
 	
+	private long checksum = -1;
+	
 	/**
 	 * @param path
 	 *            a valid project-relative path or <code>null</code> if former
@@ -86,5 +88,13 @@ public class EditorActivity implements IActivity {
 
 	public void setSource(String source) {
 		this.source = source;
+	}
+	
+	public long getChecksum(){
+		return this.checksum;
+	}
+	
+	public void setChecksum(long checksum){
+		this.checksum = checksum;
 	}
 }

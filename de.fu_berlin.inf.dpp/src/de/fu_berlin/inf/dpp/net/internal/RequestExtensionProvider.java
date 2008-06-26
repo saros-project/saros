@@ -69,7 +69,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider{
 			}
 		}
 		}catch(Exception e){
-			System.out.println("Mist");
+//			System.out.println("Mist");
 			e.printStackTrace();
 		}
 		

@@ -636,8 +636,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	public String toXML(IActivity activity) {
 		if (activity instanceof EditorActivity) {
 			EditorActivity editorActivity = (EditorActivity) activity;
+//			return "<editor " + "path=\"" + editorActivity.getPath() + "\" " + "type=\""
+//				+ editorActivity.getType() + "\" />";
 			return "<editor " + "path=\"" + editorActivity.getPath() + "\" " + "type=\""
-				+ editorActivity.getType() + "\" />";
+			+ editorActivity.getType() + "\" " + "checksum=\"" + editorActivity.getChecksum() + "\"  />";
 
 		} else if (activity instanceof TextEditActivity) {
 			TextEditActivity textEditActivity = (TextEditActivity) activity;
@@ -679,12 +681,21 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	private IActivity parseEditorActivity(XmlPullParser parser) {
 		String pathString = parser.getAttributeValue(null, "path");
+		String checksumString = parser.getAttributeValue(null, "checksum");
 
 		// TODO handle cases where the file is really named "null"
 		Path path = pathString.equals("null") ? null : new Path(pathString);
 
 		Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null, "type"));
-		return new EditorActivity(type, path);
+		EditorActivity edit = new EditorActivity(type, path);
+		try{
+			long checksum = Long.parseLong(checksumString);
+			edit.setChecksum(checksum);
+		}catch(Exception e){
+			/* exception during parse process*/
+		}
+		
+		return edit;
 	}
 
 	private TextSelectionActivity parseTextSelection(XmlPullParser parser) {
