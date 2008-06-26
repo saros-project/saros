@@ -446,8 +446,8 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 						dialog.run(true, false, new IRunnableWithProgress() {
 							public void run(IProgressMonitor monitor) {
 								
-								monitor.beginTask("Scanning workspace projects ... ",0);
-								final IProject project = getLocalProject();
+								monitor.beginTask("Scanning workspace projects ... ",IProgressMonitor.UNKNOWN);
+								final IProject project = getLocalProject(monitor);
 								monitor.done();
 								setUpdateProject(project);
 								scanRun = false;
@@ -592,7 +592,7 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		 *         existing project.
 		 */
 		public String getNewProjectName() {
-			return projUpd.getSelection()?null:newProjectNameText.getText();
+			return projUpd.getSelection()?updateProjectText.getText():newProjectNameText.getText();
 		}
 		
 		/**
@@ -612,13 +612,14 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		 * match all project from workspace with remote project list.
 		 * @return
 		 */
-		private IProject getLocalProject() {
+		private IProject getLocalProject(IProgressMonitor monitor) {
 			IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			IProject[] projects = workspace.getRoot().getProjects();
 
 			int maxMatch = 0;
 			IProject selectedProject = null;
 			for (int i = 0; i < projects.length; i++) {
+				monitor.worked(1);
 				if (!projects[i].isOpen())
 					continue;
 
@@ -824,7 +825,10 @@ public class JoinSessionWizard extends Wizard implements IInvitationUI {
 		if ( process.getState()==State.CANCELED)
 			return true;
 		
-		final IProject project = namePage.getLocalProject();
+
+		/* no additional automatic scan.*/
+//		final IProject project = namePage.getLocalProject();
+		final IProject project = namePage.simularProject;
 		final String newProjectName = namePage.getNewProjectName();
 		final boolean copyValue = namePage.getCopyValue();
 

@@ -339,6 +339,13 @@ public class SharedProject implements ISharedProject {
 
 	/*
 	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
+	 */
+	public boolean exclusiveDriver(){
+		return driverManager.exclusiveDriver();
+	}
+	/*
+	 * (non-Javadoc)
 	 * 
 	 * @see de.fu_berlin.inf.dpp.project.ISharedProject
 	 */

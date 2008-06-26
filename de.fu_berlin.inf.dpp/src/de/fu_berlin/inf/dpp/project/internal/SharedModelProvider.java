@@ -23,21 +23,31 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * 
  * @author rdjemili
  */
-public class SharedModelProvider extends ModelProvider implements ISessionListener {
+public class SharedModelProvider extends ModelProvider implements
+		ISessionListener {
 
 	private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
+	private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
 
-	private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
-		2, ERROR_TEXT, null);
+	private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
+			"de.fu_berlin.inf.dpp", 2, ERROR_TEXT, null);
+	
+	private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(IStatus.ERROR,
+			"de.fu_berlin.inf.dpp", 2, EXCLUSIVE_ERROR_TEXT, null);
 
 	/** the currently running shared project */
 	private ISharedProject sharedProject;
+
+	public SharedModelProvider() {
+
+	}
 
 	/**
 	 * Validates the resource delta.
 	 */
 	private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 		private boolean isAllowed = true;
+		private boolean isExclusive = true;
 
 		/*
 		 * (non-Javadoc)
@@ -45,8 +55,13 @@ public class SharedModelProvider extends ModelProvider implements ISessionListen
 		 * @see org.eclipse.core.resources.IResourceDeltaVisitor
 		 */
 		public boolean visit(IResourceDelta delta) throws CoreException {
-			if (sharedProject == null || sharedProject.isDriver())
+			if (sharedProject == null || sharedProject.isDriver()) {
+				/* check driver status */
+				if (!(sharedProject.isHost() && sharedProject.exclusiveDriver())){
+					isExclusive = false;
+				}
 				return false;
+			}
 
 			IResource resource = delta.getResource();
 			if (resource.getProject() == null) // work space root
@@ -82,7 +97,15 @@ public class SharedModelProvider extends ModelProvider implements ISessionListen
 			e.printStackTrace();
 		}
 
-		return visitor.isAllowed ? Status.OK_STATUS : ERROR_STATUS;
+		IStatus result = Status.OK_STATUS;
+		if(!visitor.isAllowed){
+			result = ERROR_STATUS;
+		}
+		if(!visitor.isExclusive){
+			result = EXCLUSIVE_ERROR_STATUS;
+		}
+		return result;
+//		return visitor.isAllowed ? Status.OK_STATUS : ERROR_STATUS;
 	}
 
 	/*

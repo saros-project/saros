@@ -57,7 +57,7 @@ public class Serializer extends Thread implements OperationSerializer{
 			} catch (TransformationException e) {
 				// TODO Auto-generated catch block
 				logger.error("Transformation Exception ",e);
-//				e.printStackTrace();
+
 			}
 		}
 	}

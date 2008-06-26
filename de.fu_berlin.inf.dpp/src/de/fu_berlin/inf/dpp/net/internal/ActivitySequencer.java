@@ -32,6 +32,8 @@ import org.eclipse.jface.text.TextSelection;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
@@ -156,7 +158,12 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 			if(activity instanceof EditorActivity){
 				concurrentManager.exec(activity);
 			}
-			
+			if(activity instanceof FileActivity){
+				concurrentManager.exec(activity);
+			}
+			if(activity instanceof FolderActivity){
+				
+			}
 			if (activity instanceof TextEditActivity) {
 				/* check if document is already managed by jupiter mechanism. */
 				if (!concurrentManager.isHostSide()
@@ -271,7 +278,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 	 */
 	public void activityCreated(IActivity activity) {
 
-		if(activity instanceof EditorActivity){
+		if(activity instanceof EditorActivity || activity instanceof FileActivity){
 				/* Host: start and stop jupiter server process depending on editor activities
 				 * of remote clients. 
 				 * Client: start and stop local jupiter clients depending on editor activities.

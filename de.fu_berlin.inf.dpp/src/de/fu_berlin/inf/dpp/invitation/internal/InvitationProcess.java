@@ -155,8 +155,9 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	 *            the state that the process should currently have.
 	 */
 	protected void assertState(State expected) {
-		if (state != expected)
+		if (state != expected){
 			cancel("Unexpected state(" + state + ")", false);
+		}
 	}
 
 	protected void failState() {

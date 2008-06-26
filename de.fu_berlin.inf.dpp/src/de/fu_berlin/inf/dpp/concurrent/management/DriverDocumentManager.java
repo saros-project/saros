@@ -146,18 +146,11 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 			if (activity instanceof EditorActivity) {
 				EditorActivity edit = (EditorActivity) activity;
 
+				logger.debug("receive activity of "+jid+" for editor "+edit.getPath().lastSegment()+" and action "+edit.getType());
+				
 				/* editor has activated. */
 				if(edit.getType() == EditorActivity.Type.Activated){
-//					/* add driver to new document. */
-//					DriverDocument doc = documents.get(edit.getPath());
-//					if(doc == null || !documents.containsKey(edit.getPath()) ){
-//						/* create new instance of this documents. */
-//						 doc = new DriverDocument(edit.getPath());
-//						documents.put(edit.getPath(), doc);
-//					}
-//					
-//					/* add driver to document. */
-//					doc.addDriver(jid);
+					/* add driver to new document. */
 					addDriverToDocument(edit.getPath(), jid);
 				}
 				/* editor has closed. */
@@ -175,8 +168,13 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 			if (activity instanceof RoleActivity) {
 
 			}
-			if (activity instanceof FolderActivity) {
-
+			
+			if (activity instanceof FileActivity) {
+				FileActivity file = (FileActivity) activity;
+				/* if file has been removed, delete appropriate driver document. */
+				if(file.getType() == FileActivity.Type.Removed){
+					documents.remove(file.getPath());
+				}
 			}
 		}
 		else{
@@ -205,6 +203,18 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 			removeDriver(user);
 		}
 		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#exclusiveDriver()
+	 */
+	public boolean exclusiveDriver() {
+		boolean result = true;
+		if(activDriver.size() > 1){
+			result = false;
+		}
+		return result;
 	}
 
 

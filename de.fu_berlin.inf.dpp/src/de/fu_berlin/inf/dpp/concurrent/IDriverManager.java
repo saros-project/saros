@@ -16,5 +16,11 @@ public interface IDriverManager {
 	public void removeDriver(JID jid);
 	
 	public boolean isDriver(JID jid);
+	
+	/**
+	 * only one active driver exists in the system.
+	 * @return
+	 */
+	public boolean exclusiveDriver();
 		
 }

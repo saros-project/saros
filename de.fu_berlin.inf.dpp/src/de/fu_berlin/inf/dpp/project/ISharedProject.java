@@ -208,4 +208,10 @@ public interface ISharedProject {
 	 * @param The readonly state to set the file to. 
 	 */
 	public void setProjectReadonly(boolean readonly);
+	
+	/**
+	 * true, if single driver is active, false otherwise.
+	 * @return
+	 */
+	public boolean exclusiveDriver();
 }

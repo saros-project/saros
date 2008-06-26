@@ -304,6 +304,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 * @see de.fu_berlin.inf.dpp.ITransmitter
 	 */
 	public void sendJoinMessage(ISharedProject sharedProject) {
+		try {
+			/* sleep process for 500 millis to ensure invitation state process.*/
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			log.error(e);
+		}
 		sendMessageToAll(sharedProject, PacketExtensions.createJoinExtension());
 	}
 
