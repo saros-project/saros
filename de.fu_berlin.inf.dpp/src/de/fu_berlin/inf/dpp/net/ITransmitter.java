@@ -243,4 +243,21 @@ public interface ITransmitter {
 	 */
 	public void sendJupiterRequest(ISharedProject sharedProject, Request request, JID jid);
 	
+	/**
+	 * Sends error message of checksum error.
+	 * @param to
+	 * 			the recipient
+	 * @param path
+	 * 			appropriate file for checksum error
+	 */
+	public void sendFileChecksumError(JID to, IPath path);
+	
+	/**
+	 * Sends error messge of transformation error.
+	 * @param to
+	 * 			the recipient
+	 * @param path
+	 * 			appropriate file for jupiter transformtion error
+	 */
+	public void sendJupiterTransformationError(JID to, IPath path);
 }

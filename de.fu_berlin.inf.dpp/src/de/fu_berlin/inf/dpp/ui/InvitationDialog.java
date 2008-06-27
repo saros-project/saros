@@ -146,7 +146,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,IConnectio
 		comTable .setLayout(gl);
 		comTable .setLayoutData(gd);
 
-		tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION | SWT.MULTI);
+//		tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION | SWT.MULTI);
+		//avoid multi selection
+		tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION);
 	    table = tableviewer.getTable();
 	    table.setLinesVisible(true);
 	    tableviewer.setContentProvider(new ArrayContentProvider());
@@ -296,10 +298,15 @@ public class InvitationDialog extends Dialog implements IInvitationUI,IConnectio
 		
 		// are all invites done?
 		if (alldone) {
+//			if(invdat.outginvatationProc.getState() == IInvitationProcess.State.DONE){
+//				inviteStep= InvState.SELECTION;
+//			}
 			inviteStep=InvState.DONE;
 		    getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+
 		}
 		cancelButton.setEnabled(isSelectionCancelable() && inviteStep!=InvState.DONE );
+		
 	}
 	
 	boolean isSelectionCancelable(){

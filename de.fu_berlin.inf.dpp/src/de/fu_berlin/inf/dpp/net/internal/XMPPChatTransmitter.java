@@ -338,6 +338,18 @@ public class XMPPChatTransmitter implements ITransmitter,
 			if (activity instanceof FileActivity) {
 				FileActivity fileAdd = (FileActivity) activity;
 
+				/* send file checksum error message to exclusive recipient*/
+				if(fileAdd.getType().equals(FileActivity.Type.Error)){
+					sendFileChecksumError(fileAdd.getRecipient(), fileAdd.getPath());
+				}
+				/* send file to solve checksum error to single recipient */
+				if (fileAdd.getType().equals(FileActivity.Type.Created) || fileAdd.getRecipient() != null){
+					int time = timedActivity.getTimestamp();
+					sendFile(fileAdd.getRecipient(), sharedProject.getProject(), fileAdd
+							.getPath(), time, null);
+					return;
+				}
+				
 				if (fileAdd.getType().equals(FileActivity.Type.Created)) {
 					JID myJID = Saros.getDefault().getMyJID();
 
@@ -942,6 +954,24 @@ public class XMPPChatTransmitter implements ITransmitter,
 		sendMessage(to, PacketExtensions.createUserListExtension(participants));
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendFileChecksumError(de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+	 */
+	public void sendFileChecksumError(JID to, IPath path){
+		log.debug("Sending checksum error message to "+to+" of file "+path.lastSegment());
+		sendMessage(to,PacketExtensions.createChecksumErrorExtension(path));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendJupiterTransformationError(de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+	 */
+	public void sendJupiterTransformationError(JID to, IPath path){
+		log.debug("Sending jupiter transformation error message to "+to+" of file "+path.lastSegment());
+		sendMessage(to,PacketExtensions.createJupiterErrorExtension(path));
+	}
+	
 	public void sendRemainingFiles() {
 
 		if (fileTransferQueue.size() > 0)
@@ -1239,6 +1269,18 @@ public class XMPPChatTransmitter implements ITransmitter,
 			jingleManager.setJingleErrorState(fromJID);
 			/*TODO: callback for other connections possible? */
 		}
+		else if(PacketExtensions.getJupiterErrorExtension(message) != null) {
+			log.debug("Receive jingle error messages from "+fromJID);
+			
+		}
+		else if(PacketExtensions.getChecksumErrorExtension(message) != null) {
+//			log.debug("Receive jingle error messages from "+fromJID);
+			DefaultPacketExtension checksumErrorExtension = PacketExtensions
+			.getChecksumErrorExtension(message);
+			String path = checksumErrorExtension.getValue(PacketExtensions.FILE_PATH);
+			System.out.println("Checksum Error for "+path);
+		}
+		
 	}
 
 	/*

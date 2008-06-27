@@ -129,7 +129,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 					long checksum = FileUtil.checksum(sharedProject
 							.getProject().getFile(editor.getPath()));
 					editor.setChecksum(checksum);
-					System.out.println("Add checksumme to created editor save activity : " + checksum
+					logger.debug("Add checksumme to created editor save activity : " + checksum
 							+ " for path : " + editor.getPath().toOSString());
 				}
 //			}

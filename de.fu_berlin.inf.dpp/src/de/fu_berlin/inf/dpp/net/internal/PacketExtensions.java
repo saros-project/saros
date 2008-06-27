@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import org.eclipse.core.runtime.IPath;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -55,6 +56,11 @@ public class PacketExtensions {
 	private static final String DATATRANSFER = "DataTransfer";
 	
 	private static final String JINGLEERROR = "JingleError";
+	
+	private static final String FILE_CHECKSUM_ERROR = "FileChecksumError";
+	
+	private static final String JUPITER_TRANSFORMATION_ERROR = "JupiterTransformationError";
+	
 
 	
 	// attributes
@@ -71,6 +77,8 @@ public class PacketExtensions {
 	public static final String DT_SPLIT = "DTSPLIT";
 
 	public static final String DT_DATA = "DATA_BASE64";
+	
+	public static final String FILE_PATH = "filename";
 	
 
 	
@@ -159,6 +167,20 @@ public class PacketExtensions {
 		return createExtension(JINGLEERROR);
 	}
 	
+	public static PacketExtension createChecksumErrorExtension(IPath path){
+		DefaultPacketExtension extension = new DefaultPacketExtension(FILE_CHECKSUM_ERROR, NAMESPACE);
+		extension.setValue(FILE_PATH, path.toOSString());
+		
+		return extension;
+	}
+	
+	public static PacketExtension createJupiterErrorExtension(IPath path){
+		DefaultPacketExtension extension = new DefaultPacketExtension(JUPITER_TRANSFORMATION_ERROR, NAMESPACE);
+		extension.setValue(FILE_PATH, path.toOSString());
+		
+		return extension;
+	}
+	
 	public static PacketExtension createUserListExtension(List<User> list) {
 		DefaultPacketExtension extension = new DefaultPacketExtension(USER_LIST, NAMESPACE);
 		
@@ -203,6 +225,14 @@ public class PacketExtensions {
 	
 	public static DefaultPacketExtension getJingleErrorExtension(Message message){
 		return getExtension(JINGLEERROR, message);
+	}
+	
+	public static DefaultPacketExtension getJupiterErrorExtension(Message message){
+		return getExtension(JUPITER_TRANSFORMATION_ERROR, message);
+	}
+	
+	public static DefaultPacketExtension getChecksumErrorExtension(Message message){
+		return getExtension(FILE_CHECKSUM_ERROR, message);
 	}
 	
 	public static DefaultPacketExtension getUserlistExtension(Message message) {

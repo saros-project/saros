@@ -4,9 +4,11 @@ import java.io.InputStream;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 public class FileActivity implements IActivity {
 	public static enum Type {
-		Created, Removed
+		Created, Removed, Error
 	};
 
 	private String source;
@@ -14,6 +16,9 @@ public class FileActivity implements IActivity {
 	private Type type;
 
 	private IPath path;
+	
+	/* exclusive file recipient for error file. */
+	private JID errorRecipient;
 
 	private InputStream inputStream;
 
@@ -22,6 +27,18 @@ public class FileActivity implements IActivity {
 		this.path = path;
 	}
 
+	/**
+	 * construtor to send file activity to an exclusive 
+	 * recipient.
+	 * @param type
+	 * @param path
+	 * @param to
+	 */
+	public FileActivity(Type type, IPath path, JID to) {
+		this(type, path);
+		errorRecipient = to;
+	}
+	
 	public FileActivity(Type type, IPath path, InputStream in) {
 		this(type, path);
 		inputStream = in;
@@ -33,6 +50,10 @@ public class FileActivity implements IActivity {
 
 	public Type getType() {
 		return type;
+	}
+	
+	public JID getRecipient(){
+		return errorRecipient;
 	}
 
 	/**
