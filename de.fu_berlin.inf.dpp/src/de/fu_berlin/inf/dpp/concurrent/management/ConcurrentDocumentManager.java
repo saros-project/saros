@@ -242,6 +242,11 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 				op = jupClient.receiveRequest(request);
 			} catch (TransformationException e) {
 				logger.error("Error during transformation: ", e);
+				
+				/* create save activity. */
+				IActivity activity = new EditorActivity(Type.Saved, request.getEditorPath());
+				/* execute save activity and start consistency check. */
+				sequencer.exec(activity);
 				return;
 			}
 

@@ -28,5 +28,7 @@ public interface JupiterServer extends SynchronizedQueue, RequestForwarder, Jupi
 	
 	
 	public void updateVectorTime(JID source, JID dest);
+	
+	public void transformationErrorOccured();
 
 }

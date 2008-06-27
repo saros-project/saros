@@ -251,6 +251,10 @@ public class JupiterDocumentServer implements JupiterServer{
 		
 	}
 
+	public void transformationErrorOccured() {
+		forwardOutgoingRequest(new RequestError(editor));	
+	}
+
 	/* end transfer section  */
 	
 

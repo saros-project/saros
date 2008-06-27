@@ -6,6 +6,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.IRequestManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
+import de.fu_berlin.inf.dpp.project.IActivityManager;
 
 /**
  * The IActivitySequencer is responsible for making sure that activities are
@@ -14,7 +15,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
  * @author rdjemili
  * 
  */
-public interface IActivitySequencer extends IActivityListener,IRequestManager {
+public interface IActivitySequencer extends IActivityListener,IRequestManager, IActivityManager {
 	/**
 	 * Gets all activities since last flush.
 	 * 

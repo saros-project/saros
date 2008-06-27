@@ -279,11 +279,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 	public void sendRequestForActivity(ISharedProject sharedProject,
 			int timestamp, boolean andup) {
 
-		log.info("Requesting old activity (timestamp=" + timestamp + ", "
-				+ andup + ") from all...");
-
-		sendMessageToAll(sharedProject, PacketExtensions
-				.createRequestForActivityExtension(timestamp, andup));
+//		log.info("Requesting old activity (timestamp=" + timestamp + ", "
+//				+ andup + ") from all...");
+//
+//		sendMessageToAll(sharedProject, PacketExtensions
+//				.createRequestForActivityExtension(timestamp, andup));
 
 	}
 
@@ -1279,6 +1279,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			.getChecksumErrorExtension(message);
 			String path = checksumErrorExtension.getValue(PacketExtensions.FILE_PATH);
 			System.out.println("Checksum Error for "+path);
+			ErrorMessageDialog.showChecksumErrorMessage(path);
 		}
 		
 	}

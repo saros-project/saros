@@ -39,4 +39,17 @@ public class ErrorMessageDialog {
 					
 		});
 	}
+	
+	/**
+	 * show error message dialog.
+	 * @param exception 
+	 */
+	public static void showChecksumErrorMessage(final String fileName){
+		Display.getDefault().syncExec(new Runnable() {
+			public void run() {
+				MessageDialog.openWarning(Display.getDefault().getActiveShell(), "Consistency Problem!", "Inconsitent file state has detected. File "+fileName+ " has to synchronized with project host");
+			}
+		});
+	}
+	
 }

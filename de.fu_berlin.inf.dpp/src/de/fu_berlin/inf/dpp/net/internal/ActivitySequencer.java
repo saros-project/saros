@@ -43,6 +43,7 @@ import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.IRequestManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -57,8 +58,7 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
  * 
  * @author rdjemili
  */
-public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
-		IActivityManager {
+public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	// TODO separate into two classes!?
 
 	private static Logger logger = Logger.getLogger(ExecuterQueue.class);
@@ -204,7 +204,10 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 	 */
 	private void checkSavedFile(EditorActivity editor){
 		/* 1. reset appropriate jupiter document. */
-		concurrentManager.resetJupiterDocument(editor.getPath());
+		if(isHostSide() || sharedProject.isDriver()){
+			logger.debug("reset jupiter server for "+editor.getPath());
+			concurrentManager.resetJupiterDocument(editor.getPath());
+		}
 
 		/* check match of file checksums. */
 		
@@ -530,6 +533,15 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer,
 
 	public synchronized void forwardOutgoingRequest(Request req) {
 
+		/* check for errors. */
+		if(req instanceof RequestError){
+			/* create save activity. */
+			IActivity activity = new EditorActivity(Type.Saved, req.getEditorPath());
+			/* execute save activity and start consistency check. */
+			exec(activity);
+			return;
+		}
+		
 		/* put request into outgoing queue. */
 		outgoingSyncActivities.add(req);
 

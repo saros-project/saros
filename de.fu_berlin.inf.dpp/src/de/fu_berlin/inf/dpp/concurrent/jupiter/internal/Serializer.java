@@ -54,10 +54,10 @@ public class Serializer extends Thread implements OperationSerializer{
 				
 			} catch (InterruptedException e) {
 				logger.warn("Interrupt Exception",e);
-			} catch (TransformationException e) {
-				// TODO Auto-generated catch block
+			} 
+			catch (TransformationException e) {
 				logger.error("Transformation Exception ",e);
-
+				server.transformationErrorOccured();
 			}
 		}
 	}
