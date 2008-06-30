@@ -327,7 +327,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
 	 */
 	public void viewportChanged(int top, int bottom) {
-		if (!isDriver)
+		if ( !sharedProject.isHost())
 			return;
 
 		fireActivity(new ViewportActivity(top, bottom));
