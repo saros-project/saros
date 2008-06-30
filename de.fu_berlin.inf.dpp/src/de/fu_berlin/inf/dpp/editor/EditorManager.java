@@ -860,7 +860,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	}
 
 	private void sharedEditorActivated(IEditorPart editorPart) {
-		if (!isDriver)
+		if (!sharedProject.isHost())
 			return;
 
 		IResource resource = editorAPI.getEditorResource(editorPart);
