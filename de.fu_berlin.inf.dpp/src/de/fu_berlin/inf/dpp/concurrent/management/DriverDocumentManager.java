@@ -70,7 +70,13 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 	 * @return true if driver exists in active driver list, false otherwise
 	 */
 	public boolean isDriver(JID jid) {
-		return activeDriver.contains(jid);
+		if(jid != null){
+			return activeDriver.contains(jid);
+		}
+		else{
+			System.out.println("jid null");
+		}
+		return false;
 	}
 
 	/*
@@ -82,7 +88,7 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 			List<JID> drivers = documents.get(path).getActiveDriver();
 			return drivers;
 		}
-		return null;
+		return new Vector<JID>();
 	}
 	
 	/*
