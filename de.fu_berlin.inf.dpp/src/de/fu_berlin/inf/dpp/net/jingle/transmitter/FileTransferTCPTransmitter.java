@@ -115,7 +115,8 @@ public class FileTransferTCPTransmitter extends JingleFileTransferTCPConnection 
 				/* Übertragung zwischen zwei Partnern. */
 				socket = new Socket(remoteHost, remotePort);
 			} catch (SocketException se) {
-				Thread.sleep(500);
+				logger.warn("Second tcp socket initiation.");
+				Thread.sleep(1500);
 				socket = new Socket(remoteHost, remotePort);
 			}
 			
