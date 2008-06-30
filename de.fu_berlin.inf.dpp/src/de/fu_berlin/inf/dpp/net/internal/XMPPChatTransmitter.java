@@ -343,7 +343,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 					sendFileChecksumError(fileAdd.getRecipient(), fileAdd.getPath());
 				}
 				/* send file to solve checksum error to single recipient */
-				if (fileAdd.getType().equals(FileActivity.Type.Created) || fileAdd.getRecipient() != null){
+				if (fileAdd.getType().equals(FileActivity.Type.Created) && fileAdd.getRecipient() != null){
 					int time = timedActivity.getTimestamp();
 					sendFile(fileAdd.getRecipient(), sharedProject.getProject(), fileAdd
 							.getPath(), time, null);
@@ -1652,10 +1652,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 			if (transferData.content == null)
 				readFile(transferData);
 
-			File sendFile = new File(transferData.path.toString());
-			if (!sendFile.exists()) {
-				log.error("File not exist");
-			}
+//			File sendFile = new File(transferData.path.toString());
+//			if (!sendFile.exists()) {
+//				log.error("File not exist");
+//			}
 
 			sendChatTransfer(transferData.path.toString(), description,
 					transferData.content, recipient);
