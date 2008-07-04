@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 
 /**
  * @author rdjemili
@@ -44,7 +43,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
 	protected JID peer;
 
-	protected IInvitationUI invitationUI=null;
+	protected IInvitationUI invitationUI = null;
 
 	protected String description;
 
@@ -106,7 +105,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 	 * 
 	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
 	 */
-	public void cancel(final String errorMsg, final boolean replicated) {
+	public void cancel(String errorMsg, boolean replicated) {
 		if (state == State.CANCELED)
 			return;
 
@@ -116,20 +115,11 @@ public abstract class InvitationProcess implements IInvitationProcess {
 		
 		if (!replicated) {
 			transmitter.sendCancelInvitationMessage(peer, errorMsg);
-			
-			String message = errorMsg;
-			/* inform user. */
-			if(errorMsg == null){
-				message = "Invitation canceled.";
-			}
-			ErrorMessageDialog.showErrorMessage(message);
 		}
 
 		invitationUI.cancel(errorMsg, replicated);
 
 		transmitter.removeInvitationProcess(this);
-		
-
 	}
 
 	@Override

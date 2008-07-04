@@ -62,6 +62,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class InvitationDialog extends Dialog implements IInvitationUI, IConnectionListener {
+	
 	private TableViewer tableviewer;
     private Table 		table;
     private ArrayList<inviterdata> 	input;
@@ -339,7 +340,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI, IConnecti
 			if (invdat.outginvatationProc==null)
 				continue;
 			
-			invdat.outginvatationProc.cancel("Canceled by inviter", false);
+			invdat.outginvatationProc.cancel(null, false);
 		}
 		updateInvitationProgress(null);
 	}
@@ -375,6 +376,10 @@ public class InvitationDialog extends Dialog implements IInvitationUI, IConnecti
 	};
     private String getStateDesc(IInvitationProcess.State state){
     	return StateNames[state.ordinal()];
+    }
+    
+    public void showErrorMessage(String errorMessage) {
+    	ErrorMessageDialog.showErrorMessage(errorMessage);
     }
     
 	public void cancel(String errorMsg, boolean replicated) {

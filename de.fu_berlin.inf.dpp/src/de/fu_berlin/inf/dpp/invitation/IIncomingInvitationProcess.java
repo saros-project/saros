@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.FileList;
  * @author rdjemili
  */
 public interface IIncomingInvitationProcess extends IInvitationProcess {
+	
 	/**
 	 * Requests the file list of the remotly shared project. This methods blocks
 	 * until the file list is retrieved.

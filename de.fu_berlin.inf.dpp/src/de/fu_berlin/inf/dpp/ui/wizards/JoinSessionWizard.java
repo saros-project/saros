@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
@@ -44,8 +43,6 @@ import de.fu_berlin.inf.dpp.net.JID;
  * 
  * o Automatically switch to follow mode
  * 
- * o Make a suggestion for the name of the project
- * 
  * o Suggest if the project is a CVS project that the user checks it out and
  * offers an option to transfer the settings
  * 
@@ -53,8 +50,6 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class JoinSessionWizard extends Wizard  {
 
-	static String MSG_CANCELED = "Canceled by invitee!";
-	
 	static Logger log = Logger.getLogger(JoinSessionWizard.class.getName());
 
 	ShowDescriptionPage descriptionPage;
@@ -64,9 +59,13 @@ public class JoinSessionWizard extends Wizard  {
 	WizardDialogAccessable myWizardDlg;
 
 	IIncomingInvitationProcess process;
+	
+	Display current;
 
 	public JoinSessionWizard(IIncomingInvitationProcess process) {
 		this.process = process;
+		
+		current = Display.getCurrent();
 
 		setWindowTitle("Session Invitation");
 		setHelpAvailable(false);
@@ -77,15 +76,20 @@ public class JoinSessionWizard extends Wizard  {
 		return new IInvitationUI(){
 			
 			public void cancel(final String errorMsg, final boolean replicated) {
-
-				// Do not report the cancelation that the user himself triggered
-				// TODO This does not work yet!
-				if (errorMsg != null && errorMsg.equals(MSG_CANCELED))
-					return;
-
-				Display.getCurrent().asyncExec(new Runnable() {
+				current.asyncExec(new Runnable() {
 					public void run() {
-						cancelRunASync(errorMsg, replicated);
+						
+						if (errorMsg != null){
+							MessageDialog.openError(getShell(), "Invitation aborted",
+								"Could not complete invitation because an error occurred (" + errorMsg + ")");
+						} else {
+							// errorMsg == null means canceled either by us or peer
+							if (replicated){
+								MessageDialog.openInformation(getShell(), "Invitation cancelled",
+								"Invitation was cancelled by peer.");
+							}
+						}
+						myWizardDlg.close();
 					}
 				});
 			}
@@ -97,7 +101,6 @@ public class JoinSessionWizard extends Wizard  {
 			public void updateInvitationProgress(JID jid) {
 				// ignored, not needed atm
 			}
-			
 		};
 	}
 
@@ -141,34 +144,15 @@ public class JoinSessionWizard extends Wizard  {
 
 		return true;
 	}
-
+	
 	@Override
 	public boolean performCancel() {
-		process.cancel(MSG_CANCELED, false);
+		process.cancel(null, false);
 
 		return super.performCancel();
-	}
-
-	private void cancelRunASync(String errorMsg, boolean replicated) {
-		if (replicated) {
-			if (errorMsg != null) {
-				MessageDialog.openError(getShell(), "Invitation aborted",
-					"Could not complete invitation. (" + errorMsg + ")");
-
-			} else {
-				MessageDialog.openInformation(getShell(), "Invitation cancelled",
-					"Invitation was cancelled by peer.");
-			}
-		}
-		myWizardDlg.setWizardButtonEnabled(IDialogConstants.BACK_ID, false);
-		myWizardDlg.setWizardButtonEnabled(IDialogConstants.NEXT_ID, false);
-		myWizardDlg.setWizardButtonEnabled(IDialogConstants.FINISH_ID, false);
 	}
 
 	public void setWizardDlg(WizardDialogAccessable wd) {
 		myWizardDlg = wd;
 	}
-
-
-
 }

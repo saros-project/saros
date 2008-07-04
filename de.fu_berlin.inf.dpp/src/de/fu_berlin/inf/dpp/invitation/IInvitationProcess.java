@@ -19,11 +19,20 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author rdjemili
  */
 public interface IInvitationProcess extends IFileTransferCallback {
+	
 	/**
-	 * This class contains untestable UI code which is needed by the invitation
+	 * This class contains UI code which is needed by the invitation
 	 * process.
+	 * 
+	 * Both the outgoing and incoming invitation UIs need to implement this.
 	 */
 	public interface IInvitationUI {
+
+		/**
+		 * 
+		 * @param errorMsg Is null if the cancelation was due to a user action.
+		 * @param replicated Is true if this message originated on the remote side or false if the message originated on the local side.
+		 */
 		public void cancel(String errorMsg, boolean replicated);
 		public void updateInvitationProgress(final JID jid);
 		public void runGUIAsynch(final Runnable runnable) ;
@@ -39,8 +48,6 @@ public interface IInvitationProcess extends IFileTransferCallback {
 	public static enum TransferMode {
 		JINGLE, IBB, DEFAULT
 	}
-
-	public static final String USER_CANCEL_MSG = "Invitation was cancelled by user";
 
 	/**
 	 * @return the exception that occured while executing the process or
@@ -105,6 +112,4 @@ public interface IInvitationProcess extends IFileTransferCallback {
 	public void invitationAccepted(JID from);
 	
 	public void joinReceived(JID from);
-	
-
 }

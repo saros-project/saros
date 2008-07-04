@@ -1374,7 +1374,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 					}
 				} catch (Exception e) {
 					//TODO Exception weiter reichen.
-					log.error("Incomming File Transfer Thread: ", e);
+					log.error("Incoming File Transfer Thread: ", e);
 					for (IInvitationProcess process : processes) {
 						if (process.getPeer().equals(new JID(request.getRequestor())))
 							process.cancel(e.getMessage(), false);
