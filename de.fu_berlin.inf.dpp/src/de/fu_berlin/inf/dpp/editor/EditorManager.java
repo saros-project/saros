@@ -507,6 +507,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 				}else{
 					file = sharedProject.getProject().getFile(textEdit.getEditor());
 				}
+				// TODO: This is a major HACK here. There should be a normalization 
+				// happening much earlier to also avoid UTF-8 conversion errors and such.
 				String text = fixDelimiters(file, textEdit.text);
 				replaceText(file, textEdit.offset, textEdit.replace, text,textEdit.getSource());
 				

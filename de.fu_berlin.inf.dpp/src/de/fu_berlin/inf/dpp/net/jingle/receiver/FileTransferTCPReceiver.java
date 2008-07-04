@@ -35,7 +35,6 @@ public class FileTransferTCPReceiver extends JingleFileTransferTCPConnection imp
 	private boolean on = true;
 	private boolean transmit = false;
 	private boolean receive = false;
-
 	
 	/* transfer information */
 //	private JingleFileTransferData receiveTransferData;
