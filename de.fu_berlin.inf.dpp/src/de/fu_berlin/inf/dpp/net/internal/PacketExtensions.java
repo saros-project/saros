@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IPath;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
@@ -27,7 +29,6 @@ import org.jivesoftware.smack.provider.ProviderManager;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import java.util.List;
 
 /**
  * Holds various simple helper methods to create and parse simple Smack packet

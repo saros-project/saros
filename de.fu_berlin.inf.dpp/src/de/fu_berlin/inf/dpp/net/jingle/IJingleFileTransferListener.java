@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
-import java.io.File;
 import java.io.InputStream;
 
 import de.fu_berlin.inf.dpp.net.JID;

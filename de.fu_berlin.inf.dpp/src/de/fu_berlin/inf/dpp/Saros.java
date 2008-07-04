@@ -20,10 +20,8 @@
 package de.fu_berlin.inf.dpp;
 
 import java.awt.Toolkit;
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -43,18 +41,11 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.MessageEventNotificationListener;
-import org.jivesoftware.smackx.muc.InvitationListener;
-import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.osgi.framework.BundleContext;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -92,8 +83,6 @@ public class Saros extends AbstractUIPlugin {
 	private MessagingManager messagingManager;
 
 	private ISessionManager sessionManager;
-	
-	private static Logger logger = Logger.getLogger(Saros.class.getName());
 
 	// TODO use ListenerList instead
 	private List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();

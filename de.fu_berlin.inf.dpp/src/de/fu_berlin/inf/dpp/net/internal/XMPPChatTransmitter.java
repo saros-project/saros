@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -63,8 +62,6 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiator;
-import org.jivesoftware.smackx.filetransfer.Socks5TransferNegotiatorManager;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -73,8 +70,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
@@ -447,8 +442,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 			/* send file with IBB File Transfer */
 
 			log.debug("Establishing file list transfer");
-
-			int attempts = MAX_TRANSFER_RETRIES;
 
 			/* Write xml datas to temp file for transfering. */
 			try {
@@ -1574,56 +1567,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 			// Thread.sleep(500);
 			// }
 			// monitor.closeMonitor(true);
-
-			log.info("Received resource " + request.getFileName());
-
-		} catch (Exception e) {
-			log.warn("Failed to receive " + request.getFileName(), e);
-		}
-	}
-
-	@Deprecated
-	private void receiveResourceOld(FileTransferRequest request) {
-		try {
-
-			JID from = new JID(request.getRequestor());
-			Path path = new Path(request.getFileName());
-
-			log.debug("Receiving resource from" + from.toString() + ": "
-					+ request.getFileName());
-
-			InputStream in = request.accept().recieveFile();
-
-			boolean handledByInvitation = false;
-			for (IInvitationProcess process : processes) {
-				if (process.getPeer().equals(from)) {
-					process.resourceReceived(from, path, in);
-					handledByInvitation = true;
-				}
-			}
-
-			if (!handledByInvitation) {
-				FileActivity activity = new FileActivity(
-						FileActivity.Type.Created, path, in);
-
-				int time;
-				String description = request.getDescription();
-				try {
-					time = Integer
-							.parseInt(description
-									.substring(RESOURCE_TRANSFER_DESCRIPTION
-											.length() + 1));
-				} catch (NumberFormatException e) {
-					Saros.log("Could not parse time from description: "
-							+ description, e);
-					time = 0; // HACK
-				}
-
-				TimedActivity timedActivity = new TimedActivity(activity, time);
-
-				ISessionManager sm = Saros.getDefault().getSessionManager();
-				sm.getSharedProject().getSequencer().exec(timedActivity);
-			}
 
 			log.info("Received resource " + request.getFileName());
 

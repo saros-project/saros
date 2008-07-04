@@ -86,7 +86,7 @@ public class SarosUI implements ISessionListener {
 					WizardDialogAccessable wd=
 						new WizardDialogAccessable(shell, jsw );
 					jsw.setWizardDlg(wd);
-					process.setInvitationUI(jsw);
+					process.setInvitationUI(jsw.getInvitationUI());
 					wd.open();
 				} catch (Exception e) {
 					Saros.getDefault().getLog().log(

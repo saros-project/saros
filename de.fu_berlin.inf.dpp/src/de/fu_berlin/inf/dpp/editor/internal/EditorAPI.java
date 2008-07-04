@@ -1,12 +1,12 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
-import java.awt.Toolkit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -400,7 +400,7 @@ public class EditorAPI implements IEditorAPI {
 
 		if (model != null) {
 
-			for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+			for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 				Annotation annotation = (Annotation) it.next();
 
 				if ( annotation.getType().startsWith(SelectionAnnotation.TYPE)==false)
@@ -519,7 +519,7 @@ public class EditorAPI implements IEditorAPI {
 
 		try {
 			IDocument document = viewer.getDocument();
-			for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+			for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 				Annotation ann = (Annotation) it.next();
 				if (ann.getType().equals(ViewportAnnotation.TYPE))
 					model.removeAnnotation(ann);

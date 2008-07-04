@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.concurrent;
 
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**

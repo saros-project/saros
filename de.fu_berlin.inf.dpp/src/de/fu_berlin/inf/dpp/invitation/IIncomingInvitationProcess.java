@@ -16,7 +16,7 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
 	 * Requests the file list of the remotly shared project. This methods blocks
 	 * until the file list is retrieved.
 	 * 
-	 * This method can be called the user while in INVITATION_SENT state.
+	 * This method can be called while in INVITATION_SENT state.
 	 */
 	public FileList requestRemoteFileList(IProgressMonitor monitor);
 
@@ -45,11 +45,10 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
 	 * @param monitor
 	 *            a progressmonitor that monitors the whole process. Can not be
 	 *            <code>null</code>.
-	 * @param copy 
-	 * 			  project files from simular project have to be copy.
+	 * 
 	 * @throws InvitationException -
 	 */
-	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor, boolean copy);
+	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor);
 	
 	public void setInvitationUI(IInvitationUI inviteUI);
 	

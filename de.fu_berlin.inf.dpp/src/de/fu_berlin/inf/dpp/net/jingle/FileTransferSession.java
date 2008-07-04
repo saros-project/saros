@@ -1,27 +1,16 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
-import java.awt.Rectangle;
-import java.io.File;
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
-import org.jivesoftware.smackx.jingle.mediaimpl.sshare.api.ImageDecoder;
-import org.jivesoftware.smackx.jingle.mediaimpl.sshare.api.ImageEncoder;
-import org.jivesoftware.smackx.jingle.mediaimpl.sshare.api.ImageReceiver;
-import org.jivesoftware.smackx.jingle.mediaimpl.sshare.api.ImageTransmitter;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.receiver.FileTransferTCPReceiver;
 import de.fu_berlin.inf.dpp.net.jingle.transmitter.FileTransferTCPTransmitter;
 

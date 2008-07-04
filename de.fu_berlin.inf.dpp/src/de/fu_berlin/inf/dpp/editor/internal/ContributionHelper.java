@@ -23,7 +23,7 @@ public class ContributionHelper {
 	 */
 	public static void insertAnnotation(IAnnotationModel model, int offset, int length) {
 
-		for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+		for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 			Annotation annotation = (Annotation) it.next();
 
 			if (!annotation.getType().equals(ContributionAnnotation.TYPE))
@@ -46,7 +46,7 @@ public class ContributionHelper {
 	 * after the text has changed.
 	 */
 	public static void insertAnnotation(IAnnotationModel model, int offset, int length, String source) {
-		for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+		for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 			Annotation annotation = (Annotation) it.next();
 
 			if (!annotation.getType().equals(ContributionAnnotation.TYPE))
@@ -69,7 +69,7 @@ public class ContributionHelper {
 	 * called before the text is changed.
 	 */
 	public static void splitAnnotation(IAnnotationModel model, int offset) {
-		for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+		for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 			Annotation annotation = (Annotation) it.next();
 
 			if (!annotation.getType().equals(ContributionAnnotation.TYPE))

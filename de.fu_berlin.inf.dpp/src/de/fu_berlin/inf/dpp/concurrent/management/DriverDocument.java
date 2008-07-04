@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.IDriverManager;
 import de.fu_berlin.inf.dpp.net.JID;
 

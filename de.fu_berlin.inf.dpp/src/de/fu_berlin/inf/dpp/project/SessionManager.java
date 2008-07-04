@@ -195,7 +195,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 	private void attachRosterListener() {
 		Roster roster = Saros.getDefault().getRoster();
 		roster.addRosterListener(new RosterListener() {
-			public void entriesAdded(Collection addresses) {
+			public void entriesAdded(Collection<String> addresses) {
 			}
 
 			public void entriesUpdated(Collection<String> addresses) {

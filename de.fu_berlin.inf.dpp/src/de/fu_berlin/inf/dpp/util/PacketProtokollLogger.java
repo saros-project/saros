@@ -1,10 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

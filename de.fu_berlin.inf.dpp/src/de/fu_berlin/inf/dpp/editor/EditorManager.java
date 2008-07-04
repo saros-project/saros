@@ -884,6 +884,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	/**
 	 * Removes all contribution and viewport annotations.
 	 */
+	
 	private void removeAllAnnotations(String forUserID, String typeAnnotation) {
 		
 		for (IEditorPart editor : editorPool.getAllEditors()) {
@@ -894,7 +895,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			if (model == null)
 				continue;
 
-			for (Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+			for (
+				@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
 				Annotation annotation = (Annotation) it.next();
 				String type = annotation.getType();
 				

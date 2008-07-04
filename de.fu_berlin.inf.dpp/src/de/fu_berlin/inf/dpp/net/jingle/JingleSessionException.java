@@ -14,7 +14,6 @@ public class JingleSessionException extends Exception {
 	 */
 	private static final long serialVersionUID = 4395402562918748941L;
 	
-	private Throwable throwable;
 	private String message;
 	private JID jid;
 	private String errorName = "Jingle Tranfer Error";
@@ -33,7 +32,6 @@ public class JingleSessionException extends Exception {
 	public JingleSessionException(String message, Throwable cause){
 		super();
 		this.message = message;
-		this.throwable = cause;
 	}
 	
 	public JID getJID(){

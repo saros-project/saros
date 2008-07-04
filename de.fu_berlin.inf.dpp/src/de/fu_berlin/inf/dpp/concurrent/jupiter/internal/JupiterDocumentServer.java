@@ -11,12 +11,10 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.OperationSerializer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.management.OutgoingMessageForwarder;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class JupiterDocumentServer implements JupiterServer{
@@ -32,10 +30,6 @@ public class JupiterDocumentServer implements JupiterServer{
 	
 //	/** outgoing queue to transfer request to appropriate clients. */
 	private List<Request> outgoingQueue;
-	
-	private RequestForwarder outgoing;
-	
-	private OperationSerializer serializer;
 	
 	private IPath editor;
 	/**
@@ -94,8 +88,7 @@ public class JupiterDocumentServer implements JupiterServer{
 		requestList = new Vector<Request>();
 		this.outgoingQueue = new Vector<Request>();
 		
-//		this.outgoing = forwarder;
-		serializer = new Serializer(this);
+new Serializer(this);
 		this.transmitter = new RequestTransmitter(forwarder);
 		transmitter.start();
 	}
@@ -109,8 +102,7 @@ public class JupiterDocumentServer implements JupiterServer{
 		requestList = new Vector<Request>();
 		this.outgoingQueue = new Vector<Request>();
 
-//		this.outgoing = forwarder;
-		serializer = new Serializer(this);
+new Serializer(this);
 	}
 	
 	

@@ -39,7 +39,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.MessageEventManager;
-import org.jivesoftware.smackx.MessageEventNotificationListener;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
@@ -238,8 +237,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		private String name;
 
-		private Chat chat;
-
 		private MultiUserChat muc;
 
 		private JID participant;
@@ -425,51 +422,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 			connection.addPacketListener(this, new MessageTypeFilter(
 					Message.Type.chat));
 			initMultiChatListener();
-		}
-	}
-
-	// TODO: testing
-	private void set(XMPPConnection connection) {
-		// TODO: messagenotificationlistener
-		// Create a MessageEventManager
-		MessageEventManager messageEventManager = new MessageEventManager(
-				connection);
-		// Add the listener that will react to the event notifications
-		messageEventManager
-				.addMessageEventNotificationListener(new MessageEventListener());
-
-		/* set chat room name with connection domain. */
-		CHAT_ROOM = "ori2008@conference."+new JID(connection.getUser()).getDomain();
-		
-	}
-
-	private class MessageEventListener implements
-			MessageEventNotificationListener {
-
-		public void deliveredNotification(String from, String packetID) {
-			System.out.println("The message has been delivered (" + from + ", "
-					+ packetID + ")");
-		}
-
-		public void displayedNotification(String from, String packetID) {
-			System.out.println("The message has been displayed (" + from + ", "
-					+ packetID + ")");
-		}
-
-		public void composingNotification(String from, String packetID) {
-			System.out.println("The message's receiver is composing a reply ("
-					+ from + ", " + packetID + ")");
-		}
-
-		public void offlineNotification(String from, String packetID) {
-			System.out.println("The message's receiver is offline (" + from
-					+ ", " + packetID + ")");
-		}
-
-		public void cancelledNotification(String from, String packetID) {
-			System.out
-					.println("The message's receiver cancelled composing a reply ("
-							+ from + ", " + packetID + ")");
 		}
 	}
 
@@ -720,123 +672,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		return session;
 	}
 
-	/**
-	 * löst die methode
-	 * 
-	 * @param remoteUser
-	 * @param thread
-	 * @return
-	 * @throws XMPPException
-	 */
-	private ChatSession oldSingleChat(JID remoteUser, String thread)
-			throws XMPPException {
-		/*
-		 * TODO: (23.12.) Er überprüft, ob es bereits eine Session gibt,
-		 * überlegen, wie es im multichat realisiert werden soll!
-		 */
-		for (ChatSession session : sessions) {
-			// System.out.println(remoteUser);
-			if (remoteUser.equals(session.getParticipant())) {
-				session.openWindow();
-				return session;
-			}
-		}
-
-		// create chat and open window
-		XMPPConnection connection = Saros.getDefault().getConnection();
-
-		// Chat chat = (thread != null) ? new Chat(connection,
-		// remoteUser.toString(), thread)
-		// : new Chat(connection, remoteUser.toString());
-
-		// TODO: Änderung
-		ChatManager chatmanager = connection.getChatManager();
-		Chat chat = null;
-		if (thread != null) {
-			// chat = chatmanager.createChat(remoteUser.toString(), thread,
-			// this);
-			chat = chatmanager.getThreadChat(thread);
-			// chat = new Chat(connection, remoteUser.toString(), thread)
-		} else {
-			chat = chatmanager.createChat(remoteUser.toString(), this);
-			// chat = new Chat(connection, remoteUser.toString());
-		}
-
-		// try to get name from roster
-		RosterEntry rosterEntry = connection.getRoster().getEntry(
-				remoteUser.getBase());
-
-		String name;
-		if (rosterEntry != null) {
-			name = rosterEntry.getName() != null ? rosterEntry.getName()
-					: rosterEntry.getUser();
-		} else {
-			name = "unknown";
-		}
-
-		ChatSession session = new ChatSession(chat, name);
-		// add this chat session to message listener of this chat instance.
-		chat.addMessageListener(session);
-		// chat.removeMessageListener(this);
-		sessions.add(session);
-		session.openWindow();
-		return session;
-	}
-
-	private ChatSession multiChatRoom(JID remoteUser, String thread)
-			throws XMPPException {
-		/*
-		 * TODO: (23.12.) Er überprüft, ob es bereits eine Session gibt,
-		 * überlegen, wie es im multichat realisiert werden soll!
-		 */
-		for (ChatSession session : sessions) {
-			// System.out.println(remoteUser);
-			if (remoteUser.equals(session.getParticipant())) {
-				session.openWindow();
-				return session;
-			}
-		}
-
-		// create chat and open window
-		XMPPConnection connection = Saros.getDefault().getConnection();
-
-		// Chat chat = (thread != null) ? new Chat(connection,
-		// remoteUser.toString(), thread)
-		// : new Chat(connection, remoteUser.toString());
-
-		// TODO: Änderung
-		ChatManager chatmanager = connection.getChatManager();
-		Chat chat = null;
-		if (thread != null) {
-			// chat = chatmanager.createChat(remoteUser.toString(), thread,
-			// this);
-			chat = chatmanager.getThreadChat(thread);
-			// chat = new Chat(connection, remoteUser.toString(), thread)
-		} else {
-			chat = chatmanager.createChat(remoteUser.toString(), this);
-			// chat = new Chat(connection, remoteUser.toString());
-		}
-
-		// try to get name from roster
-		RosterEntry rosterEntry = connection.getRoster().getEntry(
-				remoteUser.getBase());
-
-		String name;
-		if (rosterEntry != null) {
-			name = rosterEntry.getName() != null ? rosterEntry.getName()
-					: rosterEntry.getUser();
-		} else {
-			name = "unknown";
-		}
-
-		ChatSession session = new ChatSession(chat, name);
-		// add this chat session to message listener of this chat instance.
-		chat.addMessageListener(session);
-		// chat.removeMessageListener(this);
-		sessions.add(session);
-		session.openWindow();
-		return session;
-	}
+	
 
 	/**
 	 * Adds the chat listener.

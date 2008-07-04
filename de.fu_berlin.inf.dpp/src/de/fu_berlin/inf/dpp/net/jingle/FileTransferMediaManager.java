@@ -1,13 +1,10 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
-import java.io.File;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
@@ -15,11 +12,8 @@ import org.jivesoftware.smackx.jingle.media.PayloadType;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
-import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter.FileTransferData;
 
 public class FileTransferMediaManager extends JingleMediaManager {
 
@@ -28,29 +22,19 @@ public class FileTransferMediaManager extends JingleMediaManager {
 
 	private List<PayloadType> payloads = new ArrayList<PayloadType>();
 
-	private final XMPPConnection connection;
 	private IJingleFileTransferListener listener;
 	private HashMap<JID, FileTransferSession> sessions;
 	private JingleTransportManager transportManager;
-	// private FileTransferSession session;
 
 	/* tranfer data */
 	private JingleFileTransferData[] transferData;
 	private JingleFileTransferProcessMonitor monitor;
 
-//	@Deprecated
-//	public FileTransferMediaManager() {
-//		setupPayloads();
-//		this.connection = null;
-//		sessions = new HashMap<JID, FileTransferSession>();
-//	}
-	
 	public FileTransferMediaManager(JingleTransportManager transportManager) {
 		
 		super(transportManager);
 		this.transportManager = transportManager;
 		setupPayloads();
-		this.connection = null;
 		sessions = new HashMap<JID, FileTransferSession>();
 	}
 

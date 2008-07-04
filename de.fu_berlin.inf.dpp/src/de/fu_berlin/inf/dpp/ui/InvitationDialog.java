@@ -18,9 +18,9 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 package de.fu_berlin.inf.dpp.ui;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -61,7 +61,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
-public class InvitationDialog extends Dialog implements IInvitationUI,IConnectionListener {
+public class InvitationDialog extends Dialog implements IInvitationUI, IConnectionListener {
 	private TableViewer tableviewer;
     private Table 		table;
     private ArrayList<inviterdata> 	input;
@@ -345,11 +345,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,IConnectio
 	}
 
 
-    boolean isJIDinList(ArrayList items, JID jid) {
+    boolean isJIDinList(ArrayList<JID> items, JID jid) {
     	for (int i=0;i<items.size();i++) {
 
     		try {
-    		JID curJID= (JID)items.get(i);
+    		JID curJID = items.get(i);
     		
     		if (curJID.equals(jid))
     			return true;

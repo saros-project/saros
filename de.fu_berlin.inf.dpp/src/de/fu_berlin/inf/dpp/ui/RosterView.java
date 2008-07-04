@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,9 +49,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
-import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 
@@ -371,22 +368,6 @@ public class RosterView extends ViewPart implements IConnectionListener, IRoster
 		return users.toArray();
 	}
 	
-	@Deprecated
-	public static Object[] getChildren(Iterator iterator) {
-		List<RosterEntry> users = new LinkedList<RosterEntry>();
-
-		while(iterator.hasNext()) {
-			RosterEntry entry = (RosterEntry) iterator.next();
-			
-			if (entry.getType() == RosterPacket.ItemType.both || 
-				entry.getType() == RosterPacket.ItemType.to) {
-					users.add(entry);
-			}
-		}
-
-		return users.toArray();
-	}
-
 	/**
 	 * Needs to called from an UI thread.
 	 */

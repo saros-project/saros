@@ -27,17 +27,19 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import org.apache.log4j.Logger;
-
-import de.fu_berlin.inf.dpp.concurrent.jupiter.*;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.*;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 
 /**
  * This class implements the client-side core of the Jupiter control algorithm.
  */
 public class Jupiter implements Algorithm {
-	
-	private static Logger logger = Logger.getLogger(Jupiter.class);
 	
 	/**
 	 * The inclusion transformation function used to transform operations.
@@ -143,7 +145,7 @@ public class Jupiter implements Algorithm {
 		int[] result = new int[indices.length]; 
 		System.arraycopy(indices, 0, result, 0, indices.length);
 		for (int i = 0; i < ackRequestList.size(); i++) {
-			OperationWrapper wrap = (OperationWrapper) ackRequestList.get(i);
+			OperationWrapper wrap = ackRequestList.get(i);
 			Operation ack = wrap.getOperation();
 			for (int k = 0; k < indices.length; k++) {
 				result[k] = transformIndex(result[k], ack);
@@ -173,9 +175,9 @@ public class Jupiter implements Algorithm {
 	 * @param time the request to the remote operation count from
 	 */
 	private void discardAcknowledgedOperations(JupiterVectorTime time) {
-		Iterator iter = ackRequestList.iterator();
+		Iterator<OperationWrapper> iter = ackRequestList.iterator();
 		while (iter.hasNext()) {
-			OperationWrapper wrap = (OperationWrapper) iter.next();
+			OperationWrapper wrap = iter.next();
 			if (wrap.getLocalOperationCount() < time.getRemoteOperationCount()) {
 				iter.remove();
 			}
@@ -197,7 +199,7 @@ public class Jupiter implements Algorithm {
 	private Operation transform(Operation newOp) {
 		for (int ackRequestListCnt = 0; ackRequestListCnt < ackRequestList
 						.size(); ackRequestListCnt++) {
-			OperationWrapper wrap = (OperationWrapper) ackRequestList
+			OperationWrapper wrap = ackRequestList
 							.get(ackRequestListCnt);
 			Operation existingOp = wrap.getOperation();
 
@@ -253,8 +255,8 @@ public class Jupiter implements Algorithm {
 	 */
 	private void checkPreconditions(JupiterVectorTime time) throws TransformationException {
 		if (!ackRequestList.isEmpty()
-						&& time.getRemoteOperationCount() < ((OperationWrapper) ackRequestList
-							   .get(0)).getLocalOperationCount()) {
+						&& time.getRemoteOperationCount() < ackRequestList
+							   .get(0).getLocalOperationCount()) {
 			throw new TransformationException("precondition #1 violated.");
 		} else if (time.getRemoteOperationCount() > vectorTime
 						.getLocalOperationCount()) {

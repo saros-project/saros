@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -32,7 +31,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -41,14 +39,10 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
-import org.jivesoftware.smack.XMPPException;
-
-import com.sun.org.apache.bcel.internal.generic.GETSTATIC;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
@@ -143,7 +137,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * 
 	 * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
 	 */
-	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor, boolean copy) {
+	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor) {
 
 		if (newProjectName == null && baseProject == null)
 			throw new IllegalArgumentException(
@@ -153,7 +147,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			assertState(State.HOST_FILELIST_SENT);
 
 			if (newProjectName != null) {
-				localProject = createNewProject(newProjectName, baseProject,copy);
+				localProject = createNewProject(newProjectName, baseProject);
 			} else {
 				localProject = baseProject;
 			}
@@ -281,13 +275,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 	 * @param baseProject
 	 *            if not <code>null</code> all files of the baseProject will
 	 *            be copied into the new project after having created it.
-	 * @param copy
-	 * 				copy files of existing project
 	 * @return the new project.
 	 * @throws CoreException
 	 *             if something goes wrong while creating the new project.
 	 */
-	private IProject createNewProject(String newProjectName, final IProject baseProject,final boolean copy)
+	private IProject createNewProject(String newProjectName, final IProject baseProject)
 		throws CoreException {
 
 		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -314,14 +306,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 								project.clearHistory(null);
 								project.refreshLocal(IProject.DEPTH_INFINITE, null);
 								
-//								if(!project.exists() && new File(project.getFullPath().toOSString()).exists()){
-//									/* delete project with content*/
-//									new File(project.getFullPath().toOSString()).delete();
-////									project.delete(true, true, null);
-//								}
-								
-								
-								if (baseProject == null || !copy) {									
+								if (baseProject == null) {									
 									project.create(new NullProgressMonitor());
 									project.open(new NullProgressMonitor());
 								} else {
@@ -348,16 +333,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 				
 			}
 		});
-		
+
+		// TODO CO: What is this??? 
 //		project.clearHistory(null);
 //		project.refreshLocal(IProject.DEPTH_INFINITE, null);
-//
-//		if (baseProject == null) {
-//			project.create(new NullProgressMonitor());
-//			project.open(new NullProgressMonitor());
-//		} else {
-//			baseProject.copy(project.getFullPath(), true, new NullProgressMonitor());
-//		}
 
 		return project;
 	}

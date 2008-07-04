@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
-import de.fu_berlin.inf.dpp.*;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * Marks text selected by both driver and observer.
