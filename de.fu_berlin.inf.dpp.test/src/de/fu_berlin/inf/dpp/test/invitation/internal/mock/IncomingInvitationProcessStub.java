@@ -28,7 +28,7 @@ public class IncomingInvitationProcessStub implements IIncomingInvitationProcess
     }
 
     public void accept(IProject localProject, String newProjectName, 
-        IProgressMonitor monitor) {
+        IProgressMonitor monitor, boolean copy) {
         
         if (seconds > 0) 
             waitWithProgressMonitor(monitor);

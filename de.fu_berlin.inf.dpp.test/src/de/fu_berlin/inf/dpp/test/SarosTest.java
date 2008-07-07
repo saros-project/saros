@@ -40,7 +40,7 @@ public class SarosTest extends TestCase {
 	public XMPPConnection received_connection = null;
 
 	
-	public static  String server = "jabber.org";
+	public static  String server = "jabber.cc";
 	public static String User1 = "ori78@"+server;
 	public static String User2 = "ori79@"+server;
 	
@@ -154,12 +154,14 @@ public class SarosTest extends TestCase {
 		
 	}
 	
-	public void xtestCreateAccount() throws XMPPException, InterruptedException{
+	public void testCreateAccount() throws XMPPException, InterruptedException{
 		XMPPConnection connection = new XMPPConnection(server);
 		connection.connect();
-		connection.getAccountManager().createAccount("ori78", "123456");
+		connection.getAccountManager().createAccount("anton78", "123456");
 		Thread.sleep(1000);
-		connection.getAccountManager().createAccount("ori79", "123456");
+		connection.getAccountManager().createAccount("carl80", "123456");
+		Thread.sleep(1000);
+		connection.getAccountManager().createAccount("bob79", "123456");
 	}
 	
 	public void xtestDeleteAccount() throws XMPPException{
@@ -167,7 +169,7 @@ public class SarosTest extends TestCase {
 		received_connection.getAccountManager().deleteAccount();
 	}
 	
-	public void testDeleteAllEntries() throws XMPPException, InterruptedException {
+	public void xtestDeleteAllEntries() throws XMPPException, InterruptedException {
 		Roster re_roster = received_connection.getRoster();
 		RosterListenerImpl list2 = new RosterListenerImpl(received_connection,
 				re_roster);

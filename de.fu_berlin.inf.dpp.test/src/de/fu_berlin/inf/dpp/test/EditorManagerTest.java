@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.test.util.ResourceHelper;
 
@@ -29,7 +29,7 @@ public class EditorManagerTest extends TestCase {
 
     private EditorAPI        editorAPI;
     private SharedProject    sharedProject;
-    private SessionManager   sessionManager;
+    private ISessionManager   sessionManager;
 
     @Override
     protected void setUp() throws Exception {

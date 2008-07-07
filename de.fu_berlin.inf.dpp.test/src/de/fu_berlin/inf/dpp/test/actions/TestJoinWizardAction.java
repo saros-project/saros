@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Shell;
 import de.fu_berlin.inf.dpp.test.invitation.internal.mock.IncomingInvitationProcessStub;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 
-public class TestJoinWizardAction extends Action {
+public class TestJoinWizardAction extends Action{
 
     public TestJoinWizardAction() {
         setText("test join wizard");
@@ -23,5 +23,10 @@ public class TestJoinWizardAction extends Action {
         } catch (Exception e) {
             e.printStackTrace();
         }        
+    }
+    
+    public static void main(String [] args){
+    	TestJoinWizardAction a = new TestJoinWizardAction();
+    	a.run();
     }
 }

@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="lib/easymock.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smack.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smackx.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smackx-debug.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smackx-jingle.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="/Saros/lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/easymock.jar"/>
-	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-jingle.jar"/>
-	<classpathentry kind="lib" path="lib/xpp.jar"/>
-	<classpathentry kind="lib" path="lib/smack.jar"/>
-	<classpathentry kind="lib" path="lib/smackx.jar"/>
+	<classpathentry kind="lib" path="/Saros/bin" sourcepath="/Saros/src"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
-	<classpathentry kind="lib" path="lib/appframework-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker-1.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Saros"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
