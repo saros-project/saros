@@ -12,12 +12,6 @@ import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
  */
 public interface IJingleFileTransferListener {
 	
-	/**
-	 * 
-	 * @param monitor
-	 */
-	public void incommingFileTransfer(JingleFileTransferProcessMonitor monitor);
-
 	public void incommingFileList(String fileList_content, JID sender);
 	
 	public void incomingResourceFile(JingleFileTransferData data, InputStream input);

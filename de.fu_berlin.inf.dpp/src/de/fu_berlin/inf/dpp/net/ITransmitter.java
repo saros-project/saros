@@ -48,7 +48,7 @@ public interface ITransmitter {
 	 * Adds given invitation to the list of pending invitations.
 	 * 
 	 * @param invitation
-	 *            the invitation that is to be added.
+	 *            the invitation that to be added.
 	 */
 	public void addInvitationProcess(IInvitationProcess invitation);
 

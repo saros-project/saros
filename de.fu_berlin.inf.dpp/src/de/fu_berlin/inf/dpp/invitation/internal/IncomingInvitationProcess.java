@@ -158,7 +158,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 			if(tmode == TransferMode.IBB){
 				progressMonitor.beginTask("Transfer archive file ...", 100);
 			}else{
-				
 				progressMonitor.beginTask("Synchronizing...", filesLeftToSynchronize);
 			}
 			setState(State.SYNCHRONIZING);
@@ -420,7 +419,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 		JID host = peer;
 		JID driver = peer;
 
-		// HACK
+		// TODO: HACK
 		List<JID> users = new ArrayList<JID>();
 		users.add(host);
 		users.add(Saros.getDefault().getMyJID());

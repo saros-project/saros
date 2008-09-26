@@ -4,7 +4,6 @@ Saros CHANGELOG
 1.0.1
 	New Features
 		- Better selection support for both driver and observer.
-
 	
 	Usability Enhancements 
 		- Added Confirm Dialog to before actually deleting a contact.

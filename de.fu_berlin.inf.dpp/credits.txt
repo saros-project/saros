@@ -1,3 +1,8 @@
 
- Author: Riad Djemili
+ Author: Riad Djemili, Christopher Oezbek, Björn Gustavs, Oliver Rieger
+ 
  Icons: Eclipse Org. & Silk Icon set by http://www.famfamfam.com
+ 
+ Jupiter Algorithm Implementation taken from "ace - A Collaborative Editor"
+ 
+ This project uses the following libraries: Log4J, Smack

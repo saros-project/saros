@@ -55,7 +55,6 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
  * @author rdjemili
  */
 public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
-	// TODO separate into two classes!?
 
 	private static Logger logger = Logger.getLogger(ExecuterQueue.class);
 	/**/
@@ -82,7 +81,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 			if(currentExecutedActivity != null){
 				if(activity instanceof TextEditActivity && currentExecutedActivity.sameLike(activity)){
 					logger.debug("TextEditActivity "+activity+ " is executed.");
-//					System.out.println("Check");
 					executed = true;
 					notify();
 				}

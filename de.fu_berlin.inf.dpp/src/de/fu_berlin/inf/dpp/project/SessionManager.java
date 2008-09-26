@@ -172,22 +172,22 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 	/* (non-Javadoc)
 	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#connectionStateChanged(org.jivesoftware.smack.XMPPConnection, de.fu_berlin.inf.dpp.Saros.ConnectionState)
 	 */
-	public void connectionStateChanged(XMPPConnection connection, ConnectionState newState) {
+	public void connectionStateChanged(XMPPConnection connection,
+			ConnectionState newState) {
 
 		if (newState == Saros.ConnectionState.CONNECTED) {
-			if (transmitter==null) {
+			if (transmitter == null) {
 				transmitter = new XMPPChatTransmitter(connection);
 				attachRosterListener();
-			}
-			else
+			} else {
+				// TODO: Does this ever happen?
 				transmitter.setXMPPConnection(connection);
-			
-			
-
-		} else if (newState == Saros.ConnectionState.NOT_CONNECTED) { 
-			if (sharedProject != null) 
+			}
+		
+		} else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
+			if (sharedProject != null)
 				leaveSession();
-			
+
 			transmitter = null;
 		}
 	}
