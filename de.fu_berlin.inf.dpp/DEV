@@ -7,6 +7,7 @@ Content
 1. Introduction
 2. The repository
 3. Java packages
+4. Special Topics
 
 -----------------------------------------------------------------
 
@@ -127,3 +128,18 @@ Content
       Handles visual aspects, like showing wizards and adding
       actions and decorators.
     
+4. Special topics
+
+4.1. About Selections 
+
+SelectionAnnotation is the type used to represent a selection annotation.
+ 
+org.eclipse.jface.text.source.AnnotationPainter is the class that we need to watch.
+
+Tom Eicher answers good stuff about Painter
+
+http://dev.eclipse.org/newslists/news.eclipse.platform/msg55356.html
+
+Another interesting one:
+
+ttp://dev.eclipse.org/newslists/news.eclipse.platform/msg56587.html
