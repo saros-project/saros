@@ -135,4 +135,11 @@ public class IncomingInvitationProcessStub implements IIncomingInvitationProcess
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void accept(IProject baseProject, String newProjectName,
+			IProgressMonitor monitor) {
+		// TODO Auto-generated method stub
+		
+	}
 }

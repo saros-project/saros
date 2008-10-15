@@ -356,4 +356,16 @@ public class XMPPTransmitterTest extends TestCase implements
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	public void sendFileChecksumError(JID to, IPath path) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendJupiterTransformationError(JID to, IPath path) {
+		// TODO Auto-generated method stub
+		
+	}
 }

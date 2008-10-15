@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
+import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -160,5 +161,35 @@ public class FileStub implements IFile {
 			int depth) throws CoreException {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public Map getPersistentProperties() throws CoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map getSessionProperties() throws CoreException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isDerived(int options) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isHidden() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void setHidden(boolean isHidden) throws CoreException {
+		// TODO Auto-generated method stub
+		
 	}
 }

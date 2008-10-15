@@ -165,6 +165,13 @@ public class TestActions extends TestCase{
 		        
 		        monitor.done();
 		    }
+
+		@Override
+		public void accept(IProject baseProject, String newProjectName,
+				IProgressMonitor monitor) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
 	
 	
