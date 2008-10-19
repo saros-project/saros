@@ -204,22 +204,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		setProxyPort(connection);
 
-		// TODO always preserve threads
-		// this.connection.addPacketListener(this, new
-		// MessageTypeFilter(Message.Type.chat)); // HACK
-		// this.connection.addPacketListener(this, new
-		// MessageTypeFilter(Message.Type.groupchat));
-
-		/*
-		 * an dieser Stelle wird der MUC Transmitter initialisiert, um die
-		 * Kapselung des Systems mit dem Fassadenmuster nicht zu verletzten.
-		 * TODO: Später überlegen, wie wir es trennen. Alle Methoden rufen
-		 * momentan ITransmitter Methoden des MUC Transmitter auf, soweit diese
-		 * implementiert sind.
-		 */
-		this.mucmanager = new MultiUserChatManager();
-		mucmanager.setConnection(connection, this);
-
 		this.privatechatmanager = new PrivateChatManager();
 		privatechatmanager.setConnection(connection, this);
 

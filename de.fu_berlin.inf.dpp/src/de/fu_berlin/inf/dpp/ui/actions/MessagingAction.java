@@ -51,18 +51,12 @@ public class MessagingAction extends SelectionProviderAction {
 		MessagingManager mm = Saros.getDefault().getMessagingManager();
 		try {
 //			mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
-			mm.showMultiChatMessagingWindow(new JID(rosterEntry.getUser()), null);
+			mm.showMultiChatMessagingView(new JID(rosterEntry.getUser()));
 
 		} catch (XMPPException e) {
 //			e.printStackTrace();
-			logger.error("Error during init MultiChatMessagingWindow",e);
+			logger.error("Error during init MultiChatMessagingView",e);
 			ErrorMessageDialog.showErrorMessage("Could not establishing MUC Messaging.");
-			try {
-				mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
-			} catch (XMPPException e1) {
-				logger.error("Error during init PrivateChatMessagingWindow", e1);
-				ErrorMessageDialog.showErrorMessage("Could not establishing Messaging.");
-			}
 		}
 	}
 

@@ -24,12 +24,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -47,14 +44,12 @@ import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 /**
  * MessagingManager handles all instant messaging related communications.
  * 
- * @author rdjemili
+ * @author rdjemili,chjacob(chris_fu)
  */
-public class MessagingManager implements PacketListener, MessageListener,
-		IConnectionListener, InvitationListener {
+public class MessagingManager implements PacketListener, IConnectionListener {
 
 	private static Logger log = Logger.getLogger(MessagingManager.class.getName());
 
-	private MUCListener mucl = new MUCListener();
 	private MultiUserChatManager multitrans = null;	
 	private String CHAT_ROOM = "saros";
 
@@ -75,8 +70,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 	}
 
 	
-	public class MultiChatSession implements SessionProvider, PacketListener,
-			MessageListener {
+	public class MultiChatSession implements SessionProvider, PacketListener {
 		
 		private Logger logCH = Logger.getLogger(MultiChatSession.class.getName());
 		private String name;
@@ -106,19 +100,12 @@ public class MessagingManager implements PacketListener, MessageListener,
 		}
 
 		public void processPacket(Packet packet) {
-			logCH.debug("processPacket called");
+			log.debug("processPacket called");
 
 			final Message message = (Message) packet;
 
-			if (message.getBody() == null)
-				return;
-		}
-
-		public void processMessage(Chat chat, Message message) {
-			// TODO: new Method for messagelistener
-			logCH.debug("processMessage called.");
-			processPacket(message);
-
+			log.debug("Received Message from " + message.getFrom() + ": " +
+					message.getBody());
 		}
 
 		/*
@@ -126,19 +113,11 @@ public class MessagingManager implements PacketListener, MessageListener,
 		 */
 		public void sendMessage(String text) {
 			try {
-				// TODO: Ã„nderung:
-				// Message msg = chat.createMessage();
 
-				// TODO: Check connection before sending.
-
-				// Message msg = new Message();
-				// msg.setBody(text);
-				// send via muc process
-				// chat.sendMessage(msg);
 				Message msg = muc.createMessage();
 				msg.setBody(text);
-				// TODO: FÃœR MUC
 				if (muc != null) {
+					log.debug("Sending Message..");
 					muc.sendMessage(msg);
 				}
 
@@ -196,7 +175,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		if (newState == ConnectionState.CONNECTED) {
 			connection.addPacketListener(this, new MessageTypeFilter(
 					Message.Type.chat));
-			initMultiChatListener();
+			//initMultiChatListener();
 		}
 	}
 
@@ -213,148 +192,11 @@ public class MessagingManager implements PacketListener, MessageListener,
 		final Message message = (Message) packet;
 		final JID jid = new JID(message.getFrom());
 
-		if (message.getBody() == null)
-			return;
-
-		if (message.getFrom().contains(multitrans.getRoomName())) {
-			
-			if(multiSession == null){
-				multiSession = new MultiChatSession(multitrans.getMUC());
-				multiSession.processPacket(message);				
-			}
-		} else {
-			/* old chat based message communication. */
-			for (MultiChatSession session : sessions) {
-				// System.out.println(session.getParticipant());
-				if (jid.equals(session.getParticipant())) {
-					return; // gets already handled by message handler in
-							// session
-				}
-			}
-
-			// TODO:Checken warum der Chat manchmal nicht aufgeht. !!!
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					try {
-						MultiChatSession session = showMessagingWindow(jid, message
-								.getThread());
-
-						// do this so that current message wont be lost
-						// session.processMessage(null, message);
-						session.processPacket(message);
-					} catch (XMPPException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
+		if (message.getBody() == null) return;
+		else {
+			//TODO handle Messages with no session
 		}
-	}
-
-	public void processMessage(Chat chat, Message message) {
-		// TODO new method for message notify
-		log.debug("processMessage called.");
-		processPacket(message);
-
-	}
-
-	/**
-	 * @param thread
-	 *            ID of thread or <code>null</code> if chat should start a new
-	 *            thread.
-	 * @throws XMPPException
-	 */
-	public void showMultiChatMessagingWindow(JID remoteUser, String thread)
-			throws XMPPException {
-		if (!Saros.getDefault().isConnected())
-			throw new XMPPException("No connection ");
-
-		MultiUserChat muc = multitrans.getMUC();
-		if (muc == null) {
-//			muc = multitrans.getMUC();
-//			if(muc == null){
-				multitrans.initMUC(Saros.getDefault().getConnection(), Saros
-						.getDefault().getConnection().getUser());
-				muc = multitrans.getMUC();
-//			}
-		}
-
-		Presence remoteUserPresence = muc
-				.getOccupantPresence(CHAT_ROOM+"/"
-						+ remoteUser.toString() + "/Smack");
-		if (remoteUserPresence == null) {
-			muc.invite(remoteUser.toString(), "Testing");
-		}
-
-		if (multiSession == null) {
-			muc.removeMessageListener(mucl);
-			try {
-				multiSession = new MultiChatSession(muc);
-			} catch (Exception e) {
-				e.printStackTrace();
-				multiSession = null;
-				muc.addMessageListener(mucl);
-			}
-		} else {
-		}
-	}
-
-	/**
-	 * @param thread
-	 *            ID of thread or <code>null</code> if chat should start a new
-	 *            thread.
-	 * @throws XMPPException
-	 */
-	public MultiChatSession showMessagingWindow(JID remoteUser, String thread)
-			throws XMPPException {
-		if (!Saros.getDefault().isConnected())
-			throw new XMPPException("No connection ");
-
-		for (MultiChatSession session : sessions) {
-			// System.out.println(remoteUser);
-			if (remoteUser.equals(session.getParticipant())) {
-				return session;
-			}
-		}
-
-		// create chat and open window
-		XMPPConnection connection = Saros.getDefault().getConnection();
-
-		// Chat chat = (thread != null) ? new Chat(connection,
-		// remoteUser.toString(), thread)
-		// : new Chat(connection, remoteUser.toString());
-
-		ChatManager chatmanager = connection.getChatManager();
-		Chat chat = null;
-		if (thread != null) {
-			// chat = chatmanager.createChat(remoteUser.toString(), thread,
-			// this);
-			chat = chatmanager.getThreadChat(thread);
-			// chat = new Chat(connection, remoteUser.toString(), thread)
-		} else {
-			chat = chatmanager.createChat(remoteUser.toString(), this);
-			// chat = new Chat(connection, remoteUser.toString());
-		}
-
-		// try to get name from roster
-		RosterEntry rosterEntry = connection.getRoster().getEntry(
-				remoteUser.getBase());
-
-		String name;
-		if (rosterEntry != null) {
-			name = rosterEntry.getName() != null ? rosterEntry.getName()
-					: rosterEntry.getUser();
-		} else {
-			name = "unknown";
-		}
-
-		MultiUserChat muc = multitrans.getMUC();
-		MultiChatSession session = new MultiChatSession(muc);
-		// add this chat session to message listener of this chat instance.
-		chat.addMessageListener(session);
-		// chat.removeMessageListener(this);
-		sessions.add(session);
-		return session;
+		
 	}
 
 	/**
@@ -364,57 +206,28 @@ public class MessagingManager implements PacketListener, MessageListener,
 		chatListeners.add(listener);
 	}
 
-	/* MultiUserChat section */
+	public void showMultiChatMessagingView(JID remoteUser) throws XMPPException {
 
-	public void invitationReceived(XMPPConnection conn, String room,
-			String inviter, String reason, String password, Message message) {
-		log.debug("InvitationReceived");
-		if (multitrans.getMUC() == null) {
-			// this.muc = XMPPMultiChatTransmitter.joinMuc(conn,
-			// Saros.getDefault().getConnection().getUser(), room);
-			//multitrans.initMUC(conn, conn.getUser());
-		}
-		// muc.addMessageListener(mucl);
-		// showMultiChatMessagingWindow(new JID("Multi User Chat"), null);
-		// TODO: Überprüfen, ob auch noch verbunden
-		if (multiSession == null && multitrans.getMUC() != null) {
-			// muc.removeMessageListener(mucl);
-			MultiChatSession session = new MultiChatSession(multitrans
-					.getMUC());
-			this.multiSession = session;
-		} else {
-		}
+	if (!Saros.getDefault().isConnected())
+		throw new XMPPException("No connection ");
 
+	MultiUserChat muc = multitrans.getMUC();
+	if (muc == null) {
+			multitrans.initMUC(Saros.getDefault().getConnection(), Saros
+					.getDefault().getConnection().getUser());
+			muc = multitrans.getMUC();
 	}
 
-	/**
-	 * invitation listener for multi chat invitations.
-	 */
-	public void initMultiChatListener() {
-		// listens for MUC invitations
-		MultiUserChat.addInvitationListener(Saros.getDefault().getConnection(),
-				this);
+
+	if (multiSession == null) {
+		log.debug("Creating MUC session..");
+		multiSession = new MultiChatSession(muc);
+		//multiSession.openView();
+	} 
+	else {
+		//multiSession.openView();
 	}
-
-	/**
-	 * this class is only for testing with muc message listener.
-	 * 
-	 * @author rdjemili
-	 * 
-	 */
-	class MUCListener implements MessageListener, PacketListener {
-
-		public void processMessage(Chat chat, Message message) {
-			System.out.println("jetzt gehts los");
-
-		}
-
-		public void processPacket(Packet packet) {
-			if (packet instanceof Message) {
-				Message msg = (Message) packet;
-				System.out.println("from " + msg.getFrom() + " text: "
-						+ msg.getBody());
-			}
-		}
+	multiSession.sendMessage("Hello");
+		
 	}
 }

@@ -71,7 +71,6 @@ public class MultiUserChatManager implements InvitationListener,
 	public void initMUC(XMPPConnection connection, String user)
 			throws XMPPException {
 		this.connection = connection;
-		this.muc = new MultiUserChat(connection, Room);
 
 		// TODO: Room name should be configured by settings.
 		/* create room domain of current connection. */
@@ -81,23 +80,61 @@ public class MultiUserChatManager implements InvitationListener,
 
 		// Create a MultiUserChat using an XMPPConnection for a room
 		MultiUserChat muc = new MultiUserChat(connection, Room);
-		if (isRoomExist(muc, Room)) {
-			log.debug("try to join room..");
-			muc.join(user);
-			log.debug(muc.isJoined());
-		} else {
-			log.debug("creating room");
-			muc.create(Room);
-			// Get the the room's configuration form
-			Form form = muc.getConfigurationForm();
-			// Create a new form to submit based on the original form
-			Form submitForm = form.createAnswerForm();
-			try {
-				submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
-			} catch (Exception ee) {
-				log.debug("configure room: ", ee);
+		
+		if(isRoomExist(muc, Room)){
+			if(!isJoined(muc, user)){
+				joinMuc(muc, user);
+			}
+			else{
+				log.debug(" already joined. ");
 			}
 		}
+		else{
+			// Create the room
+			muc.create(user);
+
+			// Send an empty room configuration form which indicates that we
+			// want
+			// an instant room
+			// muc.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
+			muc.sendConfigurationForm(getConfigForm(user, muc));
+			log.debug("create room and send configuration.");
+			
+		}
+		
+		if (muc.isJoined()) {
+			this.muc = muc;
+			log.debug("Has joined in muc room.");
+		}
+		else{
+			throw new XMPPException("Couldn't join with MUC room.");
+		}
+		
+		
+//		if (isRoomExist(muc, Room)) {
+//			log.debug("try to join room..");
+//			// TODO checki whether already joined
+//			muc.join(user);
+//			log.debug(muc.isJoined());
+//		} else {
+//			log.debug("creating room");
+//			muc.create(user);
+//			
+//			// Send an empty room configuration form which indicates that we want
+//		    // an instant room
+//		    muc.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
+//
+//			
+////			// Get the the room's configuration form
+////			Form form = muc.getConfigurationForm();
+////			// Create a new form to submit based on the original form
+////			Form submitForm = form.createAnswerForm();
+////			try {
+////				submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
+////			} catch (Exception ee) {
+////				log.debug("configure room: ", ee);
+////			}
+//		}
 	}
 
 	private Form getConfigForm(String user, MultiUserChat muc)
