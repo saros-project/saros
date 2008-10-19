@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
@@ -34,12 +36,14 @@ public class ChatView extends ViewPart implements ISessionListener,
 	IConnectionListener, IChatListener {
 	
 	private static Logger log = Logger.getLogger(ChatView.class.getName());
-	
+
 	private Text inputText;
 
 	private MultiChatSession session;
 
 	private SourceViewer viewer;
+	
+	private static final int[] WEIGHTS = {75, 25};
 	
 	@Override
 	public void createPartControl(Composite parent) {
@@ -54,8 +58,9 @@ public class ChatView extends ViewPart implements ISessionListener,
 		final StyledText chatText = viewer.getTextWidget();
 		
 		inputText = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+		inputText.setEditable(false);
 		
-		//sash.setWeights(WEIGHTS);
+		sash.setWeights(WEIGHTS);
 		
 		inputText.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
@@ -76,6 +81,26 @@ public class ChatView extends ViewPart implements ISessionListener,
 			}
 		});
 		
+		// TODO add disconnect-action
+		 Action connectAction = new Action("Connect...") {
+			public void run() {
+				log.debug("MUC connecting");
+				MessagingManager mm = Saros.getDefault().getMessagingManager();
+				inputText.setEditable(true);
+				try {
+					mm.connectMultiUserChat();
+				} catch (XMPPException e) {
+					log.error("couldn't connect!");
+				}
+			}
+		};
+		connectAction.setToolTipText("Connecting to Chat");
+		connectAction.setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
+
+		IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+		mgr.add(connectAction);
+
+
 		// register ChatView as chat listener
 		MessagingManager mm = Saros.getDefault().getMessagingManager();
 		mm.addChatListener(this);
@@ -125,9 +150,10 @@ public class ChatView extends ViewPart implements ISessionListener,
 		log.debug("Received Message from " + sender + ": " + message);
 		Display.getDefault().asyncExec(new Runnable() {
 			public void run() {
-				// String from = sender.substring(sender.indexOf('/'+1));
-				// from = from.substring(0, from.indexOf('/'));
-				viewer.getDocument().set(sender + ": " + message);
+				int prefixPos = sender.indexOf('/')+1;
+				viewer.getTextWidget().append(
+						sender.substring(prefixPos,sender.indexOf('/', prefixPos))
+						+ ": " + message.substring(1) + "\n");
 			}
 		});
 		

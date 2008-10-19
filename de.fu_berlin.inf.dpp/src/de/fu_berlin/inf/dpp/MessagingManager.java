@@ -24,6 +24,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
@@ -40,6 +45,7 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
+import de.fu_berlin.inf.dpp.ui.ChatView;
 
 /**
  * MessagingManager handles all instant messaging related communications.
@@ -52,31 +58,31 @@ public class MessagingManager implements PacketListener, IConnectionListener {
 
 	private MultiUserChatManager multitrans = null;	
 	private String CHAT_ROOM = "saros";
-
+	private MultiChatSession session;
+	
+	// TODO Use ListenerList
+	private List<IChatListener> chatListeners = new ArrayList<IChatListener>();
+	
 	public class ChatLine {
 		public String sender;
 		public String text;
 		public Date date;
 		public String packedID;
 	}
-
-	/**
-	 * Encapsulates the interface that is needed by the MessagingWindow.
-	 */
-	public interface SessionProvider {
-		public List<ChatLine> getHistory();
-		public String getName();
-		public void sendMessage(String msg);
+	
+	public MultiChatSession getSession() {
+		return session;
 	}
 
 	
-	public class MultiChatSession implements SessionProvider, PacketListener {
+	public class MultiChatSession implements  PacketListener {
 		
 		private Logger logCH = Logger.getLogger(MultiChatSession.class.getName());
 		private String name;
 		private MultiUserChat muc;
 		private JID participant;
 		private List<ChatLine> history = new ArrayList<ChatLine>();
+		private ChatView chatView;
 
 		public MultiChatSession(MultiUserChat muc) {
 			this.muc = muc;
@@ -104,8 +110,29 @@ public class MessagingManager implements PacketListener, IConnectionListener {
 
 			final Message message = (Message) packet;
 
-			log.debug("Received Message from " + message.getFrom() + ": " +
-					message.getBody());
+//			log.debug("Received Message from " + message.getFrom() + ": " +
+//					message.getBody());
+			
+//			// TODO Don't work !
+//			IWorkbench workbench = PlatformUI.getWorkbench();
+//			IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+//			IWorkbenchPage page = window.getActivePage();
+//			try {
+//				log.debug("open chat view");
+//				page.showView("de.fu_berlin.inf.dpp.ui.ChatView");
+//	
+//			} catch (PartInitException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+			
+			// notify chat listener
+			log.debug("Notify Listener..");
+			for (IChatListener l : chatListeners) {
+				l.chatMessageAdded(message.getFrom(), message.getBody());
+				log.debug("Notified Listener");
+			}
+
 		}
 
 		/*
@@ -148,12 +175,6 @@ public class MessagingManager implements PacketListener, IConnectionListener {
 	public interface IChatListener {
 		public void chatMessageAdded(String sender, String message);
 	}
-
-	private List<MultiChatSession> sessions = new ArrayList<MultiChatSession>();
-
-	private MultiChatSession multiSession;
-
-	private List<IChatListener> chatListeners = new ArrayList<IChatListener>();
 
 	public MessagingManager() {
 		Saros.getDefault().addListener(this);
@@ -204,30 +225,26 @@ public class MessagingManager implements PacketListener, IConnectionListener {
 	 */
 	public void addChatListener(IChatListener listener) {
 		chatListeners.add(listener);
+		log.debug("Registered Chat Listener");
 	}
 
-	public void showMultiChatMessagingView(JID remoteUser) throws XMPPException {
+	public void connectMultiUserChat() throws XMPPException {
 
-	if (!Saros.getDefault().isConnected())
-		throw new XMPPException("No connection ");
+		if (!Saros.getDefault().isConnected())
+			throw new XMPPException("No connection ");
 
-	MultiUserChat muc = multitrans.getMUC();
-	if (muc == null) {
+		MultiUserChat muc = multitrans.getMUC();
+		if (muc == null) {
 			multitrans.initMUC(Saros.getDefault().getConnection(), Saros
 					.getDefault().getConnection().getUser());
 			muc = multitrans.getMUC();
-	}
+		}
 
+		if (session == null) {
+			log.debug("Creating MUC session..");
+			session = new MultiChatSession(muc);
+			// multiSession.openView();
+		}
 
-	if (multiSession == null) {
-		log.debug("Creating MUC session..");
-		multiSession = new MultiChatSession(muc);
-		//multiSession.openView();
-	} 
-	else {
-		//multiSession.openView();
-	}
-	multiSession.sendMessage("Hello");
-		
 	}
 }
