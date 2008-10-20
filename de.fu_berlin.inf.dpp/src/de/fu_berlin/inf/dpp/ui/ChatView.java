@@ -86,9 +86,9 @@ public class ChatView extends ViewPart implements ISessionListener,
 			public void run() {
 				log.debug("MUC connecting");
 				MessagingManager mm = Saros.getDefault().getMessagingManager();
-				inputText.setEditable(true);
 				try {
 					mm.connectMultiUserChat();
+					inputText.setEditable(true);
 				} catch (XMPPException e) {
 					log.error("couldn't connect!");
 				}
