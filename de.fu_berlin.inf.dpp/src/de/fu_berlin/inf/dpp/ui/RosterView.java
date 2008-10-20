@@ -60,7 +60,6 @@ import de.fu_berlin.inf.dpp.net.internal.RosterListenerImpl;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
-import de.fu_berlin.inf.dpp.ui.actions.MessagingAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
@@ -474,7 +473,6 @@ public class RosterView extends ViewPart implements IConnectionListener, IRoster
 		IActionBars bars = getViewSite().getActionBars();
 
 		IMenuManager menuManager = bars.getMenuManager();
-		menuManager.add(messagingAction);
 		menuManager.add(inviteAction);
 		// menuManager.add(new TestJoinWizardAction());
 		menuManager.add(new Separator());
@@ -485,7 +483,6 @@ public class RosterView extends ViewPart implements IConnectionListener, IRoster
 	}
 
 	private void fillContextMenu(IMenuManager manager) {
-		manager.add(messagingAction);
 		manager.add(skypeAction);
 		manager.add(inviteAction);
 		manager.add(new Separator());
@@ -497,7 +494,6 @@ public class RosterView extends ViewPart implements IConnectionListener, IRoster
 	}
 
 	private void makeActions() {
-		messagingAction = new MessagingAction(viewer);
 		skypeAction = new SkypeAction(viewer);
 		inviteAction = new InviteAction(viewer);
 		renameContactAction = new RenameContactAction(viewer);

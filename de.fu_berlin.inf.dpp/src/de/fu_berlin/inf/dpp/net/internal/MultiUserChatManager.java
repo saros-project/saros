@@ -15,11 +15,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.muc.Affiliate;
-import org.jivesoftware.smackx.muc.DiscussionHistory;
-import org.jivesoftware.smackx.muc.InvitationListener;
-import org.jivesoftware.smackx.muc.InvitationRejectionListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
-import org.jivesoftware.smackx.muc.RoomInfo;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.packet.DiscoverItems.Item;
 
@@ -34,13 +30,12 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 
-public class MultiUserChatManager implements InvitationListener,
-		InvitationRejectionListener, IChatManager {
+public class MultiUserChatManager implements IChatManager {
 
 	private static Logger log = Logger.getLogger(MultiUserChatManager.class
 			.getName());
 
-	public String Room = "ori2007";
+	public String room = "saros";
 
 	public static String JID_PROPERTY = "jid";
 
@@ -50,101 +45,63 @@ public class MultiUserChatManager implements InvitationListener,
 	/* current xmppconnection for transfer. */
 	private XMPPConnection connection;
 
-	private IReceiver receiver;
-	
-	private String currentJID;
-
 	public MultiUserChatManager() {
 
 	}
-	
-	public MultiUserChatManager(String conference_room_name){
-		Room = conference_room_name;
+
+	public MultiUserChatManager(String conference_room_name) {
+		room = conference_room_name;
 	}
 
-	public void initMUC(XMPPConnection connection, String user, String room) throws XMPPException{
-		Room = room;
+	public void initMUC(XMPPConnection connection, String user, String room)
+			throws XMPPException {
+		this.room = room;
 		initMUC(connection, user);
 	}
-	
+
 	public void initMUC(XMPPConnection connection, String user)
 			throws XMPPException {
-		this.muc = null;
 		this.connection = connection;
-		// Create a MultiUserChat using an XMPPConnection for a roomacknowledge
-		new JID(connection.getUser()).getDomain();
-		
-		//TODO: Room name should be configured by settings.
-		/* create room domain of current connection. */
-		Room = Room + "@conference."+new JID(connection.getUser()).getDomain();
-		MultiUserChat muc = new MultiUserChat(connection, Room);
 
-		if(isRoomExist(muc, Room)){
-			if(!isJoined(muc, user)){
+		// TODO: Room name should be configured by settings.
+		/* create room domain of current connection. */
+		// JID(connection.getUser()).getDomain();
+		room = room + "@conference.jabber.org";
+
+		// Create a MultiUserChat using an XMPPConnection for a room
+		MultiUserChat muc = new MultiUserChat(connection, room);
+
+		if (isRoomExist(muc, room)) {
+			if (!isJoined(muc, user)) {
 				joinMuc(muc, user);
-			}
-			else{
+			} else {
 				log.debug(" already joined. ");
 			}
-		}
-		else{
+		} else {
 			// Create the room
 			muc.create(user);
-
-			// Send an empty room configuration form which indicates that we
-			// want
-			// an instant room
-			// muc.sendConfigurationForm(new Form(Form.TYPE_SUBMIT));
 			muc.sendConfigurationForm(getConfigForm(user, muc));
 			log.debug("create room and send configuration.");
-			
+
 		}
-		
+
 		if (muc.isJoined()) {
 			this.muc = muc;
 			log.debug("Has joined in muc room.");
-		}
-		else{
+		} else {
 			throw new XMPPException("Couldn't join with MUC room.");
 		}
-
 	}
 
-	private Form getConfigForm(String user, MultiUserChat muc) throws XMPPException {
+	private Form getConfigForm(String user, MultiUserChat muc)
+			throws XMPPException {
 		// Get the the room's configuration form
 		Form form = muc.getConfigurationForm();
 		// Create a new form to submit based on the original form
 		Form submitForm = form.createAnswerForm();
 
-		// // Add default answers to the form to submit
-		// for (Iterator<FormField> fields = form.getFields();
-		// fields.hasNext();) {
-		// FormField field = (FormField) fields.next();
-		// if (!FormField.TYPE_HIDDEN.equals(field.getType())
-		// && field.getVariable() != null) {
-		// // Sets the default value as the answer
-		// submitForm.setDefaultAnswer(field.getVariable());
-		// }
-		// }
 		try {
 			submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
-			// Sets the new owner of the room
-			// List<String> owners = new ArrayList<String>();
-			// owners.add(user);
-
-			// FormField field = new FormField("muc#roomconfig_roomowners");
-			// field.addValues(owners);
-			// submitForm.addField(field);
-
-			// submitForm.setAnswer("muc#roomconfig_roomowners", owners);
-
-			// Collection<Affiliate> owner = muc.getOwners();
-			//			
-			// for(Affiliate a : owner){
-			// System.out.println(a.getJid());
-			// }
-			// System.out.println(owners.size());
-			// System.out.println(owner.size());
 		} catch (Exception e) {
 			log.debug("configure room: ", e);
 		}
@@ -152,84 +109,50 @@ public class MultiUserChatManager implements InvitationListener,
 	}
 
 	public void joinMuc(MultiUserChat muc, String user) throws XMPPException {
-
-		DiscussionHistory history = new DiscussionHistory();
-		history.setSeconds(2);
-
-		try{
-//		muc.join(user, null, history, SmackConfiguration
-//				.getPacketReplyTimeout());
-		muc.join(user);
-
-		}catch(Exception e){
-			log.error("try to join room. "+e.getMessage());
-		}
-		boolean isjoined = muc.isJoined();
-
-		if (isjoined) {
+		if (muc.isJoined()) {
 			this.muc = muc;
 		}
 	}
 
 	private boolean isRoomExist(MultiUserChat muc, String room) {
 		try {
-//			RoomInfo info = MultiUserChat.getRoomInfo(connection, Room);
-//			Iterator<String> it = muc.getJoinedRooms(connection, Saros.getDefault().getMyJID().toString());
-			
+			// RoomInfo info = MultiUserChat.getRoomInfo(connection, Room);
+			// Iterator<String> it = muc.getJoinedRooms(connection,
+			// Saros.getDefault().getMyJID().toString());
+
 			Collection<Affiliate> t = muc.getOwners();
-			for(Affiliate a : t){
-//				System.out.println(a.getJid());
+			if (!t.isEmpty()) {
 				return true;
 			}
-			
-//			String roomName = muc.getRoom();
-//			if (roomName != null && roomName.equals(Room)) {
-//				return true;
-//			}
 			return false;
 		} catch (Exception e) {
-			if(RoomNotExistException.MUC_ERROR_MESSAGE.equals(e.getMessage())){
+			if (RoomNotExistException.MUC_ERROR_MESSAGE.equals(e.getMessage())) {
 				/* no room exists. */
-				log.debug("room doesn't exist");
 				return false;
 			}
-			if(MUCForbiddenException.FORBIDDEN_ERROR_MESSAGE.equals(e.getMessage())){
+			if (MUCForbiddenException.FORBIDDEN_ERROR_MESSAGE.equals(e
+					.getMessage())) {
 				/* with restricted privileges */
 				String roomName = muc.getRoom();
-				if (roomName != null && roomName.equals(Room)) {
+				if (roomName != null && roomName.equals(room)) {
 					return true;
 				}
 			}
-			//HACK
-			if(e.getMessage().endsWith("No response from server.")){
-				/* in some case there are no response from existing room.*/
+			// HACK
+			if (e.getMessage().endsWith("No response from server.")) {
+				/* in some case there are no response from existing room. */
 				return true;
 			}
-			if(e.getMessage().endsWith("remote-server-not-found(404)")){
-				log.warn("try to check room: "+e.getMessage()+" for room : "+room);
+			if (e.getMessage().endsWith("remote-server-not-found(404)")) {
+				log.warn("try to check room: " + e.getMessage()
+						+ " for room : " + room);
 				return true;
 			}
 
-			log.warn("room exists failure",e);
+			log.warn("room exists failure", e);
 
 			return false;
 		}
-	}
-
-	@Deprecated
-	private boolean isRoomExist(XMPPConnection connection, String room) {
-		try {
-			RoomInfo info = MultiUserChat.getRoomInfo(connection, room);
-			if (info.isPersistent()) {
-				return true;
-			}
-		} catch (XMPPException e) {
-			// TODO Auto-generated catch block
-			System.out.println("no room exist.");
-
-		}
-
-		return false;
 	}
 
 	private boolean isJoined(MultiUserChat tmuc, String user)
@@ -246,26 +169,22 @@ public class MultiUserChatManager implements InvitationListener,
 		} else {
 			try {
 				/* find out occupants of the muc room without be joined before. */
-				ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
-		        DiscoverItems items = discoManager.discoverItems(Room);
-		        for (Iterator<Item> it = items.getItems(); it.hasNext();) {
-		            DiscoverItems.Item item = (DiscoverItems.Item) it.next();
-		            if(item.getEntityID().equals(Room+"/"+user)){
-		            	return true;
-		            }
-		        }
+				ServiceDiscoveryManager discoManager = ServiceDiscoveryManager
+						.getInstanceFor(connection);
+				DiscoverItems items = discoManager.discoverItems(room);
+				for (Iterator<Item> it = items.getItems(); it.hasNext();) {
+					DiscoverItems.Item item = (DiscoverItems.Item) it.next();
+					if (item.getEntityID().equals(room + "/" + user)) {
+						return true;
+					}
+				}
 
-			} catch(XMPPException xe){
+			} catch (XMPPException xe) {
 				log.warn(xe.getMessage());
-			}
-			catch (IllegalStateException e) {
-//				System.out.println("no logged in.");
+			} catch (IllegalStateException e) {
 				log.warn(e.getMessage());
-				// muc = joinMuc(connection, user, Room);
-				// tmuc.changeNickname(user);
 			} catch (Exception e) {
 				log.warn(e.getMessage());
-//				e.printStackTrace();
 			}
 		}
 		return isjoined;
@@ -283,7 +202,7 @@ public class MultiUserChatManager implements InvitationListener,
 	public void sendActivities(ISharedProject sharedProject,
 			List<TimedActivity> activities) {
 
-//		log.info("Sent muc activities: " + activities);
+		// log.info("Sent muc activities: " + activities);
 		try {
 			/* create new message for multi chat. */
 			Message newMessage = muc.createMessage();
@@ -318,24 +237,15 @@ public class MultiUserChatManager implements InvitationListener,
 			initMUC(connection, Saros.getDefault().getConnection().getUser());
 			/* init listener for muc messages. */
 			muc.addMessageListener(this);
-			MultiUserChat.addInvitationListener(connection, this);
-			/*
-			 * der listener im muc reagiert nur auf chat messages, die packet
-			 * extension muss über einen listener der XMPPConnection erfolgen.
-			 */
 			connection.addPacketListener(this, new MessageTypeFilter(
 					Message.Type.groupchat));
 		} catch (XMPPException xe) {
-			log.warn("XMPPException during muc connection setting: ",xe);
-//			xe.printStackTrace();
+			log.warn("XMPPException during muc connection setting: ", xe);
+			// xe.printStackTrace();
 		} catch (Exception e) {
-			log.warn("XMPPException during muc connection setting: ",e);
-//			e.printStackTrace();
+			log.warn("XMPPException during muc connection setting: ", e);
+			// e.printStackTrace();
 		}
-
-		// TODO always preserve threads
-		// this.connection.addPacketListener(this, new
-		// MessageTypeFilter(Message.Type.chat)); // HACK
 	}
 
 	/**
@@ -352,7 +262,7 @@ public class MultiUserChatManager implements InvitationListener,
 			/* replace room */
 			String sender = message.getFrom();
 			/* replace room info */
-			sender = sender.replace(Room + "/", "");
+			sender = sender.replace(room + "/", "");
 			if (sender.equals(jid.toString())) {
 				message.setFrom(sender);
 				return true;
@@ -363,132 +273,53 @@ public class MultiUserChatManager implements InvitationListener,
 		return false;
 	}
 
-	
 	public void processPacket(Packet packet) {
-		log.debug("incoming packet");
-
-		if (packet instanceof Message) {
-
-			Message message = (Message) packet;
-			
-			RequestPacketExtension packetExtension = (RequestPacketExtension)message.getExtension(RequestPacketExtension.ELEMENT,
-					RequestPacketExtension.NAMESPACE);
-			if(packetExtension != null){
-				log.error("Request packet in MUC room not allowed. "+packetExtension.getRequest());
-				return;
-			}
-			
-			
-			PacketProtokollLogger.getInstance().receivePacket(message);
-			/**
-			 * 1. check getFrom JID. Host can send muc message and shouldn't
-			 * receive the message again.
-			 */
-			if (isMessageFromJID(message, new JID(currentJID))) {
-				log.debug("Own group message. Do nothing.");
-				return;
-			} else {
-
-				/**
-				 * 2. check message property. Observer can send muc messages and
-				 * shouldn't receive the message again.
-				 */
-				String property = (String) message.getProperty(JID_PROPERTY);
-				if(property.equals(currentJID)){
-					log.debug("Own group message with property. Do nothing");
-					return;
-				}
-				else{
-					log.debug("Received group message with property");
-					message.setFrom(property);
-					
-				}
-				receiver.processPacket(message);
-				return;
-			}
-
-
-		}
-
-//		if (packet instanceof Message) {
-//			Message msg = (Message) packet;
-//			// System.out.println("from " + msg.getFrom().replace(Room + "/",
-//			// "")
-//			// + " text: " + msg.getBody());
-//			log.info("received message : +" + msg.getBody() + " from "
-//					+ msg.getProperty("jid"));
-//		} else {
-//			System.out.println("other formated message received. ");
-//		}
+		// TODO should processing here instead of MessagingManager?
 	}
 
-	public void invitationReceived(XMPPConnection conn, String room,
-			String inviter, String reason, String password, Message message) {
-		/* init xmpp and muc connection. */
-		setMUCConnection(conn);
-		// TODO: Später besser ausbauen. Momantan wird nur ein fester Room
-		// akzeptiert.
-
-	}
-
-	public void invitationDeclined(String invitee, String reason) {
-		// TODO: use case für ablehung aufstellen und umsetzen.
-		System.out.println("Invitation declined: " + invitee + "with reason : "
-				+ reason);
-	}
-
-	
+	/**
+	 * this method implements the connection to the muc room. To control
+	 * creation and destroy process of muc room should be implements in separate
+	 * class.
+	 */
 	public void setConnection(XMPPConnection connection, IReceiver receiver) {
-		/**
-		 * this method implements the connection to the muc room. To control
-		 * creation and destroy process of muc room should be implements in
-		 * separate class.
-		 */
+
 		this.connection = connection;
-		this.currentJID = connection.getUser();
+		connection.getUser();
 		try {
 			/* init multi user chat connection. */
 			initMUC(connection, connection.getUser());
 			/* init listener for muc messages. */
 			muc.addMessageListener(this);
-			MultiUserChat.addInvitationListener(connection, this);
-			/*
-			 * der listener im muc reagiert nur auf chat messages, die packet
-			 * extension muss über einen listener der XMPPConnection erfolgen.
-			 */
+
 			connection.addPacketListener(this, new MessageTypeFilter(
 					Message.Type.groupchat));
 		} catch (XMPPException xe) {
 			log.error(xe.getMessage());
-//			xe.printStackTrace();
+			xe.printStackTrace();
 		} catch (Exception e) {
 			log.error(e.getMessage());
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		setReceiver(receiver);
-
-		// TODO always preserve threads
-		// this.connection.addPacketListener(this, new
-		// MessageTypeFilter(Message.Type.chat)); // HACK
-
 	}
 
 	public void setReceiver(IReceiver receiver) {
-		this.receiver = receiver;
 
 	}
-	
-	public String getRoomName(){
-		return this.Room;
+
+	public String getRoomName() {
+		return this.room;
 	}
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see de.fu_berlin.inf.dpp.net.IChatManager#isConnected()
 	 */
 	public boolean isConnected() {
-		if(muc != null && muc.isJoined()){
+		if (muc != null && muc.isJoined()) {
 			return true;
 		}
 		return false;
@@ -496,7 +327,5 @@ public class MultiUserChatManager implements InvitationListener,
 
 	public void sendRequest(Request request) {
 		// TODO Auto-generated method stub
-		
 	}
-
 }
