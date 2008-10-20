@@ -109,15 +109,7 @@ public class MultiUserChatManager implements IChatManager {
 	}
 
 	public void joinMuc(MultiUserChat muc, String user) throws XMPPException {
-
-		try {
-			muc.join(user);
-		} catch (Exception e) {
-			log.error("try to join room. " + e.getMessage());
-		}
-		boolean isjoined = muc.isJoined();
-
-		if (isjoined) {
+		if (muc.isJoined()) {
 			this.muc = muc;
 		}
 	}
