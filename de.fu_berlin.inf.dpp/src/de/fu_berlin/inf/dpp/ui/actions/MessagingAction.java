@@ -24,24 +24,21 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class MessagingAction extends SelectionProviderAction {
 
 	private static Logger logger = Logger.getLogger(MessagingAction.class);
-	
+
 	private RosterEntry rosterEntry;
 
 	public MessagingAction(ISelectionProvider provider) {
 		super(provider, "Send instant message..");
-		selectionChanged((IStructuredSelection)provider.getSelection());
-		
+		selectionChanged((IStructuredSelection) provider.getSelection());
+
 		setToolTipText("Start a IM session with this user");
 		setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
 	}
@@ -49,27 +46,28 @@ public class MessagingAction extends SelectionProviderAction {
 	@Override
 	public void run() {
 		MessagingManager mm = Saros.getDefault().getMessagingManager();
-		try {
-//			mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
-			mm.showMultiChatMessagingWindow(new JID(rosterEntry.getUser()), null);
-
-		} catch (XMPPException e) {
-//			e.printStackTrace();
-			logger.error("Error during init MultiChatMessagingWindow",e);
-			ErrorMessageDialog.showErrorMessage("Could not establishing MUC Messaging.");
-			try {
-				mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
-			} catch (XMPPException e1) {
-				logger.error("Error during init PrivateChatMessagingWindow", e1);
-				ErrorMessageDialog.showErrorMessage("Could not establishing Messaging.");
-			}
-		}
+		// try {
+		// // mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
+		// mm.showMultiChatMessagingWindow(new JID(rosterEntry.getUser()),
+		// null);
+		//
+		// } catch (XMPPException e) {
+		// // e.printStackTrace();
+		// logger.error("Error during init MultiChatMessagingWindow",e);
+		// ErrorMessageDialog.showErrorMessage("Could not establishing MUC Messaging.");
+		// try {
+		// mm.showMessagingWindow(new JID(rosterEntry.getUser()), null);
+		// } catch (XMPPException e1) {
+		// logger.error("Error during init PrivateChatMessagingWindow", e1);
+		// ErrorMessageDialog.showErrorMessage("Could not establishing Messaging.");
+		// }
+		// }
 	}
 
 	@Override
 	public void selectionChanged(IStructuredSelection selection) {
 		Object selected = selection.getFirstElement();
-		
+
 		if (selection.size() == 1 && selected instanceof RosterEntry) {
 			rosterEntry = (RosterEntry) selected;
 			setEnabled(true);

@@ -64,7 +64,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 	MUCListener mucl = new MUCListener();
 
 	MultiUserChatManager multitrans = null;
-	
+
 	private String CHAT_ROOM = "ori2008";
 
 	public class ChatLine {
@@ -247,15 +247,9 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		public MultiChatSession(MultiUserChat muc) {
 			this.muc = muc;
-			this.name = "Multi User Chat ("+Saros.getDefault().getMyJID().getName()+")";
+			this.name = "Multi User Chat ("
+					+ Saros.getDefault().getMyJID().getName() + ")";
 			muc.addMessageListener(this);
-			
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					openWindow();
-				}
-			});
-			// openWindow();
 		}
 
 		// public MultiChatSession(Chat chat, String name) {
@@ -294,7 +288,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 			if (message.getBody() == null)
 				return;
 
-			
 			// openWindow();
 			// addChatLine(message.getFrom(),message.getBody());
 
@@ -303,13 +296,21 @@ public class MessagingManager implements PacketListener, MessageListener,
 			 * diese Stelle könnte der grund sein, warum das Fenster nicht
 			 * aufgeht.
 			 */
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					openWindow();
-					String from = message.getFrom().replace(multitrans.getRoomName()+"/", "").replace("/Smack", "");
-					addChatLine(from, message.getBody());
-				}
-			});
+			// Display.getDefault().syncExec(new Runnable() {
+			// public void run() {
+			// openWindow();
+			// String from = message.getFrom().replace(
+			// multitrans.getRoomName() + "/", "").replace(
+			// "/Smack", "");
+			// addChatLine(from, message.getBody());
+			// }
+			// });
+			// notify chat listener
+			log.debug("Notify Listener..");
+			for (IChatListener l : chatListeners) {
+				l.chatMessageAdded(message.getFrom(), message.getBody());
+				log.debug("Notified Listener");
+			}
 		}
 
 		public void processMessage(Chat chat, Message message) {
@@ -318,23 +319,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 			logCH.debug("processMessage called.");
 			processPacket(message);
 
-		}
-
-		/**
-		 * Opens the chat window for this chat session. Refocuses the window if
-		 * it is already opened.
-		 */
-		public void openWindow() {
-			if (window == null) {
-				window = new MessagingWindow(this);
-				window.open();
-			}
-
-			window.getShell().addDisposeListener(new DisposeListener() {
-				public void widgetDisposed(DisposeEvent e) {
-					window = null;
-				}
-			});
 		}
 
 		/*
@@ -401,9 +385,11 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	private List<IChatListener> chatListeners = new ArrayList<IChatListener>();
 
+	private MultiChatSession session;
+
 	public MessagingManager() {
 		Saros.getDefault().addListener(this);
-		
+
 		this.multitrans = new MultiUserChatManager(CHAT_ROOM);
 	}
 
@@ -443,10 +429,10 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		/* check for multi or single chat. */
 		if (message.getFrom().contains(multitrans.getRoomName())) {
-			
-			if(multiSession == null){
+
+			if (multiSession == null) {
 				multiSession = new MultiChatSession(multitrans.getMUC());
-				multiSession.processPacket(message);				
+				multiSession.processPacket(message);
 			}
 		} else {
 			/* old chat based message communication. */
@@ -454,26 +440,9 @@ public class MessagingManager implements PacketListener, MessageListener,
 				// System.out.println(session.getParticipant());
 				if (jid.equals(session.getParticipant())) {
 					return; // gets already handled by message handler in
-							// session
+					// session
 				}
 			}
-
-			// TODO:Checken warum der Chat manchmal nicht aufgeht. !!!
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					try {
-						ChatSession session = showMessagingWindow(jid, message
-								.getThread());
-
-						// do this so that current message wont be lost
-						// session.processMessage(null, message);
-						session.processPacket(message);
-					} catch (XMPPException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			});
 		}
 	}
 
@@ -506,12 +475,12 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		MultiUserChat muc = multitrans.getMUC();
 		if (muc == null) {
-//			muc = multitrans.getMUC();
-//			if(muc == null){
-				multitrans.initMUC(Saros.getDefault().getConnection(), Saros
-						.getDefault().getConnection().getUser());
-				muc = multitrans.getMUC();
-//			}
+			// muc = multitrans.getMUC();
+			// if(muc == null){
+			multitrans.initMUC(Saros.getDefault().getConnection(), Saros
+					.getDefault().getConnection().getUser());
+			muc = multitrans.getMUC();
+			// }
 		}
 		// else{
 		// //for testing
@@ -523,9 +492,8 @@ public class MessagingManager implements PacketListener, MessageListener,
 		 * try to invite user TODO: check if user has joined the room.
 		 */
 
-		Presence remoteUserPresence = muc
-				.getOccupantPresence(CHAT_ROOM+"/"
-						+ remoteUser.toString() + "/Smack");
+		Presence remoteUserPresence = muc.getOccupantPresence(CHAT_ROOM + "/"
+				+ remoteUser.toString() + "/Smack");
 		if (remoteUserPresence == null) {
 			muc.invite(remoteUser.toString(), "Testing");
 		}
@@ -543,14 +511,11 @@ public class MessagingManager implements PacketListener, MessageListener,
 				 * exception kommen. es muss noch geklärt werden, warum !!!!
 				 */
 				multiSession = new MultiChatSession(muc);
-				multiSession.openWindow();
 			} catch (Exception e) {
 				e.printStackTrace();
 				multiSession = null;
 				muc.addMessageListener(mucl);
 			}
-		} else {
-			multiSession.openWindow();
 		}
 
 		// multiSession.openWindow();
@@ -611,7 +576,8 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 		/*
 		 * testing for multichat if(muc == null){ this.muc =
-		 * XMPPMultiChatTransmitter.initIndicateForm(Saros.getDefault().getConnection(),
+		 * XMPPMultiChatTransmitter
+		 * .initIndicateForm(Saros.getDefault().getConnection(),
 		 * Saros.getDefault().getConnection().getUser(),
 		 * XMPPMultiChatTransmitter.Room); muc.addMessageListener(mucl); } //
 		 * try to invite user
@@ -672,8 +638,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 		return session;
 	}
 
-	
-
 	/**
 	 * Adds the chat listener.
 	 */
@@ -701,8 +665,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 				MultiChatSession session = new MultiChatSession(multitrans
 						.getMUC());
 				this.multiSession = session;
-			} else {
-				multiSession.openWindow();
 			}
 		} catch (XMPPException e) {
 			// TODO Auto-generated catch block
@@ -741,6 +703,34 @@ public class MessagingManager implements PacketListener, MessageListener,
 			}
 		}
 
+	}
+
+	public MultiChatSession getSession() {
+		return session;
+	}
+
+	public void connectMultiUserChat() throws XMPPException {
+		if (!Saros.getDefault().isConnected())
+			throw new XMPPException("No connection ");
+		String user = Saros.getDefault().getConnection().getUser();
+		if (session == null) {
+			MultiUserChat muc = multitrans.getMUC();
+			if (muc == null) {
+				multitrans.initMUC(Saros.getDefault().getConnection(), user);
+				muc = multitrans.getMUC();
+			}
+			log.debug("Creating MUC session..");
+			session = new MultiChatSession(muc);
+		} else {
+			multitrans.getMUC().join(user);
+		}
+
+	}
+
+	public void disconnectMultiUserChat() throws XMPPException {
+		log.debug("Leaving MUC session..");
+		multitrans.getMUC().leave();
+		// session = null;
 	}
 
 }
