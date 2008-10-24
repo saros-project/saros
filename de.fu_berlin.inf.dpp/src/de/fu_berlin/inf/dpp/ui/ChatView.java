@@ -111,18 +111,18 @@ public class ChatView extends ViewPart implements ISessionListener,
 				} else {
 					try {
 						mm.connectMultiUserChat();
+						joined = true;
+						viewer.setDocument(new Document());
+						inputText.setEditable(true);
+						inputText.setText("");
+						connectAction.setImageDescriptor(SarosUI
+								.getImageDescriptor("/icons/connect.png"));
 						session = Saros.getDefault().getMessagingManager()
 								.getSession();
 						session.sendMessage("have joined the chat");
 					} catch (XMPPException e) {
 						viewer.getDocument().set("Error: Couldn't connect");
 					}
-					joined = true;
-					viewer.setDocument(new Document());
-					inputText.setEditable(true);
-					inputText.setText("");
-					connectAction.setImageDescriptor(SarosUI
-							.getImageDescriptor("/icons/connect.png"));
 				}
 			}
 		};

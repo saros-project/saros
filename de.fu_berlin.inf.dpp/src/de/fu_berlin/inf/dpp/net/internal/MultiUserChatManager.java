@@ -32,7 +32,7 @@ public class MultiUserChatManager implements PacketListener {
 	private String room = "saros";
 
 	/* host name of jabber-server on which the muc room is created */
-	private String server = "conference.jabber.org";
+	private String server = "conference.idefix-xp";
 
 	// TODO really needed as field?
 	private static String JID_PROPERTY = "jid";

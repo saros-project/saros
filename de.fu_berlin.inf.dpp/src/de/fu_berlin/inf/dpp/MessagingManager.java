@@ -65,7 +65,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
 	MultiUserChatManager multitrans = null;
 
-	private String CHAT_ROOM = "ori2008";
+	private String CHAT_ROOM = "saros";
 
 	public class ChatLine {
 		public String sender;
