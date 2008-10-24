@@ -88,9 +88,8 @@ import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
  * 
  * @author rdjemili
  */
-public class XMPPChatTransmitter implements ITransmitter,
-		IReceiver, MessageListener,
-		FileTransferListener, IJingleFileTransferListener {
+public class XMPPChatTransmitter implements ITransmitter, IReceiver,
+		MessageListener, FileTransferListener, IJingleFileTransferListener {
 	private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
 			.getName());
 
@@ -111,7 +110,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	private static final String RESOURCE_TRANSFER_DESCRIPTION = "resourceAddActivity";
 
 	private static final String FILELIST_TRANSFER_DESCRIPTION = "filelist";
-	
+
 	private static final String PROJECT_ARCHIVE_DESCRIPTION = "projectArchiveFile";
 
 	private XMPPConnection connection;
@@ -217,9 +216,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 		 * momentan ITransmitter Methoden des MUC Transmitter auf, soweit diese
 		 * implementiert sind.
 		 */
-		this.mucmanager = new MultiUserChatManager();
-		mucmanager.setConnection(connection, this);
-
+		// this.mucmanager = new MultiUserChatManager();
+		// mucmanager.setConnection(connection, this);
 		this.privatechatmanager = new PrivateChatManager();
 		privatechatmanager.setConnection(connection, this);
 
@@ -235,7 +233,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	public void removeInvitationProcess(IInvitationProcess process) {
 		processes.remove(process);
-		/* terminate jingle session for states: done, cancel and joined.*/
+		/* terminate jingle session for states: done, cancel and joined. */
 		jingleManager.terminateJingleSession(process.getPeer());
 	}
 
@@ -270,11 +268,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 	public void sendRequestForActivity(ISharedProject sharedProject,
 			int timestamp, boolean andup) {
 
-//		log.info("Requesting old activity (timestamp=" + timestamp + ", "
-//				+ andup + ") from all...");
-//
-//		sendMessageToAll(sharedProject, PacketExtensions
-//				.createRequestForActivityExtension(timestamp, andup));
+		// log.info("Requesting old activity (timestamp=" + timestamp + ", "
+		// + andup + ") from all...");
+		//
+		// sendMessageToAll(sharedProject, PacketExtensions
+		// .createRequestForActivityExtension(timestamp, andup));
 
 	}
 
@@ -296,7 +294,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 	 */
 	public void sendJoinMessage(ISharedProject sharedProject) {
 		try {
-			/* sleep process for 500 millis to ensure invitation state process.*/
+			/* sleep process for 500 millis to ensure invitation state process. */
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			log.error(e);
@@ -329,18 +327,21 @@ public class XMPPChatTransmitter implements ITransmitter,
 			if (activity instanceof FileActivity) {
 				FileActivity fileAdd = (FileActivity) activity;
 
-				/* send file checksum error message to exclusive recipient*/
-				if(fileAdd.getType().equals(FileActivity.Type.Error)){
-					sendFileChecksumError(fileAdd.getRecipient(), fileAdd.getPath());
+				/* send file checksum error message to exclusive recipient */
+				if (fileAdd.getType().equals(FileActivity.Type.Error)) {
+					sendFileChecksumError(fileAdd.getRecipient(), fileAdd
+							.getPath());
 				}
 				/* send file to solve checksum error to single recipient */
-				if (fileAdd.getType().equals(FileActivity.Type.Created) && fileAdd.getRecipient() != null){
+				if (fileAdd.getType().equals(FileActivity.Type.Created)
+						&& fileAdd.getRecipient() != null) {
 					int time = timedActivity.getTimestamp();
-					sendFile(fileAdd.getRecipient(), sharedProject.getProject(), fileAdd
-							.getPath(), time, null);
+					sendFile(fileAdd.getRecipient(),
+							sharedProject.getProject(), fileAdd.getPath(),
+							time, null);
 					return;
 				}
-				
+
 				if (fileAdd.getType().equals(FileActivity.Type.Created)) {
 					JID myJID = Saros.getDefault().getMyJID();
 
@@ -375,22 +376,19 @@ public class XMPPChatTransmitter implements ITransmitter,
 		/* send activities with muc chat messages. */
 		if (mucmanager != null && mucmanager.isConnected()) {
 			mucmanager.sendActivities(sharedProject, timedActivities);
+		} else {
+			/*
+			 * if no connection with muc room, send activities with private
+			 * message
+			 */
+			if (timedActivities != null) {
+				sendMessageToAll(sharedProject, new ActivitiesPacketExtension(
+						timedActivities));
+			}
 		}
-		else{
-			/* if no connection with muc room, send activities with 
-			 * private message */
-			 if (timedActivities != null ) {
-			 sendMessageToAll(sharedProject, new
-			 ActivitiesPacketExtension(timedActivities));
-			 }	
-		}
-
-		
 
 	}
 
-
-	
 	private void sendFileListWithJingle(JID recipient, String fileListContent) {
 		JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
 		/* create file transfer. */
@@ -430,11 +428,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		/* send with jingle file transfer */
 		if (jingle
-				&& (jingleManager.getState(recipient) != JingleConnectionState.ERROR) && !JingleError) {
+				&& (jingleManager.getState(recipient) != JingleConnectionState.ERROR)
+				&& !JingleError) {
 
 			sendFileListWithJingle(recipient, xml);
 
-		} else {			
+		} else {
 			/* send file with IBB File Transfer */
 
 			log.debug("Establishing file list transfer");
@@ -846,22 +845,22 @@ public class XMPPChatTransmitter implements ITransmitter,
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendProjectArchive(de.fu_berlin.inf.dpp.net.JID,
-	 *      org.eclipse.core.resources.IProject, java.io.File,
-	 *      de.fu_berlin.inf.dpp.net.IFileTransferCallback)
+	 * @see
+	 * de.fu_berlin.inf.dpp.net.ITransmitter#sendProjectArchive(de.fu_berlin
+	 * .inf.dpp.net.JID, org.eclipse.core.resources.IProject, java.io.File,
+	 * de.fu_berlin.inf.dpp.net.IFileTransferCallback)
 	 */
 	public void sendProjectArchive(JID recipient, IProject project,
 			File archive, IFileTransferCallback callback) {
 		OutgoingFileTransfer.setResponseTimeout(MAX_TRANSFER_RETRIES * 1000);
 		OutgoingFileTransfer transfer = fileTransferManager
 				.createOutgoingFileTransfer(recipient.toString());
-		
-		
+
 		try {
 			transfer.sendFile(archive, PROJECT_ARCHIVE_DESCRIPTION);
-			
+
 			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-					transfer,callback);
+					transfer, callback);
 			/* wait for complete transfer. */
 			while (monitor.isAlive() && monitor.isRunning()) {
 				try {
@@ -879,15 +878,15 @@ public class XMPPChatTransmitter implements ITransmitter,
 				log.debug("transfer complete");
 				callback.fileSent(new Path(archive.getName()));
 			}
-			
+
 			/* delete temp archive file. */
 			archive.delete();
 
 		} catch (Exception e) {
-			
-				log.warn("Failed to send archive file", e);
-				if (callback != null)
-					callback.fileTransferFailed(null,e);
+
+			log.warn("Failed to send archive file", e);
+			if (callback != null)
+				callback.fileTransferFailed(null, e);
 		}
 	}
 
@@ -945,22 +944,30 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendFileChecksumError(de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+	 * 
+	 * @see
+	 * de.fu_berlin.inf.dpp.net.ITransmitter#sendFileChecksumError(de.fu_berlin
+	 * .inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
 	 */
-	public void sendFileChecksumError(JID to, IPath path){
-		log.debug("Sending checksum error message to "+to+" of file "+path.lastSegment());
-		sendMessage(to,PacketExtensions.createChecksumErrorExtension(path));
+	public void sendFileChecksumError(JID to, IPath path) {
+		log.debug("Sending checksum error message to " + to + " of file "
+				+ path.lastSegment());
+		sendMessage(to, PacketExtensions.createChecksumErrorExtension(path));
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendJupiterTransformationError(de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+	 * 
+	 * @see
+	 * de.fu_berlin.inf.dpp.net.ITransmitter#sendJupiterTransformationError(
+	 * de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
 	 */
-	public void sendJupiterTransformationError(JID to, IPath path){
-		log.debug("Sending jupiter transformation error message to "+to+" of file "+path.lastSegment());
-		sendMessage(to,PacketExtensions.createJupiterErrorExtension(path));
+	public void sendJupiterTransformationError(JID to, IPath path) {
+		log.debug("Sending jupiter transformation error message to " + to
+				+ " of file " + path.lastSegment());
+		sendMessage(to, PacketExtensions.createJupiterErrorExtension(path));
 	}
-	
+
 	public void sendRemainingFiles() {
 
 		if (fileTransferQueue.size() > 0)
@@ -1029,7 +1036,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	public void processMessage(Chat chat, Message message) {
 		// TODO: new method für smack 3
-//		log.debug("incomming message : " + message.getBody());
+		// log.debug("incomming message : " + message.getBody());
 		// processPacket(message);
 
 	}
@@ -1040,31 +1047,37 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	/*
 	 * (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendActivitiyTo(de.fu_berlin.inf.dpp.project.ISharedProject, java.util.List, de.fu_berlin.inf.dpp.net.JID)
+	 * 
+	 * @see
+	 * de.fu_berlin.inf.dpp.net.ITransmitter#sendActivitiyTo(de.fu_berlin.inf
+	 * .dpp.project.ISharedProject, java.util.List,
+	 * de.fu_berlin.inf.dpp.net.JID)
 	 */
 	public void sendJupiterRequest(ISharedProject sharedProject,
 			Request request, JID jid) {
-		log.info("send request to : "+jid+ " request: "+request);
+		log.info("send request to : " + jid + " request: " + request);
 		sendMessage(jid, new RequestPacketExtension(request));
 	}
-	
+
 	public void processRequest(Packet packet) {
 		Message message = (Message) packet;
-		
-		RequestPacketExtension packetExtension = PacketExtensions.getJupiterRequestExtension(message);
-		
-		if(packetExtension != null){
+
+		RequestPacketExtension packetExtension = PacketExtensions
+				.getJupiterRequestExtension(message);
+
+		if (packetExtension != null) {
 			ISharedProject project = Saros.getDefault().getSessionManager()
-			.getSharedProject();
-			log.info("Received request : "+packetExtension.getRequest().toString());
+					.getSharedProject();
+			log.info("Received request : "
+					+ packetExtension.getRequest().toString());
 			project.getSequencer().receiveRequest(packetExtension.getRequest());
-			
-		}else{
+
+		} else {
 			log.error("Failure in request packet extension.");
 		}
-		
+
 	}
-	
+
 	// TODO replace dependencies by more generic listener interfaces
 	/*
 	 * (non-Javadoc)
@@ -1103,14 +1116,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 				IActivity activity = timedActivity.getActivity();
 				activity.setSource(fromJID.toString());
-				
-//				if (activity instanceof TextSelectionActivity) {
-//					((TextSelectionActivity) activity).setSource(fromJID
-//							.toString());
-//				}
-//				if (activity instanceof TextEditActivity) {
-//					((TextEditActivity) activity).setSource(fromJID.toString());
-//				}
+
+				// if (activity instanceof TextSelectionActivity) {
+				// ((TextSelectionActivity) activity).setSource(fromJID
+				// .toString());
+				// }
+				// if (activity instanceof TextEditActivity) {
+				// ((TextEditActivity) activity).setSource(fromJID.toString());
+				// }
 
 				/*
 				 * incoming fileActivities that add files are only used as
@@ -1121,7 +1134,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 						|| !((FileActivity) activity).getType().equals(
 								FileActivity.Type.Created)) {
 
-					//TODO: Empfang der Aktivitäten und weiterleitung an den sequencer
+					// TODO: Empfang der Aktivitäten und weiterleitung an den
+					// sequencer
 					project.getSequencer().exec(timedActivity);
 
 				}
@@ -1198,23 +1212,26 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 			int count = 0;
 			while (true) {
-				String jidS = userlistExtension.getValue("User"
-						+ count);
+				String jidS = userlistExtension.getValue("User" + count);
 				if (jidS == null)
 					break;
 				log.debug("   *:" + jidS);
 
 				JID jid = new JID(jidS);
 				User user = new User(jid);
-				
-				String userRole = userlistExtension.getValue("UserRole"+count);
-				user.setUserRole(de.fu_berlin.inf.dpp.User.UserRole.valueOf(userRole));
-				
-				String color = userlistExtension.getValue("UserColor"+count);
-				try{
+
+				String userRole = userlistExtension
+						.getValue("UserRole" + count);
+				user.setUserRole(de.fu_berlin.inf.dpp.User.UserRole
+						.valueOf(userRole));
+
+				String color = userlistExtension.getValue("UserColor" + count);
+				try {
 					user.setColorID(Integer.parseInt(color));
-				}catch(NumberFormatException nfe){
-					log.warn("Exception during convert user color form userlist for user : "+user.getJid());
+				} catch (NumberFormatException nfe) {
+					log
+							.warn("Exception during convert user color form userlist for user : "
+									+ user.getJid());
 				}
 
 				if (project.getParticipant(jid) == null)
@@ -1251,26 +1268,25 @@ public class XMPPChatTransmitter implements ITransmitter,
 					process.cancel(errorMsg, true);
 			}
 		}
-		
-		else if(PacketExtensions.getJingleErrorExtension(message) != null) {
-			log.debug("Receive jingle error messages from "+fromJID);
+
+		else if (PacketExtensions.getJingleErrorExtension(message) != null) {
+			log.debug("Receive jingle error messages from " + fromJID);
 			/* set error state for this peer in jingle connection states. */
 			jingleManager.setJingleErrorState(fromJID);
-			/*TODO: callback for other connections possible? */
-		}
-		else if(PacketExtensions.getJupiterErrorExtension(message) != null) {
-			log.debug("Receive jingle error messages from "+fromJID);
-			
-		}
-		else if(PacketExtensions.getChecksumErrorExtension(message) != null) {
-//			log.debug("Receive jingle error messages from "+fromJID);
+			/* TODO: callback for other connections possible? */
+		} else if (PacketExtensions.getJupiterErrorExtension(message) != null) {
+			log.debug("Receive jingle error messages from " + fromJID);
+
+		} else if (PacketExtensions.getChecksumErrorExtension(message) != null) {
+			// log.debug("Receive jingle error messages from "+fromJID);
 			DefaultPacketExtension checksumErrorExtension = PacketExtensions
-			.getChecksumErrorExtension(message);
-			String path = checksumErrorExtension.getValue(PacketExtensions.FILE_PATH);
-			System.out.println("Checksum Error for "+path);
+					.getChecksumErrorExtension(message);
+			String path = checksumErrorExtension
+					.getValue(PacketExtensions.FILE_PATH);
+			System.out.println("Checksum Error for " + path);
 			ErrorMessageDialog.showChecksumErrorMessage(path);
 		}
-		
+
 	}
 
 	/*
@@ -1347,7 +1363,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 					String fileDescription = request.getDescription();
 					log.debug("1. incomming file transfer "
 							+ request.getFileName());
-					if(fileDescription.equals(PROJECT_ARCHIVE_DESCRIPTION)){
+					if (fileDescription.equals(PROJECT_ARCHIVE_DESCRIPTION)) {
 						log.debug(" incoming project archive file.");
 						receiveArchiveFile(request);
 					}
@@ -1357,9 +1373,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 						log.debug("2. inform invitation process...");
 						for (IInvitationProcess process : processes) {
-							if (process.getPeer().equals(fromJID)){
+							if (process.getPeer().equals(fromJID)) {
 								process.fileListReceived(fromJID, fileList);
-								/* incoming IBB transfer. cancel jingle transfer mode. */
+								/*
+								 * incoming IBB transfer. cancel jingle transfer
+								 * mode.
+								 */
 								process.setTransferMode(TransferMode.IBB);
 							}
 						}
@@ -1369,10 +1388,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 						receiveResource(request);
 					}
 				} catch (Exception e) {
-					//TODO Exception weiter reichen.
+					// TODO Exception weiter reichen.
 					log.error("Incoming File Transfer Thread: ", e);
 					for (IInvitationProcess process : processes) {
-						if (process.getPeer().equals(new JID(request.getRequestor())))
+						if (process.getPeer().equals(
+								new JID(request.getRequestor())))
 							process.cancel(e.getMessage(), false);
 					}
 				}
@@ -1385,16 +1405,18 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	/**
 	 * read incoming file and open inputstream to IInvitationProcess.
+	 * 
 	 * @param request
 	 * @throws Exception
 	 */
-	private void receiveArchiveFile(FileTransferRequest request) throws Exception{
-//		try{
+	private void receiveArchiveFile(FileTransferRequest request)
+			throws Exception {
+		// try{
 		File archive = receiveFile(request);
-		
+
 		ZipFile zip = new ZipFile(archive);
 		Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
-		while(entries.hasMoreElements()){
+		while (entries.hasMoreElements()) {
 			ZipEntry entry = entries.nextElement();
 			System.out.println(entry.getName());
 			JID fromJID = new JID(request.getRequestor());
@@ -1402,12 +1424,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 			log.debug("2. inform invitation process...");
 			for (IInvitationProcess process : processes) {
 				if (process.getPeer().equals(fromJID))
-					process.resourceReceived(fromJID, new Path(entry.getName()), zip.getInputStream(entry));
+					process.resourceReceived(fromJID,
+							new Path(entry.getName()), zip
+									.getInputStream(entry));
 			}
 		}
 		archive.delete();
 	}
-	
+
 	private void sendMessageToAll(ISharedProject sharedProject,
 			PacketExtension extension) { // HACK
 
@@ -1604,7 +1628,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 			data.type = FileTransferType.RESOURCE_TRANSFER;
 			data.recipient = recipient;
 			data.sender = new JID(connection.getUser());
-			
+
 			/* read content data. */
 			File f = new File(transferData.project.getFile(transferData.path)
 					.getLocation().toOSString());
@@ -1630,7 +1654,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		} else {
 			/* Fallback to transfer all data into one archive file. */
-			// TODO: Don't ask the InvitationProcesses what to do, rather try IBB yourself.
+			// TODO: Don't ask the InvitationProcesses what to do, rather try
+			// IBB yourself.
 			transferData.callback.jingleFallback();
 
 		}
@@ -1638,33 +1663,35 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 	/**
 	 * Receive file and save temporary.
-	 * @param request transfer request of incoming file.
+	 * 
+	 * @param request
+	 *            transfer request of incoming file.
 	 * @return File object of received file
 	 */
-	private File receiveFile(FileTransferRequest request){
+	private File receiveFile(FileTransferRequest request) {
 		File archiveFile = new File("./incoming_archive.zip");
-		log.debug("Archive file: "+archiveFile.getAbsolutePath());
+		log.debug("Archive file: " + archiveFile.getAbsolutePath());
 		try {
 			final IncomingFileTransfer transfer = request.accept();
-			
+
 			IFileTransferCallback callback = null;
-			
+
 			/* get IInvitationprocess for monitoring. */
 			JID fromJID = new JID(request.getRequestor());
 			for (IInvitationProcess process : processes) {
-				if (process.getPeer().equals(fromJID)){
+				if (process.getPeer().equals(fromJID)) {
 					/* set callback. */
 					callback = process;
 				}
 			}
-			
-			/*monitoring of transfer process*/
+
+			/* monitoring of transfer process */
 			FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-					transfer,callback);
-			
+					transfer, callback);
+
 			/* receive file. */
 			transfer.recieveFile(archiveFile);
-			
+
 			/* wait for complete transfer. */
 			while (monitor.isAlive() && monitor.isRunning()) {
 				try {
@@ -1673,9 +1700,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 					e.printStackTrace();
 				}
 			}
-			
+
 			monitor.closeMonitor(true);
-			
+
 		} catch (Exception e) {
 			log.error("Error in Incoming File: ", e);
 			return null;
@@ -1687,7 +1714,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
 		return archiveFile;
 	}
-	
+
 	private FileList receiveFileListBufferByteArray(FileTransferRequest request) {
 		FileList fileList = null;
 		try {
@@ -1753,8 +1780,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 		IPreferenceStore preferenceStore = Saros.getDefault()
 				.getPreferenceStore();
 		// TODO: Änderung für smack 3 : filetransfer have to be implements new
-		fileTransferManager.getProperties().setProperty(FileTransferNegotiator.AVOID_SOCKS5, "true");
-		fileTransferManager.getProperties().setProperty(IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE, preferenceStore.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
+		fileTransferManager.getProperties().setProperty(
+				FileTransferNegotiator.AVOID_SOCKS5, "true");
+		fileTransferManager
+				.getProperties()
+				.setProperty(
+						IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE,
+						preferenceStore
+								.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
 		// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
 		// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
 
@@ -1795,15 +1828,16 @@ public class XMPPChatTransmitter implements ITransmitter,
 		if (exception.getJID() != null) {
 			/* inform invitation process. */
 			for (IInvitationProcess process : processes) {
-				if (process.getPeer().equals(exception.getJID())){
+				if (process.getPeer().equals(exception.getJID())) {
 					/* set jingle connection error. */
 					jingleManager.setJingleErrorState(exception.getJID());
-					/* fallback in invitation process*/
+					/* fallback in invitation process */
 					process.jingleFallback();
-					/* send error state to recipient.*/
+					/* send error state to recipient. */
 					sendMessage(exception.getJID(), PacketExtensions
 							.createJingleErrorExtension());
-					log.debug("jingle fallback. send error message to "+exception.getJID());
+					log.debug("jingle fallback. send error message to "
+							+ exception.getJID());
 				}
 			}
 		} else {
