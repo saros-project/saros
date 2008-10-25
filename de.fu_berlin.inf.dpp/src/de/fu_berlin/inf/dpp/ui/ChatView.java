@@ -135,6 +135,11 @@ public class ChatView extends ViewPart implements ISessionListener,
 					.getImageDescriptor("/icons/disconnect.png"));
 		}
 
+		if (Saros.getDefault().isConnected()) {
+			connectAction.setEnabled(true);
+		} else {
+			connectAction.setEnabled(false);
+		}
 		IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
 		mgr.add(connectAction);
 
