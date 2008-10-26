@@ -6,24 +6,26 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Shell;
 
 public class WizardDialogAccessable extends WizardDialog {
-	public WizardDialogAccessable(Shell parentShell, IWizard newWizard){
-		super(parentShell,newWizard);
-	}
-	
-	public Button getWizardButton(int id){
-		return getButton(id);
-	}
-	
-	public void setWizardButtonLabel(int id, String label) {
-		Button btn = getButton(id);
-		if (btn!=null)
-			btn.setText(label);
-	}
+    public WizardDialogAccessable(Shell parentShell, IWizard newWizard) {
+	super(parentShell, newWizard);
+    }
 
-	public void setWizardButtonEnabled(int id, boolean enabled) {
-		Button btn = getButton(id);
-		if (btn!=null)
-			btn.setEnabled(enabled);
+    public Button getWizardButton(int id) {
+	return getButton(id);
+    }
+
+    public void setWizardButtonEnabled(int id, boolean enabled) {
+	Button btn = getButton(id);
+	if (btn != null) {
+	    btn.setEnabled(enabled);
 	}
-	
+    }
+
+    public void setWizardButtonLabel(int id, String label) {
+	Button btn = getButton(id);
+	if (btn != null) {
+	    btn.setText(label);
+	}
+    }
+
 }

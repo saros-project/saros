@@ -22,41 +22,41 @@ package de.fu_berlin.inf.dpp.activities;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class RoleActivity implements IActivity {
-	
-	private String source;
-	
-	private JID driver;
 
-	public RoleActivity(JID newDriver) {
-		this.driver = newDriver;
+    private final JID driver;
+
+    private String source;
+
+    public RoleActivity(JID newDriver) {
+	this.driver = newDriver;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof RoleActivity) {
+	    RoleActivity driverChange = (RoleActivity) obj;
+
+	    return driverChange.getDriver().equals(this.driver);
 	}
 
-	public JID getDriver() {
-		return driver;
-	}
+	return false;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof RoleActivity) {
-			RoleActivity driverChange = (RoleActivity) obj;
+    public JID getDriver() {
+	return this.driver;
+    }
 
-			return driverChange.getDriver().equals(driver);
-		}
+    public String getSource() {
+	return this.source;
+    }
 
-		return false;
-	}
+    public void setSource(String source) {
+	this.source = source;
 
-	@Override
-	public String toString() {
-		return "RoleActivity(driver:" + driver + ")";
-	}
+    }
 
-	public String getSource() {
-		return this.source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-		
-	}
+    @Override
+    public String toString() {
+	return "RoleActivity(driver:" + this.driver + ")";
+    }
 }

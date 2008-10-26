@@ -60,7 +60,6 @@ import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 
-
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
  * interaction with the TextEditor.
@@ -70,529 +69,547 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class EditorAPI implements IEditorAPI {
 
-	private class SharedProjectPartListener implements IPartListener2 {
-		public void partActivated(IWorkbenchPartReference partRef) {
-			IWorkbenchPart part = partRef.getPart(false);
+    private class EditorListener implements IViewportListener, MouseListener,
+	    KeyListener, ISelectionChangedListener {
 
-			if (part != null && part instanceof IEditorPart) {
-				IEditorPart editor = (IEditorPart) part;
-				editorManager.partActivated(editor);
-			}
-		}
+	private ITextSelection lastSelection = new TextSelection(-1, -1);
 
-		public void partOpened(IWorkbenchPartReference partRef) {
-			IWorkbenchPart part = partRef.getPart(false);
+	private int lastViewportBottom = -1;
 
-			if (part != null && part instanceof IEditorPart) {
-				IEditorPart editor = (IEditorPart) part;
-				editorManager.partOpened(editor);
-			}
-		}
+	private int lastViewportTop = -1;
 
-		public void partClosed(IWorkbenchPartReference partRef) {
-			IWorkbenchPart part = partRef.getPart(false);
+	private final ITextViewer viewer;
 
-			if (part != null && part instanceof IEditorPart) {
-				IEditorPart editor = (IEditorPart) part;
-				editorManager.partClosed(editor);
-			}
-		}
+	public EditorListener(ITextViewer viewer) {
+	    this.viewer = viewer;
 
-		public void partBroughtToTop(IWorkbenchPartReference partRef) {
-		}
-
-		public void partDeactivated(IWorkbenchPartReference partRef) {
-		}
-
-		public void partHidden(IWorkbenchPartReference partRef) {
-		}
-
-		public void partVisible(IWorkbenchPartReference partRef) {
-		}
-
-		public void partInputChanged(IWorkbenchPartReference partRef) {
-		}
+	    viewer.getTextWidget().addMouseListener(this);
+	    viewer.getTextWidget().addKeyListener(this);
+	    viewer.getSelectionProvider().addSelectionChangedListener(this);
+	    viewer.addViewportListener(this);
 	}
 
-	private class EditorListener implements IViewportListener, MouseListener, KeyListener,
-		ISelectionChangedListener {
+	private void checkSelection() {
+	    ISelectionProvider sp = this.viewer.getSelectionProvider();
+	    ITextSelection selection = (ITextSelection) sp.getSelection();
 
-		private ITextViewer viewer;
-
-		private ITextSelection lastSelection = new TextSelection(-1, -1);
-
-		private int lastViewportTop = -1;
-
-		private int lastViewportBottom = -1;
-
-		public EditorListener(ITextViewer viewer) {
-			this.viewer = viewer;
-
-			viewer.getTextWidget().addMouseListener(this);
-			viewer.getTextWidget().addKeyListener(this);
-			viewer.getSelectionProvider().addSelectionChangedListener(this);
-			viewer.addViewportListener(this);
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.text.IViewportListener
-		 */
-		public void viewportChanged(int verticalOffset) {
-			// TODO why doesnt this react to window resizes?
-			checkViewport();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.MouseListener
-		 */
-		public void mouseDown(MouseEvent e) {
-			checkSelection();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.MouseListener
-		 */
-		public void mouseUp(MouseEvent e) {
-			checkSelection();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.MouseListener
-		 */
-		public void mouseDoubleClick(MouseEvent e) {
-			// ignore
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.KeyListener
-		 */
-		public void keyReleased(KeyEvent e) {
-			checkSelection();
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.swt.events.KeyListener
-		 */
-		public void keyPressed(KeyEvent e) {
-			// ignore
-		}
-
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.eclipse.jface.viewers.ISelectionChangedListener
-		 */
-		public void selectionChanged(SelectionChangedEvent event) {
-			checkSelection();
-		}
-
-		private void checkSelection() {
-			ISelectionProvider sp = viewer.getSelectionProvider();
-			ITextSelection selection = (ITextSelection) sp.getSelection();
-
-			if (!lastSelection.equals(selection)) {
-				editorManager.selectionChanged(selection);
-				lastSelection = selection;
-			}
-		}
-
-		private void checkViewport() {
-			int top = viewer.getTopIndex();
-			int bottom = viewer.getBottomIndex();
-
-			if (top != lastViewportTop || bottom != lastViewportBottom) {
-				lastViewportTop = top;
-				lastViewportBottom = bottom;
-
-				editorManager.viewportChanged(viewer.getTopIndex(), viewer.getBottomIndex());
-			}
-		}
+	    if (!this.lastSelection.equals(selection)) {
+		EditorAPI.this.editorManager.selectionChanged(selection);
+		this.lastSelection = selection;
+	    }
 	}
 
-	private static Logger log = Logger.getLogger(EditorAPI.class.getName());
+	private void checkViewport() {
+	    int top = this.viewer.getTopIndex();
+	    int bottom = this.viewer.getBottomIndex();
 
-	private VerifyKeyListener keyVerifier = new VerifyKeyListener() {
-		public void verifyKey(VerifyEvent event) {
+	    if ((top != this.lastViewportTop)
+		    || (bottom != this.lastViewportBottom)) {
+		this.lastViewportTop = top;
+		this.lastViewportBottom = bottom;
 
-			// System.out.println(((int)event.character) + " - " + event.keyCode
-			// + " - " + event.stateMask);
-			if (event.character > 0) {
-				event.doit = false;
-
-				Object adapter = getActiveEditor().getAdapter(IEditorStatusLine.class);
-				if (adapter != null) {
-					IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
-					statusLine.setMessage(false,
-							"You're not allowed to perform modifications while not being the driver of the session.",
-							null);
-					Toolkit.getDefaultToolkit().beep();
-				}
-			}
-		}
-	};
-
-	private EditorManager editorManager;
-
-	/** Editors where the user isn't allowed to write */
-	private List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public void setEditorManager(EditorManager editorManager) {
-		this.editorManager = editorManager;
-
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				IWorkbenchWindow window = getActiveWindow();
-				window.getPartService().addPartListener(new SharedProjectPartListener());
-			}
-		});
+		EditorAPI.this.editorManager.viewportChanged(this.viewer
+			.getTopIndex(), this.viewer.getBottomIndex());
+	    }
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+	 * @see org.eclipse.swt.events.KeyListener
 	 */
-	public IEditorPart openEditor(IFile file) {
-		IWorkbenchWindow window = getActiveWindow();
-		if (window != null) {
-			try {
-				IWorkbenchPage page = window.getActivePage();
-				return IDE.openEditor(page, file);
-
-			} catch (PartInitException e) {
-				e.printStackTrace();
-			}
-		}
-		
-
-		return null;
+	public void keyPressed(KeyEvent e) {
+	    // ignore
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+	 * @see org.eclipse.swt.events.KeyListener
 	 */
-	public void closeEditor(IEditorPart part) {
-		IWorkbenchWindow window = getActiveWindow();
-		if (window != null) {
-			IWorkbenchPage page = window.getActivePage();
-			page.closeEditor(part, false);
-		}
+	public void keyReleased(KeyEvent e) {
+	    checkSelection();
 	}
 
-	@SuppressWarnings("restriction")
-	public IDocumentProvider getDocumentProvider(IEditorInput input) {
-		Object adapter = input.getAdapter(IFile.class);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.events.MouseListener
+	 */
+	public void mouseDoubleClick(MouseEvent e) {
+	    // ignore
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.events.MouseListener
+	 */
+	public void mouseDown(MouseEvent e) {
+	    checkSelection();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.swt.events.MouseListener
+	 */
+	public void mouseUp(MouseEvent e) {
+	    checkSelection();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.viewers.ISelectionChangedListener
+	 */
+	public void selectionChanged(SelectionChangedEvent event) {
+	    checkSelection();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.jface.text.IViewportListener
+	 */
+	public void viewportChanged(int verticalOffset) {
+	    // TODO why doesnt this react to window resizes?
+	    checkViewport();
+	}
+    }
+
+    private class SharedProjectPartListener implements IPartListener2 {
+	public void partActivated(IWorkbenchPartReference partRef) {
+	    IWorkbenchPart part = partRef.getPart(false);
+
+	    if ((part != null) && (part instanceof IEditorPart)) {
+		IEditorPart editor = (IEditorPart) part;
+		EditorAPI.this.editorManager.partActivated(editor);
+	    }
+	}
+
+	public void partBroughtToTop(IWorkbenchPartReference partRef) {
+	}
+
+	public void partClosed(IWorkbenchPartReference partRef) {
+	    IWorkbenchPart part = partRef.getPart(false);
+
+	    if ((part != null) && (part instanceof IEditorPart)) {
+		IEditorPart editor = (IEditorPart) part;
+		EditorAPI.this.editorManager.partClosed(editor);
+	    }
+	}
+
+	public void partDeactivated(IWorkbenchPartReference partRef) {
+	}
+
+	public void partHidden(IWorkbenchPartReference partRef) {
+	}
+
+	public void partInputChanged(IWorkbenchPartReference partRef) {
+	}
+
+	public void partOpened(IWorkbenchPartReference partRef) {
+	    IWorkbenchPart part = partRef.getPart(false);
+
+	    if ((part != null) && (part instanceof IEditorPart)) {
+		IEditorPart editor = (IEditorPart) part;
+		EditorAPI.this.editorManager.partOpened(editor);
+	    }
+	}
+
+	public void partVisible(IWorkbenchPartReference partRef) {
+	}
+    }
+
+    private static Logger log = Logger.getLogger(EditorAPI.class.getName());
+
+    /**
+     * Returns the active workbench window. Needs to be called from UI thread.
+     * 
+     * @return the active workbench window or <code>null</code> if there is no
+     *         window or method is called from non-UI thread.
+     * @see IWorkbench#getActiveWorkbenchWindow()
+     */
+    private static IWorkbenchWindow getActiveWindow() {
+	return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    }
+
+    private static ITextViewer getViewer(IEditorPart editorPart) {
+	return (ITextViewer) editorPart.getAdapter(ITextOperationTarget.class);
+    }
+
+    private static IWorkbenchWindow[] getWindows() {
+	return PlatformUI.getWorkbench().getWorkbenchWindows();
+    }
+
+    private EditorManager editorManager;
+
+    private final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
+	public void verifyKey(VerifyEvent event) {
+
+	    // System.out.println(((int)event.character) + " - " + event.keyCode
+	    // + " - " + event.stateMask);
+	    if (event.character > 0) {
+		event.doit = false;
+
+		Object adapter = getActiveEditor().getAdapter(
+			IEditorStatusLine.class);
 		if (adapter != null) {
-			IFile file = (IFile) adapter;
+		    IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
+		    statusLine
+			    .setMessage(
+				    false,
+				    "You're not allowed to perform modifications while not being the driver of the session.",
+				    null);
+		    Toolkit.getDefaultToolkit().beep();
+		}
+	    }
+	}
+    };
 
-			String fileExtension = file.getFileExtension();
-			if (fileExtension != null && fileExtension.equals("java")) {
-				JavaPlugin javaPlugin = JavaPlugin.getDefault();
-				return javaPlugin.getCompilationUnitDocumentProvider();
-			}
+    /** Editors where the user isn't allowed to write */
+    private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public void addSharedEditorListener(IEditorPart editorPart) {
+	new EditorListener(EditorAPI.getViewer(editorPart)); // HACK
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public void closeEditor(IEditorPart part) {
+	IWorkbenchWindow window = EditorAPI.getActiveWindow();
+	if (window != null) {
+	    IWorkbenchPage page = window.getActivePage();
+	    page.closeEditor(part, false);
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public IEditorPart getActiveEditor() {
+	IWorkbenchWindow window = EditorAPI.getActiveWindow();
+	if (window != null) {
+	    IWorkbenchPage page = window.getActivePage();
+	    if (page != null) {
+		return page.getActiveEditor();
+	    }
+	}
+
+	return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public IDocument getDocument(IEditorPart editorPart) {
+	AbstractTextEditor textEditor = (AbstractTextEditor) editorPart;
+	IEditorInput input = textEditor.getEditorInput();
+
+	return textEditor.getDocumentProvider().getDocument(input);
+    }
+
+    @SuppressWarnings("restriction")
+    public IDocumentProvider getDocumentProvider(IEditorInput input) {
+	Object adapter = input.getAdapter(IFile.class);
+	if (adapter != null) {
+	    IFile file = (IFile) adapter;
+
+	    String fileExtension = file.getFileExtension();
+	    if ((fileExtension != null) && fileExtension.equals("java")) {
+		JavaPlugin javaPlugin = JavaPlugin.getDefault();
+		return javaPlugin.getCompilationUnitDocumentProvider();
+	    }
+	}
+
+	DocumentProviderRegistry registry = DocumentProviderRegistry
+		.getDefault();
+	return registry.getDocumentProvider(input);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public IResource getEditorResource(IEditorPart editorPart) {
+	IEditorInput input = editorPart.getEditorInput();
+
+	if (input instanceof IPathEditorInput) {
+	    IResource resource = (IResource) input.getAdapter(IFile.class);
+
+	    if (resource == null) {
+		resource = (IResource) input.getAdapter(IResource.class);
+	    }
+
+	    return resource;
+	}
+
+	return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public Set<IEditorPart> getOpenEditors() {
+	Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
+
+	IWorkbenchWindow[] windows = EditorAPI.getWindows();
+	for (IWorkbenchWindow window : windows) {
+	    IWorkbenchPage[] pages = window.getPages();
+
+	    for (IWorkbenchPage page : pages) {
+		IEditorReference[] editorRefs = page.getEditorReferences();
+
+		for (IEditorReference reference : editorRefs) {
+		    IEditorPart editorPart = reference.getEditor(true);
+
+		    if (editorPart != null) {
+			editorParts.add(editorPart);
+		    }
+		}
+	    }
+	}
+
+	return editorParts;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI#getSelection
+     */
+    public ITextSelection getSelection(IEditorPart editorPart) {
+	if (!(editorPart instanceof ITextEditor)) {
+	    return null;
+	}
+
+	ITextEditor textEditor = (ITextEditor) editorPart;
+	ISelectionProvider selectionProvider = textEditor
+		.getSelectionProvider();
+	if (selectionProvider != null) {
+	    return (ITextSelection) selectionProvider.getSelection();
+	}
+
+	return null;
+    }
+
+    public ILineRange getViewport(IEditorPart editorPart) {
+	ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+	int top = viewer.getTopIndex();
+	int bottom = viewer.getBottomIndex();
+
+	return new LineRange(top, bottom - top);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public IEditorPart openEditor(IFile file) {
+	IWorkbenchWindow window = EditorAPI.getActiveWindow();
+	if (window != null) {
+	    try {
+		IWorkbenchPage page = window.getActivePage();
+		return IDE.openEditor(page, file);
+
+	    } catch (PartInitException e) {
+		e.printStackTrace();
+	    }
+	}
+
+	return null;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public void setEditable(final IEditorPart editorPart, final boolean editable) {
+	EditorAPI.log.fine(editorPart + " set to editable:" + editable);
+
+	Display.getDefault().syncExec(new Runnable() {
+	    public void run() {
+		updateStatusLine(editorPart, editable);
+
+		ITextViewerExtension textViewer = (ITextViewerExtension) EditorAPI
+			.getViewer(editorPart);
+
+		if (textViewer == null) {
+		    return;
 		}
 
-		DocumentProviderRegistry registry = DocumentProviderRegistry.getDefault();
-		return registry.getDocumentProvider(input);
+		if (editable
+			&& EditorAPI.this.lockedEditors.contains(editorPart)) {
+		    EditorAPI.this.lockedEditors.remove(editorPart);
+		    textViewer
+			    .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
+		} else if (!editable
+			&& !EditorAPI.this.lockedEditors.contains(editorPart)) {
+		    EditorAPI.this.lockedEditors.add(editorPart);
+		    textViewer
+			    .appendVerifyKeyListener(EditorAPI.this.keyVerifier);
+		}
+	    }
+	});
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public void setEditorManager(EditorManager editorManager) {
+	this.editorManager = editorManager;
+
+	Display.getDefault().syncExec(new Runnable() {
+	    public void run() {
+		IWorkbenchWindow window = EditorAPI.getActiveWindow();
+		window.getPartService().addPartListener(
+			new SharedProjectPartListener());
+	    }
+	});
+    }
+
+    /*
+     * This implementation does not really set the selection but rather adds an
+     * annotation.
+     * 
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public void setSelection(IEditorPart editorPart, ITextSelection selection,
+	    String source) {
+
+	if (!(editorPart instanceof ITextEditor)) {
+	    return;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public Set<IEditorPart> getOpenEditors() {
-		Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
+	ITextEditor textEditor = (ITextEditor) editorPart;
+	IAnnotationModel model = textEditor.getDocumentProvider()
+		.getAnnotationModel(textEditor.getEditorInput());
 
-		IWorkbenchWindow[] windows = getWindows();
-		for (int i = 0; i < windows.length; i++) {
-			IWorkbenchPage[] pages = windows[i].getPages();
+	if (model != null) {
 
-			for (int j = 0; j < pages.length; j++) {
-				IEditorReference[] editorRefs = pages[j].getEditorReferences();
+	    for (@SuppressWarnings("unchecked")
+	    Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+		Annotation annotation = (Annotation) it.next();
 
-				for (int k = 0; k < editorRefs.length; k++) {
-					IEditorReference reference = editorRefs[k];
-					IEditorPart editorPart = reference.getEditor(true);
-
-					if (editorPart != null)
-						editorParts.add(editorPart);
-				}
-			}
+		if (annotation.getType().startsWith(SelectionAnnotation.TYPE) == false) {
+		    continue;
 		}
 
-		return editorParts;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public IEditorPart getActiveEditor() {
-		IWorkbenchWindow window = getActiveWindow();
-		if (window != null) {
-			IWorkbenchPage page = window.getActivePage();
-			if (page != null) {
-				return page.getActiveEditor();
-			}
+		AnnotationSaros anns = (AnnotationSaros) annotation;
+		if (anns.getSource().equals(source)) {
+		    model.removeAnnotation(annotation);
 		}
+	    }
 
-		return null;
+	    JID sourceJid = new JID(source);
+	    String label = "Selection of " + sourceJid.getName();
+
+	    Position position = new Position(selection.getOffset(), selection
+		    .getLength());
+	    AnnotationSaros annotation = new SelectionAnnotation(label, source); // BG:was
+										 // source
+	    model.addAnnotation(annotation, position);
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+     */
+    public void setViewport(IEditorPart editorPart, boolean jumpTo, int top,
+	    int bottom, String source) {
+
+	ITextViewer viewer = EditorAPI.getViewer(editorPart);
+	updateViewportAnnotation(viewer, top, bottom, source);
+
+	if (jumpTo) {
+	    viewer.setTopIndex(top);
+	}
+    }
+
+    /**
+     * Needs UI-thread.
+     */
+    private void updateStatusLine(IEditorPart editorPart, boolean editable) {
+	Object adapter = editorPart.getAdapter(IEditorStatusLine.class);
+	if (adapter != null) {
+	    IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
+	    statusLine.setMessage(false, editable ? "" : "Not editable", null);
+	}
+    }
+
+    private void updateViewportAnnotation(ITextViewer viewer, int top,
+	    int bottom, String source) {
+
+	if (!(viewer instanceof ISourceViewer)) {
+	    return;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public IResource getEditorResource(IEditorPart editorPart) {
-		IEditorInput input = editorPart.getEditorInput();
+	ISourceViewer sourceViewer = (ISourceViewer) viewer;
+	IAnnotationModel model = sourceViewer.getAnnotationModel();
 
-		if (input instanceof IPathEditorInput) {
-			IResource resource = (IResource) input.getAdapter(IFile.class);
-
-			if (resource == null) {
-				resource = (IResource) input.getAdapter(IResource.class);
-			}
-
-			return resource;
+	try {
+	    IDocument document = viewer.getDocument();
+	    for (@SuppressWarnings("unchecked")
+	    Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+		Annotation ann = (Annotation) it.next();
+		if (ann.getType().equals(ViewportAnnotation.TYPE)) {
+		    model.removeAnnotation(ann);
 		}
+	    }
 
-		return null;
+	    int start = document.getLineOffset(top);
+	    int end = document.getLineOffset(bottom);
+
+	    JID jid = new JID(source);
+	    String text = "Visible scope of " + jid.getName();
+
+	    AnnotationSaros annotation = new ViewportAnnotation(text, source);
+	    Position position = new Position(start, end - start);
+	    model.addAnnotation(annotation, position);
+	} catch (BadLocationException e) {
+	    e.printStackTrace();
 	}
+    }
 
-	/*
-	 * This implementation does not really set the selection but rather adds an
-	 * annotation.
-	 * 
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public void setSelection(IEditorPart editorPart, ITextSelection selection, String source) {
-
-		if (!(editorPart instanceof ITextEditor))
-			return;
-
-		ITextEditor textEditor = (ITextEditor) editorPart;
-		IAnnotationModel model = textEditor.getDocumentProvider().getAnnotationModel(
-			textEditor.getEditorInput());
-
-		if (model != null) {
-
-			for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-				Annotation annotation = (Annotation) it.next();
-
-				if ( annotation.getType().startsWith(SelectionAnnotation.TYPE)==false)
-					continue;
-
-				AnnotationSaros anns=(AnnotationSaros)annotation;
-				if (anns.getSource().equals(source)	)
-					model.removeAnnotation(annotation);
-			}
-
-			JID sourceJid=new JID(source);
-			String label="Selection of "+sourceJid.getName();
-
-			Position position = new Position(selection.getOffset(), selection.getLength());
-			AnnotationSaros annotation = new SelectionAnnotation(label,source);	// BG:was source
-			model.addAnnotation(annotation, position);
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI#getSelection
-	 */
-	public ITextSelection getSelection(IEditorPart editorPart) {
-		if (!(editorPart instanceof ITextEditor))
-			return null;
-
-		ITextEditor textEditor = (ITextEditor) editorPart;
-		ISelectionProvider selectionProvider = textEditor.getSelectionProvider();
-		if (selectionProvider != null)
-			return (ITextSelection) selectionProvider.getSelection();
-
-		return null;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public void setEditable(final IEditorPart editorPart, final boolean editable) {
-		log.fine(editorPart + " set to editable:" + editable);
-
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				updateStatusLine(editorPart, editable);
-
-				ITextViewerExtension textViewer = (ITextViewerExtension) getViewer(editorPart);
-
-				if (textViewer == null)
-					return;
-
-				if (editable && lockedEditors.contains(editorPart)) {
-					lockedEditors.remove(editorPart);
-					textViewer.removeVerifyKeyListener(keyVerifier);
-				} else if (!editable && !lockedEditors.contains(editorPart)) {
-					lockedEditors.add(editorPart);
-					textViewer.appendVerifyKeyListener(keyVerifier);
-				}
-			}
-		});
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public void addSharedEditorListener(IEditorPart editorPart) {
-		new EditorListener(getViewer(editorPart)); // HACK
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public IDocument getDocument(IEditorPart editorPart) {
-		AbstractTextEditor textEditor = (AbstractTextEditor) editorPart;
-		IEditorInput input = textEditor.getEditorInput();
-
-		return textEditor.getDocumentProvider().getDocument(input);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-	 */
-	public void setViewport(IEditorPart editorPart, boolean jumpTo, int top, int bottom, String source) {
-
-		ITextViewer viewer = getViewer(editorPart);
-		updateViewportAnnotation(viewer, top, bottom, source);
-
-		if (jumpTo)
-			viewer.setTopIndex(top);
-	}
-
-	public ILineRange getViewport(IEditorPart editorPart) {
-		ITextViewer viewer = getViewer(editorPart);
-
-		int top = viewer.getTopIndex();
-		int bottom = viewer.getBottomIndex();
-
-		return new LineRange(top, bottom - top);
-	}
-
-	private void updateViewportAnnotation(ITextViewer viewer, int top, int bottom, String source) {
-
-		if (!(viewer instanceof ISourceViewer))
-			return;
-
-		ISourceViewer sourceViewer = (ISourceViewer) viewer;
-		IAnnotationModel model = sourceViewer.getAnnotationModel();
-
-		try {
-			IDocument document = viewer.getDocument();
-			for (@SuppressWarnings("unchecked")Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-				Annotation ann = (Annotation) it.next();
-				if (ann.getType().equals(ViewportAnnotation.TYPE))
-					model.removeAnnotation(ann);
-			}
-
-			int start = document.getLineOffset(top);
-			int end = document.getLineOffset(bottom);
-
-			JID jid=new JID(source);
-			String text = "Visible scope of " + jid.getName();
-
-			AnnotationSaros annotation = new ViewportAnnotation(text, source);
-			Position position = new Position(start, end - start);
-			model.addAnnotation(annotation, position);
-		} catch (BadLocationException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Needs UI-thread.
-	 */
-	private void updateStatusLine(IEditorPart editorPart, boolean editable) {
-		Object adapter = editorPart.getAdapter(IEditorStatusLine.class);
-		if (adapter != null) {
-			IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
-			statusLine.setMessage(false, editable ? "" : "Not editable", null);
-		}
-	}
-
-	private static ITextViewer getViewer(IEditorPart editorPart) {
-		return (ITextViewer) editorPart.getAdapter(ITextOperationTarget.class);
-	}
-
-	/**
-	 * Returns the active workbench window. Needs to be called from UI thread.
-	 * 
-	 * @return the active workbench window or <code>null</code> if there is no
-	 *         window or method is called from non-UI thread.
-	 * @see IWorkbench#getActiveWorkbenchWindow()
-	 */
-	private static IWorkbenchWindow getActiveWindow() {
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-	}
-
-	private static IWorkbenchWindow[] getWindows() {
-		return PlatformUI.getWorkbench().getWorkbenchWindows();
-	}
-
-/*
-	private void makeAllProjectResourcesReadOnly(ISharedProject sharedProject) {
-		
-		try {
-			ResourceAttributes attributes = new ResourceAttributes();
-			attributes.setReadOnly(!sharedProject.isDriver());
-			attributes.setArchive(!sharedProject.isDriver());
-
-			IResource[] resources = sharedProject.getProject().members();
-			for (int i = 0; i < resources.length; i++) {
-				if (resources[i] instanceof IFile) {
-					IFile file = (IFile) resources[i];
-
-					try {
-						file.setResourceAttributes(attributes);
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-	}
-*/
+    /*
+     * private void makeAllProjectResourcesReadOnly(ISharedProject
+     * sharedProject) {
+     * 
+     * try { ResourceAttributes attributes = new ResourceAttributes();
+     * attributes.setReadOnly(!sharedProject.isDriver());
+     * attributes.setArchive(!sharedProject.isDriver());
+     * 
+     * IResource[] resources = sharedProject.getProject().members(); for (int i
+     * = 0; i < resources.length; i++) { if (resources[i] instanceof IFile) {
+     * IFile file = (IFile) resources[i];
+     * 
+     * try { file.setResourceAttributes(attributes); } catch (CoreException e) {
+     * // TODO Auto-generated catch block e.printStackTrace(); } } } } catch
+     * (CoreException e) { e.printStackTrace(); } }
+     */
 }

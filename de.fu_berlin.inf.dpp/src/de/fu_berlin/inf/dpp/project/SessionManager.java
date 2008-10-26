@@ -49,202 +49,244 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
  * @author rdjemili
  */
 public class SessionManager implements IConnectionListener, ISessionManager {
-	private static Logger log = Logger.getLogger(SessionManager.class.getName());
+    private static Logger log = Logger
+	    .getLogger(SessionManager.class.getName());
 
-	private SharedProject sharedProject;
+    // TODO use ListenerList instead
+    private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
-	// TODO use ListenerList instead
-	private List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
+    private SharedProject sharedProject;
 
-	ITransmitter transmitter;
+    ITransmitter transmitter;
 
-	public SessionManager() {
-		Saros.getDefault().addListener(this);
+    public SessionManager() {
+	Saros.getDefault().addListener(this);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.fu_berlin.inf.dpp.project.ISessionManager#addSessionListener(de.fu_berlin
+     * .inf.dpp.project.ISessionListener)
+     */
+    public void addSessionListener(ISessionListener listener) {
+	if (!this.listeners.contains(listener)) {
+	    this.listeners.add(listener);
 	}
+    }
 
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#startSession(org.eclipse.core.resources.IProject)
-	 */
-	public void startSession(IProject project) throws XMPPException {
-		if (!Saros.getDefault().isConnected()) {
-			throw new XMPPException("No connection");
+    private void attachRosterListener() {
+	Roster roster = Saros.getDefault().getRoster();
+	roster.addRosterListener(new RosterListener() {
+	    public void entriesAdded(Collection<String> addresses) {
+	    }
+
+	    public void entriesDeleted(Collection<String> addresses) {
+	    }
+
+	    public void entriesUpdated(Collection<String> addresses) {
+	    }
+
+	    public void presenceChanged(Presence presence) {
+		// TODO: new Method for Smack 3
+		presenceChanged(presence.getFrom());
+
+	    }
+
+	    public void presenceChanged(String XMPPAddress) {
+
+		if (SessionManager.this.sharedProject == null) {
+		    return;
 		}
 
-		JID myJID = Saros.getDefault().getMyJID();
-		sharedProject = new SharedProject(transmitter, project, myJID);
-		sharedProject.start();
-		
-		for (ISessionListener listener : listeners) {
-			listener.sessionStarted(sharedProject);
-		}
-
-		sharedProject.startInvitation(null);
-		
-		log.info("Session started");
-	}
-
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#joinSession(org.eclipse.core.resources.IProject, de.fu_berlin.inf.dpp.net.JID, de.fu_berlin.inf.dpp.net.JID, java.util.List)
-	 */
-	public ISharedProject joinSession(IProject project, JID host, JID driver, List<JID> users) {
-
-		sharedProject = new SharedProject(transmitter, project, Saros.getDefault().getMyJID(),
-			host, driver, users);
-		sharedProject.start();
-
-		for (ISessionListener listener : listeners) {
-			listener.sessionStarted(sharedProject);
-		}
-
-		log.info("Session joined");
-
-		return sharedProject;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#leaveSession()
-	 */
-	public void leaveSession() {
-		if (sharedProject == null)
-			return;
-
-		transmitter.sendLeaveMessage(sharedProject);
-		sharedProject.setProjectReadonly(false);	// set ressources writeable again
-
-		sharedProject.stop();
-
-		ISharedProject closedProject = sharedProject;
-		sharedProject = null;
-
-		for (ISessionListener listener : listeners) {
-			listener.sessionEnded(closedProject);
-		}
-
-		log.info("Session left");
-	}
-
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#getSharedProject()
-	 */
-	public ISharedProject getSharedProject() {
-		return sharedProject;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#addSessionListener(de.fu_berlin.inf.dpp.project.ISessionListener)
-	 */
-	public void addSessionListener(ISessionListener listener) {
-		if (!listeners.contains(listener)) {
-			listeners.add(listener);
-		}
-	}
-
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#removeSessionListener(de.fu_berlin.inf.dpp.project.ISessionListener)
-	 */
-	public void removeSessionListener(ISessionListener listener) {
-		listeners.remove(listener);
-	}
-
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#invitationReceived(de.fu_berlin.inf.dpp.net.JID, java.lang.String, java.lang.String)
-	 */
-	public IIncomingInvitationProcess invitationReceived(JID from, String projectName,
-		String description) {
-
-		IIncomingInvitationProcess process = new IncomingInvitationProcess(transmitter, from,
-			projectName, description);
-
-		for (ISessionListener listener : listeners) {
-			listener.invitationReceived(process);
-		}
-
-		log.info("Received invitation");
-
-		return process;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-	 */
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#connectionStateChanged(org.jivesoftware.smack.XMPPConnection, de.fu_berlin.inf.dpp.Saros.ConnectionState)
-	 */
-	public void connectionStateChanged(XMPPConnection connection,
-			ConnectionState newState) {
-
-		if (newState == Saros.ConnectionState.CONNECTED) {
-			if (transmitter == null) {
-				transmitter = new XMPPChatTransmitter(connection);
-				attachRosterListener();
-			} else {
-				// TODO: Does this ever happen?
-				transmitter.setXMPPConnection(connection);
-			}
-		
-		} else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
-			if (sharedProject != null)
-				leaveSession();
-
-			transmitter = null;
-		}
-	}
-
-	private void attachRosterListener() {
 		Roster roster = Saros.getDefault().getRoster();
-		roster.addRosterListener(new RosterListener() {
-			public void entriesAdded(Collection<String> addresses) {
-			}
+		Presence presence = roster.getPresence(XMPPAddress);
 
-			public void entriesUpdated(Collection<String> addresses) {
-			}
+		JID jid = new JID(XMPPAddress);
+		User user = SessionManager.this.sharedProject
+			.getParticipant(jid);
+		if (user != null) {
+		    if (presence == null) {
+			user.setPresence(User.UserConnectionState.OFFLINE);
 
-			public void entriesDeleted(Collection<String> addresses) {
-			}
+		    } else {
+			user.setPresence(User.UserConnectionState.ONLINE);
+		    }
+		}
+	    }
 
-			public void presenceChanged(String XMPPAddress) {
-				
-				if (sharedProject==null)
-					return;
-				
-				Roster roster = Saros.getDefault().getRoster();
-				Presence presence = roster.getPresence(XMPPAddress);
+	});
+    }
 
-				JID jid = new JID(XMPPAddress);
-				User user = sharedProject.getParticipant(jid);
-				if (user!=null){
-					if (presence==null) {
-						user.setPresence( User.UserConnectionState.OFFLINE);
-						
-					} else
-						user.setPresence( User.UserConnectionState.ONLINE );
-				}
-			}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+     */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.fu_berlin.inf.dpp.project.ISessionManager#connectionStateChanged(org
+     * .jivesoftware.smack.XMPPConnection,
+     * de.fu_berlin.inf.dpp.Saros.ConnectionState)
+     */
+    public void connectionStateChanged(XMPPConnection connection,
+	    ConnectionState newState) {
 
-			
-			public void presenceChanged(Presence presence) {
-				//TODO: new Method for Smack 3
-				presenceChanged(presence.getFrom());
-				
-			}
+	if (newState == Saros.ConnectionState.CONNECTED) {
+	    if (this.transmitter == null) {
+		this.transmitter = new XMPPChatTransmitter(connection);
+		attachRosterListener();
+	    } else {
+		// TODO: Does this ever happen?
+		this.transmitter.setXMPPConnection(connection);
+	    }
 
-		});
+	} else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
+	    if (this.sharedProject != null) {
+		leaveSession();
+	    }
+
+	    this.transmitter = null;
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.project.ISessionManager#OnReconnect(int)
-	 */
-	public void OnReconnect(int oldtimestamp){
+    }
 
-		if (sharedProject==null)
-			return;
-		
-		transmitter.sendRemainingFiles();
-		transmitter.sendRemainingMessages();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.project.ISessionManager#getSharedProject()
+     */
+    public ISharedProject getSharedProject() {
+	return this.sharedProject;
+    }
 
-		// ask for next expected timestamp activities (in case I missed something while being not available)
-		transmitter.sendRequestForActivity( sharedProject, oldtimestamp, true );
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.fu_berlin.inf.dpp.project.ISessionManager#invitationReceived(de.fu_berlin
+     * .inf.dpp.net.JID, java.lang.String, java.lang.String)
+     */
+    public IIncomingInvitationProcess invitationReceived(JID from,
+	    String projectName, String description) {
+
+	IIncomingInvitationProcess process = new IncomingInvitationProcess(
+		this.transmitter, from, projectName, description);
+
+	for (ISessionListener listener : this.listeners) {
+	    listener.invitationReceived(process);
 	}
+
+	SessionManager.log.info("Received invitation");
+
+	return process;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.fu_berlin.inf.dpp.project.ISessionManager#joinSession(org.eclipse.
+     * core.resources.IProject, de.fu_berlin.inf.dpp.net.JID,
+     * de.fu_berlin.inf.dpp.net.JID, java.util.List)
+     */
+    public ISharedProject joinSession(IProject project, JID host, JID driver,
+	    List<JID> users) {
+
+	this.sharedProject = new SharedProject(this.transmitter, project, Saros
+		.getDefault().getMyJID(), host, driver, users);
+	this.sharedProject.start();
+
+	for (ISessionListener listener : this.listeners) {
+	    listener.sessionStarted(this.sharedProject);
+	}
+
+	SessionManager.log.info("Session joined");
+
+	return this.sharedProject;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.project.ISessionManager#leaveSession()
+     */
+    public void leaveSession() {
+	if (this.sharedProject == null) {
+	    return;
+	}
+
+	this.transmitter.sendLeaveMessage(this.sharedProject);
+	this.sharedProject.setProjectReadonly(false); // set ressources
+						      // writeable again
+
+	this.sharedProject.stop();
+
+	ISharedProject closedProject = this.sharedProject;
+	this.sharedProject = null;
+
+	for (ISessionListener listener : this.listeners) {
+	    listener.sessionEnded(closedProject);
+	}
+
+	SessionManager.log.info("Session left");
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.project.ISessionManager#OnReconnect(int)
+     */
+    public void OnReconnect(int oldtimestamp) {
+
+	if (this.sharedProject == null) {
+	    return;
+	}
+
+	this.transmitter.sendRemainingFiles();
+	this.transmitter.sendRemainingMessages();
+
+	// ask for next expected timestamp activities (in case I missed
+	// something while being not available)
+	this.transmitter.sendRequestForActivity(this.sharedProject,
+		oldtimestamp, true);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.fu_berlin.inf.dpp.project.ISessionManager#removeSessionListener(de
+     * .fu_berlin.inf.dpp.project.ISessionListener)
+     */
+    public void removeSessionListener(ISessionListener listener) {
+	this.listeners.remove(listener);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * de.fu_berlin.inf.dpp.project.ISessionManager#startSession(org.eclipse
+     * .core.resources.IProject)
+     */
+    public void startSession(IProject project) throws XMPPException {
+	if (!Saros.getDefault().isConnected()) {
+	    throw new XMPPException("No connection");
+	}
+
+	JID myJID = Saros.getDefault().getMyJID();
+	this.sharedProject = new SharedProject(this.transmitter, project, myJID);
+	this.sharedProject.start();
+
+	for (ISessionListener listener : this.listeners) {
+	    listener.sessionStarted(this.sharedProject);
+	}
+
+	this.sharedProject.startInvitation(null);
+
+	SessionManager.log.info("Session started");
+    }
 }

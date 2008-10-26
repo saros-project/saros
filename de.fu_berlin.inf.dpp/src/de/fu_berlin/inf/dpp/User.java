@@ -21,77 +21,85 @@ package de.fu_berlin.inf.dpp;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-
 public class User {
-	public enum UserConnectionState {UNKNOWN,ONLINE,OFFLINE};
-	public enum UserRole {DRIVER,OBSERVER};
-	private UserConnectionState presence = UserConnectionState.UNKNOWN;
-	
-	private JID jid;
-	private int colorid=0;
-	private long offlineTime=0;
-	private UserRole role = UserRole.OBSERVER;
+    public enum UserConnectionState {
+	OFFLINE, ONLINE, UNKNOWN
+    };
 
-	public User(JID jid) {
-		this.jid = jid;
-	}
+    public enum UserRole {
+	DRIVER, OBSERVER
+    };
 
-	public JID getJid() {
-		return jid;
-	}
+    private int colorid = 0;
 
-	/**
-	 * set the current user role of this user inside the
-	 * current project.
-	 * @param role (Driver, Observer)
-	 */
-	public void setUserRole(UserRole role){
-		this.role = role;
-	}
-	
-	/**
-	 * Gets current project role of this user.
-	 * @return role (Driver, Observer)
-	 */
-	public UserRole getUserRole(){
-		return this.role;
+    private final JID jid;
+    private long offlineTime = 0;
+    private UserConnectionState presence = UserConnectionState.UNKNOWN;
+    private UserRole role = UserRole.OBSERVER;
+
+    public User(JID jid) {
+	this.jid = jid;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof User) {
+	    User other = (User) obj;
+	    return this.jid.equals(other.jid);
 	}
 
-	@Override
-	public String toString() {
-		return jid.getName();
-	}
+	return false;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof User) {
-			User other = (User) obj;
-			return jid.equals(other.jid);
-		}
+    public int getColorID() {
+	return this.colorid;
+    }
 
-		return false;
+    public JID getJid() {
+	return this.jid;
+    }
+
+    public int getOfflineSecs() {
+	return (int) (((new java.util.Date().getTime()) - this.offlineTime) / 1000);
+    }
+
+    public UserConnectionState getPresence() {
+	return this.presence;
+    }
+
+    /**
+     * Gets current project role of this user.
+     * 
+     * @return role (Driver, Observer)
+     */
+    public UserRole getUserRole() {
+	return this.role;
+    }
+
+    public void setColorID(int c) {
+	this.colorid = c;
+    }
+
+    public void setPresence(UserConnectionState p) {
+	this.presence = p;
+	if (this.presence == User.UserConnectionState.OFFLINE) {
+	    this.offlineTime = (new java.util.Date().getTime());
 	}
-	
-	public int getColorID(){
-		return colorid;
-	}
-	
-	public void setColorID(int c) {
-		colorid=c;
-	}
-	
-	
-	public UserConnectionState getPresence() {
-		return presence;
-	}
-	
-	public void setPresence(UserConnectionState p) {
-		presence=p;
-		if (presence==User.UserConnectionState.OFFLINE)
-			offlineTime = (new java.util.Date().getTime() ) ;
-	}
-	public int getOfflineSecs() {
-		return (int)(( (new java.util.Date().getTime() ) - offlineTime) / 1000) ;
-	}
+    }
+
+    /**
+     * set the current user role of this user inside the current project.
+     * 
+     * @param role
+     *            (Driver, Observer)
+     */
+    public void setUserRole(UserRole role) {
+	this.role = role;
+    }
+
+    @Override
+    public String toString() {
+	return this.jid.getName();
+    }
 
 }

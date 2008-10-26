@@ -45,105 +45,106 @@ import de.fu_berlin.inf.dpp.Saros;
  * 
  */
 public class MessagingWindow extends ApplicationWindow {
-	private MessagingManager.SessionProvider session;
+    private TextViewer historyViewer;
 
-	private TextViewer historyViewer;
+    private final MessagingManager.SessionProvider session;
 
-	private StyledText textInput;
+    private StyledText textInput;
 
-	public MessagingWindow(MessagingManager.SessionProvider session) {
-		super(null); // top-level window
+    public MessagingWindow(MessagingManager.SessionProvider session) {
+	super(null); // top-level window
 
-		this.session = session;
+	this.session = session;
+    }
+
+    /**
+     * Add a chat line to the text viewer.
+     */
+    public void addChatLine(MessagingManager.ChatLine line) {
+	String sender = line.sender;
+	String text = line.text;
+
+	IDocument document = this.historyViewer.getDocument();
+	int start = document.getLength();
+
+	// build and append new chat line string
+	StringBuffer newLine = new StringBuffer();
+	if (start > 0) {
+	    newLine.append('\n');
+	    start++;
+	}
+	newLine.append(sender);
+	newLine.append(": ");
+	newLine.append(text);
+
+	try {
+	    document.replace(document.getLength(), 0, newLine.toString());
+	} catch (BadLocationException e) {
+	    Saros.log("Could not update chat window", e);
 	}
 
-	@Override
-	protected Control createContents(Composite parent) {
-		// main composite
-		Composite composite = new Composite(parent, SWT.None);
-		FillLayout fillLayout = new FillLayout();
-		// fillLayout.marginHeight = 5;
-		// fillLayout.marginWidth = 5;
-		composite.setLayout(fillLayout);
+	// Show sender in bold
+	StyledText styledText = this.historyViewer.getTextWidget();
+	StyleRange styleRange = new StyleRange();
+	styleRange.start = start;
+	styleRange.length = sender.length();
+	styleRange.fontStyle = SWT.BOLD;
+	styledText.setStyleRange(styleRange);
+    }
 
-		SashForm form = new SashForm(composite, SWT.VERTICAL);
+    @Override
+    protected void configureShell(Shell shell) {
+	super.configureShell(shell);
 
-		historyViewer = new TextViewer(form, SWT.READ_ONLY | SWT.V_SCROLL | SWT.BORDER);
-		historyViewer.setDocument(new Document());
+	shell.setText("Talking to " + this.session.getName());
+	shell.setSize(500, 400);
+	shell.setImage(SarosUI.getImage("icons/comment.png"));
+    }
 
-		textInput = new StyledText(form, SWT.MULTI | SWT.BORDER);
-		textInput.addKeyListener(new KeyListener() {
-			public void keyPressed(KeyEvent e) {
-				if (e.character == SWT.CR) {
-					e.doit = false;
-					sendInput();
-				}
-			}
+    @Override
+    protected Control createContents(Composite parent) {
+	// main composite
+	Composite composite = new Composite(parent, SWT.None);
+	FillLayout fillLayout = new FillLayout();
+	// fillLayout.marginHeight = 5;
+	// fillLayout.marginWidth = 5;
+	composite.setLayout(fillLayout);
 
-			public void keyReleased(KeyEvent e) {
-				// ignore
-			}
-		});
-		textInput.setFocus();
+	SashForm form = new SashForm(composite, SWT.VERTICAL);
 
-		form.setWeights(new int[] { 5, 1 });
+	this.historyViewer = new TextViewer(form, SWT.READ_ONLY | SWT.V_SCROLL
+		| SWT.BORDER);
+	this.historyViewer.setDocument(new Document());
 
-		// fill textViewer
-		for (MessagingManager.ChatLine chatLine : session.getHistory()) {
-			addChatLine(chatLine);
+	this.textInput = new StyledText(form, SWT.MULTI | SWT.BORDER);
+	this.textInput.addKeyListener(new KeyListener() {
+	    public void keyPressed(KeyEvent e) {
+		if (e.character == SWT.CR) {
+		    e.doit = false;
+		    sendInput();
 		}
+	    }
 
-		return composite;
+	    public void keyReleased(KeyEvent e) {
+		// ignore
+	    }
+	});
+	this.textInput.setFocus();
+
+	form.setWeights(new int[] { 5, 1 });
+
+	// fill textViewer
+	for (MessagingManager.ChatLine chatLine : this.session.getHistory()) {
+	    addChatLine(chatLine);
 	}
 
-	@Override
-	protected void configureShell(Shell shell) {
-    	super.configureShell(shell);
+	return composite;
+    }
 
-		shell.setText("Talking to "+session.getName());
-		shell.setSize(500, 400);
-		shell.setImage(SarosUI.getImage("icons/comment.png"));
-	}
+    private void sendInput() {
+	String msg = this.textInput.getText().trim();
+	this.textInput.setText("");
 
-	private void sendInput() {
-		String msg = textInput.getText().trim();
-		textInput.setText("");
-
-		session.sendMessage(msg);
-	}
-
-	/**
-	 * Add a chat line to the text viewer.
-	 */
-	public void addChatLine(MessagingManager.ChatLine line) {
-		String sender = line.sender;
-		String text = line.text;
-
-		IDocument document = historyViewer.getDocument();
-		int start = document.getLength();
-
-		// build and append new chat line string
-		StringBuffer newLine = new StringBuffer();
-		if (start > 0) {
-			newLine.append('\n');
-			start++;
-		}
-		newLine.append(sender);
-		newLine.append(": ");
-		newLine.append(text);
-
-		try {
-			document.replace(document.getLength(), 0, newLine.toString());
-		} catch (BadLocationException e) {
-			Saros.log("Could not update chat window", e);
-		}
-
-		// Show sender in bold
-		StyledText styledText = historyViewer.getTextWidget();
-		StyleRange styleRange = new StyleRange();
-		styleRange.start = start;
-		styleRange.length = sender.length();
-		styleRange.fontStyle = SWT.BOLD;
-		styledText.setStyleRange(styleRange);
-	}
+	this.session.sendMessage(msg);
+    }
 }

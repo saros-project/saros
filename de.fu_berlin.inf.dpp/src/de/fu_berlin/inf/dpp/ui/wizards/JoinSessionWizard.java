@@ -48,111 +48,119 @@ import de.fu_berlin.inf.dpp.net.JID;
  * 
  * @author rdjemili
  */
-public class JoinSessionWizard extends Wizard  {
+public class JoinSessionWizard extends Wizard {
 
-	static Logger log = Logger.getLogger(JoinSessionWizard.class.getName());
+    static Logger log = Logger.getLogger(JoinSessionWizard.class.getName());
 
-	ShowDescriptionPage descriptionPage;
+    Display current;
 
-	EnterNamePage namePage;
-	
-	WizardDialogAccessable myWizardDlg;
+    ShowDescriptionPage descriptionPage;
 
-	IIncomingInvitationProcess process;
-	
-	Display current;
+    WizardDialogAccessable myWizardDlg;
 
-	public JoinSessionWizard(IIncomingInvitationProcess process) {
-		this.process = process;
-		
-		current = Display.getCurrent();
+    EnterNamePage namePage;
 
-		setWindowTitle("Session Invitation");
-		setHelpAvailable(false);
-		setNeedsProgressMonitor(true);
-	}
-	
-	public IInvitationUI getInvitationUI() {
-		return new IInvitationUI(){
-			
-			public void cancel(final String errorMsg, final boolean replicated) {
-				current.asyncExec(new Runnable() {
-					public void run() {
-						
-						if (errorMsg != null){
-							MessageDialog.openError(getShell(), "Invitation aborted",
-								"Could not complete invitation because an error occurred (" + errorMsg + ")");
-						} else {
-							// errorMsg == null means canceled either by us or peer
-							if (replicated){
-								MessageDialog.openInformation(getShell(), "Invitation cancelled",
-								"Invitation was cancelled by peer.");
-							}
-						}
-						myWizardDlg.close();
-					}
-				});
+    IIncomingInvitationProcess process;
+
+    public JoinSessionWizard(IIncomingInvitationProcess process) {
+	this.process = process;
+
+	this.current = Display.getCurrent();
+
+	setWindowTitle("Session Invitation");
+	setHelpAvailable(false);
+	setNeedsProgressMonitor(true);
+    }
+
+    @Override
+    public void addPages() {
+	this.descriptionPage = new ShowDescriptionPage(this);
+	this.namePage = new EnterNamePage(this);
+
+	addPage(this.descriptionPage);
+	addPage(this.namePage);
+    }
+
+    @Override
+    public void createPageControls(Composite pageContainer) {
+	this.descriptionPage.createControl(pageContainer);
+	// create namePage lazily
+    }
+
+    public IInvitationUI getInvitationUI() {
+	return new IInvitationUI() {
+
+	    public void cancel(final String errorMsg, final boolean replicated) {
+		JoinSessionWizard.this.current.asyncExec(new Runnable() {
+		    public void run() {
+
+			if (errorMsg != null) {
+			    MessageDialog.openError(getShell(),
+				    "Invitation aborted",
+				    "Could not complete invitation because an error occurred ("
+					    + errorMsg + ")");
+			} else {
+			    // errorMsg == null means canceled either by us or
+			    // peer
+			    if (replicated) {
+				MessageDialog.openInformation(getShell(),
+					"Invitation cancelled",
+					"Invitation was cancelled by peer.");
+			    }
 			}
-		
-			public void runGUIAsynch(Runnable runnable) {
-				// ignored, not needed atm
-			}
+			JoinSessionWizard.this.myWizardDlg.close();
+		    }
+		});
+	    }
 
-			public void updateInvitationProgress(JID jid) {
-				// ignored, not needed atm
-			}
-		};
+	    public void runGUIAsynch(Runnable runnable) {
+		// ignored, not needed atm
+	    }
+
+	    public void updateInvitationProgress(JID jid) {
+		// ignored, not needed atm
+	    }
+	};
+    }
+
+    @Override
+    public boolean performCancel() {
+	this.process.cancel(null, false);
+
+	return super.performCancel();
+    }
+
+    @Override
+    public boolean performFinish() {
+
+	if (this.process.getState() == State.CANCELED) {
+	    return true;
 	}
 
-	@Override
-	public void createPageControls(Composite pageContainer) {
-		descriptionPage.createControl(pageContainer);
-		// create namePage lazily
-	}
-	
-	@Override
-	public void addPages() {
-		descriptionPage = new ShowDescriptionPage(this);
-		namePage = new EnterNamePage(this);
+	final IProject source = this.namePage.getSourceProject();
+	final String target = this.namePage.getTargetProjectName();
 
-		addPage(descriptionPage);
-		addPage(namePage);
-	}
+	try {
+	    getContainer().run(true, true, new IRunnableWithProgress() {
+		public void run(IProgressMonitor monitor)
+			throws InvocationTargetException, InterruptedException {
 
-	@Override
-	public boolean performFinish() {
-
-		if (process.getState() == State.CANCELED)
-			return true;
-
-		final IProject source = namePage.getSourceProject();
-		final String target = namePage.getTargetProjectName();
-		
-		try {
-			getContainer().run(true, true, new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException,
-					InterruptedException {
-
-					process.accept(source, target, monitor);
-				}
-			});
-		} catch (InvocationTargetException e) {
-			log.log(Level.WARNING, "Exception while requesting remote file list", e);
-		} catch (InterruptedException e) {
-			log.log(Level.FINE, "Request of remote file list canceled/interrupted", e);
+		    JoinSessionWizard.this.process.accept(source, target,
+			    monitor);
 		}
-
-		return true;
-	}
-	
-	@Override
-	public boolean performCancel() {
-		process.cancel(null, false);
-
-		return super.performCancel();
+	    });
+	} catch (InvocationTargetException e) {
+	    JoinSessionWizard.log.log(Level.WARNING,
+		    "Exception while requesting remote file list", e);
+	} catch (InterruptedException e) {
+	    JoinSessionWizard.log.log(Level.FINE,
+		    "Request of remote file list canceled/interrupted", e);
 	}
 
-	public void setWizardDlg(WizardDialogAccessable wd) {
-		myWizardDlg = wd;
-	}
+	return true;
+    }
+
+    public void setWizardDlg(WizardDialogAccessable wd) {
+	this.myWizardDlg = wd;
+    }
 }

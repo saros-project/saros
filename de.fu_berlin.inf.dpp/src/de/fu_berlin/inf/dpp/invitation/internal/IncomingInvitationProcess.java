@@ -57,437 +57,474 @@ import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 public class IncomingInvitationProcess extends InvitationProcess implements
 	IIncomingInvitationProcess {
 
-	private static Logger logger = Logger.getLogger(IncomingInvitationProcess.class);
-	
-	private FileList remoteFileList;
+    private static Logger logger = Logger
+	    .getLogger(IncomingInvitationProcess.class);
 
-	private IProject localProject;
+    private int filesLeftToSynchronize;
 
-	private int filesLeftToSynchronize;
-	
-	/** size of current transfered part of archive file. */
-	private int transferedFileSize = 0;
+    private IProject localProject;
 
+    private IProgressMonitor progressMonitor;
 
-	private IProgressMonitor progressMonitor;
-	
-	protected String projectName;
-	
-	public IncomingInvitationProcess(ITransmitter transmitter, JID from, String projectName,
-		String description) {
+    protected String projectName;
 
-		super(transmitter, from, description);
+    private FileList remoteFileList;
 
-		this.projectName = projectName;
-		this.setState(State.INVITATION_SENT);
-		
+    /** size of current transfered part of archive file. */
+    private int transferedFileSize = 0;
+
+    public IncomingInvitationProcess(ITransmitter transmitter, JID from,
+	    String projectName, String description) {
+
+	super(transmitter, from, description);
+
+	this.projectName = projectName;
+	setState(State.INVITATION_SENT);
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
+     */
+    public void accept(IProject baseProject, String newProjectName,
+	    IProgressMonitor monitor) {
+
+	if ((newProjectName == null) && (baseProject == null)) {
+	    throw new IllegalArgumentException(
+		    "At least newProjectName or baseProject have to be not null.");
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
-	 */
-	public void fileListReceived(JID from, FileList fileList) {
-		assertState(State.HOST_FILELIST_REQUESTED);
-		
-		if (fileList == null)
-			cancel("Failed to receive remote file list.", false);
-		else {
-			remoteFileList = fileList;
-			setState(State.HOST_FILELIST_SENT);
+	try {
+	    assertState(State.HOST_FILELIST_SENT);
+
+	    if (newProjectName != null) {
+		this.localProject = createNewProject(newProjectName,
+			baseProject);
+	    } else {
+		this.localProject = baseProject;
+	    }
+
+	    this.filesLeftToSynchronize = handleDiff(this.localProject,
+		    this.remoteFileList);
+
+	    this.progressMonitor = monitor;
+	    if (this.tmode == TransferMode.IBB) {
+		this.progressMonitor
+			.beginTask("Transfer archive file ...", 100);
+	    } else {
+		this.progressMonitor.beginTask("Synchronizing...",
+			this.filesLeftToSynchronize);
+	    }
+	    setState(State.SYNCHRONIZING);
+
+	    this.transmitter.sendFileList(this.peer, new FileList(
+		    this.localProject));
+
+	    if (blockUntilAllFilesSynchronized(monitor)) {
+		done();
+	    } else {
+		cancel(null, false);
+	    }
+
+	} catch (Exception e) {
+	    ErrorMessageDialog.showErrorMessage(new Exception(
+		    "Exception during create project."));
+	    failed(e);
+
+	} finally {
+	    monitor.done();
+	}
+    }
+
+    private int addAllFolders(IProject localProject, FileList diff)
+	    throws CoreException {
+
+	int addedFolders = 0;
+
+	for (IPath path : diff.getAddedPaths()) {
+	    if (path.hasTrailingSeparator()) {
+		IFolder folder = localProject.getFolder(path);
+		if (!folder.exists()) {
+		    folder.create(true, true, new NullProgressMonitor());
 		}
+
+		addedFolders++;
+	    }
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
-	 */
-	public FileList requestRemoteFileList(IProgressMonitor monitor) {
-		assertState(State.INVITATION_SENT);
+	return addedFolders;
+    }
 
-		monitor.beginTask("Requesting remote file list", IProgressMonitor.UNKNOWN);
+    /**
+     * Blocks until all files have been synchronized or cancel has been
+     * selected.
+     * 
+     * @return <code>true</code> if all files were synchronized.
+     *         <code>false</code> if operation was canceled by user.
+     */
+    private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
+	// TODO: deadlock abfangen.
+	while (this.filesLeftToSynchronize > 0) {
+	    if (monitor.isCanceled() || (getState() == State.CANCELED)) {
+		return false;
+	    }
 
-		transmitter.sendRequestForFileListMessage(peer);
-		setState(State.HOST_FILELIST_REQUESTED);
-
-		while (remoteFileList == null && state != State.CANCELED) {
-			if (monitor.isCanceled()) {
-				cancel(null, false);
-			}
-			
-			try {
-				Thread.sleep(500);
-				monitor.worked(1);
-			} catch (InterruptedException e) {
-			}
-		}
-
-		monitor.done();
-		
-		//TODO: for testing
-//		tmode = TransferMode.IBB;
-
-		return remoteFileList;
+	    try {
+		Thread.sleep(500);
+	    } catch (InterruptedException e) {
+	    }
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
-	 */
-	public void accept(IProject baseProject, String newProjectName, IProgressMonitor monitor) {
+	return true;
+    }
 
-		if (newProjectName == null && baseProject == null)
-			throw new IllegalArgumentException(
-				"At least newProjectName or baseProject have to be not null.");
+    /**
+     * Creates a new project.
+     * 
+     * @param newProjectName
+     *            the project name of the new project.
+     * @param baseProject
+     *            if not <code>null</code> all files of the baseProject will be
+     *            copied into the new project after having created it.
+     * @return the new project.
+     * @throws CoreException
+     *             if something goes wrong while creating the new project.
+     */
+    private IProject createNewProject(String newProjectName,
+	    final IProject baseProject) throws CoreException {
 
+	IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	final IProject project = workspaceRoot.getProject(newProjectName);
+
+	final File projectDir = new File(workspaceRoot.getLocation().toString()
+		+ File.separator + newProjectName);
+	if (projectDir.exists()) {
+	    projectDir.delete();
+	}
+
+	/* run project read only settings in progress monitor thread. */
+	Display.getDefault().syncExec(new Runnable() {
+	    public void run() {
+		ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+			Display.getDefault().getActiveShell());
 		try {
-			assertState(State.HOST_FILELIST_SENT);
+		    dialog.run(true, false, new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) {
 
-			if (newProjectName != null) {
-				localProject = createNewProject(newProjectName, baseProject);
-			} else {
-				localProject = baseProject;
-			}
+			    try {
 
-			filesLeftToSynchronize = handleDiff(localProject, remoteFileList);
+				monitor.beginTask("Copy local resources ... ",
+					IProgressMonitor.UNKNOWN);
 
-			progressMonitor = monitor;
-			if(tmode == TransferMode.IBB){
-				progressMonitor.beginTask("Transfer archive file ...", 100);
-			}else{
-				progressMonitor.beginTask("Synchronizing...", filesLeftToSynchronize);
-			}
-			setState(State.SYNCHRONIZING);
+				project.clearHistory(null);
+				project.refreshLocal(IResource.DEPTH_INFINITE,
+					null);
 
-			transmitter.sendFileList(peer, new FileList(localProject));
-
-			if (blockUntilAllFilesSynchronized(monitor))
-				done();
-			else
-				cancel(null, false);
-
-		} catch (Exception e) {
-			ErrorMessageDialog.showErrorMessage(new Exception("Exception during create project."));
-			failed(e);
-
-		} finally {
-			monitor.done();
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.InvitationProcess
-	 */
-	public void invitationAccepted(JID from) {
-		failState();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.InvitationProcess
-	 */
-	public void joinReceived(JID from) {
-		failState();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.InvitationProcess
-	 */
-	public void resourceReceived(JID from, IPath path, InputStream in) {
-		logger.debug("new file received: "+path);
-		if (localProject==null)
-			return; // we dont have started the new project yet, so received ressources are not welcomed
-		
-		try {
-			IFile file = localProject.getFile(path);
-			if (file.exists()) {
-				file.setReadOnly(false);
-				file.setContents(in, IResource.FORCE, new NullProgressMonitor());
-			} else {
-				file.create(in, true, new NullProgressMonitor());
-				logger.debug("New File created: "+file.getName());
-			}
-		} catch (Exception e) {
-			failed(e);
-		}
-		
-		/* archive file for transfering data finished.
-		 * Unzip separate files.
-		 * */
-		if(tmode == TransferMode.IBB){
-			tmode = TransferMode.DEFAULT;
-			progressMonitor.beginTask("Files left: ",filesLeftToSynchronize);
-		}
-		
-		progressMonitor.worked(1);
-		progressMonitor.subTask("Files left: " + filesLeftToSynchronize);
-		
-		filesLeftToSynchronize--;
-		logger.debug("file counter: "+filesLeftToSynchronize);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
-	 */
-	public FileList getRemoteFileList() {
-		return remoteFileList;
-	}
-
-	/**
-	 * Blocks until all files have been synchronized or cancel has been
-	 * selected.
-	 * 
-	 * @return <code>true</code> if all files were synchronized.
-	 *         <code>false</code> if operation was canceled by user.
-	 */
-	private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
-		//TODO: deadlock abfangen.
-		while (filesLeftToSynchronize > 0) {
-			if (monitor.isCanceled() || getState() == State.CANCELED) {
-				return false;
-			}
-
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Creates a new project.
-	 * 
-	 * @param newProjectName
-	 *            the project name of the new project.
-	 * @param baseProject
-	 *            if not <code>null</code> all files of the baseProject will
-	 *            be copied into the new project after having created it.
-	 * @return the new project.
-	 * @throws CoreException
-	 *             if something goes wrong while creating the new project.
-	 */
-	private IProject createNewProject(String newProjectName, final IProject baseProject)
-		throws CoreException {
-
-		IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-		final IProject project = workspaceRoot.getProject(newProjectName);
-		
-		final File projectDir = new File(workspaceRoot.getLocation().toString() + File.separator +newProjectName);
-		if(projectDir.exists()){
-			projectDir.delete();
-		}
-		
-		/* run project read only settings in progress monitor thread. */
-		Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-				ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display.getDefault().getActiveShell());
-				try {
-					dialog.run(true, false, new IRunnableWithProgress(){
-						public void run(IProgressMonitor monitor){
-							
-				
-							try {
-				
-								monitor.beginTask("Copy local resources ... ",IProgressMonitor.UNKNOWN);
-								
-								project.clearHistory(null);
-								project.refreshLocal(IProject.DEPTH_INFINITE, null);
-								
-								if (baseProject == null) {									
-									project.create(new NullProgressMonitor());
-									project.open(new NullProgressMonitor());
-								} else {
-									baseProject.copy(project.getFullPath(), true, new NullProgressMonitor());
-								}
-				
-							} catch (CoreException e) {
-								logger.warn( "Exception during copy local ressources",e);
-								monitor.done();
-							}
-							
-							monitor.done();
-
-						}
-						
-					});
-				} catch (InvocationTargetException e) {
-					logger.warn( "",e);
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					logger.warn( "",e);
-					e.printStackTrace();
+				if (baseProject == null) {
+				    project.create(new NullProgressMonitor());
+				    project.open(new NullProgressMonitor());
+				} else {
+				    baseProject.copy(project.getFullPath(),
+					    true, new NullProgressMonitor());
 				}
-				
+
+			    } catch (CoreException e) {
+				IncomingInvitationProcess.logger
+					.warn(
+						"Exception during copy local ressources",
+						e);
+				monitor.done();
+			    }
+
+			    monitor.done();
+
 			}
-		});
 
-		// TODO CO: What is this??? 
-//		project.clearHistory(null);
-//		project.refreshLocal(IProject.DEPTH_INFINITE, null);
-
-		return project;
-	}
-
-	/**
-	 * Prepares for receiving the missing resources.
-	 * 
-	 * @param localProject
-	 *            the project that is used for the base of the replication.
-	 * @param remoteFileList
-	 *            the file list of the remote project.
-	 * @return the number of files that we need to receive to end the
-	 *         synchronization.
-	 * @throws CoreException
-	 *             is thrown when getting all files of the local project.
-	 */
-	private int handleDiff(IProject localProject, FileList remoteFileList) throws CoreException {
-
-		//TODO: Thread 
-		FileList diff = new FileList(localProject).diff(remoteFileList);
-
-		removeUnneededResources(localProject, diff);
-		int addedPaths = addAllFolders(localProject, diff);
-
-		return diff.getAddedPaths().size() - addedPaths + diff.getAlteredPaths().size();
-	}
-
-	/**
-	 * Removes all local resources that aren't part of the shared project we're
-	 * currently joining. This includes files and folders.
-	 * 
-	 * @param localProject
-	 *            the local project were the shared project will be replicated.
-	 * @param diff
-	 *            the fileList which contains the diff information.
-	 * @throws CoreException
-	 */
-	private void removeUnneededResources(IProject localProject, FileList diff) throws CoreException {
-
-		// TODO dont throw CoreException
-		// TODO check if this triggers the resource listener
-		for (IPath path : diff.getRemovedPaths()) {
-			if (path.hasTrailingSeparator()) {
-				IFolder folder = localProject.getFolder(path);
-
-				if (folder.exists())
-					folder.delete(true, new NullProgressMonitor());
-
-			} else {
-				IFile file = localProject.getFile(path);
-
-				// check if file exists because it might have already been
-				// deleted when deleting its folder
-				if (file.exists())
-					file.delete(true, new NullProgressMonitor());
-			}
-		}
-	}
-
-	private int addAllFolders(IProject localProject, FileList diff) throws CoreException {
-
-		int addedFolders = 0;
-
-		for (IPath path : diff.getAddedPaths()) {
-			if (path.hasTrailingSeparator()) {
-				IFolder folder = localProject.getFolder(path);
-				if (!folder.exists())
-					folder.create(true, true, new NullProgressMonitor());
-
-				addedFolders++;
-			}
+		    });
+		} catch (InvocationTargetException e) {
+		    IncomingInvitationProcess.logger.warn("", e);
+		    e.printStackTrace();
+		} catch (InterruptedException e) {
+		    IncomingInvitationProcess.logger.warn("", e);
+		    e.printStackTrace();
 		}
 
-		return addedFolders;
+	    }
+	});
+
+	// TODO CO: What is this???
+	// project.clearHistory(null);
+	// project.refreshLocal(IProject.DEPTH_INFINITE, null);
+
+	return project;
+    }
+
+    /**
+     * Ends the incoming invitiation process.
+     */
+    private void done() {
+	JID host = this.peer;
+	JID driver = this.peer;
+
+	// TODO: HACK
+	List<JID> users = new ArrayList<JID>();
+	users.add(host);
+	users.add(Saros.getDefault().getMyJID());
+
+	ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+	ISharedProject sharedProject = sessionManager.joinSession(
+		this.localProject, host, driver, users);
+
+	this.transmitter.sendJoinMessage(sharedProject);
+	this.transmitter.removeInvitationProcess(this); // HACK
+
+	sharedProject.setProjectReadonly(true);
+
+	setState(State.DONE);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.IInvitationProcess
+     */
+    public void fileListReceived(JID from, FileList fileList) {
+	assertState(State.HOST_FILELIST_REQUESTED);
+
+	if (fileList == null) {
+	    cancel("Failed to receive remote file list.", false);
+	} else {
+	    this.remoteFileList = fileList;
+	    setState(State.HOST_FILELIST_SENT);
 	}
+    }
 
-	/**
-	 * Ends the incoming invitiation process.
-	 */
-	private void done() {
-		JID host = peer;
-		JID driver = peer;
+    public void fileSent(IPath path) {
+	// do nothing
 
-		// TODO: HACK
-		List<JID> users = new ArrayList<JID>();
-		users.add(host);
-		users.add(Saros.getDefault().getMyJID());
+    }
 
-		ISessionManager sessionManager = Saros.getDefault().getSessionManager();
-		ISharedProject sharedProject = sessionManager
-			.joinSession(localProject, host, driver, users);
+    public void fileTransferFailed(IPath path, Exception e) {
+	failed(e);
 
-		transmitter.sendJoinMessage(sharedProject);
-		transmitter.removeInvitationProcess(this); // HACK
-		
-		sharedProject.setProjectReadonly(true);
+    }
 
-		setState(State.DONE);
-	}
+    public String getProjectName() {
+	return this.projectName;
+    }
 
-	public String getProjectName() {
-		return this.projectName;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
+     */
+    public FileList getRemoteFileList() {
+	return this.remoteFileList;
+    }
 
-	public void updateInvitationProgress(JID jid) {
-		// ignored, not needed atm		
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
+     */
+    public TransferMode getTransferMode() {
+	return this.tmode;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
-	 */
-	public TransferMode getTransferMode() {
-		return tmode;
-	}
+    /**
+     * Prepares for receiving the missing resources.
+     * 
+     * @param localProject
+     *            the project that is used for the base of the replication.
+     * @param remoteFileList
+     *            the file list of the remote project.
+     * @return the number of files that we need to receive to end the
+     *         synchronization.
+     * @throws CoreException
+     *             is thrown when getting all files of the local project.
+     */
+    private int handleDiff(IProject localProject, FileList remoteFileList)
+	    throws CoreException {
 
-	/*
-	 * (non-Javadoc)
-	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#jingleFallback()
-	 */
-	public void jingleFallback() {
-		logger.warn("jingle fallback");
-		tmode = TransferMode.IBB;
-		/* if send file list failed. */
-		if(getState() == State.SYNCHRONIZING){
-			logger.debug("send file list another one.");
-			try {
-				transmitter.sendFileList(peer, new FileList(localProject));
-			} catch (Exception e) {
-				ErrorMessageDialog.showErrorMessage(new Exception("Exception during create project."));
-				failed(e);
-			} 
-		}
-	}
+	// TODO: Thread
+	FileList diff = new FileList(localProject).diff(remoteFileList);
 
-	public void fileSent(IPath path) {
-		// do nothing
-		
-	}
+	removeUnneededResources(localProject, diff);
+	int addedPaths = addAllFolders(localProject, diff);
 
-	public void fileTransferFailed(IPath path, Exception e) {
+	return diff.getAddedPaths().size() - addedPaths
+		+ diff.getAlteredPaths().size();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.InvitationProcess
+     */
+    public void invitationAccepted(JID from) {
+	failState();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#jingleFallback()
+     */
+    public void jingleFallback() {
+	IncomingInvitationProcess.logger.warn("jingle fallback");
+	this.tmode = TransferMode.IBB;
+	/* if send file list failed. */
+	if (getState() == State.SYNCHRONIZING) {
+	    IncomingInvitationProcess.logger
+		    .debug("send file list another one.");
+	    try {
+		this.transmitter.sendFileList(this.peer, new FileList(
+			this.localProject));
+	    } catch (Exception e) {
+		ErrorMessageDialog.showErrorMessage(new Exception(
+			"Exception during create project."));
 		failed(e);
-		
+	    }
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.InvitationProcess
+     */
+    public void joinReceived(JID from) {
+	failState();
+    }
+
+    /**
+     * Removes all local resources that aren't part of the shared project we're
+     * currently joining. This includes files and folders.
+     * 
+     * @param localProject
+     *            the local project were the shared project will be replicated.
+     * @param diff
+     *            the fileList which contains the diff information.
+     * @throws CoreException
+     */
+    private void removeUnneededResources(IProject localProject, FileList diff)
+	    throws CoreException {
+
+	// TODO dont throw CoreException
+	// TODO check if this triggers the resource listener
+	for (IPath path : diff.getRemovedPaths()) {
+	    if (path.hasTrailingSeparator()) {
+		IFolder folder = localProject.getFolder(path);
+
+		if (folder.exists()) {
+		    folder.delete(true, new NullProgressMonitor());
+		}
+
+	    } else {
+		IFile file = localProject.getFile(path);
+
+		// check if file exists because it might have already been
+		// deleted when deleting its folder
+		if (file.exists()) {
+		    file.delete(true, new NullProgressMonitor());
+		}
+	    }
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
+     */
+    public FileList requestRemoteFileList(IProgressMonitor monitor) {
+	assertState(State.INVITATION_SENT);
+
+	monitor.beginTask("Requesting remote file list",
+		IProgressMonitor.UNKNOWN);
+
+	this.transmitter.sendRequestForFileListMessage(this.peer);
+	setState(State.HOST_FILELIST_REQUESTED);
+
+	while ((this.remoteFileList == null) && (this.state != State.CANCELED)) {
+	    if (monitor.isCanceled()) {
+		cancel(null, false);
+	    }
+
+	    try {
+		Thread.sleep(500);
+		monitor.worked(1);
+	    } catch (InterruptedException e) {
+	    }
 	}
 
-	public void transferProgress(int transfered) {
-		progressMonitor.worked(transfered - transferedFileSize);
-		transferedFileSize = transfered;
+	monitor.done();
+
+	// TODO: for testing
+	// tmode = TransferMode.IBB;
+
+	return this.remoteFileList;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.InvitationProcess
+     */
+    public void resourceReceived(JID from, IPath path, InputStream in) {
+	IncomingInvitationProcess.logger.debug("new file received: " + path);
+	if (this.localProject == null) {
+	    return; // we dont have started the new project yet, so received
+		    // ressources are not welcomed
 	}
 
-	public void setTransferMode(TransferMode mode) {
-		tmode = mode;
+	try {
+	    IFile file = this.localProject.getFile(path);
+	    if (file.exists()) {
+		file.setReadOnly(false);
+		file
+			.setContents(in, IResource.FORCE,
+				new NullProgressMonitor());
+	    } else {
+		file.create(in, true, new NullProgressMonitor());
+		IncomingInvitationProcess.logger.debug("New File created: "
+			+ file.getName());
+	    }
+	} catch (Exception e) {
+	    failed(e);
 	}
+
+	/*
+	 * archive file for transfering data finished. Unzip separate files.
+	 */
+	if (this.tmode == TransferMode.IBB) {
+	    this.tmode = TransferMode.DEFAULT;
+	    this.progressMonitor.beginTask("Files left: ",
+		    this.filesLeftToSynchronize);
+	}
+
+	this.progressMonitor.worked(1);
+	this.progressMonitor.subTask("Files left: "
+		+ this.filesLeftToSynchronize);
+
+	this.filesLeftToSynchronize--;
+	IncomingInvitationProcess.logger.debug("file counter: "
+		+ this.filesLeftToSynchronize);
+    }
+
+    public void setTransferMode(TransferMode mode) {
+	this.tmode = mode;
+    }
+
+    public void transferProgress(int transfered) {
+	this.progressMonitor.worked(transfered - this.transferedFileSize);
+	this.transferedFileSize = transfered;
+    }
+
+    public void updateInvitationProgress(JID jid) {
+	// ignored, not needed atm
+    }
 
 }

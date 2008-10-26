@@ -30,13 +30,13 @@ import java.io.Serializable;
  * @see ch.iserver.ace.algorithm.VectorTime
  */
 public interface Timestamp extends Serializable {
-	
-	/**
-	 * Retrieves the components of the timestamp as an int array. The exact
-	 * representation is up to the concrete Timestamp implementation.
-	 * 
-	 * @return the components of the Timestamp implementation
-	 */
-	int[] getComponents();
-	
+
+    /**
+     * Retrieves the components of the timestamp as an int array. The exact
+     * representation is up to the concrete Timestamp implementation.
+     * 
+     * @return the components of the Timestamp implementation
+     */
+    int[] getComponents();
+
 }

@@ -3,40 +3,40 @@ package de.fu_berlin.inf.dpp.activities;
 import org.eclipse.core.runtime.IPath;
 
 public class FolderActivity implements IActivity {
-	public static enum Type {
-		Created, Removed
-	};
+    public static enum Type {
+	Created, Removed
+    };
 
-	private String source;
-	
-	private Type type;
+    private final IPath path;
 
-	private IPath path;
+    private String source;
 
-	public FolderActivity(Type type, IPath path) {
-		this.type = type;
-		this.path = path;
-	}
+    private final Type type;
 
-	public IPath getPath() {
-		return path;
-	}
+    public FolderActivity(Type type, IPath path) {
+	this.type = type;
+	this.path = path;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public IPath getPath() {
+	return this.path;
+    }
 
-	@Override
-	public String toString() {
-		return "FolderActivity(type:" + type + ", path:" + path + ")";
-	}
+    public String getSource() {
+	return this.source;
+    }
 
-	public String getSource() {
-		return this.source;
-	}
+    public Type getType() {
+	return this.type;
+    }
 
-	public void setSource(String source) {
-		this.source = source;
-		
-	}
+    public void setSource(String source) {
+	this.source = source;
+
+    }
+
+    @Override
+    public String toString() {
+	return "FolderActivity(type:" + this.type + ", path:" + this.path + ")";
+    }
 }

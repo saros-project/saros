@@ -28,79 +28,80 @@ import org.jivesoftware.smack.util.StringUtils;
  * 
  * @author rdjemili
  */
-public class JID implements Serializable{
-	private final String jid;
+public class JID implements Serializable {
+    private final String jid;
 
-	/**
-	 * Construct a new Jabber-ID
-	 * 
-	 * @param jid
-	 *            the Jabber ID in the format of user@host[/resource]. Resource
-	 *            is optional.
-	 */
-	public JID(String jid) {
-		// TODO check for malformated string
-		this.jid = jid;
+    /**
+     * Construct a new Jabber-ID
+     * 
+     * @param jid
+     *            the Jabber ID in the format of user@host[/resource]. Resource
+     *            is optional.
+     */
+    public JID(String jid) {
+	// TODO check for malformated string
+	this.jid = jid;
+    }
+
+    /**
+     * @return <code>true</code> if the IDs have the same user and domain.
+     *         Resource is ignored.
+     */
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof JID) {
+	    JID other = (JID) obj;
+	    return getBase().equals(other.getBase());
 	}
 
-	/**
-	 * @return the name segment of this Jabber ID.
-	 * @see StringUtils#parseName(String))
-	 */
-	public String getName() {
-		return StringUtils.parseName(jid);
-	}
+	return false;
+    }
 
-	/**
-	 * @return the Jabber ID without resource qualifier.
-	 * @see StringUtils#parseBareAddress(String)
-	 */
-	public String getBase() {
-		return StringUtils.parseBareAddress(jid);
-	}
+    /**
+     * @return the Jabber ID without resource qualifier.
+     * @see StringUtils#parseBareAddress(String)
+     */
+    public String getBase() {
+	return StringUtils.parseBareAddress(this.jid);
+    }
 
-	/**
-	 * @return the domain segment of this Jabber ID.
-	 * @see StringUtils#parseServer(String)
-	 */
-	public String getDomain() {
-		return StringUtils.parseServer(jid);
-	}
+    /**
+     * @return the domain segment of this Jabber ID.
+     * @see StringUtils#parseServer(String)
+     */
+    public String getDomain() {
+	return StringUtils.parseServer(this.jid);
+    }
 
-	/**
-	 * @return the resource segment of this Jabber ID or the empty string if
-	 *         there is none.
-	 * @see StringUtils#parseResource(String)
-	 */
-	public String getResource() {
-		return StringUtils.parseResource(jid);
-	}
+    /**
+     * @return the name segment of this Jabber ID.
+     * @see StringUtils#parseName(String))
+     */
+    public String getName() {
+	return StringUtils.parseName(this.jid);
+    }
 
-	/**
-	 * @return <code>true</code> if the IDs have the same user and domain.
-	 *         Resource is ignored.
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof JID) {
-			JID other = (JID) obj;
-			return getBase().equals(other.getBase());
-		}
+    /**
+     * @return the resource segment of this Jabber ID or the empty string if
+     *         there is none.
+     * @see StringUtils#parseResource(String)
+     */
+    public String getResource() {
+	return StringUtils.parseResource(this.jid);
+    }
 
-		return false;
-	}
+    @Override
+    public int hashCode() {
+	return getBase().hashCode();
+    }
 
-	@Override
-	public int hashCode() {
-		return getBase().hashCode();
-	}
-
-	/**
-	 * @return the complete string that was used to construct this object.
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		return jid;
-	}
+    /**
+     * @return the complete string that was used to construct this object.
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+	return this.jid;
+    }
 }

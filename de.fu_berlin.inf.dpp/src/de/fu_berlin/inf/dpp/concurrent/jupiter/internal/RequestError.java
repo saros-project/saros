@@ -6,55 +6,56 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
+
 /**
  * Error object of an transformation request.
+ * 
  * @author orieger
- *
+ * 
  */
-public class RequestError implements Request{
+public class RequestError implements Request {
 
-	private IPath path;
-	
-	public RequestError(IPath path){
-		this.path = path;
-	}
-	
-	
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3111067620344018430L;
+    private static final long serialVersionUID = 3111067620344018430L;
 
-	public IPath getEditorPath() {
-		return path;
-	}
+    private IPath path;
 
-	public JID getJID() {
+    public RequestError(IPath path) {
+	this.path = path;
+    }
 
-		return null;
-	}
+    public IPath getEditorPath() {
+	return this.path;
+    }
 
-	public Operation getOperation() {
+    public JID getJID() {
 
-		return null;
-	}
+	return null;
+    }
 
-	public int getSiteId() {
+    public Operation getOperation() {
 
-		return 0;
-	}
+	return null;
+    }
 
-	public Timestamp getTimestamp() {
+    public int getSiteId() {
 
-		return null;
-	}
+	return 0;
+    }
 
-	public void setEditorPath(IPath editor) {
-		this.path = editor;
-	}
+    public Timestamp getTimestamp() {
 
-	public void setJID(JID jid) {
-		
-	}
+	return null;
+    }
+
+    public void setEditorPath(IPath editor) {
+	this.path = editor;
+    }
+
+    public void setJID(JID jid) {
+
+    }
 
 }

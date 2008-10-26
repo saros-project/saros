@@ -7,84 +7,85 @@ import org.eclipse.core.runtime.IPath;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class FileActivity implements IActivity {
-	public static enum Type {
-		Created, Removed, Error
-	};
+    public static enum Type {
+	Created, Error, Removed
+    };
 
-	private String source;
-	
-	private Type type;
+    /* exclusive file recipient for error file. */
+    private JID errorRecipient;
 
-	private IPath path;
-	
-	/* exclusive file recipient for error file. */
-	private JID errorRecipient;
+    private InputStream inputStream;
 
-	private InputStream inputStream;
+    private final IPath path;
 
-	public FileActivity(Type type, IPath path) {
-		this.type = type;
-		this.path = path;
+    private String source;
+
+    private final Type type;
+
+    public FileActivity(Type type, IPath path) {
+	this.type = type;
+	this.path = path;
+    }
+
+    public FileActivity(Type type, IPath path, InputStream in) {
+	this(type, path);
+	this.inputStream = in;
+    }
+
+    /**
+     * construtor to send file activity to an exclusive recipient.
+     * 
+     * @param type
+     * @param path
+     * @param to
+     */
+    public FileActivity(Type type, IPath path, JID to) {
+	this(type, path);
+	this.errorRecipient = to;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof FileActivity) {
+	    FileActivity activity = (FileActivity) obj;
+
+	    return (getPath().equals(activity.getPath()) && getType().equals(
+		    activity.getType()));
 	}
 
-	/**
-	 * construtor to send file activity to an exclusive 
-	 * recipient.
-	 * @param type
-	 * @param path
-	 * @param to
-	 */
-	public FileActivity(Type type, IPath path, JID to) {
-		this(type, path);
-		errorRecipient = to;
-	}
-	
-	public FileActivity(Type type, IPath path, InputStream in) {
-		this(type, path);
-		inputStream = in;
-	}
+	return false;
+    }
 
-	public IPath getPath() {
-		return path;
-	}
+    /**
+     * @return the inputStream for the contents of this file for incoming file
+     *         creation activities. <code>null</code> otherwise.
+     */
+    public InputStream getContents() {
+	return this.inputStream;
+    }
 
-	public Type getType() {
-		return type;
-	}
-	
-	public JID getRecipient(){
-		return errorRecipient;
-	}
+    public IPath getPath() {
+	return this.path;
+    }
 
-	/**
-	 * @return the inputStream for the contents of this file for incoming file
-	 *         creation activities. <code>null</code> otherwise.
-	 */
-	public InputStream getContents() {
-		return inputStream;
-	}
+    public JID getRecipient() {
+	return this.errorRecipient;
+    }
 
-	@Override
-	public String toString() {
-		return "FileActivity(type:" + type + ", path:" + path + ")";
-	}
+    public String getSource() {
+	return this.source;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof FileActivity) {
-			FileActivity activity = (FileActivity) obj;
+    public Type getType() {
+	return this.type;
+    }
 
-			return (getPath().equals(activity.getPath()) && getType().equals(activity.getType()));
-		}
+    public void setSource(String source) {
+	this.source = source;
+    }
 
-		return false;
-	}
-
-	public String getSource() {
-		return this.source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
-	}
+    @Override
+    public String toString() {
+	return "FileActivity(type:" + this.type + ", path:" + this.path + ")";
+    }
 }

@@ -27,49 +27,48 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-
 /**
  * This interface represents a request. Requests are typically sent over the
  * network to other sites. A request consists at least of the identifier of the
  * sending site, an operation and a timestamp that specifies the definition
  * context of the operation.
  * 
-
  */
 public interface Request extends Serializable {
 
-	/**
-	 * Gets the identifier of the sending site.
-	 * 
-	 * @return the identifier of the sending site
-	 */
-	public int getSiteId();
+    public IPath getEditorPath();
 
-	/**
-	 * Gets the operation to be propagated.
-	 * 
-	 * @return the operation
-	 */
-	public Operation getOperation();
+    /**
+     * Gets the jid of the appropriate client site.
+     * 
+     * @return the jid of the client
+     */
+    public JID getJID();
 
-	/**
-	 * Gets the timestamp that specifies the definition context of the enclosed
-	 * operation.
-	 * 
-	 * @return the timestamp of the definition context
-	 */
-	public Timestamp getTimestamp();
-	
-	/**
-	 * Gets the jid of the appropriate client site.
-	 * @return the jid of the client
-	 */
-	public JID getJID();
-	
-	public void setJID(JID jid);
-	
-	public IPath getEditorPath();
-	
-	public void setEditorPath(IPath editor);
+    /**
+     * Gets the operation to be propagated.
+     * 
+     * @return the operation
+     */
+    public Operation getOperation();
+
+    /**
+     * Gets the identifier of the sending site.
+     * 
+     * @return the identifier of the sending site
+     */
+    public int getSiteId();
+
+    /**
+     * Gets the timestamp that specifies the definition context of the enclosed
+     * operation.
+     * 
+     * @return the timestamp of the definition context
+     */
+    public Timestamp getTimestamp();
+
+    public void setEditorPath(IPath editor);
+
+    public void setJID(JID jid);
 
 }

@@ -17,176 +17,150 @@ import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.IReceiver;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 
 public class MultiUserChatManager implements PacketListener {
 
-	private static Logger log = Logger.getLogger(MultiUserChatManager.class
-			.getName());
+    // TODO really needed as field?
+    private static String JID_PROPERTY = "jid";
 
-	// TODO: Room name should be configured by settings.
-	/* name of multi user chat room */
-	private String room = "saros";
+    private static Logger log = Logger.getLogger(MultiUserChatManager.class
+	    .getName());
 
-	/* host name of jabber-server on which the muc room is created */
-	private String server = "conference.idefix-xp";
+    /* current muc connection. */
+    private MultiUserChat muc;
 
-	// TODO really needed as field?
-	private static String JID_PROPERTY = "jid";
+    // TODO: Room name should be configured by settings.
+    /* name of multi user chat room */
+    private String room = "saros";
 
-	/* current muc connection. */
-	private MultiUserChat muc;
+    /* host name of jabber-server on which the muc room is created */
+    private final String server = "conference.idefix-xp";
 
-	public MultiUserChatManager(String roomName) {
-		room = roomName;
-	}
+    public MultiUserChatManager(String roomName) {
+	this.room = roomName;
+    }
 
-	public void initMUC(XMPPConnection connection, String user, String room)
-			throws XMPPException {
-		this.room = room;
-		initMUC(connection, user);
-	}
+    /**
+     * this method returns current muc or null no muc exists.
+     * 
+     * @return
+     */
+    public MultiUserChat getMUC() {
+	return this.muc;
+    }
 
-	public void initMUC(XMPPConnection connection, String user)
-			throws XMPPException {
+    public String getRoomName() {
+	return this.room;
+    }
 
-		/* create room domain of current connection. */
-		// JID(connection.getUser()).getDomain();
-		String host = room + "@" + server;
+    public void initMUC(XMPPConnection connection, String user)
+	    throws XMPPException {
 
-		// Create a MultiUserChat using an XMPPConnection for a room
-		MultiUserChat muc = new MultiUserChat(connection, host);
+	/* create room domain of current connection. */
+	// JID(connection.getUser()).getDomain();
+	String host = this.room + "@" + this.server;
 
-		// try to join to room
+	// Create a MultiUserChat using an XMPPConnection for a room
+	MultiUserChat muc = new MultiUserChat(connection, host);
+
+	// try to join to room
+	try {
+	    muc.join(user);
+	} catch (XMPPException e) {
+	    MultiUserChatManager.log.debug(e);
+	    if (e.getMessage().contains("404")) {
+		// room doesn't exist
+
 		try {
-			muc.join(user);
-		} catch (XMPPException e) {
-			log.debug(e);
-			if (e.getMessage().contains("404")) {
-				// room doesn't exist
 
-				try {
+		    // Create the room
+		    muc.create("testbot");
 
-					// Create the room
-					muc.create("testbot");
+		    // Get the the room's configuration form
+		    Form form = muc.getConfigurationForm();
 
-					// Get the the room's configuration form
-					Form form = muc.getConfigurationForm();
+		    // Create a new form to submit based on the original form
+		    Form submitForm = form.createAnswerForm();
 
-					// Create a new form to submit based on the original form
-					Form submitForm = form.createAnswerForm();
-
-					// Add default answers to the form to submit
-					for (Iterator fields = form.getFields(); fields.hasNext();) {
-						FormField field = (FormField) fields.next();
-						if (!FormField.TYPE_HIDDEN.equals(field.getType())
-								&& field.getVariable() != null) {
-							// Sets the default value as the answer
-							submitForm.setDefaultAnswer(field.getVariable());
-						}
-					}
-
-					// set configuration, see XMPP Specs
-					submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
-					submitForm.setAnswer("muc#roomconfig_allowinvites", true);
-					submitForm
-							.setAnswer("muc#roomconfig_persistentroom", false);
-
-					// Send the completed form (with default values) to the
-					// server to configure the room
-					muc.sendConfigurationForm(submitForm);
-
-				} catch (XMPPException ee) {
-					log.debug(e.getLocalizedMessage(), ee);
-					throw ee;
-				}
-			} else {
-				log.debug(e.getLocalizedMessage(), e);
-				throw e;
+		    // Add default answers to the form to submit
+		    for (Iterator fields = form.getFields(); fields.hasNext();) {
+			FormField field = (FormField) fields.next();
+			if (!FormField.TYPE_HIDDEN.equals(field.getType())
+				&& (field.getVariable() != null)) {
+			    // Sets the default value as the answer
+			    submitForm.setDefaultAnswer(field.getVariable());
 			}
+		    }
+
+		    // set configuration, see XMPP Specs
+		    submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
+		    submitForm.setAnswer("muc#roomconfig_allowinvites", true);
+		    submitForm
+			    .setAnswer("muc#roomconfig_persistentroom", false);
+
+		    // Send the completed form (with default values) to the
+		    // server to configure the room
+		    muc.sendConfigurationForm(submitForm);
+
+		} catch (XMPPException ee) {
+		    MultiUserChatManager.log.debug(e.getLocalizedMessage(), ee);
+		    throw ee;
 		}
-		this.muc = muc;
+	    } else {
+		MultiUserChatManager.log.debug(e.getLocalizedMessage(), e);
+		throw e;
+	    }
+	}
+	this.muc = muc;
+    }
+
+    public void initMUC(XMPPConnection connection, String user, String room)
+	    throws XMPPException {
+	this.room = room;
+	initMUC(connection, user);
+    }
+
+    public boolean isConnected() {
+	if ((this.muc != null) && this.muc.isJoined()) {
+	    return true;
+	}
+	return false;
+    }
+
+    public void processPacket(Packet packet) {
+	// TODO should processing here instead of MessagingManager?
+    }
+
+    public void sendActivities(ISharedProject sharedProject,
+	    List<TimedActivity> activities) {
+
+	// log.info("Sent muc activities: " + activities);
+	try {
+	    /* create new message for multi chat. */
+	    Message newMessage = this.muc.createMessage();
+	    /* add packet extension. */
+	    newMessage.addExtension(new ActivitiesPacketExtension(activities));
+	    /* add jid property */
+	    newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, Saros
+		    .getDefault().getMyJID().toString());
+
+	    // newMessage.setBody("test");
+	    this.muc.sendMessage(newMessage);
+	    PacketProtokollLogger.getInstance().sendPacket(newMessage);
+
+	} catch (XMPPException e) {
+
+	    Saros.getDefault().getLog().log(
+		    new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+			    "Could not send message, message queued", e));
 	}
 
-	/**
-	 * this method returns current muc or null no muc exists.
-	 * 
-	 * @return
-	 */
-	public MultiUserChat getMUC() {
-		return muc;
-	}
+    }
 
-	public void sendActivities(ISharedProject sharedProject,
-			List<TimedActivity> activities) {
+    public void setReceiver(IReceiver receiver) {
 
-		// log.info("Sent muc activities: " + activities);
-		try {
-			/* create new message for multi chat. */
-			Message newMessage = muc.createMessage();
-			/* add packet extension. */
-			newMessage.addExtension(new ActivitiesPacketExtension(activities));
-			/* add jid property */
-			newMessage.setProperty(JID_PROPERTY, Saros.getDefault().getMyJID()
-					.toString());
-
-			// newMessage.setBody("test");
-			muc.sendMessage(newMessage);
-			PacketProtokollLogger.getInstance().sendPacket(newMessage);
-
-		} catch (XMPPException e) {
-
-			Saros.getDefault().getLog().log(
-					new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-							"Could not send message, message queued", e));
-		}
-
-	}
-
-	/**
-	 * This method check sender of packet.
-	 * 
-	 * @param packet
-	 *            incoming packet
-	 * @param jid
-	 * @return true if given jid is sender of packet.
-	 */
-	private boolean isMessageFromJID(Packet packet, JID jid) {
-		if (packet instanceof Message) {
-			Message message = (Message) packet;
-			/* replace room */
-			String sender = message.getFrom();
-			/* replace room info */
-			sender = sender.replace(room + "/", "");
-			if (sender.equals(jid.toString())) {
-				message.setFrom(sender);
-				return true;
-			} else {
-				return false;
-			}
-		}
-		return false;
-	}
-
-	public void processPacket(Packet packet) {
-		// TODO should processing here instead of MessagingManager?
-	}
-
-	public void setReceiver(IReceiver receiver) {
-
-	}
-
-	public String getRoomName() {
-		return this.room;
-	}
-
-	public boolean isConnected() {
-		if (muc != null && muc.isJoined()) {
-			return true;
-		}
-		return false;
-	}
+    }
 }

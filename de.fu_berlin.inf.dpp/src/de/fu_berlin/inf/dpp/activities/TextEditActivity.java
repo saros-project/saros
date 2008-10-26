@@ -27,102 +27,106 @@ import org.eclipse.core.runtime.IPath;
  * @author rdjemili
  */
 public class TextEditActivity implements IActivity {
-	public final int offset;
+    private IPath editor;
 
-	private String source;
+    public final int offset;
 
-	private IPath editor;
-	/**
-	 * This string only uses \n as line delimiter. Keep this in mind when adding
-	 * it to an IDocument with probably other line delimiters.
-	 */
-	public String text;
+    public final int replace;
+    private String source;
 
-	public final int replace;
+    /**
+     * This string only uses \n as line delimiter. Keep this in mind when adding
+     * it to an IDocument with probably other line delimiters.
+     */
+    public String text;
 
-	/**
-	 * @param offset
-	 *            the offset inside the document where this activity happend.
-	 * @param text
-	 *            the text that was inserted.
-	 * @param replace
-	 *            the length of text that was replaced by this activity.
-	 * @param source
-	 *            the source ID of this activity
-	 */
-	public TextEditActivity(int offset, String text, int replace) {
-		this.offset = offset;
-		this.text = text;
-		this.replace = replace;
-		this.source = null;
+    /**
+     * @param offset
+     *            the offset inside the document where this activity happend.
+     * @param text
+     *            the text that was inserted.
+     * @param replace
+     *            the length of text that was replaced by this activity.
+     * @param source
+     *            the source ID of this activity
+     */
+    public TextEditActivity(int offset, String text, int replace) {
+	this.offset = offset;
+	this.text = text;
+	this.replace = replace;
+	this.source = null;
+    }
+
+    /**
+     * @param offset
+     *            the offset inside the document where this activity happend.
+     * @param text
+     *            the text that was inserted.
+     * @param replace
+     *            the length of text that was replaced by this activity.
+     * @param source
+     *            the source ID of this activity
+     */
+    public TextEditActivity(int offset, String text, int replace, IPath editor) {
+	this.offset = offset;
+	this.text = text;
+	this.replace = replace;
+	this.source = null;
+	this.editor = editor;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof TextEditActivity) {
+	    TextEditActivity other = (TextEditActivity) obj;
+	    return (this.offset == other.offset)
+		    && this.text.equals(other.text)
+		    && (this.replace == other.replace)
+		    && (this.source == other.source);
 	}
 
-	/**
-	 * @param offset
-	 *            the offset inside the document where this activity happend.
-	 * @param text
-	 *            the text that was inserted.
-	 * @param replace
-	 *            the length of text that was replaced by this activity.
-	 * @param source
-	 *            the source ID of this activity
-	 */
-	public TextEditActivity(int offset, String text, int replace, IPath editor) {
-		this.offset = offset;
-		this.text = text;
-		this.replace = replace;
-		this.source = null;
-		this.editor = editor;
-	}
+	return false;
+    }
 
-	public String getSource() {
-		return source;
-	}
+    public IPath getEditor() {
+	return this.editor;
+    }
 
-	public void setSource(String source) {
-		this.source = source;
-	}
+    public String getSource() {
+	return this.source;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof TextEditActivity) {
-			TextEditActivity other = (TextEditActivity) obj;
-			return offset == other.offset && text.equals(other.text)
-					&& replace == other.replace && source == other.source;
-		}
-
-		return false;
+    /**
+     * Compare text edit information without source settings.
+     * 
+     * @param obj
+     *            TextEditActivity Object
+     * @return true if edit information equals. false otherwise.
+     */
+    public boolean sameLike(Object obj) {
+	if (obj instanceof TextEditActivity) {
+	    TextEditActivity other = (TextEditActivity) obj;
+	    return (this.offset == other.offset)
+		    && ((this.editor != null) && (other.editor != null) && this.editor
+			    .equals(other.editor))
+		    && this.text.equals(other.text)
+		    && (this.replace == other.replace);
 	}
+	return false;
+    }
 
-	@Override
-	public String toString() {
-		return "TextEditActivity(offset:" + offset + ",text:" + text
-				+ ",replace:" + replace + ", path : " + editor.toString() + ")";
-	}
+    public void setEditor(IPath editor) {
+	this.editor = editor;
+    }
 
-	/**
-	 * Compare text edit information without source settings.
-	 * 
-	 * @param obj
-	 *            TextEditActivity Object
-	 * @return true if edit information equals. false otherwise.
-	 */
-	public boolean sameLike(Object obj) {
-		if (obj instanceof TextEditActivity) {
-			TextEditActivity other = (TextEditActivity) obj;
-			return offset == other.offset
-					&& (editor != null && other.editor != null && editor
-							.equals(other.editor)) && text.equals(other.text)
-					&& replace == other.replace;
-		}
-		return false;
-	}
+    public void setSource(String source) {
+	this.source = source;
+    }
 
-	public IPath getEditor() {
-		return this.editor;
-	}
-
-	public void setEditor(IPath editor) {
-		this.editor = editor;
-	}
+    @Override
+    public String toString() {
+	return "TextEditActivity(offset:" + this.offset + ",text:" + this.text
+		+ ",replace:" + this.replace + ", path : "
+		+ this.editor.toString() + ")";
+    }
 }

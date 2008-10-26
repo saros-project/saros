@@ -35,90 +35,96 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 public class GiveDriverRoleAction extends SelectionProviderAction implements
 	ISharedProjectListener, ISessionListener {
 
-	private User selectedUser;
+    private User selectedUser;
 
-	public GiveDriverRoleAction(ISelectionProvider provider) {
-		super(provider, "Give driver role");
-		setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
-		setToolTipText("Give the driver role to this user");
+    public GiveDriverRoleAction(ISelectionProvider provider) {
+	super(provider, "Give driver role");
+	setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
+	setToolTipText("Give the driver role to this user");
 
-		Saros.getDefault().getSessionManager().addSessionListener(this);
-		updateEnablemnet();
-	}
+	Saros.getDefault().getSessionManager().addSessionListener(this);
+	updateEnablemnet();
+    }
 
-	@Override
-	public void run() {
-		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
-		project.setDriver(selectedUser, false);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+     */
+    public void driverChanged(JID driver, boolean replicated) {
+	updateEnablemnet();
+    }
 
-	@Override
-	public void selectionChanged(IStructuredSelection selection) {
-		selectedUser = (selection.size() == 1) ? (User) selection.getFirstElement() : null;
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void invitationReceived(IIncomingInvitationProcess process) {
+	// ignore
+    }
 
-		updateEnablemnet();
-	}
+    @Override
+    public void run() {
+	ISharedProject project = Saros.getDefault().getSessionManager()
+		.getSharedProject();
+	project.setDriver(this.selectedUser, false);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void sessionStarted(ISharedProject session) {
-		session.addListener(this);
-	}
+    @Override
+    public void selectionChanged(IStructuredSelection selection) {
+	this.selectedUser = (selection.size() == 1) ? (User) selection
+		.getFirstElement() : null;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void sessionEnded(ISharedProject session) {
-		session.removeListener(this);
-	}
+	updateEnablemnet();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void invitationReceived(IIncomingInvitationProcess process) {
-		// ignore
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void sessionEnded(ISharedProject session) {
+	session.removeListener(this);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-	 */
-	public void driverChanged(JID driver, boolean replicated) {
-		updateEnablemnet();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void sessionStarted(ISharedProject session) {
+	session.addListener(this);
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-	 */
-	public void userJoined(JID user) {
-		// ignore
-	}
+    private void updateEnablemnet() {
+	ISharedProject project = Saros.getDefault().getSessionManager()
+		.getSharedProject();
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-	 */
-	public void userLeft(JID user) {
-		// ignore
-	}
+	boolean enabled = ((project != null) && (this.selectedUser != null)
+		&& project.isHost() && !project.isDriver(this.selectedUser));
+	setEnabled(enabled);
+	// setEnabled(project != null && (project.isDriver() /*||
+	// project.isHost()*/)
+	// && selectedUser != null &&
+	// !project.getDriver().equals(selectedUser));
+    }
 
-	private void updateEnablemnet() {
-		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+     */
+    public void userJoined(JID user) {
+	// ignore
+    }
 
-		boolean enabled = (project != null && selectedUser != null && project.isHost() && !project.isDriver(selectedUser));
-		setEnabled(enabled);
-//		setEnabled(project != null && (project.isDriver() /*|| project.isHost()*/)
-//			&& selectedUser != null && !project.getDriver().equals(selectedUser));
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+     */
+    public void userLeft(JID user) {
+	// ignore
+    }
 }

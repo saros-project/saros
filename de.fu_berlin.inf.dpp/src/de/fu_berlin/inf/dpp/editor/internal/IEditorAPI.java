@@ -23,88 +23,90 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
  * @author rdjemili
  */
 public interface IEditorAPI {
-	/**
-	 * Sets the editor manager that uses this IEditorAPI. The given editor
-	 * manager will receive the callbacks.
-	 */
-	public void setEditorManager(EditorManager editorManager);
+    /**
+     * Attaches listeners to the given editor that will fire the
+     * {@link IEditorListener} methods on the editor manager set with
+     * {@link #setEditorManager(EditorManager)}.
+     * 
+     * Connecting to an editorPart multiple times, will result in multiple
+     * events. The caller is responsible for organizing connections.
+     * 
+     * Needs to be called from a UI thread.
+     */
+    public void addSharedEditorListener(IEditorPart editorPart);
 
-	/**
-	 * Opens the editor with given file. Needs to be called from an UI thread.
-	 * 
-	 * @return the opened editor or <code>null</code> if the editor couldn't
-	 *         be opened.
-	 */
-	public IEditorPart openEditor(IFile file);
+    /**
+     * Closes the given editorpart.
+     * 
+     * Needs to be called from an UI thread.
+     */
+    public void closeEditor(IEditorPart part);
 
-	/**
-	 * Closes the given editorpart.
-	 * 
-	 * Needs to be called from an UI thread.
-	 */
-	public void closeEditor(IEditorPart part);
+    /**
+     * @return the editor that is currently activated.
+     */
+    public IEditorPart getActiveEditor();
 
-	/**
-	 * @return the editor that is currently activated.
-	 */
-	public IEditorPart getActiveEditor();
+    public IDocument getDocument(IEditorPart editorPart);
 
-	/**
-	 * @return all editors that are currently opened.
-	 */
-	public Set<IEditorPart> getOpenEditors();
+    public IDocumentProvider getDocumentProvider(IEditorInput editorInput);
 
-	/**
-	 * Sets the text selection in given editor.
-	 */
-	public void setSelection(IEditorPart editorPart, ITextSelection selection, String source);
+    /**
+     * @return the file path that given editor is displaying.
+     */
+    public IResource getEditorResource(IEditorPart editorPart);
 
-	/**
-	 * Returns the current text selection for given editor.
-	 * 
-	 * @param editorPart
-	 *            the editorPart for which to get the text selection.
-	 * @return the current text selection. Returns
-	 *         {@link TextSelection#emptySelection()} if no text selection
-	 *         exists.
-	 * 
-	 */
-	public ITextSelection getSelection(IEditorPart editorPart);
+    /**
+     * @return all editors that are currently opened.
+     */
+    public Set<IEditorPart> getOpenEditors();
 
-	/**
-	 * @return the file path that given editor is displaying.
-	 */
-	public IResource getEditorResource(IEditorPart editorPart);
+    /**
+     * Returns the current text selection for given editor.
+     * 
+     * @param editorPart
+     *            the editorPart for which to get the text selection.
+     * @return the current text selection. Returns
+     *         {@link TextSelection#emptySelection()} if no text selection
+     *         exists.
+     * 
+     */
+    public ITextSelection getSelection(IEditorPart editorPart);
 
-	public void setViewport(IEditorPart editorPart, boolean jumpTo, int top, int bottom, String source);
+    /**
+     * Return the viewport for given editor.
+     * 
+     * @param editorPart
+     *            the editor for which to get the viewport
+     * @return the viewport. Never <code>null</code>.
+     */
+    public ILineRange getViewport(IEditorPart editorPart);
 
-	/**
-	 * Return the viewport for given editor.
-	 * 
-	 * @param editorPart
-	 *            the editor for which to get the viewport
-	 * @return the viewport. Never <code>null</code>.
-	 */
-	public ILineRange getViewport(IEditorPart editorPart);
+    /**
+     * Opens the editor with given file. Needs to be called from an UI thread.
+     * 
+     * @return the opened editor or <code>null</code> if the editor couldn't be
+     *         opened.
+     */
+    public IEditorPart openEditor(IFile file);
 
-	/**
-	 * Enables/disables the ability to edit the document in given editor.
-	 */
-	public void setEditable(IEditorPart editorPart, boolean editable);
+    /**
+     * Enables/disables the ability to edit the document in given editor.
+     */
+    public void setEditable(IEditorPart editorPart, boolean editable);
 
-	/**
-	 * Attaches listeners to the given editor that will fire the
-	 * {@link IEditorListener} methods on the editor manager set with
-	 * {@link #setEditorManager(EditorManager)}.
-	 * 
-	 * Connecting to an editorPart multiple times, will result in multiple
-	 * events. The caller is responsible for organizing connections.
-	 * 
-	 * Needs to be called from a UI thread.
-	 */
-	public void addSharedEditorListener(IEditorPart editorPart);
+    /**
+     * Sets the editor manager that uses this IEditorAPI. The given editor
+     * manager will receive the callbacks.
+     */
+    public void setEditorManager(EditorManager editorManager);
 
-	public IDocument getDocument(IEditorPart editorPart);
+    /**
+     * Sets the text selection in given editor.
+     */
+    public void setSelection(IEditorPart editorPart, ITextSelection selection,
+	    String source);
 
-	public IDocumentProvider getDocumentProvider(IEditorInput editorInput);
+    public void setViewport(IEditorPart editorPart, boolean jumpTo, int top,
+	    int bottom, String source);
 }

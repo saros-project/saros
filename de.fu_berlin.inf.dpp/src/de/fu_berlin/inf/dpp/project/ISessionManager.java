@@ -12,87 +12,87 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public interface ISessionManager {
 
-	/**
-	 * Starts a new shared project with the local user as only participant.
-	 * 
-	 * @param project
-	 *            the local Eclipse project which should become shared.
-	 * @throws XMPPException
-	 *             if this method is called with no established XMPP-connection.
-	 */
-	public abstract void startSession(IProject project) throws XMPPException;
+    /**
+     * Add the given session listener. Is ignored if the listener is already
+     * listening.
+     * 
+     * @param listener
+     *            the listener that is to be added.
+     */
+    public abstract void addSessionListener(ISessionListener listener);
 
-	/**
-	 * Joins an remotly already running shared project.
-	 * 
-	 * @param project
-	 *            the local Eclipse project which should be used to replicate
-	 *            the remote shared project.
-	 * @param host
-	 *            the host of the remotly shared project.
-	 * @param driver
-	 *            the driver of the shared project.
-	 * @param users
-	 *            the participants of the shared project.
-	 * @return the shared project.
-	 */
-	public abstract ISharedProject joinSession(IProject project, JID host,
-			JID driver, List<JID> users);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+     */
+    public abstract void connectionStateChanged(XMPPConnection connection,
+	    ConnectionState newState);
 
-	/**
-	 * Leaves the currently active session. If the local user is the host, this
-	 * will close the session for everybody.
-	 * 
-	 * Has no effect if there is no currently shared project.
-	 */
-	public abstract void leaveSession();
+    /**
+     * @return the active SharedProject object or <code>null</code> if there is
+     *         no active project.
+     */
+    public abstract ISharedProject getSharedProject();
 
-	/**
-	 * @return the active SharedProject object or <code>null</code> if there
-	 *         is no active project.
-	 */
-	public abstract ISharedProject getSharedProject();
+    /**
+     * Is fired when an incoming invitation is received.
+     * 
+     * @param from
+     *            the sender of this invitation.
+     * @param description
+     *            the informal description text that can be given with
+     *            invitations.
+     * @return the process that represents the invitation and which handles the
+     *         further interaction with the invitation.
+     */
+    public abstract IIncomingInvitationProcess invitationReceived(JID from,
+	    String projectName, String description);
 
-	/**
-	 * Add the given session listener. Is ignored if the listener is already
-	 * listening.
-	 * 
-	 * @param listener
-	 *            the listener that is to be added.
-	 */
-	public abstract void addSessionListener(ISessionListener listener);
+    /**
+     * Joins an remotly already running shared project.
+     * 
+     * @param project
+     *            the local Eclipse project which should be used to replicate
+     *            the remote shared project.
+     * @param host
+     *            the host of the remotly shared project.
+     * @param driver
+     *            the driver of the shared project.
+     * @param users
+     *            the participants of the shared project.
+     * @return the shared project.
+     */
+    public abstract ISharedProject joinSession(IProject project, JID host,
+	    JID driver, List<JID> users);
 
-	/**
-	 * Removes the given session listener. Is ignored if the given listener
-	 * wasn't listening.
-	 * 
-	 * @param listener
-	 *            the listener that is to be removed.
-	 */
-	public abstract void removeSessionListener(ISessionListener listener);
+    /**
+     * Leaves the currently active session. If the local user is the host, this
+     * will close the session for everybody.
+     * 
+     * Has no effect if there is no currently shared project.
+     */
+    public abstract void leaveSession();
 
-	/**
-	 * Is fired when an incoming invitation is received.
-	 * 
-	 * @param from
-	 *            the sender of this invitation.
-	 * @param description
-	 *            the informal description text that can be given with
-	 *            invitations.
-	 * @return the process that represents the invitation and which handles the
-	 *         further interaction with the invitation.
-	 */
-	public abstract IIncomingInvitationProcess invitationReceived(JID from,
-			String projectName, String description);
+    public abstract void OnReconnect(int oldtimestamp);
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-	 */
-	public abstract void connectionStateChanged(XMPPConnection connection,
-			ConnectionState newState);
+    /**
+     * Removes the given session listener. Is ignored if the given listener
+     * wasn't listening.
+     * 
+     * @param listener
+     *            the listener that is to be removed.
+     */
+    public abstract void removeSessionListener(ISessionListener listener);
 
-	public abstract void OnReconnect(int oldtimestamp);
+    /**
+     * Starts a new shared project with the local user as only participant.
+     * 
+     * @param project
+     *            the local Eclipse project which should become shared.
+     * @throws XMPPException
+     *             if this method is called with no established XMPP-connection.
+     */
+    public abstract void startSession(IProject project) throws XMPPException;
 
 }

@@ -22,19 +22,21 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 /**
- * TimestampFactory is a factory that can create Timestamp objects from
- * an external representation of timestamps in the form of an int array.
+ * TimestampFactory is a factory that can create Timestamp objects from an
+ * external representation of timestamps in the form of an int array.
  */
 public interface TimestampFactory {
-	
-	/**
-	 * Creates a Timestamp from the components in the int array. 
-	 * 
-	 * @param components the components of the timestamp as an int array
-	 * @return a Timestamp instance created from the component array
-	 * @throws IllegalArgumentException if the component array does not satisfy
-	 *         the expectations of the TimestampFactory
-	 */
-	Timestamp createTimestamp(int[] components);
-	
+
+    /**
+     * Creates a Timestamp from the components in the int array.
+     * 
+     * @param components
+     *            the components of the timestamp as an int array
+     * @return a Timestamp instance created from the component array
+     * @throws IllegalArgumentException
+     *             if the component array does not satisfy the expectations of
+     *             the TimestampFactory
+     */
+    Timestamp createTimestamp(int[] components);
+
 }

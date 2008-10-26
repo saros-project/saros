@@ -7,14 +7,16 @@ import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData;
 
 /**
  * this class contains method for jingle file transfer action
+ * 
  * @author orieger
- *
+ * 
  */
 public interface IJingleFileTransferListener {
-	
-	public void incommingFileList(String fileList_content, JID sender);
-	
-	public void incomingResourceFile(JingleFileTransferData data, InputStream input);
-	
-	public void exceptionOccured(JingleSessionException exception);
+
+    public void exceptionOccured(JingleSessionException exception);
+
+    public void incomingResourceFile(JingleFileTransferData data,
+	    InputStream input);
+
+    public void incommingFileList(String fileList_content, JID sender);
 }
