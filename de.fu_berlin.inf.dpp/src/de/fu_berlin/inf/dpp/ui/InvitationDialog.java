@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -63,6 +64,9 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class InvitationDialog extends Dialog implements IInvitationUI,
 	IConnectionListener {
+
+    private static Logger logger = Logger.getLogger(InvitationDialog.class
+	    .getName());
 
     // assigned to any of the entries of the invite-tableview
     private class inviterdata {
@@ -428,7 +432,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
 	    String username = entry.getUser();
 	    Presence presence = this.roster.getPresence(username);
-	    System.out.println(presence.getType());
 
 	    User user = Saros.getDefault().getSessionManager()
 		    .getSharedProject()
