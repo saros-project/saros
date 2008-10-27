@@ -130,7 +130,6 @@ public class ChatView extends ViewPart implements ISessionListener,
 	    }
 	});
 
-	// TODO add disconnect-action
 	this.connectAction = new Action("Connect/DisConnect") {
 
 	    @Override
