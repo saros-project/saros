@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
-
 /**
  * Marks text selected by both driver and observer.
  * 
@@ -8,19 +7,18 @@ package de.fu_berlin.inf.dpp.editor.annotations;
  * 
  * @author coezbek
  */
-public class SelectionAnnotation extends AnnotationSaros  {
+public class SelectionAnnotation extends AnnotationSaros {
 
-	// base TYPE name, will be extended for different remote users
-	public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
-	
-	public SelectionAnnotation() {
-		this(null,null);
-	}
+    // base TYPE name, will be extended for different remote users
+    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 
-	public SelectionAnnotation(String label, String username) {
-		super(TYPE, false, label,username);	
-		
-	}
+    public SelectionAnnotation() {
+	this(null, null);
+    }
 
-	
+    public SelectionAnnotation(String label, String username) {
+	super(SelectionAnnotation.TYPE, false, label, username);
+
+    }
+
 }

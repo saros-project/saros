@@ -29,21 +29,22 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	/*
-	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
-	 */
-	public void initializeDefaultPreferences() {
-		IPreferenceStore store = Saros.getDefault().getPreferenceStore();
-		store.setDefault(PreferenceConstants.SERVER, "jabber.org");
-		store.setDefault(PreferenceConstants.USERNAME, "");
-		store.setDefault(PreferenceConstants.PASSWORD, "");
+    /*
+     * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
+     */
+    @Override
+    public void initializeDefaultPreferences() {
+	IPreferenceStore store = Saros.getDefault().getPreferenceStore();
+	store.setDefault(PreferenceConstants.SERVER, "jabber.org");
+	store.setDefault(PreferenceConstants.USERNAME, "");
+	store.setDefault(PreferenceConstants.PASSWORD, "");
 
-		store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
-		store.setDefault(PreferenceConstants.AUTO_FOLLOW_MODE, true);
-		store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
-		store.setDefault(PreferenceConstants.DEBUG, false);
-		store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
-		store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
-		store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
-	}
+	store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
+	store.setDefault(PreferenceConstants.AUTO_FOLLOW_MODE, true);
+	store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
+	store.setDefault(PreferenceConstants.DEBUG, false);
+	store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
+	store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
+	store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
+    }
 }

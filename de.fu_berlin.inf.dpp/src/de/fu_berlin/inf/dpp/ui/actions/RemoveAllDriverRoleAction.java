@@ -30,100 +30,105 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+
 /**
- * this action remove all remote driver from project. Only the project host has 
+ * this action remove all remote driver from project. Only the project host has
  * the driver role after this action is executed.
+ * 
  * @author orieger
- *
+ * 
  */
-public class RemoveAllDriverRoleAction extends Action implements ISharedProjectListener,
-	ISessionListener {
+public class RemoveAllDriverRoleAction extends Action implements
+	ISharedProjectListener, ISessionListener {
 
-	public RemoveAllDriverRoleAction() {
-		super("Take remote user driver roles");
-		setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
-		setToolTipText("Take remote driver roles");
+    public RemoveAllDriverRoleAction() {
+	super("Take remote user driver roles");
+	setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
+	setToolTipText("Take remote driver roles");
 
-		Saros.getDefault().getSessionManager().addSessionListener(this);
-		updateEnablement();
+	Saros.getDefault().getSessionManager().addSessionListener(this);
+	updateEnablement();
+    }
+
+    @Override
+    public void run() {
+	// getSharedProject().setDriver(getSharedProject().getHost(), false);
+	ISharedProject project = Saros.getDefault().getSessionManager()
+		.getSharedProject();
+	for (User user : project.getParticipants()) {
+
+	    if ((user.getUserRole() == UserRole.DRIVER)
+		    && !project.getHost().equals(user)) {
+		project.removeDriver(user, false);
+	    }
 	}
+    }
 
-	@Override
-	public void run() {
-//		getSharedProject().setDriver(getSharedProject().getHost(), false);
-		ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
-		for(User user : project.getParticipants()){
-			
-			if(user.getUserRole() == UserRole.DRIVER && !project.getHost().equals(user)){
-				project.removeDriver(user, false);
-			}
-		}
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void sessionStarted(ISharedProject session) {
+	session.addListener(this);
+	updateEnablement();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void sessionStarted(ISharedProject session) {
-		session.addListener(this);
-		updateEnablement();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void sessionEnded(ISharedProject session) {
+	session.removeListener(this);
+	updateEnablement();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void sessionEnded(ISharedProject session) {
-		session.removeListener(this);
-		updateEnablement();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void invitationReceived(IIncomingInvitationProcess process) {
+	// ignore
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void invitationReceived(IIncomingInvitationProcess process) {
-		// ignore
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+     */
+    public void driverChanged(JID driver, boolean replicated) {
+	updateEnablement();
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-	 */
-	public void driverChanged(JID driver, boolean replicated) {
-		updateEnablement();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+     */
+    public void userJoined(JID user) {
+	// ignore
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-	 */
-	public void userJoined(JID user) {
-		// ignore
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
+     */
+    public void userLeft(JID user) {
+	// ignore
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-	 */
-	public void userLeft(JID user) {
-		// ignore
-	}
+    private void updateEnablement() {
+	ISharedProject project = getSharedProject();
+	boolean enabled = ((project != null) && project.isHost());
+	setEnabled(enabled);
+	// setEnabled(project != null && project.isHost() &&
+	// !project.isDriver());
+    }
 
-	private void updateEnablement() {
-		ISharedProject project = getSharedProject();
-		boolean enabled = (project != null && project.isHost());
-		setEnabled(enabled);
-//		setEnabled(project != null && project.isHost() && !project.isDriver());
-	}
-
-	private ISharedProject getSharedProject() {
-		return Saros.getDefault().getSessionManager().getSharedProject();
-	}
+    private ISharedProject getSharedProject() {
+	return Saros.getDefault().getSessionManager().getSharedProject();
+    }
 }

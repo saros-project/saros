@@ -9,31 +9,31 @@ import org.eclipse.swt.widgets.Label;
 
 public class PrivacyPage extends WizardPage implements IWizardPage2 {
 
-	protected PrivacyPage() {
-		super("PrivacyPage");
-	}
+    protected PrivacyPage() {
+	super("PrivacyPage");
+    }
 
-	public void createControl(Composite parent) {
-		
-		Composite root = new Composite(parent, SWT.NONE);
+    public void createControl(Composite parent) {
 
-		root.setLayout(new GridLayout(2, false));
+	Composite root = new Composite(parent, SWT.NONE);
 
-		setTitle("Configure Privacy Setting");
-		setDescription("Saros is a research project and we are very interested in understanding how people use distributed pair programming.");
+	root.setLayout(new GridLayout(2, false));
 
-		
-		 // Of course we respect your privacy and give you full control over which information you would like to share.
-		Label portDescription = new Label(root, SWT.NONE);
-		GridData twoColumn = new GridData();
-		twoColumn.horizontalSpan = 3;
-		portDescription.setLayoutData(twoColumn);
-		portDescription.setText("Share aggregated anonymous data");
-		
-		setControl(root);
-	}
+	setTitle("Configure Privacy Setting");
+	setDescription("Saros is a research project and we are very interested in understanding how people use distributed pair programming.");
 
-	public boolean performFinish() {
-		return true;
-	}
+	// Of course we respect your privacy and give you full control over
+	// which information you would like to share.
+	Label portDescription = new Label(root, SWT.NONE);
+	GridData twoColumn = new GridData();
+	twoColumn.horizontalSpan = 3;
+	portDescription.setLayoutData(twoColumn);
+	portDescription.setText("Share aggregated anonymous data");
+
+	setControl(root);
+    }
+
+    public boolean performFinish() {
+	return true;
+    }
 }

@@ -20,47 +20,49 @@
 package de.fu_berlin.inf.dpp.activities;
 
 public class TextSelectionActivity implements IActivity {
-	private int offset;
+    private final int offset;
 
-	private int length;
-	
-	private String source;
+    private final int length;
 
-	public TextSelectionActivity(int offset, int length) {
-		this.offset = offset;
-		this.length = length;
-		this.source = null;
+    private String source;
+
+    public TextSelectionActivity(int offset, int length) {
+	this.offset = offset;
+	this.length = length;
+	this.source = null;
+    }
+
+    public int getLength() {
+	return this.length;
+    }
+
+    public int getOffset() {
+	return this.offset;
+    }
+
+    public String getSource() {
+	return this.source;
+    }
+
+    public void setSource(String source) {
+	this.source = source;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+	if (obj instanceof TextSelectionActivity) {
+	    TextSelectionActivity activity = (TextSelectionActivity) obj;
+	    return (this.offset == activity.offset)
+		    && (this.length == activity.length)
+		    && (this.source == activity.source);
 	}
 
-	public int getLength() {
-		return length;
-	}
+	return false;
+    }
 
-	public int getOffset() {
-		return offset;
-	}
-
-	public String getSource() {
-		return source;
-	}
-	public void setSource(String source) {
-		this.source=source;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof TextSelectionActivity) {
-			TextSelectionActivity activity = (TextSelectionActivity) obj;
-			return  offset == activity.offset && 
-					length == activity.length &&
-					source == activity.source;
-		}
-
-		return false;
-	}
-
-	@Override
-	public String toString() {
-		return "TextSelectionActivity(offset:" + offset + ", length:" + length + ")";
-	}
+    @Override
+    public String toString() {
+	return "TextSelectionActivity(offset:" + this.offset + ", length:"
+		+ this.length + ")";
+    }
 }

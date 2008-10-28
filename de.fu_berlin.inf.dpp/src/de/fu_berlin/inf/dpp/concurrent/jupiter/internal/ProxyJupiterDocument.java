@@ -12,80 +12,78 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class ProxyJupiterDocument implements JupiterClient{
+public class ProxyJupiterDocument implements JupiterClient {
 
-	/**
-	 * 1. Outgoing queue
-	 * 2. request forwarder
-	 * 
-	 */
-	
-	private static Logger logger = Logger.getLogger(ProxyJupiterDocument.class);
-	
-	/** jid of remote client*/
-	private JID jid;
-	/** jupiter sync algorithm. */
-	private Algorithm jupiter;
-	/** forwarder send request to client. */
-	private RequestForwarder forwarder;
-	
-	private IPath editor;
-	
-	public ProxyJupiterDocument(JID jid, RequestForwarder forwarder){
-		this.jid = jid;
-		jupiter = new Jupiter(false);
-		this.forwarder = forwarder;
-	}
-	
-	
-	public Request generateRequest(Operation op) {
-		Request req = null;
-		logger.debug(jid.toString()+" proxy client generate request for "+op);
-		req = jupiter.generateRequest(op);
-		req.setJID(this.jid);
-		req.setEditorPath(editor);
-		/* send request*/
-		logger.debug(jid.toString()+" proxy client forward request:  "+req);
-		forwarder.forwardOutgoingRequest(req);
-		
-		return req;
-	}
+    /**
+     * 1. Outgoing queue 2. request forwarder
+     * 
+     */
 
-	public Operation receiveRequest(Request req) throws TransformationException {
-		Operation op = null;
-		logger.debug(jid.toString()+" proxy client receive request "+req.getOperation());
-		/* receive request action */
-		op =  jupiter.receiveRequest(req);
-		logger.debug(jid.toString()+" proxy client operation of IT: "+op);
-		return op;
-	}
+    private static Logger logger = Logger.getLogger(ProxyJupiterDocument.class);
 
-	/**
-	 * @see de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient#getJID()
-	 */
-	public JID getJID() {
-		return jid;
-	}
+    /** jid of remote client */
+    private final JID jid;
+    /** jupiter sync algorithm. */
+    private final Algorithm jupiter;
+    /** forwarder send request to client. */
+    private final RequestForwarder forwarder;
 
+    private IPath editor;
 
-	public IPath getEditor() {
-		return this.editor;
-	}
+    public ProxyJupiterDocument(JID jid, RequestForwarder forwarder) {
+	this.jid = jid;
+	this.jupiter = new Jupiter(false);
+	this.forwarder = forwarder;
+    }
 
+    public Request generateRequest(Operation op) {
+	Request req = null;
+	ProxyJupiterDocument.logger.debug(this.jid.toString()
+		+ " proxy client generate request for " + op);
+	req = this.jupiter.generateRequest(op);
+	req.setJID(this.jid);
+	req.setEditorPath(this.editor);
+	/* send request */
+	ProxyJupiterDocument.logger.debug(this.jid.toString()
+		+ " proxy client forward request:  " + req);
+	this.forwarder.forwardOutgoingRequest(req);
 
-	public void setEditor(IPath path) {
-		this.editor = path;
-	}
+	return req;
+    }
 
+    public Operation receiveRequest(Request req) throws TransformationException {
+	Operation op = null;
+	ProxyJupiterDocument.logger.debug(this.jid.toString()
+		+ " proxy client receive request " + req.getOperation());
+	/* receive request action */
+	op = this.jupiter.receiveRequest(req);
+	ProxyJupiterDocument.logger.debug(this.jid.toString()
+		+ " proxy client operation of IT: " + op);
+	return op;
+    }
 
-	public Timestamp getTimestamp() {
-		return jupiter.getTimestamp();
-	}
+    /**
+     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient#getJID()
+     */
+    public JID getJID() {
+	return this.jid;
+    }
 
+    public IPath getEditor() {
+	return this.editor;
+    }
 
-	public void updateVectorTime(Timestamp timestamp) throws TransformationException{
-			jupiter.updateVectorTime(timestamp);	
-	}
+    public void setEditor(IPath path) {
+	this.editor = path;
+    }
 
+    public Timestamp getTimestamp() {
+	return this.jupiter.getTimestamp();
+    }
+
+    public void updateVectorTime(Timestamp timestamp)
+	    throws TransformationException {
+	this.jupiter.updateVectorTime(timestamp);
+    }
 
 }

@@ -45,186 +45,192 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * 
  * @see ILightweightLabelDecorator
  */
-public class SharedProjectDecorator implements ILightweightLabelDecorator, ISessionListener,
-	ISharedEditorListener {
+public class SharedProjectDecorator implements ILightweightLabelDecorator,
+	ISessionListener, ISharedEditorListener {
 
-	private ImageDescriptor activeDescriptor = SarosUI.getImageDescriptor("icons/bullet_green.png"); // NON-NLS-1
+    private final ImageDescriptor activeDescriptor = SarosUI
+	    .getImageDescriptor("icons/bullet_green.png"); // NON-NLS-1
 
-	private ImageDescriptor passiveDescriptor = SarosUI
-		.getImageDescriptor("icons/bullet_yellow.png"); // NON-NLS-1
+    private final ImageDescriptor passiveDescriptor = SarosUI
+	    .getImageDescriptor("icons/bullet_yellow.png"); // NON-NLS-1
 
-	private ISharedProject sharedProject;
+    private ISharedProject sharedProject;
 
-	private List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
+    private final List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
-	public SharedProjectDecorator() {
-		ISessionManager sessionManager = Saros.getDefault().getSessionManager();
-		sessionManager.addSessionListener(this);
+    public SharedProjectDecorator() {
+	ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+	sessionManager.addSessionListener(this);
 
-		if (sessionManager.getSharedProject() != null) {
-			sessionStarted(sessionManager.getSharedProject());
+	if (sessionManager.getSharedProject() != null) {
+	    sessionStarted(sessionManager.getSharedProject());
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate
+     */
+    public void decorate(Object element, IDecoration decoration) {
+	if (this.sharedProject == null) {
+	    return;
+	}
+
+	IFile file = (IFile) element; // enablement ensures that we only get
+	// IFile's
+	if (!this.sharedProject.getProject().equals(file.getProject())) {
+	    return;
+	}
+
+	IPath path = file.getProjectRelativePath();
+	if (path != null) {
+	    EditorManager editorManager = EditorManager.getDefault();
+	    if (path.equals(editorManager.getActiveDriverEditor())) {
+		decoration.addOverlay(this.activeDescriptor,
+			IDecoration.TOP_LEFT);
+	    } else if (editorManager.getDriverEditors().contains(path)) {
+		decoration.addOverlay(this.passiveDescriptor,
+			IDecoration.TOP_LEFT);
+	    }
+	}
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener
+     */
+    public void addListener(ILabelProviderListener listener) {
+	this.listeners.add(listener);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+     */
+    public void dispose() {
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty
+     */
+    public boolean isLabelProperty(Object element, String property) {
+	return false;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener
+     */
+    public void removeListener(ILabelProviderListener listener) {
+	this.listeners.remove(listener);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener#sessionStarted
+     */
+    public void sessionStarted(ISharedProject session) {
+	this.sharedProject = session;
+	EditorManager.getDefault().addSharedEditorListener(this);
+
+	updateDecorators(null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener#sessionEnded
+     */
+    public void sessionEnded(ISharedProject session) {
+	if (this.sharedProject != null) {
+	    EditorManager.getDefault().removeSharedEditorListener(this);
+	}
+
+	this.sharedProject = null;
+	updateDecorators(null);
+    }
+
+    public void invitationReceived(IIncomingInvitationProcess process) {
+	// ignore
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
+     */
+    public void activeDriverEditorChanged(IPath path, boolean replicated) {
+	updateDecorators(null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
+     */
+    public void driverEditorRemoved(IPath path, boolean replicated) {
+	updateDecorators(null);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
+     */
+    public void driverEditorSaved(IPath path, boolean replicated) {
+	// ignore
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
+     */
+    public void followModeChanged(boolean enabled) {
+	// ignore
+    }
+
+    private void updateDecorators(final Object[] updateElements) {
+	// Set<IFile> changedFiles = new HashSet<IFile>();
+	//        
+	// if (sharedProject != null) {
+	// if (sharedProject.getActiveDriverEditor() != null) {
+	// activeFile = sharedProject.getProject().getFile(
+	// sharedProject.getActiveDriverEditor());
+	//                
+	// } else if (sharedProject.getDriverEditors() != null) {
+	// passiveFiles =
+	// }
+	// }
+	//        
+	// final Object[] updateElements;
+	// if (activeDriverFile == null) {
+	// updateElements = new Object[]{activeFile};
+	// } else if (activeFile == null) {
+	// updateElements = new Object[]{activeDriverFile};
+	// } else {
+	// updateElements = new Object[]{activeDriverFile, activeFile};
+	// }
+	//        
+	// activeDriverFile = activeFile;
+
+	Display.getDefault().asyncExec(new Runnable() {
+	    public void run() {
+		LabelProviderChangedEvent event = new LabelProviderChangedEvent(
+			SharedProjectDecorator.this, updateElements);
+
+		for (ILabelProviderListener listener : SharedProjectDecorator.this.listeners) {
+		    listener.labelProviderChanged(event);
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILightweightLabelDecorator#decorate
-	 */
-	public void decorate(Object element, IDecoration decoration) {
-		if (sharedProject == null)
-			return;
-
-		IFile file = (IFile) element; // enablement ensures that we only get
-		// IFile's
-		if (!sharedProject.getProject().equals(file.getProject()))
-			return;
-
-		IPath path = file.getProjectRelativePath();
-		if (path != null) {
-			EditorManager editorManager = EditorManager.getDefault();
-			if (path.equals(editorManager.getActiveDriverEditor())) {
-				decoration.addOverlay(activeDescriptor, IDecoration.TOP_LEFT);
-			} else if (editorManager.getDriverEditors().contains(path)) {
-				decoration.addOverlay(passiveDescriptor, IDecoration.TOP_LEFT);
-			}
-		}
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#addListener
-	 */
-	public void addListener(ILabelProviderListener listener) {
-		listeners.add(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
-	public void dispose() {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty
-	 */
-	public boolean isLabelProperty(Object element, String property) {
-		return false;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#removeListener
-	 */
-	public void removeListener(ILabelProviderListener listener) {
-		listeners.remove(listener);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener#sessionStarted
-	 */
-	public void sessionStarted(ISharedProject session) {
-		sharedProject = session;
-		EditorManager.getDefault().addSharedEditorListener(this);
-
-		updateDecorators(null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener#sessionEnded
-	 */
-	public void sessionEnded(ISharedProject session) {
-		if (sharedProject != null)
-			EditorManager.getDefault().removeSharedEditorListener(this);
-
-		sharedProject = null;
-		updateDecorators(null);
-	}
-
-	public void invitationReceived(IIncomingInvitationProcess process) {
-		// ignore
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
-	 */
-	public void activeDriverEditorChanged(IPath path, boolean replicated) {
-		updateDecorators(null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
-	 */
-	public void driverEditorRemoved(IPath path, boolean replicated) {
-		updateDecorators(null);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
-	 */
-	public void driverEditorSaved(IPath path, boolean replicated) {
-		// ignore
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
-	 */
-	public void followModeChanged(boolean enabled) {
-		// ignore
-	}
-
-	private void updateDecorators(final Object[] updateElements) {
-		// Set<IFile> changedFiles = new HashSet<IFile>();
-		//        
-		// if (sharedProject != null) {
-		// if (sharedProject.getActiveDriverEditor() != null) {
-		// activeFile = sharedProject.getProject().getFile(
-		// sharedProject.getActiveDriverEditor());
-		//                
-		// } else if (sharedProject.getDriverEditors() != null) {
-		// passiveFiles =
-		// }
-		// }
-		//        
-		// final Object[] updateElements;
-		// if (activeDriverFile == null) {
-		// updateElements = new Object[]{activeFile};
-		// } else if (activeFile == null) {
-		// updateElements = new Object[]{activeDriverFile};
-		// } else {
-		// updateElements = new Object[]{activeDriverFile, activeFile};
-		// }
-		//        
-		// activeDriverFile = activeFile;
-
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				LabelProviderChangedEvent event = new LabelProviderChangedEvent(
-					SharedProjectDecorator.this, updateElements);
-
-				for (ILabelProviderListener listener : listeners) {
-					listener.labelProviderChanged(event);
-				}
-			}
-		});
-	}
+	    }
+	});
+    }
 }

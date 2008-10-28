@@ -39,64 +39,64 @@ import de.fu_berlin.inf.dpp.Saros;
  */
 public class CreateAccountWizard extends Wizard {
 
-	private RegisterAccountPage page;
+    private final RegisterAccountPage page;
 
-	public CreateAccountWizard(boolean createAccount,
-			boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
+    public CreateAccountWizard(boolean createAccount,
+	    boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
 
-		if (createAccount) {
-			setWindowTitle("Create New User Account");
-		} else {
-			setWindowTitle("Enter User Account");
-		}
-		page = new RegisterAccountPage(createAccount, showStoreInPrefsButton,
-				storeInPrefsDefault);
-		setHelpAvailable(false);
-		setNeedsProgressMonitor(true);
+	if (createAccount) {
+	    setWindowTitle("Create New User Account");
+	} else {
+	    setWindowTitle("Enter User Account");
 	}
+	this.page = new RegisterAccountPage(createAccount,
+		showStoreInPrefsButton, storeInPrefsDefault);
+	setHelpAvailable(false);
+	setNeedsProgressMonitor(true);
+    }
 
-	public String getServer() {
-		return server;
+    public String getServer() {
+	return this.server;
+    }
+
+    public String getUsername() {
+	return this.username;
+    }
+
+    public String getPassword() {
+	return this.password;
+    }
+
+    String server, password, username;
+
+    @Override
+    public void addPages() {
+	addPage(this.page);
+    }
+
+    @Override
+    public boolean performFinish() {
+	if (this.page.performFinish()) {
+	    this.server = this.page.getServer();
+	    this.username = this.page.getUsername();
+	    this.password = this.page.getPassword();
+
+	    try {
+		// Open Roster so that a participant can be invited
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+		window.getActivePage().showView(
+			"de.fu_berlin.inf.dpp.ui.RosterView", null,
+			IWorkbenchPage.VIEW_ACTIVATE);
+	    } catch (PartInitException e) {
+		Saros.getDefault().getLog().log(
+			new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+				"Could not activate Roster View", e));
+	    }
+	    return true;
+	} else {
+	    return false;
 	}
-
-	public String getUsername() {
-		return username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	String server, password, username;
-
-	@Override
-	public void addPages() {
-		addPage(page);
-	}
-
-	@Override
-	public boolean performFinish() {
-		if (page.performFinish()) {
-			server = page.getServer();
-			username = page.getUsername();
-			password = page.getPassword();
-
-			try {
-				// Open Roster so that a participant can be invited
-				IWorkbench workbench = PlatformUI.getWorkbench();
-				IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-				window.getActivePage().showView(
-						"de.fu_berlin.inf.dpp.ui.RosterView", null,
-						IWorkbenchPage.VIEW_ACTIVATE);
-			} catch (PartInitException e) {
-				Saros.getDefault().getLog().log(
-						new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-								"Could not activate Roster View", e));
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
+    }
 
 }

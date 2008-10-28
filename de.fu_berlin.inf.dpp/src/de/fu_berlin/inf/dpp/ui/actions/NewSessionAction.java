@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.action.IAction;
@@ -42,57 +43,61 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
  */
 public class NewSessionAction implements IObjectActionDelegate {
 
-	private IProject selectedProject;
+    private IProject selectedProject;
 
-	/*
-	 * (non-Javadoc) Defined in IActionDelegate
-	 */
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-	}
+    /*
+     * (non-Javadoc) Defined in IActionDelegate
+     */
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+    }
 
-	/*
-	 * (non-Javadoc) Defined in IActionDelegate
-	 */
-	public void run(IAction action) {
-		try {
-			ISessionManager sm = Saros.getDefault().getSessionManager();
-			sm.startSession(selectedProject);
-		} catch (final XMPPException e) {
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					ErrorDialog.openError(Display.getDefault().getActiveShell(),
-						"Error Starting Session", "Session could not be started", new Status(
-							Status.ERROR, "de.fu_berlin.inf.dpp", Status.ERROR, e.getMessage(), e));
-				}
-			});
+    /*
+     * (non-Javadoc) Defined in IActionDelegate
+     */
+    public void run(IAction action) {
+	try {
+	    ISessionManager sm = Saros.getDefault().getSessionManager();
+	    sm.startSession(this.selectedProject);
+	} catch (final XMPPException e) {
+	    Display.getDefault().syncExec(new Runnable() {
+		public void run() {
+		    ErrorDialog.openError(
+			    Display.getDefault().getActiveShell(),
+			    "Error Starting Session",
+			    "Session could not be started", new Status(
+				    IStatus.ERROR, "de.fu_berlin.inf.dpp",
+				    IStatus.ERROR, e.getMessage(), e));
 		}
+	    });
+	}
+    }
+
+    /*
+     * (non-Javadoc) Defined in IActionDelegate
+     */
+    public void selectionChanged(IAction action, ISelection selection) {
+	this.selectedProject = getProject(selection);
+
+	ISessionManager sm = Saros.getDefault().getSessionManager();
+	boolean running = sm.getSharedProject() != null;
+	boolean connected = Saros.getDefault().isConnected();
+
+	// TODO This action should rather connect if not already connected
+	// instead of being disabled.
+
+	action.setEnabled(connected && !running
+		&& (this.selectedProject != null)
+		&& this.selectedProject.isAccessible());
+    }
+
+    private IProject getProject(ISelection selection) {
+	Object element = ((IStructuredSelection) selection).getFirstElement();
+	if (element instanceof IProject) {
+	    return (IProject) element;
+	} else if (element instanceof IJavaProject) {
+	    return ((IJavaProject) element).getProject();
 	}
 
-	/*
-	 * (non-Javadoc) Defined in IActionDelegate
-	 */
-	public void selectionChanged(IAction action, ISelection selection) {
-		selectedProject = getProject(selection);
-
-		ISessionManager sm = Saros.getDefault().getSessionManager();
-		boolean running = sm.getSharedProject() != null;
-		boolean connected = Saros.getDefault().isConnected();
-
-		// TODO This action should rather connect if not already connected
-		// instead of being disabled.
-
-		action.setEnabled(connected && !running && selectedProject != null
-			&& selectedProject.isAccessible());
-	}
-
-	private IProject getProject(ISelection selection) {
-		Object element = ((IStructuredSelection) selection).getFirstElement();
-		if (element instanceof IProject) {
-			return (IProject) element;
-		} else if (element instanceof IJavaProject) {
-			return ((IJavaProject) element).getProject();
-		}
-
-		return null;
-	}
+	return null;
+    }
 }

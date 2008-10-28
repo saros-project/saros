@@ -16,41 +16,43 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * @author rdjemili
  */
 public class SkypeAction extends SelectionProviderAction {
-	private String skypeURL;
+    private String skypeURL;
 
-	public SkypeAction(ISelectionProvider provider) {
-		super(provider, "Skype this user");
-		setEnabled(false);
+    public SkypeAction(ISelectionProvider provider) {
+	super(provider, "Skype this user");
+	setEnabled(false);
 
-		setToolTipText("Start a Skype-VoIP session with this user");
-		setImageDescriptor(SarosUI.getImageDescriptor("icons/telephone.png"));
+	setToolTipText("Start a Skype-VoIP session with this user");
+	setImageDescriptor(SarosUI.getImageDescriptor("icons/telephone.png"));
+    }
+
+    @Override
+    public void run() {
+	if (this.skypeURL == null) {
+	    return;
 	}
 
-	@Override
-	public void run() {
-		if (skypeURL == null)
-			return;
+	URLHyperlink link = new URLHyperlink(new Region(0, 0), this.skypeURL);
+	link.open();
+    }
 
-		URLHyperlink link = new URLHyperlink(new Region(0, 0), skypeURL);
-		link.open();
-	}
+    @Override
+    public void selectionChanged(IStructuredSelection selection) {
+	final Object item = selection.getFirstElement();
 
-	@Override
-	public void selectionChanged(IStructuredSelection selection) {
-		final Object item = selection.getFirstElement();
+	if ((selection.size() != 1) || !(item instanceof RosterEntry)) {
+	    setEnabled(false);
 
-		if (selection.size() != 1 || !(item instanceof RosterEntry)) {
-			setEnabled(false);
-
-		} else {
-			new Thread(new Runnable() {
-				public void run() {
-					setEnabled(false);
-					SkypeManager sm = SkypeManager.getDefault();
-					skypeURL = sm.getSkypeURL((RosterEntry) item);
-					setEnabled(skypeURL != null);
-				}
-			}).start();
+	} else {
+	    new Thread(new Runnable() {
+		public void run() {
+		    setEnabled(false);
+		    SkypeManager sm = SkypeManager.getDefault();
+		    SkypeAction.this.skypeURL = sm
+			    .getSkypeURL((RosterEntry) item);
+		    setEnabled(SkypeAction.this.skypeURL != null);
 		}
+	    }).start();
 	}
+    }
 }

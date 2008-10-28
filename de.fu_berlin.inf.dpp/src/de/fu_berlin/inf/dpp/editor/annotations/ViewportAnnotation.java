@@ -23,105 +23,110 @@ import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
  * 
  * @author rdjemili
  */
-public class ViewportAnnotation extends AnnotationSaros implements IAnnotationPresentation,
-	IPropertyChangeListener {
+public class ViewportAnnotation extends AnnotationSaros implements
+	IAnnotationPresentation, IPropertyChangeListener {
 
-	public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
+    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
 
-	public static final int LAYER = 6;
+    public static final int LAYER = 6;
 
-	private static final int INSET = 2;
+    private static final int INSET = 2;
 
-	private static final double STROKE_SCALE = 0.5;
+    private static final double STROKE_SCALE = 0.5;
 
-	private static final double FILL_SCALE = 0.9;
+    private static final double FILL_SCALE = 0.9;
 
-	private static Color strokeColor;
+    private static Color strokeColor;
 
-	private static Color fillColor;
+    private static Color fillColor;
 
-	public ViewportAnnotation(String label, String source) {
-		super(TYPE, false, label, source );
+    public ViewportAnnotation(String label, String source) {
+	super(ViewportAnnotation.TYPE, false, label, source);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.text.source.IAnnotationPresentation
+     */
+    public void paint(GC gc, Canvas canvas, Rectangle bounds) {
+	if (ViewportAnnotation.strokeColor == null) {
+	    ViewportAnnotation.strokeColor = getColor(ViewportAnnotation.STROKE_SCALE);
+	    ViewportAnnotation.fillColor = getColor(ViewportAnnotation.FILL_SCALE);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.text.source.IAnnotationPresentation
-	 */
-	public void paint(GC gc, Canvas canvas, Rectangle bounds) {
-		if (strokeColor == null) {
-			strokeColor = getColor(STROKE_SCALE);
-			fillColor = getColor(FILL_SCALE);
-		}
+	Point canvasSize = canvas.getSize();
 
-		Point canvasSize = canvas.getSize();
+	gc.setBackground(ViewportAnnotation.fillColor);
+	gc.setForeground(ViewportAnnotation.strokeColor);
+	gc.setLineWidth(1);
 
-		gc.setBackground(fillColor);
-		gc.setForeground(strokeColor);
-		gc.setLineWidth(1);
+	int x = ViewportAnnotation.INSET;
+	int y = bounds.y;
+	int w = canvasSize.x - 2 * ViewportAnnotation.INSET;
+	int h = bounds.height;
 
-		int x = INSET;
-		int y = bounds.y;
-		int w = canvasSize.x - 2 * INSET;
-		int h = bounds.height;
-
-		if (y < 0) {
-			h = h + y;
-			y = 0;
-		}
-
-		if (h <= 0)
-			return;
-
-		gc.fillRectangle(x, y, w, h);
-		gc.drawRectangle(x, y, w, h);
+	if (y < 0) {
+	    h = h + y;
+	    y = 0;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.text.source.IAnnotationPresentation
-	 */
-	public int getLayer() {
-		return IAnnotationPresentation.DEFAULT_LAYER;
+	if (h <= 0) {
+	    return;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.util.IPropertyChangeListener
-	 */
-	public void propertyChange(PropertyChangeEvent event) {
-		if (event.getProperty().equals(getColorPreferenceKey())) {
-			if (strokeColor != null) {
-				strokeColor.dispose();
-				strokeColor = null;
+	gc.fillRectangle(x, y, w, h);
+	gc.drawRectangle(x, y, w, h);
+    }
 
-				fillColor.dispose();
-				fillColor = null;
-			}
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.text.source.IAnnotationPresentation
+     */
+    public int getLayer() {
+	return IAnnotationPresentation.DEFAULT_LAYER;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.util.IPropertyChangeListener
+     */
+    public void propertyChange(PropertyChangeEvent event) {
+	if (event.getProperty().equals(
+		ViewportAnnotation.getColorPreferenceKey())) {
+	    if (ViewportAnnotation.strokeColor != null) {
+		ViewportAnnotation.strokeColor.dispose();
+		ViewportAnnotation.strokeColor = null;
+
+		ViewportAnnotation.fillColor.dispose();
+		ViewportAnnotation.fillColor = null;
+	    }
 	}
+    }
 
-	public static String getColorPreferenceKey() {
-		AnnotationPreferenceLookup lookup = EditorsUI.getAnnotationPreferenceLookup();
+    public static String getColorPreferenceKey() {
+	AnnotationPreferenceLookup lookup = EditorsUI
+		.getAnnotationPreferenceLookup();
 
-		AnnotationPreference preference = lookup.getAnnotationPreference(ViewportAnnotation.TYPE);
+	AnnotationPreference preference = lookup
+		.getAnnotationPreference(ViewportAnnotation.TYPE);
 
-		return preference.getColorPreferenceKey();
-	}
+	return preference.getColorPreferenceKey();
+    }
 
-	private Color getColor(double scale) {
-		IPreferenceStore store = EditorsUI.getPreferenceStore();
-		store.addPropertyChangeListener(this);
+    private Color getColor(double scale) {
+	IPreferenceStore store = EditorsUI.getPreferenceStore();
+	store.addPropertyChangeListener(this);
 
-		RGB rgb = PreferenceConverter.getColor(store, getColorPreferenceKey());
-		int red = (int) ((1.0 - scale) * rgb.red + 255 * scale);
-		int green = (int) ((1.0 - scale) * rgb.green + 255 * scale);
-		int blue = (int) ((1.0 - scale) * rgb.blue + 255 * scale);
-		rgb = new RGB(red, green, blue);
+	RGB rgb = PreferenceConverter.getColor(store, ViewportAnnotation
+		.getColorPreferenceKey());
+	int red = (int) ((1.0 - scale) * rgb.red + 255 * scale);
+	int green = (int) ((1.0 - scale) * rgb.green + 255 * scale);
+	int blue = (int) ((1.0 - scale) * rgb.blue + 255 * scale);
+	rgb = new RGB(red, green, blue);
 
-		return new Color(Display.getDefault(), rgb);
-	}
+	return new Color(Display.getDefault(), rgb);
+    }
 }

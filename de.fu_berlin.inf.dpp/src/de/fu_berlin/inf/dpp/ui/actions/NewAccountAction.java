@@ -30,44 +30,45 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
-	private IWorkbenchWindow window;
+    private IWorkbenchWindow window;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate
-	 */
-	public void run(IAction action) {
-		try {
-			Shell shell = window.getShell();
-			new WizardDialog(shell, new CreateAccountWizard(true, true, true)).open();
-		} catch (Exception e) {
-			Saros.log("Could not create new Account.", e); 
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IActionDelegate
+     */
+    public void run(IAction action) {
+	try {
+	    Shell shell = this.window.getShell();
+	    new WizardDialog(shell, new CreateAccountWizard(true, true, true))
+		    .open();
+	} catch (Exception e) {
+	    Saros.log("Could not create new Account.", e);
 	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
-	 */
-	public void init(IWorkbenchWindow window) {
-		this.window = window;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
+     */
+    public void init(IWorkbenchWindow window) {
+	this.window = window;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IActionDelegate
-	 */
-	public void selectionChanged(IAction action, ISelection selection) {
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IActionDelegate
+     */
+    public void selectionChanged(IAction action, ISelection selection) {
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
-	 */
-	public void dispose() {
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
+     */
+    public void dispose() {
+    }
 }

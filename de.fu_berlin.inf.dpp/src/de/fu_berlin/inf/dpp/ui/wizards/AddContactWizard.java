@@ -36,90 +36,94 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class AddContactWizard extends Wizard {
 
-	private class AddContactPage extends WizardPage {
-		private Text idText;
+    private class AddContactPage extends WizardPage {
+	private Text idText;
 
-		private Text nicknameText;
+	private Text nicknameText;
 
-		protected AddContactPage() {
-			super("create");
+	protected AddContactPage() {
+	    super("create");
 
-			setTitle("New Contact");
-			setDescription("Add a new contact to your Jabber roster");
-		}
-
-		public void createControl(Composite parent) {
-			Composite composite = new Composite(parent, SWT.NONE);
-
-			composite.setLayout(new GridLayout(2, false));
-
-			Label idLabel = new Label(composite, SWT.NONE);
-			idLabel.setText("Jabber ID");
-
-			idText = new Text(composite, SWT.BORDER);
-			idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-			Label nicknameLabel = new Label(composite, SWT.NONE);
-			nicknameLabel.setText("Nickname");
-
-			nicknameText = new Text(composite, SWT.BORDER);
-			nicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-			hookListeners();
-			updateNextEnablement();
-
-			setControl(composite);
-		}
-
-		public JID getJID() {
-			return new JID(idText.getText());
-		}
-
-		public String getNickname() {
-			return nicknameText.getText();
-		}
-
-		private void hookListeners() {
-			ModifyListener listener = new ModifyListener() {
-				public void modifyText(ModifyEvent e) {
-					updateNextEnablement();
-				}
-			};
-
-			idText.addModifyListener(listener);
-			nicknameText.addModifyListener(listener);
-		}
-
-		private void updateNextEnablement() {
-			boolean done = idText.getText().length() > 0 && nicknameText.getText().length() > 0;
-
-			setPageComplete(done);
-		}
+	    setTitle("New Contact");
+	    setDescription("Add a new contact to your Jabber roster");
 	}
 
-	private AddContactPage page = new AddContactPage();
+	public void createControl(Composite parent) {
+	    Composite composite = new Composite(parent, SWT.NONE);
 
-	public AddContactWizard() {
-		setWindowTitle("New Contact");
-		setHelpAvailable(false);
+	    composite.setLayout(new GridLayout(2, false));
+
+	    Label idLabel = new Label(composite, SWT.NONE);
+	    idLabel.setText("Jabber ID");
+
+	    this.idText = new Text(composite, SWT.BORDER);
+	    this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+		    false));
+
+	    Label nicknameLabel = new Label(composite, SWT.NONE);
+	    nicknameLabel.setText("Nickname");
+
+	    this.nicknameText = new Text(composite, SWT.BORDER);
+	    this.nicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+		    true, false));
+
+	    hookListeners();
+	    updateNextEnablement();
+
+	    setControl(composite);
 	}
 
-	@Override
-	public void addPages() {
-		addPage(page);
+	public JID getJID() {
+	    return new JID(this.idText.getText());
 	}
 
-	@Override
-	public boolean performFinish() {
-		try {
-			Saros.getDefault().addContact(page.getJID(), page.getNickname(), null);
-			return true;
+	public String getNickname() {
+	    return this.nicknameText.getText();
+	}
 
-		} catch (Exception e) {
-			page.setMessage(e.getMessage(), IMessageProvider.ERROR);
-			e.printStackTrace();
+	private void hookListeners() {
+	    ModifyListener listener = new ModifyListener() {
+		public void modifyText(ModifyEvent e) {
+		    updateNextEnablement();
 		}
+	    };
 
-		return false;
+	    this.idText.addModifyListener(listener);
+	    this.nicknameText.addModifyListener(listener);
 	}
+
+	private void updateNextEnablement() {
+	    boolean done = (this.idText.getText().length() > 0)
+		    && (this.nicknameText.getText().length() > 0);
+
+	    setPageComplete(done);
+	}
+    }
+
+    private final AddContactPage page = new AddContactPage();
+
+    public AddContactWizard() {
+	setWindowTitle("New Contact");
+	setHelpAvailable(false);
+    }
+
+    @Override
+    public void addPages() {
+	addPage(this.page);
+    }
+
+    @Override
+    public boolean performFinish() {
+	try {
+	    Saros.getDefault().addContact(this.page.getJID(),
+		    this.page.getNickname(), null);
+	    return true;
+
+	} catch (Exception e) {
+	    this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
+	    e.printStackTrace();
+	}
+
+	return false;
+    }
 }

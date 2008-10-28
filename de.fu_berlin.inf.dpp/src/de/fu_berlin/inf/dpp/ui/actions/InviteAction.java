@@ -35,76 +35,82 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 /**
  * @author rdjemili
  */
-public class InviteAction extends SelectionProviderAction implements ISessionListener {
+public class InviteAction extends SelectionProviderAction implements
+	ISessionListener {
 
-	private RosterEntry selectedEntry;
+    private RosterEntry selectedEntry;
 
-	public InviteAction(ISelectionProvider provider) {
-		super(provider, "Invite user to shared project..");
-		selectionChanged((IStructuredSelection)provider.getSelection());
+    public InviteAction(ISelectionProvider provider) {
+	super(provider, "Invite user to shared project..");
+	selectionChanged((IStructuredSelection) provider.getSelection());
 
-		setToolTipText("Start a IM messaging session with this user");
-		setImageDescriptor(SarosUI.getImageDescriptor("icons/transmit_blue.png"));
+	setToolTipText("Start a IM messaging session with this user");
+	setImageDescriptor(SarosUI
+		.getImageDescriptor("icons/transmit_blue.png"));
 
-		Saros.getDefault().getSessionManager().addSessionListener(this);
+	Saros.getDefault().getSessionManager().addSessionListener(this);
+    }
+
+    @Override
+    public void run() {
+	JID jid = new JID(this.selectedEntry.getUser());
+	ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+	ISharedProject project = sessionManager.getSharedProject();
+
+	project.startInvitation(jid);
+    }
+
+    @Override
+    public void selectionChanged(IStructuredSelection selection) {
+	if ((selection.size() == 1)
+		&& (selection.getFirstElement() instanceof RosterEntry)) {
+	    this.selectedEntry = (RosterEntry) selection.getFirstElement();
+	} else {
+	    this.selectedEntry = null;
 	}
 
-	@Override
-	public void run() {
-		JID jid = new JID(selectedEntry.getUser());
-		ISessionManager sessionManager = Saros.getDefault().getSessionManager();
-		ISharedProject project = sessionManager.getSharedProject();
+	updateEnablement();
+    }
 
-		project.startInvitation(jid);
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void sessionStarted(ISharedProject session) {
+	updateEnablement();
+    }
 
-	@Override
-	public void selectionChanged(IStructuredSelection selection) {
-		if (selection.size() == 1 && selection.getFirstElement() instanceof RosterEntry) {
-			selectedEntry = (RosterEntry) selection.getFirstElement();
-		} else {
-			selectedEntry = null;
-		}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void sessionEnded(ISharedProject session) {
+	updateEnablement();
+    }
 
-		updateEnablement();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+     */
+    public void invitationReceived(IIncomingInvitationProcess process) {
+	// ignore
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void sessionStarted(ISharedProject session) {
-		updateEnablement();
-	}
+    private void updateEnablement() {
+	JID jid = (this.selectedEntry == null) ? null : new JID(
+		this.selectedEntry.getUser());
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void sessionEnded(ISharedProject session) {
-		updateEnablement();
-	}
+	setEnabled((getSharedProject() != null)
+		&& (this.selectedEntry != null)
+		&& (getSharedProject().getParticipant(jid) == null)
+		&& (getSharedProject().isHost() || getSharedProject()
+			.isDriver()));
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-	 */
-	public void invitationReceived(IIncomingInvitationProcess process) {
-		// ignore
-	}
-
-	private void updateEnablement() {
-		JID jid = (selectedEntry==null)?null:new JID(selectedEntry.getUser());
-		
-		setEnabled(getSharedProject() != null && selectedEntry != null &&
-				getSharedProject().getParticipant(jid)==null
-			&& (getSharedProject().isHost() || getSharedProject().isDriver()) );
-	}
-
-	private ISharedProject getSharedProject() {
-		return Saros.getDefault().getSessionManager().getSharedProject();
-	}
+    private ISharedProject getSharedProject() {
+	return Saros.getDefault().getSessionManager().getSharedProject();
+    }
 }

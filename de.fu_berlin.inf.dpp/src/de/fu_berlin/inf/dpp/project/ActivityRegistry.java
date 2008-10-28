@@ -16,70 +16,74 @@ import de.fu_berlin.inf.dpp.project.internal.RoleManager;
  * @author rdjemili
  */
 public class ActivityRegistry {
-	private List<IActivityProvider> activityProviders = new ArrayList<IActivityProvider>();
+    private final List<IActivityProvider> activityProviders = new ArrayList<IActivityProvider>();
 
-	private static ActivityRegistry instance;
+    private static ActivityRegistry instance;
 
-	/**
-	 * @return the singleton instance of this registry..
-	 */
-	public static ActivityRegistry getDefault() {
-		if (instance == null)
-			instance = new ActivityRegistry();
-
-		return instance;
+    /**
+     * @return the singleton instance of this registry..
+     */
+    public static ActivityRegistry getDefault() {
+	if (ActivityRegistry.instance == null) {
+	    ActivityRegistry.instance = new ActivityRegistry();
 	}
 
-	public void addProvider(IActivityProvider provider) {
-		if (!activityProviders.contains(provider))
-			activityProviders.add(provider);
+	return ActivityRegistry.instance;
+    }
+
+    public void addProvider(IActivityProvider provider) {
+	if (!this.activityProviders.contains(provider)) {
+	    this.activityProviders.add(provider);
+	}
+    }
+
+    /**
+     * Converts given XML data into an activity.
+     */
+    public IActivity parseActivity(XmlPullParser parser) {
+	IActivity activity = null;
+	for (IActivityProvider provider : this.activityProviders) {
+	    activity = provider.fromXML(parser);
+
+	    if (activity != null) {
+		return activity;
+	    }
 	}
 
-	/**
-	 * Converts given XML data into an activity.
-	 */
-	public IActivity parseActivity(XmlPullParser parser) {
-		IActivity activity = null;
-		for (IActivityProvider provider : activityProviders) {
-			activity = provider.fromXML(parser);
+	return null;
+    }
 
-			if (activity != null)
-				return activity;
-		}
+    /**
+     * Converts given activity into a XML format.
+     */
+    public String toXML(IActivity activity) {
+	String xml;
+	for (IActivityProvider provider : this.activityProviders) {
+	    xml = provider.toXML(activity);
 
-		return null;
+	    if (xml != null) {
+		return xml;
+	    }
 	}
 
-	/**
-	 * Converts given activity into a XML format.
-	 */
-	public String toXML(IActivity activity) {
-		String xml;
-		for (IActivityProvider provider : activityProviders) {
-			xml = provider.toXML(activity);
+	return null;
+    }
 
-			if (xml != null)
-				return xml;
-		}
+    /**
+     * Singleton constructor
+     */
+    private ActivityRegistry() {
+	loadDefaultActivityProviders();
+	loadExtensionPoints();
+    }
 
-		return null;
-	}
+    private void loadDefaultActivityProviders() {
+	addProvider(EditorManager.getDefault());
+	addProvider(new SharedResourcesManager());
+	addProvider(new RoleManager());
+    }
 
-	/**
-	 * Singleton constructor
-	 */
-	private ActivityRegistry() {
-		loadDefaultActivityProviders();
-		loadExtensionPoints();
-	}
-
-	private void loadDefaultActivityProviders() {
-		addProvider(EditorManager.getDefault());
-		addProvider(new SharedResourcesManager());
-		addProvider(new RoleManager());
-	}
-
-	private void loadExtensionPoints() {
-		// TODO load activity providers from the extension-point for Saros
-	}
+    private void loadExtensionPoints() {
+	// TODO load activity providers from the extension-point for Saros
+    }
 }
