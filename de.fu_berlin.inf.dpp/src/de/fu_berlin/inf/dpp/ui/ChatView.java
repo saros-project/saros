@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.ITextListener;
+import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -88,7 +90,18 @@ public class ChatView extends ViewPart implements ISessionListener,
 	    }
 	});
 
-	// TODO add disconnect-action
+	this.viewer.addTextListener(new ITextListener() {
+
+	    @Override
+	    public void textChanged(TextEvent event) {
+
+		// scrolls down, so the last line is visible
+		int lines = ChatView.this.viewer.getDocument()
+			.getNumberOfLines();
+		ChatView.this.viewer.setTopIndex(lines);
+	    }
+	});
+
 	this.connectAction = new Action("Connect/DisConnect") {
 
 	    @Override

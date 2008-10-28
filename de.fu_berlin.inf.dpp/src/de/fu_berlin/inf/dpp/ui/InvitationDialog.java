@@ -152,8 +152,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 	comTable.setLayout(gl);
 	comTable.setLayoutData(gd);
 
-	// tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION |
-	// SWT.MULTI);
 	// avoid multi selection
 	this.tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION);
 	this.table = this.tableviewer.getTable();
@@ -266,7 +264,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 	    }
 
 	    return false; // we wanna wait (and block) until all invites are
-			  // done
+	    // done
 
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -500,12 +498,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 	    return;
 	}
 
-	// TODO: Änderung für smack 3
-	// Iterator iter = roster.getEntries();
 	Collection<RosterEntry> users = this.roster.getEntries();
 	int index = -1;
-	// while (iter.hasNext()) {
-	// RosterEntry entry = (RosterEntry) iter.next();
 	for (RosterEntry entry : users) {
 
 	    String username = entry.getUser();
@@ -514,17 +508,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 	    User user = Saros.getDefault().getSessionManager()
 		    .getSharedProject()
 		    .getParticipant(new JID(entry.getUser()));
-	    /*
-	     * TODO: Änderung: presence.type available hinzugefügt. Es ist
-	     * hier jedoch zu prüfen, inwieweit auch offline user eingeladen
-	     * werden könnten.
-	     */
+
 	    if ((presence != null)
 		    && presence.getType().equals(Presence.Type.available)
 		    && (user == null)) {
 		inviterdata invdat = new inviterdata();
 		invdat.jid = new JID(entry.getUser());
-		invdat.name = entry.getName();
+		String name = entry.getName();
+		invdat.name = (name == null) ? entry.getUser() : name;
 		invdat.outginvatationProc = null;
 
 		this.input.add(invdat);
