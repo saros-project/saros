@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/de.fu_berlin.inf.dpp.feature_1.0.9.jar" id="de.fu_berlin.inf.dpp.feature" version="1.0.9"/>
+   <feature url="features/de.fu_berlin.inf.dpp.feature_8.10.28.jar" id="de.fu_berlin.inf.dpp.feature" version="8.10.28">
+      <category name="DPP"/>
+   </feature>
+   <category-def name="DPP" label="Distributed Pair Programming"/>
 </site>
