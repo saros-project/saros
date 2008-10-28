@@ -14,83 +14,79 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class JupiterDocumentClient implements JupiterClient {
 
-    /**
-     * 1. Outgoing queue 2. request forwarder
-     * 
-     */
+	/**
+	 * 1. Outgoing queue
+	 * 2. request forwarder
+	 * 
+	 */
+	
+	private static Logger logger = Logger.getLogger(JupiterDocumentClient.class.toString());
+	
+	/** jid of remote client*/
+	private JID jid;
+	/** jupiter sync algorithm. */
+	private Algorithm jupiter;
+	
+	private IPath editor;
+	
+	/** forwarder send request to server. */
+	private RequestForwarder forwarder;
+	
+	@Deprecated
+	public JupiterDocumentClient(JID jid, RequestForwarder forwarder){
+		this.jid = jid;
+		this.jupiter = new Jupiter(true);
+		this.forwarder = forwarder;
+	}
+	
+	public JupiterDocumentClient(JID jid, RequestForwarder forwarder, IPath editor){
+		this.jid = jid;
+		this.jupiter = new Jupiter(true);
+		this.forwarder = forwarder;
+		this.editor = editor;
+	}
+	
+	public Request generateRequest(Operation op) {
+		Request req = null;
+		logger.debug(jid.toString()+" client generate request for "+op);
+		req = jupiter.generateRequest(op);
+		req.setJID(this.jid);
+		req.setEditorPath(editor);
+		/* send request*/
+		forwarder.forwardOutgoingRequest(req);
+		
+		return req;
+	}
 
-    private static Logger logger = Logger.getLogger(JupiterDocumentClient.class
-	    .toString());
+	public Operation receiveRequest(Request req)throws TransformationException  {
+		Operation op = null;
+		logger.debug(jid.toString()+" client receive request "+req.getOperation());
+		/* receive request action */
+		op =  jupiter.receiveRequest(req);
+		logger.debug(jid.toString()+" client operation of IT: "+op);
+		return op;
+	}
 
-    private IPath editor;
-    /** forwarder send request to server. */
-    private final RequestForwarder forwarder;
+	public JID getJID() {
+		return this.jid;
+	}
 
-    /** jid of remote client */
-    private final JID jid;
+	public IPath getEditor() {
+		return editor;
+	}
 
-    /** jupiter sync algorithm. */
-    private final Algorithm jupiter;
+	public void setEditor(IPath path) {
+		this.editor = path;
+		
+	}
 
-    @Deprecated
-    public JupiterDocumentClient(JID jid, RequestForwarder forwarder) {
-	this.jid = jid;
-	this.jupiter = new Jupiter(true);
-	this.forwarder = forwarder;
-    }
+	public Timestamp getTimestamp() {
+		return jupiter.getTimestamp();
+	}
 
-    public JupiterDocumentClient(JID jid, RequestForwarder forwarder,
-	    IPath editor) {
-	this.jid = jid;
-	this.jupiter = new Jupiter(true);
-	this.forwarder = forwarder;
-	this.editor = editor;
-    }
+	public void updateVectorTime(Timestamp timestamp) throws TransformationException {
+		jupiter.updateVectorTime(timestamp);
+	}
 
-    public Request generateRequest(Operation op) {
-	Request req = null;
-	JupiterDocumentClient.logger.debug(this.jid.toString()
-		+ " client generate request for " + op);
-	req = this.jupiter.generateRequest(op);
-	req.setJID(this.jid);
-	req.setEditorPath(this.editor);
-	/* send request */
-	this.forwarder.forwardOutgoingRequest(req);
-
-	return req;
-    }
-
-    public IPath getEditor() {
-	return this.editor;
-    }
-
-    public JID getJID() {
-	return this.jid;
-    }
-
-    public Timestamp getTimestamp() {
-	return this.jupiter.getTimestamp();
-    }
-
-    public Operation receiveRequest(Request req) throws TransformationException {
-	Operation op = null;
-	JupiterDocumentClient.logger.debug(this.jid.toString()
-		+ " client receive request " + req.getOperation());
-	/* receive request action */
-	op = this.jupiter.receiveRequest(req);
-	JupiterDocumentClient.logger.debug(this.jid.toString()
-		+ " client operation of IT: " + op);
-	return op;
-    }
-
-    public void setEditor(IPath path) {
-	this.editor = path;
-
-    }
-
-    public void updateVectorTime(Timestamp timestamp)
-	    throws TransformationException {
-	this.jupiter.updateVectorTime(timestamp);
-    }
-
+	
 }

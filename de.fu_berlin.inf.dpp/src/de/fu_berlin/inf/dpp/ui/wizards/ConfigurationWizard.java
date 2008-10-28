@@ -29,41 +29,41 @@ import org.eclipse.jface.wizard.Wizard;
  * 
  */
 public class ConfigurationWizard extends Wizard {
-
-    List<IWizardPage2> wizards = new LinkedList<IWizardPage2>();
-
-    public ConfigurationWizard() {
-	setWindowTitle("Saros Configuration");
-	setHelpAvailable(false);
-	setNeedsProgressMonitor(true);
-
-	this.wizards.add(new RegisterAccountPage(false, false, true));
-	this.wizards.add(new NetworkSettingsPage());
-    }
-
-    @Override
-    public void addPages() {
-	for (IWizardPage2 wizard : this.wizards) {
-	    addPage(wizard);
+	
+	public ConfigurationWizard() {
+		setWindowTitle("Saros Configuration");
+		setHelpAvailable(false);
+		setNeedsProgressMonitor(true);
+		
+		wizards.add(new RegisterAccountPage(false, false, true));
+		wizards.add(new NetworkSettingsPage());
 	}
-    }
-
-    @Override
-    public boolean performCancel() {
-	return true;
-    }
-
-    @Override
-    public boolean performFinish() {
-
-	for (IWizardPage2 wizard : this.wizards) {
-	    if (!wizard.performFinish()) {
-		getContainer().showPage(wizard);
-		return false;
-	    }
+	
+	List<IWizardPage2> wizards = new LinkedList<IWizardPage2>(); 
+	
+	@Override
+	public void addPages() {
+		for (IWizardPage2 wizard : wizards){
+			addPage(wizard);	
+		}
 	}
 
-	return true;
-    }
-
+	@Override
+	public boolean performFinish() {
+	
+		for (IWizardPage2 wizard : wizards){
+			if (!wizard.performFinish()){
+				getContainer().showPage(wizard);
+				return false;
+			}
+		}
+	
+		return true;
+	}
+	
+	@Override
+	public boolean performCancel() {
+		return true;
+	}
+	
 }

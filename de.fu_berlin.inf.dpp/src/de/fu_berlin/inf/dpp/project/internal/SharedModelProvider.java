@@ -24,121 +24,114 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * @author rdjemili
  */
 public class SharedModelProvider extends ModelProvider implements
-	ISessionListener {
+		ISessionListener {
 
-    /**
-     * Validates the resource delta.
-     */
-    private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
-	private boolean isAllowed = true;
-	private boolean isExclusive = true;
+	private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
+	private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
+
+	private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
+			"de.fu_berlin.inf.dpp", 2, ERROR_TEXT, null);
+	
+	private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(IStatus.ERROR,
+			"de.fu_berlin.inf.dpp", 2, EXCLUSIVE_ERROR_TEXT, null);
+
+	/** the currently running shared project */
+	private ISharedProject sharedProject;
+
+	public SharedModelProvider() {
+
+	}
+
+	/**
+	 * Validates the resource delta.
+	 */
+	private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
+		private boolean isAllowed = true;
+		private boolean isExclusive = true;
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.eclipse.core.resources.IResourceDeltaVisitor
+		 */
+		public boolean visit(IResourceDelta delta) throws CoreException {
+			if (sharedProject == null || sharedProject.isDriver()) {
+				/* check driver status */
+				if (!(sharedProject.isHost() && sharedProject.exclusiveDriver())){
+					isExclusive = false;
+				}
+				return false;
+			}
+
+			IResource resource = delta.getResource();
+			if (resource.getProject() == null) // work space root
+				return true;
+
+			if (resource.getProject() != sharedProject.getProject())
+				return false;
+
+			if (resource instanceof IFile || resource instanceof IFolder) {
+				isAllowed = false;
+				return false;
+			}
+
+			return delta.getKind() > 0;
+		}
+	}
+
+	@Override
+	protected void initialize() {
+		ISessionManager sm = Saros.getDefault().getSessionManager();
+
+		sm.addSessionListener(this);
+		sharedProject = sm.getSharedProject();
+	}
+
+	@Override
+	public IStatus validateChange(IResourceDelta delta, IProgressMonitor pm) {
+		ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
+
+		try {
+			delta.accept(visitor);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		IStatus result = Status.OK_STATUS;
+		if(!visitor.isAllowed){
+			result = ERROR_STATUS;
+		}
+		if(!visitor.isExclusive){
+			result = EXCLUSIVE_ERROR_STATUS;
+		}
+		return result;
+//		return visitor.isAllowed ? Status.OK_STATUS : ERROR_STATUS;
+	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.core.resources.IResourceDeltaVisitor
+	 * @see de.fu_berlin.inf.dpp.project.ISessionListener
 	 */
-	public boolean visit(IResourceDelta delta) throws CoreException {
-	    if ((SharedModelProvider.this.sharedProject == null)
-		    || SharedModelProvider.this.sharedProject.isDriver()) {
-		/* check driver status */
-		if (!(SharedModelProvider.this.sharedProject.isHost() && SharedModelProvider.this.sharedProject
-			.exclusiveDriver())) {
-		    this.isExclusive = false;
-		}
-		return false;
-	    }
-
-	    IResource resource = delta.getResource();
-	    if (resource.getProject() == null) {
-		return true;
-	    }
-
-	    if (resource.getProject() != SharedModelProvider.this.sharedProject
-		    .getProject()) {
-		return false;
-	    }
-
-	    if ((resource instanceof IFile) || (resource instanceof IFolder)) {
-		this.isAllowed = false;
-		return false;
-	    }
-
-	    return delta.getKind() > 0;
-	}
-    }
-
-    private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
-	    "de.fu_berlin.inf.dpp", 2, SharedModelProvider.ERROR_TEXT, null);
-
-    private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
-
-    private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(
-	    IStatus.ERROR, "de.fu_berlin.inf.dpp", 2,
-	    SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
-
-    private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
-
-    /** the currently running shared project */
-    private ISharedProject sharedProject;
-
-    public SharedModelProvider() {
-
-    }
-
-    @Override
-    protected void initialize() {
-	ISessionManager sm = Saros.getDefault().getSessionManager();
-
-	sm.addSessionListener(this);
-	this.sharedProject = sm.getSharedProject();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-	// ignore
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-	this.sharedProject = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-	this.sharedProject = session;
-    }
-
-    @Override
-    public IStatus validateChange(IResourceDelta delta, IProgressMonitor pm) {
-	ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
-
-	try {
-	    delta.accept(visitor);
-	} catch (CoreException e) {
-	    e.printStackTrace();
+	public void sessionStarted(ISharedProject session) {
+		sharedProject = session;
 	}
 
-	IStatus result = Status.OK_STATUS;
-	if (!visitor.isAllowed) {
-	    result = SharedModelProvider.ERROR_STATUS;
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.project.ISessionListener
+	 */
+	public void sessionEnded(ISharedProject session) {
+		sharedProject = null;
 	}
-	if (!visitor.isExclusive) {
-	    result = SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.project.ISessionListener
+	 */
+	public void invitationReceived(IIncomingInvitationProcess invitation) {
+		// ignore
 	}
-	return result;
-	// return visitor.isAllowed ? Status.OK_STATUS : ERROR_STATUS;
-    }
 }

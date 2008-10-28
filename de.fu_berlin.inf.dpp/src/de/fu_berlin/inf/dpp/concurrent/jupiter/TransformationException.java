@@ -6,43 +6,39 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
  */
 public class TransformationException extends Exception {
 
-    /**
-     * Creates a new TransformationException.
-     */
-    public TransformationException() {
-	super();
-    }
+	/**
+	 * Creates a new TransformationException.
+	 */
+	public TransformationException() {
+		super();
+	}
 
-    /**
-     * Creates a new TransformationException.
-     * 
-     * @param message
-     *            the detail message
-     */
-    public TransformationException(String message) {
-	super(message);
-    }
+	/**
+	 * Creates a new TransformationException.
+	 * 
+	 * @param message the detail message
+	 */
+	public TransformationException(String message) {
+		super(message);
+	}
 
-    /**
-     * Creates a new TransformationException.
-     * 
-     * @param message
-     *            the detail message
-     * @param cause
-     *            the cause of this exception
-     */
-    public TransformationException(String message, Throwable cause) {
-	super(message, cause);
-    }
+	/**
+	 * Creates a new TransformationException.
+	 * 
+	 * @param cause the cause of this exception
+	 */
+	public TransformationException(Throwable cause) {
+		super(cause);
+	}
 
-    /**
-     * Creates a new TransformationException.
-     * 
-     * @param cause
-     *            the cause of this exception
-     */
-    public TransformationException(Throwable cause) {
-	super(cause);
-    }
+	/**
+	 * Creates a new TransformationException.
+	 * 
+	 * @param message the detail message
+	 * @param cause the cause of this exception
+	 */
+	public TransformationException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
 }

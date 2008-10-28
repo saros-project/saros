@@ -31,184 +31,188 @@ import org.eclipse.core.runtime.Path;
  */
 public class FileZipper {
 
-    private static Logger logger = Logger.getLogger(FileZipper.class);
+	private static Logger logger = Logger.getLogger(FileZipper.class);
 
-    private static void addFile(String path, File file, ZipOutputStream zos)
-	    throws Exception {
-	FileInputStream fis = null;
-	int i;
+	public static void createZipArchive() throws Exception {
 
-	/* Pfad übergeben */
-	ZipEntry e = new ZipEntry(path + File.separator + file.getName());
-	zos.putNextEntry(e);
+		File dir = new File("/home/troll/test_archiv");
+		// archive müssen rekursiv ausgelesen werden.
+		File[] files = (dir.listFiles());
 
-	fis = new FileInputStream(file);
-	while ((i = fis.read()) != -1) {
-	    zos.write(i);
-	}
+		CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(
+				"/home/troll/archive.zip"), new Adler32());
+		ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(cos));
 
-	zos.closeEntry();
-    }
+		FileInputStream fis;
+		File f;
+		int i;
 
-    private static void addFolder(String path, File file, ZipOutputStream zos)
-	    throws Exception {
+		// for(String path : files){
+		for (File path : files) {
 
-	File[] files = file.listFiles();
-	for (File f : files) {
-	    if (f.isDirectory()) {
-		FileZipper.logger.debug("compress folder: " + file.getName());
-		FileZipper.addFolder(path + File.separator + file.getName(), f,
-			zos);
-	    } else {
-		FileZipper.logger.debug("compress file : " + file.getName()
-			+ " path " + path);
-		FileZipper.addFile(path + File.separator + file.getName(), f,
-			zos);
-	    }
-	}
+			logger.debug("compress file: " + path.toString());
 
-    }
+			f = new File(path.getPath());
+			if (f.exists()) {
 
-    public static void createProjectZipArchive(List<IPath> files,
-	    String descPath, IProject project) throws Exception {
-	CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(
-		descPath), new Adler32());
-	ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(cos));
+				if (f.isDirectory()) {
+					addFolder("",f, zos);
+				} else {
+					addFile("", f, zos);
+				}
 
-	File f;
+				
+			} else {
+				new FileNotFoundException(path.getName());
+			}
 
-	for (IPath path : files) {
-	    FileZipper.logger.debug("compress file: " + path);
-
-	    f = project.getFile(path).getLocation().toFile();
-	    if (f.exists()) {
-
-		/* create project path in folder structure. */
-		String[] structure = path.segments();
-		String path_structure = "";
-		for (int j = 0; j < structure.length - 1; j++) {
-
-		    String s = structure[j];
-		    path_structure += s + File.separator;
 		}
-
-		FileZipper.addFile(path_structure, f, zos);
-
-	    } else {
-		new FileNotFoundException(path.toString());
-	    }
-
+		zos.close();
+		// checksum
+		logger.debug("checksum: " + cos.getChecksum().getValue());
 	}
-	zos.close();
-	// checksum
-	FileZipper.logger.debug("checksum: " + cos.getChecksum().getValue());
-	// return cos.getChecksum().getValue();
-    }
 
-    public static void createZipArchive() throws Exception {
+	private static void addFile(String path, File file,
+			ZipOutputStream zos) throws Exception {
+		FileInputStream fis = null;
+		int i;
+		
+		/* Pfad übergeben*/
+		ZipEntry e = new ZipEntry(path + File.separator +file.getName());
+		zos.putNextEntry(e);
+		
 
-	File dir = new File("/home/troll/test_archiv");
-	// archive müssen rekursiv ausgelesen werden.
-	File[] files = (dir.listFiles());
-
-	CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(
-		"/home/troll/archive.zip"), new Adler32());
-	ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(cos));
-
-	File f;
-	// for(String path : files){
-	for (File path : files) {
-
-	    FileZipper.logger.debug("compress file: " + path.toString());
-
-	    f = new File(path.getPath());
-	    if (f.exists()) {
-
-		if (f.isDirectory()) {
-		    FileZipper.addFolder("", f, zos);
-		} else {
-		    FileZipper.addFile("", f, zos);
+		fis = new FileInputStream(file);
+		while ((i = fis.read()) != -1) {
+			zos.write(i);
 		}
-
-	    } else {
-		new FileNotFoundException(path.getName());
-	    }
-
+		
+		zos.closeEntry();
 	}
-	zos.close();
-	// checksum
-	FileZipper.logger.debug("checksum: " + cos.getChecksum().getValue());
-    }
 
-    public static void readInputStreamsProjectArchive(File file)
-	    throws Exception {
-	ZipFile zip = new ZipFile(file);
-	Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
-	while (entries.hasMoreElements()) {
-	    ZipEntry entry = entries.nextElement();
-	    System.out.println(entry.getName());
+	private static void addFolder(String path, File file, ZipOutputStream zos) throws Exception{
 
+		File[] files = file.listFiles();
+		for(File f : files){
+			if(f.isDirectory()){
+				logger.debug("compress folder: " + file.getName());
+				addFolder(path + File.separator + file.getName(), f, zos);
+			}
+			else{
+				logger.debug("compress file : "+file.getName() + " path "+path);
+				addFile(path + File.separator + file.getName(),f,zos);
+			}
+		}
+		
 	}
-    }
 
-    public static void readProjectZipArchive() throws Exception {
+	public static void readZipArchive(String archive) throws Exception {
+		CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
+				archive), new Adler32());
+		ZipInputStream zis = new ZipInputStream(cis);
 
-	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-	IProject project = root.getProject("Projectname");
-	Path p = new Path("");
-	project.getFile(p);
-
-	CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
-		"./archive.zip"), new Adler32());
-	ZipInputStream zis = new ZipInputStream(cis);
-
-	// entpacke archiv
-	ZipEntry entry;
-	int i = 0;
-	while ((entry = zis.getNextEntry()) != null) {
-
-	    FileZipper.logger.debug("unzip file: " + entry.getName());
-	    // zu entpackende Datei im Zielverzeichnis anlegen
-	    FileOutputStream fos = new FileOutputStream(new File(
-		    "zielverzeichns", entry.getName()));
-	    while ((i = zis.read()) != -1) {
-		fos.write(i);
-	    }
-	    fos.close();
-	    zis.closeEntry();
+		String outputFolder = "/home/troll/test_archiv_output";
+		new File(outputFolder).delete();
+		
+		// entpacke archiv
+		ZipEntry entry;
+		int i = 0;
+		while ((entry = zis.getNextEntry()) != null) {
+			logger.debug("unzip file: " + entry.getName());
+			// zu entpackende Datei im Zielverzeichnis anlegen
+			  File directory = new File(entry.getName());
+			  directory.mkdirs();
+//			FileOutputStream fos = new FileOutputStream(new File(
+//					"/home/troll/test_archiv_output", entry.getName()));
+			  FileOutputStream fos = new FileOutputStream(entry.getName());
+			  
+			while ((i = zis.read()) != -1) {
+				fos.write(i);
+			}
+			fos.close();
+			zis.closeEntry();
+		}
+		logger.debug("checksum: " + cis.getChecksum().getValue());
+		zis.close();
 	}
-	FileZipper.logger.debug("checksum: " + cis.getChecksum().getValue());
-	zis.close();
-    }
 
-    public static void readZipArchive(String archive) throws Exception {
-	CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
-		archive), new Adler32());
-	ZipInputStream zis = new ZipInputStream(cis);
 
-	String outputFolder = "/home/troll/test_archiv_output";
-	new File(outputFolder).delete();
+	public static void createProjectZipArchive(List<IPath> files, String descPath, IProject project)
+			throws Exception {
+		CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(
+				descPath), new Adler32());
+		ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(cos));
 
-	// entpacke archiv
-	ZipEntry entry;
-	int i = 0;
-	while ((entry = zis.getNextEntry()) != null) {
-	    FileZipper.logger.debug("unzip file: " + entry.getName());
-	    // zu entpackende Datei im Zielverzeichnis anlegen
-	    File directory = new File(entry.getName());
-	    directory.mkdirs();
-	    // FileOutputStream fos = new FileOutputStream(new File(
-	    // "/home/troll/test_archiv_output", entry.getName()));
-	    FileOutputStream fos = new FileOutputStream(entry.getName());
+		File f;
 
-	    while ((i = zis.read()) != -1) {
-		fos.write(i);
-	    }
-	    fos.close();
-	    zis.closeEntry();
+		for (IPath path : files) {
+			logger.debug("compress file: " + path);
+
+			f = project.getFile(path).getLocation().toFile();
+			if (f.exists()) {
+
+				/* create project path in folder structure. */
+				String[] structure = path.segments();
+				String path_structure = "";
+				for(int j = 0; j< structure.length-1; j++){
+
+					String s = structure[j];
+					path_structure += s + File.separator;
+				}
+				
+				addFile(path_structure,f,zos);
+
+			} else {
+				new FileNotFoundException(path.toString());
+			}
+
+		}
+		zos.close();
+		// checksum
+		logger.debug("checksum: " + cos.getChecksum().getValue());
+//		return cos.getChecksum().getValue();
 	}
-	FileZipper.logger.debug("checksum: " + cis.getChecksum().getValue());
-	zis.close();
-    }
+
+	public static void readInputStreamsProjectArchive(File file) throws Exception{
+		ZipFile zip = new ZipFile(file);
+		Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
+		while(entries.hasMoreElements()){
+			ZipEntry entry = entries.nextElement();
+			System.out.println(entry.getName());
+
+		}
+	}
+	
+	public static void readProjectZipArchive() throws Exception {
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject("Projectname");
+		Path p = new Path("");
+		project.getFile(p);
+
+		CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
+				"./archive.zip"), new Adler32());
+		ZipInputStream zis = new ZipInputStream(cis);
+
+		// entpacke archiv
+		ZipEntry entry;
+		int i = 0;
+		while ((entry = zis.getNextEntry()) != null) {
+			
+			logger.debug("unzip file: " + entry.getName());
+			// zu entpackende Datei im Zielverzeichnis anlegen
+			FileOutputStream fos = new FileOutputStream(new File(
+					"zielverzeichns", entry.getName()));
+			while ((i = zis.read()) != -1) {
+				fos.write(i);
+			}
+			fos.close();
+			zis.closeEntry();
+		}
+		logger.debug("checksum: " + cis.getChecksum().getValue());
+		zis.close();
+	}
+	
+	
 
 }

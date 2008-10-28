@@ -28,75 +28,73 @@ import org.eclipse.core.runtime.IPath;
  * @author rdjemili
  */
 public class EditorActivity implements IActivity {
-    public static enum Type {
-	Activated, Closed, Saved
-    };
+	public static enum Type {
+		Activated, Closed, Saved
+	};
 
-    private long checksum = -1;
+	private Type type;
 
-    private final IPath path;
+	private IPath path;
 
-    private String source;
+	private String source;
+	
+	private long checksum = -1;
+	
+	/**
+	 * @param path
+	 *            a valid project-relative path or <code>null</code> if former
+	 *            resource should be deactivated.
+	 */
+	public EditorActivity(Type type, IPath path) {
+		if (type != Type.Activated && path == null)
+			throw new IllegalArgumentException(
+				"Null path for non-activation type editor activity given.");
 
-    private final Type type;
-
-    /**
-     * @param path
-     *            a valid project-relative path or <code>null</code> if former
-     *            resource should be deactivated.
-     */
-    public EditorActivity(Type type, IPath path) {
-	if ((type != Type.Activated) && (path == null)) {
-	    throw new IllegalArgumentException(
-		    "Null path for non-activation type editor activity given.");
+		this.type = type;
+		this.path = path;
 	}
 
-	this.type = type;
-	this.path = path;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (!(obj instanceof EditorActivity)) {
-	    return false;
+	/**
+	 * @return the project-relative path to the resource that should be
+	 *         activated.
+	 */
+	public IPath getPath() {
+		return path;
 	}
 
-	EditorActivity other = (EditorActivity) obj;
-	return (((this.path == null) && (other.path == null)) || this.path
-		.equals(other.path))
-		&& this.type.equals(other.type);
-    }
+	public Type getType() {
+		return type;
+	}
 
-    public long getChecksum() {
-	return this.checksum;
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof EditorActivity)) {
+			return false;
+		}
 
-    /**
-     * @return the project-relative path to the resource that should be
-     *         activated.
-     */
-    public IPath getPath() {
-	return this.path;
-    }
+		EditorActivity other = (EditorActivity) obj;
+		return ((path == null && other.path == null) || path.equals(other.path))
+			&& type.equals(other.type);
+	}
 
-    public String getSource() {
-	return this.source;
-    }
+	@Override
+	public String toString() {
+		return "EditorActivity(type:" + type + ", path:" + path + ")";
+	}
 
-    public Type getType() {
-	return this.type;
-    }
+	public String getSource() {
+		return this.source;
+	}
 
-    public void setChecksum(long checksum) {
-	this.checksum = checksum;
-    }
-
-    public void setSource(String source) {
-	this.source = source;
-    }
-
-    @Override
-    public String toString() {
-	return "EditorActivity(type:" + this.type + ", path:" + this.path + ")";
-    }
+	public void setSource(String source) {
+		this.source = source;
+	}
+	
+	public long getChecksum(){
+		return this.checksum;
+	}
+	
+	public void setChecksum(long checksum){
+		this.checksum = checksum;
+	}
 }

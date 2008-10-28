@@ -4,6 +4,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 
 public interface IWizardPage2 extends IWizardPage {
 
-    public boolean performFinish();
-
+	public boolean performFinish();
+	
 }

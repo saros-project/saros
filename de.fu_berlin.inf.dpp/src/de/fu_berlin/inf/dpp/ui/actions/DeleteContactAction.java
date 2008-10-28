@@ -33,52 +33,50 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.Saros;
 
 public class DeleteContactAction extends SelectionProviderAction {
-    private RosterEntry rosterEntry;
+	private RosterEntry rosterEntry;
 
-    public DeleteContactAction(ISelectionProvider provider) {
-	super(provider, "Delete");
-	selectionChanged((IStructuredSelection) provider.getSelection());
+	public DeleteContactAction(ISelectionProvider provider) {
+		super(provider, "Delete");
+		selectionChanged((IStructuredSelection)provider.getSelection());
 
-	setToolTipText("Set the nickname of this contact.");
+		setToolTipText("Set the nickname of this contact.");
 
-	IWorkbench workbench = Saros.getDefault().getWorkbench();
-	setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
-		ISharedImages.IMG_TOOL_DELETE));
-    }
-
-    @Override
-    public void run() {
-
-	Shell shell = Display.getDefault().getActiveShell();
-	if ((shell == null) || (this.rosterEntry == null)) {
-	    return;
+		IWorkbench workbench = Saros.getDefault().getWorkbench();
+		setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
+			ISharedImages.IMG_TOOL_DELETE));
 	}
 
-	if (MessageDialog.openQuestion(shell, "Confirm Delete",
-		"Are you sure you want to delete contact '"
-			+ this.rosterEntry.getName() + "' ('"
-			+ this.rosterEntry.getUser() + "')?")) {
+	@Override
+	public void run() {
 
-	    try {
-		Saros.getDefault().removeContact(this.rosterEntry);
-	    } catch (XMPPException e) {
-		e.printStackTrace();
-	    }
-	}
-    }
+		Shell shell = Display.getDefault().getActiveShell();
+		if (shell == null || rosterEntry == null)
+			return;
 
-    @Override
-    public void selectionChanged(IStructuredSelection selection) {
-	Object selected = selection.getFirstElement();
+		if (MessageDialog.openQuestion(shell, "Confirm Delete",
+			"Are you sure you want to delete contact '" + rosterEntry.getName() + "' ('"
+				+ rosterEntry.getUser() + "')?")) {
 
-	if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-	    this.rosterEntry = (RosterEntry) selected;
-	    setEnabled(true);
-	} else {
-	    this.rosterEntry = null;
-	    setEnabled(false);
+			try {
+				Saros.getDefault().removeContact(rosterEntry);
+			} catch (XMPPException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-	// TODO disable if user == self
-    }
+	@Override
+	public void selectionChanged(IStructuredSelection selection) {
+		Object selected = selection.getFirstElement();
+
+		if (selection.size() == 1 && selected instanceof RosterEntry) {
+			rosterEntry = (RosterEntry) selected;
+			setEnabled(true);
+		} else {
+			rosterEntry = null;
+			setEnabled(false);
+		}
+
+		// TODO disable if user == self
+	}
 }

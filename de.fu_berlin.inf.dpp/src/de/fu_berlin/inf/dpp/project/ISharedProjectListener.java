@@ -29,46 +29,47 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author rdjemili
  */
 public interface ISharedProjectListener {
-    // TODO add some easy way to check if given driver is the client (you)
+	// TODO add some easy way to check if given driver is the client (you)
 
-    /**
-     * The driver role of one participant has changed.
-     * 
-     * @param driver
-     *            the new driver.
-     * 
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    public void driverChanged(JID driver, boolean replicated);
+	/**
+	 * The driver role of one participant has changed.
+	 * 
+	 * @param driver
+	 *            the new driver.
+	 * 
+	 * @param replicated
+	 *            <code>false</code> if this event was created by this client.
+	 *            <code>true</code> if it was created by another client and
+	 *            only replicated to this client.
+	 */
+	public void driverChanged(JID driver, boolean replicated);
 
-    /**
-     * The driver role of one participant has changed.
-     * 
-     * @param driver
-     *            the new driver.
-     * 
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    // public void driverAdded(JID driver, boolean replicated);
-    /**
-     * Is fired when an user joins the shared project.
-     * 
-     * @param user
-     *            the user that has joined.
-     */
-    public void userJoined(JID user);
+	/**
+	 * The driver role of one participant has changed.
+	 * 
+	 * @param driver
+	 *            the new driver.
+	 * 
+	 * @param replicated
+	 *            <code>false</code> if this event was created by this client.
+	 *            <code>true</code> if it was created by another client and
+	 *            only replicated to this client.
+	 */
+//	public void driverAdded(JID driver, boolean replicated);
 
-    /**
-     * Is fired when an user leaves the shared project.
-     * 
-     * @param user
-     *            the user that has left.
-     */
-    public void userLeft(JID user);
+	/**
+	 * Is fired when an user joins the shared project.
+	 * 
+	 * @param user
+	 *            the user that has joined.
+	 */
+	public void userJoined(JID user);
+
+	/**
+	 * Is fired when an user leaves the shared project.
+	 * 
+	 * @param user
+	 *            the user that has left.
+	 */
+	public void userLeft(JID user);
 }

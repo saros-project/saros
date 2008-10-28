@@ -36,55 +36,55 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  */
 public class LeaveSessionAction extends Action implements ISessionListener {
 
-    private static ISessionManager getSessionManager() {
-	return Saros.getDefault().getSessionManager();
-    }
+	public LeaveSessionAction() {
+		setToolTipText("Leave the session");
+		setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
 
-    public LeaveSessionAction() {
-	setToolTipText("Leave the session");
-	setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
-
-	LeaveSessionAction.getSessionManager().addSessionListener(this);
-	updateEnablement();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
-    }
-
-    @Override
-    public void run() {
-	try {
-	    LeaveSessionAction.getSessionManager().leaveSession();
-	} catch (Exception e) {
-	    e.printStackTrace();
+		getSessionManager().addSessionListener(this);
+		updateEnablement();
 	}
-    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-	updateEnablement();
-    }
+	@Override
+	public void run() {
+		try {
+			getSessionManager().leaveSession();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-	updateEnablement();
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionStarted(ISharedProject session) {
+		updateEnablement();
+	}
 
-    private void updateEnablement() {
-	setEnabled(LeaveSessionAction.getSessionManager().getSharedProject() != null);
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void sessionEnded(ISharedProject session) {
+		updateEnablement();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+	 */
+	public void invitationReceived(IIncomingInvitationProcess process) {
+		// ignore
+	}
+
+	private void updateEnablement() {
+		setEnabled(getSessionManager().getSharedProject() != null);
+	}
+
+	private static ISessionManager getSessionManager() {
+		return Saros.getDefault().getSessionManager();
+	}
 }

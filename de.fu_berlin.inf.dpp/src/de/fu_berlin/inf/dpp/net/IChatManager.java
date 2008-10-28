@@ -9,20 +9,19 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
  * The IChatManager contains the logic for appropriate chat transfer.
  * 
  * @author orieger
- * 
+ *
  */
 public interface IChatManager extends PacketListener {
 
-    /**
-     * status of chat connection.
-     * 
-     * @return
-     */
-    public boolean isConnected();
-
-    public void sendRequest(Request request);
-
-    public void setConnection(XMPPConnection connection, IReceiver receiver);
-
-    public void setReceiver(IReceiver receiver);
+	public void setConnection(XMPPConnection connection, IReceiver receiver);
+	
+	public void setReceiver(IReceiver receiver);
+	
+	/**
+	 * status of chat connection.
+	 * @return
+	 */
+	public boolean isConnected();
+	
+	public void sendRequest(Request request);
 }

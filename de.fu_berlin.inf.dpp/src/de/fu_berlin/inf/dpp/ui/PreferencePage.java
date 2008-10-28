@@ -33,39 +33,37 @@ import de.fu_berlin.inf.dpp.Saros;
  * 
  * @author rdjemili
  */
-public class PreferencePage extends FieldEditorPreferencePage implements
-	IWorkbenchPreferencePage {
+public class PreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-    public PreferencePage() {
-	super(FieldEditorPreferencePage.GRID);
-	setPreferenceStore(Saros.getDefault().getPreferenceStore());
-	setDescription("Your settings for Jabber.");
-    }
+	public PreferencePage() {
+		super(GRID);
+		setPreferenceStore(Saros.getDefault().getPreferenceStore());
+		setDescription("Your settings for Jabber.");
+	}
 
-    @Override
-    public void createFieldEditors() {
-	addField(new StringFieldEditor(PreferenceConstants.SERVER, "Server:",
-		getFieldEditorParent()));
+	@Override
+	public void createFieldEditors() {
+		addField(new StringFieldEditor(PreferenceConstants.SERVER, "Server:",
+			getFieldEditorParent()));
 
-	addField(new StringFieldEditor(PreferenceConstants.USERNAME,
-		"Username:", getFieldEditorParent()));
+		addField(new StringFieldEditor(PreferenceConstants.USERNAME, "Username:",
+			getFieldEditorParent()));
 
-	StringFieldEditor passwordField = new StringFieldEditor(
-		PreferenceConstants.PASSWORD, "Password:",
-		getFieldEditorParent());
-	passwordField.getTextControl(getFieldEditorParent()).setEchoChar('*');
-	addField(passwordField);
+		StringFieldEditor passwordField = new StringFieldEditor(PreferenceConstants.PASSWORD,
+			"Password:", getFieldEditorParent());
+		passwordField.getTextControl(getFieldEditorParent()).setEchoChar('*');
+		addField(passwordField);
 
-	addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
-		"Automatically connect on startup.", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
+			"Automatically connect on startup.", getFieldEditorParent()));
+		
+		addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE, 
+			"Start in Follow Mode.", getFieldEditorParent()));
+	}
 
-	addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
-		"Start in Follow Mode.", getFieldEditorParent()));
-    }
-
-    /*
-     * @see org.eclipse.ui.IWorkbenchPreferencePage
-     */
-    public void init(IWorkbench workbench) {
-    }
+	/*
+	 * @see org.eclipse.ui.IWorkbenchPreferencePage
+	 */
+	public void init(IWorkbench workbench) {
+	}
 }

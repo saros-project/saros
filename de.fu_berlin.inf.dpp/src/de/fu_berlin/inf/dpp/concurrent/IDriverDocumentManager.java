@@ -8,19 +8,16 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
-public interface IDriverDocumentManager extends IDriverManager,
-	ISharedProjectListener {
+public interface IDriverDocumentManager extends IDriverManager, ISharedProjectListener{
 
-    public void addDriverToDocument(IPath path, JID jid);
-
-    /**
-     * get driver for the appropriate document.
-     * 
-     * @param path
-     *            to document
-     * @return list of active driver on document.
-     */
-    public List<JID> getDriverForDocument(IPath path);
-
-    public void receiveActivity(IActivity activity);
+	public void receiveActivity(IActivity activity);
+	
+	public void addDriverToDocument(IPath path, JID jid);
+	
+	/**
+	 * get driver for the appropriate document.
+	 * @param path to document
+	 * @return list of active driver on document.
+	 */
+	public List<JID> getDriverForDocument(IPath path);
 }

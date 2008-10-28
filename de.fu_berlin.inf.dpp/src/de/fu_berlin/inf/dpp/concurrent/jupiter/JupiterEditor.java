@@ -4,13 +4,12 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * interface for jupiter editor settings.
- * 
  * @author orieger
- * 
+ *
  */
 public interface JupiterEditor {
-
-    public IPath getEditor();
-
-    public void setEditor(IPath path);
+	
+	public void setEditor(IPath path);
+	
+	public IPath getEditor();
 }

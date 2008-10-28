@@ -30,137 +30,132 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public abstract class InvitationProcess implements IInvitationProcess {
 
-    private static Logger logger = Logger.getLogger(InvitationProcess.class);
+	private static Logger logger = Logger.getLogger(InvitationProcess.class);
+	
+	protected final ITransmitter transmitter;
 
-    protected String description;
+	protected State state;
+	
+	/** mode of file transfer.*/
+	protected TransferMode tmode;
 
-    private Exception exception;
+	private Exception exception;
 
-    protected IInvitationUI invitationUI = null;
+	protected JID peer;
 
-    protected JID peer;
+	protected IInvitationUI invitationUI = null;
 
-    protected State state;
+	protected String description;
 
-    /** mode of file transfer. */
-    protected TransferMode tmode;
+	public InvitationProcess(ITransmitter transmitter, JID peer, String description) {
+		this.transmitter = transmitter;
+		this.peer = peer;
+		this.description = description;
 
-    protected final ITransmitter transmitter;
-
-    public InvitationProcess(ITransmitter transmitter, JID peer,
-	    String description) {
-	this.transmitter = transmitter;
-	this.peer = peer;
-	this.description = description;
-
-	this.tmode = TransferMode.JINGLE;
-
-	transmitter.addInvitationProcess(this);
-    }
-
-    /**
-     * Asssert that the process is in given state or throw an exception
-     * otherwise.
-     * 
-     * @param expected
-     *            the state that the process should currently have.
-     */
-    protected void assertState(State expected) {
-	if (this.state != expected) {
-	    cancel("Unexpected state(" + this.state + ")", false);
-	}
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
-     */
-    public void cancel(String errorMsg, boolean replicated) {
-	if (this.state == State.CANCELED) {
-	    return;
+		tmode = TransferMode.JINGLE;
+		
+		transmitter.addInvitationProcess(this);
 	}
 
-	setState(State.CANCELED);
-
-	InvitationProcess.logger.error("Invitation was canceled. " + errorMsg);
-
-	if (!replicated) {
-	    this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public Exception getException() {
+		return exception;
 	}
 
-	this.invitationUI.cancel(errorMsg, replicated);
-
-	this.transmitter.removeInvitationProcess(this);
-    }
-
-    /**
-     * Should be called if an exception occured. This saves the exception and
-     * sets the invitation to cancelled.
-     */
-    protected void failed(Exception e) {
-	this.exception = e;
-	e.printStackTrace(); // HACK
-	cancel(e.getMessage(), false);
-    }
-
-    protected void failState() {
-	throw new IllegalStateException("Bad input while in state "
-		+ this.state);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public String getDescription() {
-	return this.description;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public Exception getException() {
-	return this.exception;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public JID getPeer() {
-	return this.peer;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
-     */
-    public State getState() {
-	return this.state;
-    }
-
-    public void setInvitationUI(IInvitationUI inviteUI) {
-	this.invitationUI = inviteUI;
-    }
-
-    public void setState(State newstate) {
-	this.state = newstate;
-
-	if (this.invitationUI != null) {
-	    this.invitationUI.updateInvitationProgress(this.peer);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public State getState() {
+		return state;
 	}
-    }
+	
+	public void setState(State newstate) {
+		state = newstate;
+		
+		if (invitationUI!=null)
+			invitationUI.updateInvitationProgress(peer);
+	}
 
-    @Override
-    public String toString() {
-	return "InvitationProcess(peer:" + this.peer + ", state:" + this.state
-		+ ")";
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public JID getPeer() {
+		return peer;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.IInvitationProcess
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
+	 */
+	public void cancel(String errorMsg, boolean replicated) {
+		if (state == State.CANCELED)
+			return;
+
+		setState(State.CANCELED);
+
+		logger.error("Invitation was canceled. " + errorMsg);
+		
+		if (!replicated) {
+			transmitter.sendCancelInvitationMessage(peer, errorMsg);
+		}
+
+		invitationUI.cancel(errorMsg, replicated);
+
+		transmitter.removeInvitationProcess(this);
+	}
+
+	@Override
+	public String toString() {
+		return "InvitationProcess(peer:" + peer + ", state:" + state + ")";
+	}
+
+	/**
+	 * Should be called if an exception occured. This saves the exception and
+	 * sets the invitation to cancelled.
+	 */
+	protected void failed(Exception e) {
+		exception = e;
+		e.printStackTrace(); // HACK
+		cancel(e.getMessage(), false);
+	}
+
+	/**
+	 * Asssert that the process is in given state or throw an exception
+	 * otherwise.
+	 * 
+	 * @param expected
+	 *            the state that the process should currently have.
+	 */
+	protected void assertState(State expected) {
+		if (state != expected){
+			cancel("Unexpected state(" + state + ")", false);
+		}
+	}
+
+	protected void failState() {
+		throw new IllegalStateException("Bad input while in state " + state);
+	}
+	
+	public void setInvitationUI(IInvitationUI inviteUI){
+		this.invitationUI = inviteUI;
+	}
 
 }

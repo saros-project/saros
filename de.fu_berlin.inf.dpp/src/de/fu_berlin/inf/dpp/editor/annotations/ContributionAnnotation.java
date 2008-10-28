@@ -6,14 +6,14 @@ package de.fu_berlin.inf.dpp.editor.annotations;
  * @author rdjemili
  */
 public class ContributionAnnotation extends AnnotationSaros {
-    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
+	public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
 
-    public ContributionAnnotation() {
-	this("", "");
-    }
+	public ContributionAnnotation() {
+		this("","");
+	}
 
-    public ContributionAnnotation(String label, String source) {
-	super(ContributionAnnotation.TYPE, false, label, source);
-
-    }
+	public ContributionAnnotation(String label, String source) {
+		super(TYPE, false, label, source);
+		
+	}
 }

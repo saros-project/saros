@@ -4,23 +4,25 @@ import org.eclipse.jface.wizard.Wizard;
 
 public class PropertyConfigurationWizard extends Wizard {
 
-    private NetworkSettingsPage firewallPage;
+	public PropertyConfigurationWizard() {
+		setWindowTitle("Saros Configuration");
+		setHelpAvailable(false);
+		setNeedsProgressMonitor(true);
+	}
+	
+	private NetworkSettingsPage firewallPage;
 
-    public PropertyConfigurationWizard() {
-	setWindowTitle("Saros Configuration");
-	setHelpAvailable(false);
-	setNeedsProgressMonitor(true);
-    }
+	@Override
+	public void addPages() {
+		firewallPage = new NetworkSettingsPage();
+		addPage(firewallPage);
+	}
+	
+	@Override
+	public boolean performFinish() {
+		return firewallPage.performFinish();
+	}
 
-    @Override
-    public void addPages() {
-	this.firewallPage = new NetworkSettingsPage();
-	addPage(this.firewallPage);
-    }
-
-    @Override
-    public boolean performFinish() {
-	return this.firewallPage.performFinish();
-    }
+	
 
 }

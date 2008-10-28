@@ -37,271 +37,240 @@ import de.fu_berlin.inf.dpp.net.JID;
  * @author rdjemili
  */
 public class PacketExtensions {
-    private static final String CANCEL_INVITATION = "cancelInvite";
+	public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
-    private static final String DATATRANSFER = "DataTransfer";
+	// elements
+	private static final String INVITATION = "invite";
 
-    // attributes
-    public static final String DESCRIPTION = "description";
+	private static final String CANCEL_INVITATION = "cancelInvite";
 
-    public static final String DT_DATA = "DATA_BASE64";
+	private static final String JOIN = "join";
 
-    public static final String DT_DESC = "DTDESC";
+	private static final String LEAVE = "leave";
 
-    public static final String DT_NAME = "DTNAME";
+	private static final String REQUEST_FOR_LIST = "requestList";
+	
+	private static final String REQUEST_FOR_ACTIVITY = "requestActivity";
+	
+	private static final String USER_LIST = "userList";
 
-    public static final String DT_SPLIT = "DTSPLIT";
+	private static final String DATATRANSFER = "DataTransfer";
+	
+	private static final String JINGLEERROR = "JingleError";
+	
+	private static final String FILE_CHECKSUM_ERROR = "FileChecksumError";
+	
+	private static final String JUPITER_TRANSFORMATION_ERROR = "JupiterTransformationError";
+	
 
-    public static final String ERROR = "error";
+	
+	// attributes
+	public static final String DESCRIPTION = "description";
 
-    private static final String FILE_CHECKSUM_ERROR = "FileChecksumError";
+	public static final String PROJECTNAME = "description";
 
-    public static final String FILE_PATH = "filename";
+	public static final String ERROR = "error";
 
-    // elements
-    private static final String INVITATION = "invite";
+	public static final String DT_NAME = "DTNAME";
 
-    private static final String JINGLEERROR = "JingleError";
+	public static final String DT_DESC = "DTDESC";
 
-    private static final String JOIN = "join";
+	public static final String DT_SPLIT = "DTSPLIT";
 
-    private static final String JUPITER_TRANSFORMATION_ERROR = "JupiterTransformationError";
+	public static final String DT_DATA = "DATA_BASE64";
+	
+	public static final String FILE_PATH = "filename";
+	
 
-    private static final String LEAVE = "leave";
-
-    public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
-
-    public static final String PROJECTNAME = "description";
-
-    private static final String REQUEST_FOR_ACTIVITY = "requestActivity";
-
-    private static final String REQUEST_FOR_LIST = "requestList";
-
-    private static final String USER_LIST = "userList";
-
-    /**
-     * Creates the packet extension for canceling invitations.
-     * 
-     * @param error
-     *            an user-readable text that contains the reason for the
-     *            cancellation. Can be <code>null</code>.
-     * @return the packet extension.
-     */
-    public static PacketExtension createCancelInviteExtension(String error) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.CANCEL_INVITATION, PacketExtensions.NAMESPACE);
-
-	if ((error != null) && (error.length() > 0)) {
-	    extension.setValue(PacketExtensions.ERROR, error);
-	}
-	return extension;
-    }
-
-    public static PacketExtension createChecksumErrorExtension(IPath path) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.FILE_CHECKSUM_ERROR,
-		PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
-
-	return extension;
-    }
-
-    public static PacketExtension createDataTransferExtension(String name,
-	    String desc, int index, int count, String data) {
-
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.DATATRANSFER, PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.DT_NAME, name);
-	extension.setValue(PacketExtensions.DT_DESC, desc);
-	extension.setValue(PacketExtensions.DT_DATA, data);
-
-	String split = index + "/" + count;
-	extension.setValue(PacketExtensions.DT_SPLIT, split);
-
-	return extension;
-    }
-
-    private static DefaultPacketExtension createExtension(String element) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(element,
-		PacketExtensions.NAMESPACE);
-	extension.setValue(element, "");
-	return extension;
-    }
-
-    /**
-     * Creates the packet extension for new invitations.
-     * 
-     * @param description
-     *            an informal text that will be shown with the invitation.
-     * @return the packet extension.
-     */
-    public static PacketExtension createInviteExtension(String projectName,
-	    String description) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.INVITATION, PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.PROJECTNAME, projectName);
-	extension.setValue(PacketExtensions.DESCRIPTION, description);
-
-	return extension;
-    }
-
-    public static PacketExtension createJingleErrorExtension() {
-	return PacketExtensions.createExtension(PacketExtensions.JINGLEERROR);
-    }
-
-    public static PacketExtension createJoinExtension() {
-	return PacketExtensions.createExtension(PacketExtensions.JOIN);
-    }
-
-    public static PacketExtension createJupiterErrorExtension(IPath path) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.JUPITER_TRANSFORMATION_ERROR,
-		PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
-
-	return extension;
-    }
-
-    public static PacketExtension createLeaveExtension() {
-	return PacketExtensions.createExtension(PacketExtensions.LEAVE);
-    }
-
-    public static PacketExtension createRequestForActivityExtension(
-	    int timestamp, boolean andup) {
-
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.REQUEST_FOR_ACTIVITY,
-		PacketExtensions.NAMESPACE);
-	extension.setValue("ID", (new Integer(timestamp)).toString());
-
-	if (andup) {
-	    extension.setValue("ANDUP", "true");
+	
+	public static void hookExtensionProviders() {
+		
+		ProviderManager providermanager = ProviderManager.getInstance();
+		providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
+				new ActivitiesProvider());
+		providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT, RequestPacketExtension.NAMESPACE,
+				new RequestExtensionProvider());
+		
+		//TODO: Änderung für Smack 3
+//		ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT, NAMESPACE,
+//			new ActivitiesProvider());
 	}
 
-	return extension;
-    }
+	/**
+	 * Creates the packet extension for new invitations.
+	 * 
+	 * @param description
+	 *            an informal text that will be shown with the invitation.
+	 * @return the packet extension.
+	 */
+	public static PacketExtension createInviteExtension(String projectName, String description) {
+		DefaultPacketExtension extension = new DefaultPacketExtension(INVITATION, NAMESPACE);
+		extension.setValue(PROJECTNAME, projectName);
+		extension.setValue(DESCRIPTION, description);
 
-    public static PacketExtension createRequestForFileListExtension() {
-	return PacketExtensions
-		.createExtension(PacketExtensions.REQUEST_FOR_LIST);
-    }
-
-    public static PacketExtension createUserListExtension(List<User> list) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.USER_LIST, PacketExtensions.NAMESPACE);
-
-	int count = 0;
-	for (User participant : list) {
-	    JID jid = participant.getJid();
-	    String id = "User" + count;
-	    String role = "UserRole" + count;
-	    String color = "UserColor" + count;
-	    extension.setValue(id, jid.toString());
-	    extension.setValue(role, participant.getUserRole().toString());
-	    extension.setValue(color, participant.getColorID() + "");
-	    count++;
+		return extension;
 	}
 
-	return extension;
-    }
+	/**
+	 * Creates the packet extension for canceling invitations.
+	 * 
+	 * @param error
+	 *            an user-readable text that contains the reason for the
+	 *            cancellation. Can be <code>null</code>.
+	 * @return the packet extension.
+	 */
+	public static PacketExtension createCancelInviteExtension(String error) {
+		DefaultPacketExtension extension = new DefaultPacketExtension(CANCEL_INVITATION, NAMESPACE);
 
-    public static ActivitiesPacketExtension getActvitiesExtension(
-	    Message message) {
-	return (ActivitiesPacketExtension) message.getExtension(
-		ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
-    }
+		if (error != null && error.length() > 0)
+			extension.setValue(ERROR, error);
+		return extension;
+	}
 
-    /**
-     * Tries to create an default packet extension from given message. The
-     * cancel extension can have a error field.
-     */
-    public static DefaultPacketExtension getCancelInviteExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.CANCEL_INVITATION, message);
-    }
+	public static PacketExtension createRequestForActivityExtension(int timestamp, boolean andup) {
+		
+		DefaultPacketExtension extension = new DefaultPacketExtension(REQUEST_FOR_ACTIVITY, NAMESPACE);
+		extension.setValue("ID",  (new Integer(timestamp)).toString() );
+		
+		if (andup)
+			extension.setValue("ANDUP",  "true" );
 
-    public static DefaultPacketExtension getChecksumErrorExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.FILE_CHECKSUM_ERROR, message);
-    }
+		return extension;
+	}
+	
+	public static PacketExtension createDataTransferExtension(String name, String desc, int index, int count, String data) {
+		
+		DefaultPacketExtension extension = new DefaultPacketExtension(DATATRANSFER, NAMESPACE);
+		extension.setValue(DT_NAME,  name );
+		extension.setValue(DT_DESC,  desc );
+		extension.setValue(DT_DATA,  data );
 
-    public static DefaultPacketExtension getDataTransferExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.DATATRANSFER,
-		message);
-    }
+		String split= index+"/" + count;
+		extension.setValue(DT_SPLIT,  split );
 
-    private static DefaultPacketExtension getExtension(String element,
-	    Message message) {
-	return (DefaultPacketExtension) message.getExtension(element,
-		PacketExtensions.NAMESPACE);
-    }
+		return extension;
+	}
+	
+	
+	public static PacketExtension createRequestForFileListExtension() {
+		return createExtension(REQUEST_FOR_LIST);
+	}
 
-    /**
-     * Tries to create an default packet extension from given message. The
-     * invite extension has a description field.
-     */
-    public static DefaultPacketExtension getInviteExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.INVITATION,
-		message);
-    }
+	public static PacketExtension createJoinExtension() {
+		return createExtension(JOIN);
+	}
 
-    public static DefaultPacketExtension getJingleErrorExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.JINGLEERROR,
-		message);
-    }
+	public static PacketExtension createLeaveExtension() {
+		return createExtension(LEAVE);
+	}
+	
+	public static PacketExtension createJingleErrorExtension(){
+		return createExtension(JINGLEERROR);
+	}
+	
+	public static PacketExtension createChecksumErrorExtension(IPath path){
+		DefaultPacketExtension extension = new DefaultPacketExtension(FILE_CHECKSUM_ERROR, NAMESPACE);
+		extension.setValue(FILE_PATH, path.toOSString());
+		
+		return extension;
+	}
+	
+	public static PacketExtension createJupiterErrorExtension(IPath path){
+		DefaultPacketExtension extension = new DefaultPacketExtension(JUPITER_TRANSFORMATION_ERROR, NAMESPACE);
+		extension.setValue(FILE_PATH, path.toOSString());
+		
+		return extension;
+	}
+	
+	public static PacketExtension createUserListExtension(List<User> list) {
+		DefaultPacketExtension extension = new DefaultPacketExtension(USER_LIST, NAMESPACE);
+		
+		int count=0;
+		for (User participant : list ) {
+			JID jid = participant.getJid();
+			String id="User" +count;
+			String role="UserRole"+count;
+			String color = "UserColor"+count;
+			extension.setValue( id , jid.toString() );
+			extension.setValue(role, participant.getUserRole().toString());
+			extension.setValue(color, participant.getColorID()+"");
+			count++;
+		}
+		
+		return extension;
+	}
 
-    public static DefaultPacketExtension getJoinExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.JOIN, message);
-    }
+	/**
+	 * Tries to create an default packet extension from given message. The
+	 * invite extension has a description field.
+	 */
+	public static DefaultPacketExtension getInviteExtension(Message message) {
+		return getExtension(INVITATION, message);
+	}
 
-    public static DefaultPacketExtension getJupiterErrorExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.JUPITER_TRANSFORMATION_ERROR, message);
-    }
+	/**
+	 * Tries to create an default packet extension from given message. The
+	 * cancel extension can have a error field.
+	 */
+	public static DefaultPacketExtension getCancelInviteExtension(Message message) {
+		return getExtension(CANCEL_INVITATION, message);
+	}
 
-    public static RequestPacketExtension getJupiterRequestExtension(
-	    Message message) {
-	return (RequestPacketExtension) message.getExtension(
-		RequestPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
-    }
+	public static DefaultPacketExtension getJoinExtension(Message message) {
+		return getExtension(JOIN, message);
+	}
 
-    public static DefaultPacketExtension getLeaveExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.LEAVE, message);
-    }
+	public static DefaultPacketExtension getLeaveExtension(Message message) {
+		return getExtension(LEAVE, message);
+	}
+	
+	public static DefaultPacketExtension getJingleErrorExtension(Message message){
+		return getExtension(JINGLEERROR, message);
+	}
+	
+	public static DefaultPacketExtension getJupiterErrorExtension(Message message){
+		return getExtension(JUPITER_TRANSFORMATION_ERROR, message);
+	}
+	
+	public static DefaultPacketExtension getChecksumErrorExtension(Message message){
+		return getExtension(FILE_CHECKSUM_ERROR, message);
+	}
+	
+	public static DefaultPacketExtension getUserlistExtension(Message message) {
+		return getExtension(USER_LIST, message);
+	}
+	
+	
+	public static DefaultPacketExtension getRequestActivityExtension(Message message) {
+		return getExtension(REQUEST_FOR_ACTIVITY, message);
+	}
 
-    public static DefaultPacketExtension getRequestActivityExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.REQUEST_FOR_ACTIVITY, message);
-    }
+	public static DefaultPacketExtension getRequestExtension(Message message) {
+		return getExtension(REQUEST_FOR_LIST, message);
+	}
 
-    public static DefaultPacketExtension getRequestExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.REQUEST_FOR_LIST,
-		message);
-    }
+	public static DefaultPacketExtension getDataTransferExtension(Message message) {
+		return getExtension(DATATRANSFER, message);
+	}
 
-    public static DefaultPacketExtension getUserlistExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.USER_LIST,
-		message);
-    }
+	public static ActivitiesPacketExtension getActvitiesExtension(Message message) {
+		return (ActivitiesPacketExtension) message.getExtension(ActivitiesPacketExtension.ELEMENT,
+			NAMESPACE);
+	}
 
-    public static void hookExtensionProviders() {
+	public static RequestPacketExtension getJupiterRequestExtension(Message message) {
+		return (RequestPacketExtension) message.getExtension(RequestPacketExtension.ELEMENT,
+			NAMESPACE);
+	}
+	
+	private static DefaultPacketExtension createExtension(String element) {
+		DefaultPacketExtension extension = new DefaultPacketExtension(element, NAMESPACE);
+		extension.setValue(element, "");
+		return extension;
+	}
 
-	ProviderManager providermanager = ProviderManager.getInstance();
-	providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-		PacketExtensions.NAMESPACE, new ActivitiesProvider());
-	providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
-		RequestPacketExtension.NAMESPACE,
-		new RequestExtensionProvider());
-
-	// TODO: Änderung für Smack 3
-	// ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-	// NAMESPACE,
-	// new ActivitiesProvider());
-    }
-
+	private static DefaultPacketExtension getExtension(String element, Message message) {
+		return (DefaultPacketExtension) message.getExtension(element, NAMESPACE);
+	}
+	
 }

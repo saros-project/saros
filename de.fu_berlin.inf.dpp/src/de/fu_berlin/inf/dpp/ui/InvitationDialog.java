@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -62,489 +61,463 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
-public class InvitationDialog extends Dialog implements IInvitationUI,
-	IConnectionListener {
+public class InvitationDialog extends Dialog implements IInvitationUI, IConnectionListener {
+	
+	private TableViewer tableviewer;
+    private Table 		table;
+    private ArrayList<inviterdata> 	input;
+    private Button		cancelButton;
+    
+	private Roster 	roster=Saros.getDefault().getRoster();
+	private InvState inviteStep		= InvState.SELECTION;
+	private JID 	autoinviteJID	= null;
+	private Display display 		= null;
 
-    private static Logger logger = Logger.getLogger(InvitationDialog.class
-	    .getName());
-
-    // assigned to any of the entries of the invite-tableview
-    private class inviterdata {
-	JID jid;
-	String name;
-	IOutgoingInvitationProcess outginvatationProc;
-    }
-
-    private static enum InvState {
-	DONE, INVITING, SELECTION
-    }
-
-    // Class for providing labels of my Tableview
-    private class MyLabelProvider extends LabelProvider implements
-	    ITableLabelProvider {
-
-	public Image getColumnImage(Object element, int columnIndex) {
-	    return null;
+	private static enum InvState {
+		SELECTION, INVITING, DONE
+	}
+	
+	// assigned to any of the entries of the invite-tableview
+	private class inviterdata {
+		JID 	jid;
+		String 	name;
+		IOutgoingInvitationProcess outginvatationProc;
 	}
 
-	public String getColumnText(Object element, int columnIndex) {
-	    inviterdata item = (inviterdata) element;
+	
+	// Class for providing labels of my Tableview
+	private class MyLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-	    switch (columnIndex) {
-	    case 0:
-		return item.name;
-	    case 1:
-		if (item.outginvatationProc != null) {
-		    return getStateDesc(item.outginvatationProc.getState());
-		} else {
-		    return "";
+		public Image getColumnImage(Object element, int columnIndex) {
+			return null;
 		}
-	    case 2:
-		if (item.outginvatationProc != null) {
-		    if (item.outginvatationProc.getState() == IInvitationProcess.State.SYNCHRONIZING) {
-			return "Transfering file "
-				+ (item.outginvatationProc.getProgressCurrent())
-				+ " of "
-				+ item.outginvatationProc.getProgressMax()
-				+ ": "
-				+ item.outginvatationProc.getProgressInfo();
-		    } else {
+	
+		public String getColumnText(Object element, int columnIndex) {
+			inviterdata item = (inviterdata)element;
+			
+			switch(columnIndex) {
+			case 0:
+				return item.name;
+			case 1:
+				if (item.outginvatationProc!=null)
+					return getStateDesc(item.outginvatationProc.getState());
+				else
+					return "";
+			case 2:
+				if (item.outginvatationProc!=null){
+					if (item.outginvatationProc.getState()==IInvitationProcess.State.SYNCHRONIZING)
+						return "Transfering file "+
+							(item.outginvatationProc.getProgressCurrent()) +" of "+
+							item.outginvatationProc.getProgressMax()+": "+
+							item.outginvatationProc.getProgressInfo();
+					else 
+						return "";
+				} else
+					return "";
+			}
 			return "";
-		    }
-		} else {
-		    return "";
 		}
-	    }
-	    return "";
 	}
-    }
+	
+	public InvitationDialog(Shell parentShell, JID jid) {
+		super(parentShell);
+		autoinviteJID=jid;
 
-    static final String[] StateNames = { "Initialized",
-	    "Invitation sent. Waiting for acknowledgement...",
-	    "Filelist of inviter requested", "Filelist of inviter sent",
-	    "Filelist of invitee sent",
-	    "Synchornizing project files. Transfering files...",
-	    "Files sent. Waiting for invitee...", "Invitiation completed",
-	    "Invitation canceled" };
-
-    private JID autoinviteJID = null;
-    private Button cancelButton;
-    private Display display = null;
-    private ArrayList<inviterdata> input;
-
-    private InvState inviteStep = InvState.SELECTION;
-
-    private Roster roster = Saros.getDefault().getRoster();
-
-    private Table table;
-
-    private TableViewer tableviewer;
-
-    public InvitationDialog(Shell parentShell, JID jid) {
-	super(parentShell);
-	this.autoinviteJID = jid;
-
-	// TODO Auto-generated constructor stub
-    }
-
-    private void attachRosterListener() {
-	this.roster.addRosterListener(new RosterListener() {
-	    public void entriesAdded(Collection<String> addresses) {
-		refreshRosterList();
-	    }
-
-	    public void entriesDeleted(Collection<String> addresses) {
-		refreshRosterList();
-	    }
-
-	    public void entriesUpdated(Collection<String> addresses) {
-		refreshRosterList();
-	    }
-
-	    public void presenceChanged(Presence presence) {
-		presenceChanged(presence.getFrom());
-
-	    }
-
-	    public void presenceChanged(String XMPPAddress) {
-		refreshRosterList();
-	    }
-	});
-    }
-
-    public void cancel(String errorMsg, boolean replicated) {
-	updateInvitationProgress(null);
-    }
-
-    void cancelInvite() {
-	TableItem[] cursel = this.table.getSelection();
-	for (TableItem ti : cursel) {
-	    Object o = ti.getData();
-	    inviterdata invdat = (inviterdata) o;
-	    if (invdat.outginvatationProc == null) {
-		continue;
-	    }
-
-	    invdat.outginvatationProc.cancel(null, false);
-	}
-	updateInvitationProgress(null);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-     */
-    public void connectionStateChanged(XMPPConnection connection,
-	    final ConnectionState newState) {
-
-	if (newState == ConnectionState.CONNECTED) {
-	    this.roster = Saros.getDefault().getRoster();
-	    attachRosterListener();
-
-	} else if (newState == ConnectionState.NOT_CONNECTED) {
-	    this.roster = null;
+		// TODO Auto-generated constructor stub
 	}
 
-	refreshRosterListRunASync(null);
 
-    }
+	@Override
+	protected Control createContents(Composite parent) {
+		
+		getShell().setText("Invitation Helper");
+		display = getShell().getDisplay();
+			
+		Composite composite = new Composite(parent, SWT.NONE);
+		
+		GridLayout gl = new GridLayout();
+		composite.setLayout(gl);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.minimumHeight=200;
 
-    @Override
-    protected Control createContents(Composite parent) {
+		Label usersLabel = new Label(composite, SWT.NONE);
+		usersLabel.setText("Select users to invite:");
 
-	getShell().setText("Invitation Helper");
-	this.display = getShell().getDisplay();
+	    Composite comTable = new Composite(composite , SWT.NONE);
+		comTable .setLayout(gl);
+		comTable .setLayoutData(gd);
 
-	Composite composite = new Composite(parent, SWT.NONE);
+//		tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION | SWT.MULTI);
+		//avoid multi selection
+		tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION);
+	    table = tableviewer.getTable();
+	    table.setLinesVisible(true);
+	    tableviewer.setContentProvider(new ArrayContentProvider());
+	    tableviewer.setLabelProvider(new MyLabelProvider());
+	    table.setHeaderVisible(true);
+	    table.setLayoutData(gd);
+	    TableColumn column = new TableColumn(table,SWT.NONE);
+	    column.setText("User");
+	    column.setWidth(150);
+	    column = new TableColumn(table,SWT.NONE);
+	    column.setText("Status");
+	    column.setWidth(300);
+	    column = new TableColumn(table,SWT.NONE);
+	    column.setText("Action");
+	    column.setWidth(200);
+	    
+		
+//	    table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+	    
+	    input = new ArrayList<inviterdata>();
+	    tableviewer.setInput(input);
 
-	GridLayout gl = new GridLayout();
-	composite.setLayout(gl);
-	GridData gd = new GridData(GridData.FILL_BOTH);
-	gd.minimumHeight = 200;
+	    cancelButton = new Button(composite, SWT.NONE);
+	    cancelButton.setText("Cancel selected invitation");
+	    cancelButton.addSelectionListener(new SelectionListener() {
+	
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 
-	Label usersLabel = new Label(composite, SWT.NONE);
-	usersLabel.setText("Select users to invite:");
-
-	Composite comTable = new Composite(composite, SWT.NONE);
-	comTable.setLayout(gl);
-	comTable.setLayoutData(gd);
-
-	this.tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION);
-	this.table = this.tableviewer.getTable();
-	this.table.setLinesVisible(true);
-	this.tableviewer.setContentProvider(new ArrayContentProvider());
-	this.tableviewer.setLabelProvider(new MyLabelProvider());
-	this.table.setHeaderVisible(true);
-	this.table.setLayoutData(gd);
-	TableColumn column = new TableColumn(this.table, SWT.NONE);
-	column.setText("User");
-	column.setWidth(150);
-	column = new TableColumn(this.table, SWT.NONE);
-	column.setText("Status");
-	column.setWidth(300);
-	column = new TableColumn(this.table, SWT.NONE);
-	column.setText("Action");
-	column.setWidth(200);
-
-	// table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-	this.input = new ArrayList<inviterdata>();
-	this.tableviewer.setInput(this.input);
-
-	this.cancelButton = new Button(composite, SWT.NONE);
-	this.cancelButton.setText("Cancel selected invitation");
-	this.cancelButton.addSelectionListener(new SelectionListener() {
-
-	    public void widgetDefaultSelected(SelectionEvent e) {
-	    }
-
-	    public void widgetSelected(SelectionEvent e) {
-		cancelInvite();
-		Display.getDefault().syncExec(new Runnable() {
-		    public void run() {
-		    }
+			public void widgetSelected(SelectionEvent e) {
+				cancelInvite();
+				Display.getDefault().syncExec(new Runnable() {						
+					public void run() {							
+					}
+				});
+			}
 		});
-	    }
-	});
+	    
+		table.addSelectionListener(new SelectionAdapter()
+		{
+	        public void widgetSelected(SelectionEvent event) {
+        		if (inviteStep==InvState.SELECTION) 
+        			setInviteable( (table.getSelectionCount()>0) );
+        		else if (inviteStep==InvState.INVITING)
+        			cancelButton.setEnabled(isSelectionCancelable());
+        		else
+        			cancelButton.setEnabled(false);
+	        }
+	        public void widgetDefaultSelected(SelectionEvent event) {
+	        }
+		} ) ;
+		
+	    cancelButton.setEnabled(false);
 
-	this.table.addSelectionListener(new SelectionAdapter() {
-	    @Override
-	    public void widgetDefaultSelected(SelectionEvent event) {
-	    }
+	    // get online users from roster
+		if (autoinviteJID==null)
+			attachRosterListener();
+		refreshRosterListRunASync(autoinviteJID);
+		
+		Control c=super.createContents(parent);
 
-	    @Override
-	    public void widgetSelected(SelectionEvent event) {
-		if (InvitationDialog.this.inviteStep == InvState.SELECTION) {
-		    setInviteable((InvitationDialog.this.table
-			    .getSelectionCount() > 0));
-		} else if (InvitationDialog.this.inviteStep == InvState.INVITING) {
-		    InvitationDialog.this.cancelButton
-			    .setEnabled(isSelectionCancelable());
-		} else {
-		    InvitationDialog.this.cancelButton.setEnabled(false);
+		getButton(IDialogConstants.OK_ID).setText("Invite");
+	    getButton(IDialogConstants.CANCEL_ID).setText("Close");
+	    setInviteable(false);
+	    
+		// auto trigger automatic invite
+		if (autoinviteJID!=null)
+			performInvitation();
+
+		return c;
+	}
+
+	protected void setInviteable(boolean b) {
+	    getButton(IDialogConstants.OK_ID).setEnabled(b);
+	}
+
+	@Override
+	protected void okPressed() {
+		performInvitation();
+	}
+	public boolean performInvitation() {
+		
+		inviteStep=InvState.INVITING;
+		setInviteable(false);
+		cancelButton.setEnabled(true);
+	    getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+		
+		try {	
+			TableItem[] cursel = table.getSelection();
+
+			ISharedProject project = Saros.getDefault().getSessionManager().getSharedProject();
+			String name = project.getProject().getName();
+	
+			for (int i=0; i < cursel.length; i++) {
+				TableItem ti = cursel[i];
+				Object o=ti.getData();
+				
+				inviterdata invdat = (inviterdata)o;
+				invdat.outginvatationProc=project.invite(invdat.jid, name, true, this);
+			}
+			
+			return false; // we wanna wait (and block) until all invites are done
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-	    }
-	});
 
-	this.cancelButton.setEnabled(false);
-
-	// get online users from roster
-	if (this.autoinviteJID == null) {
-	    attachRosterListener();
+		return false;
 	}
-	refreshRosterListRunASync(this.autoinviteJID);
+	
+	// Triggers the update of the table in a GUI thread.
+	public void updateInvitationProgress(final JID jid) {
+		display.asyncExec(new Runnable() {
+			public void run() {
+				updateInvitationProgressRunASyn(jid);
+		}} );	
+	}
+	
+	/*
+	 * Updates the invitation progress for all users in the table by refreshing
+	 * the table. MyLabelProvider will then poll the current progresses. 
+	 */
+	private void updateInvitationProgressRunASyn(JID jid) {
+		boolean alldone		= true;
+		inviterdata invdat	= null;
+		int index;
 
-	Control c = super.createContents(parent);
+		for (index=0; index<table.getItemCount(); index++) {
 
-	getButton(IDialogConstants.OK_ID).setText("Invite");
-	getButton(IDialogConstants.CANCEL_ID).setText("Close");
-	setInviteable(false);
+			TableItem ti=table.getItem(index);
+			Object o=ti.getData();
+			invdat=(inviterdata)o;
 
-	// auto trigger automatic invite
-	if (this.autoinviteJID != null) {
-	    performInvitation();
+			if (invdat.outginvatationProc!=null &&  
+					invdat.outginvatationProc.getState()!=IInvitationProcess.State.DONE && 
+					invdat.outginvatationProc.getState()!=IInvitationProcess.State.CANCELED ) {
+				alldone=false;
+			}
+			
+			if (jid!=null && invdat.jid.equals(jid))
+				tableviewer.refresh(o);
+		}
+
+		// force the table to update ALL labels
+		if (jid==null)
+			tableviewer.refresh();
+		
+		// are all invites done?
+		if (alldone) {
+//			if(invdat.outginvatationProc.getState() == IInvitationProcess.State.DONE){
+//				inviteStep= InvState.SELECTION;
+//			}
+			inviteStep=InvState.DONE;
+		    getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+
+		}
+		cancelButton.setEnabled(isSelectionCancelable() && inviteStep!=InvState.DONE );
+		
+	}
+	
+	boolean isSelectionCancelable(){
+
+		if (table.getSelectionCount()==0)
+			return false;
+		
+		TableItem[] cursel = table.getSelection();
+		for (int i=0;i<cursel.length;i++) {
+			TableItem ti=cursel[i];
+			Object o=ti.getData();
+			inviterdata invdat=(inviterdata)o;
+			if (invdat.outginvatationProc==null ||
+				(invdat.outginvatationProc.getState()==State.INITIALIZED || 
+				invdat.outginvatationProc.getState()==State.SYNCHRONIZING_DONE ||
+				invdat.outginvatationProc.getState()==State.CANCELED ||
+				invdat.outginvatationProc.getState()==State.DONE
+				) )
+				return false;
+		}
+		return true;
+	}
+	
+	void cancelInvite() {
+		TableItem[] cursel = table.getSelection();
+		for (int i=0;i<cursel.length;i++) {
+			TableItem ti=cursel[i];
+			Object o=ti.getData();
+			inviterdata invdat=(inviterdata)o;
+			if (invdat.outginvatationProc==null)
+				continue;
+			
+			invdat.outginvatationProc.cancel(null, false);
+		}
+		updateInvitationProgress(null);
 	}
 
-	return c;
-    }
-
-    private String getStateDesc(IInvitationProcess.State state) {
-	return InvitationDialog.StateNames[state.ordinal()];
-    }
 
     boolean isJIDinList(ArrayList<JID> items, JID jid) {
-	for (int i = 0; i < items.size(); i++) {
+    	for (int i=0;i<items.size();i++) {
 
-	    try {
-		JID curJID = items.get(i);
-
-		if (curJID.equals(jid)) {
-		    return true;
-		}
-
-	    } catch (Exception e) {
-		System.out.println(e);
-	    }
-	}
-
-	return false;
+    		try {
+    		JID curJID = items.get(i);
+    		
+    		if (curJID.equals(jid))
+    			return true;
+    		
+    		} catch(Exception e) {
+    			System.out.println(e);
+    		}
+    	}
+    	
+    	return false;
     }
-
-    boolean isSelectionCancelable() {
-
-	if (this.table.getSelectionCount() == 0) {
-	    return false;
-	}
-
-	TableItem[] cursel = this.table.getSelection();
-	for (TableItem ti : cursel) {
-	    Object o = ti.getData();
-	    inviterdata invdat = (inviterdata) o;
-	    if ((invdat.outginvatationProc == null)
-		    || ((invdat.outginvatationProc.getState() == State.INITIALIZED)
-			    || (invdat.outginvatationProc.getState() == State.SYNCHRONIZING_DONE)
-			    || (invdat.outginvatationProc.getState() == State.CANCELED) || (invdat.outginvatationProc
-			    .getState() == State.DONE))) {
-		return false;
-	    }
-	}
-	return true;
+    
+	static final String[] StateNames = {
+		"Initialized",
+		"Invitation sent. Waiting for acknowledgement...",
+		"Filelist of inviter requested",
+		"Filelist of inviter sent",
+		"Filelist of invitee sent",
+		"Synchornizing project files. Transfering files...",
+		"Files sent. Waiting for invitee...", 
+		"Invitiation completed",
+		"Invitation canceled"
+	};
+    private String getStateDesc(IInvitationProcess.State state){
+    	return StateNames[state.ordinal()];
     }
-
-    @Override
-    protected void okPressed() {
-	performInvitation();
-    }
-
-    public boolean performInvitation() {
-
-	this.inviteStep = InvState.INVITING;
-	setInviteable(false);
-	this.cancelButton.setEnabled(true);
-	getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
-
-	try {
-	    TableItem[] cursel = this.table.getSelection();
-
-	    ISharedProject project = Saros.getDefault().getSessionManager()
-		    .getSharedProject();
-	    String name = project.getProject().getName();
-
-	    for (TableItem ti : cursel) {
-		Object o = ti.getData();
-
-		inviterdata invdat = (inviterdata) o;
-		invdat.outginvatationProc = project.invite(invdat.jid, name,
-			true, this);
-	    }
-
-	    return false; // we wanna wait (and block) until all invites are
-	    // done
-
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
-
-	return false;
-    }
-
-    /*
-     * Triggers the refresh of the roster list in a GUI thread.
-     */
-    private void refreshRosterList() {
-	if (this.inviteStep != InvState.SELECTION) {
-	    return;
-	}
-
-	this.display.asyncExec(new Runnable() {
-	    public void run() {
-		refreshRosterListRunASync(null);
-	    }
-	});
-    }
-
-    /*
-     * Clears and re-filles the table with all online users from my roster.
-     * Selections are preserved.
-     */
-    private void refreshRosterListRunASync(JID toselect) {
-	ArrayList<JID> curselA = new ArrayList<JID>();
-	int[] curselNew = null;
-
-	// save selection
-	TableItem[] curselTIs = this.table.getSelection();
-	for (TableItem curselTI : curselTIs) {
-	    curselA.add(((inviterdata) curselTI.getData()).jid);
-	}
-
-	this.input.clear();
-	this.table.removeAll();
-
-	if (this.roster == null) {
-	    return;
-	}
-
-	Collection<RosterEntry> users = this.roster.getEntries();
-	int index = -1;
-
-	for (RosterEntry entry : users) {
-
-	    String username = entry.getUser();
-	    Presence presence = this.roster.getPresence(username);
-
-	    User user = Saros.getDefault().getSessionManager()
-		    .getSharedProject()
-		    .getParticipant(new JID(entry.getUser()));
-
-	    if ((presence != null)
-		    && presence.getType().equals(Presence.Type.available)
-		    && (user == null)) {
-		inviterdata invdat = new inviterdata();
-		invdat.jid = new JID(entry.getUser());
-		String name = entry.getName();
-		invdat.name = (name == null) ? entry.getUser() : name;
-		invdat.outginvatationProc = null;
-
-		this.input.add(invdat);
-		index++;
-
-		if (((this.autoinviteJID != null) && invdat.jid
-			.equals(this.autoinviteJID))
-			|| ((this.autoinviteJID == null) && isJIDinList(
-				curselA, invdat.jid))) {
-		    int curselOld[] = this.table.getSelectionIndices();
-		    curselNew = new int[curselOld.length + 1];
-		    System.arraycopy(curselOld, 0, curselNew, 0,
-			    curselOld.length);
-		    curselNew[curselNew.length - 1] = index;
-		}
-	    }
-	}
-
-	this.tableviewer.refresh();
-
-	if (curselNew != null) {
-	    this.table.setSelection(curselNew);
-	}
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
-     */
-    public void runGUIAsynch(final Runnable runnable) {
-
-	this.display.asyncExec(new Runnable() {
-	    public void run() {
-		new Thread(runnable).start();
-	    }
-	});
-    }
-
-    protected void setInviteable(boolean b) {
-	getButton(IDialogConstants.OK_ID).setEnabled(b);
-    }
-
+    
     public void showErrorMessage(String errorMessage) {
-	ErrorMessageDialog.showErrorMessage(errorMessage);
+    	ErrorMessageDialog.showErrorMessage(errorMessage);
     }
-
-    // Triggers the update of the table in a GUI thread.
-    public void updateInvitationProgress(final JID jid) {
-	this.display.asyncExec(new Runnable() {
-	    public void run() {
-		updateInvitationProgressRunASyn(jid);
-	    }
-	});
-    }
-
-    /*
-     * Updates the invitation progress for all users in the table by refreshing
-     * the table. MyLabelProvider will then poll the current progresses.
-     */
-    private void updateInvitationProgressRunASyn(JID jid) {
-	boolean alldone = true;
-	inviterdata invdat = null;
-	int index;
-
-	for (index = 0; index < this.table.getItemCount(); index++) {
-
-	    TableItem ti = this.table.getItem(index);
-	    Object o = ti.getData();
-	    invdat = (inviterdata) o;
-
-	    if ((invdat.outginvatationProc != null)
-		    && (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE)
-		    && (invdat.outginvatationProc.getState() != IInvitationProcess.State.CANCELED)) {
-		alldone = false;
-	    }
-
-	    if ((jid != null) && invdat.jid.equals(jid)) {
-		this.tableviewer.refresh(o);
-	    }
+    
+	public void cancel(String errorMsg, boolean replicated) {
+		updateInvitationProgress(null);
 	}
 
-	// force the table to update ALL labels
-	if (jid == null) {
-	    this.tableviewer.refresh();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
+	 */
+	public void runGUIAsynch(final Runnable runnable) {
+
+		display.asyncExec(new Runnable() {
+			public void run() {
+				new Thread(runnable).start();
+		}} );	
 	}
 
-	// are all invites done?
-	if (alldone) {
-	    // if(invdat.outginvatationProc.getState() ==
-	    // IInvitationProcess.State.DONE){
-	    // inviteStep= InvState.SELECTION;
-	    // }
-	    this.inviteStep = InvState.DONE;
-	    getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+	 */
+	public void connectionStateChanged(XMPPConnection connection, final ConnectionState newState) {
+		
+		if (newState == ConnectionState.CONNECTED) {
+			roster = Saros.getDefault().getRoster();
+			attachRosterListener();
+
+		} else if (newState == ConnectionState.NOT_CONNECTED) {
+			roster = null;
+		}
+
+		refreshRosterListRunASync(null);
 
 	}
-	this.cancelButton.setEnabled(isSelectionCancelable()
-		&& (this.inviteStep != InvState.DONE));
+	
+	private void attachRosterListener() {
+		roster.addRosterListener(new RosterListener() {
+			public void entriesAdded(Collection<String> addresses) {
+				refreshRosterList();
+			}
 
-    }
+			public void entriesUpdated(Collection<String> addresses) {
+				refreshRosterList();
+			}
+
+			public void entriesDeleted(Collection<String> addresses) {
+				refreshRosterList();
+			}
+
+			public void presenceChanged(String XMPPAddress) {
+				refreshRosterList();
+			}
+			
+			
+			public void presenceChanged(Presence presence) {
+				//TODO: new Method for Smack 3
+				presenceChanged(presence.getFrom());
+				
+			}
+		});
+	}
+	
+	/*
+	 * Triggers the refresh of the roster list in a GUI thread.
+	 */
+	private void refreshRosterList() {
+		if (inviteStep!=InvState.SELECTION)
+			return;
+		
+		display.asyncExec(new Runnable() {
+			public void run() {
+				refreshRosterListRunASync(null);
+		}} );	
+	}
+	
+	/*
+	 * Clears and re-filles the table with all online users from my roster.
+	 * Selections are preserved.
+	 */
+	private void refreshRosterListRunASync(JID toselect) {
+		ArrayList<JID> curselA = new ArrayList<JID>();
+		int[] curselNew=null;
+
+		// save selection
+		TableItem[] curselTIs = table.getSelection();
+		for (int i=0;i<curselTIs.length;i++)
+			curselA.add( ((inviterdata)curselTIs[i].getData()).jid );
+
+		input.clear();
+		table.removeAll();
+		
+		if (roster==null)
+			return;
+		
+		//TODO: Änderung für smack 3
+//		Iterator iter = roster.getEntries();
+		Collection<RosterEntry> users = roster.getEntries();
+		int index=-1;
+//	    while (iter.hasNext()) {
+//	        RosterEntry entry = (RosterEntry) iter.next();
+		for(RosterEntry entry : users){
+			
+	        String username = entry.getUser();
+	        Presence presence = roster.getPresence(username); 
+
+	        User user = Saros.getDefault().getSessionManager().
+	        	getSharedProject().getParticipant(new JID(entry.getUser()));
+	        /*TODO: Änderung: presence.type available hinzugefügt.
+	         * 		Es ist hier jedoch zu prüfen, inwieweit auch offline user eingeladen werden könnten.
+	         * */
+	        if (presence != null && presence.getType().equals(Presence.Type.available)&& user==null )
+	        {
+	        	inviterdata invdat = new inviterdata();
+	        	invdat.jid= new JID(entry.getUser());
+	        	invdat.name=entry.getName();
+	        	invdat.outginvatationProc=null;
+	 
+	        	input.add(invdat);
+	        	index++;
+	        	
+	        	if ( (autoinviteJID!=null && invdat.jid.equals(autoinviteJID) ) ||
+	        	     (autoinviteJID==null && isJIDinList(curselA, invdat.jid) )  )
+	        	{
+	        		int curselOld[]=table.getSelectionIndices();
+	        		curselNew=new int[curselOld.length+1];
+	        		System.arraycopy(curselOld, 0, curselNew, 0, curselOld.length);
+	        		curselNew[curselNew.length-1]=index;
+	        	}
+	        }
+	    }			
+	    		    
+	    tableviewer.refresh();
+
+	    if (curselNew!=null)
+	    	table.setSelection(curselNew);
+	}
 
 }

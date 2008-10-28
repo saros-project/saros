@@ -40,184 +40,178 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public interface ISharedProject {
 
-    /**
-     * Adds the given shared project listener. This call is ignored if the
-     * listener is all a listener of this shared project.
-     * 
-     * @param listener
-     *            The listener that is to be added.
-     */
-    public void addListener(ISharedProjectListener listener);
+	/**
+	 * @return a list of all participants of the shared project. This list
+	 *         includes yourself.
+	 */
+	public List<User> getParticipants();
 
-    /**
-     * Adds the user.
-     * 
-     * @param user
-     *            the user that is to be added.
-     */
-    public void addUser(User user);
+	/**
+	 * Sets the new driver. If given driver is already driver the call is
+	 * ignored.
+	 * 
+	 * @param driver
+	 *            the new driver.
+	 * @param replicated
+	 *            <code>false</code> if this event was created by this client.
+	 *            <code>true</code> if it was created by another client and
+	 *            only replicated to this client.
+	 */
+	public void setDriver(User driver, boolean replicated);
+	
+	/**
+	 * Remove driver role for given User.
+	 * 
+	 * @param driver
+	 *            one current driver.
+	 * @param replicated
+	 *            <code>false</code> if this event was created by this client.
+	 *            <code>true</code> if it was created by another client and
+	 *            only replicated to this client.
+	 */
+	public void removeDriver(User driver, boolean replicated);
 
-    public void addUser(User user, int index);
+	/**
+	 * The driver is the person that is currently allowed to edit the resources.
+	 * 
+	 * @return the driver.
+	 */
+	public User getDriver();
 
-    /**
-     * true, if single driver is active, false otherwise.
-     * 
-     * @return
-     */
-    public boolean exclusiveDriver();
+	/**
+	 * @return <code>true</code> if the local client is the current driver of
+	 *         this shared project. <code>false</code> otherwise.
+	 */
+	public boolean isDriver();
+	
+	/**
+	 * @return <code>true</code> if the given user is one of the current driver of
+	 *         this shared project. <code>false</code> otherwise.
+	 */
+	public boolean isDriver(User user);
 
-    /**
-     * @return the activity manager that is responsible for all activity
-     *         providers.
-     */
-    public IActivityManager getActivityManager();
+	/**
+	 * The host is the person that initiated this SharedProject and holds all
+	 * original files.
+	 * 
+	 * @return the host.
+	 */
+	public User getHost();
 
-    /**
-     * The driver is the person that is currently allowed to edit the resources.
-     * 
-     * @return the driver.
-     */
-    public User getDriver();
+	/**
+	 * @return <code>true</code> if the local client is the host of this
+	 *         shared project. <code>false</code> otherwise.
+	 */
+	public boolean isHost();
 
-    /**
-     * @return the file list representation of the Eclipse project that is
-     *         associated with this shared project.
-     * @throws CoreException
-     *             if there are problems while reading file tree of the Eclipse
-     *             project.
-     */
-    public FileList getFileList() throws CoreException;
+	/**
+	 * Adds the user.
+	 * 
+	 * @param user
+	 *            the user that is to be added.
+	 */
+	public void addUser(User user);
+	public void addUser(User user, int index);
 
-    /**
-     * The host is the person that initiated this SharedProject and holds all
-     * original files.
-     * 
-     * @return the host.
-     */
-    public User getHost();
+	/**
+	 * Removes the user.
+	 * 
+	 * @param user
+	 *            the user that is to be removed.
+	 */
+	public void removeUser(User user);
 
-    public User getParticipant(JID jid);
+	/**
+	 * Invites a user to the shared project.
+	 * 
+	 * @param jid
+	 *            the JID of the user that is to be invited.
+	 * @param description
+	 *            a description that will be shown to the invited user before he
+	 *            makes the decision to accept or decline the invitation.
+	 * @param inviteUI
+	 *            user interface of the invitation for feedback calls.
+	 * @return the outgoing invitation process.
+	 */
+	public IOutgoingInvitationProcess invite(JID jid, String description, boolean inactive, IInvitationUI inviteUI);
 
-    /**
-     * @return a list of all participants of the shared project. This list
-     *         includes yourself.
-     */
-    public List<User> getParticipants();
+	/**
+	 * Adds the given shared project listener. This call is ignored if the
+	 * listener is all a listener of this shared project.
+	 * 
+	 * @param listener
+	 *            The listener that is to be added.
+	 */
+	public void addListener(ISharedProjectListener listener);
 
-    /**
-     * @return the Eclipse project associtated with this shared project. This
-     *         never returns <code>null</code>.
-     */
-    public IProject getProject();
+	/**
+	 * Removes the given shared project listener. This call is ignored if the
+	 * listener doesn't belongs to the current listeners of this shared project.
+	 * 
+	 * @param listener
+	 *            the listener that is to be removed.
+	 */
+	public void removeListener(ISharedProjectListener listener);
 
-    /**
-     * @return the sequencer that is responsible for sending and receiving
-     *         activities.
-     */
-    public IActivitySequencer getSequencer();
+	/**
+	 * @return the Eclipse project associtated with this shared project. This
+	 *         never returns <code>null</code>.
+	 */
+	public IProject getProject();
 
-    /**
-     * Invites a user to the shared project.
-     * 
-     * @param jid
-     *            the JID of the user that is to be invited.
-     * @param description
-     *            a description that will be shown to the invited user before he
-     *            makes the decision to accept or decline the invitation.
-     * @param inviteUI
-     *            user interface of the invitation for feedback calls.
-     * @return the outgoing invitation process.
-     */
-    public IOutgoingInvitationProcess invite(JID jid, String description,
-	    boolean inactive, IInvitationUI inviteUI);
+	/**
+	 * @return the file list representation of the Eclipse project that is
+	 *         associated with this shared project.
+	 * @throws CoreException
+	 *             if there are problems while reading file tree of the Eclipse
+	 *             project.
+	 */
+	public FileList getFileList() throws CoreException;
 
-    /**
-     * @return <code>true</code> if the local client is the current driver of
-     *         this shared project. <code>false</code> otherwise.
-     */
-    public boolean isDriver();
+	// TODO remove direct uses of FileList
 
-    /**
-     * @return <code>true</code> if the given user is one of the current driver
-     *         of this shared project. <code>false</code> otherwise.
-     */
-    public boolean isDriver(User user);
+	/**
+	 * @return the sequencer that is responsible for sending and receiving
+	 *         activities.
+	 */
+	public IActivitySequencer getSequencer();
 
-    /**
-     * @return <code>true</code> if the local client is the host of this shared
-     *         project. <code>false</code> otherwise.
-     */
-    public boolean isHost();
+	/**
+	 * @return the activity manager that is responsible for all activity
+	 *         providers.
+	 */
+	public IActivityManager getActivityManager();
 
-    // TODO remove direct uses of FileList
+	/**
+	 * Starts the invitation wizard to invite users.
+	 * @param jid
+	 *            the JID of a user to invite without manual selection
+	 */
+	public void startInvitation(JID jid);
+	
+	/**
+	 * Activates sending of activities. The reason that this isn't done
+	 * automatically are unit tests.
+	 */
+	public void start();
 
-    /**
-     * Remove driver role for given User.
-     * 
-     * @param driver
-     *            one current driver.
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    public void removeDriver(User driver, boolean replicated);
+	/**
+	 * Deactivates sending of activities.
+	 */
+	public void stop();
 
-    /**
-     * Removes the given shared project listener. This call is ignored if the
-     * listener doesn't belongs to the current listeners of this shared project.
-     * 
-     * @param listener
-     *            the listener that is to be removed.
-     */
-    public void removeListener(ISharedProjectListener listener);
+	public User getParticipant(JID jid);
 
-    /**
-     * Removes the user.
-     * 
-     * @param user
-     *            the user that is to be removed.
-     */
-    public void removeUser(User user);
-
-    /**
-     * Sets the new driver. If given driver is already driver the call is
-     * ignored.
-     * 
-     * @param driver
-     *            the new driver.
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    public void setDriver(User driver, boolean replicated);
-
-    /**
-     * Sets all resources of the project to a readonly state on the local file
-     * system.
-     * 
-     * @param The
-     *            readonly state to set the file to.
-     */
-    public void setProjectReadonly(boolean readonly);
-
-    /**
-     * Activates sending of activities. The reason that this isn't done
-     * automatically are unit tests.
-     */
-    public void start();
-
-    /**
-     * Starts the invitation wizard to invite users.
-     * 
-     * @param jid
-     *            the JID of a user to invite without manual selection
-     */
-    public void startInvitation(JID jid);
-
-    /**
-     * Deactivates sending of activities.
-     */
-    public void stop();
+	/**
+	 * Sets all resources of the project to a readonly state 
+	 * on the local file system.
+	 * @param The readonly state to set the file to. 
+	 */
+	public void setProjectReadonly(boolean readonly);
+	
+	/**
+	 * true, if single driver is active, false otherwise.
+	 * @return
+	 */
+	public boolean exclusiveDriver();
 }

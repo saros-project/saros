@@ -49,337 +49,320 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
  * @author rdjemili
  */
 public class FileList {
-    private class PathLengthComprarator implements Comparator<IPath> {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.Comparator
+	private Map<IPath, Long> all = new HashMap<IPath, Long>();
+
+	private Map<IPath, Long> added = new HashMap<IPath, Long>();
+
+	private Map<IPath, Long> removed = new HashMap<IPath, Long>();
+
+	private Map<IPath, Long> altered = new HashMap<IPath, Long>();
+
+	private Map<IPath, Long> unaltered = new HashMap<IPath, Long>();
+
+	private Comparator<IPath> comparator = new PathLengthComprarator();
+
+	private class PathLengthComprarator implements Comparator<IPath> {
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see java.util.Comparator
+		 */
+		public int compare(IPath p1, IPath p2) {
+			int l1 = p1.toString().length();
+			int l2 = p2.toString().length();
+
+			if (l1 < l2)
+				return -1;
+			else if (l1 > l2)
+				return 1;
+			else
+				return 0;
+		}
+	}
+
+	/**
+	 * Creates an empty file list.
 	 */
-	public int compare(IPath p1, IPath p2) {
-	    int l1 = p1.toString().length();
-	    int l2 = p2.toString().length();
-
-	    if (l1 < l2) {
-		return -1;
-	    } else if (l1 > l2) {
-		return 1;
-	    } else {
-		return 0;
-	    }
+	public FileList() {
 	}
-    }
 
-    private final Map<IPath, Long> added = new HashMap<IPath, Long>();
+	/**
+	 * Creates a new file list from the file tree in given container.
+	 * 
+	 * @param container
+	 *            the resource container that should be represented by the new
+	 *            file list.
+	 * @throws CoreException
+	 *             exception that might happen while fetching the files from the
+	 *             given container.
+	 */
+	public FileList(IContainer container) throws CoreException {
+		container.refreshLocal(IResource.DEPTH_INFINITE, null);
+		addMembers(container.members(), all, true);
+		unaltered.putAll(all);
+	}
 
-    private Map<IPath, Long> all = new HashMap<IPath, Long>();
+	/**
+	 * Creates a new file list from the file tree in given container.
+	 * 
+	 * @param container
+	 *            the resource container that should be represented by the new
+	 *            file list.
+	 * @param ignoreDerived
+	 *            <code>true</code> if derived resources should be ignored.
+	 * @throws CoreException
+	 *             exception that might happen while fetching the files from the
+	 *             given container.
+	 */
+	public FileList(IContainer container, boolean ignoreDerived) throws CoreException {
 
-    private final Map<IPath, Long> altered = new HashMap<IPath, Long>();
+		container.refreshLocal(IResource.DEPTH_INFINITE, null);
+		addMembers(container.members(), all, ignoreDerived);
+		unaltered.putAll(all);
+	}
 
-    private final Comparator<IPath> comparator = new PathLengthComprarator();
+	/**
+	 * Creates a new file list from given resources.
+	 * 
+	 * @param resources
+	 *            the resources that should be added to this file list.
+	 * @throws CoreException
+	 */
+	public FileList(IResource[] resources) throws CoreException {
 
-    private final Map<IPath, Long> removed = new HashMap<IPath, Long>();
+		addMembers(resources, all, false);
+		unaltered.putAll(all);
+	}
 
-    private final Map<IPath, Long> unaltered = new HashMap<IPath, Long>();
+	/**
+	 * Build the FileList from its XML representation.
+	 * 
+	 * @throws XmlPullParserException
+	 * @throws IOException
+	 */
+	public FileList(String xml) throws XmlPullParserException, IOException {
+		MXParser parser = new MXParser();
+		parser.setInput(new StringReader(xml));
 
-    /**
-     * Creates an empty file list.
-     */
-    public FileList() {
-    }
+		Map<IPath, Long> context = added;
 
-    /**
-     * Creates a new file list from the file tree in given container.
-     * 
-     * @param container
-     *            the resource container that should be represented by the new
-     *            file list.
-     * @throws CoreException
-     *             exception that might happen while fetching the files from the
-     *             given container.
-     */
-    public FileList(IContainer container) throws CoreException {
-	container.refreshLocal(IResource.DEPTH_INFINITE, null);
-	addMembers(container.members(), this.all, true);
-	this.unaltered.putAll(this.all);
-    }
+		boolean done = false;
+		while (!done) {
+			int eventType = parser.next();
+			if (eventType == XmlPullParser.START_TAG) {
 
-    /**
-     * Creates a new file list from the file tree in given container.
-     * 
-     * @param container
-     *            the resource container that should be represented by the new
-     *            file list.
-     * @param ignoreDerived
-     *            <code>true</code> if derived resources should be ignored.
-     * @throws CoreException
-     *             exception that might happen while fetching the files from the
-     *             given container.
-     */
-    public FileList(IContainer container, boolean ignoreDerived)
-	    throws CoreException {
+				if (parser.getName().equals("added")) {
+					context = added;
 
-	container.refreshLocal(IResource.DEPTH_INFINITE, null);
-	addMembers(container.members(), this.all, ignoreDerived);
-	this.unaltered.putAll(this.all);
-    }
+				} else if (parser.getName().equals("removed")) {
+					context = removed;
 
-    /**
-     * Creates a new file list from given resources.
-     * 
-     * @param resources
-     *            the resources that should be added to this file list.
-     * @throws CoreException
-     */
-    public FileList(IResource[] resources) throws CoreException {
+				} else if (parser.getName().equals("altered")) {
+					context = altered;
 
-	addMembers(resources, this.all, false);
-	this.unaltered.putAll(this.all);
-    }
+				} else if (parser.getName().equals("unaltered")) {
+					context = unaltered;
 
-    /**
-     * Build the FileList from its XML representation.
-     * 
-     * @throws XmlPullParserException
-     * @throws IOException
-     */
-    public FileList(String xml) throws XmlPullParserException, IOException {
-	MXParser parser = new MXParser();
-	parser.setInput(new StringReader(xml));
+				} else if (parser.getName().equals("file")) {
+					IPath path = new Path(parser.getAttributeValue(null, "path"));
+					Long checksum = Long.parseLong(parser.getAttributeValue(null, "checksum"));
 
-	Map<IPath, Long> context = this.added;
+					context.put(path, checksum);
 
-	boolean done = false;
-	while (!done) {
-	    int eventType = parser.next();
-	    if (eventType == XmlPullParser.START_TAG) {
+					if (context != removed)
+						all.put(path, checksum);
 
-		if (parser.getName().equals("added")) {
-		    context = this.added;
+				} else if (parser.getName().equals("folder")) {
+					IPath path = new Path(parser.getAttributeValue(null, "path"));
 
-		} else if (parser.getName().equals("removed")) {
-		    context = this.removed;
+					context.put(path, null);
 
-		} else if (parser.getName().equals("altered")) {
-		    context = this.altered;
+					if (context != removed)
+						all.put(path, null);
+				}
 
-		} else if (parser.getName().equals("unaltered")) {
-		    context = this.unaltered;
+			} else if (eventType == XmlPullParser.END_TAG) {
+				if (parser.getName().equals("filelist")) {
+					done = true;
+				}
+			}
+		}
+	}
 
-		} else if (parser.getName().equals("file")) {
-		    IPath path = new Path(parser
-			    .getAttributeValue(null, "path"));
-		    Long checksum = Long.parseLong(parser.getAttributeValue(
-			    null, "checksum"));
+	// TODO invert diff direction
+	/**
+	 * Returns a new FileList which contains the diff from the two FileLists.
+	 * 
+	 * @param other
+	 *            the other FileList with which this FileList is compared with.
+	 * 
+	 * @return a new FileList which contains the diff information from the two
+	 *         FileLists. The diff contains the operations which are needed to
+	 *         get from this FileList to the other FileList.
+	 */
+	public FileList diff(FileList other) {
+		FileList fileList = new FileList();
 
-		    context.put(path, checksum);
-
-		    if (context != this.removed) {
-			this.all.put(path, checksum);
-		    }
-
-		} else if (parser.getName().equals("folder")) {
-		    IPath path = new Path(parser
-			    .getAttributeValue(null, "path"));
-
-		    context.put(path, null);
-
-		    if (context != this.removed) {
-			this.all.put(path, null);
-		    }
+		for (Map.Entry<IPath, Long> entry : all.entrySet()) {
+			if (!other.all.containsKey(entry.getKey())) {
+				fileList.removed.put(entry.getKey(), entry.getValue());
+			}
 		}
 
-	    } else if (eventType == XmlPullParser.END_TAG) {
-		if (parser.getName().equals("filelist")) {
-		    done = true;
-		}
-	    }
-	}
-    }
-
-    private void addMembers(IResource[] resources, Map<IPath, Long> members,
-	    boolean ignoreDerived) throws CoreException {
-
-	for (IResource resource : resources) {
-	    if (ignoreDerived && resource.isDerived()) {
-		continue;
-	    }
-
-	    if (resource instanceof IFile) {
-		IFile file = (IFile) resource;
-		if (file.exists() == false) {
-		    continue;
+		for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
+			if (!all.containsKey(entry.getKey())) {
+				fileList.added.put(entry.getKey(), entry.getValue());
+			}
 		}
 
-		Long checksum = FileUtil.checksum(file);
-		if (checksum != -1) {
-		    members.put(file.getProjectRelativePath(), checksum);
+		for (Map.Entry<IPath, Long> entry : all.entrySet()) {
+			IPath path = entry.getKey();
+			if (other.all.containsKey(path)) {
+
+				if (path.hasTrailingSeparator()) {
+					fileList.unaltered.put(path, null);
+
+				} else {
+					long checksum = entry.getValue();
+					long otherChecksum = other.all.get(path);
+
+					if (checksum == otherChecksum) {
+						fileList.unaltered.put(path, checksum);
+					} else {
+						fileList.altered.put(path, checksum);
+					}
+				}
+
+			}
 		}
 
-	    } else if (resource instanceof IFolder) {
-		IFolder folder = (IFolder) resource;
+		fileList.all = new HashMap<IPath, Long>(other.all);
+		return fileList;
+	}
 
-		IPath path = folder.getProjectRelativePath();
-		if (!path.hasTrailingSeparator()) {
-		    path = path.addTrailingSeparator();
+	/**
+	 * @return the amount in percentage by which this file list has the same
+	 *         files as the other filelist.
+	 */
+	public int match(FileList other) {
+		return getPaths().size() == 0 ? 0 : 100 * diff(other).getUnalteredPaths().size()
+			/ getPaths().size();
+	}
+
+	/**
+	 * @return a sorted list of all paths in this file list. The paths are
+	 *         sorted by their character length.
+	 */
+	public List<IPath> getPaths() {
+		return sorted(all.keySet());
+	}
+
+	public List<IPath> getAddedPaths() {
+		return sorted(added.keySet());
+	}
+
+	public List<IPath> getRemovedPaths() {
+		return sorted(removed.keySet());
+	}
+
+	public List<IPath> getAlteredPaths() {
+		return sorted(altered.keySet());
+	}
+
+	public List<IPath> getUnalteredPaths() {
+		return sorted(unaltered.keySet());
+	}
+
+	/**
+	 * @return the XML representation of this FileList. You can use the returned
+	 *         string to construct the same file list again.
+	 */
+	public String toXML() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<filelist>");
+
+		appendFileGroup(sb, "added", added);
+		appendFileGroup(sb, "removed", removed);
+		appendFileGroup(sb, "altered", altered);
+		appendFileGroup(sb, "unaltered", unaltered);
+
+		sb.append("</filelist>");
+
+		return sb.toString();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof FileList))
+			return false;
+
+		FileList other = (FileList) obj;
+		return all.equals(other.all) && added.equals(other.added) && removed.equals(other.removed)
+			&& altered.equals(other.altered) && unaltered.equals(other.unaltered);
+	}
+
+	@Override
+	public String toString() {
+		return "FileList(files:" + all.size() + ")";
+	}
+
+	private List<IPath> sorted(Set<IPath> pathSet) {
+		List<IPath> paths = new ArrayList<IPath>(pathSet);
+		Collections.sort(paths, comparator);
+		return paths;
+	}
+
+	private void addMembers(IResource[] resources, Map<IPath, Long> members, boolean ignoreDerived)
+		throws CoreException {
+
+		for (int i = 0; i < resources.length; i++) {
+			if (ignoreDerived && resources[i].isDerived())
+				continue;
+
+			if (resources[i] instanceof IFile) {
+				IFile file = (IFile) resources[i];
+				if (file.exists()==false)
+					continue;
+				
+				Long checksum=FileUtil.checksum(file);
+				if (checksum!=-1)
+					members.put(file.getProjectRelativePath(), checksum);
+
+			} else if (resources[i] instanceof IFolder) {
+				IFolder folder = (IFolder) resources[i];
+
+				IPath path = folder.getProjectRelativePath();
+				if (!path.hasTrailingSeparator())
+					path = path.addTrailingSeparator();
+
+				members.put(path, null);
+				addMembers(folder.members(), members, ignoreDerived);
+			}
 		}
-
-		members.put(path, null);
-		addMembers(folder.members(), members, ignoreDerived);
-	    }
-	}
-    }
-
-    private void appendFileGroup(StringBuilder sb, String element,
-	    Map<IPath, Long> map) {
-
-	if (map.size() == 0) {
-	    return;
 	}
 
-	sb.append('<').append(element).append('>');
-	for (Map.Entry<IPath, Long> entry : map.entrySet()) {
-	    IPath path = entry.getKey();
+	private void appendFileGroup(StringBuilder sb, String element, Map<IPath, Long> map) {
 
-	    if (path.hasTrailingSeparator()) {
-		sb.append("<folder path=\"").append(path).append("\"/>");
+		if (map.size() == 0)
+			return;
 
-	    } else {
-		long checksum = entry.getValue();
-		sb.append("<file path=\"").append(path).append("\" ");
-		sb.append("checksum=\"").append(checksum).append("\"/>");
-	    }
+		sb.append('<').append(element).append('>');
+		for (Map.Entry<IPath, Long> entry : map.entrySet()) {
+			IPath path = entry.getKey();
 
-	}
-	sb.append("</").append(element).append('>');
-    }
+			if (path.hasTrailingSeparator()) {
+				sb.append("<folder path=\"").append(path).append("\"/>");
 
-    // TODO invert diff direction
-    /**
-     * Returns a new FileList which contains the diff from the two FileLists.
-     * 
-     * @param other
-     *            the other FileList with which this FileList is compared with.
-     * 
-     * @return a new FileList which contains the diff information from the two
-     *         FileLists. The diff contains the operations which are needed to
-     *         get from this FileList to the other FileList.
-     */
-    public FileList diff(FileList other) {
-	FileList fileList = new FileList();
+			} else {
+				long checksum = entry.getValue();
+				sb.append("<file path=\"").append(path).append("\" ");
+				sb.append("checksum=\"").append(checksum).append("\"/>");
+			}
 
-	for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-	    if (!other.all.containsKey(entry.getKey())) {
-		fileList.removed.put(entry.getKey(), entry.getValue());
-	    }
-	}
-
-	for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
-	    if (!this.all.containsKey(entry.getKey())) {
-		fileList.added.put(entry.getKey(), entry.getValue());
-	    }
-	}
-
-	for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-	    IPath path = entry.getKey();
-	    if (other.all.containsKey(path)) {
-
-		if (path.hasTrailingSeparator()) {
-		    fileList.unaltered.put(path, null);
-
-		} else {
-		    long checksum = entry.getValue();
-		    long otherChecksum = other.all.get(path);
-
-		    if (checksum == otherChecksum) {
-			fileList.unaltered.put(path, checksum);
-		    } else {
-			fileList.altered.put(path, checksum);
-		    }
 		}
-
-	    }
+		sb.append("</").append(element).append('>');
 	}
-
-	fileList.all = new HashMap<IPath, Long>(other.all);
-	return fileList;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
-
-	if (!(obj instanceof FileList)) {
-	    return false;
-	}
-
-	FileList other = (FileList) obj;
-	return this.all.equals(other.all) && this.added.equals(other.added)
-		&& this.removed.equals(other.removed)
-		&& this.altered.equals(other.altered)
-		&& this.unaltered.equals(other.unaltered);
-    }
-
-    public List<IPath> getAddedPaths() {
-	return sorted(this.added.keySet());
-    }
-
-    public List<IPath> getAlteredPaths() {
-	return sorted(this.altered.keySet());
-    }
-
-    /**
-     * @return a sorted list of all paths in this file list. The paths are
-     *         sorted by their character length.
-     */
-    public List<IPath> getPaths() {
-	return sorted(this.all.keySet());
-    }
-
-    public List<IPath> getRemovedPaths() {
-	return sorted(this.removed.keySet());
-    }
-
-    public List<IPath> getUnalteredPaths() {
-	return sorted(this.unaltered.keySet());
-    }
-
-    /**
-     * @return the amount in percentage by which this file list has the same
-     *         files as the other filelist.
-     */
-    public int match(FileList other) {
-	return getPaths().size() == 0 ? 0 : 100
-		* diff(other).getUnalteredPaths().size() / getPaths().size();
-    }
-
-    private List<IPath> sorted(Set<IPath> pathSet) {
-	List<IPath> paths = new ArrayList<IPath>(pathSet);
-	Collections.sort(paths, this.comparator);
-	return paths;
-    }
-
-    @Override
-    public String toString() {
-	return "FileList(files:" + this.all.size() + ")";
-    }
-
-    /**
-     * @return the XML representation of this FileList. You can use the returned
-     *         string to construct the same file list again.
-     */
-    public String toXML() {
-	StringBuilder sb = new StringBuilder();
-	sb.append("<filelist>");
-
-	appendFileGroup(sb, "added", this.added);
-	appendFileGroup(sb, "removed", this.removed);
-	appendFileGroup(sb, "altered", this.altered);
-	appendFileGroup(sb, "unaltered", this.unaltered);
-
-	sb.append("</filelist>");
-
-	return sb.toString();
-    }
 }

@@ -30,85 +30,80 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
-public class ConnectDisconnectAction extends Action implements
-	IConnectionListener {
+public class ConnectDisconnectAction extends Action implements IConnectionListener {
 
-    private final IPropertyChangeListener propertyListener;
+	private IPropertyChangeListener propertyListener;
 
-    public ConnectDisconnectAction() {
-	updateStatus();
-	Saros.getDefault().addListener(this);
+	public ConnectDisconnectAction() {
+		updateStatus();
+		Saros.getDefault().addListener(this);
 
-	this.propertyListener = new IPropertyChangeListener() {
-	    public void propertyChange(PropertyChangeEvent event) {
-		if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
-		    updateStatus();
-		}
-	    }
-	};
-	Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
-		this.propertyListener);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-     */
-    public void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState) {
-	updateStatus();
-    }
-
-    @Override
-    public void run() {
-	new Thread(new Runnable() {
-	    public void run() {
-		Saros saros = Saros.getDefault();
-		boolean reconnect = false;
-		if (saros.getConnectionState() == Saros.ConnectionState.ERROR) {
-		    reconnect = true;
-		}
-
-		if (saros.isConnected()) {
-		    saros.disconnect(null);
-		} else {
-		    saros.connect(reconnect);
-		}
-	    }
-	}).start();
-    }
-
-    private void updateStatus() {
-	ConnectionState state = Saros.getDefault().getConnectionState();
-
-	switch (state) {
-	case CONNECTED:
-	case CONNECTING:
-	    setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
-	    break;
-
-	case ERROR:
-	case NOT_CONNECTED:
-	case DISCONNECTING:
-	    setImageDescriptor(SarosUI
-		    .getImageDescriptor("/icons/disconnect.png"));
-	    break;
+		propertyListener = new IPropertyChangeListener() {
+			public void propertyChange(PropertyChangeEvent event) {
+				if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
+					updateStatus();
+				}
+			}
+		};
+		Saros.getDefault().getPreferenceStore().addPropertyChangeListener(propertyListener);
 	}
 
-	String username = Saros.getDefault().getPreferenceStore().getString(
-		PreferenceConstants.USERNAME);
+	@Override
+	public void run() {
+		new Thread(new Runnable() {
+			public void run() {
+				Saros saros = Saros.getDefault();
+				boolean reconnect=false;
+				if (saros.getConnectionState() == Saros.ConnectionState.ERROR)
+					reconnect=true;
 
-	setEnabled((state == ConnectionState.CONNECTED)
-		|| (((state == ConnectionState.NOT_CONNECTED) || (state == ConnectionState.ERROR)) && ((username != null) && (username
-			.length() > 0))));
-	updateText();
-    }
+				if (saros.isConnected()) {
+					saros.disconnect(null);
+				} else {
+					saros.connect(reconnect);
+				}
+			}
+		}).start();
+	}
 
-    private void updateText() {
-	ConnectionState state = Saros.getDefault().getConnectionState();
-	String text = SarosUI.getDescription(state);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+	 */
+	public void connectionStateChanged(XMPPConnection connection, ConnectionState newState) {
+		updateStatus();
+	}
 
-	setText(text);
-    }
+	private void updateStatus() {
+		ConnectionState state = Saros.getDefault().getConnectionState();
+
+		switch (state) {
+		case CONNECTED:
+		case CONNECTING:
+			setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
+			break;
+
+		case ERROR:
+		case NOT_CONNECTED:
+		case DISCONNECTING:
+			setImageDescriptor(SarosUI.getImageDescriptor("/icons/disconnect.png"));
+			break;
+		}
+
+		String username = Saros.getDefault().getPreferenceStore().getString(
+			PreferenceConstants.USERNAME);
+
+		setEnabled(state == ConnectionState.CONNECTED
+			|| ((state == ConnectionState.NOT_CONNECTED || state == ConnectionState.ERROR) && (username != null && username
+				.length() > 0)));
+		updateText();
+	}
+
+	private void updateText() {
+		ConnectionState state = Saros.getDefault().getConnectionState();
+		String text = SarosUI.getDescription(state);
+
+		setText(text);
+	}
 }

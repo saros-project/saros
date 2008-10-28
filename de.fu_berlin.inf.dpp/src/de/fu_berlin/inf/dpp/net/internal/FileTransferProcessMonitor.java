@@ -14,77 +14,71 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
  */
 public class FileTransferProcessMonitor extends Thread {
 
-    private static Logger logger = Logger
-	    .getLogger(FileTransferProcessMonitor.class);
+	private static Logger logger = Logger.getLogger(FileTransferProcessMonitor.class);
+	
+	FileTransfer transfer;
+	private int TIMEOUT = 10000;
 
-    private IFileTransferCallback callback;
-    private boolean closeMonitor = false;
+	private boolean running = true;
 
-    private boolean running = true;
+	private boolean closeMonitor = false;
+	
+	private IFileTransferCallback callback;
 
-    private final int TIMEOUT = 10000;
-
-    FileTransfer transfer;
-
-    public FileTransferProcessMonitor(FileTransfer transfer) {
-	this.transfer = transfer;
-	start();
-    }
-
-    public FileTransferProcessMonitor(FileTransfer transfer,
-	    IFileTransferCallback callback) {
-	this.transfer = transfer;
-	this.callback = callback;
-	start();
-    }
-
-    public void closeMonitor(boolean close) {
-	this.closeMonitor = close;
-    }
-
-    public String getException() {
-	return null;
-    }
-
-    public boolean isRunning() throws XMPPException {
-	return this.running;
-    }
-
-    @Override
-    public void run() {
-	int time = 0;
-
-	while (!this.closeMonitor) {
-	    try {
-		while (!this.transfer.isDone()
-			&& (this.transfer.getProgress() < 1.0)) {
-
-		    /* check negotiator process */
-		    FileTransferProcessMonitor.logger.debug("Status: "
-			    + this.transfer.getStatus() + " Progress : "
-			    + this.transfer.getProgress());
-		    if (this.callback != null) {
-			this.callback.transferProgress((int) (this.transfer
-				.getProgress() * 100));
-		    }
-		    if (this.closeMonitor) {
-			return;
-		    }
-		    Thread.sleep(500);
-		}
-		this.running = false;
-		time = time + 500;
-
-		if (time > this.TIMEOUT) {
-		    this.closeMonitor = true;
-		    return;
-		}
-		Thread.sleep(500);
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-	    }
+	public FileTransferProcessMonitor(FileTransfer transfer) {
+		this.transfer = transfer;
+		start();
+	}
+	
+	public FileTransferProcessMonitor(FileTransfer transfer, IFileTransferCallback callback) {
+		this.transfer = transfer;
+		this.callback = callback;
+		start();
 	}
 
-    }
+	public boolean isRunning() throws XMPPException {
+		return this.running;
+	}
+
+	public String getException() {
+		return null;
+	}
+
+	public void closeMonitor(boolean close) {
+		this.closeMonitor = close;
+	}
+
+	public void run() {
+		int time = 0;
+
+		while (!closeMonitor ) {
+			try {
+				while (!transfer.isDone() && (transfer.getProgress()<1.0)) {
+
+					/* check negotiator process */
+					logger.debug("Status: " + transfer.getStatus()
+							+ " Progress : " + transfer.getProgress());
+					if(callback != null){
+						callback.transferProgress((int)(transfer.getProgress()*100));
+					}
+					if(closeMonitor){
+						return;
+					}
+					Thread.sleep(500);
+				}
+				this.running = false;
+				time = time + 500;
+				
+				if(time>TIMEOUT){
+					closeMonitor = true;
+					return;
+				}
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
 
 }
