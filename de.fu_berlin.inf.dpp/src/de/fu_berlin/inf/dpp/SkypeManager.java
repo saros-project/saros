@@ -32,12 +32,9 @@ public class SkypeManager implements IConnectionListener {
 
     private SkypeManager() {
 	Saros.getDefault().addListener(this);
-	// TODO: Änderung für Smack 3
 	ProviderManager providermanager = ProviderManager.getInstance();
 	providermanager
 		.addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
-	// ProviderManager.addIQProvider("query", "jabber:iq:skype",
-	// SkypeIQ.class);
     }
 
     public static SkypeManager getDefault() {
