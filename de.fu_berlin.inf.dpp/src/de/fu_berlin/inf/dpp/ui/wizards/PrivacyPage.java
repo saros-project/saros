@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
+// TODO CJ Review needed: Class never used
 public class PrivacyPage extends WizardPage implements IWizardPage2 {
 
     protected PrivacyPage() {
