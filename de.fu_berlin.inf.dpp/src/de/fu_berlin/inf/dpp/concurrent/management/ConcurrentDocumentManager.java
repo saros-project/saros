@@ -124,19 +124,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 				+ " for path : "
 				+ editor.getPath().toOSString());
 	    }
-	    // }
-	    // else{
-	    // if(editor.getType() == Type.Saved){
-	    // long checksum =
-	    // FileUtil.checksum(sharedProject.getProject().getFile(editor.getPath()));
-	    // System.out.println("Checksumme on client side : "+checksum+ " for
-	    // path : "+editor.getPath().toOSString());
-	    // if(checksum != editor.getChecksum()){
-	    // System.out.println("Problem!");
-	    // }
-	    // }
-	    // }
-
 	}
     }
 
@@ -176,11 +163,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	if (activity instanceof TextEditActivity) {
 	    TextEditActivity textEdit = (TextEditActivity) activity;
 	    // if (!isHostSide()) {
-	    /**
-	     * lokal erzeugte operation beim client 1. Aufruf von
-	     * generateRequest beim client. Ã„nderungen wurden bereits im Editor
-	     * geschrieben. 2. versenden der Ã„nderungen an Server (spÃ¤ter)
-	     */
 	    JupiterClient jupClient = null;
 	    /* no jupiter client already exists for this editor text edit */
 	    if (!this.clientDocs.containsKey(textEdit.getEditor())) {
@@ -448,12 +430,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	return result;
     }
 
-    /*
-     * 1. hinzufügen und löschen von jupiter servern 2. list mit transmitter
-     * threads, die Nachrichten aus den outgoing queues versenden. 3.
-     * Schnittstelle vom Itransmitter zu den einzelnen jupiter document servern,
-     * um die Nachrichten vom Itransmitter weiterzuleiten.
-     */
     private JupiterDocumentServer initDocumentServer(IPath path) {
 	JupiterDocumentServer docServer = null;
 	/* create new document server. */
