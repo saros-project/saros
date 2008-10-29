@@ -86,6 +86,8 @@ public class Saros extends AbstractUIPlugin {
     // Smack (XMPP) connection listener
     private final ConnectionListener smackConnectionListener = new XMPPConnectionListener();
 
+    private Logger logger;
+
     static {
 	PacketExtensions.hookExtensionProviders();
 	Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
@@ -124,22 +126,6 @@ public class Saros extends AbstractUIPlugin {
 		&& hasUserName) {
 	    asyncConnect();
 	}
-
-	// if (!hasUserName){
-	//			
-	// Display.getDefault().asyncExec(new Runnable() {
-	// public void run() {
-	// try {
-	// Shell shell = Display.getDefault().getActiveShell();
-	// new WizardDialog(shell, new ConfigurationWizard()).open();
-	// } catch (Exception e) {
-	// Saros.getDefault().getLog().log(
-	// new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-	// "Error while running configuration wizard", e));
-	// }
-	// }
-	// });
-	// }
     }
 
     /**
@@ -283,7 +269,7 @@ public class Saros extends AbstractUIPlugin {
 	    this.connection
 		    .removeConnectionListener(this.smackConnectionListener);
 	    // connection.close();
-	    // TODO: Änderung für Smack 3
+	    // TODO CJ: changed by orieger -> inspection needed
 	    this.connection.disconnect();
 	    this.connection = null;
 	}
@@ -325,7 +311,7 @@ public class Saros extends AbstractUIPlugin {
 	monitor.worked(1);
 
 	// connection.close();
-	// TODO: Änderung für Smack 3
+	// TODO CJ: changed by orieger -> inspection needed
 	connection.disconnect();
 	monitor.done();
     }
@@ -365,30 +351,6 @@ public class Saros extends AbstractUIPlugin {
     }
 
     public boolean isConnected() {
-	//		
-	// new Thread(new Runnable() {
-	// public void run() {
-	// int counter = 0;
-	// while(counter < 30){
-	// if(connection != null && connection.isConnected()){
-	// System.out.println(".");
-	// }
-	// else{
-	// System.out.println("-");
-	// }
-	// try {
-	// Thread.sleep(1000);
-	// } catch (InterruptedException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// counter++;
-	// }
-	// }
-	// }).start();
-	//		
-	// System.out.println("reconnect enable: "+connection.isConnected());
-	// connection.disconnect();
 	return (this.connection != null) && this.connection.isConnected();
     }
 
@@ -449,27 +411,11 @@ public class Saros extends AbstractUIPlugin {
 
 	    PropertyConfigurator.configureAndWatch("log4j.properties",
 		    60 * 1000);
-	    Logger.getLogger("de.fu_berlin.inf.dpp");
-
-	    // Logger sarosRootLogger =
-	    // Logger.getLogger("de.fu_berlin.inf.dpp");
-	    // sarosRootLogger.setLevel(Level.ALL);
-
-	    // Handler handler = new FileHandler("saros.log", 10 * 1024 * 1024,
-	    // 1, true);
-	    // Handler handler = new ConsoleHandler();
-	    // handler.setFormatter(new SimpleFormatter());
-	    // sarosRootLogger.addHandler(handler);
-
-	    // handler = new ConsoleHandler();
-	    // sarosRootLogger.addHandler(handler);
+	    logger = Logger.getLogger("de.fu_berlin.inf.dpp");
 
 	} catch (SecurityException e) {
 	    e.printStackTrace();
 	}
-	// catch (IOException e) {
-	// e.printStackTrace();
-	// }
     }
 
     /**
@@ -491,6 +437,7 @@ public class Saros extends AbstractUIPlugin {
 
     private class XMPPConnectionListener implements ConnectionListener {
 
+	// TODO CJ Review needed
 	// Variables to support listener notifications verification
 	private boolean connectionClosed = false;
 	private boolean connectionClosedOnError = false;
@@ -511,13 +458,13 @@ public class Saros extends AbstractUIPlugin {
 	    this.connectionClosedOnError = true;
 
 	    Toolkit.getDefaultToolkit().beep();
-	    System.out.println("XMPP Connection Error: " + e.toString());
+	    logger.debug("XMPP Connection Error: " + e.toString());
 
 	    if (Saros.this.connection != null) {
 		Saros.this.connection
 			.removeConnectionListener(Saros.this.smackConnectionListener);
 		Saros.this.connection.disconnect();
-		// TODO: Änderung
+		// TODO CJ: changed by orieger -> inspection needed
 		// connection.close();
 	    }
 
@@ -549,7 +496,7 @@ public class Saros extends AbstractUIPlugin {
 			    if (Saros.this.connection.isConnected()) {
 				Saros.this.sessionManager
 					.OnReconnect(offlineAtTS);
-				System.out.println("XMPP reconnected");
+				logger.debug("XMPP reconnected");
 			    }
 
 			} catch (InterruptedException e) {
@@ -564,21 +511,18 @@ public class Saros extends AbstractUIPlugin {
 	}
 
 	public void reconnectingIn(int seconds) {
-	    // TODO Auto-generated method stub
-	    System.out.println("saros reconnectingIn");
+	    logger.debug("saros reconnectingIn");
 	    this.attemptsNotifications = this.attemptsNotifications + 1;
 	    this.remainingSeconds = seconds;
 	}
 
 	public void reconnectionFailed(Exception e) {
-	    // TODO Auto-generated method stub
-	    System.out.println("saros reconnectionFailed");
+	    logger.debug("saros reconnectionFailed");
 	    this.reconnectionFailed = true;
 	}
 
 	public void reconnectionSuccessful() {
-	    // TODO Auto-generated method stub
-	    System.out.println("saros reconnectionSuccessful");
+	    logger.debug("saros reconnectionSuccessful");
 	    this.reconnected = true;
 	}
     }
