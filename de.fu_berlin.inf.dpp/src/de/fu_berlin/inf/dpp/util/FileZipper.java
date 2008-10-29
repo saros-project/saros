@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.Path;
  * 
  * @author orieger
  * 
+ *         TODO CJ: review needed
+ * 
  */
 public class FileZipper {
 

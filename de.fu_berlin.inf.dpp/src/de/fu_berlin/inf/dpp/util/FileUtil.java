@@ -13,6 +13,8 @@ import org.eclipse.core.runtime.CoreException;
  * 
  * @author orieger
  * 
+ *         TODO CJ: review needed
+ * 
  */
 public class FileUtil {
 

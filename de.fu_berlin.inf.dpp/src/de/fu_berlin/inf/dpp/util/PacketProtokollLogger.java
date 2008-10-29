@@ -8,6 +8,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.Saros;
 
+// TODO CJ: review needed
 public class PacketProtokollLogger {
 
     private static Logger logger;
