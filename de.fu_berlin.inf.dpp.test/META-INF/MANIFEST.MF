@@ -46,7 +46,6 @@ Export-Package: de.fu_berlin.inf.dpp.test;uses:="org.jivesoftware.smackx.filetra
    de.fu_berlin.inf.dpp,
    org.eclipse.core.resources,
    org.eclipse.core.runtime",
- de.fu_berlin.inf.dpp.test.project.svn;uses:="junit.framework",
  de.fu_berlin.inf.dpp.test.stubs;
   uses:="de.fu_berlin.inf.dpp.editor,
    org.eclipse.swt.graphics,

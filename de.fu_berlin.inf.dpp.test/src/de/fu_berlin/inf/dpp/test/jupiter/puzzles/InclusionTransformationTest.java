@@ -15,7 +15,6 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
  * @author orieger
  * 
  */
-
 public class InclusionTransformationTest extends JupiterTestCase {
 
     TwoWayJupiterClientDocument client;
