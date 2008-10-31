@@ -6,12 +6,14 @@ import de.fu_berlin.inf.dpp.FileList;
 
 public class FileListHelper {
 
-	public static FileList createFileListForDefaultProject() throws CoreException{
-		return new FileList(ResourceHelper.createDefaultProject());
-	}
-	
-	public static FileList createFielListForProject(String projectname) throws CoreException{
-		return new FileList(ResourceHelper.createProject(projectname));
-	}
-	
+    public static FileList createFileListForDefaultProject()
+	    throws CoreException {
+	return new FileList(ResourceHelper.createDefaultProject());
+    }
+
+    public static FileList createFielListForProject(String projectname)
+	    throws CoreException {
+	return new FileList(ResourceHelper.createProject(projectname));
+    }
+
 }

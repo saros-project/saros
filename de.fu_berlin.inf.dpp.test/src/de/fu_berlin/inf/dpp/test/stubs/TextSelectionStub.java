@@ -27,35 +27,35 @@ public class TextSelectionStub implements ITextSelection {
     private int length;
     private int startLine;
     private int endLine;
-    
+
     public TextSelectionStub(int offset, int length, int startLine, int endLine) {
-        this.offset = offset;
-        this.length = length;
-        this.startLine = startLine;
-        this.endLine = endLine;
+	this.offset = offset;
+	this.length = length;
+	this.startLine = startLine;
+	this.endLine = endLine;
     }
 
     public int getOffset() {
-        return offset;
+	return offset;
     }
 
     public int getLength() {
-        return length;
+	return length;
     }
 
     public int getStartLine() {
-        return startLine;
+	return startLine;
     }
 
     public int getEndLine() {
-        return endLine;
+	return endLine;
     }
 
     public String getText() {
-        return null;
+	return null;
     }
 
     public boolean isEmpty() {
-        return false;
+	return false;
     }
 }

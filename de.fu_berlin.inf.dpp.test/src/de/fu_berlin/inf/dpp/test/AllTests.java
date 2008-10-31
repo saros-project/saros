@@ -25,15 +25,20 @@ import junit.framework.TestSuite;
 public class AllTests {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("Test for de.fu_berlin.inf.dpp.test");
-        //$JUnit-BEGIN$
-        suite.addTestSuite(ActivitiesExtensionProviderTest.class);
-//        suite.addTestSuite(ActivityCollectorTest.class);
-        suite.addTestSuite(JIDTest.class);
-        suite.addTestSuite(FileListTest.class);
-        suite.addTestSuite(ActivitySequencerTest.class);
-        suite.addTestSuite(EditorManagerTest2.class);
-        //$JUnit-END$
-        return suite;
+	TestSuite suite = new TestSuite("Test for de.fu_berlin.inf.dpp.test");
+	// $JUnit-BEGIN$
+	suite.addTestSuite(ActivitiesExtensionProviderTest.class);
+	suite.addTestSuite(SmackFileTransferTest.class);
+	suite.addTestSuite(ActivitySequencerTest.class);
+	suite.addTestSuite(JIDTest.class);
+	suite.addTestSuite(FileListTest.class);
+	suite.addTestSuite(SarosTest.class);
+	suite.addTestSuite(EditorManagerTest2.class);
+	suite.addTestSuite(ContributionAnnotationTest.class);
+	suite.addTestSuite(EditorManagerTest.class);
+	suite.addTestSuite(EditorAPITest.class);
+	suite.addTestSuite(RequestExtensionProviderTest.class);
+	// $JUnit-END$
+	return suite;
     }
 }

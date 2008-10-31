@@ -19,53 +19,53 @@
  */
 package de.fu_berlin.inf.dpp.test;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import junit.framework.TestCase;
+import de.fu_berlin.inf.dpp.net.JID;
 
 public class JIDTest extends TestCase {
     private JID id;
     private JID idWithResource;
-    
+
     @Override
     protected void setUp() throws Exception {
-        id  = new JID("riad@jabber.org");
-        idWithResource = new JID("riad@jabber.org/saros");
+	id = new JID("riad@jabber.org");
+	idWithResource = new JID("riad@jabber.org/saros");
     }
-    
+
     public void testMalformatedJID() {
-        try {
-            new JID("riad");
-            fail();
-        } catch (IllegalArgumentException e) {
-            // okay
-        }        
+	try {
+	    new JID("riad");
+	    fail();
+	} catch (IllegalArgumentException e) {
+	    // okay
+	}
     }
-    
+
     public void testGetUser() {
-        assertEquals("riad", id.getName());
-        assertEquals("riad", idWithResource.getName());
+	assertEquals("riad", id.getName());
+	assertEquals("riad", idWithResource.getName());
     }
-    
+
     public void testGetHost() {
-        assertEquals("jabber.org", id.getDomain());
-        assertEquals("jabber.org", idWithResource.getDomain());
+	assertEquals("jabber.org", id.getDomain());
+	assertEquals("jabber.org", idWithResource.getDomain());
     }
-    
+
     public void testGetResource() {
-        assertEquals("", id.getResource());
-        assertEquals("saros", idWithResource.getResource());
+	assertEquals("", id.getResource());
+	assertEquals("saros", idWithResource.getResource());
     }
-    
+
     public void testGetBase() {
-        assertEquals("riad@jabber.org", id.getBase());
-        assertEquals("riad@jabber.org", idWithResource.getBase());
+	assertEquals("riad@jabber.org", id.getBase());
+	assertEquals("riad@jabber.org", idWithResource.getBase());
     }
-    
+
     public void testEquals() {
-        assertEquals(id, id);
-        assertEquals(idWithResource, idWithResource);
-        assertEquals(id, idWithResource);
-        
-        assert !id.equals(new JID("bob@jabber.org"));
+	assertEquals(id, id);
+	assertEquals(idWithResource, idWithResource);
+	assertEquals(id, idWithResource);
+
+	assert !id.equals(new JID("bob@jabber.org"));
     }
 }

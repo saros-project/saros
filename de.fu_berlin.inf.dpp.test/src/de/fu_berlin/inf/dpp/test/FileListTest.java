@@ -35,123 +35,130 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.test.stubs.FileStub;
 
 public class FileListTest extends TestCase {
-    private IFile[]  files;
-    private IFile[]  otherFiles;
+    private IFile[] files;
+    private IFile[] otherFiles;
 
     private FileList fileList;
     private FileList otherFileList;
-    
+
     @Override
     protected void setUp() throws Exception {
-        files = new IFile[] {
-            new FileStub("root.txt", "this in the root"),
-            new FileStub("foo/bar/unit.java", "class Test {}"),
-            new FileStub("foo/bar/test.txt", "")
-        };
-        fileList = new FileList(files);
-        
-        otherFiles = new IFile[] {
-            new FileStub("root.txt", "this in the root"),
-            new FileStub("foo/bar/unit.java", "class Test {void foo(){}}"),
-            new FileStub("foo/test.txt", "another test content")
-        };
-        otherFileList = new FileList(otherFiles);
+	files = new IFile[] { new FileStub("root.txt", "this in the root"),
+		new FileStub("foo/bar/unit.java", "class Test {}"),
+		new FileStub("foo/bar/test.txt", "") };
+	fileList = new FileList(files);
+
+	otherFiles = new IFile[] {
+		new FileStub("root.txt", "this in the root"),
+		new FileStub("foo/bar/unit.java", "class Test {void foo(){}}"),
+		new FileStub("foo/test.txt", "another test content") };
+	otherFileList = new FileList(otherFiles);
     }
-    
+
     @Override
     protected void tearDown() throws Exception {
     }
-    
+
     public void testGetFilePaths() {
-        List<IPath> paths = fileList.getPaths();
-        
-        assertPaths(new String[]{"root.txt", "foo/bar/unit.java", "foo/bar/test.txt"}, paths);
+	List<IPath> paths = fileList.getPaths();
+
+	assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
+		"foo/bar/test.txt" }, paths);
     }
-    
+
     public void testGetFileUnalteredPaths() {
-        Collection<IPath> paths = fileList.getUnalteredPaths();
-        
-        assertPaths(new String[]{"root.txt", "foo/bar/unit.java", "foo/bar/test.txt"}, paths);
+	Collection<IPath> paths = fileList.getUnalteredPaths();
+
+	assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
+		"foo/bar/test.txt" }, paths);
     }
-    
+
     public void testDiffGetAddedFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getAddedPaths();        
+	Collection<IPath> paths = fileList.diff(otherFileList).getAddedPaths();
 
-        assertPaths(new String[]{"foo/test.txt"}, paths);
+	assertPaths(new String[] { "foo/test.txt" }, paths);
     }
-    
+
     public void testReversedDiffGetAddedFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList).getAddedPaths(); 
+	Collection<IPath> paths = otherFileList.diff(fileList).getAddedPaths();
 
-        assertPaths(new String[]{"foo/bar/test.txt"}, paths);
+	assertPaths(new String[] { "foo/bar/test.txt" }, paths);
     }
-    
+
     public void testDiffGetRemovedFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getRemovedPaths();        
+	Collection<IPath> paths = fileList.diff(otherFileList)
+		.getRemovedPaths();
 
-        assertPaths(new String[]{"foo/bar/test.txt"}, paths);
+	assertPaths(new String[] { "foo/bar/test.txt" }, paths);
     }
-    
+
     public void testReversedDiffGetRemovedFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList).getRemovedPaths();        
+	Collection<IPath> paths = otherFileList.diff(fileList)
+		.getRemovedPaths();
 
-        assertPaths(new String[]{"foo/test.txt"}, paths);
+	assertPaths(new String[] { "foo/test.txt" }, paths);
     }
-    
+
     public void testDiffGetAlteredFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getAlteredPaths();        
+	Collection<IPath> paths = fileList.diff(otherFileList)
+		.getAlteredPaths();
 
-        assertPaths(new String[]{"foo/bar/unit.java"}, paths);
+	assertPaths(new String[] { "foo/bar/unit.java" }, paths);
     }
-    
+
     public void testReversedDiffGetAlteredFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList).getAlteredPaths();        
+	Collection<IPath> paths = otherFileList.diff(fileList)
+		.getAlteredPaths();
 
-        assertPaths(new String[]{"foo/bar/unit.java"}, paths);
+	assertPaths(new String[] { "foo/bar/unit.java" }, paths);
     }
-    
+
     public void testDiffGetUnalteredFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getUnalteredPaths();        
+	Collection<IPath> paths = fileList.diff(otherFileList)
+		.getUnalteredPaths();
 
-        assertPaths(new String[]{"root.txt"}, paths);
+	assertPaths(new String[] { "root.txt" }, paths);
     }
-    
+
     public void testReversedDiffGetUnalteredFilePaths() {
-        Collection<IPath> paths = otherFileList.diff(fileList).getUnalteredPaths();        
+	Collection<IPath> paths = otherFileList.diff(fileList)
+		.getUnalteredPaths();
 
-        assertPaths(new String[]{"root.txt"}, paths);
+	assertPaths(new String[] { "root.txt" }, paths);
     }
-    
+
     public void testDiffGetFilePaths() {
-        Collection<IPath> paths = fileList.diff(otherFileList).getPaths();
-        
-        assertPaths(new String[]{"root.txt", "foo/bar/unit.java", "foo/test.txt"}, paths);
+	Collection<IPath> paths = fileList.diff(otherFileList).getPaths();
+
+	assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
+		"foo/test.txt" }, paths);
     }
-    
+
     public void testMatch() {
-        assertEquals(33, fileList.match(otherFileList));
-        assertEquals(33, otherFileList.match(fileList));
-        assertEquals(100, fileList.match(fileList));
+	assertEquals(33, fileList.match(otherFileList));
+	assertEquals(33, otherFileList.match(fileList));
+	assertEquals(100, fileList.match(fileList));
     }
-    
+
     public void testEquals() throws CoreException {
-        FileList sameFileList = new FileList(files);
-        assertEquals(fileList, sameFileList);
-        
-        assertFalse(fileList.equals(otherFileList));
+	FileList sameFileList = new FileList(files);
+	assertEquals(fileList, sameFileList);
+
+	assertFalse(fileList.equals(otherFileList));
     }
-    
-    public void testRoundtripSerialization() throws XmlPullParserException, IOException {
-        FileList replicated = new FileList(fileList.toXML());
-        assertEquals(fileList, replicated);
+
+    public void testRoundtripSerialization() throws XmlPullParserException,
+	    IOException {
+	FileList replicated = new FileList(fileList.toXML());
+	assertEquals(fileList, replicated);
     }
-    
+
     private void assertPaths(String[] expected, Collection<IPath> actual) {
-        for (int i = 0; i < expected.length; i++) {
-            Path path = new Path(expected[i]);
-            assertTrue(actual.contains(path));
-        }
-        
-        assertEquals(expected.length, actual.size());
+	for (int i = 0; i < expected.length; i++) {
+	    Path path = new Path(expected[i]);
+	    assertTrue(actual.contains(path));
+	}
+
+	assertEquals(expected.length, actual.size());
     }
 }
