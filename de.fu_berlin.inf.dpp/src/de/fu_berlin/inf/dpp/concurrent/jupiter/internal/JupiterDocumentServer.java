@@ -38,11 +38,6 @@ public class JupiterDocumentServer implements JupiterServer {
      */
     private RequestTransmitter transmitter;
 
-    // /** for add and remove client synchronization. */
-    // public boolean waitForSerializer = false;
-    // /** counter for remove client synchronization.*/
-    // public int requestSyncCounter = 0;
-
     /**
      * this forwarder reads request form the local outgoing queue and transmit
      * the requests to the global outgoing queue.

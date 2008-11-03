@@ -43,6 +43,10 @@ public class MultiUserChatManager implements PacketListener {
 	this.room = roomName;
     }
 
+    public MultiUserChatManager() {
+	// TODO Auto-generated constructor stub
+    }
+
     public void initMUC(XMPPConnection connection, String user, String room)
 	    throws XMPPException {
 	this.room = room;
