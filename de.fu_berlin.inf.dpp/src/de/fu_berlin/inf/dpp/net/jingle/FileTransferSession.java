@@ -137,37 +137,6 @@ public class FileTransferSession extends JingleMediaSession {
 	}
     }
 
-    /**
-     * Obtain a free port we can use.
-     * 
-     * @return A free port number.
-     */
-    protected int getFreePort() {
-	ServerSocket ss;
-	int freePort = 0;
-
-	for (int i = 0; i < 10; i++) {
-	    freePort = (int) (10000 + Math.round(Math.random() * 10000));
-	    freePort = freePort % 2 == 0 ? freePort : freePort + 1;
-	    try {
-		ss = new ServerSocket(freePort);
-		freePort = ss.getLocalPort();
-		ss.close();
-		return freePort;
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
-	}
-	try {
-	    ss = new ServerSocket(0);
-	    freePort = ss.getLocalPort();
-	    ss.close();
-	} catch (IOException e) {
-	    e.printStackTrace();
-	}
-	return freePort;
-    }
-
     public JingleFileTransferProcessMonitor getProcessMonitor() {
 	return this.monitor;
     }
