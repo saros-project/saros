@@ -26,6 +26,16 @@ public class AllTests {
 
     public static Test suite() {
 	TestSuite suite = new TestSuite("Test for de.fu_berlin.inf.dpp.test");
+
+	suite.addTest(de.fu_berlin.inf.dpp.test.actions.AllTests.suite());
+	suite.addTest(de.fu_berlin.inf.dpp.test.jupiter.puzzles.AllTests
+		.suite());
+	suite
+		.addTest(de.fu_berlin.inf.dpp.test.jupiter.server.AllTests
+			.suite());
+	suite.addTest(de.fu_berlin.inf.dpp.test.jupiter.text.network.AllTests
+		.suite());
+
 	// $JUnit-BEGIN$
 	suite.addTestSuite(ActivitiesExtensionProviderTest.class);
 	suite.addTestSuite(SmackFileTransferTest.class);
