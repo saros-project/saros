@@ -40,7 +40,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
@@ -52,9 +51,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
-import org.jivesoftware.smackx.filetransfer.FileTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IBBTransferNegotiator;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.xmlpull.v1.XmlPullParserException;
@@ -73,12 +70,6 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.JingleFileTransferData.FileTransferType;
-import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferProcessMonitor;
-import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
@@ -89,7 +80,7 @@ import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
  * @author rdjemili
  */
 public class XMPPChatTransmitter implements ITransmitter, IReceiver,
-	MessageListener, FileTransferListener, IJingleFileTransferListener {
+	MessageListener, FileTransferListener {
     private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
 	    .getName());
 
@@ -98,8 +89,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
     private static boolean jingle = true;
-    private final boolean JingleError = false;
-    private JingleFileTransferManager jingleManager;
+
     /*
      * the following string descriptions are used to differentiate between
      * transfers that are for invitations and transfers that are an activity for
@@ -136,15 +126,10 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     private boolean m_bFileTransferByChat = false; // to switch to
 
-    // chat-filetransfer as
-    // fallback
-
     /**
      * A simple struct that is used to queue file transfers.
      */
     public class FileTransferData {
-
-	public FileTransferType type;
 	public JID recipient;
 	public IPath path;
 	public int timestamp;
@@ -194,35 +179,12 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	this.connection = connection;
 	this.chatmanager = connection.getChatManager();
 	this.fileTransferManager = new FileTransferManager(connection);
-	// TODO: aktuell noch nicht angesprochen
 	this.fileTransferManager.addFileTransferListener(this);
 
 	this.chats.clear();
 
-	setProxyPort(connection);
-
-	// TODO always preserve threads
-	// this.connection.addPacketListener(this, new
-	// MessageTypeFilter(Message.Type.chat)); // HACK
-	// this.connection.addPacketListener(this, new
-	// MessageTypeFilter(Message.Type.groupchat));
-
-	/*
-	 * an dieser Stelle wird der MUC Transmitter initialisiert, um die
-	 * Kapselung des Systems mit dem Fassadenmuster nicht zu verletzten.
-	 * TODO: Später überlegen, wie wir es trennen. Alle Methoden rufen
-	 * momentan ITransmitter Methoden des MUC Transmitter auf, soweit diese
-	 * implementiert sind.
-	 */
-	// this.mucmanager = new MultiUserChatManager();
-	// mucmanager.setConnection(connection, this);
 	this.privatechatmanager = new PrivateChatManager();
 	this.privatechatmanager.setConnection(connection, this);
-
-	if (XMPPChatTransmitter.jingle) {
-	    /* try to connect with jingle */
-	    this.jingleManager = new JingleFileTransferManager(connection, this);
-	}
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
@@ -231,8 +193,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     public void removeInvitationProcess(IInvitationProcess process) {
 	this.processes.remove(process);
-	/* terminate jingle session for states: done, cancel and joined. */
-	this.jingleManager.terminateJingleSession(process.getPeer());
     }
 
     /*
@@ -243,8 +203,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
 	sendMessage(user, PacketExtensions
 		.createCancelInviteExtension(errorMsg));
-	/* terminate jingle session. */
-	this.jingleManager.terminateJingleSession(user);
     }
 
     /*
@@ -376,32 +334,11 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	if ((this.mucmanager != null) && this.mucmanager.isConnected()) {
 	    this.mucmanager.sendActivities(sharedProject, timedActivities);
 	} else {
-	    /*
-	     * if no connection with muc room, send activities with private
-	     * message
-	     */
 	    if (timedActivities != null) {
 		sendMessageToAll(sharedProject, new ActivitiesPacketExtension(
 			timedActivities));
 	    }
 	}
-
-    }
-
-    private void sendFileListWithJingle(JID recipient, String fileListContent) {
-	JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
-	/* create file transfer. */
-	JingleFileTransferData data = new JingleFileTransferData();
-
-	/* only for testing. */
-	data.file_list_content = fileListContent;
-	data.type = FileTransferType.FILELIST_TRANSFER;
-	data.recipient = recipient;
-	data.sender = new JID(this.connection.getUser());
-	data.file_project_path = FileTransferType.FILELIST_TRANSFER.toString();
-
-	this.jingleManager.createOutgoingJingleFileTransfer(recipient,
-		new JingleFileTransferData[] { data }, monitor);
 
     }
 
@@ -429,151 +366,70 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    }
 	}
 
-	/* send with jingle file transfer */
-	if (XMPPChatTransmitter.jingle
-		&& (this.jingleManager.getState(recipient) != JingleConnectionState.ERROR)
-		&& !this.JingleError) {
+	/* send file with IBB File Transfer */
 
-	    sendFileListWithJingle(recipient, xml);
+	XMPPChatTransmitter.log.debug("Establishing file list transfer");
 
-	} else {
-	    /* send file with IBB File Transfer */
-
-	    XMPPChatTransmitter.log.debug("Establishing file list transfer");
-
-	    /* Write xml datas to temp file for transfering. */
-	    try {
-		File newfile = new File(
-			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
-				+ new JID(this.connection.getUser()).getName());
-		if (newfile.exists()) {
-		    newfile.delete();
-		}
-		XMPPChatTransmitter.log.debug("file : "
-			+ newfile.getAbsolutePath());
-
-		FileWriter writer = new FileWriter(
-			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
-				+ new JID(this.connection.getUser()).getName());
-		writer.append(xml);
-		writer.close();
-
-		// } catch (IOException e1) {
-		// // TODO Auto-generated catch block
-		// e1.printStackTrace();
-		// }
-
-		// while (true) {
-
-		// try {
-		OutgoingFileTransfer
-			.setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
-		OutgoingFileTransfer transfer = this.fileTransferManager
-			.createOutgoingFileTransfer(to);
-
-		// OutputStream out = transfer.sendFile(
-		// FILELIST_TRANSFER_DESCRIPTION, xml.getBytes().length,
-		// FILELIST_TRANSFER_DESCRIPTION);
-		//
-		// if (out != null) {
-		// if (attempts-- > 0)
-		// continue;
-		// throw new XMPPException(transfer.getException());
-		// }
-		//
-		// BufferedWriter writer = new BufferedWriter(new
-		// PrintWriter(
-		// out));
-		// writer.write(xml);
-		// writer.flush();
-		// writer.close();
-		// }
-
-		XMPPChatTransmitter.log.info("Sending file list");
-		FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-			transfer);
-		transfer.sendFile(newfile,
-			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION);
-
-		/* wait for complete transfer. */
-		while (monitor.isAlive() && monitor.isRunning()) {
-		    Thread.sleep(500);
-		}
-		monitor.closeMonitor(true);
-
-		// int time = 0;
-		// while (!transfer.isDone()) {
-		//
-		// if (transfer
-		// .getStatus()
-		// .equals(
-		// org.jivesoftware.smackx.filetransfer.FileTransfer.Status.error))
-		// {
-		// log.error("ERROR!!! " + transfer.getError());
-		// } else {
-		// log.debug("Status : " + transfer.getStatus()+" Progress :
-		// " +
-		// transfer.getProgress());
-		// }
-		// try {
-		// /* check response time out. */
-		// if (time < OutgoingFileTransfer.getResponseTimeout()) {
-		// Thread.sleep(100);
-		// time += 100;
-		// }
-		// else{
-		// log.error("File transfer response error.");
-		// throw new XMPPException("File transfer response error.");
-		// }
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
-
-		/*
-		 * TODO: es kommt momentan zu einer file not found exception,
-		 * obwohl die Datei übertragen wurde.
-		 */
-		// if (!transfer
-		// .getStatus()
-		// .equals(
-		// org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete))
-		// {
-		// log.warn("file list transfer incomplete!");
-		// throw new XMPPException("file list transfer incomplete");
-		// }
-		/* delete temp file. */
-		// File list = new File(FILELIST_TRANSFER_DESCRIPTION);
-		if (newfile.exists()) {
-		    newfile.delete();
-		}
-		XMPPChatTransmitter.log.info("File list sent");
-
-		// break;
-
-	    } catch (IOException e) {
-		// if (attempts-- > 0)
-		// continue;
-
-		this.m_bFileTransferByChat = true;
-		sendChatTransfer(
-			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION, "",
-			xml.getBytes(), recipient);
-		// TODO errorhandling
-
-		XMPPChatTransmitter.log
-			.info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
+	/* Write xml datas to temp file for transfering. */
+	try {
+	    File newfile = new File(
+		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
+			    + new JID(this.connection.getUser()).getName());
+	    if (newfile.exists()) {
+		newfile.delete();
 	    }
-	    // }
-	    catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	    }
+	    XMPPChatTransmitter.log
+		    .debug("file : " + newfile.getAbsolutePath());
 
-	    // end of jingle transfer
+	    FileWriter writer = new FileWriter(
+		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
+			    + new JID(this.connection.getUser()).getName());
+	    writer.append(xml);
+	    writer.close();
+
+	    OutgoingFileTransfer
+		    .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
+	    OutgoingFileTransfer transfer = this.fileTransferManager
+		    .createOutgoingFileTransfer(to);
+
+	    XMPPChatTransmitter.log.info("Sending file list");
+	    FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
+		    transfer);
+	    transfer.sendFile(newfile,
+		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION);
+
+	    /* wait for complete transfer. */
+	    while (monitor.isAlive() && monitor.isRunning()) {
+		Thread.sleep(500);
+	    }
+	    monitor.closeMonitor(true);
+
+	    if (newfile.exists()) {
+		newfile.delete();
+	    }
+	    XMPPChatTransmitter.log.info("File list sent");
+
+	    // break;
+
+	} catch (IOException e) {
+	    // if (attempts-- > 0)
+	    // continue;
+
+	    this.m_bFileTransferByChat = true;
+	    sendChatTransfer(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION,
+		    "", xml.getBytes(), recipient);
+	    // TODO errorhandling
+
+	    XMPPChatTransmitter.log
+		    .info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
+	}
+	// }
+	catch (InterruptedException e) {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
 	}
 
+	// end of jingle transfer
     }
 
     /**
@@ -1182,7 +1038,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    }
 	    if (!iAmInviter && (project != null)) {
 		project.addUser(new User(fromJID)); // a new user joined this
-						    // session
+		// session
 
 	    }
 
@@ -1309,9 +1165,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	else if (PacketExtensions.getJingleErrorExtension(message) != null) {
 	    XMPPChatTransmitter.log.debug("Receive jingle error messages from "
 		    + fromJID);
-	    /* set error state for this peer in jingle connection states. */
-	    this.jingleManager.setJingleErrorState(fromJID);
-	    /* TODO: callback for other connections possible? */
 	} else if (PacketExtensions.getJupiterErrorExtension(message) != null) {
 	    XMPPChatTransmitter.log.debug("Receive jingle error messages from "
 		    + fromJID);
@@ -1334,64 +1187,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
      * @see org.jivesoftware.smackx.filetransfer.FileTransferListener
      */
     public void fileTransferRequest(FileTransferRequest incommingRequest) {
-
-	/* for testing file transfer. */
-
-	// File newfile = null;
-	// try {
-	//
-	// String fileDescription = request.getDescription();
-	// log.debug("incomming file transfer " + request.getFileName());
-	// if (fileDescription.equals(FILELIST_TRANSFER_DESCRIPTION)) {
-	//
-	// /*
-	// * Create file list file
-	// */
-	// IncomingFileTransfer transfer = request.accept();
-	//
-	// log.debug(request.getFileName() + " with filepath "
-	// + transfer.getFilePath());
-	//
-	// FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-	// transfer);
-	// /* receive file. */
-	// newfile = new File(request.getFileName());
-	// transfer.recieveFile(newfile);
-	//
-	// /* wait for complete transfer. */
-	// while (monitor.isAlive() && monitor.isRunning()) {
-	// Thread.sleep(500);
-	// }
-	// monitor.closeMonitor(true);
-	//
-	// /* change file list receiver */
-	// FileList fileList = receiveFileList(newfile);
-	//
-	// // FileList fileList = receiveFileList(request);
-	//
-	// JID fromJID = new JID(request.getRequestor());
-	//
-	// for (IInvitationProcess process : processes) {
-	// if (process.getPeer().equals(fromJID))
-	// process.fileListReceived(fromJID, fileList);
-	// }
-	// log.debug("received filelist with file transfer. ");
-	// } else {
-	// if (fileDescription
-	// .startsWith(RESOURCE_TRANSFER_DESCRIPTION, 0)) {
-	// // /* receive file. */
-	// // newfile = new File(request.getFileName());
-	// // transfer.recieveFile(newfile);
-	//
-	// receiveResource(request);
-	// log.debug("receive ressource file transfer.");
-	// }
-	// }
-	//
-	// } catch (Exception e) {
-	// log.error(e);
-	// }
-	/* end for testing file transfer. */
 
 	final FileTransferRequest request = incommingRequest;
 
@@ -1432,7 +1227,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 			receiveResource(request);
 		    }
 		} catch (Exception e) {
-		    // TODO Exception weiter reichen.
 		    XMPPChatTransmitter.log.error(
 			    "Incoming File Transfer Thread: ", e);
 		    for (IInvitationProcess process : XMPPChatTransmitter.this.processes) {
@@ -1549,23 +1343,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	}
     }
 
-    private void receiveResource(JingleFileTransferData data, InputStream input) {
-	try {
-	    JID from = data.sender;
-	    Path path = new Path(data.file_project_path);
-
-	    for (IInvitationProcess process : this.processes) {
-		if (process.getPeer().equals(from)) {
-		    process.resourceReceived(from, path, input);
-
-		}
-	    }
-
-	} catch (Exception e) {
-	    XMPPChatTransmitter.log.error("Error during receive file", e);
-	}
-    }
-
     /**
      * receive resource with file transfer.
      * 
@@ -1670,54 +1447,11 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    return;
 	}
 
-	if (XMPPChatTransmitter.jingle
-		&& (this.jingleManager.getState(recipient) != JingleConnectionState.ERROR)) {
-	    XMPPChatTransmitter.log.info("Sent file " + transferData.path
-		    + " (with Jingle)");
+	/* Fallback to transfer all data into one archive file. */
+	// TODO: Don't ask the InvitationProcesses what to do, rather try
+	// IBB yourself.
+	transferData.callback.jingleFallback();
 
-	    JingleFileTransferProcessMonitor monitor = new JingleFileTransferProcessMonitor();
-	    /* create file transfer. */
-	    JingleFileTransferData data = new JingleFileTransferData();
-
-	    /* only for testing. */
-	    data.file_project_path = transferData.path.toString();
-	    data.project_name = transferData.project.getName();
-	    data.type = FileTransferType.RESOURCE_TRANSFER;
-	    data.recipient = recipient;
-	    data.sender = new JID(this.connection.getUser());
-
-	    /* read content data. */
-	    File f = new File(transferData.project.getFile(transferData.path)
-		    .getLocation().toOSString());
-	    data.filesize = f.length();
-	    data.content = new byte[(int) data.filesize];
-
-	    try {
-		InputStream in = transferData.project
-			.getFile(transferData.path).getContents();
-		in.read(data.content, 0, (int) data.filesize);
-	    } catch (Exception e) {
-		e.printStackTrace();
-		data.content = null;
-		XMPPChatTransmitter.log
-			.error("Error during read file content for transfer!");
-	    }
-
-	    this.jingleManager.createOutgoingJingleFileTransfer(recipient,
-		    new JingleFileTransferData[] { data }, monitor);
-
-	    /* inform callback. */
-	    if (transferData.callback != null) {
-		transferData.callback.fileSent(transferData.path);
-	    }
-
-	} else {
-	    /* Fallback to transfer all data into one archive file. */
-	    // TODO: Don't ask the InvitationProcesses what to do, rather try
-	    // IBB yourself.
-	    transferData.callback.jingleFallback();
-
-	}
     }
 
     /**
@@ -1795,10 +1529,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	} catch (Exception e) {
 	    XMPPChatTransmitter.log.error("Error in Incoming File List: ", e);
 	    return null;
-	    // e.printStackTrace();
-	    // Saros.log("Exception while receiving file list", e);
-	    // TODO retry? but we dont catch any exception here,
-	    // smack might not throw them up
 	}
 
 	return fileList;
@@ -1806,10 +1536,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     private void putIncomingChat(JID jid, String thread) {
 	if (!this.chats.containsKey(jid)) {
-
-	    // TODO: Änderung für Smack 3
-	    // Chat chat = this.chatmanager.createChat(jid.toString(), thread,
-	    // this);
 	    Chat chat = this.chatmanager.getThreadChat(thread);
 	    this.chats.put(jid, chat);
 	}
@@ -1824,34 +1550,11 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	Chat chat = this.chats.get(jid);
 
 	if (chat == null) {
-
-	    // ChatManager chatmanager = connection.getChatManager();
-	    // chat = new Chat(connection, jid.toString());
-
-	    // TODO: Änderung für Smack 3 : Listener angeben
 	    chat = this.chatmanager.createChat(jid.toString(), this);
 	    this.chats.put(jid, chat);
 	}
 
 	return chat;
-    }
-
-    private void setProxyPort(XMPPConnection connection) {
-
-	IPreferenceStore preferenceStore = Saros.getDefault()
-		.getPreferenceStore();
-	// TODO: Änderung für smack 3 : filetransfer have to be implements new
-	this.fileTransferManager.getProperties().setProperty(
-		FileTransferNegotiator.AVOID_SOCKS5, "true");
-	this.fileTransferManager
-		.getProperties()
-		.setProperty(
-			IBBTransferNegotiator.PROPERTIES_BLOCK_SIZE,
-			preferenceStore
-				.getString(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE));
-	// fileTransferManager.getProperties().setProperty(Socks5TransferNegotiator.PROPERTIES_PORT,
-	// preferenceStore.getString(PreferenceConstants.FILE_TRANSFER_PORT));
-
     }
 
     private boolean getFileTransferModeViaChat() {
@@ -1879,38 +1582,5 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    }
 	}
 
-    }
-
-    public void exceptionOccured(JingleSessionException exception) {
-	// TODO: exception weiter geben oder für Fallback verwenden!
-	XMPPChatTransmitter.log.error("Jingle Session Exception");
-
-	// this.JingleError = true;
-	/* jingle exception with given jid */
-	if (exception.getJID() != null) {
-	    /* inform invitation process. */
-	    for (IInvitationProcess process : this.processes) {
-		if (process.getPeer().equals(exception.getJID())) {
-		    /* set jingle connection error. */
-		    this.jingleManager.setJingleErrorState(exception.getJID());
-		    /* fallback in invitation process */
-		    process.jingleFallback();
-		    /* send error state to recipient. */
-		    sendMessage(exception.getJID(), PacketExtensions
-			    .createJingleErrorExtension());
-		    XMPPChatTransmitter.log
-			    .debug("jingle fallback. send error message to "
-				    + exception.getJID());
-		}
-	    }
-	} else {
-	    ErrorMessageDialog.showErrorMessage(exception);
-	}
-    }
-
-    public void incomingResourceFile(JingleFileTransferData data,
-	    InputStream input) {
-	XMPPChatTransmitter.log.debug("incoming file");
-	receiveResource(data, input);
     }
 }
