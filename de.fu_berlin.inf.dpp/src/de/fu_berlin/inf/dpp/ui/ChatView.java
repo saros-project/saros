@@ -92,7 +92,6 @@ public class ChatView extends ViewPart implements ISessionListener,
 
 	this.viewer.addTextListener(new ITextListener() {
 
-	    @Override
 	    public void textChanged(TextEvent event) {
 
 		// scrolls down, so the last line is visible
@@ -104,7 +103,6 @@ public class ChatView extends ViewPart implements ISessionListener,
 
 	this.connectAction = new Action("Connect/DisConnect") {
 
-	    @Override
 	    public void run() {
 		MessagingManager mm = Saros.getDefault().getMessagingManager();
 		Saros.getDefault().getConnection().getUser();
@@ -170,31 +168,26 @@ public class ChatView extends ViewPart implements ISessionListener,
 	Saros.getDefault().addListener(this);
     }
 
-    @Override
     public void setFocus() {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void invitationReceived(IIncomingInvitationProcess invitation) {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void sessionEnded(ISharedProject session) {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void sessionStarted(ISharedProject session) {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void connectionStateChanged(XMPPConnection connection,
 	    ConnectionState newState) {
 	if (newState == ConnectionState.CONNECTED) {
@@ -214,7 +207,6 @@ public class ChatView extends ViewPart implements ISessionListener,
 
     }
 
-    @Override
     public void chatMessageAdded(final String sender, final String message) {
 	ChatView.log.debug("Received Message from " + sender + ": " + message);
 	Display.getDefault().asyncExec(new Runnable() {

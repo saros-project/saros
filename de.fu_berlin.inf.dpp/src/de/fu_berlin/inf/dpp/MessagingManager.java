@@ -408,7 +408,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 		this.multitrans.initMUC(conn, conn.getUser());
 	    }
 	    // muc.addMessageListener(mucl);
-	    // TODO: Überprüfen, ob auch noch verbunden
+	    // TODO: check if still connected
 	    if ((this.multiSession == null)
 		    && (this.multitrans.getMUC() != null)) {
 		// muc.removeMessageListener(mucl);
