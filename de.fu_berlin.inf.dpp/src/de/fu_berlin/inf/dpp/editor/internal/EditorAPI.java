@@ -6,8 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
@@ -25,6 +25,7 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -227,8 +228,9 @@ public class EditorAPI implements IEditorAPI {
     private final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
 	public void verifyKey(VerifyEvent event) {
 
-	    // System.out.println(((int)event.character) + " - " + event.keyCode
-	    // + " - " + event.stateMask);
+	    log.debug(((int) event.character) + " - " + event.keyCode + " - "
+		    + event.stateMask);
+
 	    if (event.character > 0) {
 		event.doit = false;
 
@@ -458,7 +460,7 @@ public class EditorAPI implements IEditorAPI {
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
     public void setEditable(final IEditorPart editorPart, final boolean editable) {
-	EditorAPI.log.fine(editorPart + " set to editable:" + editable);
+	EditorAPI.log.debug(editorPart + " set to editable:" + editable);
 
 	Display.getDefault().syncExec(new Runnable() {
 	    public void run() {
@@ -476,11 +478,24 @@ public class EditorAPI implements IEditorAPI {
 		    EditorAPI.this.lockedEditors.remove(editorPart);
 		    textViewer
 			    .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
+
+		    // enable editing and undo-manager
+		    SourceViewer sourceViewer = (SourceViewer) textViewer;
+		    sourceViewer.setEditable(true);
+
+		    // TODO use undoLevel from Preferences (TextEditorPlugin)
+		    sourceViewer.getUndoManager().setMaximalUndoLevel(200);
+
 		} else if (!editable
 			&& !EditorAPI.this.lockedEditors.contains(editorPart)) {
 		    EditorAPI.this.lockedEditors.add(editorPart);
 		    textViewer
 			    .appendVerifyKeyListener(EditorAPI.this.keyVerifier);
+
+		    // disable editing and undo-manager
+		    SourceViewer sourceViewer = (SourceViewer) textViewer;
+		    sourceViewer.setEditable(false);
+		    sourceViewer.getUndoManager().setMaximalUndoLevel(0);
 		}
 	    }
 	});
