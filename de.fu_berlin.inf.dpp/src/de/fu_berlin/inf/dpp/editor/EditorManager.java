@@ -489,9 +489,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void exec(final IActivity activity) {
 
-	/* set current execute activity to avoid cirle executions. */
-	this.currentExecuteActivity = activity;
-
 	if (activity instanceof EditorActivity) {
 	    EditorActivity editorActivity = (EditorActivity) activity;
 
@@ -538,12 +535,17 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		    file = EditorManager.this.sharedProject.getProject()
 			    .getFile(textEdit.getEditor());
 		}
+
 		// TODO: This is a major HACK here. There should be a
 		// normalization
 		// happening much earlier to also avoid UTF-8 conversion errors
 		// and such.
 		String text = fixDelimiters(file, textEdit.text);
-		((TextEditActivity) EditorManager.this.currentExecuteActivity).text = text;
+		textEdit.text = text;
+
+		/* set current execute activity to avoid cirle executions. */
+		EditorManager.this.currentExecuteActivity = textEdit;
+
 		replaceText(file, textEdit.offset, textEdit.replace, text,
 			textEdit.getSource());
 
