@@ -1001,14 +1001,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 		IActivity activity = timedActivity.getActivity();
 		activity.setSource(fromJID.toString());
 
-		// if (activity instanceof TextSelectionActivity) {
-		// ((TextSelectionActivity) activity).setSource(fromJID
-		// .toString());
-		// }
-		// if (activity instanceof TextEditActivity) {
-		// ((TextEditActivity) activity).setSource(fromJID.toString());
-		// }
-
 		/*
 		 * incoming fileActivities that add files are only used as
 		 * placeholder to bump the timestamp. the real fileActivity will
@@ -1018,8 +1010,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 			|| !((FileActivity) activity).getType().equals(
 				FileActivity.Type.Created)) {
 
-		    // TODO: Empfang der Aktivitäten und weiterleitung an den
-		    // sequencer
 		    project.getSequencer().exec(timedActivity);
 
 		}
