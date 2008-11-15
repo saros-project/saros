@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
  * Implements {@link IActivitySequencer} and {@link IActivityManager}.
@@ -208,49 +207,49 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      *            incoming editor activity with type saved
      */
     private void checkSavedFile(EditorActivity editor) {
-	/* 1. reset appropriate jupiter document. */
-	if (isHostSide() || this.sharedProject.isDriver()) {
-	    ActivitySequencer.logger.debug("reset jupiter server for "
-		    + editor.getPath());
-	    this.concurrentManager.resetJupiterDocument(editor.getPath());
-	}
-
-	/* check match of file checksums. */
-
-	if (!isHostSide() && (editor.getType() == Type.Saved)) {
-	    long checksum = FileUtil.checksum(this.sharedProject.getProject()
-		    .getFile(editor.getPath()));
-	    ActivitySequencer.logger
-		    .debug("Checksumme on client side : " + checksum
-			    + " for path : " + editor.getPath().toOSString());
-	    if (checksum != editor.getChecksum()) {
-		ActivitySequencer.logger.error("Checksum error of file "
-			+ editor.getPath());
-	    }
-	}
-	if (isHostSide()) {
-	    /* create local checksum. */
-	    long checksum = FileUtil.checksum(this.sharedProject.getProject()
-		    .getFile(editor.getPath()));
-
-	    if (checksum != editor.getChecksum()) {
-		/* send checksum error */
-		ActivitySequencer.logger.error("Checksum error for file "
-			+ editor.getPath() + " of " + editor.getSource()
-			+ " ( " + checksum + " != " + editor.getChecksum()
-			+ " )");
-
-		/* send checksum error */
-		FileActivity fileError = new FileActivity(
-			FileActivity.Type.Error, editor.getPath(), new JID(
-				editor.getSource()));
-		activityCreated(fileError);
-		/* send sync file. */
-		FileActivity file = new FileActivity(FileActivity.Type.Created,
-			editor.getPath(), new JID(editor.getSource()));
-		activityCreated(file);
-	    }
-	}
+	// /* 1. reset appropriate jupiter document. */
+	// if (isHostSide() || this.sharedProject.isDriver()) {
+	// ActivitySequencer.logger.debug("reset jupiter server for "
+	// + editor.getPath());
+	// this.concurrentManager.resetJupiterDocument(editor.getPath());
+	// }
+	//
+	// /* check match of file checksums. */
+	//
+	// if (!isHostSide() && (editor.getType() == Type.Saved)) {
+	// long checksum = FileUtil.checksum(this.sharedProject.getProject()
+	// .getFile(editor.getPath()));
+	// ActivitySequencer.logger
+	// .debug("Checksumme on client side : " + checksum
+	// + " for path : " + editor.getPath().toOSString());
+	// if (checksum != editor.getChecksum()) {
+	// ActivitySequencer.logger.error("Checksum error of file "
+	// + editor.getPath());
+	// }
+	// }
+	// if (isHostSide()) {
+	// /* create local checksum. */
+	// long checksum = FileUtil.checksum(this.sharedProject.getProject()
+	// .getFile(editor.getPath()));
+	//
+	// if (checksum != editor.getChecksum()) {
+	// /* send checksum error */
+	// ActivitySequencer.logger.error("Checksum error for file "
+	// + editor.getPath() + " of " + editor.getSource()
+	// + " ( " + checksum + " != " + editor.getChecksum()
+	// + " )");
+	//
+	// /* send checksum error */
+	// FileActivity fileError = new FileActivity(
+	// FileActivity.Type.Error, editor.getPath(), new JID(
+	// editor.getSource()));
+	// activityCreated(fileError);
+	// /* send sync file. */
+	// FileActivity file = new FileActivity(FileActivity.Type.Created,
+	// editor.getPath(), new JID(editor.getSource()));
+	// activityCreated(file);
+	// }
+	// }
     }
 
     /*
