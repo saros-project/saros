@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IPath;
 
 public interface ISharedEditorListener {
     /**
-     * The resource that the driver is currently editting has changed.
+     * The resource that the driver is currently editing has changed.
      * 
      * @param path
      *            the project-relative path of the resource that is the new
@@ -22,7 +22,7 @@ public interface ISharedEditorListener {
      * the driver is currently using.
      * 
      * @param path
-     *            the path to the resource that the driver was editting.
+     *            the path to the resource that the driver was editing.
      * @param replicated
      *            <code>false</code> if this action originates on this client.
      *            <code>false</code> if it is an replication of an action from
@@ -34,7 +34,7 @@ public interface ISharedEditorListener {
      * Is fired when the driver editor is saved.
      * 
      * @param path
-     *            the path to the resource that the driver was editting.
+     *            the path to the resource that the driver was editing.
      * @param replicated
      *            <code>false</code> if this action originates on this client.
      *            <code>false</code> if it is an replication of an action from
