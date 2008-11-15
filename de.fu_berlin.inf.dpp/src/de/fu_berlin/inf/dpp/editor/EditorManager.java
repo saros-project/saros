@@ -827,7 +827,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * Saves the driver editor.
      * 
      * @param path
-     *            the path to the resource that the driver was editting.
+     *            the path to the resource that the driver was editing.
      * @param replicated
      *            <code>false</code> if this action originates on this client.
      *            <code>false</code> if it is an replication of an action from
