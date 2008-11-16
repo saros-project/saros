@@ -55,7 +55,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  */
 public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
-    private static Logger logger = Logger.getLogger(ExecuterQueue.class);
+    private static Logger logger = Logger.getLogger(ActivitySequencer.class
+	    .getName());
 
     /**/
     public class ExecuterQueue {
@@ -81,8 +82,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	    if (this.currentExecutedActivity != null) {
 		if ((activity instanceof TextEditActivity)
 			&& this.currentExecutedActivity.sameLike(activity)) {
-		    ActivitySequencer.logger.debug("TextEditActivity "
-			    + activity + " is executed.");
+		    logger.debug("TextEditActivity " + activity
+			    + " is executed.");
 		    this.executed = true;
 		    notify();
 		}
@@ -92,7 +93,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
 	public synchronized void addActivity(IActivity activity) {
 	    if (activity instanceof TextEditActivity) {
-		ActivitySequencer.logger.debug("Add new Activity " + activity
+		logger.debug("Add new Activity " + activity
 			+ " to executer queue.");
 		this.executerQueue.add((TextEditActivity) activity);
 		notify();
@@ -106,8 +107,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 		}
 		this.currentExecutedActivity = this.executerQueue.remove(0);
 		this.executed = false;
-		ActivitySequencer.logger.debug("Remove "
-			+ this.currentExecutedActivity
+		logger.debug("Remove " + this.currentExecutedActivity
 			+ " form executer queue.");
 		/* get next activity in queue. */
 		return this.currentExecutedActivity;
@@ -120,9 +120,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     private static final int UNDEFINED_TIME = -1;
-
-    private static Logger log = Logger.getLogger(ActivitySequencer.class
-	    .getName());
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
@@ -173,7 +170,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 		if (!this.concurrentManager.isHostSide()
 			&& (this.concurrentManager.exec(activity) != null)) {
 		    // CLIENT SIDE
-		    ActivitySequencer.logger
+		    logger
 			    .debug("Execute received activity (without jupiter): "
 				    + activity);
 		    for (IActivityProvider executor : this.providers) {
@@ -196,7 +193,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	    }
 
 	} catch (Exception e) {
-	    ActivitySequencer.log.error("Error while executing activity.", e);
+	    logger.error("Error while executing activity.", e);
 	}
     }
 
@@ -367,7 +364,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	    // return;
 	    // }
 	    /* check for execute next activity in queue. */
-	    ActivitySequencer.log.debug("activity created : " + activity);
+	    logger.debug("activity created : " + activity);
 	    this.executer.checkCreatedActivity(activity);
 
 	    /* activity is already managed by jupiter and executed now. */
@@ -593,7 +590,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	 * sync with jupiter server on host side and transform operation with
 	 * jupiter client side.
 	 */
-	ActivitySequencer.log.debug("Receive request : " + request + " from "
+	logger.debug("Receive request : " + request + " from "
 		+ request.getJID());
 	this.concurrentManager.receiveRequest(request);
 
@@ -617,8 +614,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      */
     public void execTransformedActivity(IActivity activity) {
 	try {
-	    ActivitySequencer.log.debug("execute transformed activity: "
-		    + activity);
+	    logger.debug("execute transformed activity: " + activity);
 
 	    /* add new activity to executer queue. */
 	    this.executer.addActivity(activity);
@@ -638,12 +634,11 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	    }
 	    /* send activity to all observer. */
 	    if (this.concurrentManager.isHostSide()) {
-		ActivitySequencer.log.debug("send transformed activity: "
-			+ activity);
+		logger.debug("send transformed activity: " + activity);
 		this.activities.add(activity);
 	    }
 	} catch (Exception e) {
-	    ActivitySequencer.log.error("Error while executing activity.", e);
+	    logger.error("Error while executing activity.", e);
 	}
     }
 }
