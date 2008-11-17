@@ -28,14 +28,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.manipulation.ConvertLineDelimitersOperation;
+import org.eclipse.core.filebuffers.manipulation.FileBufferOperationRunner;
+import org.eclipse.core.filebuffers.manipulation.TextFileBufferOperation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
@@ -125,6 +130,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	}
     }
 
+    /**
+     * @author rdjemili
+     * 
+     */
+    /**
+     * @author rdjemili
+     * 
+     */
     private class EditorPool {
 	private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
@@ -151,14 +164,59 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	    IDocument document = EditorManager.this.editorAPI
 		    .getDocument(editorPart);
-	    document.addDocumentListener(EditorManager.this.documentListener);
 
 	    if (editors == null) {
 		editors = new HashSet<IEditorPart>();
 		this.editorParts.put(path, editors);
 	    }
 
+	    // if line delimiters are not in unix style convert them
+	    if (document instanceof IDocumentExtension4) {
+		if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
+			.equals("\n")) {
+		    convertLineDelimiters(editorPart);
+		}
+	    } else {
+		EditorManager.log
+			.error("Can't discover line delimiter of document");
+	    }
+
+	    document.addDocumentListener(EditorManager.this.documentListener);
 	    editors.add(editorPart);
+	}
+
+	private void convertLineDelimiters(IEditorPart editorPart) {
+
+	    EditorManager.log.debug("Converting line delimiters...");
+
+	    // get path of file
+	    IFile file = ((FileEditorInput) editorPart.getEditorInput())
+		    .getFile();
+	    IPath[] paths = new IPath[1];
+	    paths[0] = file.getFullPath();
+
+	    ITextFileBufferManager buffManager = FileBuffers
+		    .getTextFileBufferManager();
+
+	    // convert operation to change line delimiters
+	    TextFileBufferOperation convertOperation = new ConvertLineDelimitersOperation(
+		    "\n");
+
+	    // operation runner for the convert operation
+	    FileBufferOperationRunner runner = new FileBufferOperationRunner(
+		    buffManager, null);
+
+	    // execute convert operation in runner
+	    try {
+		runner.execute(paths, convertOperation,
+			new NullProgressMonitor());
+	    } catch (OperationCanceledException e) {
+		EditorManager.log.error("Can't convert line delimiters! "
+			+ e.getMessage());
+	    } catch (CoreException e) {
+		EditorManager.log.error("Can't convert line delimiters!"
+			+ e.getMessage());
+	    }
 	}
 
 	public void remove(IEditorPart editorPart) {
@@ -517,7 +575,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    private void execTextEdit(TextEditActivity textEdit) {
 		if (getActiveDriverEditor() == null) {
 		    EditorManager.log
-			    .severe("Received text edit but have no driver editor");
+			    .error("Received text edit but have no driver editor");
 		    return;
 		}
 		// TODO: change getActiveEditor to IActivity.getEditorPath()
@@ -536,25 +594,19 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			    .getFile(textEdit.getEditor());
 		}
 
-		// TODO: This is a major HACK here. There should be a
-		// normalization
-		// happening much earlier to also avoid UTF-8 conversion errors
-		// and such.
-		String text = fixDelimiters(file, textEdit.text);
-		textEdit.text = text;
-
 		/* set current execute activity to avoid cirle executions. */
 		EditorManager.this.currentExecuteActivity = textEdit;
 
-		replaceText(file, textEdit.offset, textEdit.replace, text,
-			textEdit.getSource());
+		replaceText(file, textEdit.offset, textEdit.replace,
+			textEdit.text, textEdit.getSource());
 
 		Set<IEditorPart> editors = EditorManager.this.editorPool
 			.getEditors(driverEditor);
 		for (IEditorPart editorPart : editors) {
 		    EditorManager.this.editorAPI.setSelection(editorPart,
-			    new TextSelection(textEdit.offset + text.length(),
-				    0), textEdit.getSource());
+			    new TextSelection(textEdit.offset
+				    + textEdit.text.length(), 0), textEdit
+				    .getSource());
 		}
 	    }
 
@@ -567,7 +619,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 		if (activeDriverEditor == null) {
 		    EditorManager.log
-			    .severe("Received text selection but have no driver editor");
+			    .error("Received text selection but have no driver editor");
 		    return;
 		}
 
@@ -582,7 +634,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    private void execViewport(ViewportActivity viewport) {
 		if (getActiveDriverEditor() == null) {
 		    EditorManager.log
-			    .severe("Received viewport but have no driver editor");
+			    .error("Received viewport but have no driver editor");
 		    return;
 		}
 
@@ -669,9 +721,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    }
 
 	} catch (XmlPullParserException e) {
-	    EditorManager.log.severe("Couldn't parse message");
+	    EditorManager.log.error("Couldn't parse message");
 	} catch (IOException e) {
-	    EditorManager.log.severe("Couldn't parse message");
+	    EditorManager.log.error("Couldn't parse message");
 	}
 
 	return null;
@@ -859,7 +911,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 		provider.saveDocument(new NullProgressMonitor(), input, doc,
 			true);
-		EditorManager.log.fine("Saved document " + path);
+		EditorManager.log.debug("Saved document " + path);
 
 		model.disconnect(doc);
 
@@ -867,8 +919,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		this.connectedFiles.remove(file);
 
 	    } catch (CoreException e) {
-		EditorManager.log.log(Level.SEVERE, "Failed to save document.",
-			e);
+		EditorManager.log.error("Failed to save document.", e);
 	    }
 
 	} else {
@@ -886,29 +937,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	for (IActivityListener listener : this.activityListeners) {
 	    listener.activityCreated(activity);
 	}
-    }
-
-    /**
-     * Replaces the line delimiters in given text by the default line delimiters
-     * of given file.
-     * 
-     * @return the string with replaced delimiters.
-     */
-    private String fixDelimiters(IFile file, String text) {
-	FileEditorInput input = new FileEditorInput(file);
-	IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
-	IDocument doc = provider.getDocument(input);
-
-	if (doc instanceof IDocumentExtension4) {
-	    IDocumentExtension4 docExtension4 = (IDocumentExtension4) doc;
-	    String delimiter = docExtension4.getDefaultLineDelimiter();
-
-	    if (delimiter != null) {
-		return text.replace("\n", delimiter);
-	    }
-	}
-
-	return text;
     }
 
     private void activateOpenEditors() {
