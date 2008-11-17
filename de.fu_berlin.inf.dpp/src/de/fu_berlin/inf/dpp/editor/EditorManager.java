@@ -134,10 +134,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @author rdjemili
      * 
      */
-    /**
-     * @author rdjemili
-     * 
-     */
     private class EditorPool {
 	private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
