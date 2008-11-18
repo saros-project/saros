@@ -557,97 +557,91 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    }
 	}
 
-	Display.getDefault().syncExec(new Runnable() {
-	    public void run() {
-		if (activity instanceof TextEditActivity) {
-		    execTextEdit((TextEditActivity) activity);
-		} else if (activity instanceof TextSelectionActivity) {
-		    execTextSelection((TextSelectionActivity) activity);
-		} else if (activity instanceof ViewportActivity) {
-		    execViewport((ViewportActivity) activity);
-		}
-	    }
+	if (activity instanceof TextEditActivity) {
+	    execTextEdit((TextEditActivity) activity);
+	} else if (activity instanceof TextSelectionActivity) {
+	    execTextSelection((TextSelectionActivity) activity);
+	} else if (activity instanceof ViewportActivity) {
+	    execViewport((ViewportActivity) activity);
+	}
+    }
 
-	    private void execTextEdit(TextEditActivity textEdit) {
-		if (getActiveDriverEditor() == null) {
-		    EditorManager.log
-			    .error("Received text edit but have no driver editor");
-		    return;
-		}
-		// TODO: change getActiveEditor to IActivity.getEditorPath()
-		IPath driverEditor = getActiveDriverEditor();
-		IFile file = null;
-		/*
-		 * if concurrent driver edited another document, get the right
-		 * file.
-		 */
-		if ((textEdit.getEditor() != null)
-			&& driverEditor.equals(textEdit.getEditor())) {
-		    file = EditorManager.this.sharedProject.getProject()
-			    .getFile(driverEditor);
-		} else {
-		    file = EditorManager.this.sharedProject.getProject()
-			    .getFile(textEdit.getEditor());
-		}
+    private void execTextEdit(TextEditActivity textEdit) {
+	if (getActiveDriverEditor() == null) {
+	    EditorManager.log
+		    .error("Received text edit but have no driver editor");
+	    return;
+	}
+	// TODO: change getActiveEditor to IActivity.getEditorPath()
+	IPath driverEditor = getActiveDriverEditor();
+	IFile file = null;
+	/*
+	 * if concurrent driver edited another document, get the right file.
+	 */
+	if ((textEdit.getEditor() != null)
+		&& driverEditor.equals(textEdit.getEditor())) {
+	    file = EditorManager.this.sharedProject.getProject().getFile(
+		    driverEditor);
+	} else {
+	    file = EditorManager.this.sharedProject.getProject().getFile(
+		    textEdit.getEditor());
+	}
 
-		/* set current execute activity to avoid cirle executions. */
-		EditorManager.this.currentExecuteActivity = textEdit;
+	/* set current execute activity to avoid cirle executions. */
+	EditorManager.this.currentExecuteActivity = textEdit;
 
-		replaceText(file, textEdit.offset, textEdit.replace,
-			textEdit.text, textEdit.getSource());
+	replaceText(file, textEdit.offset, textEdit.replace, textEdit.text,
+		textEdit.getSource());
 
-		Set<IEditorPart> editors = EditorManager.this.editorPool
-			.getEditors(driverEditor);
-		for (IEditorPart editorPart : editors) {
-		    EditorManager.this.editorAPI.setSelection(editorPart,
-			    new TextSelection(textEdit.offset
-				    + textEdit.text.length(), 0), textEdit
-				    .getSource());
-		}
-	    }
+	Set<IEditorPart> editors = EditorManager.this.editorPool
+		.getEditors(driverEditor);
+	for (IEditorPart editorPart : editors) {
+	    EditorManager.this.editorAPI.setSelection(editorPart,
+		    new TextSelection(textEdit.offset + textEdit.text.length(),
+			    0), textEdit.getSource());
+	}
+    }
 
-	    private void execTextSelection(TextSelectionActivity cursor) {
-		IPath activeDriverEditor = getActiveDriverEditor();
-		TextSelection textSelection = new TextSelection(cursor
-			.getOffset(), cursor.getLength());
+    private void execTextSelection(TextSelectionActivity cursor) {
+	IPath activeDriverEditor = getActiveDriverEditor();
+	TextSelection textSelection = new TextSelection(cursor.getOffset(),
+		cursor.getLength());
 
-		setDriverTextSelection(textSelection);
+	setDriverTextSelection(textSelection);
 
-		if (activeDriverEditor == null) {
-		    EditorManager.log
-			    .error("Received text selection but have no driver editor");
-		    return;
-		}
+	if (activeDriverEditor == null) {
+	    EditorManager.log
+		    .error("Received text selection but have no driver editor");
+	    return;
+	}
 
-		Set<IEditorPart> editors = EditorManager.this.editorPool
-			.getEditors(activeDriverEditor);
-		for (IEditorPart editorPart : editors) {
-		    EditorManager.this.editorAPI.setSelection(editorPart,
-			    textSelection, cursor.getSource());
-		}
-	    }
+	Set<IEditorPart> editors = EditorManager.this.editorPool
+		.getEditors(activeDriverEditor);
+	for (IEditorPart editorPart : editors) {
+	    EditorManager.this.editorAPI.setSelection(editorPart,
+		    textSelection, cursor.getSource());
+	}
+    }
 
-	    private void execViewport(ViewportActivity viewport) {
-		if (getActiveDriverEditor() == null) {
-		    EditorManager.log
-			    .error("Received viewport but have no driver editor");
-		    return;
-		}
+    private void execViewport(ViewportActivity viewport) {
+	if (getActiveDriverEditor() == null) {
+	    EditorManager.log
+		    .error("Received viewport but have no driver editor");
+	    return;
+	}
 
-		int top = viewport.getTopIndex();
-		int bottom = viewport.getBottomIndex();
+	int top = viewport.getTopIndex();
+	int bottom = viewport.getBottomIndex();
 
-		IPath driverEditor = getActiveDriverEditor();
-		Set<IEditorPart> editors = EditorManager.this.editorPool
-			.getEditors(driverEditor);
-		for (IEditorPart editorPart : editors) {
-		    EditorManager.this.editorAPI.setViewport(editorPart,
-			    EditorManager.this.isFollowing, top, bottom,
-			    EditorManager.this.sharedProject.getDriver()
-				    .getJid().toString());
-		}
-	    }
-	});
+	IPath driverEditor = getActiveDriverEditor();
+	Set<IEditorPart> editors = EditorManager.this.editorPool
+		.getEditors(driverEditor);
+	for (IEditorPart editorPart : editors) {
+	    EditorManager.this.editorAPI.setViewport(editorPart,
+		    EditorManager.this.isFollowing, top, bottom,
+		    EditorManager.this.sharedProject.getDriver().getJid()
+			    .toString());
+	}
     }
 
     // TODO unify partActivated and partOpened

@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -190,14 +191,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	return false;
     }
 
-    private void execTextEditActivity(Request request) {
+    private void execTextEditActivity(final Request request) {
 
 	// if (!isHostSide()) {
-	/**
-	 * lokal erzeugte operation beim client 1. Aufruf von generateRequest
-	 * beim client. Änderungen wurden bereits im Editor geschrieben. 2.
-	 * versenden der Änderungen an Server (später)
-	 */
 	JupiterClient jupClient = null;
 	/* no jupiter client already exists for this editor text edit */
 	if (!this.clientDocs.containsKey(request.getEditorPath())) {
@@ -210,32 +206,36 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	/* generate request. */
 	jupClient = this.clientDocs.get(request.getEditorPath());
 	if (jupClient != null) {
+
 	    /* operational transformation. */
-	    Operation op;
-	    try {
-		op = jupClient.receiveRequest(request);
-	    } catch (TransformationException e) {
-		ConcurrentDocumentManager.logger.error(
-			"Error during transformation: ", e);
+	    final JupiterClient jupiterClient = jupClient;
+	    Display.getDefault().syncExec(new Runnable() {
+		public void run() {
+		    Operation op;
+		    try {
+			op = jupiterClient.receiveRequest(request);
+		    } catch (TransformationException e) {
+			ConcurrentDocumentManager.logger.error(
+				"Error during transformation: ", e);
 
-		/* create save activity. */
-		IActivity activity = new EditorActivity(Type.Saved, request
-			.getEditorPath());
-		/* execute save activity and start consistency check. */
-		this.sequencer.exec(activity);
-		return;
-	    }
+			/* create save activity. */
+			IActivity activity = new EditorActivity(Type.Saved,
+				request.getEditorPath());
+			/* execute save activity and start consistency check. */
+			ConcurrentDocumentManager.this.sequencer.exec(activity);
+			return;
+		    }
 
-	    for (TextEditActivity textEdit : getTextEditActivity(op)) {
-		textEdit.setEditor(request.getEditorPath());
-		textEdit.setSource(request.getJID().toString());
-		/* execute activity in activity sequencer. */
-		this.sequencer.execTransformedActivity(textEdit);
-	    }
-	    // return textEdit;
+		    for (TextEditActivity textEdit : getTextEditActivity(op)) {
+			textEdit.setEditor(request.getEditorPath());
+			textEdit.setSource(request.getJID().toString());
+			/* execute activity in activity sequencer. */
+			ConcurrentDocumentManager.this.sequencer
+				.execTransformedActivity(textEdit);
+		    }
+		}
+	    });
 	}
-	// }
-	// return null;
     }
 
     public IActivity exec(IActivity activity) {

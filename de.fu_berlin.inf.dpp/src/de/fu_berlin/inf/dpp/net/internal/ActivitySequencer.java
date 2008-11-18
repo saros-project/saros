@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -153,7 +154,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * 
      * @see de.fu_berlin.inf.dpp.project.IActivityManager
      */
-    public void exec(IActivity activity) {
+    public void exec(final IActivity activity) {
 	try {
 
 	    if (activity instanceof EditorActivity) {
@@ -165,32 +166,43 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	    if (activity instanceof FolderActivity) {
 
 	    }
-	    if (activity instanceof TextEditActivity) {
-		/* check if document is already managed by jupiter mechanism. */
-		if (!this.concurrentManager.isHostSide()
-			&& (this.concurrentManager.exec(activity) != null)) {
-		    // CLIENT SIDE
-		    logger
-			    .debug("Execute received activity (without jupiter): "
-				    + activity);
-		    for (IActivityProvider executor : this.providers) {
-			executor.exec(activity);
+	    Display.getDefault().syncExec(new Runnable() {
+		public void run() {
+		    if (activity instanceof TextEditActivity) {
+
+			/*
+			 * check if document is already managed by jupiter
+			 * mechanism.
+			 */
+			if (!ActivitySequencer.this.concurrentManager
+				.isHostSide()
+				&& (ActivitySequencer.this.concurrentManager
+					.exec(activity) != null)) {
+			    // CLIENT SIDE
+			    logger
+				    .debug("Execute received activity (without jupiter): "
+					    + activity);
+			    for (IActivityProvider executor : ActivitySequencer.this.providers) {
+				executor.exec(activity);
+			    }
+			}
+		    } else {
+
+			// Execute all other activities
+			for (IActivityProvider executor : ActivitySequencer.this.providers) {
+			    executor.exec(activity);
+			}
+
+			// Check for file checksum after incoming save file
+			// activity.
+			if ((activity instanceof EditorActivity)
+				&& (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
+			    checkSavedFile((EditorActivity) activity);
+			}
+
 		    }
 		}
-	    } else {
-
-		// Execute all other activities
-		for (IActivityProvider executor : this.providers) {
-		    executor.exec(activity);
-		}
-
-		// Check for file checksum after incoming save file activity.
-		if ((activity instanceof EditorActivity)
-			&& (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
-		    checkSavedFile((EditorActivity) activity);
-		}
-
-	    }
+	    });
 
 	} catch (Exception e) {
 	    logger.error("Error while executing activity.", e);
@@ -616,18 +628,20 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	try {
 	    logger.debug("execute transformed activity: " + activity);
 
-	    /* add new activity to executer queue. */
-	    this.executer.addActivity(activity);
-
-	    /*
-	     * get next activity from queue or waiting for finishing of current
-	     * execute activity.
-	     */
-	    IActivity queueActivity = this.executer.getNextActivity();
+	    // /* add new activity to executer queue. */
+	    // this.executer.addActivity(activity);
+	    //
+	    // /*
+	    // * get next activity from queue or waiting for finishing of
+	    // current
+	    // * execute activity.
+	    // */
+	    // IActivity queueActivity = this.executer.getNextActivity();
 
 	    // mark current execute activity
 	    // executedJupiterActivity = activity;
-	    this.executedJupiterActivity = queueActivity;
+	    // this.executedJupiterActivity = queueActivity;
+	    this.executedJupiterActivity = activity;
 
 	    for (IActivityProvider exec : this.providers) {
 		exec.exec(activity);
