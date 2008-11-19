@@ -191,6 +191,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    IPath[] paths = new IPath[1];
 	    paths[0] = file.getFullPath();
 
+	    IDocument doc = EditorManager.this.editorAPI
+		    .getDocument(editorPart);
+
 	    ITextFileBufferManager buffManager = FileBuffers
 		    .getTextFileBufferManager();
 
@@ -213,6 +216,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		EditorManager.log.error("Can't convert line delimiters!"
 			+ e.getMessage());
 	    }
+	    ((IDocumentExtension4) doc).setInitialLineDelimiter("\n");
 	}
 
 	public void remove(IEditorPart editorPart) {
