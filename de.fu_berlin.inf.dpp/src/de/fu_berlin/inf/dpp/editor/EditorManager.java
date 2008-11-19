@@ -427,6 +427,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void textAboutToBeChanged(int offset, String text, int replace) {
 	if (!this.isDriver) {
+	    this.currentExecuteActivity = null;
 	    return;
 	}
 
@@ -443,6 +444,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	     * activity to all.
 	     */
 	    // fireActivity(currentExecuteActivity);
+	    this.currentExecuteActivity = null;
 	    return;
 	}
 
