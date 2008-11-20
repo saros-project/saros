@@ -1248,7 +1248,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
 	while (entries.hasMoreElements()) {
 	    ZipEntry entry = entries.nextElement();
-	    System.out.println(entry.getName());
+	    XMPPChatTransmitter.log.debug(entry.getName());
 	    JID fromJID = new JID(request.getRequestor());
 
 	    XMPPChatTransmitter.log.debug("2. inform invitation process...");

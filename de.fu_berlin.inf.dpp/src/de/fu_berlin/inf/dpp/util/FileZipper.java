@@ -76,7 +76,7 @@ public class FileZipper {
 	int i;
 
 	/* Pfad übergeben */
-	ZipEntry e = new ZipEntry(path + File.separator + file.getName());
+	ZipEntry e = new ZipEntry(path + Path.SEPARATOR + file.getName());
 	zos.putNextEntry(e);
 
 	fis = new FileInputStream(file);
@@ -94,12 +94,12 @@ public class FileZipper {
 	for (File f : files) {
 	    if (f.isDirectory()) {
 		FileZipper.logger.debug("compress folder: " + file.getName());
-		FileZipper.addFolder(path + File.separator + file.getName(), f,
+		FileZipper.addFolder(path + Path.SEPARATOR + file.getName(), f,
 			zos);
 	    } else {
 		FileZipper.logger.debug("compress file : " + file.getName()
 			+ " path " + path);
-		FileZipper.addFile(path + File.separator + file.getName(), f,
+		FileZipper.addFile(path + Path.SEPARATOR + file.getName(), f,
 			zos);
 	    }
 	}
@@ -156,7 +156,7 @@ public class FileZipper {
 		for (int j = 0; j < structure.length - 1; j++) {
 
 		    String s = structure[j];
-		    path_structure += s + File.separator;
+		    path_structure += s + Path.SEPARATOR;
 		}
 
 		FileZipper.addFile(path_structure, f, zos);
