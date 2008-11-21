@@ -330,14 +330,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
 	XMPPChatTransmitter.log.info("Sent activities: " + timedActivities);
 
-	/* send activities with muc chat messages. */
-	if ((this.mucmanager != null) && this.mucmanager.isConnected()) {
-	    this.mucmanager.sendActivities(sharedProject, timedActivities);
-	} else {
-	    if (timedActivities != null) {
-		sendMessageToAll(sharedProject, new ActivitiesPacketExtension(
-			timedActivities));
-	    }
+	if (timedActivities != null) {
+	    sendMessageToAll(sharedProject, new ActivitiesPacketExtension(
+		    timedActivities));
 	}
 
     }
