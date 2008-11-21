@@ -404,33 +404,40 @@ public class EditorAPI implements IEditorAPI {
 	}
 
 	ITextEditor textEditor = (ITextEditor) editorPart;
-	IAnnotationModel model = textEditor.getDocumentProvider()
-		.getAnnotationModel(textEditor.getEditorInput());
 
-	if (model != null) {
+	IDocumentProvider docProvider = textEditor.getDocumentProvider();
 
-	    for (@SuppressWarnings("unchecked")
-	    Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-		Annotation annotation = (Annotation) it.next();
+	if (docProvider != null) {
+	    IAnnotationModel model = docProvider.getAnnotationModel(textEditor
+		    .getEditorInput());
 
-		if (annotation.getType().startsWith(SelectionAnnotation.TYPE) == false) {
-		    continue;
+	    if (model != null) {
+
+		for (@SuppressWarnings("unchecked")
+		Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+		    Annotation annotation = (Annotation) it.next();
+
+		    if (annotation.getType().startsWith(
+			    SelectionAnnotation.TYPE) == false) {
+			continue;
+		    }
+
+		    AnnotationSaros anns = (AnnotationSaros) annotation;
+		    if (anns.getSource().equals(source)) {
+			model.removeAnnotation(annotation);
+		    }
 		}
 
-		AnnotationSaros anns = (AnnotationSaros) annotation;
-		if (anns.getSource().equals(source)) {
-		    model.removeAnnotation(annotation);
-		}
+		JID sourceJid = new JID(source);
+		String label = "Selection of " + sourceJid.getName();
+
+		Position position = new Position(selection.getOffset(),
+			selection.getLength());
+		AnnotationSaros annotation = new SelectionAnnotation(label,
+			source); // BG:was
+		// source
+		model.addAnnotation(annotation, position);
 	    }
-
-	    JID sourceJid = new JID(source);
-	    String label = "Selection of " + sourceJid.getName();
-
-	    Position position = new Position(selection.getOffset(), selection
-		    .getLength());
-	    AnnotationSaros annotation = new SelectionAnnotation(label, source); // BG:was
-										 // source
-	    model.addAnnotation(annotation, position);
 	}
     }
 
