@@ -259,6 +259,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 		SessionView.this.viewer.setInput(null);
 	    }
 	});
+	this.sharedProject = null;
     }
 
     public void invitationReceived(IIncomingInvitationProcess process) {

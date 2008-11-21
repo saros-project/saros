@@ -12,19 +12,24 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
+import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * 
  * @author orieger
  * 
  */
-public class DriverDocumentManager implements IDriverDocumentManager {
+public class DriverDocumentManager implements IDriverDocumentManager,
+	ISessionListener {
 
     private static Logger logger = Logger
 	    .getLogger(DriverDocumentManager.class);
@@ -43,6 +48,7 @@ public class DriverDocumentManager implements IDriverDocumentManager {
     private DriverDocumentManager() {
 	this.activeDriver = new Vector<JID>();
 	this.documents = new HashMap<IPath, DriverDocument>();
+	Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
     /**
@@ -248,6 +254,21 @@ public class DriverDocumentManager implements IDriverDocumentManager {
 	    result = false;
 	}
 	return result;
+    }
+
+    public void invitationReceived(IIncomingInvitationProcess invitation) {
+	// ignore
+
+    }
+
+    public void sessionEnded(ISharedProject session) {
+	activeDriver.clear();
+
+    }
+
+    public void sessionStarted(ISharedProject session) {
+	// ignore
+
     }
 
 }
