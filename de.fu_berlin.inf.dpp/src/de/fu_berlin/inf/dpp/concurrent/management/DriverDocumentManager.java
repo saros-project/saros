@@ -258,17 +258,23 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     public void invitationReceived(IIncomingInvitationProcess invitation) {
 	// ignore
-
     }
 
     public void sessionEnded(ISharedProject session) {
 	activeDriver.clear();
-
     }
 
     public void sessionStarted(ISharedProject session) {
-	// ignore
 
+	// when this is called the host is already active Driver, remove all
+	// other
+	if (activeDriver.size() > 1) {
+	    for (JID participant : activeDriver) {
+		if (!participant.equals(session.getHost().getJid())) {
+		    activeDriver.remove(participant);
+		}
+	    }
+	}
     }
 
 }
