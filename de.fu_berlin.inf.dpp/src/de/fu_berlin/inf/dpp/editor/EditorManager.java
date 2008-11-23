@@ -172,11 +172,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 			.equals("\n")) {
 		    convertLineDelimiters(editorPart);
 		}
+		((IDocumentExtension4) document).setInitialLineDelimiter("\n");
 	    } else {
 		EditorManager.log
 			.error("Can't discover line delimiter of document");
 	    }
-
 	    document.addDocumentListener(EditorManager.this.documentListener);
 	    editors.add(editorPart);
 	}
@@ -216,7 +216,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		EditorManager.log.error("Can't convert line delimiters!"
 			+ e.getMessage());
 	    }
-	    ((IDocumentExtension4) doc).setInitialLineDelimiter("\n");
 	}
 
 	public void remove(IEditorPart editorPart) {
@@ -257,9 +256,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	 * @see org.eclipse.jface.text.IDocumentListener
 	 */
 	public void documentAboutToBeChanged(final DocumentEvent event) {
-	    // don't give NULL string
 	    String text = event.getText() == null ? "" : event.getText();
-	    textAboutToBeChanged(event.getOffset(), text, event.getLength());
+	    textAboutToBeChanged(event.getOffset(), text, event.getLength(),
+		    event.getDocument());
 	}
 
 	/*
@@ -425,41 +424,49 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
-    public void textAboutToBeChanged(int offset, String text, int replace) {
+    public void textAboutToBeChanged(int offset, String text, int replace,
+	    IDocument document) {
 	if (!this.isDriver) {
 	    this.currentExecuteActivity = null;
 	    return;
 	}
 
-	TextEditActivity activity = new TextEditActivity(offset, text, replace,
-		this.activeDriverEditor);
-	/*
-	 * check if text edit activity is executed by other driver activity
-	 * recently.
-	 */
-	// TODO: check scenario of concurrent edit in same position.
-	if (activity.sameLike(this.currentExecuteActivity)) {
-	    /*
-	     * if activity is execute from remote client activity, send this
-	     * activity to all.
-	     */
-	    // fireActivity(currentExecuteActivity);
-	    this.currentExecuteActivity = null;
-	    return;
+	IPath path = null;
+
+	Set<IEditorPart> editors = editorPool.getAllEditors();
+	for (IEditorPart editor : editors) {
+	    if (editorAPI.getDocument(editor) == document) {
+		path = editorAPI.getEditorResource(editor)
+			.getProjectRelativePath();
+		break;
+	    }
+
 	}
 
-	/* if activity is create be this client. */
-	// TextEditActivity activity = new TextEditActivity(offset, text,
-	// replace);
-	// activity.setEditor(this.activeDriverEditor);
-	//		
-	fireActivity(activity);
+	if (path != null) {
+	    TextEditActivity activity = new TextEditActivity(offset, text,
+		    replace, path);
+	    /*
+	     * check if text edit activity is executed by other driver activity
+	     * recently.
+	     */
+	    if (activity.sameLike(this.currentExecuteActivity)) {
+		this.currentExecuteActivity = null;
+		return;
+	    }
 
-	IEditorInput input = this.editorAPI.getActiveEditor().getEditorInput();
-	IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
-	IAnnotationModel model = provider.getAnnotationModel(input);
+	    fireActivity(activity);
 
-	ContributionHelper.splitAnnotation(model, offset);
+	    IEditorInput input = this.editorAPI.getActiveEditor()
+		    .getEditorInput();
+	    IDocumentProvider provider = this.editorAPI
+		    .getDocumentProvider(input);
+	    IAnnotationModel model = provider.getAnnotationModel(input);
+
+	    ContributionHelper.splitAnnotation(model, offset);
+	} else {
+	    log.error("Can't get editor path");
+	}
     }
 
     /* ---------- ISharedProjectListener --------- */
@@ -573,25 +580,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private void execTextEdit(TextEditActivity textEdit) {
-	if (getActiveDriverEditor() == null) {
-	    EditorManager.log
-		    .error("Received text edit but have no driver editor");
-	    return;
-	}
-	// TODO: change getActiveEditor to IActivity.getEditorPath()
-	IPath driverEditor = getActiveDriverEditor();
-	IFile file = null;
-	/*
-	 * if concurrent driver edited another document, get the right file.
-	 */
-	if ((textEdit.getEditor() != null)
-		&& driverEditor.equals(textEdit.getEditor())) {
-	    file = EditorManager.this.sharedProject.getProject().getFile(
-		    driverEditor);
-	} else {
-	    file = EditorManager.this.sharedProject.getProject().getFile(
-		    textEdit.getEditor());
-	}
+
+	IPath path = textEdit.getEditor();
+	IFile file = EditorManager.this.sharedProject.getProject()
+		.getFile(path);
 
 	/* set current execute activity to avoid cirle executions. */
 	EditorManager.this.currentExecuteActivity = textEdit;
@@ -600,7 +592,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		textEdit.getSource());
 
 	Set<IEditorPart> editors = EditorManager.this.editorPool
-		.getEditors(driverEditor);
+		.getEditors(path);
 	for (IEditorPart editorPart : editors) {
 	    EditorManager.this.editorAPI.setSelection(editorPart,
 		    new TextSelection(textEdit.offset + textEdit.text.length(),
@@ -845,12 +837,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	} catch (BadLocationException e) {
 	    // TODO If this happens a resend of the original text should be
 	    // initiated.
-	    Saros
-		    .log(
+	    log
+		    .error(
 			    "Couldn't insert driver text because of bad location.",
 			    e);
 	} catch (CoreException e) {
-	    Saros.log("Couldn't insert driver text.", e);
+	    log.error("Couldn't insert driver text.", e);
 	}
     }
 
@@ -1073,7 +1065,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            the path to the resource that the driver was editting.
      * @param replicated
      *            <code>false</code> if this action originates on this client.
-     *            <code>false</code> if it is an replication of an action from
+     *            <code>true</code> if it is an replication of an action from
      *            another participant of the shared project.
      */
     private void removeDriverEditor(final IPath path, boolean replicated) {
