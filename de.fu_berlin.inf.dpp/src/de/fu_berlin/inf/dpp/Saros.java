@@ -421,47 +421,55 @@ public class Saros extends AbstractUIPlugin {
 	public void connectionClosedOnError(Exception e) {
 
 	    Toolkit.getDefaultToolkit().beep();
-	    logger.debug("XMPP Connection Error: " + e.toString());
+	    logger.error("XMPP Connection Error: " + e.toString());
 
-	    if (Saros.this.connection != null) {
-		Saros.this.connection
-			.removeConnectionListener(Saros.this.smackConnectionListener);
-		Saros.this.connection.disconnect();
+	    disconnect("XMPP Connection Error");
+
+	    if (e.toString().equals("stream:error (conflict)")) {
+		Display.getDefault().syncExec(new Runnable() {
+		    public void run() {
+			MessageDialog
+				.openError(
+					Display.getDefault().getActiveShell(),
+					"Connection error",
+					"There is a conflict with the jabber connection."
+						+ "The reason for this is mostly that another saros "
+						+ "instance have connected with the same login.");
+		    }
+		});
+
+	    } else {
+		new Thread(new Runnable() {
+
+		    public void run() {
+
+			int offlineAtTS = 0;
+			if (Saros.this.sessionManager.getSharedProject() != null) {
+			    offlineAtTS = Saros.this.sessionManager
+				    .getSharedProject().getSequencer()
+				    .getTimestamp();
+			}
+
+			try {
+			    do {
+				connect();
+
+				if (!Saros.this.connection.isConnected()) {
+				    Thread.sleep(5000);
+				}
+
+			    } while (!Saros.this.connection.isConnected());
+
+			    Saros.this.sessionManager.OnReconnect(offlineAtTS);
+			    setConnectionState(ConnectionState.CONNECTED, null);
+			    logger.debug("XMPP reconnected");
+
+			} catch (InterruptedException e) {
+			    e.printStackTrace();
+			}
+		    }
+		}).start();
 	    }
-
-	    setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
-
-	    new Thread(new Runnable() {
-
-		public void run() {
-
-		    int offlineAtTS = 0;
-		    if (Saros.this.sessionManager.getSharedProject() != null) {
-			offlineAtTS = Saros.this.sessionManager
-				.getSharedProject().getSequencer()
-				.getTimestamp();
-		    }
-
-		    try {
-			do {
-			    connect();
-
-			    if (!Saros.this.connection.isConnected()) {
-				Thread.sleep(5000);
-			    }
-
-			} while (!Saros.this.connection.isConnected());
-
-			Saros.this.sessionManager.OnReconnect(offlineAtTS);
-			setConnectionState(ConnectionState.CONNECTED, null);
-			logger.debug("XMPP reconnected");
-
-		    } catch (InterruptedException e) {
-			e.printStackTrace();
-		    }
-		}
-	    }).start();
-
 	}
 
 	public void reconnectingIn(int seconds) {
