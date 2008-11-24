@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * The main plug-in of Saros.
@@ -64,6 +65,8 @@ public class Saros extends AbstractUIPlugin {
     private static Saros plugin;
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
+
+    private static SarosUI uiInstance;
 
     private XMPPConnection connection;
 
@@ -112,6 +115,8 @@ public class Saros extends AbstractUIPlugin {
 
 	ActivityRegistry.getDefault();
 	SkypeManager.getDefault();
+
+	Saros.uiInstance = new SarosUI(this.sessionManager);
 
 	boolean hasUserName = getPreferenceStore().getString(
 		PreferenceConstants.USERNAME).length() > 0;
