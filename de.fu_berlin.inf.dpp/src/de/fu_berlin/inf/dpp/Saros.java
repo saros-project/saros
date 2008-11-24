@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * The main plug-in of Saros.
@@ -66,8 +65,6 @@ public class Saros extends AbstractUIPlugin {
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
-    private static SarosUI uiInstance;
-
     private XMPPConnection connection;
 
     private JID myjid;
@@ -80,7 +77,6 @@ public class Saros extends AbstractUIPlugin {
 
     private ISessionManager sessionManager;
 
-    // TODO use ListenerList instead
     private final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
     // Smack (XMPP) connection listener
@@ -117,8 +113,6 @@ public class Saros extends AbstractUIPlugin {
 	ActivityRegistry.getDefault();
 	SkypeManager.getDefault();
 
-	Saros.uiInstance = new SarosUI(this.sessionManager);
-
 	boolean hasUserName = getPreferenceStore().getString(
 		PreferenceConstants.USERNAME).length() > 0;
 
@@ -154,10 +148,6 @@ public class Saros extends AbstractUIPlugin {
 	return this.myjid;
     }
 
-    public SarosUI getUI() { // HACK
-	return Saros.uiInstance;
-    }
-
     public Roster getRoster() {
 	if (!isConnected()) {
 	    return null;
@@ -184,7 +174,7 @@ public class Saros extends AbstractUIPlugin {
     public void asyncConnect() {
 	new Thread(new Runnable() {
 	    public void run() {
-		connect(false);
+		connect();
 	    }
 	}).start();
     }
@@ -195,7 +185,7 @@ public class Saros extends AbstractUIPlugin {
      * If there is already a established connection when calling this method, it
      * disconnects before connecting.
      */
-    public void connect(boolean reconnect) {
+    public void connect() {
 
 	IPreferenceStore prefStore = getPreferenceStore();
 	final String server = prefStore.getString(PreferenceConstants.SERVER);
@@ -204,51 +194,40 @@ public class Saros extends AbstractUIPlugin {
 	String password = prefStore.getString(PreferenceConstants.PASSWORD);
 
 	try {
-	    if (!reconnect) {
-		if (isConnected()) {
-		    disconnect(null);
+	    if (isConnected()) {
 
-		    setConnectionState(ConnectionState.CONNECTING, null);
-		}
-	    } else if (isConnected()) {
-		// connection.close();
 		this.connection.disconnect();
 		this.connection
 			.removeConnectionListener(this.smackConnectionListener);
 	    }
 
-	    // TODO: for testing reconnection
 	    ConnectionConfiguration conConfig = new ConnectionConfiguration(
 		    server);
 	    conConfig.setReconnectionAllowed(true);
 
-	    // connection = new XMPPConnection(server);
 	    this.connection = new XMPPConnection(conConfig);
 	    this.connection.connect();
 	    this.connection.login(username, password);
 
-	    // TODO: ConnectionListener
 	    this.connection.addConnectionListener(this.smackConnectionListener);
 	    setConnectionState(ConnectionState.CONNECTED, null);
 
 	    this.myjid = new JID(this.connection.getUser());
 
 	} catch (final Exception e) {
-	    // disconnect(e.getMessage());
 
-	    if (!reconnect) {
-		setConnectionState(ConnectionState.NOT_CONNECTED, null);
-		Display.getDefault().syncExec(new Runnable() {
-		    public void run() {
-			MessageDialog.openError(Display.getDefault()
-				.getActiveShell(), "Error Connecting",
-				"Could not connect to server '" + server
-					+ "' as user '" + username
-					+ "'.\nErrorMessage was: "
-					+ e.getMessage());
-		    }
-		});
-	    }
+	    setConnectionState(ConnectionState.ERROR, e.getMessage());
+	    Display.getDefault().syncExec(new Runnable() {
+		public void run() {
+		    MessageDialog
+			    .openError(Display.getDefault().getActiveShell(),
+				    "Error Connecting",
+				    "Could not connect to server '" + server
+					    + "' as user '" + username
+					    + "'.\nErrorMessage was: "
+					    + e.getMessage());
+		}
+	    });
 	}
     }
 
@@ -268,8 +247,7 @@ public class Saros extends AbstractUIPlugin {
 
 	    this.connection
 		    .removeConnectionListener(this.smackConnectionListener);
-	    // connection.close();
-	    // TODO CJ: changed by orieger -> inspection needed
+
 	    this.connection.disconnect();
 	    this.connection = null;
 	}
@@ -310,8 +288,6 @@ public class Saros extends AbstractUIPlugin {
 	connection.getAccountManager().createAccount(username, password);
 	monitor.worked(1);
 
-	// connection.close();
-	// TODO CJ: changed by orieger -> inspection needed
 	connection.disconnect();
 	monitor.done();
     }
@@ -437,25 +413,12 @@ public class Saros extends AbstractUIPlugin {
 
     private class XMPPConnectionListener implements ConnectionListener {
 
-	// TODO CJ Review needed
-	// Variables to support listener notifications verification
-	private boolean connectionClosed = false;
-	private boolean connectionClosedOnError = false;
-	private boolean reconnected = false;
-	private boolean reconnectionFailed = false;
-	private int remainingSeconds = 0;
-	private int attemptsNotifications = 0;
-	private final boolean reconnectionCanceled = false;
-
 	public void connectionClosed() {
-
 	    // self inflicted, controlled disconnect
-	    this.connectionClosed = true;
+	    setConnectionState(ConnectionState.NOT_CONNECTED, null);
 	}
 
 	public void connectionClosedOnError(Exception e) {
-
-	    this.connectionClosedOnError = true;
 
 	    Toolkit.getDefaultToolkit().beep();
 	    logger.debug("XMPP Connection Error: " + e.toString());
@@ -464,66 +427,56 @@ public class Saros extends AbstractUIPlugin {
 		Saros.this.connection
 			.removeConnectionListener(Saros.this.smackConnectionListener);
 		Saros.this.connection.disconnect();
-		// TODO CJ: changed by orieger -> inspection needed
-		// connection.close();
 	    }
 
-	    if (getConnectionState() != ConnectionState.ERROR) {
-		setConnectionState(ConnectionState.ERROR,
-			"XMPP Connection Error");
+	    setConnectionState(ConnectionState.ERROR, "XMPP Connection Error");
 
-		new Thread(new Runnable() {
+	    new Thread(new Runnable() {
 
-		    public void run() {
+		public void run() {
 
-			int offlineAtTS = 0;
-			if (Saros.this.sessionManager.getSharedProject() != null) {
-			    offlineAtTS = Saros.this.sessionManager
-				    .getSharedProject().getSequencer()
-				    .getTimestamp();
-			}
+		    int offlineAtTS = 0;
+		    if (Saros.this.sessionManager.getSharedProject() != null) {
+			offlineAtTS = Saros.this.sessionManager
+				.getSharedProject().getSequencer()
+				.getTimestamp();
+		    }
 
-			try {
-			    do {
-				connect(true);
+		    try {
+			do {
+			    connect();
 
-				if (!Saros.this.connection.isConnected()) {
-				    Thread.sleep(5000);
-				}
-
-			    } while (!Saros.this.connection.isConnected());
-
-			    if (Saros.this.connection.isConnected()) {
-				Saros.this.sessionManager
-					.OnReconnect(offlineAtTS);
-				logger.debug("XMPP reconnected");
+			    if (!Saros.this.connection.isConnected()) {
+				Thread.sleep(5000);
 			    }
 
-			} catch (InterruptedException e) {
+			} while (!Saros.this.connection.isConnected());
 
-			    e.printStackTrace();
-			}
+			Saros.this.sessionManager.OnReconnect(offlineAtTS);
+			setConnectionState(ConnectionState.CONNECTED, null);
+			logger.debug("XMPP reconnected");
+
+		    } catch (InterruptedException e) {
+			e.printStackTrace();
 		    }
-		}).start();
-
-	    }
+		}
+	    }).start();
 
 	}
 
 	public void reconnectingIn(int seconds) {
-	    logger.debug("saros reconnectingIn");
-	    this.attemptsNotifications = this.attemptsNotifications + 1;
-	    this.remainingSeconds = seconds;
+	    logger.debug("saros reconnecting");
+	    setConnectionState(ConnectionState.CONNECTING, null);
 	}
 
 	public void reconnectionFailed(Exception e) {
-	    logger.debug("saros reconnectionFailed");
-	    this.reconnectionFailed = true;
+	    logger.debug("saros reconnection failed");
+	    setConnectionState(ConnectionState.ERROR, e.getMessage());
 	}
 
 	public void reconnectionSuccessful() {
-	    logger.debug("saros reconnectionSuccessful");
-	    this.reconnected = true;
+	    logger.debug("saros reconnection successful");
+	    setConnectionState(ConnectionState.CONNECTED, null);
 	}
     }
 

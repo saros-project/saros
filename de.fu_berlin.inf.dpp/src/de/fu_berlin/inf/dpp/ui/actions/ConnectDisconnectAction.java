@@ -55,15 +55,10 @@ public class ConnectDisconnectAction extends Action implements
 	new Thread(new Runnable() {
 	    public void run() {
 		Saros saros = Saros.getDefault();
-		boolean reconnect = false;
-		if (saros.getConnectionState() == Saros.ConnectionState.ERROR) {
-		    reconnect = true;
-		}
-
 		if (saros.isConnected()) {
 		    saros.disconnect(null);
 		} else {
-		    saros.connect(reconnect);
+		    saros.connect();
 		}
 	    }
 	}).start();
