@@ -191,9 +191,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    IPath[] paths = new IPath[1];
 	    paths[0] = file.getFullPath();
 
-	    IDocument doc = EditorManager.this.editorAPI
-		    .getDocument(editorPart);
-
 	    ITextFileBufferManager buffManager = FileBuffers
 		    .getTextFileBufferManager();
 
