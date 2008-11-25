@@ -19,6 +19,7 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -29,6 +30,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -262,6 +264,17 @@ public interface ITransmitter {
      *            appropriate file for checksum error
      */
     public void sendFileChecksumError(JID to, IPath path);
+
+    /**
+     * Sends the checksum of all concurrent documents.
+     * 
+     * @param to
+     *            the recipient
+     * @param collection
+     *            the checksums
+     */
+    public void sendDocChecksums(JID to,
+	    Collection<DocumentChecksum> collection);
 
     /**
      * Sends error messge of transformation error.

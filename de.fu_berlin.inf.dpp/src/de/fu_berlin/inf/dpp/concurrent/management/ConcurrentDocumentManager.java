@@ -2,12 +2,19 @@ package de.fu_berlin.inf.dpp.concurrent.management;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Display;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -31,14 +38,19 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 
-public class ConcurrentDocumentManager implements ConcurrentManager {
+public class ConcurrentDocumentManager implements ConcurrentManager,
+	ISessionListener {
 
-    private static Logger logger = Logger.getLogger(Logger.class);
+    private static Logger logger = Logger
+	    .getLogger(ConcurrentDocumentManager.class);
 
     /** Jupiter server instance documents */
     private HashMap<IPath, JupiterDocumentServer> concurrentDocuments;
@@ -62,20 +74,127 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 
     private final ISharedProject sharedProject;
 
-    public ConcurrentDocumentManager(Side side, User host, JID myJID,
-	    ISharedProject sharedProject) {
+    private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
+	    "ConsistencyWatchdog");
 
-	if (side == Side.HOST_SIDE) {
-	    this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
+    /**
+     * This class consists of two parts. The first is a run-method which runs as
+     * an eclipse job on the host side. Once started with schedule() the job is
+     * scheduled to rerun every 5 seconds. The second part is a check method
+     * which checks the documents on this client side against the given
+     * checksums.
+     */
+    private class ConsistencyWatchdog extends Job {
+
+	public ConsistencyWatchdog(String name) {
+	    super(name);
 	}
 
+	// this map holds for all jupiter controlled documents the checksums
+	private final HashMap<IPath, DocumentChecksum> docsChecksums = new HashMap<IPath, DocumentChecksum>();
+
+	@Override
+	protected IStatus run(IProgressMonitor monitor) {
+
+	    // if not on host side cancel the job
+	    if (!isHostSide()) {
+		logger.error("This job is intended to be run on host side!");
+		return Status.CANCEL_STATUS;
+	    }
+
+	    // get the documents which are controlled by jupiter
+	    Set<IPath> docs = clientDocs.keySet();
+
+	    EditorManager editorMgmt = EditorManager.getDefault();
+
+	    // for all documents
+	    for (IPath docPath : docs) {
+
+		IDocument doc = editorMgmt.getDocument(docPath);
+
+		// if no entry for this document exists create a new one
+		if (docsChecksums.get(docPath) == null) {
+		    DocumentChecksum c = new DocumentChecksum(docPath, doc
+			    .getLength(), doc.get().hashCode());
+		    docsChecksums.put(docPath, c);
+		    logger.debug(c.getHash());
+		} else {
+		    DocumentChecksum c = docsChecksums.get(docPath);
+		    if (c.getLength() != doc.getLength()) {
+			// length has changed, compute the hash new
+			c.setLength(doc.getLength());
+			c.setHash(doc.get().hashCode());
+			docsChecksums.put(docPath, c);
+		    }
+		}
+	    }
+	    // send checksums to all clients
+	    ISharedProject project = Saros.getDefault().getSessionManager()
+		    .getSharedProject();
+	    if (project != null) {
+		List<User> participants = project.getParticipants();
+		for (User participant : participants) {
+		    ITransmitter transmit = Saros.getDefault()
+			    .getSessionManager().getTransmitter();
+		    if (!isHost(participant.getJid())) {
+			transmit.sendDocChecksums(participant.getJid(),
+				docsChecksums.values());
+		    }
+		}
+	    }
+	    // schedule the next run in 5 seconds
+	    schedule(5000);
+	    return Status.OK_STATUS;
+	}
+
+	/**
+	 * Checks the local documents against the given checksums.
+	 * 
+	 * @param checksums
+	 *            the checksums to check the documents against
+	 * @return <code>true</code> if the given checksums are all equal to the
+	 *         corresponding checksums of the local documents
+	 *         <code>false</code> otherwise.
+	 */
+	public boolean check(DocumentChecksum[] checksums) {
+	    EditorManager editorMgmt = EditorManager.getDefault();
+
+	    for (DocumentChecksum checksum : checksums) {
+		IDocument doc = editorMgmt.getDocument(checksum.getPath());
+
+		if ((doc.getLength() != checksum.getLength())) {
+		    if (doc.get().hashCode() != checksum.hashCode()) {
+			logger.error("Inconsistency detected in document "
+				+ checksum.getPath().toOSString());
+			return false;
+		    }
+		}
+
+		logger.debug(checksum.getPath().toString() + ": "
+			+ doc.getLength() + "/" + checksum.getLength() + " ; "
+			+ doc.get().hashCode() + "/" + checksum.getHash());
+	    }
+	    return true;
+	}
+    }
+
+    public ConcurrentDocumentManager(Side side, User host, JID myJID,
+	    ISharedProject sharedProject) {
 	this.sharedProject = sharedProject;
 	this.clientDocs = new HashMap<IPath, JupiterClient>();
-	// drivers = new Vector<JID>();
 	this.driverManager = DriverDocumentManager.getInstance();
 	this.side = side;
 	this.host = host.getJid();
 	this.myJID = myJID;
+
+	if (side == Side.HOST_SIDE) {
+	    this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
+	    logger.debug("starting consistency watchdog");
+	    consistencyWatchdog.setSystem(true);
+	    consistencyWatchdog.schedule();
+	}
+
+	Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
     public void setActivitySequencer(IActivitySequencer sequencer) {
@@ -115,15 +234,15 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 
 	    // if (isHostSide()) {
 	    if (editor.getType() == Type.Saved) {
-		// calculate checksum for saved file
-		long checksum = FileUtil.checksum(this.sharedProject
-			.getProject().getFile(editor.getPath()));
-		editor.setChecksum(checksum);
-		ConcurrentDocumentManager.logger
-			.debug("Add checksumme to created editor save activity : "
-				+ checksum
-				+ " for path : "
-				+ editor.getPath().toOSString());
+		// // calculate checksum for saved file
+		// long checksum = FileUtil.checksum(this.sharedProject
+		// .getProject().getFile(editor.getPath()));
+		// editor.setChecksum(checksum);
+		// ConcurrentDocumentManager.logger
+		// .debug("Add checksumme to created editor save activity : "
+		// + checksum
+		// + " for path : "
+		// + editor.getPath().toOSString());
 	    }
 	}
     }
@@ -627,6 +746,28 @@ public class ConcurrentDocumentManager implements ConcurrentManager {
 	    ConcurrentDocumentManager.logger
 		    .error("No jupter document exists for " + path.toOSString());
 	}
+
+    }
+
+    @Override
+    public void invitationReceived(IIncomingInvitationProcess invitation) {
+	// TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void sessionEnded(ISharedProject session) {
+	this.consistencyWatchdog.cancel();
+    }
+
+    @Override
+    public void sessionStarted(ISharedProject session) {
+	// TODO Auto-generated method stub
+
+    }
+
+    public void checkConsistency(DocumentChecksum[] checksums) {
+	this.consistencyWatchdog.check(checksums);
 
     }
 

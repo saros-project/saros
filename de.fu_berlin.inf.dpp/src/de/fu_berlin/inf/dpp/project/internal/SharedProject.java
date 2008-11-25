@@ -53,6 +53,7 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DriverDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
@@ -747,6 +748,12 @@ public class SharedProject implements ISharedProject {
 
 	    e.printStackTrace();
 	}
+    }
+
+    public ConcurrentDocumentManager getConcurrentDocumentManager() {
+	return (ConcurrentDocumentManager) this.activitySequencer
+		.getConcurrentManager();
+
     }
 
 }

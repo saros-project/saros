@@ -57,7 +57,11 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     // TODO use ListenerList instead
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
-    ITransmitter transmitter;
+    private ITransmitter transmitter;
+
+    public ITransmitter getTransmitter() {
+	return transmitter;
+    }
 
     public SessionManager() {
 	Saros.getDefault().addListener(this);

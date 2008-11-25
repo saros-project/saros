@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 import org.xmlpull.v1.XmlPullParser;
@@ -382,6 +383,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
+     * Return the document of the given path.
+     * 
+     * @param path
+     *            the path of the wanted document
+     * @return the document
+     */
+    public IDocument getDocument(IPath path) {
+	Set<IEditorPart> editors = getEditors(path);
+	AbstractTextEditor editor = (AbstractTextEditor) editors.toArray()[0];
+	IEditorInput input = editor.getEditorInput();
+	return editor.getDocumentProvider().getDocument(input);
+    }
+
+    /**
      * @return the text selection that the driver is currently using.
      */
     public ITextSelection getDriverTextSelection() {
@@ -428,17 +443,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    return;
 	}
 
+	IEditorPart changedEditor = null;
 	IPath path = null;
 
+	// search editor which changed
 	Set<IEditorPart> editors = editorPool.getAllEditors();
 	for (IEditorPart editor : editors) {
 	    if (editorAPI.getDocument(editor) == document) {
-		path = editorAPI.getEditorResource(editor)
-			.getProjectRelativePath();
+		changedEditor = editor;
 		break;
 	    }
-
 	}
+
+	path = editorAPI.getEditorResource(changedEditor)
+		.getProjectRelativePath();
 
 	if (path != null) {
 	    TextEditActivity activity = new TextEditActivity(offset, text,
@@ -454,8 +472,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	    fireActivity(activity);
 
-	    IEditorInput input = this.editorAPI.getActiveEditor()
-		    .getEditorInput();
+	    IEditorInput input = changedEditor.getEditorInput();
 	    IDocumentProvider provider = this.editorAPI
 		    .getDocumentProvider(input);
 	    IAnnotationModel model = provider.getAnnotationModel(input);
@@ -619,15 +636,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private void execViewport(ViewportActivity viewport) {
-	if (getActiveDriverEditor() == null) {
-	    EditorManager.log
-		    .error("Received viewport but have no driver editor");
-	    return;
-	}
 
 	int top = viewport.getTopIndex();
 	int bottom = viewport.getBottomIndex();
 
+	// TODO CJ: alle active Driver ersetzen !
 	IPath driverEditor = getActiveDriverEditor();
 	Set<IEditorPart> editors = EditorManager.this.editorPool
 		.getEditors(driverEditor);
@@ -682,6 +695,17 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public boolean isOpened(IPath path) {
 	return this.editorPool.getEditors(path).size() > 0;
+    }
+
+    /**
+     * Gives the editors of given path.
+     * 
+     * @param path
+     *            the project-relative path to the resource.
+     * @return the set of editors
+     */
+    public Set<IEditorPart> getEditors(IPath path) {
+	return this.editorPool.getEditors(path);
     }
 
     /*

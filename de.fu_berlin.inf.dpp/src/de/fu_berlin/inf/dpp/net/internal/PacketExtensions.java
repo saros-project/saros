@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -28,6 +29,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -79,6 +81,8 @@ public class PacketExtensions {
 
     public static final String FILE_PATH = "filename";
 
+    private static final String DOC_CHECKSUM = "DocChecksum";
+
     public static void hookExtensionProviders() {
 
 	ProviderManager providermanager = ProviderManager.getInstance();
@@ -87,11 +91,6 @@ public class PacketExtensions {
 	providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
 		RequestPacketExtension.NAMESPACE,
 		new RequestExtensionProvider());
-
-	// TODO: Änderung für Smack 3
-	// ProviderManager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-	// NAMESPACE,
-	// new ActivitiesProvider());
     }
 
     /**
@@ -185,6 +184,27 @@ public class PacketExtensions {
 	return extension;
     }
 
+    public static PacketExtension createChecksumsExtension(
+	    Collection<DocumentChecksum> checksums) {
+	DefaultPacketExtension extension = new DefaultPacketExtension(
+		PacketExtensions.DOC_CHECKSUM, PacketExtensions.NAMESPACE);
+
+	extension.setValue("quantity", Integer.toString(checksums.size()));
+
+	int i = 1;
+	for (DocumentChecksum checksum : checksums) {
+	    extension.setValue("path" + Integer.toString(i), checksum.getPath()
+		    .toPortableString());
+	    extension.setValue("length" + Integer.toString(i), Integer
+		    .toString(checksum.getLength()));
+	    extension.setValue("hash" + Integer.toString(i), Integer
+		    .toString(checksum.getHash()));
+	    i++;
+	}
+
+	return extension;
+    }
+
     public static PacketExtension createJupiterErrorExtension(IPath path) {
 	DefaultPacketExtension extension = new DefaultPacketExtension(
 		PacketExtensions.JUPITER_TRANSFORMATION_ERROR,
@@ -255,6 +275,11 @@ public class PacketExtensions {
 	    Message message) {
 	return PacketExtensions.getExtension(
 		PacketExtensions.FILE_CHECKSUM_ERROR, message);
+    }
+
+    public static DefaultPacketExtension getChecksumExtension(Message message) {
+	return PacketExtensions.getExtension(PacketExtensions.DOC_CHECKSUM,
+		message);
     }
 
     public static DefaultPacketExtension getUserlistExtension(Message message) {

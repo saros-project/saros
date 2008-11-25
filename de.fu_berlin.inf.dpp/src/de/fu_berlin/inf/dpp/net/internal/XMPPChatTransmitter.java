@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -63,6 +64,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -87,8 +89,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     private static final int MAX_PARALLEL_SENDS = 10;
     private static final int MAX_TRANSFER_RETRIES = 5;
     private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
-
-    private static boolean jingle = true;
 
     /*
      * the following string descriptions are used to differentiate between
@@ -830,6 +830,23 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     /*
      * (non-Javadoc)
      * 
+     * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendDocChecksums(de.fu_berlin
+     * .inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+     */
+    public void sendDocChecksums(JID to, Collection<DocumentChecksum> checksums) {
+	XMPPChatTransmitter.log.debug("Sending checksums to " + to);
+	Message m = new Message();
+	m.addExtension(PacketExtensions.createChecksumsExtension(checksums));
+	try {
+	    getChat(to).sendMessage(m);
+	} catch (XMPPException e) {
+	    log.error("Can't send checksums to " + to);
+	}
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see
      * de.fu_berlin.inf.dpp.net.ITransmitter#sendJupiterTransformationError(
      * de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
@@ -1009,6 +1026,23 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
 		}
 	    }
+	}
+
+	if (PacketExtensions.getChecksumExtension(message) != null) {
+	    DefaultPacketExtension ext = PacketExtensions
+		    .getChecksumExtension(message);
+	    log.debug("Received checksums");
+
+	    int count = Integer.parseInt(ext.getValue("quantity"));
+	    DocumentChecksum[] checksums = new DocumentChecksum[count];
+
+	    for (int i = 1; i <= count; i++) {
+		IPath path = Path.fromPortableString(ext.getValue("path" + i));
+		int length = Integer.parseInt(ext.getValue("length" + i));
+		int hash = Integer.parseInt(ext.getValue("hash" + i));
+		checksums[i - 1] = new DocumentChecksum(path, length, hash);
+	    }
+	    project.getConcurrentDocumentManager().checkConsistency(checksums);
 	}
 
 	if (PacketExtensions.getJoinExtension(message) != null) {
@@ -1311,12 +1345,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	try {
 
 	    Chat chat = getChat(jid);
-	    Message message;
-	    // Änderung für Smack 3
-	    message = new Message();
-	    // message = chat.createMessage();
+	    Message message = new Message();
 	    message.addExtension(extension);
-
 	    chat.sendMessage(message);
 
 	} catch (Exception e) {
@@ -1566,6 +1596,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 		process.fileListReceived(recipient, fileList);
 	    }
 	}
-
     }
+
 }

@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
@@ -220,4 +221,12 @@ public interface ISharedProject {
      * @return
      */
     public boolean exclusiveDriver();
+
+    /**
+     * the concurrent document manager is responsible for all jupiter controlled
+     * documents
+     * 
+     * @return the concurrent document manager
+     */
+    public ConcurrentDocumentManager getConcurrentDocumentManager();
 }

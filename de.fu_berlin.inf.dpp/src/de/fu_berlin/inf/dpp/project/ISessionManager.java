@@ -8,6 +8,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public interface ISessionManager {
@@ -94,5 +95,12 @@ public interface ISessionManager {
 	    ConnectionState newState);
 
     public abstract void OnReconnect(int oldtimestamp);
+
+    /**
+     * Get the transmitter of the session.
+     * 
+     * @return the transmitter of the session
+     */
+    public abstract ITransmitter getTransmitter();
 
 }
