@@ -60,6 +60,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
@@ -317,6 +318,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 	IActionBars bars = getViewSite().getActionBars();
 	IToolBarManager toolBar = bars.getToolBarManager();
 
+	toolBar.add(new ConsistencyAction());
 	toolBar.add(new OpenInviteInterface());
 	toolBar.add(new RemoveAllDriverRoleAction());
 	toolBar.add(new FollowModeAction());

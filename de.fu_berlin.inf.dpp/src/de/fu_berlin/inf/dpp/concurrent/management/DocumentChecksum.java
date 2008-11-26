@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IPath;
  * This Class represents a checksum of an document. It contains the path, the
  * length and the hash code of the document.
  * 
+ * @author chjacob
  */
 public class DocumentChecksum {
 

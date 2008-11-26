@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
@@ -77,14 +78,20 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
 	    "ConsistencyWatchdog");
 
+    private ListenerList consistencyListener = new ListenerList();
+
     /**
      * This class consists of two parts. The first is a run-method which runs as
      * an eclipse job on the host side. Once started with schedule() the job is
      * scheduled to rerun every 5 seconds. The second part is a check method
      * which checks the documents on this client side against the given
      * checksums.
+     * 
+     * @author chjacob
      */
     private class ConsistencyWatchdog extends Job {
+
+	private boolean inconsistencyToResolve = false;
 
 	public ConsistencyWatchdog(String name) {
 	    super(name);
@@ -143,20 +150,21 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 		}
 	    }
 	    // schedule the next run in 5 seconds
-	    schedule(5000);
+	    schedule(2000);
 	    return Status.OK_STATUS;
 	}
 
 	/**
-	 * Checks the local documents against the given checksums.
+	 * Checks the local documents against the given checksums. When an
+	 * inconsistency occurs all at the concurrent document manager
+	 * registered consistency listener are informed about the issue. When a
+	 * previous consistency issue have resolved the listeners are also
+	 * notified.
 	 * 
 	 * @param checksums
 	 *            the checksums to check the documents against
-	 * @return <code>true</code> if the given checksums are all equal to the
-	 *         corresponding checksums of the local documents
-	 *         <code>false</code> otherwise.
 	 */
-	public boolean check(DocumentChecksum[] checksums) {
+	private void check(DocumentChecksum[] checksums) {
 	    EditorManager editorMgmt = EditorManager.getDefault();
 
 	    for (DocumentChecksum checksum : checksums) {
@@ -164,17 +172,38 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
 		if ((doc.getLength() != checksum.getLength())) {
 		    if (doc.get().hashCode() != checksum.hashCode()) {
-			logger.error("Inconsistency detected in document "
+			logger.debug("Inconsistency detected in document "
 				+ checksum.getPath().toOSString());
-			return false;
+
+			this.inconsistencyToResolve = true;
+
+			// notify all listeners
+			Object[] listeners = consistencyListener.getListeners();
+			for (Object listener : listeners) {
+			    ((IConsistencyListener) listener)
+				    .inconsistencyDetected();
+			}
+			return;
 		    }
 		}
 
 		logger.debug(checksum.getPath().toString() + ": "
 			+ doc.getLength() + "/" + checksum.getLength() + " ; "
 			+ doc.get().hashCode() + "/" + checksum.getHash());
+
+		if (inconsistencyToResolve) {
+		    logger.debug("All Inconsistencies are resolved");
+
+		    this.inconsistencyToResolve = false;
+
+		    // notify all listener that inconsistency are resolved
+		    Object[] listeners = consistencyListener.getListeners();
+		    for (Object listener : listeners) {
+			((IConsistencyListener) listener)
+				.inconsistencyResolved();
+		    }
+		}
 	    }
-	    return true;
 	}
     }
 
@@ -191,6 +220,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	    this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
 	    logger.debug("starting consistency watchdog");
 	    consistencyWatchdog.setSystem(true);
+	    consistencyWatchdog.setPriority(Job.SHORT);
 	    consistencyWatchdog.schedule();
 	}
 
@@ -766,9 +796,38 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
     }
 
+    /**
+     * Checks the local documents against the given checksums. When an
+     * inconsistency occurs all at the concurrent document manager registered
+     * consistency listener are informed about the issue. When a previous
+     * consistency issue have resolved the listeners are also notified.
+     * 
+     * @param checksums
+     *            the checksums to check the documents against
+     */
     public void checkConsistency(DocumentChecksum[] checksums) {
-	this.consistencyWatchdog.check(checksums);
+	consistencyWatchdog.check(checksums);
+    }
 
+    /**
+     * Add the given consistency listener. Is ignored if the listener is already
+     * listening.
+     * 
+     * @param listener
+     *            the listener that is to be added.
+     */
+    public void addConsistencyListener(Object listener) {
+	this.consistencyListener.add(listener);
+    }
+
+    /**
+     * Removes the given consistency listener.
+     * 
+     * @param listener
+     *            the listener that is to be removed.
+     */
+    public void removeConsistencyListener(Object listener) {
+	this.consistencyListener.remove(listener);
     }
 
 }
