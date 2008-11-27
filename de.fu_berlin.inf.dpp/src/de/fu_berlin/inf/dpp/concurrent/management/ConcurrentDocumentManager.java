@@ -779,18 +779,15 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
     }
 
-    @Override
     public void invitationReceived(IIncomingInvitationProcess invitation) {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void sessionEnded(ISharedProject session) {
 	this.consistencyWatchdog.cancel();
     }
 
-    @Override
     public void sessionStarted(ISharedProject session) {
 	// TODO Auto-generated method stub
 
