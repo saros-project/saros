@@ -170,20 +170,21 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 		IDocument doc = editorMgmt.getDocument(checksum.getPath());
 
 		if ((doc.getLength() != checksum.getLength())
-			|| (doc.get().hashCode() != checksum.hashCode())) {
+			|| (doc.get().hashCode() != checksum.getHash())) {
+
+		    logger.debug("Inconsistency detected in document "
+			    + checksum.getPath().toOSString());
+
+		    logger.debug(checksum.getPath().toString() + ": "
+			    + doc.getLength() + "/" + checksum.getLength()
+			    + " ; " + doc.get().hashCode() + "/"
+			    + checksum.getHash());
 
 		    if (!inconsistencyToResolve.getVariable()) {
-			logger.debug("Inconsistency detected in document "
-				+ checksum.getPath().toOSString());
 			this.inconsistencyToResolve.setVariable(true);
 		    }
 		    return;
 		}
-
-		logger.debug(checksum.getPath().toString() + ": "
-			+ doc.getLength() + "/" + checksum.getLength() + " ; "
-			+ doc.get().hashCode() + "/" + checksum.getHash());
-
 		if (inconsistencyToResolve.getVariable()) {
 		    logger.debug("All Inconsistencies are resolved");
 		    this.inconsistencyToResolve.setVariable(false);
