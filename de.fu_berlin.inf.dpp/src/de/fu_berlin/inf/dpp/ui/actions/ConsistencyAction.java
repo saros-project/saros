@@ -20,30 +20,25 @@ public class ConsistencyAction extends Action implements IConsistencyListener,
 	Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
-    @Override
     public void inconsistencyDetected() {
 	setEnabled(true);
 	setToolTipText("Inconsistency Detected!");
     }
 
-    @Override
     public void inconsistencyResolved() {
 	setEnabled(false);
 	setToolTipText("");
     }
 
-    @Override
     public void sessionStarted(ISharedProject session) {
 	Saros.getDefault().getSessionManager().getSharedProject()
 		.getConcurrentDocumentManager().addConsistencyListener(this);
     }
 
-    @Override
     public void invitationReceived(IIncomingInvitationProcess invitation) {
 	// ignore
     }
 
-    @Override
     public void sessionEnded(ISharedProject session) {
 	Saros.getDefault().getSessionManager().getSharedProject()
 		.getConcurrentDocumentManager().removeConsistencyListener(this);
