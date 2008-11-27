@@ -410,12 +410,25 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
-    public void viewportChanged(int top, int bottom) {
+    public void viewportChanged(int top, int bottom, IPath editor) {
 	if (!this.sharedProject.isHost()) {
 	    return;
 	}
 
-	fireActivity(new ViewportActivity(top, bottom));
+	fireActivity(new ViewportActivity(top, bottom, editor));
+    }
+
+    public IPath getPathOfDocument(IDocument doc) {
+	IPath path = null;
+	Set<IEditorPart> editors = editorPool.getAllEditors();
+	for (IEditorPart editor : editors) {
+	    if (editorAPI.getDocument(editor) == doc) {
+		path = editorAPI.getEditorResource(editor)
+			.getProjectRelativePath();
+		break;
+	    }
+	}
+	return path;
     }
 
     /*
@@ -429,19 +442,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	int offset = selection.getOffset();
 	int length = selection.getLength();
-	IPath path = null;
+	IPath path = getPathOfDocument(doc);
 
-	// search path of resource
-	Set<IEditorPart> editors = editorPool.getAllEditors();
-	for (IEditorPart editor : editors) {
-	    if (editorAPI.getDocument(editor) == doc) {
-		path = editorAPI.getEditorResource(editor)
-			.getProjectRelativePath();
-		break;
-	    }
-	}
-
-	fireActivity(new TextSelectionActivity(offset, length, path));
+	if (path == null) {
+	    log.error("Couldn't get editor!");
+	} else
+	    fireActivity(new TextSelectionActivity(offset, length, path));
     }
 
     /*
@@ -784,7 +790,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	    ViewportActivity viewportActvity = (ViewportActivity) activity;
 	    return "<viewport " + "top=\"" + viewportActvity.getTopIndex()
 		    + "\" " + "bottom=\"" + viewportActvity.getBottomIndex()
-		    + "\" />";
+		    + "\" " + "editor=\""
+		    + viewportActvity.getEditor().toPortableString() + "\" />";
 	}
 
 	return null;
@@ -841,7 +848,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private ViewportActivity parseViewport(XmlPullParser parser) {
 	int top = Integer.parseInt(parser.getAttributeValue(null, "top"));
 	int bottom = Integer.parseInt(parser.getAttributeValue(null, "bottom"));
-	return new ViewportActivity(top, bottom);
+	String path = parser.getAttributeValue(null, "editor");
+	return new ViewportActivity(top, bottom, Path.fromPortableString(path));
     }
 
     private boolean isSharedEditor(IEditorPart editorPart) {
@@ -996,7 +1004,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	ILineRange viewport = this.editorAPI.getViewport(editorPart);
 	int startLine = viewport.getStartLine();
-	viewportChanged(startLine, startLine + viewport.getNumberOfLines());
+	viewportChanged(startLine, startLine + viewport.getNumberOfLines(),
+		editorPath);
     }
 
     private void setAllEditorsToEditable() {

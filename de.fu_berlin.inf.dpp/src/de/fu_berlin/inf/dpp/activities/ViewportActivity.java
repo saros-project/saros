@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities;
 
+import org.eclipse.core.runtime.IPath;
+
 public class ViewportActivity implements IActivity {
     public final int topIndex;
 
@@ -7,9 +9,12 @@ public class ViewportActivity implements IActivity {
 
     private String source;
 
-    public ViewportActivity(int topIndex, int bottomIndex) {
+    private IPath editor;
+
+    public ViewportActivity(int topIndex, int bottomIndex, IPath editor) {
 	this.topIndex = topIndex;
 	this.bottomIndex = bottomIndex;
+	this.editor = editor;
     }
 
     public int getBottomIndex() {
@@ -18,6 +23,10 @@ public class ViewportActivity implements IActivity {
 
     public int getTopIndex() {
 	return this.topIndex;
+    }
+
+    public IPath getEditor() {
+	return this.editor;
     }
 
     @Override

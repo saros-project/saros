@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -211,6 +212,8 @@ public class EditorAPI implements IEditorAPI {
 	private void checkViewport() {
 	    int top = this.viewer.getTopIndex();
 	    int bottom = this.viewer.getBottomIndex();
+	    IPath editor = EditorAPI.this.editorManager
+		    .getPathOfDocument(this.viewer.getDocument());
 
 	    if ((top != this.lastViewportTop)
 		    || (bottom != this.lastViewportBottom)) {
@@ -218,7 +221,7 @@ public class EditorAPI implements IEditorAPI {
 		this.lastViewportBottom = bottom;
 
 		EditorAPI.this.editorManager.viewportChanged(this.viewer
-			.getTopIndex(), this.viewer.getBottomIndex());
+			.getTopIndex(), this.viewer.getBottomIndex(), editor);
 	    }
 	}
     }

@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
@@ -466,6 +467,12 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 		source = textSelection.getSource();
 		path = textSelection.getEditor();
 
+	    } else if (activity instanceof ViewportActivity) {
+		ViewportActivity viewport = (ViewportActivity) activity;
+		path = viewport.getEditor();
+		source = viewport.getSource();
+		selection = addSelection(result, selection, source, path);
+		result.add(activity);
 	    } else {
 		selection = addSelection(result, selection, source, path);
 		result.add(activity);
