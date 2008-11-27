@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
@@ -46,6 +45,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.VariableProxy;
 
 public class ConcurrentDocumentManager implements ConcurrentManager,
 	ISessionListener {
@@ -78,8 +78,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
 	    "ConsistencyWatchdog");
 
-    private ListenerList consistencyListener = new ListenerList();
-
     /**
      * This class consists of two parts. The first is a run-method which runs as
      * an eclipse job on the host side. Once started with schedule() the job is
@@ -91,7 +89,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
      */
     private class ConsistencyWatchdog extends Job {
 
-	private boolean inconsistencyToResolve = false;
+	private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
+		false);
 
 	public ConsistencyWatchdog(String name) {
 	    super(name);
@@ -149,7 +148,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 		    }
 		}
 	    }
-	    // schedule the next run in 5 seconds
+	    // schedule the next run in 2 seconds
 	    schedule(2000);
 	    return Status.OK_STATUS;
 	}
@@ -170,38 +169,24 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	    for (DocumentChecksum checksum : checksums) {
 		IDocument doc = editorMgmt.getDocument(checksum.getPath());
 
-		if ((doc.getLength() != checksum.getLength())) {
-		    if (doc.get().hashCode() != checksum.hashCode()) {
+		if ((doc.getLength() != checksum.getLength())
+			|| (doc.get().hashCode() != checksum.hashCode())) {
+
+		    if (!inconsistencyToResolve.getVariable()) {
 			logger.debug("Inconsistency detected in document "
 				+ checksum.getPath().toOSString());
-
-			this.inconsistencyToResolve = true;
-
-			// notify all listeners
-			Object[] listeners = consistencyListener.getListeners();
-			for (Object listener : listeners) {
-			    ((IConsistencyListener) listener)
-				    .inconsistencyDetected();
-			}
-			return;
+			this.inconsistencyToResolve.setVariable(true);
 		    }
+		    return;
 		}
 
 		logger.debug(checksum.getPath().toString() + ": "
 			+ doc.getLength() + "/" + checksum.getLength() + " ; "
 			+ doc.get().hashCode() + "/" + checksum.getHash());
 
-		if (inconsistencyToResolve) {
+		if (inconsistencyToResolve.getVariable()) {
 		    logger.debug("All Inconsistencies are resolved");
-
-		    this.inconsistencyToResolve = false;
-
-		    // notify all listener that inconsistency are resolved
-		    Object[] listeners = consistencyListener.getListeners();
-		    for (Object listener : listeners) {
-			((IConsistencyListener) listener)
-				.inconsistencyResolved();
-		    }
+		    this.inconsistencyToResolve.setVariable(false);
 		}
 	    }
 	}
@@ -807,24 +792,10 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     }
 
     /**
-     * Add the given consistency listener. Is ignored if the listener is already
-     * listening.
+     * Returns the variable proxy which stores the current inconsistency state
      * 
-     * @param listener
-     *            the listener that is to be added.
      */
-    public void addConsistencyListener(Object listener) {
-	this.consistencyListener.add(listener);
+    public VariableProxy<Boolean> getConsistencyToResolve() {
+	return consistencyWatchdog.inconsistencyToResolve;
     }
-
-    /**
-     * Removes the given consistency listener.
-     * 
-     * @param listener
-     *            the listener that is to be removed.
-     */
-    public void removeConsistencyListener(Object listener) {
-	this.consistencyListener.remove(listener);
-    }
-
 }
