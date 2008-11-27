@@ -48,10 +48,12 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -421,14 +423,25 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
-    public void selectionChanged(ITextSelection selection) {
-	// Commented to allow selection to work for observer too.
-	// if (!isDriver) return;
+    public void selectionChanged(ITextSelection selection, ISelectionProvider sp) {
+
+	IDocument doc = ((ITextViewer) sp).getDocument();
 
 	int offset = selection.getOffset();
 	int length = selection.getLength();
+	IPath path = null;
 
-	fireActivity(new TextSelectionActivity(offset, length));
+	// search path of resource
+	Set<IEditorPart> editors = editorPool.getAllEditors();
+	for (IEditorPart editor : editors) {
+	    if (editorAPI.getDocument(editor) == doc) {
+		path = editorAPI.getEditorResource(editor)
+			.getProjectRelativePath();
+		break;
+	    }
+	}
+
+	fireActivity(new TextSelectionActivity(offset, length, path));
     }
 
     /*
@@ -615,20 +628,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private void execTextSelection(TextSelectionActivity cursor) {
-	IPath activeDriverEditor = getActiveDriverEditor();
+	IPath path = cursor.getEditor();
 	TextSelection textSelection = new TextSelection(cursor.getOffset(),
 		cursor.getLength());
 
 	setDriverTextSelection(textSelection);
 
-	if (activeDriverEditor == null) {
+	if (path == null) {
 	    EditorManager.log
 		    .error("Received text selection but have no driver editor");
 	    return;
 	}
 
 	Set<IEditorPart> editors = EditorManager.this.editorPool
-		.getEditors(activeDriverEditor);
+		.getEditors(path);
 	for (IEditorPart editorPart : editors) {
 	    EditorManager.this.editorAPI.setSelection(editorPart,
 		    textSelection, cursor.getSource());
@@ -763,7 +776,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	} else if (activity instanceof TextSelectionActivity) {
 	    TextSelectionActivity textSelection = (TextSelectionActivity) activity;
 	    return "<textSelection " + "offset=\"" + textSelection.getOffset()
-		    + "\" " + "length=\"" + textSelection.getLength() + "\" />";
+		    + "\" " + "length=\"" + textSelection.getLength() + "\" "
+		    + "editor=\""
+		    + textSelection.getEditor().toPortableString() + "\" />";
 
 	} else if (activity instanceof ViewportActivity) {
 	    ViewportActivity viewportActvity = (ViewportActivity) activity;
@@ -818,7 +833,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	// TODO extract constants
 	int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
 	int length = Integer.parseInt(parser.getAttributeValue(null, "length"));
-	return new TextSelectionActivity(offset, length);
+	String path = parser.getAttributeValue(null, "editor");
+	return new TextSelectionActivity(offset, length, Path
+		.fromPortableString(path));
     }
 
     private ViewportActivity parseViewport(XmlPullParser parser) {

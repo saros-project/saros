@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
+import org.eclipse.core.runtime.IPath;
+
 public class TextSelectionActivity implements IActivity {
     private final int offset;
 
@@ -26,10 +28,13 @@ public class TextSelectionActivity implements IActivity {
 
     private String source;
 
-    public TextSelectionActivity(int offset, int length) {
+    private IPath editor;
+
+    public TextSelectionActivity(int offset, int length, IPath path) {
 	this.offset = offset;
 	this.length = length;
 	this.source = null;
+	this.editor = path;
     }
 
     public int getLength() {
@@ -38,6 +43,10 @@ public class TextSelectionActivity implements IActivity {
 
     public int getOffset() {
 	return this.offset;
+    }
+
+    public IPath getEditor() {
+	return this.editor;
     }
 
     public String getSource() {
@@ -54,7 +63,8 @@ public class TextSelectionActivity implements IActivity {
 	    TextSelectionActivity activity = (TextSelectionActivity) obj;
 	    return (this.offset == activity.offset)
 		    && (this.length == activity.length)
-		    && (this.source == activity.source);
+		    && (this.source == activity.source)
+		    && (this.editor == activity.editor);
 	}
 
 	return false;
@@ -63,6 +73,6 @@ public class TextSelectionActivity implements IActivity {
     @Override
     public String toString() {
 	return "TextSelectionActivity(offset:" + this.offset + ", length:"
-		+ this.length + ")";
+		+ this.length + ", " + this.editor + ")";
     }
 }

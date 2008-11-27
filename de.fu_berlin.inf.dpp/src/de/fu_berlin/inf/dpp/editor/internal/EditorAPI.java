@@ -203,7 +203,7 @@ public class EditorAPI implements IEditorAPI {
 	    ITextSelection selection = (ITextSelection) sp.getSelection();
 
 	    if (!this.lastSelection.equals(selection)) {
-		EditorAPI.this.editorManager.selectionChanged(selection);
+		EditorAPI.this.editorManager.selectionChanged(selection, sp);
 		this.lastSelection = selection;
 	    }
 	}

@@ -26,6 +26,7 @@ import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.swt.widgets.Display;
@@ -441,9 +442,11 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
 	ITextSelection selection = null;
 	String source = null;
+	IPath path = null;
 
 	for (IActivity activity : activities) {
 	    source = null;
+	    path = null;
 	    if (activity instanceof TextEditActivity) {
 		TextEditActivity textEdit = (TextEditActivity) activity;
 
@@ -452,6 +455,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 		selection = new TextSelection(textEdit.offset
 			+ textEdit.text.length(), 0);
 		source = textEdit.getSource();
+		path = textEdit.getEditor();
 		result.add(textEdit);
 
 	    } else if (activity instanceof TextSelectionActivity) {
@@ -460,13 +464,14 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 		selection = new TextSelection(textSelection.getOffset(),
 			textSelection.getLength());
 		source = textSelection.getSource();
+		path = textSelection.getEditor();
 
 	    } else {
-		selection = addSelection(result, selection, null);
+		selection = addSelection(result, selection, source, path);
 		result.add(activity);
 	    }
 
-	    selection = addSelection(result, selection, source);
+	    selection = addSelection(result, selection, source, path);
 	}
 
 	return result;
@@ -499,7 +504,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     private ITextSelection addSelection(List<IActivity> result,
-	    ITextSelection selection, String source) {
+	    ITextSelection selection, String source, IPath path) {
 	if (selection == null) {
 	    return null;
 	}
@@ -519,7 +524,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 	}
 
 	TextSelectionActivity newSel = new TextSelectionActivity(selection
-		.getOffset(), selection.getLength());
+		.getOffset(), selection.getLength(), path);
 	newSel.setSource(source);
 	result.add(newSel);
 
