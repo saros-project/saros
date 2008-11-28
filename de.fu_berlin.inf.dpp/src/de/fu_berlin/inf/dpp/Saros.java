@@ -36,6 +36,7 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
@@ -212,6 +213,13 @@ public class Saros extends AbstractUIPlugin {
 
 	    this.connection = new XMPPConnection(conConfig);
 	    this.connection.connect();
+
+	    // have to put this line to use new smack 3.1
+	    // without this line a NullPointerException happens but after a
+	    // longer time it connects anyway, with this line it connects fast
+	    // TODO: security issue?
+	    SASLAuthentication.supportSASLMechanism("PLAIN", 0);
+
 	    this.connection.login(username, password);
 
 	    this.connection.addConnectionListener(this.smackConnectionListener);
