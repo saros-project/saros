@@ -658,11 +658,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	int top = viewport.getTopIndex();
 	int bottom = viewport.getBottomIndex();
-
-	// TODO CJ: alle active Driver ersetzen !
-	IPath driverEditor = getActiveDriverEditor();
+	IPath path = viewport.getEditor();
+	
 	Set<IEditorPart> editors = EditorManager.this.editorPool
-		.getEditors(driverEditor);
+		.getEditors(path);
 	for (IEditorPart editorPart : editors) {
 	    EditorManager.this.editorAPI.setViewport(editorPart,
 		    EditorManager.this.isFollowing, top, bottom,
