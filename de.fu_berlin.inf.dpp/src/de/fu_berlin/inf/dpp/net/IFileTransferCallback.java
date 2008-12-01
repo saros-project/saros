@@ -44,9 +44,4 @@ public interface IFileTransferCallback {
      * @param mode
      */
     public void setTransferMode(TransferMode mode);
-
-    /**
-     * Is fired if jingle connection couldn't be established.
-     */
-    public void jingleFallback();
 }

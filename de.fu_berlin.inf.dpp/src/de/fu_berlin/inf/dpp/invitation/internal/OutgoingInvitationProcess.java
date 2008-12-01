@@ -68,8 +68,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     private long transferedFileSize = 0;
 
     public int getProgressCurrent() {
+	// TODO CJ: Jingle File Transfer progrss information
 	if (this.tmode == TransferMode.IBB) {
-	    // TODO Änderung
 	    return (int) (this.transferedFileSize);
 	} else {
 	    return this.progress_done + 1;
@@ -78,7 +78,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public int getProgressMax() {
 	if (this.tmode == TransferMode.IBB) {
-	    // TODO Änderung
 	    return (int) (this.fileSize);
 	} else {
 	    return this.progress_max;
@@ -150,8 +149,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		this.progress_max = this.toSend.size();
 		this.progress_done = 0;
 
+		if (this.tmode == TransferMode.JINGLE) {
+		    logger.error("Jingle File Trandfer not yet implemented..");
+		    // TODO CJ: implementing jingle file transfer
+		}
 		/* transfer all data with archive. */
-		if (this.tmode == TransferMode.IBB) {
+		else if (this.tmode == TransferMode.IBB) {
 		    sendArchive();
 		} else {
 		    /* send separate files. */
@@ -191,8 +194,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	    failed(e);
 	}
 
-	// TODO: For testing only
-	// tmode = TransferMode.IBB;
     }
 
     /*
@@ -207,7 +208,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 	setState(State.GUEST_FILELIST_SENT);
 
 	this.invitationUI.runGUIAsynch(new SynchronizationRunnable(this));
-
     }
 
     /*
@@ -253,9 +253,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.net.IFileTrafnsferCallback
      */
     public void fileSent(IPath path) {
-	if (this.tmode == TransferMode.IBB) {
-	    // TODO Änderung
 
+	// TODO CJ: Jingle File Transfer
+
+	if (this.tmode == TransferMode.IBB) {
 	    setState(State.SYNCHRONIZING_DONE);
 	} else {
 	    this.progress_done++;
@@ -269,7 +270,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback#transferProgress(int)
      */
     public void transferProgress(int transfered) {
-	// TODO Änderung
 	this.transferedFileSize = transfered;
 	/* update ui */
 	this.invitationUI.updateInvitationProgress(this.peer);
@@ -300,7 +300,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * send all project data with archive file.
      */
     private void sendArchive() {
-	// TODO Änderung
 	if (getState() == State.CANCELED) {
 	    this.toSend.clear();
 	    return;
@@ -417,30 +416,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public String getProjectName() {
 	return this.sharedProject.getProject().getName();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback#jingleFallback()
-     */
-    public void jingleFallback() {
-	// System.out.println("Fallback");
-	OutgoingInvitationProcess.logger.info("Jingle Fallback to IBB.");
-	this.tmode = TransferMode.IBB;
-	try {
-	    if (getState() == State.HOST_FILELIST_SENT) {
-		/* TODO: send file list another one. */
-		this.transmitter.sendFileList(this.peer, this.sharedProject
-			.getFileList());
-	    }
-	    /* error during send single project file with jingle */
-	    if (getState() == State.SYNCHRONIZING) {
-		sendArchive();
-	    }
-	} catch (Exception e) {
-	    failed(e);
-	}
     }
 
     /*

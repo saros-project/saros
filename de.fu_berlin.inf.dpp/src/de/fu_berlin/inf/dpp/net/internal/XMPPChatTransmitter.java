@@ -35,6 +35,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,7 +56,6 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -138,10 +138,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	public byte[] content;
 	public long filesize;
 	public IProject project;
-
-	// /* for testing only */
-	// public File file;
-	// public String filePath;
     }
 
     /**
@@ -349,82 +345,73 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	String to = recipient.toString();
 
 	if (getFileTransferModeViaChat()) {
+	    /* send file with IBB File Transfer */
 
-	    if (sendChatTransfer(
-		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION, "", xml
-			    .getBytes(), recipient)) {
+	    XMPPChatTransmitter.log.debug("Establishing file list transfer");
+
+	    /* Write xml datas to temp file for transfering. */
+	    try {
+		File newfile = new File(
+			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
+				+ new JID(this.connection.getUser()).getName());
+		if (newfile.exists()) {
+		    newfile.delete();
+		}
+		XMPPChatTransmitter.log.debug("file : "
+			+ newfile.getAbsolutePath());
+
+		FileWriter writer = new FileWriter(
+			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
+				+ new JID(this.connection.getUser()).getName());
+		writer.append(xml);
+		writer.close();
+
+		OutgoingFileTransfer
+			.setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
+		OutgoingFileTransfer transfer = this.fileTransferManager
+			.createOutgoingFileTransfer(to);
+
+		XMPPChatTransmitter.log.info("Sending file list");
+		FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
+			transfer);
+		transfer.sendFile(newfile,
+			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION);
+
+		/* wait for complete transfer. */
+		while (monitor.isAlive() && monitor.isRunning()) {
+		    Thread.sleep(500);
+		}
+		monitor.closeMonitor(true);
+
+		if (newfile.exists()) {
+		    newfile.delete();
+		}
+		XMPPChatTransmitter.log.info("File list sent");
+
+		// break;
+
+	    } catch (IOException e) {
+		// if (attempts-- > 0)
+		// continue;
+
+		this.m_bFileTransferByChat = true;
+		sendChatTransfer(
+			XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION, "",
+			xml.getBytes(), recipient);
+
 		XMPPChatTransmitter.log
-			.debug("Sent file list via ChatTransfer");
-	    } else {
-		XMPPChatTransmitter.log
-			.warn("Error sending file list via ChatTransfer");
+			.info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
 	    }
-	}
-
-	/* send file with IBB File Transfer */
-
-	XMPPChatTransmitter.log.debug("Establishing file list transfer");
-
-	/* Write xml datas to temp file for transfering. */
-	try {
-	    File newfile = new File(
-		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
-			    + new JID(this.connection.getUser()).getName());
-	    if (newfile.exists()) {
-		newfile.delete();
+	    // }
+	    catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
 	    }
-	    XMPPChatTransmitter.log
-		    .debug("file : " + newfile.getAbsolutePath());
 
-	    FileWriter writer = new FileWriter(
-		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION + "."
-			    + new JID(this.connection.getUser()).getName());
-	    writer.append(xml);
-	    writer.close();
+	} else
+	    log.error("Jingle File Transfer not yet implemented..");
+	// TODO CJ: implementing jingle file transfer
 
-	    OutgoingFileTransfer
-		    .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
-	    OutgoingFileTransfer transfer = this.fileTransferManager
-		    .createOutgoingFileTransfer(to);
-
-	    XMPPChatTransmitter.log.info("Sending file list");
-	    FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-		    transfer);
-	    transfer.sendFile(newfile,
-		    XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION);
-
-	    /* wait for complete transfer. */
-	    while (monitor.isAlive() && monitor.isRunning()) {
-		Thread.sleep(500);
-	    }
-	    monitor.closeMonitor(true);
-
-	    if (newfile.exists()) {
-		newfile.delete();
-	    }
-	    XMPPChatTransmitter.log.info("File list sent");
-
-	    // break;
-
-	} catch (IOException e) {
-	    // if (attempts-- > 0)
-	    // continue;
-
-	    this.m_bFileTransferByChat = true;
-	    sendChatTransfer(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION,
-		    "", xml.getBytes(), recipient);
-	    // TODO errorhandling
-
-	    XMPPChatTransmitter.log
-		    .info("File list sent via ChatTransfer. File transfer mode is set to ChatTransfer.");
-	}
-	// }
-	catch (InterruptedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
-
-	// end of jingle transfer
     }
 
     /**
@@ -1179,17 +1166,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 		    process.cancel(errorMsg, true);
 		}
 	    }
-	}
-
-	else if (PacketExtensions.getJingleErrorExtension(message) != null) {
-	    XMPPChatTransmitter.log.debug("Receive jingle error messages from "
-		    + fromJID);
-	} else if (PacketExtensions.getJupiterErrorExtension(message) != null) {
-	    XMPPChatTransmitter.log.debug("Receive jingle error messages from "
-		    + fromJID);
 
 	} else if (PacketExtensions.getChecksumErrorExtension(message) != null) {
-	    // log.debug("Receive jingle error messages from "+fromJID);
 	    DefaultPacketExtension checksumErrorExtension = PacketExtensions
 		    .getChecksumErrorExtension(message);
 	    String path = checksumErrorExtension
@@ -1448,25 +1426,70 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    description = description + ':' + transferData.timestamp;
 	}
 
-	if (getFileTransferModeViaChat() || (transferData.callback == null)) {
-
-	    if (transferData.content == null) {
-		readFile(transferData);
-	    }
-
-	    sendChatTransfer(transferData.path.toString(), description,
-		    transferData.content, recipient);
-
-	    XMPPChatTransmitter.log.info("Sent file " + transferData.path
-		    + " (by ChatTransfer)");
-	    return;
+	if (getFileTransferModeViaChat()) {
+	    sendSingleFileWithIBB(transferData);
+	} else {
+	    log.error("Jingle File Trandfer not yet implemented..");
+	    // TODO CJ: implementing jingle file transfer
 	}
 
-	/* Fallback to transfer all data into one archive file. */
-	// TODO: Don't ask the InvitationProcesses what to do, rather try
-	// IBB yourself.
-	transferData.callback.jingleFallback();
+    }
 
+    /**
+     * send single file from queue with xmpp message.
+     * 
+     * @param transferData
+     * @throws CoreException
+     * @throws XMPPException
+     * @throws IOException
+     */
+    private void sendSingleFileWithIBB(FileTransferData transferData)
+	    throws CoreException, XMPPException, IOException {
+
+	JID recipient = transferData.recipient;
+
+	String description = RESOURCE_TRANSFER_DESCRIPTION;
+
+	OutgoingFileTransfer.setResponseTimeout(MAX_TRANSFER_RETRIES * 1000);
+	OutgoingFileTransfer transfer = fileTransferManager
+		.createOutgoingFileTransfer(recipient.toString());
+
+	IFile f = transferData.project.getFile(transferData.path);
+
+	if (f.exists()) {
+	    log.debug("file exists and will be send :" + f.getName() + " "
+		    + f.getLocation());
+	    /* set path in description */
+	    description = description + ":" + transferData.path;
+	    /* send file */
+	    transfer
+		    .sendFile(new File(f.getLocation().toString()), description);
+	} else {
+	    log.warn("file NOT exists. " + f.getLocation());
+	    throw new IOException("File not exists.");
+	}
+
+	FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
+		transfer);
+	/* wait for complete transfer. */
+	while (monitor.isAlive() && monitor.isRunning()) {
+	    try {
+		Thread.sleep(500);
+	    } catch (InterruptedException e) {
+		e.printStackTrace();
+	    }
+	}
+	monitor.closeMonitor(true);
+
+	if (transfer
+		.getStatus()
+		.equals(
+			org.jivesoftware.smackx.filetransfer.FileTransfer.Status.complete)) {
+	    log.debug("transfer complete");
+	}
+
+	if (transferData.callback != null)
+	    transferData.callback.fileSent(transferData.path);
     }
 
     /**
@@ -1515,10 +1538,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	} catch (Exception e) {
 	    XMPPChatTransmitter.log.error("Error in Incoming File: ", e);
 	    return null;
-	    // e.printStackTrace();
-	    // Saros.log("Exception while receiving file list", e);
-	    // TODO retry? but we dont catch any exception here,
-	    // smack might not throw them up
 	}
 
 	return archiveFile;
@@ -1577,25 +1596,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 		|| Saros.getDefault().getPreferenceStore().getBoolean(
 			PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
 
-    }
-
-    public void incommingFileList(String fileList_content, JID recipient) {
-	FileList fileList = null;
-	XMPPChatTransmitter.log.info("incoming file list");
-	try {
-	    fileList = new FileList(fileList_content);
-	} catch (XmlPullParserException e) {
-
-	    e.printStackTrace();
-	} catch (IOException e) {
-
-	    e.printStackTrace();
-	}
-	for (IInvitationProcess process : this.processes) {
-	    if (process.getPeer().equals(recipient)) {
-		process.fileListReceived(recipient, fileList);
-	    }
-	}
     }
 
 }

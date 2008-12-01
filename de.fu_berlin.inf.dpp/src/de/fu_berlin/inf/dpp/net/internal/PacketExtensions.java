@@ -171,10 +171,6 @@ public class PacketExtensions {
 	return PacketExtensions.createExtension(PacketExtensions.LEAVE);
     }
 
-    public static PacketExtension createJingleErrorExtension() {
-	return PacketExtensions.createExtension(PacketExtensions.JINGLEERROR);
-    }
-
     public static PacketExtension createChecksumErrorExtension(IPath path) {
 	DefaultPacketExtension extension = new DefaultPacketExtension(
 		PacketExtensions.FILE_CHECKSUM_ERROR,
@@ -258,11 +254,6 @@ public class PacketExtensions {
 
     public static DefaultPacketExtension getLeaveExtension(Message message) {
 	return PacketExtensions.getExtension(PacketExtensions.LEAVE, message);
-    }
-
-    public static DefaultPacketExtension getJingleErrorExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.JINGLEERROR,
-		message);
     }
 
     public static DefaultPacketExtension getJupiterErrorExtension(
