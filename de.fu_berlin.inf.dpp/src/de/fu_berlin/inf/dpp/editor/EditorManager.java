@@ -53,9 +53,7 @@ import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -141,7 +139,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     private class EditorPool {
 	private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
-	private final Map<IDocument, IPath> paths = new HashMap<IDocument, IPath>();
 
 	public void add(IEditorPart editorPart) {
 	    IResource resource = EditorManager.this.editorAPI
@@ -171,8 +168,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 		editors = new HashSet<IEditorPart>();
 		this.editorParts.put(path, editors);
 	    }
-
-	    paths.put(document, path);
 
 	    // if line delimiters are not in unix style convert them
 	    if (document instanceof IDocumentExtension4) {
@@ -234,8 +229,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	    HashSet<IEditorPart> editors = this.editorParts.get(path);
 	    editors.remove(editorPart);
-	    paths.remove(((SourceViewer) editorPart.getAdapter(Control.class))
-		    .getDocument());
 	}
 
 	public Set<IEditorPart> getEditors(IPath path) {
@@ -405,8 +398,18 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	return editor.getDocumentProvider().getDocument(input);
     }
 
+    // TODO CJ: find a better solution
     public IPath getPathOfDocument(IDocument doc) {
-	return editorPool.paths.get(doc);
+	IPath path = null;
+	Set<IEditorPart> editors = editorPool.getAllEditors();
+	for (IEditorPart editor : editors) {
+	    if (editorAPI.getDocument(editor) == doc) {
+		path = editorAPI.getEditorResource(editor)
+			.getProjectRelativePath();
+		break;
+	    }
+	}
+	return path;
     }
 
     /**
