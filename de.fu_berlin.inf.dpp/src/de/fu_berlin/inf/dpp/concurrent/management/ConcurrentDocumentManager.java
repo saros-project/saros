@@ -116,7 +116,10 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	    // for all documents
 	    for (IPath docPath : docs) {
 
+		// TODO CJ: can't get document if no editor is open
 		IDocument doc = editorMgmt.getDocument(docPath);
+		assert (doc != null) : ("Couldn't get Document" + docPath
+			.toOSString());
 
 		// if no entry for this document exists create a new one
 		if (docsChecksums.get(docPath) == null) {
@@ -169,6 +172,10 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	    for (DocumentChecksum checksum : checksums) {
 		IDocument doc = editorMgmt.getDocument(checksum.getPath());
 
+		// TODO CJ: can't get document if no editor is open
+		assert (doc != null) : ("Couldn't get Document" + checksum
+			.getPath().toOSString());
+
 		if ((doc.getLength() != checksum.getLength())
 			|| (doc.get().hashCode() != checksum.getHash())) {
 
@@ -185,6 +192,10 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 		    }
 		    return;
 		}
+		logger.debug(checksum.getPath().toString() + ": "
+			+ doc.getLength() + "/" + checksum.getLength() + " ; "
+			+ doc.get().hashCode() + "/" + checksum.getHash());
+
 		if (inconsistencyToResolve.getVariable()) {
 		    logger.debug("All Inconsistencies are resolved");
 		    this.inconsistencyToResolve.setVariable(false);

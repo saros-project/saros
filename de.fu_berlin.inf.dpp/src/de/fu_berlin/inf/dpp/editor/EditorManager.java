@@ -389,10 +389,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @param path
      *            the path of the wanted document
-     * @return the document
+     * @return the document or null if no document exists with given path or no
+     *         editor with this file is open
      */
     public IDocument getDocument(IPath path) {
 	Set<IEditorPart> editors = getEditors(path);
+	if (editors.isEmpty())
+	    return null;
 	AbstractTextEditor editor = (AbstractTextEditor) editors.toArray()[0];
 	IEditorInput input = editor.getEditorInput();
 	return editor.getDocumentProvider().getDocument(input);

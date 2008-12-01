@@ -20,16 +20,6 @@ public class ConsistencyAction extends Action implements ISessionListener {
 	Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
-    public void inconsistencyDetected() {
-	setEnabled(true);
-	setToolTipText("Inconsistency Detected!");
-    }
-
-    public void inconsistencyResolved() {
-	setEnabled(false);
-	setToolTipText("");
-    }
-
     VariableProxy<Boolean> proxy;
 
     VariableProxyListener<Boolean> listener = new VariableProxyListener<Boolean>() {
