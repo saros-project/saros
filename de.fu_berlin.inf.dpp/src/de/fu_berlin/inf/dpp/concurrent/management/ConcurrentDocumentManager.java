@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,7 +40,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -111,13 +112,11 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	    // get the documents which are controlled by jupiter
 	    Set<IPath> docs = clientDocs.keySet();
 
-	    EditorManager editorMgmt = EditorManager.getDefault();
-
 	    // for all documents
 	    for (IPath docPath : docs) {
 
-		// TODO CJ: can't get document if no editor is open
-		IDocument doc = editorMgmt.getDocument(docPath);
+		IDocument doc = getDocumentFromProjectRelativePath(docPath);
+
 		assert (doc != null) : ("Couldn't get Document" + docPath
 			.toOSString());
 
@@ -167,12 +166,12 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	 *            the checksums to check the documents against
 	 */
 	private void check(DocumentChecksum[] checksums) {
-	    EditorManager editorMgmt = EditorManager.getDefault();
 
 	    for (DocumentChecksum checksum : checksums) {
-		IDocument doc = editorMgmt.getDocument(checksum.getPath());
 
-		// TODO CJ: can't get document if no editor is open
+		IDocument doc = getDocumentFromProjectRelativePath(checksum
+			.getPath());
+
 		assert (doc != null) : ("Couldn't get Document" + checksum
 			.getPath().toOSString());
 
@@ -201,6 +200,14 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 		    this.inconsistencyToResolve.setVariable(false);
 		}
 	    }
+	}
+
+	private IDocument getDocumentFromProjectRelativePath(IPath path) {
+	    IPath fullPath = Saros.getDefault().getSessionManager()
+		    .getSharedProject().getProject().findMember(path)
+		    .getFullPath();
+	    return FileBuffers.getTextFileBufferManager().getTextFileBuffer(
+		    fullPath, LocationKind.IFILE).getDocument();
 	}
     }
 
