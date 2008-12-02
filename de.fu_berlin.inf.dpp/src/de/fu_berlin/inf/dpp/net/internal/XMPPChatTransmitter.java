@@ -72,6 +72,9 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
@@ -125,6 +128,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     private int runningFileTransfers = 0;
 
     private boolean m_bFileTransferByChat = false; // to switch to
+
+    private JingleFileTransferManager jingleManager;
 
     /**
      * A simple struct that is used to queue file transfers.
@@ -181,6 +186,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
 	this.privatechatmanager = new PrivateChatManager();
 	this.privatechatmanager.setConnection(connection, this);
+	this.jingleManager = new JingleFileTransferManager(connection);
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
@@ -410,7 +416,17 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
 	} else
 	    log.error("Jingle File Transfer not yet implemented..");
-	// TODO CJ: implementing jingle file transfer
+	/* create file transfer. */
+	JingleFileTransferData data = new JingleFileTransferData();
+
+	data.file_list_content = xml;
+	data.type = FileTransferType.FILELIST_TRANSFER;
+	data.recipient = recipient;
+	data.sender = new JID(connection.getUser());
+	data.file_project_path = FileTransferType.FILELIST_TRANSFER.toString();
+
+	jingleManager.createOutgoingJingleFileTransfer(recipient,
+		new JingleFileTransferData[] { data });
 
     }
 
