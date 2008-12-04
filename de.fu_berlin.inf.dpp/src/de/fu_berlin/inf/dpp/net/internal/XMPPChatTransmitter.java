@@ -56,6 +56,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -72,9 +73,12 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
+import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
@@ -85,7 +89,7 @@ import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
  * @author rdjemili
  */
 public class XMPPChatTransmitter implements ITransmitter, IReceiver,
-	MessageListener, FileTransferListener {
+	MessageListener, FileTransferListener, IJingleFileTransferListener {
     private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
 	    .getName());
 
@@ -186,7 +190,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
 	this.privatechatmanager = new PrivateChatManager();
 	this.privatechatmanager.setConnection(connection, this);
-	this.jingleManager = new JingleFileTransferManager(connection);
+	this.jingleManager = new JingleFileTransferManager(connection, this);
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
@@ -414,20 +418,21 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 		e.printStackTrace();
 	    }
 
-	} else
-	    log.error("Jingle File Transfer not yet implemented..");
-	/* create file transfer. */
-	JingleFileTransferData data = new JingleFileTransferData();
+	} else { // transfer file list with jingle
+	    JingleFileTransferData data = new JingleFileTransferData();
 
-	data.file_list_content = xml;
-	data.type = FileTransferType.FILELIST_TRANSFER;
-	data.recipient = recipient;
-	data.sender = new JID(connection.getUser());
-	data.file_project_path = FileTransferType.FILELIST_TRANSFER.toString();
+	    data.file_list_content = xml;
+	    data.type = FileTransferType.FILELIST_TRANSFER;
+	    data.recipient = recipient;
+	    data.sender = new JID(connection.getUser());
+	    data.file_project_path = FileTransferType.FILELIST_TRANSFER
+		    .toString();
 
-	jingleManager.createOutgoingJingleFileTransfer(recipient,
-		new JingleFileTransferData[] { data });
+	    jingleManager.createOutgoingJingleFileTransfer(recipient,
+		    new JingleFileTransferData[] { data });
 
+	    // TODO CJ: Fallback to IBB when jingle fails
+	}
     }
 
     /**
@@ -1446,7 +1451,50 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    sendSingleFileWithIBB(transferData);
 	} else {
 	    log.error("Jingle File Trandfer not yet implemented..");
-	    // TODO CJ: implementing jingle file transfer
+
+	    if ((jingleManager.getState(recipient) != JingleConnectionState.ERROR)) {
+		log.info("Send file " + transferData.path + " (with Jingle)");
+
+		/* create file transfer. */
+		JingleFileTransferData data = new JingleFileTransferData();
+
+		data.file_project_path = transferData.path.toString();
+		data.project_name = transferData.project.getName();
+		data.type = FileTransferType.RESOURCE_TRANSFER;
+		data.recipient = recipient;
+		data.sender = new JID(connection.getUser());
+
+		/* read content data. */
+		File f = new File(transferData.project.getFile(
+			transferData.path).getLocation().toOSString());
+		data.filesize = f.length();
+		data.content = new byte[(int) data.filesize];
+
+		try {
+		    InputStream in = transferData.project.getFile(
+			    transferData.path).getContents();
+		    in.read(data.content, 0, (int) data.filesize);
+		} catch (Exception e) {
+		    e.printStackTrace();
+		    data.content = null;
+		    log.error("Error during read file content for transfer!");
+		}
+
+		jingleManager.createOutgoingJingleFileTransfer(recipient,
+			new JingleFileTransferData[] { data });
+
+		/* inform callback. */
+		if (transferData.callback != null)
+		    transferData.callback.fileSent(transferData.path);
+
+	    } else {
+		/* Fallback to transfer all data into one archive file. */
+		log.debug("Falling Back to send archiv file...");
+		// TODO: Don't ask the InvitationProcesses what to do, rather
+		// try IBB yourself.
+		// TODO CJ: fallback
+		// transferData.callback.jingleFallback();
+	    }
 	}
 
     }
@@ -1611,6 +1659,43 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	return this.m_bFileTransferByChat
 		|| Saros.getDefault().getPreferenceStore().getBoolean(
 			PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+
+    }
+
+    public void exceptionOccured(JingleSessionException exception) {
+	// TODO Auto-generated method stub
+
+    }
+
+    public void incomingResourceFile(JingleFileTransferData data,
+	    InputStream input) {
+	log.info("incoming resource " + data.file_project_path);
+	JID from = data.sender;
+	Path path = new Path(data.file_project_path);
+
+	for (IInvitationProcess process : processes) {
+	    if (process.getPeer().equals(from)) {
+		process.resourceReceived(from, path, input);
+	    }
+	}
+    }
+
+    public void incomingFileList(String fileList_content, JID recipient) {
+	FileList fileList = null;
+	log.info("incoming file list");
+	try {
+	    fileList = new FileList(fileList_content);
+	} catch (XmlPullParserException e) {
+
+	    e.printStackTrace();
+	} catch (IOException e) {
+
+	    e.printStackTrace();
+	}
+	for (IInvitationProcess process : processes) {
+	    if (process.getPeer().equals(recipient))
+		process.fileListReceived(recipient, fileList);
+	}
 
     }
 

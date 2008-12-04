@@ -32,16 +32,27 @@ public class JingleFileTransferManager {
 
     private class FileMediaManager extends JingleMediaManager {
 
+	private JingleFileTransferData[] transferData;
+	private IJingleFileTransferListener listener;
+	private HashMap<JID, JingleFileTransferSession> sessions;
+
 	public FileMediaManager(JingleTransportManager transportManager) {
 	    super(transportManager);
+	    sessions = new HashMap<JID, JingleFileTransferSession>();
 	}
 
 	@Override
 	public JingleMediaSession createMediaSession(PayloadType payload,
 		TransportCandidate tc1, TransportCandidate tc2,
 		JingleSession jingleSession) {
-	    return new JingleFileTransferSession(payload, tc1, tc2, null,
-		    jingleSession);
+
+	    JingleFileTransferSession newSession = new JingleFileTransferSession(
+		    payload, tc1, tc2, null, jingleSession, transferData,
+		    listener);
+
+	    JID jid = new JID(jingleSession.getResponder());
+	    sessions.put(jid, newSession);
+	    return newSession;
 	}
 
 	@Override
@@ -51,6 +62,18 @@ public class JingleFileTransferManager {
 	    return result;
 	}
 
+	public void setTransferFile(JingleFileTransferData[] transferData) {
+	    this.transferData = transferData;
+	}
+
+	public void transferFiles(JingleFileTransferData[] transferData, JID jid) {
+	    JingleFileTransferSession session = sessions.get(jid);
+	    if (session != null) {
+		session.setTransferData(transferData);
+		session.setTrasmit(true);
+	    }
+
+	}
     }
 
     private XMPPConnection xmppConnection;
@@ -68,16 +91,19 @@ public class JingleFileTransferManager {
      */
     private HashMap<JID, JingleConnectionState> connectionStates = null;
     private FileMediaManager mediaManager = null;
+    private IJingleFileTransferListener listener;
 
     public enum JingleConnectionState {
 	INIT, ESTABLISHED, CLOSED, ERROR, DEFAULT
     }
 
-    public JingleFileTransferManager(XMPPConnection connection) {
+    public JingleFileTransferManager(XMPPConnection connection,
+	    IJingleFileTransferListener listener) {
 	this.xmppConnection = connection;
 	incomingSessions = new HashMap<JID, JingleSession>();
 	outgoingSessions = new HashMap<JID, JingleSession>();
 	connectionStates = new HashMap<JID, JingleConnectionState>();
+	this.listener = listener;
 	logger.debug("initialized jingle file transfer manager.");
 	initialize();
     }
@@ -90,6 +116,7 @@ public class JingleFileTransferManager {
 	// STUNTransportManager stun = new STUNTransportManager();
 
 	mediaManager = new FileMediaManager(icetm0);
+	mediaManager.listener = listener;
 
 	List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
 	medias.add(mediaManager);
@@ -302,42 +329,31 @@ public class JingleFileTransferManager {
     public void createOutgoingJingleFileTransfer(JID jid,
 	    JingleFileTransferData[] transferData) {
 
-	JingleSession incoming = incomingSessions.get(jid);
-	if (incoming != null) {
-	    /* an incoming session already exist. */
-	    logger
-		    .debug("Incoming stream exists. Send data with current stream.");
-
-	    // TODO CJ
-	    // mediaManager.transferFiles(transferData);
-
-	    return;
-	}
-
 	JingleSession outgoing = outgoingSessions.get(jid);
+	JingleSession incoming = incomingSessions.get(jid);
+
 	if (outgoing != null) {
 	    /* send new data with current connection. */
-
-	    // TODO CJ
-	    // mediaManager.transferFiles(transferData);
+	    mediaManager.transferFiles(transferData, jid);
 	    return;
 	}
 
-	// TODO CJ
-	// mediaManager.transferFiles(transferData);
-
 	try {
+	    mediaManager.setTransferFile(transferData);
 	    outgoing = jm.createOutgoingJingleSession(jid.toString());
+
+	    initJingleListener(outgoing, jid);
+
+	    /* add to outgoing session list. */
+	    outgoingSessions.put(jid, outgoing);
+
+	    outgoing.startOutgoing();
+
 	} catch (XMPPException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	}
 
-	initJingleListener(outgoing, jid);
-
-	/* add to outgoing session list. */
-	outgoingSessions.put(jid, outgoing);
-	outgoing.startOutgoing();
     }
 
     /**

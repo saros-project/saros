@@ -149,12 +149,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 		this.progress_max = this.toSend.size();
 		this.progress_done = 0;
 
-		if (this.tmode == TransferMode.JINGLE) {
-		    logger.error("Jingle File Trandfer not yet implemented..");
-		    // TODO CJ: implementing jingle file transfer
-		}
 		/* transfer all data with archive. */
-		else if (this.tmode == TransferMode.IBB) {
+		if (tmode == TransferMode.IBB) {
 		    sendArchive();
 		} else {
 		    /* send separate files. */
