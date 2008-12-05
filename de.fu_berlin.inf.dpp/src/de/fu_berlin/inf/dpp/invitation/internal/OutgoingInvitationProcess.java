@@ -250,8 +250,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      */
     public void fileSent(IPath path) {
 
-	// TODO CJ: Jingle File Transfer
-
 	if (this.tmode == TransferMode.IBB) {
 	    setState(State.SYNCHRONIZING_DONE);
 	} else {

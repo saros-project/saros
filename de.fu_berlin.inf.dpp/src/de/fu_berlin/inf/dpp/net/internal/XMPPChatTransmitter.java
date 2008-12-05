@@ -1667,16 +1667,33 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     }
 
+    /**
+     * File received with jingle.
+     */
     public void incomingResourceFile(JingleFileTransferData data,
 	    InputStream input) {
 	log.info("incoming resource " + data.file_project_path);
+
 	JID from = data.sender;
 	Path path = new Path(data.file_project_path);
+	int time = data.timestamp;
 
+	boolean handledByInvitation = false;
 	for (IInvitationProcess process : processes) {
 	    if (process.getPeer().equals(from)) {
 		process.resourceReceived(from, path, input);
+		handledByInvitation = true;
 	    }
+	}
+
+	if (!handledByInvitation) {
+	    FileActivity activity = new FileActivity(FileActivity.Type.Created,
+		    path, input);
+
+	    TimedActivity timedActivity = new TimedActivity(activity, time);
+
+	    ISessionManager sm = Saros.getDefault().getSessionManager();
+	    sm.getSharedProject().getSequencer().exec(timedActivity);
 	}
     }
 
