@@ -1384,19 +1384,17 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	    // transfer);
 
 	    InputStream in = transfer.recieveFile();
-	    /* 1. Wenn es innerhalb des Invitation processes stattfindet. */
+	    
+	 // TODO CJ: move this to business logic
 	    boolean handledByInvitation = false;
 	    for (IInvitationProcess process : this.processes) {
 		if (process.getPeer().equals(from)) {
 		    process.resourceReceived(from, path, in);
 		    handledByInvitation = true;
+		    break;
 		}
 	    }
 
-	    /*
-	     * 2. wenn es nicht innerhalb des invitation process stattfindet,
-	     * sondern innerhalb der session.
-	     */
 	    if (!handledByInvitation) {
 		FileActivity activity = new FileActivity(
 			FileActivity.Type.Created, path, in);
@@ -1678,11 +1676,13 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 	Path path = new Path(data.file_project_path);
 	int time = data.timestamp;
 
+	// TODO CJ: move this to business logic
 	boolean handledByInvitation = false;
 	for (IInvitationProcess process : processes) {
 	    if (process.getPeer().equals(from)) {
 		process.resourceReceived(from, path, input);
 		handledByInvitation = true;
+		break;
 	    }
 	}
 

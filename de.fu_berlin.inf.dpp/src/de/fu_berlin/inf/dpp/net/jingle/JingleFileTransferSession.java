@@ -181,8 +181,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 	// try to use tcp
 	try {
 	    logger.debug("trying to send with TCP");
-	    Socket socket = new Socket(remote.getIp(), remote.getPort());
-	    this.socket = socket;
+	    this.socket = new Socket(remote.getIp(), remote.getPort());
 	    transmitTCP(socket);
 	} catch (IOException e) {
 	    e.getLocalizedMessage();
