@@ -61,13 +61,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
 			} else if (data.type == FileTransferType.RESOURCE_TRANSFER) {
 			    logger.debug("received resource "
-				    + data.file_project_path + "with TCP");
+				    + data.file_project_path + " with TCP");
 			    listener.incomingResourceFile(data,
 				    new ByteArrayInputStream(data.content));
 			}
 		    }
-		    serverSocket.setSoTimeout(0);
-		    socket = serverSocket.accept();
+		    // serverSocket.setSoTimeout(0);
+		    // socket = serverSocket.accept();
 		}
 
 	    } catch (SocketTimeoutException e) {
@@ -111,6 +111,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private JingleFileTransferData[] transferList;
     private JingleFileTransferData currentSending;
     private IJingleFileTransferListener listener;
+    private Socket socket;
 
     public JingleFileTransferSession(PayloadType payloadType,
 	    TransportCandidate remote, TransportCandidate local,
@@ -134,20 +135,21 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     @Override
     public void setTrasmit(boolean active) {
-	// TODO Auto-generated method stub
 	logger
 		.debug("JingleFileTransferSesseion activity was set to "
 			+ active);
-	if (active) {
+	if (active && socket != null) {
 	    logger.debug("sending with TCP..");
 	    try {
-		Socket socket = new Socket(remote.getIp(), remote.getPort());
 		transmitTCP(socket);
 	    } catch (IOException e) {
 		logger.debug(e.getLocalizedMessage());
 		logger.debug("sending with TCP failed, use UDP instead");
-		transmitUDP();
+
 	    }
+	} else {
+	    logger.debug("sending with UDP..");
+	    transmitUDP();
 	}
     }
 
@@ -180,6 +182,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 	try {
 	    logger.debug("trying to send with TCP");
 	    Socket socket = new Socket(remote.getIp(), remote.getPort());
+	    this.socket = socket;
 	    transmitTCP(socket);
 	} catch (IOException e) {
 	    e.getLocalizedMessage();
