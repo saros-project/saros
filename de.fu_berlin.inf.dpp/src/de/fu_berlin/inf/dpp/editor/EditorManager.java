@@ -247,6 +247,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
 	    return all;
 	}
+
+	public void removeAllEditors() {
+	    editorParts.clear();
+	}
     }
 
     private class DocumentListener implements IDocumentListener {
@@ -324,6 +328,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void sessionStarted(ISharedProject session) {
 	this.sharedProject = session;
+	assert (this.editorPool.editorParts.isEmpty());
 	this.isDriver = this.sharedProject.isDriver();
 	this.sharedProject.addListener(this);
 	this.sharedProject.getActivityManager().addProvider(this);
@@ -343,6 +348,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	this.sharedProject.removeListener(this);
 	this.sharedProject.getActivityManager().removeProvider(this);
 	this.sharedProject = null;
+	this.editorPool.removeAllEditors();
     }
 
     /*
@@ -976,6 +982,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 	}
     }
 
+    // TODO CJ: review needed
     private void activateOpenEditors() {
 	Display.getDefault().syncExec(new Runnable() {
 	    public void run() {

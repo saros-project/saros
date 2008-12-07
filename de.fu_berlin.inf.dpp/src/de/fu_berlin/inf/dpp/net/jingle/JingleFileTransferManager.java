@@ -23,6 +23,7 @@ import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class JingleFileTransferManager {
@@ -35,6 +36,7 @@ public class JingleFileTransferManager {
 	private JingleFileTransferData[] transferData;
 	private IJingleFileTransferListener listener;
 	private HashMap<JID, JingleFileTransferSession> sessions;
+	private JingleFileTransferSession session;
 
 	public FileMediaManager(JingleTransportManager transportManager) {
 	    super(transportManager);
@@ -50,8 +52,13 @@ public class JingleFileTransferManager {
 		    payload, tc1, tc2, null, jingleSession, transferData,
 		    listener);
 
-	    JID jid = new JID(jingleSession.getResponder());
+	    // get JID from other side
+	    JID jid = Saros.getDefault().getMyJID().toString().equals(
+		    jingleSession.getInitiator()) ? new JID(jingleSession
+		    .getResponder()) : new JID(jingleSession.getInitiator());
+
 	    sessions.put(jid, newSession);
+
 	    return newSession;
 	}
 
@@ -69,10 +76,8 @@ public class JingleFileTransferManager {
 	public void transferFiles(JingleFileTransferData[] transferData, JID jid) {
 	    JingleFileTransferSession session = sessions.get(jid);
 	    if (session != null) {
-		session.setTransferData(transferData);
-		session.setTrasmit(true);
+		session.sendFiles(transferData);
 	    }
-
 	}
     }
 
@@ -333,6 +338,11 @@ public class JingleFileTransferManager {
 	JingleSession incoming = incomingSessions.get(jid);
 
 	if (outgoing != null) {
+	    /* send new data with current connection. */
+	    mediaManager.transferFiles(transferData, jid);
+	    return;
+	}
+	if (incoming != null) {
 	    /* send new data with current connection. */
 	    mediaManager.transferFiles(transferData, jid);
 	    return;

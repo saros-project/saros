@@ -20,7 +20,13 @@ Bundle-ClassPath: bin/,
  lib/smack.jar,
  lib/smackx.jar,
  lib/smackx-debug.jar,
- lib/smackx-jingle.jar
+ lib/smackx-jingle.jar,
+ lib/lw-rudp.jar,
+ lib/lw-nio.jar,
+ lib/lw-io.jar,
+ lib/lw-common.jar,
+ lib/lw-collection.jar,
+ lib/commons-logging.jar
 Export-Package: com.jcraft.jzlib,
  de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
