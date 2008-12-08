@@ -19,8 +19,8 @@ import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
 import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
-import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
+import org.jivesoftware.smackx.jingle.nat.STUNTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -29,56 +29,56 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class JingleFileTransferManager {
 
     private static Logger logger = Logger
-	    .getLogger(JingleFileTransferManager.class);
+            .getLogger(JingleFileTransferManager.class);
 
     private class FileMediaManager extends JingleMediaManager {
 
-	private JingleFileTransferData[] transferData;
-	private IJingleFileTransferListener listener;
-	private HashMap<JID, JingleFileTransferSession> sessions;
-	private JingleFileTransferSession session;
+        private JingleFileTransferData[] transferData;
+        private IJingleFileTransferListener listener;
+        private HashMap<JID, JingleFileTransferSession> sessions;
+        private JingleFileTransferSession session;
 
-	public FileMediaManager(JingleTransportManager transportManager) {
-	    super(transportManager);
-	    sessions = new HashMap<JID, JingleFileTransferSession>();
-	}
+        public FileMediaManager(JingleTransportManager transportManager) {
+            super(transportManager);
+            sessions = new HashMap<JID, JingleFileTransferSession>();
+        }
 
-	@Override
-	public JingleMediaSession createMediaSession(PayloadType payload,
-		TransportCandidate tc1, TransportCandidate tc2,
-		JingleSession jingleSession) {
+        @Override
+        public JingleMediaSession createMediaSession(PayloadType payload,
+                TransportCandidate tc1, TransportCandidate tc2,
+                JingleSession jingleSession) {
 
-	    JingleFileTransferSession newSession = new JingleFileTransferSession(
-		    payload, tc1, tc2, null, jingleSession, transferData,
-		    listener);
+            JingleFileTransferSession newSession = new JingleFileTransferSession(
+                    payload, tc1, tc2, null, jingleSession, transferData,
+                    listener);
 
-	    // get JID from other side
-	    JID jid = Saros.getDefault().getMyJID().toString().equals(
-		    jingleSession.getInitiator()) ? new JID(jingleSession
-		    .getResponder()) : new JID(jingleSession.getInitiator());
+            // get JID from other side
+            JID jid = Saros.getDefault().getMyJID().toString().equals(
+                    jingleSession.getInitiator()) ? new JID(jingleSession
+                    .getResponder()) : new JID(jingleSession.getInitiator());
 
-	    sessions.put(jid, newSession);
+            sessions.put(jid, newSession);
 
-	    return newSession;
-	}
+            return newSession;
+        }
 
-	@Override
-	public List<PayloadType> getPayloads() {
-	    List<PayloadType> result = new ArrayList<PayloadType>();
-	    result.add(new PayloadType.Audio(333, "fileshare"));
-	    return result;
-	}
+        @Override
+        public List<PayloadType> getPayloads() {
+            List<PayloadType> result = new ArrayList<PayloadType>();
+            result.add(new PayloadType.Audio(333, "fileshare"));
+            return result;
+        }
 
-	public void setTransferFile(JingleFileTransferData[] transferData) {
-	    this.transferData = transferData;
-	}
+        public void setTransferFile(JingleFileTransferData[] transferData) {
+            this.transferData = transferData;
+        }
 
-	public void transferFiles(JingleFileTransferData[] transferData, JID jid) {
-	    JingleFileTransferSession session = sessions.get(jid);
-	    if (session != null) {
-		session.sendFiles(transferData);
-	    }
-	}
+        public void transferFiles(JingleFileTransferData[] transferData, JID jid) {
+            JingleFileTransferSession session = sessions.get(jid);
+            if (session != null) {
+                session.sendFiles(transferData);
+            }
+        }
     }
 
     private XMPPConnection xmppConnection;
@@ -99,193 +99,193 @@ public class JingleFileTransferManager {
     private IJingleFileTransferListener listener;
 
     public enum JingleConnectionState {
-	INIT, ESTABLISHED, CLOSED, ERROR, DEFAULT
+        INIT, ESTABLISHED, CLOSED, ERROR, DEFAULT
     }
 
     public JingleFileTransferManager(XMPPConnection connection,
-	    IJingleFileTransferListener listener) {
-	this.xmppConnection = connection;
-	incomingSessions = new HashMap<JID, JingleSession>();
-	outgoingSessions = new HashMap<JID, JingleSession>();
-	connectionStates = new HashMap<JID, JingleConnectionState>();
-	this.listener = listener;
-	logger.debug("initialized jingle file transfer manager.");
-	initialize();
+            IJingleFileTransferListener listener) {
+        this.xmppConnection = connection;
+        incomingSessions = new HashMap<JID, JingleSession>();
+        outgoingSessions = new HashMap<JID, JingleSession>();
+        connectionStates = new HashMap<JID, JingleConnectionState>();
+        this.listener = listener;
+        logger.debug("initialized jingle file transfer manager.");
+        initialize();
     }
 
     public void initialize() {
 
-	ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-		"jivesoftware.com", 3478);
+        // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
+        // "jivesoftware.com", 3478);
 
-	// STUNTransportManager stun = new STUNTransportManager();
+        STUNTransportManager stun = new STUNTransportManager();
 
-	mediaManager = new FileMediaManager(icetm0);
-	mediaManager.listener = listener;
+        mediaManager = new FileMediaManager(stun);
+        mediaManager.listener = listener;
 
-	List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
-	medias.add(mediaManager);
+        List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
+        medias.add(mediaManager);
 
-	jm = new JingleManager(xmppConnection, medias);
-	JingleManager.setJingleServiceEnabled();
+        jm = new JingleManager(xmppConnection, medias);
+        JingleManager.setJingleServiceEnabled();
 
-	jm.addJingleSessionRequestListener(new JingleSessionRequestListener() {
-	    public void sessionRequested(JingleSessionRequest request) {
+        jm.addJingleSessionRequestListener(new JingleSessionRequestListener() {
+            public void sessionRequested(JingleSessionRequest request) {
 
-		JID jid = new JID(request.getFrom());
-		JingleSession incoming = incomingSessions.get(jid);
+                JID jid = new JID(request.getFrom());
+                JingleSession incoming = incomingSessions.get(jid);
 
-		if (incoming != null)
-		    return;
+                if (incoming != null)
+                    return;
 
-		try {
+                try {
 
-		    // Accept the call
-		    incoming = request.accept();
+                    // Accept the call
+                    incoming = request.accept();
 
-		    initJingleListener(incoming, new JID(incoming
-			    .getInitiator()));
-		    /* put to current session list. */
-		    incomingSessions.put(jid, incoming);
-		    // Start the call
-		    incoming.startIncoming();
-		} catch (XMPPException e) {
-		    e.printStackTrace();
-		}
+                    initJingleListener(incoming, new JID(incoming
+                            .getInitiator()));
+                    /* put to current session list. */
+                    incomingSessions.put(jid, incoming);
+                    // Start the call
+                    incoming.startIncoming();
+                } catch (XMPPException e) {
+                    e.printStackTrace();
+                }
 
-	    }
-	});
+            }
+        });
 
     }
 
     private void initJingleListener(JingleSession js, final JID jid) {
 
-	connectionStates.put(jid, JingleConnectionState.INIT);
+        connectionStates.put(jid, JingleConnectionState.INIT);
 
-	/* add media listener. */
-	js.addMediaListener(new JingleMediaListener() {
+        /* add media listener. */
+        js.addMediaListener(new JingleMediaListener() {
 
-	    public void mediaClosed(PayloadType cand) {
-		logger.debug("media closed : " + jid.toString());
+            public void mediaClosed(PayloadType cand) {
+                logger.debug("media closed : " + jid.toString());
 
-		// NEGOTIATION = false;
-		// notifyAll();
-	    }
+                // NEGOTIATION = false;
+                // notifyAll();
+            }
 
-	    public void mediaEstablished(PayloadType pt) {
-		logger.debug("media established : " + jid.toString());
+            public void mediaEstablished(PayloadType pt) {
+                logger.debug("media established : " + jid.toString());
 
-		// NEGOTIATION = false;
-		// notifyAll();
-	    }
-	});
+                // NEGOTIATION = false;
+                // notifyAll();
+            }
+        });
 
-	// /* add state listener. */
-	// js.addStateListener(new JingleSessionStateListener() {
-	//
-	// public void afterChanged(State old, State newOne) {
-	// // logger.debug("session state after change new state :
-	// // "+newOne.toString()+" JID: "+jid_string);
-	//
-	// }
-	//
-	// public void beforeChange(State old, State newOne)
-	// throws JingleException {
-	// // logger.debug("session state before change :
-	// // "+old.toString()+" new : "+newOne.toString()+" JID:
-	// // "+jid_string);
-	//
-	// }
-	// });
+        // /* add state listener. */
+        // js.addStateListener(new JingleSessionStateListener() {
+        //
+        // public void afterChanged(State old, State newOne) {
+        // // logger.debug("session state after change new state :
+        // // "+newOne.toString()+" JID: "+jid_string);
+        //
+        // }
+        //
+        // public void beforeChange(State old, State newOne)
+        // throws JingleException {
+        // // logger.debug("session state before change :
+        // // "+old.toString()+" new : "+newOne.toString()+" JID:
+        // // "+jid_string);
+        //
+        // }
+        // });
 
-	js.addListener(new JingleSessionListener() {
+        js.addListener(new JingleSessionListener() {
 
-	    public void sessionClosed(String arg0, JingleSession arg1) {
-		logger.info("session closed : " + jid.toString());
+            public void sessionClosed(String arg0, JingleSession arg1) {
+                logger.info("session closed : " + jid.toString());
 
-		/*
-		 * if session closed during pending process, fallback to
-		 * XEP-0096 transfer
-		 */
-		if (arg1.getNegotiatorState() == JingleNegotiatorState.PENDING
-			&& (connectionStates.get(jid) != JingleConnectionState.ESTABLISHED && connectionStates
-				.get(jid) != JingleConnectionState.ERROR)) {
-		    logger.error("Session closed during pending process : "
-			    + jid + " with current state : " + getState(jid));
-		    connectionStates.remove(jid);
-		    connectionStates.put(jid, JingleConnectionState.ERROR);
+                /*
+                 * if session closed during pending process, fallback to
+                 * XEP-0096 transfer
+                 */
+                if (arg1.getNegotiatorState() == JingleNegotiatorState.PENDING
+                        && (connectionStates.get(jid) != JingleConnectionState.ESTABLISHED && connectionStates
+                                .get(jid) != JingleConnectionState.ERROR)) {
+                    logger.error("Session closed during pending process : "
+                            + jid + " with current state : " + getState(jid));
+                    connectionStates.remove(jid);
+                    connectionStates.put(jid, JingleConnectionState.ERROR);
 
-		}
-		connectionStates.remove(jid);
-		connectionStates.put(jid, JingleConnectionState.CLOSED);
+                }
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.CLOSED);
 
-	    }
+            }
 
-	    public void sessionClosedOnError(XMPPException arg0,
-		    JingleSession arg1) {
-		logger.error("session closed on error : " + jid.toString());
-		connectionStates.remove(jid);
-		connectionStates.put(jid, JingleConnectionState.ERROR);
+            public void sessionClosedOnError(XMPPException arg0,
+                    JingleSession arg1) {
+                logger.error("session closed on error : " + jid.toString());
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.ERROR);
 
-	    }
+            }
 
-	    public void sessionDeclined(String arg0, JingleSession arg1) {
-		// TODO Auto-generated method stub
+            public void sessionDeclined(String arg0, JingleSession arg1) {
+                // TODO Auto-generated method stub
 
-	    }
+            }
 
-	    public void sessionEstablished(PayloadType arg0,
-		    TransportCandidate arg1, TransportCandidate arg2,
-		    JingleSession arg3) {
-		logger.debug("session established : " + jid.toString());
-		connectionStates.remove(jid);
-		connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
+            public void sessionEstablished(PayloadType arg0,
+                    TransportCandidate arg1, TransportCandidate arg2,
+                    JingleSession arg3) {
+                logger.debug("session established : " + jid.toString());
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
 
-	    }
+            }
 
-	    public void sessionMediaReceived(JingleSession arg0, String arg1) {
-		// TODO Auto-generated method stub
+            public void sessionMediaReceived(JingleSession arg0, String arg1) {
+                // TODO Auto-generated method stub
 
-	    }
+            }
 
-	    public void sessionRedirected(String arg0, JingleSession arg1) {
-		// TODO Auto-generated method stub
+            public void sessionRedirected(String arg0, JingleSession arg1) {
+                // TODO Auto-generated method stub
 
-	    }
+            }
 
-	});
+        });
 
-	/* transport events */
-	js.addTransportListener(new JingleTransportListener() {
+        /* transport events */
+        js.addTransportListener(new JingleTransportListener() {
 
-	    public void transportClosed(TransportCandidate cand) {
-		logger.debug("transport closed: " + jid.toString());
-		connectionStates.remove(jid);
-		connectionStates.put(jid, JingleConnectionState.CLOSED);
-		// NEGOTIATION = false;
-		// notifyAll();
-	    }
+            public void transportClosed(TransportCandidate cand) {
+                logger.debug("transport closed: " + jid.toString());
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.CLOSED);
+                // NEGOTIATION = false;
+                // notifyAll();
+            }
 
-	    public void transportClosedOnError(XMPPException e) {
-		logger.error("transport closed on error : " + jid.toString());
-		connectionStates.remove(jid);
-		connectionStates.put(jid, JingleConnectionState.ERROR);
-		// NEGOTIATION = false;
-		// notifyAll();
-	    }
+            public void transportClosedOnError(XMPPException e) {
+                logger.error("transport closed on error : " + jid.toString());
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.ERROR);
+                // NEGOTIATION = false;
+                // notifyAll();
+            }
 
-	    public void transportEstablished(TransportCandidate local,
-		    TransportCandidate remote) {
-		logger.debug("transport established : " + jid.toString());
-		connectionStates.remove(jid);
-		connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
-		// NEGOTIATION = false;
-		// notifyAll();
-	    }
-	});
+            public void transportEstablished(TransportCandidate local,
+                    TransportCandidate remote) {
+                logger.debug("transport established : " + jid.toString());
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
+                // NEGOTIATION = false;
+                // notifyAll();
+            }
+        });
 
-	/* time out. */
-	// timeOutCheck(jid, JINGLE_TIME_OUT);
+        /* time out. */
+        // timeOutCheck(jid, JINGLE_TIME_OUT);
     }
 
     /**
@@ -296,37 +296,37 @@ public class JingleFileTransferManager {
      * @param monitor
      */
     public void createOutgoingJingleFileTransfer(JID jid,
-	    JingleFileTransferData[] transferData) {
+            JingleFileTransferData[] transferData) {
 
-	JingleSession outgoing = outgoingSessions.get(jid);
-	JingleSession incoming = incomingSessions.get(jid);
+        JingleSession outgoing = outgoingSessions.get(jid);
+        JingleSession incoming = incomingSessions.get(jid);
 
-	if (outgoing != null) {
-	    /* send new data with current connection. */
-	    mediaManager.transferFiles(transferData, jid);
-	    return;
-	}
-	if (incoming != null) {
-	    /* send new data with current connection. */
-	    mediaManager.transferFiles(transferData, jid);
-	    return;
-	}
+        if (outgoing != null) {
+            /* send new data with current connection. */
+            mediaManager.transferFiles(transferData, jid);
+            return;
+        }
+        if (incoming != null) {
+            /* send new data with current connection. */
+            mediaManager.transferFiles(transferData, jid);
+            return;
+        }
 
-	try {
-	    mediaManager.setTransferFile(transferData);
-	    outgoing = jm.createOutgoingJingleSession(jid.toString());
+        try {
+            mediaManager.setTransferFile(transferData);
+            outgoing = jm.createOutgoingJingleSession(jid.toString());
 
-	    initJingleListener(outgoing, jid);
+            initJingleListener(outgoing, jid);
 
-	    /* add to outgoing session list. */
-	    outgoingSessions.put(jid, outgoing);
+            /* add to outgoing session list. */
+            outgoingSessions.put(jid, outgoing);
 
-	    outgoing.startOutgoing();
+            outgoing.startOutgoing();
 
-	} catch (XMPPException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        } catch (XMPPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
     }
 
@@ -335,42 +335,42 @@ public class JingleFileTransferManager {
      */
     public void terminateAllJingleSessions() {
 
-	logger.debug("Terminate all jingle sessions.");
+        logger.debug("Terminate all jingle sessions.");
 
-	JingleSession outgoing = null;
-	for (JID jid : outgoingSessions.keySet()) {
-	    outgoing = outgoingSessions.get(jid);
-	    if (outgoing != null) {
-		try {
-		    outgoing.terminate();
-		} catch (XMPPException e1) {
-		    e1.printStackTrace();
-		} finally {
-		    outgoing = null;
-		    // mediaManager.removeJingleSession(jid);
-		    outgoingSessions.remove(jid);
-		}
-	    }
-	}
+        JingleSession outgoing = null;
+        for (JID jid : outgoingSessions.keySet()) {
+            outgoing = outgoingSessions.get(jid);
+            if (outgoing != null) {
+                try {
+                    outgoing.terminate();
+                } catch (XMPPException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    outgoing = null;
+                    // mediaManager.removeJingleSession(jid);
+                    outgoingSessions.remove(jid);
+                }
+            }
+        }
 
-	JingleSession incoming = null;
-	for (JID jid : incomingSessions.keySet()) {
-	    incoming = incomingSessions.get(jid);
-	    if (incoming != null) {
-		try {
-		    incoming.terminate();
-		} catch (XMPPException e1) {
-		    e1.printStackTrace();
-		} finally {
-		    incoming = null;
-		    // mediaManager..removeJingleSession(jid);
-		    incomingSessions.remove(jid);
-		}
-	    }
-	}
+        JingleSession incoming = null;
+        for (JID jid : incomingSessions.keySet()) {
+            incoming = incomingSessions.get(jid);
+            if (incoming != null) {
+                try {
+                    incoming.terminate();
+                } catch (XMPPException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    incoming = null;
+                    // mediaManager..removeJingleSession(jid);
+                    incomingSessions.remove(jid);
+                }
+            }
+        }
 
-	/* reset connection state list */
-	// connectionStates.clear();
+        /* reset connection state list */
+        // connectionStates.clear();
     }
 
     /**
@@ -379,42 +379,42 @@ public class JingleFileTransferManager {
      * @param jid
      */
     public void terminateJingleSession(JID jid) {
-	JingleSession outgoing = outgoingSessions.get(jid);
-	if (outgoing != null) {
-	    try {
-		outgoing.terminate();
-	    } catch (XMPPException e1) {
-		// e1.printStackTrace();
-		logger.error(
-			"Error during terminate outgoing jingle session with JID : "
-				+ jid, e1);
-	    } finally {
-		outgoing = null;
-		// mediaManager.removeJingleSession(jid);
-		outgoingSessions.get(jid).close();
-		outgoingSessions.remove(jid);
-		logger.debug("Terminate outgoing jingle session with JID : "
-			+ jid);
-	    }
-	}
+        JingleSession outgoing = outgoingSessions.get(jid);
+        if (outgoing != null) {
+            try {
+                outgoing.terminate();
+            } catch (XMPPException e1) {
+                // e1.printStackTrace();
+                logger.error(
+                        "Error during terminate outgoing jingle session with JID : "
+                                + jid, e1);
+            } finally {
+                outgoing = null;
+                // mediaManager.removeJingleSession(jid);
+                outgoingSessions.get(jid).close();
+                outgoingSessions.remove(jid);
+                logger.debug("Terminate outgoing jingle session with JID : "
+                        + jid);
+            }
+        }
 
-	JingleSession incoming = incomingSessions.get(jid);
-	if (incoming != null) {
-	    try {
-		incoming.terminate();
-	    } catch (XMPPException e1) {
-		// e1.printStackTrace();
-		logger.error(
-			"Error during terminate incoming jingle session with JID : "
-				+ jid, e1);
-	    } finally {
-		incoming = null;
-		// mediaManager.removeJingleSession(jid);
-		incomingSessions.remove(jid);
-		logger.debug("Terminate incoming jingle session with JID : "
-			+ jid);
-	    }
-	}
+        JingleSession incoming = incomingSessions.get(jid);
+        if (incoming != null) {
+            try {
+                incoming.terminate();
+            } catch (XMPPException e1) {
+                // e1.printStackTrace();
+                logger.error(
+                        "Error during terminate incoming jingle session with JID : "
+                                + jid, e1);
+            } finally {
+                incoming = null;
+                // mediaManager.removeJingleSession(jid);
+                incomingSessions.remove(jid);
+                logger.debug("Terminate incoming jingle session with JID : "
+                        + jid);
+            }
+        }
     }
 
     /**
@@ -427,8 +427,8 @@ public class JingleFileTransferManager {
      *         session has found.
      */
     public JingleConnectionState getState(JID jid) {
-	JingleConnectionState state = connectionStates.get(jid);
-	return state;
+        JingleConnectionState state = connectionStates.get(jid);
+        return state;
     }
 
     /**
@@ -437,13 +437,13 @@ public class JingleFileTransferManager {
      * @param jid
      */
     public void setJingleErrorState(JID jid) {
-	if (jid != null) {
-	    logger.debug("Terminate Jingle Session for " + jid);
-	    terminateJingleSession(jid);
-	    connectionStates.remove(jid);
-	    connectionStates.put(jid, JingleConnectionState.ERROR);
-	} else {
-	    logger.warn("JID is null. Jingle error state couldn't be set.");
-	}
+        if (jid != null) {
+            logger.debug("Terminate Jingle Session for " + jid);
+            terminateJingleSession(jid);
+            connectionStates.remove(jid);
+            connectionStates.put(jid, JingleConnectionState.ERROR);
+        } else {
+            logger.warn("JID is null. Jingle error state couldn't be set.");
+        }
     }
 }

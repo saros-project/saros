@@ -1,0 +1,55 @@
+<?xml version="1.0"?> 
+<!-- Configuration for the STUN extension -->
+<stunConfig> 
+    
+    <stunServer> 
+        <name>stun.xten.net</name> 
+        <port>3478</port>
+    </stunServer>
+
+    <stunServer> 
+        <name>iphone-stun.freenet.de</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>larry.gloo.net</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun.fwdnet.net</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun.fwd.org</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun01.sipphone.com</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun.softjoys.com</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun.voipbuster.com</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun.voxgratia.org</name> 
+        <port>3478</port> 
+    </stunServer>
+
+    <stunServer> 
+        <name>stun.noc.ams-ix.net</name> 
+        <port>3478</port> 
+    </stunServer>
+    
+</stunConfig>
