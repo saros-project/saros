@@ -94,10 +94,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
 		    }
 		}
 	    } catch (IOException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		logger.info("receive-thread interrupted");
 	    } catch (ClassNotFoundException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	    }
 
@@ -332,13 +330,23 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void stopReceive() {
 	logger.debug("JingleFileTransferSesseion: stop receiving");
-	// TODO CJ: interrupt receive threads
+	if (tcpReceiveThread != null)
+	    tcpReceiveThread.interrupt();
+	if (udpReceiveThread != null)
+	    udpReceiveThread.interrupt();
     }
 
     @Override
     public void stopTrasmit() {
 	logger.debug("JingleFileTransferSesseion: stop transmitting");
-	// TODO CJ: What have to do here?
+	try {
+	    if (udpSocket != null)
+		udpSocket.close();
+	    if (tcpSocket != null)
+		tcpSocket.close();
+	} catch (IOException e) {
+	    logger.warn("Failed to close sockets");
+	}
     }
 
     @Override

@@ -539,9 +539,11 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public User getParticipant(JID jid) {
-	for (User participant : this.participants) {
-	    if (participant.getJid().equals(jid)) {
-		return participant;
+	if (participants != null) {
+	    for (User participant : this.participants) {
+		if (participant.getJid().equals(jid)) {
+		    return participant;
+		}
 	    }
 	}
 

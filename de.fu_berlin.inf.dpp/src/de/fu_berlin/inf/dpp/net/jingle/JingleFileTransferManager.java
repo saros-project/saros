@@ -116,7 +116,7 @@ public class JingleFileTransferManager {
     public void initialize() {
 
 	ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-		"jivesoftware.com", 3478);
+		"stun.ekiga.net ", 3478);
 
 	// STUNTransportManager stun = new STUNTransportManager();
 
