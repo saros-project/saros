@@ -74,7 +74,7 @@ public interface ITransmitter {
      *            invitation. Can not be <code>null</code>.
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-	    String description);
+            String description);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
@@ -127,7 +127,7 @@ public interface ITransmitter {
      *            <code>null</code>.
      */
     public void sendFile(JID recipient, IProject project, IPath path,
-	    IFileTransferCallback callback);
+            IFileTransferCallback callback);
 
     /**
      * Sends given file to given recipient with given timestamp.
@@ -145,7 +145,7 @@ public interface ITransmitter {
      *            <code>null</code>.
      */
     public void sendFile(JID recipient, IProject project, IPath path,
-	    int timestamp, IFileTransferCallback callback);
+            int timestamp, IFileTransferCallback callback);
 
     /**
      * Sends given archive file to given recipient. (Fallback of jingle file
@@ -162,7 +162,7 @@ public interface ITransmitter {
      *            <code>null</code>.
      */
     public void sendProjectArchive(JID recipient, IProject project,
-	    File archive, IFileTransferCallback callback);
+            File archive, IFileTransferCallback callback);
 
     /**
      * Sends queued file transfers.
@@ -205,7 +205,7 @@ public interface ITransmitter {
      *            requested too
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
-	    int timestamp, boolean andup);
+            int timestamp, boolean andup);
 
     /* ---------- etc --------- */
 
@@ -239,7 +239,7 @@ public interface ITransmitter {
      *            a list of timed activities.
      */
     public void sendActivities(ISharedProject sharedProject,
-	    List<TimedActivity> activities);
+            List<TimedActivity> activities);
 
     /**
      * Sends given list of activities with given timestamp to given participant
@@ -253,7 +253,7 @@ public interface ITransmitter {
      *            the recipient
      */
     public void sendJupiterRequest(ISharedProject sharedProject,
-	    Request request, JID jid);
+            Request request, JID jid);
 
     /**
      * Sends error message of checksum error.
@@ -273,8 +273,7 @@ public interface ITransmitter {
      * @param collection
      *            the checksums
      */
-    public void sendDocChecksums(JID to,
-	    Collection<DocumentChecksum> collection);
+    public void sendDocChecksums(JID to, Collection<DocumentChecksum> collection);
 
     /**
      * Sends error messge of transformation error.

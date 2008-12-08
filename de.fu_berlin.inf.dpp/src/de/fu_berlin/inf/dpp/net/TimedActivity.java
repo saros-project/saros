@@ -21,37 +21,37 @@ public class TimedActivity {
      *            the timestamp that belongs to the activity.
      */
     public TimedActivity(IActivity activity, int timestamp) {
-	this.activity = activity;
-	this.timestamp = timestamp;
+        this.activity = activity;
+        this.timestamp = timestamp;
     }
 
     /**
      * @return the activity.
      */
     public IActivity getActivity() {
-	return this.activity;
+        return this.activity;
     }
 
     /**
      * @return the timestamp of the activiy.
      */
     public int getTimestamp() {
-	return this.timestamp;
+        return this.timestamp;
     }
 
     @Override
     public String toString() {
-	return "[" + this.timestamp + ":" + this.activity + "]";
+        return "[" + this.timestamp + ":" + this.activity + "]";
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (!(obj instanceof TimedActivity)) {
-	    return false;
-	}
+        if (!(obj instanceof TimedActivity)) {
+            return false;
+        }
 
-	TimedActivity other = (TimedActivity) obj;
-	return other.activity.equals(this.activity)
-		&& (other.timestamp == this.timestamp);
+        TimedActivity other = (TimedActivity) obj;
+        return other.activity.equals(this.activity)
+                && (other.timestamp == this.timestamp);
     }
 }

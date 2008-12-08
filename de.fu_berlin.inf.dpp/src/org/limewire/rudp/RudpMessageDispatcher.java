@@ -14,35 +14,35 @@ import org.limewire.rudp.messages.RUDPMessage;
 public class RudpMessageDispatcher implements MessageDispatcher {
 
     private static final Log LOG = LogFactory
-	    .getLog(DefaultMessageDispatcher.class);
+            .getLog(DefaultMessageDispatcher.class);
 
     private final Executor executor = ExecutorsHelper
-	    .newProcessingQueue("RUDPDispatch");
+            .newProcessingQueue("RUDPDispatch");
     private volatile UDPMultiplexor multiplexor;
 
     public void setUDPMultiplexor(UDPMultiplexor plexor) {
-	if (plexor != null)
-	    multiplexor = plexor;
+        if (plexor != null)
+            multiplexor = plexor;
     }
 
     public void dispatch(RUDPMessage message, InetSocketAddress from) {
-	executor.execute(new Dispatch(multiplexor, message, from));
+        executor.execute(new Dispatch(multiplexor, message, from));
     }
 
     private static class Dispatch implements Runnable {
-	private final UDPMultiplexor plexor;
-	private final RUDPMessage msg;
-	private final InetSocketAddress from;
+        private final UDPMultiplexor plexor;
+        private final RUDPMessage msg;
+        private final InetSocketAddress from;
 
-	Dispatch(UDPMultiplexor plexor, RUDPMessage msg, InetSocketAddress from) {
-	    this.plexor = plexor;
-	    this.msg = msg;
-	    this.from = from;
-	}
+        Dispatch(UDPMultiplexor plexor, RUDPMessage msg, InetSocketAddress from) {
+            this.plexor = plexor;
+            this.msg = msg;
+            this.from = from;
+        }
 
-	public void run() {
-	    plexor.routeMessage(msg, from);
-	}
+        public void run() {
+            plexor.routeMessage(msg, from);
+        }
     }
 
 }

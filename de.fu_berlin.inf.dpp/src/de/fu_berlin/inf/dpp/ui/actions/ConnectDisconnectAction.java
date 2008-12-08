@@ -31,37 +31,37 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class ConnectDisconnectAction extends Action implements
-	IConnectionListener {
+        IConnectionListener {
 
     private final IPropertyChangeListener propertyListener;
 
     public ConnectDisconnectAction() {
-	updateStatus();
-	Saros.getDefault().addListener(this);
+        updateStatus();
+        Saros.getDefault().addListener(this);
 
-	this.propertyListener = new IPropertyChangeListener() {
-	    public void propertyChange(PropertyChangeEvent event) {
-		if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
-		    updateStatus();
-		}
-	    }
-	};
-	Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
-		this.propertyListener);
+        this.propertyListener = new IPropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent event) {
+                if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
+                    updateStatus();
+                }
+            }
+        };
+        Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
+                this.propertyListener);
     }
 
     @Override
     public void run() {
-	new Thread(new Runnable() {
-	    public void run() {
-		Saros saros = Saros.getDefault();
-		if (saros.isConnected()) {
-		    saros.disconnect(null);
-		} else {
-		    saros.connect();
-		}
-	    }
-	}).start();
+        new Thread(new Runnable() {
+            public void run() {
+                Saros saros = Saros.getDefault();
+                if (saros.isConnected()) {
+                    saros.disconnect(null);
+                } else {
+                    saros.connect();
+                }
+            }
+        }).start();
     }
 
     /*
@@ -70,40 +70,40 @@ public class ConnectDisconnectAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState) {
-	updateStatus();
+            ConnectionState newState) {
+        updateStatus();
     }
 
     private void updateStatus() {
-	ConnectionState state = Saros.getDefault().getConnectionState();
+        ConnectionState state = Saros.getDefault().getConnectionState();
 
-	switch (state) {
-	case CONNECTED:
-	case CONNECTING:
-	    setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
-	    break;
+        switch (state) {
+        case CONNECTED:
+        case CONNECTING:
+            setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
+            break;
 
-	case ERROR:
-	case NOT_CONNECTED:
-	case DISCONNECTING:
-	    setImageDescriptor(SarosUI
-		    .getImageDescriptor("/icons/disconnect.png"));
-	    break;
-	}
+        case ERROR:
+        case NOT_CONNECTED:
+        case DISCONNECTING:
+            setImageDescriptor(SarosUI
+                    .getImageDescriptor("/icons/disconnect.png"));
+            break;
+        }
 
-	String username = Saros.getDefault().getPreferenceStore().getString(
-		PreferenceConstants.USERNAME);
+        String username = Saros.getDefault().getPreferenceStore().getString(
+                PreferenceConstants.USERNAME);
 
-	setEnabled((state == ConnectionState.CONNECTED)
-		|| (((state == ConnectionState.NOT_CONNECTED) || (state == ConnectionState.ERROR)) && ((username != null) && (username
-			.length() > 0))));
-	updateText();
+        setEnabled((state == ConnectionState.CONNECTED)
+                || (((state == ConnectionState.NOT_CONNECTED) || (state == ConnectionState.ERROR)) && ((username != null) && (username
+                        .length() > 0))));
+        updateText();
     }
 
     private void updateText() {
-	ConnectionState state = Saros.getDefault().getConnectionState();
-	String text = SarosUI.getDescription(state);
+        ConnectionState state = Saros.getDefault().getConnectionState();
+        String text = SarosUI.getDescription(state);
 
-	setText(text);
+        setText(text);
     }
 }

@@ -10,19 +10,19 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class JumpToDriverPositionAction extends Action implements
-	ISessionListener {
+        ISessionListener {
 
     public JumpToDriverPositionAction() {
-	setToolTipText("Jump to position of driver.");
-	setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
+        setToolTipText("Jump to position of driver.");
+        setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
 
-	Saros.getDefault().getSessionManager().addSessionListener(this);
-	updateEnablement();
+        Saros.getDefault().getSessionManager().addSessionListener(this);
+        updateEnablement();
     }
 
     @Override
     public void run() {
-	EditorManager.getDefault().openDriverEditor();
+        EditorManager.getDefault().openDriverEditor();
     }
 
     /*
@@ -31,7 +31,7 @@ public class JumpToDriverPositionAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-	updateEnablement();
+        updateEnablement();
     }
 
     /*
@@ -40,7 +40,7 @@ public class JumpToDriverPositionAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-	updateEnablement();
+        updateEnablement();
     }
 
     /*
@@ -49,14 +49,14 @@ public class JumpToDriverPositionAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
+        // ignore
     }
 
     private void updateEnablement() {
-	setEnabled(getSharedProject() != null);
+        setEnabled(getSharedProject() != null);
     }
 
     private ISharedProject getSharedProject() {
-	return Saros.getDefault().getSessionManager().getSharedProject();
+        return Saros.getDefault().getSessionManager().getSharedProject();
     }
 }

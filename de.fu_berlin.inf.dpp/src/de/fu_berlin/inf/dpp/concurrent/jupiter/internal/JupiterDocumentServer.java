@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class JupiterDocumentServer implements JupiterServer {
 
     private static Logger logger = Logger
-	    .getLogger(JupiterDocumentServer.class);
+            .getLogger(JupiterDocumentServer.class);
 
     /**
      * List of proxy clients.
@@ -44,38 +44,38 @@ public class JupiterDocumentServer implements JupiterServer {
      */
     class RequestTransmitter extends Thread {
 
-	private final RequestForwarder rf;
-	private static final int MILLIS = 100;
+        private final RequestForwarder rf;
+        private static final int MILLIS = 100;
 
-	public RequestTransmitter(RequestForwarder forw) {
-	    this.rf = forw;
-	}
+        public RequestTransmitter(RequestForwarder forw) {
+            this.rf = forw;
+        }
 
-	public Timer flushTimer = new Timer(true);
+        public Timer flushTimer = new Timer(true);
 
-	@Override
-	public void run() {
-	    this.flushTimer.schedule(new TimerTask() {
+        @Override
+        public void run() {
+            this.flushTimer.schedule(new TimerTask() {
 
-		@Override
-		public void run() {
-		    /* forwarding */
-		    try {
-			JupiterDocumentServer.logger
-				.debug("Forwarding requests to activity sequencer. ");
-			RequestTransmitter.this.rf
-				.forwardOutgoingRequest(getNextOutgoingRequest());
-			JupiterDocumentServer.logger
-				.debug("Forwarding is sended to activity sequencer. ");
-		    } catch (InterruptedException e) {
-			JupiterDocumentServer.logger.warn(
-				"Exception forwarding request.", e);
-		    }
+                @Override
+                public void run() {
+                    /* forwarding */
+                    try {
+                        JupiterDocumentServer.logger
+                                .debug("Forwarding requests to activity sequencer. ");
+                        RequestTransmitter.this.rf
+                                .forwardOutgoingRequest(getNextOutgoingRequest());
+                        JupiterDocumentServer.logger
+                                .debug("Forwarding is sended to activity sequencer. ");
+                    } catch (InterruptedException e) {
+                        JupiterDocumentServer.logger.warn(
+                                "Exception forwarding request.", e);
+                    }
 
-		}
+                }
 
-	    }, 0, RequestTransmitter.MILLIS);
-	}
+            }, 0, RequestTransmitter.MILLIS);
+        }
 
     }
 
@@ -84,13 +84,13 @@ public class JupiterDocumentServer implements JupiterServer {
      * request of the proxy clients forwarding to this forwarder.
      */
     public JupiterDocumentServer(RequestForwarder forwarder) {
-	this.proxies = new HashMap<JID, JupiterClient>();
-	this.requestList = new Vector<Request>();
-	this.outgoingQueue = new Vector<Request>();
+        this.proxies = new HashMap<JID, JupiterClient>();
+        this.requestList = new Vector<Request>();
+        this.outgoingQueue = new Vector<Request>();
 
-	new Serializer(this);
-	this.transmitter = new RequestTransmitter(forwarder);
-	this.transmitter.start();
+        new Serializer(this);
+        this.transmitter = new RequestTransmitter(forwarder);
+        this.transmitter.start();
     }
 
     /**
@@ -98,33 +98,33 @@ public class JupiterDocumentServer implements JupiterServer {
      * queue.
      */
     public JupiterDocumentServer() {
-	this.proxies = new HashMap<JID, JupiterClient>();
-	this.requestList = new Vector<Request>();
-	this.outgoingQueue = new Vector<Request>();
+        this.proxies = new HashMap<JID, JupiterClient>();
+        this.requestList = new Vector<Request>();
+        this.outgoingQueue = new Vector<Request>();
 
-	new Serializer(this);
+        new Serializer(this);
     }
 
     public synchronized void addProxyClient(JID jid) {
-	JupiterClient proxy = new ProxyJupiterDocument(jid, this);
-	proxy.setEditor(this.editor);
-	// /* add to serializer. */
-	// waitForSerializer = true;
-	// TODO: Sync with serializer before add action.
-	JupiterDocumentServer.logger.debug("add new proxy client : " + jid);
-	this.proxies.put(jid, proxy);
+        JupiterClient proxy = new ProxyJupiterDocument(jid, this);
+        proxy.setEditor(this.editor);
+        // /* add to serializer. */
+        // waitForSerializer = true;
+        // TODO: Sync with serializer before add action.
+        JupiterDocumentServer.logger.debug("add new proxy client : " + jid);
+        this.proxies.put(jid, proxy);
     }
 
     public synchronized void removeProxyClient(JID jid) {
 
-	/**
-	 * TODO: sync with serializer.
-	 * 
-	 * 1. save current action count 2. stop serializer after this cound and
-	 * remove client.
-	 */
-	this.proxies.remove(jid);
-	notifyAll();
+        /**
+         * TODO: sync with serializer.
+         * 
+         * 1. save current action count 2. stop serializer after this cound and
+         * remove client.
+         */
+        this.proxies.remove(jid);
+        notifyAll();
     }
 
     /**
@@ -132,45 +132,45 @@ public class JupiterDocumentServer implements JupiterServer {
      */
     public synchronized void addRequest(Request request) {
 
-	/* TODO: Sync with serializer. */
+        /* TODO: Sync with serializer. */
 
-	/**
-	 * add request to serialized queue.
-	 */
-	JupiterDocumentServer.logger.debug("add new Request: "
-		+ request.getJID() + " " + request.getOperation());
-	this.requestList.add(request);
-	notify();
+        /**
+         * add request to serialized queue.
+         */
+        JupiterDocumentServer.logger.debug("add new Request: "
+                + request.getJID() + " " + request.getOperation());
+        this.requestList.add(request);
+        notify();
     }
 
     /**
      * next message in request queue.
      */
     public synchronized Request getNextRequestInSynchronizedQueue()
-	    throws InterruptedException {
-	/* if queue is empty or proxy managing action is running. */
-	while (!(this.requestList.size() > 0)) {
-	    wait();
-	}
-	JupiterDocumentServer.logger.debug("read out next request in queue! "
-		+ this.requestList.get(0).getJID() + this.requestList.get(0));
-	/* get next request. */
-	return this.requestList.remove(0);
+            throws InterruptedException {
+        /* if queue is empty or proxy managing action is running. */
+        while (!(this.requestList.size() > 0)) {
+            wait();
+        }
+        JupiterDocumentServer.logger.debug("read out next request in queue! "
+                + this.requestList.get(0).getJID() + this.requestList.get(0));
+        /* get next request. */
+        return this.requestList.remove(0);
     }
 
     public synchronized HashMap<JID, JupiterClient> getProxies()
-	    throws InterruptedException {
-	/*
-	 * Was Passiert, wenn während der Bearbeitung ein neuer proxy
-	 * eingefügt wird
-	 */
+            throws InterruptedException {
+        /*
+         * Was Passiert, wenn während der Bearbeitung ein neuer proxy
+         * eingefügt wird
+         */
 
-	// /* Synchronistation für das Client Management.*/
-	// while(waitForSerializer && requestSyncCounter == 0){
-	// wait();
-	// }
-	JupiterDocumentServer.logger.debug("Get jupiter proxies.");
-	return this.proxies;
+        // /* Synchronistation für das Client Management.*/
+        // while(waitForSerializer && requestSyncCounter == 0){
+        // wait();
+        // }
+        JupiterDocumentServer.logger.debug("Get jupiter proxies.");
+        return this.proxies;
     }
 
     /* start transfer section. */
@@ -179,84 +179,84 @@ public class JupiterDocumentServer implements JupiterServer {
      * proxies add generated request to outgoing queue.
      */
     public synchronized void forwardOutgoingRequest(Request req) {
-	/* add request to outgoing queue. */
-	// if(outgoing == null){
-	this.outgoingQueue.add(req);
-	// }else{
-	// /* forward request.*/
-	// outgoing.forwardOutgoingRequest(req);
-	// }
-	JupiterDocumentServer.logger.debug("add request to outgoing queue : "
-		+ req.getJID() + " " + req);
-	notify();
+        /* add request to outgoing queue. */
+        // if(outgoing == null){
+        this.outgoingQueue.add(req);
+        // }else{
+        // /* forward request.*/
+        // outgoing.forwardOutgoingRequest(req);
+        // }
+        JupiterDocumentServer.logger.debug("add request to outgoing queue : "
+                + req.getJID() + " " + req);
+        notify();
     }
 
     /**
      * transmitter interface get next request for transfer.
      */
     public synchronized Request getNextOutgoingRequest()
-	    throws InterruptedException {
-	Request req = null;
-	// if(outgoing == null){
-	/* get next message and transfer to client. */
-	while (!(this.outgoingQueue.size() > 0)) {
-	    wait(200);
-	}
-	/* remove first queue element. */
-	req = this.outgoingQueue.remove(0);
-	// }
-	// else{
-	// req = outgoing.getNextOutgoingRequest();
-	//			
-	// }
-	JupiterDocumentServer.logger
-		.debug("read next request from outgoing queue: " + req.getJID()
-			+ " " + req);
-	return req;
+            throws InterruptedException {
+        Request req = null;
+        // if(outgoing == null){
+        /* get next message and transfer to client. */
+        while (!(this.outgoingQueue.size() > 0)) {
+            wait(200);
+        }
+        /* remove first queue element. */
+        req = this.outgoingQueue.remove(0);
+        // }
+        // else{
+        // req = outgoing.getNextOutgoingRequest();
+        //			
+        // }
+        JupiterDocumentServer.logger
+                .debug("read next request from outgoing queue: " + req.getJID()
+                        + " " + req);
+        return req;
 
-	// return outgoing.getNextOutgoingRequest();
+        // return outgoing.getNextOutgoingRequest();
     }
 
     public IPath getEditor() {
-	return this.editor;
+        return this.editor;
     }
 
     public void setEditor(IPath path) {
-	this.editor = path;
+        this.editor = path;
 
     }
 
     public boolean isExist(JID jid) {
-	if (this.proxies.containsKey(jid)) {
-	    return true;
-	}
-	return false;
+        if (this.proxies.containsKey(jid)) {
+            return true;
+        }
+        return false;
     }
 
     public void updateVectorTime(JID source, JID dest) {
-	JupiterClient proxy = this.proxies.get(source);
-	if (proxy != null) {
-	    try {
-		Timestamp ts = proxy.getTimestamp();
-		getProxies().get(dest).updateVectorTime(
-			new JupiterVectorTime(ts.getComponents()[1], ts
-				.getComponents()[0]));
-	    } catch (TransformationException e) {
-		JupiterDocumentServer.logger.error(
-			"Error during update vector time for " + dest, e);
-	    } catch (InterruptedException e) {
-		JupiterDocumentServer.logger.error(
-			"Error during update vector time for " + dest, e);
-	    }
-	} else {
-	    JupiterDocumentServer.logger
-		    .error("No proxy found for given source jid: " + source);
-	}
+        JupiterClient proxy = this.proxies.get(source);
+        if (proxy != null) {
+            try {
+                Timestamp ts = proxy.getTimestamp();
+                getProxies().get(dest).updateVectorTime(
+                        new JupiterVectorTime(ts.getComponents()[1], ts
+                                .getComponents()[0]));
+            } catch (TransformationException e) {
+                JupiterDocumentServer.logger.error(
+                        "Error during update vector time for " + dest, e);
+            } catch (InterruptedException e) {
+                JupiterDocumentServer.logger.error(
+                        "Error during update vector time for " + dest, e);
+            }
+        } else {
+            JupiterDocumentServer.logger
+                    .error("No proxy found for given source jid: " + source);
+        }
 
     }
 
     public void transformationErrorOccured() {
-	forwardOutgoingRequest(new RequestError(this.editor));
+        forwardOutgoingRequest(new RequestError(this.editor));
     }
 
     /* end transfer section */

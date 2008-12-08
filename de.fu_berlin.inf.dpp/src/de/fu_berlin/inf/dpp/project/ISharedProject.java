@@ -136,7 +136,7 @@ public interface ISharedProject {
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-	    boolean inactive, IInvitationUI inviteUI);
+            boolean inactive, IInvitationUI inviteUI);
 
     /**
      * Adds the given shared project listener. This call is ignored if the

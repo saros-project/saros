@@ -31,18 +31,18 @@ public class SkypeManager implements IConnectionListener {
     private final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
     private SkypeManager() {
-	Saros.getDefault().addListener(this);
-	ProviderManager providermanager = ProviderManager.getInstance();
-	providermanager
-		.addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
+        Saros.getDefault().addListener(this);
+        ProviderManager providermanager = ProviderManager.getInstance();
+        providermanager
+                .addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
     }
 
     public static SkypeManager getDefault() {
-	if (SkypeManager.instance == null) {
-	    SkypeManager.instance = new SkypeManager();
-	}
+        if (SkypeManager.instance == null) {
+            SkypeManager.instance = new SkypeManager();
+        }
 
-	return SkypeManager.instance;
+        return SkypeManager.instance;
     }
 
     /**
@@ -52,19 +52,19 @@ public class SkypeManager implements IConnectionListener {
      *         roster entry has no skype name.
      */
     public String getSkypeURL(RosterEntry rosterEntry) {
-	XMPPConnection connection = Saros.getDefault().getConnection();
-	JID jid = new JID(rosterEntry.getUser());
+        XMPPConnection connection = Saros.getDefault().getConnection();
+        JID jid = new JID(rosterEntry.getUser());
 
-	String name;
-	if (this.skypeNames.containsKey(jid)) {
-	    name = this.skypeNames.get(jid);
+        String name;
+        if (this.skypeNames.containsKey(jid)) {
+            name = this.skypeNames.get(jid);
 
-	} else {
-	    name = SkypeManager.requestSkypeName(connection, jid);
-	    this.skypeNames.put(jid, name);
-	}
+        } else {
+            name = SkypeManager.requestSkypeName(connection, jid);
+            this.skypeNames.put(jid, name);
+        }
 
-	return name == null ? null : "skype:" + name;
+        return name == null ? null : "skype:" + name;
     }
 
     /*
@@ -73,39 +73,39 @@ public class SkypeManager implements IConnectionListener {
      * @see de.fu_berlin.inf.dpp.net.IConnectionListener
      */
     public void connectionStateChanged(final XMPPConnection connection,
-	    ConnectionState newState) {
+            ConnectionState newState) {
 
-	if (newState == ConnectionState.CONNECTED) {
-	    connection.addPacketListener(new PacketListener() {
+        if (newState == ConnectionState.CONNECTED) {
+            connection.addPacketListener(new PacketListener() {
 
-		/*
-		 * (non-Javadoc)
-		 * 
-		 * @see org.jivesoftware.smack.PacketListener
-		 */
-		public void processPacket(Packet packet) {
-		    if (packet instanceof SkypeIQ) {
-			SkypeIQ iq = (SkypeIQ) packet;
+                /*
+                 * (non-Javadoc)
+                 * 
+                 * @see org.jivesoftware.smack.PacketListener
+                 */
+                public void processPacket(Packet packet) {
+                    if (packet instanceof SkypeIQ) {
+                        SkypeIQ iq = (SkypeIQ) packet;
 
-			SkypeIQ result = new SkypeIQ();
-			result.setType(IQ.Type.RESULT);
-			result.setPacketID(iq.getPacketID());
-			result.setTo(iq.getFrom()); // HACK
-			result.setName(getLocalSkypeName());
+                        SkypeIQ result = new SkypeIQ();
+                        result.setType(IQ.Type.RESULT);
+                        result.setPacketID(iq.getPacketID());
+                        result.setTo(iq.getFrom()); // HACK
+                        result.setName(getLocalSkypeName());
 
-			connection.sendPacket(result);
-		    }
-		}
-	    }, new IQTypeFilter(IQ.Type.GET));
-	}
+                        connection.sendPacket(result);
+                    }
+                }
+            }, new IQTypeFilter(IQ.Type.GET));
+        }
     }
 
     /**
      * @return the local skype name or <code>null</code> if none is set.
      */
     private String getLocalSkypeName() {
-	IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
-	return prefs.getString(PreferenceConstants.SKYPE_USERNAME);
+        IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
+        return prefs.getString(PreferenceConstants.SKYPE_USERNAME);
     }
 
     /**
@@ -119,31 +119,31 @@ public class SkypeManager implements IConnectionListener {
      *         user doesn't respond in time or has no Skype name.
      */
     private static String requestSkypeName(XMPPConnection connection, JID user) {
-	if ((connection == null) || !connection.isConnected()) {
-	    return null;
-	}
+        if ((connection == null) || !connection.isConnected()) {
+            return null;
+        }
 
-	// Request the time from a remote user.
-	SkypeIQ request = new SkypeIQ();
+        // Request the time from a remote user.
+        SkypeIQ request = new SkypeIQ();
 
-	request.setType(IQ.Type.GET);
-	request.setTo(user.toString() + "/Smack"); // HACK
+        request.setType(IQ.Type.GET);
+        request.setTo(user.toString() + "/Smack"); // HACK
 
-	// Create a packet collector to listen for a response.
-	PacketCollector collector = connection
-		.createPacketCollector(new PacketIDFilter(request.getPacketID()));
+        // Create a packet collector to listen for a response.
+        PacketCollector collector = connection
+                .createPacketCollector(new PacketIDFilter(request.getPacketID()));
 
-	connection.sendPacket(request);
+        connection.sendPacket(request);
 
-	// Wait up to 5 seconds for a result.
-	IQ result = (IQ) collector.nextResult(5000);
-	if ((result != null) && (result.getType() == IQ.Type.RESULT)) {
-	    SkypeIQ skypeResult = (SkypeIQ) result;
+        // Wait up to 5 seconds for a result.
+        IQ result = (IQ) collector.nextResult(5000);
+        if ((result != null) && (result.getType() == IQ.Type.RESULT)) {
+            SkypeIQ skypeResult = (SkypeIQ) result;
 
-	    return skypeResult.getName().length() == 0 ? null : skypeResult
-		    .getName();
-	}
+            return skypeResult.getName().length() == 0 ? null : skypeResult
+                    .getName();
+        }
 
-	return null;
+        return null;
     }
 }

@@ -40,7 +40,7 @@ public class NoOperation implements Operation {
      * @return the position
      */
     public int getPosition() {
-	return 0;
+        return 0;
     }
 
     /**
@@ -50,7 +50,7 @@ public class NoOperation implements Operation {
      *            the position to set
      */
     public void setPosition(int position) {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -59,7 +59,7 @@ public class NoOperation implements Operation {
      * @return the length of the text
      */
     public int getTextLength() {
-	return 0;
+        return 0;
     }
 
     /**
@@ -68,7 +68,7 @@ public class NoOperation implements Operation {
      * @return the text to be deleted
      */
     public String getText() {
-	return "";
+        return "";
     }
 
     /**
@@ -78,7 +78,7 @@ public class NoOperation implements Operation {
      *            the text to be deleted
      */
     public void setText(String text) {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -86,7 +86,7 @@ public class NoOperation implements Operation {
      */
     @Override
     public String toString() {
-	return "Noop(0,'')";
+        return "Noop(0,'')";
     }
 
     /**
@@ -94,15 +94,15 @@ public class NoOperation implements Operation {
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	} else if (obj == null) {
-	    return false;
-	} else if (obj.getClass().equals(getClass())) {
-	    return true;
-	} else {
-	    return false;
-	}
+        if (obj == this) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (obj.getClass().equals(getClass())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -110,7 +110,7 @@ public class NoOperation implements Operation {
      */
     @Override
     public int hashCode() {
-	int hashcode = 37;
-	return hashcode;
+        int hashcode = 37;
+        return hashcode;
     }
 }

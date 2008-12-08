@@ -51,282 +51,282 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     private final boolean storePreferences;
 
     public RegisterAccountPage() {
-	this(true, true, true);
+        this(true, true, true);
     }
 
     public RegisterAccountPage(boolean createAccount, boolean showPrefButton,
-	    boolean storePreferences) {
-	super("create");
-	this.createAccount = createAccount;
-	this.showPrefButton = showPrefButton;
-	this.storePreferences = storePreferences;
+            boolean storePreferences) {
+        super("create");
+        this.createAccount = createAccount;
+        this.showPrefButton = showPrefButton;
+        this.storePreferences = storePreferences;
     }
 
     public void createControl(Composite parent) {
-	Composite root = new Composite(parent, SWT.NONE);
+        Composite root = new Composite(parent, SWT.NONE);
 
-	root.setLayout(new GridLayout(2, false));
+        root.setLayout(new GridLayout(2, false));
 
-	if (this.createAccount) {
-	    setTitle("Create New User Account");
-	    setDescription("Create a new user account for a Jabber server");
-	} else {
-	    setTitle("Enter User Account");
-	    setDescription("Enter your account information and Jabber server");
-	}
+        if (this.createAccount) {
+            setTitle("Create New User Account");
+            setDescription("Create a new user account for a Jabber server");
+        } else {
+            setTitle("Enter User Account");
+            setDescription("Enter your account information and Jabber server");
+        }
 
-	Label serverLabel = new Label(root, SWT.NONE);
-	serverLabel.setText("Jabber Server");
+        Label serverLabel = new Label(root, SWT.NONE);
+        serverLabel.setText("Jabber Server");
 
-	this.serverText = new Text(root, SWT.BORDER);
-	this.serverText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-		false));
-	this.serverText.setText("jabber.org");
+        this.serverText = new Text(root, SWT.BORDER);
+        this.serverText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+                false));
+        this.serverText.setText("jabber.org");
 
-	Label userLabel = new Label(root, SWT.NONE);
-	userLabel.setText("Username");
+        Label userLabel = new Label(root, SWT.NONE);
+        userLabel.setText("Username");
 
-	this.userText = new Text(root, SWT.BORDER);
-	this.userText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-		false));
+        this.userText = new Text(root, SWT.BORDER);
+        this.userText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+                false));
 
-	Label pwLabel = new Label(root, SWT.NONE);
-	pwLabel.setText("Password");
+        Label pwLabel = new Label(root, SWT.NONE);
+        pwLabel.setText("Password");
 
-	this.passwordText = new Text(root, SWT.BORDER);
-	this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-		true, false));
-	this.passwordText.setEchoChar('*');
+        this.passwordText = new Text(root, SWT.BORDER);
+        this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+                true, false));
+        this.passwordText.setEchoChar('*');
 
-	Label rpwLabel = new Label(root, SWT.NONE);
-	rpwLabel.setText("Repeat Password");
+        Label rpwLabel = new Label(root, SWT.NONE);
+        rpwLabel.setText("Repeat Password");
 
-	this.repeatPasswordText = new Text(root, SWT.BORDER);
-	this.repeatPasswordText.setLayoutData(new GridData(SWT.FILL,
-		SWT.CENTER, true, false));
-	this.repeatPasswordText.setEchoChar('*');
+        this.repeatPasswordText = new Text(root, SWT.BORDER);
+        this.repeatPasswordText.setLayoutData(new GridData(SWT.FILL,
+                SWT.CENTER, true, false));
+        this.repeatPasswordText.setEchoChar('*');
 
-	if (this.showPrefButton) {
-	    this.prefButton = new Button(root, SWT.CHECK | SWT.SEPARATOR);
-	    this.prefButton.setSelection(this.storePreferences);
-	    this.prefButton
-		    .setText("Store the new configuration in your preferences.");
-	    this.prefButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-		    true, false, 2, 1));
-	}
+        if (this.showPrefButton) {
+            this.prefButton = new Button(root, SWT.CHECK | SWT.SEPARATOR);
+            this.prefButton.setSelection(this.storePreferences);
+            this.prefButton
+                    .setText("Store the new configuration in your preferences.");
+            this.prefButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+                    true, false, 2, 1));
+        }
 
-	if (!this.createAccount) {
+        if (!this.createAccount) {
 
-	    Button createAccountButton = new Button(root, SWT.NONE);
-	    createAccountButton.setText("Create Account");
-	    createAccountButton.addSelectionListener(new SelectionListener() {
-		public void widgetDefaultSelected(SelectionEvent e) {
-		}
+            Button createAccountButton = new Button(root, SWT.NONE);
+            createAccountButton.setText("Create Account");
+            createAccountButton.addSelectionListener(new SelectionListener() {
+                public void widgetDefaultSelected(SelectionEvent e) {
+                }
 
-		public void widgetSelected(SelectionEvent e) {
-		    Display.getDefault().syncExec(new Runnable() {
-			public void run() {
-			    try {
-				Shell shell = Display.getDefault()
-					.getActiveShell();
+                public void widgetSelected(SelectionEvent e) {
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            try {
+                                Shell shell = Display.getDefault()
+                                        .getActiveShell();
 
-				CreateAccountWizard wizard = new CreateAccountWizard(
-					true, false, false);
-				boolean success = Window.OK == new WizardDialog(
-					shell, wizard).open();
+                                CreateAccountWizard wizard = new CreateAccountWizard(
+                                        true, false, false);
+                                boolean success = Window.OK == new WizardDialog(
+                                        shell, wizard).open();
 
-				if (success) {
-				    RegisterAccountPage.this.passwordText
-					    .setText(wizard.getPassword());
-				    RegisterAccountPage.this.repeatPasswordText
-					    .setText(wizard.getPassword());
-				    RegisterAccountPage.this.serverText
-					    .setText(wizard.getServer());
-				    RegisterAccountPage.this.userText
-					    .setText(wizard.getUsername());
-				}
+                                if (success) {
+                                    RegisterAccountPage.this.passwordText
+                                            .setText(wizard.getPassword());
+                                    RegisterAccountPage.this.repeatPasswordText
+                                            .setText(wizard.getPassword());
+                                    RegisterAccountPage.this.serverText
+                                            .setText(wizard.getServer());
+                                    RegisterAccountPage.this.userText
+                                            .setText(wizard.getUsername());
+                                }
 
-			    } catch (Exception e) {
-				Saros
-					.getDefault()
-					.getLog()
-					.log(
-						new Status(
-							IStatus.ERROR,
-							Saros.SAROS,
-							IStatus.ERROR,
-							"Error while running enter account wizard",
-							e));
-			    }
-			}
-		    });
-		}
-	    });
-	}
+                            } catch (Exception e) {
+                                Saros
+                                        .getDefault()
+                                        .getLog()
+                                        .log(
+                                                new Status(
+                                                        IStatus.ERROR,
+                                                        Saros.SAROS,
+                                                        IStatus.ERROR,
+                                                        "Error while running enter account wizard",
+                                                        e));
+                            }
+                        }
+                    });
+                }
+            });
+        }
 
-	setInitialValues();
+        setInitialValues();
 
-	hookListeners();
-	updateNextEnablement();
+        hookListeners();
+        updateNextEnablement();
 
-	setControl(root);
+        setControl(root);
     }
 
     public String getServer() {
-	return this.serverText.getText();
+        return this.serverText.getText();
     }
 
     public String getUsername() {
-	return this.userText.getText();
+        return this.userText.getText();
     }
 
     public String getPassword() {
-	return this.passwordText.getText();
+        return this.passwordText.getText();
     }
 
     public boolean isStoreInPreferences() {
-	if (this.showPrefButton) {
-	    return this.prefButton.getSelection();
-	}
-	return this.storePreferences;
+        if (this.showPrefButton) {
+            return this.prefButton.getSelection();
+        }
+        return this.storePreferences;
     }
 
     private void hookListeners() {
-	ModifyListener listener = new ModifyListener() {
-	    public void modifyText(ModifyEvent e) {
-		updateNextEnablement();
-	    }
-	};
+        ModifyListener listener = new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+                updateNextEnablement();
+            }
+        };
 
-	this.serverText.addModifyListener(listener);
-	this.userText.addModifyListener(listener);
-	this.passwordText.addModifyListener(listener);
-	this.repeatPasswordText.addModifyListener(listener);
-	if (this.showPrefButton) {
-	    this.prefButton.addSelectionListener(new SelectionListener() {
-		public void widgetDefaultSelected(SelectionEvent e) {
-		    // do nothing
-		}
+        this.serverText.addModifyListener(listener);
+        this.userText.addModifyListener(listener);
+        this.passwordText.addModifyListener(listener);
+        this.repeatPasswordText.addModifyListener(listener);
+        if (this.showPrefButton) {
+            this.prefButton.addSelectionListener(new SelectionListener() {
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    // do nothing
+                }
 
-		public void widgetSelected(SelectionEvent e) {
-		    IPreferenceStore preferences = Saros.getDefault()
-			    .getPreferenceStore();
-		    if ((preferences.getString(PreferenceConstants.USERNAME)
-			    .length() != 0)
-			    && RegisterAccountPage.this.prefButton
-				    .getSelection()) {
-			setMessage(
-				"Storing the configuration will override the existing settings.",
-				IMessageProvider.WARNING);
-		    } else {
-			setMessage(null);
-		    }
-		}
+                public void widgetSelected(SelectionEvent e) {
+                    IPreferenceStore preferences = Saros.getDefault()
+                            .getPreferenceStore();
+                    if ((preferences.getString(PreferenceConstants.USERNAME)
+                            .length() != 0)
+                            && RegisterAccountPage.this.prefButton
+                                    .getSelection()) {
+                        setMessage(
+                                "Storing the configuration will override the existing settings.",
+                                IMessageProvider.WARNING);
+                    } else {
+                        setMessage(null);
+                    }
+                }
 
-	    });
-	}
+            });
+        }
     }
 
     private void updateNextEnablement() {
 
-	boolean passwordsMatch = this.passwordText.getText().equals(
-		this.repeatPasswordText.getText());
-	boolean done = (this.serverText.getText().length() > 0)
-		&& (this.userText.getText().length() > 0)
-		&& (this.passwordText.getText().length() > 0) && passwordsMatch;
+        boolean passwordsMatch = this.passwordText.getText().equals(
+                this.repeatPasswordText.getText());
+        boolean done = (this.serverText.getText().length() > 0)
+                && (this.userText.getText().length() > 0)
+                && (this.passwordText.getText().length() > 0) && passwordsMatch;
 
-	if (passwordsMatch) {
-	    setErrorMessage(null);
-	} else {
-	    setErrorMessage("Passwords don't match.");
-	}
+        if (passwordsMatch) {
+            setErrorMessage(null);
+        } else {
+            setErrorMessage("Passwords don't match.");
+        }
 
-	setPageComplete(done);
+        setPageComplete(done);
     }
 
     public void setInitialValues() {
-	IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
-	this.serverText.setText(preferences
-		.getDefaultString(PreferenceConstants.SERVER));
-	if (this.showPrefButton) {
-	    this.prefButton.setSelection(preferences.getString(
-		    PreferenceConstants.USERNAME).length() == 0);
-	}
+        IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+        this.serverText.setText(preferences
+                .getDefaultString(PreferenceConstants.SERVER));
+        if (this.showPrefButton) {
+            this.prefButton.setSelection(preferences.getString(
+                    PreferenceConstants.USERNAME).length() == 0);
+        }
     }
 
     public boolean performFinish() {
 
-	if (this.createAccount) {
+        if (this.createAccount) {
 
-	    final String server = getServer();
-	    final String username = getUsername();
-	    final String password = getPassword();
-	    final boolean storeInPreferences = isStoreInPreferences();
+            final String server = getServer();
+            final String username = getUsername();
+            final String password = getPassword();
+            final boolean storeInPreferences = isStoreInPreferences();
 
-	    try {
-		getContainer().run(false, false, new IRunnableWithProgress() {
-		    public void run(IProgressMonitor monitor)
-			    throws InvocationTargetException,
-			    InterruptedException {
-			try {
-			    Saros.getDefault().createAccount(server, username,
-				    password, monitor);
+            try {
+                getContainer().run(false, false, new IRunnableWithProgress() {
+                    public void run(IProgressMonitor monitor)
+                            throws InvocationTargetException,
+                            InterruptedException {
+                        try {
+                            Saros.getDefault().createAccount(server, username,
+                                    password, monitor);
 
-			    if (storeInPreferences) {
-				IPreferenceStore preferences = Saros
-					.getDefault().getPreferenceStore();
-				preferences.setValue(
-					PreferenceConstants.SERVER, server);
-				preferences.setValue(
-					PreferenceConstants.USERNAME, username);
-				preferences.setValue(
-					PreferenceConstants.PASSWORD, password);
-			    }
+                            if (storeInPreferences) {
+                                IPreferenceStore preferences = Saros
+                                        .getDefault().getPreferenceStore();
+                                preferences.setValue(
+                                        PreferenceConstants.SERVER, server);
+                                preferences.setValue(
+                                        PreferenceConstants.USERNAME, username);
+                                preferences.setValue(
+                                        PreferenceConstants.PASSWORD, password);
+                            }
 
-			} catch (final XMPPException e) {
-			    throw new InvocationTargetException(e);
-			}
-		    }
-		});
+                        } catch (final XMPPException e) {
+                            throw new InvocationTargetException(e);
+                        }
+                    }
+                });
 
-	    } catch (InvocationTargetException e) {
-		String s = ((XMPPException) e.getCause()).getXMPPError()
-			.getMessage();
+            } catch (InvocationTargetException e) {
+                String s = ((XMPPException) e.getCause()).getXMPPError()
+                        .getMessage();
 
-		if ((s == null)
-			&& (((XMPPException) e.getCause()).getXMPPError()
-				.getCode() == 409)) {
-		    s = "Account already exists";
-		}
+                if ((s == null)
+                        && (((XMPPException) e.getCause()).getXMPPError()
+                                .getCode() == 409)) {
+                    s = "Account already exists";
+                }
 
-		setMessage(e.getCause().getMessage() + ": "
-			+ (s != null ? s : "No Explanation"),
-			IMessageProvider.ERROR);
-		return false;
+                setMessage(e.getCause().getMessage() + ": "
+                        + (s != null ? s : "No Explanation"),
+                        IMessageProvider.ERROR);
+                return false;
 
-	    } catch (InterruptedException e) {
-		setMessage(e.getCause().getMessage(), IMessageProvider.ERROR);
-		return false;
-	    }
+            } catch (InterruptedException e) {
+                setMessage(e.getCause().getMessage(), IMessageProvider.ERROR);
+                return false;
+            }
 
-	    return true;
-	}
+            return true;
+        }
 
-	else {
-	    if (isStoreInPreferences()) {
+        else {
+            if (isStoreInPreferences()) {
 
-		final String server = getServer();
-		final String username = getUsername();
-		final String password = getPassword();
+                final String server = getServer();
+                final String username = getUsername();
+                final String password = getPassword();
 
-		IPreferenceStore preferences = Saros.getDefault()
-			.getPreferenceStore();
-		preferences.setValue(PreferenceConstants.SERVER, server);
-		preferences.setValue(PreferenceConstants.USERNAME, username);
-		preferences.setValue(PreferenceConstants.PASSWORD, password);
-	    }
-	    return true;
-	}
+                IPreferenceStore preferences = Saros.getDefault()
+                        .getPreferenceStore();
+                preferences.setValue(PreferenceConstants.SERVER, server);
+                preferences.setValue(PreferenceConstants.USERNAME, username);
+                preferences.setValue(PreferenceConstants.PASSWORD, password);
+            }
+            return true;
+        }
     }
 
 }

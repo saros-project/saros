@@ -59,67 +59,67 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private static Logger logger = Logger.getLogger(ActivitySequencer.class
-	    .getName());
+            .getName());
 
     /**/
     public class ExecuterQueue {
 
-	/** Queue with IActivity Elements */
-	private final List<TextEditActivity> executerQueue;
+        /** Queue with IActivity Elements */
+        private final List<TextEditActivity> executerQueue;
 
-	private TextEditActivity currentExecutedActivity;
+        private TextEditActivity currentExecutedActivity;
 
-	private boolean executed = true;
+        private boolean executed = true;
 
-	public ExecuterQueue() {
-	    this.executerQueue = new Vector<TextEditActivity>();
-	}
+        public ExecuterQueue() {
+            this.executerQueue = new Vector<TextEditActivity>();
+        }
 
-	/**
-	 * check status of created activity. After execution in
-	 * ActivitySequencer activity has created new call of activityCreated.
-	 * 
-	 * @param activity
-	 */
-	public synchronized boolean checkCreatedActivity(IActivity activity) {
-	    if (this.currentExecutedActivity != null) {
-		if ((activity instanceof TextEditActivity)
-			&& this.currentExecutedActivity.sameLike(activity)) {
-		    logger.debug("TextEditActivity " + activity
-			    + " is executed.");
-		    this.executed = true;
-		    notify();
-		}
-	    }
-	    return this.executed;
-	}
+        /**
+         * check status of created activity. After execution in
+         * ActivitySequencer activity has created new call of activityCreated.
+         * 
+         * @param activity
+         */
+        public synchronized boolean checkCreatedActivity(IActivity activity) {
+            if (this.currentExecutedActivity != null) {
+                if ((activity instanceof TextEditActivity)
+                        && this.currentExecutedActivity.sameLike(activity)) {
+                    logger.debug("TextEditActivity " + activity
+                            + " is executed.");
+                    this.executed = true;
+                    notify();
+                }
+            }
+            return this.executed;
+        }
 
-	public synchronized void addActivity(IActivity activity) {
-	    if (activity instanceof TextEditActivity) {
-		logger.debug("Add new Activity " + activity
-			+ " to executer queue.");
-		this.executerQueue.add((TextEditActivity) activity);
-		notify();
-	    }
-	}
+        public synchronized void addActivity(IActivity activity) {
+            if (activity instanceof TextEditActivity) {
+                logger.debug("Add new Activity " + activity
+                        + " to executer queue.");
+                this.executerQueue.add((TextEditActivity) activity);
+                notify();
+            }
+        }
 
-	public synchronized IActivity getNextActivity() {
-	    try {
-		while ((this.executerQueue.size() < 1) && !this.executed) {
-		    wait();
-		}
-		this.currentExecutedActivity = this.executerQueue.remove(0);
-		this.executed = false;
-		logger.debug("Remove " + this.currentExecutedActivity
-			+ " form executer queue.");
-		/* get next activity in queue. */
-		return this.currentExecutedActivity;
-	    } catch (InterruptedException e) {
-		e.printStackTrace();
-		return null;
-	    }
+        public synchronized IActivity getNextActivity() {
+            try {
+                while ((this.executerQueue.size() < 1) && !this.executed) {
+                    wait();
+                }
+                this.currentExecutedActivity = this.executerQueue.remove(0);
+                this.executed = false;
+                logger.debug("Remove " + this.currentExecutedActivity
+                        + " form executer queue.");
+                /* get next activity in queue. */
+                return this.currentExecutedActivity;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
 
-	}
+        }
     }
 
     private static final int UNDEFINED_TIME = -1;
@@ -148,7 +148,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     private ISharedProject sharedProject;
 
     public ActivitySequencer() {
-	this.executer = new ExecuterQueue();
+        this.executer = new ExecuterQueue();
     }
 
     /*
@@ -157,58 +157,58 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.project.IActivityManager
      */
     public void exec(final IActivity activity) {
-	try {
+        try {
 
-	    if (activity instanceof EditorActivity) {
-		this.concurrentManager.exec(activity);
-	    }
-	    if (activity instanceof FileActivity) {
-		this.concurrentManager.exec(activity);
-	    }
-	    if (activity instanceof FolderActivity) {
+            if (activity instanceof EditorActivity) {
+                this.concurrentManager.exec(activity);
+            }
+            if (activity instanceof FileActivity) {
+                this.concurrentManager.exec(activity);
+            }
+            if (activity instanceof FolderActivity) {
 
-	    }
-	    Display.getDefault().syncExec(new Runnable() {
-		public void run() {
-		    if (activity instanceof TextEditActivity) {
+            }
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    if (activity instanceof TextEditActivity) {
 
-			/*
-			 * check if document is already managed by jupiter
-			 * mechanism.
-			 */
-			if (!ActivitySequencer.this.concurrentManager
-				.isHostSide()
-				&& (ActivitySequencer.this.concurrentManager
-					.exec(activity) != null)) {
-			    // CLIENT SIDE
-			    logger
-				    .debug("Execute received activity (without jupiter): "
-					    + activity);
-			    for (IActivityProvider executor : ActivitySequencer.this.providers) {
-				executor.exec(activity);
-			    }
-			}
-		    } else {
+                        /*
+                         * check if document is already managed by jupiter
+                         * mechanism.
+                         */
+                        if (!ActivitySequencer.this.concurrentManager
+                                .isHostSide()
+                                && (ActivitySequencer.this.concurrentManager
+                                        .exec(activity) != null)) {
+                            // CLIENT SIDE
+                            logger
+                                    .debug("Execute received activity (without jupiter): "
+                                            + activity);
+                            for (IActivityProvider executor : ActivitySequencer.this.providers) {
+                                executor.exec(activity);
+                            }
+                        }
+                    } else {
 
-			// Execute all other activities
-			for (IActivityProvider executor : ActivitySequencer.this.providers) {
-			    executor.exec(activity);
-			}
+                        // Execute all other activities
+                        for (IActivityProvider executor : ActivitySequencer.this.providers) {
+                            executor.exec(activity);
+                        }
 
-			// Check for file checksum after incoming save file
-			// activity.
-			if ((activity instanceof EditorActivity)
-				&& (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
-			    checkSavedFile((EditorActivity) activity);
-			}
+                        // Check for file checksum after incoming save file
+                        // activity.
+                        if ((activity instanceof EditorActivity)
+                                && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
+                            checkSavedFile((EditorActivity) activity);
+                        }
 
-		    }
-		}
-	    });
+                    }
+                }
+            });
 
-	} catch (Exception e) {
-	    logger.error("Error while executing activity.", e);
-	}
+        } catch (Exception e) {
+            logger.error("Error while executing activity.", e);
+        }
     }
 
     /**
@@ -218,49 +218,49 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      *            incoming editor activity with type saved
      */
     private void checkSavedFile(EditorActivity editor) {
-	// /* 1. reset appropriate jupiter document. */
-	// if (isHostSide() || this.sharedProject.isDriver()) {
-	// ActivitySequencer.logger.debug("reset jupiter server for "
-	// + editor.getPath());
-	// this.concurrentManager.resetJupiterDocument(editor.getPath());
-	// }
-	//
-	// /* check match of file checksums. */
-	//
-	// if (!isHostSide() && (editor.getType() == Type.Saved)) {
-	// long checksum = FileUtil.checksum(this.sharedProject.getProject()
-	// .getFile(editor.getPath()));
-	// ActivitySequencer.logger
-	// .debug("Checksumme on client side : " + checksum
-	// + " for path : " + editor.getPath().toOSString());
-	// if (checksum != editor.getChecksum()) {
-	// ActivitySequencer.logger.error("Checksum error of file "
-	// + editor.getPath());
-	// }
-	// }
-	// if (isHostSide()) {
-	// /* create local checksum. */
-	// long checksum = FileUtil.checksum(this.sharedProject.getProject()
-	// .getFile(editor.getPath()));
-	//
-	// if (checksum != editor.getChecksum()) {
-	// /* send checksum error */
-	// ActivitySequencer.logger.error("Checksum error for file "
-	// + editor.getPath() + " of " + editor.getSource()
-	// + " ( " + checksum + " != " + editor.getChecksum()
-	// + " )");
-	//
-	// /* send checksum error */
-	// FileActivity fileError = new FileActivity(
-	// FileActivity.Type.Error, editor.getPath(), new JID(
-	// editor.getSource()));
-	// activityCreated(fileError);
-	// /* send sync file. */
-	// FileActivity file = new FileActivity(FileActivity.Type.Created,
-	// editor.getPath(), new JID(editor.getSource()));
-	// activityCreated(file);
-	// }
-	// }
+        // /* 1. reset appropriate jupiter document. */
+        // if (isHostSide() || this.sharedProject.isDriver()) {
+        // ActivitySequencer.logger.debug("reset jupiter server for "
+        // + editor.getPath());
+        // this.concurrentManager.resetJupiterDocument(editor.getPath());
+        // }
+        //
+        // /* check match of file checksums. */
+        //
+        // if (!isHostSide() && (editor.getType() == Type.Saved)) {
+        // long checksum = FileUtil.checksum(this.sharedProject.getProject()
+        // .getFile(editor.getPath()));
+        // ActivitySequencer.logger
+        // .debug("Checksumme on client side : " + checksum
+        // + " for path : " + editor.getPath().toOSString());
+        // if (checksum != editor.getChecksum()) {
+        // ActivitySequencer.logger.error("Checksum error of file "
+        // + editor.getPath());
+        // }
+        // }
+        // if (isHostSide()) {
+        // /* create local checksum. */
+        // long checksum = FileUtil.checksum(this.sharedProject.getProject()
+        // .getFile(editor.getPath()));
+        //
+        // if (checksum != editor.getChecksum()) {
+        // /* send checksum error */
+        // ActivitySequencer.logger.error("Checksum error for file "
+        // + editor.getPath() + " of " + editor.getSource()
+        // + " ( " + checksum + " != " + editor.getChecksum()
+        // + " )");
+        //
+        // /* send checksum error */
+        // FileActivity fileError = new FileActivity(
+        // FileActivity.Type.Error, editor.getPath(), new JID(
+        // editor.getSource()));
+        // activityCreated(fileError);
+        // /* send sync file. */
+        // FileActivity file = new FileActivity(FileActivity.Type.Created,
+        // editor.getPath(), new JID(editor.getSource()));
+        // activityCreated(file);
+        // }
+        // }
     }
 
     /*
@@ -269,8 +269,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public void exec(TimedActivity timedActivity) {
-	this.queue.add(timedActivity);
-	execQueue();
+        this.queue.add(timedActivity);
+        execQueue();
     }
 
     /*
@@ -279,8 +279,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.IActivitySequencer
      */
     public void exec(List<TimedActivity> activities) {
-	this.queue.addAll(activities);
-	execQueue();
+        this.queue.addAll(activities);
+        execQueue();
     }
 
     /*
@@ -289,11 +289,11 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public List<IActivity> flush() {
-	List<IActivity> out = new ArrayList<IActivity>(this.activities);
-	this.activities.clear();
-	out = optimize(out);
-	this.flushedLog.addAll(out);
-	return out.size() > 0 ? out : null;
+        List<IActivity> out = new ArrayList<IActivity>(this.activities);
+        this.activities.clear();
+        out = optimize(out);
+        this.flushedLog.addAll(out);
+        return out.size() > 0 ? out : null;
     }
 
     /*
@@ -302,22 +302,22 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public List<TimedActivity> flushTimed() {
-	List<IActivity> activities = flush();
+        List<IActivity> activities = flush();
 
-	if (activities == null) {
-	    return null;
-	}
+        if (activities == null) {
+            return null;
+        }
 
-	if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
-	    this.timestamp = 0;
-	}
+        if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
+            this.timestamp = 0;
+        }
 
-	List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-	for (IActivity activity : activities) {
-	    timedActivities.add(new TimedActivity(activity, this.timestamp++));
-	}
+        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
+        for (IActivity activity : activities) {
+            timedActivities.add(new TimedActivity(activity, this.timestamp++));
+        }
 
-	return timedActivities;
+        return timedActivities;
     }
 
     /*
@@ -326,8 +326,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public void addProvider(IActivityProvider provider) {
-	this.providers.add(provider);
-	provider.addActivityListener(this);
+        this.providers.add(provider);
+        provider.addActivityListener(this);
     }
 
     /*
@@ -336,8 +336,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public void removeProvider(IActivityProvider provider) {
-	this.providers.remove(provider);
-	provider.removeActivityListener(this);
+        this.providers.remove(provider);
+        provider.removeActivityListener(this);
     }
 
     /*
@@ -346,7 +346,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.IActivitySequencer
      */
     public List<IActivity> getLog() {
-	return this.flushedLog;
+        return this.flushedLog;
     }
 
     /*
@@ -356,40 +356,40 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      */
     public void activityCreated(IActivity activity) {
 
-	if ((activity instanceof EditorActivity)
-		|| (activity instanceof FileActivity)) {
-	    /*
-	     * Host: start and stop jupiter server process depending on editor
-	     * activities of remote clients. Client: start and stop local
-	     * jupiter clients depending on editor activities.
-	     */
-	    this.concurrentManager.activityCreated(activity);
-	}
+        if ((activity instanceof EditorActivity)
+                || (activity instanceof FileActivity)) {
+            /*
+             * Host: start and stop jupiter server process depending on editor
+             * activities of remote clients. Client: start and stop local
+             * jupiter clients depending on editor activities.
+             */
+            this.concurrentManager.activityCreated(activity);
+        }
 
-	if (activity instanceof TextEditActivity) {
+        if (activity instanceof TextEditActivity) {
 
-	    /* check for execute next activity in queue. */
-	    logger.debug("activity created : " + activity);
-	    this.executer.checkCreatedActivity(activity);
+            /* check for execute next activity in queue. */
+            logger.debug("activity created : " + activity);
+            this.executer.checkCreatedActivity(activity);
 
-	    /*
-	     * new text edit activity has created and has to sync with jupiter
-	     * logic.
-	     */
-	    IActivity resultAC = this.concurrentManager
-		    .activityCreated(activity);
-	    /**
-	     * host activity: put into outgoing queue and send to all if
-	     * activity is generated by host. otherwise: send request to host.
-	     */
-	    if ((resultAC != null) || this.concurrentManager.isHostSide()) {
-		this.activities.add(activity);
-	    }
+            /*
+             * new text edit activity has created and has to sync with jupiter
+             * logic.
+             */
+            IActivity resultAC = this.concurrentManager
+                    .activityCreated(activity);
+            /**
+             * host activity: put into outgoing queue and send to all if
+             * activity is generated by host. otherwise: send request to host.
+             */
+            if ((resultAC != null) || this.concurrentManager.isHostSide()) {
+                this.activities.add(activity);
+            }
 
-	} else {
+        } else {
 
-	    this.activities.add(activity);
-	}
+            this.activities.add(activity);
+        }
     }
 
     /*
@@ -398,15 +398,15 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public int getTimestamp() {
-	return this.timestamp;
+        return this.timestamp;
     }
 
     public int getQueuedActivities() {
-	return this.queue.size();
+        return this.queue.size();
     }
 
     public List<TimedActivity> getActivityHistory() {
-	return this.activityHistory;
+        return this.activityHistory;
     }
 
     /**
@@ -414,201 +414,201 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * to their individual time stamps.
      */
     private void execQueue() {
-	boolean executed;
+        boolean executed;
 
-	do {
-	    executed = false;
+        do {
+            executed = false;
 
-	    for (TimedActivity timedActivity : this.queue) {
-		if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
-		    this.timestamp = timedActivity.getTimestamp();
-		}
+            for (TimedActivity timedActivity : this.queue) {
+                if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
+                    this.timestamp = timedActivity.getTimestamp();
+                }
 
-		if (timedActivity.getTimestamp() <= this.timestamp) {
-		    this.queue.remove(timedActivity);
+                if (timedActivity.getTimestamp() <= this.timestamp) {
+                    this.queue.remove(timedActivity);
 
-		    this.timestamp++;
-		    exec(timedActivity.getActivity());
-		    executed = true;
-		}
-	    }
+                    this.timestamp++;
+                    exec(timedActivity.getActivity());
+                    executed = true;
+                }
+            }
 
-	} while (executed);
+        } while (executed);
 
     }
 
     // TODO extract this into the activities themselves
     private List<IActivity> optimize(List<IActivity> activities) {
-	List<IActivity> result = new ArrayList<IActivity>(activities.size());
+        List<IActivity> result = new ArrayList<IActivity>(activities.size());
 
-	ITextSelection selection = null;
-	String source = null;
-	IPath path = null;
+        ITextSelection selection = null;
+        String source = null;
+        IPath path = null;
 
-	for (IActivity activity : activities) {
-	    source = null;
-	    path = null;
-	    if (activity instanceof TextEditActivity) {
-		TextEditActivity textEdit = (TextEditActivity) activity;
+        for (IActivity activity : activities) {
+            source = null;
+            path = null;
+            if (activity instanceof TextEditActivity) {
+                TextEditActivity textEdit = (TextEditActivity) activity;
 
-		textEdit = joinTextEdits(result, textEdit);
+                textEdit = joinTextEdits(result, textEdit);
 
-		selection = new TextSelection(textEdit.offset
-			+ textEdit.text.length(), 0);
-		source = textEdit.getSource();
-		path = textEdit.getEditor();
-		result.add(textEdit);
+                selection = new TextSelection(textEdit.offset
+                        + textEdit.text.length(), 0);
+                source = textEdit.getSource();
+                path = textEdit.getEditor();
+                result.add(textEdit);
 
-	    } else if (activity instanceof TextSelectionActivity) {
-		TextSelectionActivity textSelection = (TextSelectionActivity) activity;
+            } else if (activity instanceof TextSelectionActivity) {
+                TextSelectionActivity textSelection = (TextSelectionActivity) activity;
 
-		selection = new TextSelection(textSelection.getOffset(),
-			textSelection.getLength());
-		source = textSelection.getSource();
-		path = textSelection.getEditor();
+                selection = new TextSelection(textSelection.getOffset(),
+                        textSelection.getLength());
+                source = textSelection.getSource();
+                path = textSelection.getEditor();
 
-	    } else if (activity instanceof ViewportActivity) {
-		ViewportActivity viewport = (ViewportActivity) activity;
-		path = viewport.getEditor();
-		source = viewport.getSource();
-		selection = addSelection(result, selection, source, path);
-		result.add(activity);
-	    } else {
-		selection = addSelection(result, selection, source, path);
-		result.add(activity);
-	    }
+            } else if (activity instanceof ViewportActivity) {
+                ViewportActivity viewport = (ViewportActivity) activity;
+                path = viewport.getEditor();
+                source = viewport.getSource();
+                selection = addSelection(result, selection, source, path);
+                result.add(activity);
+            } else {
+                selection = addSelection(result, selection, source, path);
+                result.add(activity);
+            }
 
-	    selection = addSelection(result, selection, source, path);
-	}
+            selection = addSelection(result, selection, source, path);
+        }
 
-	return result;
+        return result;
     }
 
     private TextEditActivity joinTextEdits(List<IActivity> result,
-	    TextEditActivity textEdit) {
-	if (result.size() == 0) {
-	    return textEdit;
-	}
+            TextEditActivity textEdit) {
+        if (result.size() == 0) {
+            return textEdit;
+        }
 
-	IActivity lastActivity = result.get(result.size() - 1);
-	if (lastActivity instanceof TextEditActivity) {
-	    TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
+        IActivity lastActivity = result.get(result.size() - 1);
+        if (lastActivity instanceof TextEditActivity) {
+            TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
 
-	    if (((lastTextEdit.getSource() == null) || lastTextEdit.getSource()
-		    .equals(textEdit.getSource()))
-		    && (textEdit.offset == lastTextEdit.offset
-			    + lastTextEdit.text.length())) {
-		result.remove(lastTextEdit);
-		textEdit = new TextEditActivity(lastTextEdit.offset,
-			lastTextEdit.text + textEdit.text, lastTextEdit.replace
-				+ textEdit.replace);
-		textEdit.setSource(lastTextEdit.getSource());
-		textEdit.setEditor(lastTextEdit.getEditor());
-	    }
-	}
+            if (((lastTextEdit.getSource() == null) || lastTextEdit.getSource()
+                    .equals(textEdit.getSource()))
+                    && (textEdit.offset == lastTextEdit.offset
+                            + lastTextEdit.text.length())) {
+                result.remove(lastTextEdit);
+                textEdit = new TextEditActivity(lastTextEdit.offset,
+                        lastTextEdit.text + textEdit.text, lastTextEdit.replace
+                                + textEdit.replace);
+                textEdit.setSource(lastTextEdit.getSource());
+                textEdit.setEditor(lastTextEdit.getEditor());
+            }
+        }
 
-	return textEdit;
+        return textEdit;
     }
 
     private ITextSelection addSelection(List<IActivity> result,
-	    ITextSelection selection, String source, IPath path) {
-	if (selection == null) {
-	    return null;
-	}
+            ITextSelection selection, String source, IPath path) {
+        if (selection == null) {
+            return null;
+        }
 
-	if (result.size() > 0) {
-	    IActivity lastActivity = result.get(result.size() - 1);
-	    if (lastActivity instanceof TextEditActivity) {
-		TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
+        if (result.size() > 0) {
+            IActivity lastActivity = result.get(result.size() - 1);
+            if (lastActivity instanceof TextEditActivity) {
+                TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
 
-		if ((selection.getOffset() == lastTextEdit.offset
-			+ lastTextEdit.text.length())
-			&& (selection.getLength() == 0)) {
+                if ((selection.getOffset() == lastTextEdit.offset
+                        + lastTextEdit.text.length())
+                        && (selection.getLength() == 0)) {
 
-		    return selection;
-		}
-	    }
-	}
+                    return selection;
+                }
+            }
+        }
 
-	TextSelectionActivity newSel = new TextSelectionActivity(selection
-		.getOffset(), selection.getLength(), path);
-	newSel.setSource(source);
-	result.add(newSel);
+        TextSelectionActivity newSel = new TextSelectionActivity(selection
+                .getOffset(), selection.getLength(), path);
+        newSel.setSource(source);
+        result.add(newSel);
 
-	selection = null;
-	return selection;
+        selection = null;
+        return selection;
     }
 
     public void initConcurrentManager(
-	    de.fu_berlin.inf.dpp.concurrent.ConcurrentManager.Side side,
-	    de.fu_berlin.inf.dpp.User host, JID myJID,
-	    ISharedProject sharedProject) {
-	this.concurrentManager = new ConcurrentDocumentManager(side, host,
-		myJID, sharedProject);
-	this.sharedProject = sharedProject;
-	sharedProject.addListener(this.concurrentManager);
-	this.concurrentManager.setRequestForwarder(this);
-	this.concurrentManager.setActivitySequencer(this);
+            de.fu_berlin.inf.dpp.concurrent.ConcurrentManager.Side side,
+            de.fu_berlin.inf.dpp.User host, JID myJID,
+            ISharedProject sharedProject) {
+        this.concurrentManager = new ConcurrentDocumentManager(side, host,
+                myJID, sharedProject);
+        this.sharedProject = sharedProject;
+        sharedProject.addListener(this.concurrentManager);
+        this.concurrentManager.setRequestForwarder(this);
+        this.concurrentManager.setActivitySequencer(this);
     }
 
     public ConcurrentManager getConcurrentManager() {
-	return this.concurrentManager;
+        return this.concurrentManager;
     }
 
     public synchronized void forwardOutgoingRequest(Request req) {
 
-	/* check for errors. */
-	if (req instanceof RequestError) {
-	    /* create save activity. */
-	    IActivity activity = new EditorActivity(Type.Saved, req
-		    .getEditorPath());
-	    /* execute save activity and start consistency check. */
-	    exec(activity);
-	    return;
-	}
+        /* check for errors. */
+        if (req instanceof RequestError) {
+            /* create save activity. */
+            IActivity activity = new EditorActivity(Type.Saved, req
+                    .getEditorPath());
+            /* execute save activity and start consistency check. */
+            exec(activity);
+            return;
+        }
 
-	/* put request into outgoing queue. */
-	this.outgoingSyncActivities.add(req);
+        /* put request into outgoing queue. */
+        this.outgoingSyncActivities.add(req);
 
-	notify();
+        notify();
     }
 
     public synchronized Request getNextOutgoingRequest()
-	    throws InterruptedException {
-	Request request = null;
-	/* get next message and transfer to client. */
-	while (!(this.outgoingSyncActivities.size() > 0)) {
-	    wait();
-	}
-	/* remove first queue element. */
-	request = this.outgoingSyncActivities.remove(0);
+            throws InterruptedException {
+        Request request = null;
+        /* get next message and transfer to client. */
+        while (!(this.outgoingSyncActivities.size() > 0)) {
+            wait();
+        }
+        /* remove first queue element. */
+        request = this.outgoingSyncActivities.remove(0);
 
-	return request;
+        return request;
     }
 
     /**
      * Receive request from ITransmitter and transfer to concurrent control.
      */
     public void receiveRequest(Request request) {
-	/*
-	 * sync with jupiter server on host side and transform operation with
-	 * jupiter client side.
-	 */
-	logger.debug("Receive request : " + request + " from "
-		+ request.getJID());
-	this.concurrentManager.receiveRequest(request);
+        /*
+         * sync with jupiter server on host side and transform operation with
+         * jupiter client side.
+         */
+        logger.debug("Receive request : " + request + " from "
+                + request.getJID());
+        this.concurrentManager.receiveRequest(request);
 
-	// return null;
-	// IActivity activity = concurrentManager.receiveRequest(request);
-	// if (activity != null) {
-	// /* execute transformed activity */
-	// execTransformedActivity(activity);
-	// }
-	// return activity;
+        // return null;
+        // IActivity activity = concurrentManager.receiveRequest(request);
+        // if (activity != null) {
+        // /* execute transformed activity */
+        // execTransformedActivity(activity);
+        // }
+        // return activity;
     }
 
     private boolean isHostSide() {
-	return this.concurrentManager.isHostSide();
+        return this.concurrentManager.isHostSide();
     }
 
     /**
@@ -617,34 +617,34 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * @param activity
      */
     public void execTransformedActivity(IActivity activity) {
-	try {
-	    logger.debug("execute transformed activity: " + activity);
+        try {
+            logger.debug("execute transformed activity: " + activity);
 
-	    // /* add new activity to executer queue. */
-	    // this.executer.addActivity(activity);
-	    //
-	    // /*
-	    // * get next activity from queue or waiting for finishing of
-	    // current
-	    // * execute activity.
-	    // */
-	    // IActivity queueActivity = this.executer.getNextActivity();
+            // /* add new activity to executer queue. */
+            // this.executer.addActivity(activity);
+            //
+            // /*
+            // * get next activity from queue or waiting for finishing of
+            // current
+            // * execute activity.
+            // */
+            // IActivity queueActivity = this.executer.getNextActivity();
 
-	    // mark current execute activity
-	    // executedJupiterActivity = activity;
-	    // this.executedJupiterActivity = queueActivity;
-	    this.executedJupiterActivity = activity;
+            // mark current execute activity
+            // executedJupiterActivity = activity;
+            // this.executedJupiterActivity = queueActivity;
+            this.executedJupiterActivity = activity;
 
-	    for (IActivityProvider exec : this.providers) {
-		exec.exec(activity);
-	    }
-	    /* send activity to all observer. */
-	    if (this.concurrentManager.isHostSide()) {
-		logger.debug("send transformed activity: " + activity);
-		this.activities.add(activity);
-	    }
-	} catch (Exception e) {
-	    logger.error("Error while executing activity.", e);
-	}
+            for (IActivityProvider exec : this.providers) {
+                exec.exec(activity);
+            }
+            /* send activity to all observer. */
+            if (this.concurrentManager.isHostSide()) {
+                logger.debug("send transformed activity: " + activity);
+                this.activities.add(activity);
+            }
+        } catch (Exception e) {
+            logger.error("Error while executing activity.", e);
+        }
     }
 }

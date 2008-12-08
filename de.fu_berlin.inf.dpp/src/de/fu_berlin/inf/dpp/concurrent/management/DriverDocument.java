@@ -18,41 +18,41 @@ public class DriverDocument implements IDriverManager {
     private final List<JID> currentDriver;
 
     public DriverDocument(IPath editor) {
-	this.editor = editor;
-	this.currentDriver = new Vector<JID>();
+        this.editor = editor;
+        this.currentDriver = new Vector<JID>();
     }
 
     public IPath getEditor() {
-	return this.editor;
+        return this.editor;
     }
 
     public void addDriver(JID jid) {
-	/* if driver not exists in list. */
-	if (!isDriver(jid)) {
-	    this.currentDriver.add(jid);
-	} else {
-	    DriverDocument.logger.debug("Driver " + jid
-		    + " is already Driver for "
-		    + this.editor.lastSegment().toString());
-	}
+        /* if driver not exists in list. */
+        if (!isDriver(jid)) {
+            this.currentDriver.add(jid);
+        } else {
+            DriverDocument.logger.debug("Driver " + jid
+                    + " is already Driver for "
+                    + this.editor.lastSegment().toString());
+        }
     }
 
     public boolean isDriver(JID jid) {
-	return this.currentDriver.contains(jid);
+        return this.currentDriver.contains(jid);
     }
 
     public boolean noDriver() {
-	return this.currentDriver.isEmpty();
+        return this.currentDriver.isEmpty();
     }
 
     public void removeDriver(JID jid) {
-	if (isDriver(jid)) {
-	    this.currentDriver.remove(jid);
-	} else {
-	    DriverDocument.logger.warn("JID " + jid
-		    + " is not driver for this document "
-		    + this.editor.lastSegment().toString());
-	}
+        if (isDriver(jid)) {
+            this.currentDriver.remove(jid);
+        } else {
+            DriverDocument.logger.warn("JID " + jid
+                    + " is not driver for this document "
+                    + this.editor.lastSegment().toString());
+        }
 
     }
 
@@ -62,10 +62,10 @@ public class DriverDocument implements IDriverManager {
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#exclusiveDriver()
      */
     public boolean exclusiveDriver() {
-	if (this.currentDriver.size() > 1) {
-	    return false;
-	}
-	return true;
+        if (this.currentDriver.size() > 1) {
+            return false;
+        }
+        return true;
     }
 
     /*
@@ -74,6 +74,6 @@ public class DriverDocument implements IDriverManager {
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
      */
     public List<JID> getActiveDriver() {
-	return this.currentDriver;
+        return this.currentDriver;
     }
 }

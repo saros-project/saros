@@ -36,49 +36,49 @@ public class DeleteContactAction extends SelectionProviderAction {
     private RosterEntry rosterEntry;
 
     public DeleteContactAction(ISelectionProvider provider) {
-	super(provider, "Delete");
-	selectionChanged((IStructuredSelection) provider.getSelection());
+        super(provider, "Delete");
+        selectionChanged((IStructuredSelection) provider.getSelection());
 
-	setToolTipText("Set the nickname of this contact.");
+        setToolTipText("Set the nickname of this contact.");
 
-	IWorkbench workbench = Saros.getDefault().getWorkbench();
-	setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
-		ISharedImages.IMG_TOOL_DELETE));
+        IWorkbench workbench = Saros.getDefault().getWorkbench();
+        setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
+                ISharedImages.IMG_TOOL_DELETE));
     }
 
     @Override
     public void run() {
 
-	Shell shell = Display.getDefault().getActiveShell();
-	if ((shell == null) || (this.rosterEntry == null)) {
-	    return;
-	}
+        Shell shell = Display.getDefault().getActiveShell();
+        if ((shell == null) || (this.rosterEntry == null)) {
+            return;
+        }
 
-	if (MessageDialog.openQuestion(shell, "Confirm Delete",
-		"Are you sure you want to delete contact '"
-			+ this.rosterEntry.getName() + "' ('"
-			+ this.rosterEntry.getUser() + "')?")) {
+        if (MessageDialog.openQuestion(shell, "Confirm Delete",
+                "Are you sure you want to delete contact '"
+                        + this.rosterEntry.getName() + "' ('"
+                        + this.rosterEntry.getUser() + "')?")) {
 
-	    try {
-		Saros.getDefault().removeContact(this.rosterEntry);
-	    } catch (XMPPException e) {
-		e.printStackTrace();
-	    }
-	}
+            try {
+                Saros.getDefault().removeContact(this.rosterEntry);
+            } catch (XMPPException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-	Object selected = selection.getFirstElement();
+        Object selected = selection.getFirstElement();
 
-	if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-	    this.rosterEntry = (RosterEntry) selected;
-	    setEnabled(true);
-	} else {
-	    this.rosterEntry = null;
-	    setEnabled(false);
-	}
+        if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
+            this.rosterEntry = (RosterEntry) selected;
+            setEnabled(true);
+        } else {
+            this.rosterEntry = null;
+            setEnabled(false);
+        }
 
-	// TODO disable if user == self
+        // TODO disable if user == self
     }
 }

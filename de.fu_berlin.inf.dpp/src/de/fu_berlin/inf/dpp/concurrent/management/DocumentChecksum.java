@@ -20,32 +20,32 @@ public class DocumentChecksum {
     private int hash;
 
     public DocumentChecksum(IPath path, int length, int hash) {
-	this.path = path;
-	this.length = length;
-	this.hash = hash;
+        this.path = path;
+        this.length = length;
+        this.hash = hash;
     }
 
     public IPath getPath() {
-	return path;
+        return path;
     }
 
     public void setPath(IPath path) {
-	this.path = path;
+        this.path = path;
     }
 
     public int getLength() {
-	return length;
+        return length;
     }
 
     public void setLength(int length) {
-	this.length = length;
+        this.length = length;
     }
 
     public int getHash() {
-	return hash;
+        return hash;
     }
 
     public void setHash(int hash) {
-	this.hash = hash;
+        this.hash = hash;
     }
 }

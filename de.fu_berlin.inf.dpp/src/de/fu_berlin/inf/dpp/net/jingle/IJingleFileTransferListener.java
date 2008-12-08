@@ -15,7 +15,7 @@ public interface IJingleFileTransferListener {
     public void incomingFileList(String fileList_content, JID sender);
 
     public void incomingResourceFile(JingleFileTransferData data,
-	    InputStream input);
+            InputStream input);
 
     public void exceptionOccured(JingleSessionException exception);
 }

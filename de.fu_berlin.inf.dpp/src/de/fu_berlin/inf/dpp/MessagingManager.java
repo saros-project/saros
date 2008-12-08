@@ -51,10 +51,10 @@ import de.fu_berlin.inf.dpp.ui.MessagingWindow;
  * @author rdjemili
  */
 public class MessagingManager implements PacketListener, MessageListener,
-	IConnectionListener, InvitationListener {
+        IConnectionListener, InvitationListener {
 
     private static Logger log = Logger.getLogger(MessagingManager.class
-	    .getName());
+            .getName());
 
     MessageEventManager messageEventManager;
 
@@ -63,24 +63,24 @@ public class MessagingManager implements PacketListener, MessageListener,
     private final String CHAT_ROOM = "saros";
 
     public class ChatLine {
-	public String sender;
+        public String sender;
 
-	public String text;
+        public String text;
 
-	public Date date;
+        public Date date;
 
-	public String packedID;
+        public String packedID;
     }
 
     /**
      * Encapsulates the interface that is needed by the MessagingWindow.
      */
     public interface SessionProvider {
-	public List<ChatLine> getHistory();
+        public List<ChatLine> getHistory();
 
-	public String getName();
+        public String getName();
 
-	public void sendMessage(String msg);
+        public void sendMessage(String msg);
     }
 
     /**
@@ -97,214 +97,214 @@ public class MessagingManager implements PacketListener, MessageListener,
      * fallback if muc fails?
      */
     public class ChatSession implements SessionProvider, PacketListener,
-	    MessageListener {
-	private final Logger logCH = Logger.getLogger(ChatSession.class
-		.getName());
+            MessageListener {
+        private final Logger logCH = Logger.getLogger(ChatSession.class
+                .getName());
 
-	private final String name;
+        private final String name;
 
-	private final Chat chat;
+        private final Chat chat;
 
-	private final JID participant;
+        private final JID participant;
 
-	private MessagingWindow window; // is null if disposed
+        private MessagingWindow window; // is null if disposed
 
-	private final List<ChatLine> history = new ArrayList<ChatLine>();
+        private final List<ChatLine> history = new ArrayList<ChatLine>();
 
-	public ChatSession(Chat chat, String name) {
-	    this.chat = chat;
-	    this.name = name;
-	    this.participant = new JID(chat.getParticipant());
+        public ChatSession(Chat chat, String name) {
+            this.chat = chat;
+            this.name = name;
+            this.participant = new JID(chat.getParticipant());
 
-	    // TODO: this method is not exists in the new API version.
-	    chat.addMessageListener(this); // HACK
-	    openWindow();
-	}
+            // TODO: this method is not exists in the new API version.
+            chat.addMessageListener(this); // HACK
+            openWindow();
+        }
 
-	public String getName() {
-	    return this.name;
-	}
+        public String getName() {
+            return this.name;
+        }
 
-	public List<ChatLine> getHistory() {
-	    return this.history;
-	}
+        public List<ChatLine> getHistory() {
+            return this.history;
+        }
 
-	/**
-	 * @return the participant associated to the chat object.
-	 */
-	public JID getParticipant() {
-	    return this.participant;
-	}
+        /**
+         * @return the participant associated to the chat object.
+         */
+        public JID getParticipant() {
+            return this.participant;
+        }
 
-	public void processPacket(Packet packet) {
-	    this.logCH.debug("processPacket called");
+        public void processPacket(Packet packet) {
+            this.logCH.debug("processPacket called");
 
-	    final Message message = (Message) packet;
+            final Message message = (Message) packet;
 
-	    if (message.getBody() == null) {
-		return;
-	    }
+            if (message.getBody() == null) {
+                return;
+            }
 
-	    Display.getDefault().syncExec(new Runnable() {
-		public void run() {
-		    openWindow();
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    openWindow();
 
-		    addChatLine(ChatSession.this.name, message.getBody());
-		}
-	    });
-	}
+                    addChatLine(ChatSession.this.name, message.getBody());
+                }
+            });
+        }
 
-	public void processMessage(Chat chat, Message message) {
-	    // TODO: new Method for messagelistener
+        public void processMessage(Chat chat, Message message) {
+            // TODO: new Method for messagelistener
 
-	    this.logCH.debug("processMessage called.");
-	    processPacket(message);
+            this.logCH.debug("processMessage called.");
+            processPacket(message);
 
-	}
+        }
 
-	/**
-	 * Opens the chat window for this chat session. Refocuses the window if
-	 * it is already opened.
-	 */
-	public void openWindow() {
-	    if (this.window == null) {
-		this.window = new MessagingWindow(this);
-		this.window.open();
-	    }
+        /**
+         * Opens the chat window for this chat session. Refocuses the window if
+         * it is already opened.
+         */
+        public void openWindow() {
+            if (this.window == null) {
+                this.window = new MessagingWindow(this);
+                this.window.open();
+            }
 
-	    this.window.getShell().addDisposeListener(new DisposeListener() {
-		public void widgetDisposed(DisposeEvent e) {
-		    ChatSession.this.window = null;
-		}
-	    });
-	}
+            this.window.getShell().addDisposeListener(new DisposeListener() {
+                public void widgetDisposed(DisposeEvent e) {
+                    ChatSession.this.window = null;
+                }
+            });
+        }
 
-	/*
-	 * @see de.fu_berlin.inf.dpp.MessagingManager.SessionProvider
-	 */
-	public void sendMessage(String text) {
-	    try {
+        /*
+         * @see de.fu_berlin.inf.dpp.MessagingManager.SessionProvider
+         */
+        public void sendMessage(String text) {
+            try {
 
-		Message msg = new Message();
-		msg.setBody(text);
-		// send via muc process
-		this.chat.sendMessage(msg);
+                Message msg = new Message();
+                msg.setBody(text);
+                // send via muc process
+                this.chat.sendMessage(msg);
 
-		// for Testing
-		addChatLine(Saros.getDefault().getMyJID().getName(), text);
+                // for Testing
+                addChatLine(Saros.getDefault().getMyJID().getName(), text);
 
-	    } catch (XMPPException e1) {
-		e1.printStackTrace();
-		addChatLine("error", "Couldn't send message");
-	    }
-	}
+            } catch (XMPPException e1) {
+                e1.printStackTrace();
+                addChatLine("error", "Couldn't send message");
+            }
+        }
 
-	private void addChatLine(String sender, String text) {
-	    ChatLine chatLine = new ChatLine();
-	    chatLine.sender = sender;
-	    chatLine.text = text;
-	    chatLine.date = new Date();
+        private void addChatLine(String sender, String text) {
+            ChatLine chatLine = new ChatLine();
+            chatLine.sender = sender;
+            chatLine.text = text;
+            chatLine.date = new Date();
 
-	    this.history.add(chatLine);
-	    this.window.addChatLine(chatLine);
+            this.history.add(chatLine);
+            this.window.addChatLine(chatLine);
 
-	    for (IChatListener chatListener : MessagingManager.this.chatListeners) {
-		chatListener.chatMessageAdded(sender, text);
-	    }
-	}
+            for (IChatListener chatListener : MessagingManager.this.chatListeners) {
+                chatListener.chatMessageAdded(sender, text);
+            }
+        }
     }
 
     public class MultiChatSession implements SessionProvider, PacketListener,
-	    MessageListener {
-	private final Logger logCH = Logger.getLogger(ChatSession.class
-		.getName());
+            MessageListener {
+        private final Logger logCH = Logger.getLogger(ChatSession.class
+                .getName());
 
-	private final String name;
+        private final String name;
 
-	private final MultiUserChat muc;
+        private final MultiUserChat muc;
 
-	private JID participant;
+        private JID participant;
 
-	private MessagingWindow window; // is null if disposed
+        private MessagingWindow window; // is null if disposed
 
-	private final List<ChatLine> history = new ArrayList<ChatLine>();
+        private final List<ChatLine> history = new ArrayList<ChatLine>();
 
-	public MultiChatSession(MultiUserChat muc) {
-	    this.muc = muc;
-	    this.name = "Multi User Chat ("
-		    + Saros.getDefault().getMyJID().getName() + ")";
-	    muc.addMessageListener(this);
-	}
+        public MultiChatSession(MultiUserChat muc) {
+            this.muc = muc;
+            this.name = "Multi User Chat ("
+                    + Saros.getDefault().getMyJID().getName() + ")";
+            muc.addMessageListener(this);
+        }
 
-	public String getName() {
-	    return this.name;
-	}
+        public String getName() {
+            return this.name;
+        }
 
-	public List<ChatLine> getHistory() {
-	    return this.history;
-	}
+        public List<ChatLine> getHistory() {
+            return this.history;
+        }
 
-	/**
-	 * @return the participant associated to the chat object.
-	 */
-	public JID getParticipant() {
-	    return this.participant;
-	}
+        /**
+         * @return the participant associated to the chat object.
+         */
+        public JID getParticipant() {
+            return this.participant;
+        }
 
-	public void processPacket(Packet packet) {
-	    this.logCH.debug("processPacket called");
+        public void processPacket(Packet packet) {
+            this.logCH.debug("processPacket called");
 
-	    final Message message = (Message) packet;
+            final Message message = (Message) packet;
 
-	    if (message.getBody() == null) {
-		return;
-	    }
+            if (message.getBody() == null) {
+                return;
+            }
 
-	    // notify chat listener
-	    MessagingManager.log.debug("Notify Listener..");
-	    for (IChatListener l : MessagingManager.this.chatListeners) {
-		l.chatMessageAdded(message.getFrom(), message.getBody());
-		MessagingManager.log.debug("Notified Listener");
-	    }
-	}
+            // notify chat listener
+            MessagingManager.log.debug("Notify Listener..");
+            for (IChatListener l : MessagingManager.this.chatListeners) {
+                l.chatMessageAdded(message.getFrom(), message.getBody());
+                MessagingManager.log.debug("Notified Listener");
+            }
+        }
 
-	public void processMessage(Chat chat, Message message) {
-	    this.logCH.debug("processMessage called.");
-	    processPacket(message);
-	}
+        public void processMessage(Chat chat, Message message) {
+            this.logCH.debug("processMessage called.");
+            processPacket(message);
+        }
 
-	/*
-	 * @see de.fu_berlin.inf.dpp.MessagingManager.SessionProvider
-	 */
-	public void sendMessage(String text) {
-	    try {
+        /*
+         * @see de.fu_berlin.inf.dpp.MessagingManager.SessionProvider
+         */
+        public void sendMessage(String text) {
+            try {
 
-		Message msg = this.muc.createMessage();
-		msg.setBody(text);
+                Message msg = this.muc.createMessage();
+                msg.setBody(text);
 
-		if (this.muc != null) {
-		    this.muc.sendMessage(msg);
-		}
+                if (this.muc != null) {
+                    this.muc.sendMessage(msg);
+                }
 
-	    } catch (XMPPException e1) {
-		e1.printStackTrace();
-		addChatLine("error", "Couldn't send message");
-	    }
-	}
+            } catch (XMPPException e1) {
+                e1.printStackTrace();
+                addChatLine("error", "Couldn't send message");
+            }
+        }
 
-	private void addChatLine(String sender, String text) {
-	    ChatLine chatLine = new ChatLine();
-	    chatLine.sender = sender;
-	    chatLine.text = text;
-	    chatLine.date = new Date();
+        private void addChatLine(String sender, String text) {
+            ChatLine chatLine = new ChatLine();
+            chatLine.sender = sender;
+            chatLine.text = text;
+            chatLine.date = new Date();
 
-	    this.history.add(chatLine);
-	    this.window.addChatLine(chatLine);
+            this.history.add(chatLine);
+            this.window.addChatLine(chatLine);
 
-	    for (IChatListener chatListener : MessagingManager.this.chatListeners) {
-		chatListener.chatMessageAdded(sender, text);
-	    }
-	}
+            for (IChatListener chatListener : MessagingManager.this.chatListeners) {
+                chatListener.chatMessageAdded(sender, text);
+            }
+        }
 
     }
 
@@ -312,7 +312,7 @@ public class MessagingManager implements PacketListener, MessageListener,
      * Listener for incoming chat messages.
      */
     public interface IChatListener {
-	public void chatMessageAdded(String sender, String message);
+        public void chatMessageAdded(String sender, String message);
     }
 
     private final List<ChatSession> sessions = new ArrayList<ChatSession>();
@@ -324,9 +324,9 @@ public class MessagingManager implements PacketListener, MessageListener,
     private MultiChatSession session;
 
     public MessagingManager() {
-	Saros.getDefault().addListener(this);
+        Saros.getDefault().addListener(this);
 
-	this.multitrans = new MultiUserChatManager(this.CHAT_ROOM);
+        this.multitrans = new MultiUserChatManager(this.CHAT_ROOM);
     }
 
     /*
@@ -335,17 +335,17 @@ public class MessagingManager implements PacketListener, MessageListener,
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState) {
-	if ((connection != null) && (newState == ConnectionState.NOT_CONNECTED)) {
-	    // TODO CJ Review: connection.removePacketListener(this);
-	    log.debug("unconnect");
-	}
+            ConnectionState newState) {
+        if ((connection != null) && (newState == ConnectionState.NOT_CONNECTED)) {
+            // TODO CJ Review: connection.removePacketListener(this);
+            log.debug("unconnect");
+        }
 
-	if (newState == ConnectionState.CONNECTED) {
-	    connection.addPacketListener(this, new MessageTypeFilter(
-		    Message.Type.chat));
-	    initMultiChatListener();
-	}
+        if (newState == ConnectionState.CONNECTED) {
+            connection.addPacketListener(this, new MessageTypeFilter(
+                    Message.Type.chat));
+            initMultiChatListener();
+        }
     }
 
     /**
@@ -357,106 +357,106 @@ public class MessagingManager implements PacketListener, MessageListener,
      * @see org.jivesoftware.smack.PacketListener
      */
     public void processPacket(Packet packet) {
-	MessagingManager.log.debug("messagePacket called");
-	final Message message = (Message) packet;
-	final JID jid = new JID(message.getFrom());
+        MessagingManager.log.debug("messagePacket called");
+        final Message message = (Message) packet;
+        final JID jid = new JID(message.getFrom());
 
-	if (message.getBody() == null) {
-	    return;
-	}
+        if (message.getBody() == null) {
+            return;
+        }
 
-	/* check for multi or single chat. */
-	if (message.getFrom().contains(this.multitrans.getRoomName())) {
+        /* check for multi or single chat. */
+        if (message.getFrom().contains(this.multitrans.getRoomName())) {
 
-	    if (this.multiSession == null) {
-		this.multiSession = new MultiChatSession(this.multitrans
-			.getMUC());
-		this.multiSession.processPacket(message);
-	    }
-	} else {
-	    /* old chat based message communication. */
-	    for (ChatSession session : this.sessions) {
-		if (jid.equals(session.getParticipant())) {
-		    return; // gets already handled by message handler in
-		    // session
-		}
-	    }
-	}
+            if (this.multiSession == null) {
+                this.multiSession = new MultiChatSession(this.multitrans
+                        .getMUC());
+                this.multiSession.processPacket(message);
+            }
+        } else {
+            /* old chat based message communication. */
+            for (ChatSession session : this.sessions) {
+                if (jid.equals(session.getParticipant())) {
+                    return; // gets already handled by message handler in
+                    // session
+                }
+            }
+        }
     }
 
     public void processMessage(Chat chat, Message message) {
-	// TODO new method for message notify
-	MessagingManager.log.debug("processMessage called.");
-	processPacket(message);
+        // TODO new method for message notify
+        MessagingManager.log.debug("processMessage called.");
+        processPacket(message);
     }
 
     /**
      * Adds the chat listener.
      */
     public void addChatListener(IChatListener listener) {
-	this.chatListeners.add(listener);
+        this.chatListeners.add(listener);
     }
 
     // TODO CJ Rework needed
     public void invitationReceived(XMPPConnection conn, String room,
-	    String inviter, String reason, String password, Message message) {
-	try {
-	    // System.out.println(conn.getUser());
-	    if (this.multitrans.getMUC() == null) {
-		// this.muc = XMPPMultiChatTransmitter.joinMuc(conn,
-		// Saros.getDefault().getConnection().getUser(), room);
-		this.multitrans.initMUC(conn, conn.getUser());
-	    }
-	    // muc.addMessageListener(mucl);
-	    // TODO: check if still connected
-	    if ((this.multiSession == null)
-		    && (this.multitrans.getMUC() != null)) {
-		// muc.removeMessageListener(mucl);
-		MultiChatSession session = new MultiChatSession(this.multitrans
-			.getMUC());
-		this.multiSession = session;
-	    }
-	} catch (XMPPException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+            String inviter, String reason, String password, Message message) {
+        try {
+            // System.out.println(conn.getUser());
+            if (this.multitrans.getMUC() == null) {
+                // this.muc = XMPPMultiChatTransmitter.joinMuc(conn,
+                // Saros.getDefault().getConnection().getUser(), room);
+                this.multitrans.initMUC(conn, conn.getUser());
+            }
+            // muc.addMessageListener(mucl);
+            // TODO: check if still connected
+            if ((this.multiSession == null)
+                    && (this.multitrans.getMUC() != null)) {
+                // muc.removeMessageListener(mucl);
+                MultiChatSession session = new MultiChatSession(this.multitrans
+                        .getMUC());
+                this.multiSession = session;
+            }
+        } catch (XMPPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
      * invitation listener for multi chat invitations.
      */
     public void initMultiChatListener() {
-	// listens for MUC invitations
-	MultiUserChat.addInvitationListener(Saros.getDefault().getConnection(),
-		this);
+        // listens for MUC invitations
+        MultiUserChat.addInvitationListener(Saros.getDefault().getConnection(),
+                this);
     }
 
     public MultiChatSession getSession() {
-	return this.session;
+        return this.session;
     }
 
     public void connectMultiUserChat() throws XMPPException {
-	if (!Saros.getDefault().isConnected()) {
-	    throw new XMPPException("No connection ");
-	}
-	String user = Saros.getDefault().getConnection().getUser();
-	if (this.session == null) {
-	    MultiUserChat muc = this.multitrans.getMUC();
-	    if (muc == null) {
-		this.multitrans.initMUC(Saros.getDefault().getConnection(),
-			user);
-		muc = this.multitrans.getMUC();
-	    }
-	    MessagingManager.log.debug("Creating MUC session..");
-	    this.session = new MultiChatSession(muc);
-	} else {
-	    this.multitrans.getMUC().join(user);
-	}
+        if (!Saros.getDefault().isConnected()) {
+            throw new XMPPException("No connection ");
+        }
+        String user = Saros.getDefault().getConnection().getUser();
+        if (this.session == null) {
+            MultiUserChat muc = this.multitrans.getMUC();
+            if (muc == null) {
+                this.multitrans.initMUC(Saros.getDefault().getConnection(),
+                        user);
+                muc = this.multitrans.getMUC();
+            }
+            MessagingManager.log.debug("Creating MUC session..");
+            this.session = new MultiChatSession(muc);
+        } else {
+            this.multitrans.getMUC().join(user);
+        }
     }
 
     public void disconnectMultiUserChat() throws XMPPException {
-	MessagingManager.log.debug("Leaving MUC session..");
-	this.multitrans.getMUC().leave();
+        MessagingManager.log.debug("Leaving MUC session..");
+        this.multitrans.getMUC().leave();
     }
 
 }

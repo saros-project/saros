@@ -48,14 +48,14 @@ public abstract class InvitationProcess implements IInvitationProcess {
     protected String description;
 
     public InvitationProcess(ITransmitter transmitter, JID peer,
-	    String description) {
-	this.transmitter = transmitter;
-	this.peer = peer;
-	this.description = description;
+            String description) {
+        this.transmitter = transmitter;
+        this.peer = peer;
+        this.description = description;
 
-	this.tmode = TransferMode.JINGLE;
+        this.tmode = TransferMode.JINGLE;
 
-	transmitter.addInvitationProcess(this);
+        transmitter.addInvitationProcess(this);
     }
 
     /*
@@ -64,7 +64,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public Exception getException() {
-	return this.exception;
+        return this.exception;
     }
 
     /*
@@ -73,15 +73,15 @@ public abstract class InvitationProcess implements IInvitationProcess {
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public State getState() {
-	return this.state;
+        return this.state;
     }
 
     public void setState(State newstate) {
-	this.state = newstate;
+        this.state = newstate;
 
-	if (this.invitationUI != null) {
-	    this.invitationUI.updateInvitationProgress(this.peer);
-	}
+        if (this.invitationUI != null) {
+            this.invitationUI.updateInvitationProgress(this.peer);
+        }
     }
 
     /*
@@ -90,7 +90,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public JID getPeer() {
-	return this.peer;
+        return this.peer;
     }
 
     /*
@@ -99,7 +99,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public String getDescription() {
-	return this.description;
+        return this.description;
     }
 
     /*
@@ -108,27 +108,27 @@ public abstract class InvitationProcess implements IInvitationProcess {
      * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
      */
     public void cancel(String errorMsg, boolean replicated) {
-	if (this.state == State.CANCELED) {
-	    return;
-	}
+        if (this.state == State.CANCELED) {
+            return;
+        }
 
-	setState(State.CANCELED);
+        setState(State.CANCELED);
 
-	InvitationProcess.logger.error("Invitation was canceled. " + errorMsg);
+        InvitationProcess.logger.error("Invitation was canceled. " + errorMsg);
 
-	if (!replicated) {
-	    this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
-	}
+        if (!replicated) {
+            this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
+        }
 
-	this.invitationUI.cancel(errorMsg, replicated);
+        this.invitationUI.cancel(errorMsg, replicated);
 
-	this.transmitter.removeInvitationProcess(this);
+        this.transmitter.removeInvitationProcess(this);
     }
 
     @Override
     public String toString() {
-	return "InvitationProcess(peer:" + this.peer + ", state:" + this.state
-		+ ")";
+        return "InvitationProcess(peer:" + this.peer + ", state:" + this.state
+                + ")";
     }
 
     /**
@@ -136,9 +136,9 @@ public abstract class InvitationProcess implements IInvitationProcess {
      * sets the invitation to cancelled.
      */
     protected void failed(Exception e) {
-	this.exception = e;
-	e.printStackTrace(); // HACK
-	cancel(e.getMessage(), false);
+        this.exception = e;
+        e.printStackTrace(); // HACK
+        cancel(e.getMessage(), false);
     }
 
     /**
@@ -149,18 +149,18 @@ public abstract class InvitationProcess implements IInvitationProcess {
      *            the state that the process should currently have.
      */
     protected void assertState(State expected) {
-	if (this.state != expected) {
-	    cancel("Unexpected state(" + this.state + ")", false);
-	}
+        if (this.state != expected) {
+            cancel("Unexpected state(" + this.state + ")", false);
+        }
     }
 
     protected void failState() {
-	throw new IllegalStateException("Bad input while in state "
-		+ this.state);
+        throw new IllegalStateException("Bad input while in state "
+                + this.state);
     }
 
     public void setInvitationUI(IInvitationUI inviteUI) {
-	this.invitationUI = inviteUI;
+        this.invitationUI = inviteUI;
     }
 
 }

@@ -37,93 +37,93 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class AddContactWizard extends Wizard {
 
     private class AddContactPage extends WizardPage {
-	private Text idText;
+        private Text idText;
 
-	private Text nicknameText;
+        private Text nicknameText;
 
-	protected AddContactPage() {
-	    super("create");
+        protected AddContactPage() {
+            super("create");
 
-	    setTitle("New Contact");
-	    setDescription("Add a new contact to your Jabber roster");
-	}
+            setTitle("New Contact");
+            setDescription("Add a new contact to your Jabber roster");
+        }
 
-	public void createControl(Composite parent) {
-	    Composite composite = new Composite(parent, SWT.NONE);
+        public void createControl(Composite parent) {
+            Composite composite = new Composite(parent, SWT.NONE);
 
-	    composite.setLayout(new GridLayout(2, false));
+            composite.setLayout(new GridLayout(2, false));
 
-	    Label idLabel = new Label(composite, SWT.NONE);
-	    idLabel.setText("Jabber ID");
+            Label idLabel = new Label(composite, SWT.NONE);
+            idLabel.setText("Jabber ID");
 
-	    this.idText = new Text(composite, SWT.BORDER);
-	    this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-		    false));
+            this.idText = new Text(composite, SWT.BORDER);
+            this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
+                    false));
 
-	    Label nicknameLabel = new Label(composite, SWT.NONE);
-	    nicknameLabel.setText("Nickname");
+            Label nicknameLabel = new Label(composite, SWT.NONE);
+            nicknameLabel.setText("Nickname");
 
-	    this.nicknameText = new Text(composite, SWT.BORDER);
-	    this.nicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-		    true, false));
+            this.nicknameText = new Text(composite, SWT.BORDER);
+            this.nicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+                    true, false));
 
-	    hookListeners();
-	    updateNextEnablement();
+            hookListeners();
+            updateNextEnablement();
 
-	    setControl(composite);
-	}
+            setControl(composite);
+        }
 
-	public JID getJID() {
-	    return new JID(this.idText.getText());
-	}
+        public JID getJID() {
+            return new JID(this.idText.getText());
+        }
 
-	public String getNickname() {
-	    return this.nicknameText.getText();
-	}
+        public String getNickname() {
+            return this.nicknameText.getText();
+        }
 
-	private void hookListeners() {
-	    ModifyListener listener = new ModifyListener() {
-		public void modifyText(ModifyEvent e) {
-		    updateNextEnablement();
-		}
-	    };
+        private void hookListeners() {
+            ModifyListener listener = new ModifyListener() {
+                public void modifyText(ModifyEvent e) {
+                    updateNextEnablement();
+                }
+            };
 
-	    this.idText.addModifyListener(listener);
-	    this.nicknameText.addModifyListener(listener);
-	}
+            this.idText.addModifyListener(listener);
+            this.nicknameText.addModifyListener(listener);
+        }
 
-	private void updateNextEnablement() {
-	    boolean done = (this.idText.getText().length() > 0)
-		    && (this.nicknameText.getText().length() > 0);
+        private void updateNextEnablement() {
+            boolean done = (this.idText.getText().length() > 0)
+                    && (this.nicknameText.getText().length() > 0);
 
-	    setPageComplete(done);
-	}
+            setPageComplete(done);
+        }
     }
 
     private final AddContactPage page = new AddContactPage();
 
     public AddContactWizard() {
-	setWindowTitle("New Contact");
-	setHelpAvailable(false);
+        setWindowTitle("New Contact");
+        setHelpAvailable(false);
     }
 
     @Override
     public void addPages() {
-	addPage(this.page);
+        addPage(this.page);
     }
 
     @Override
     public boolean performFinish() {
-	try {
-	    Saros.getDefault().addContact(this.page.getJID(),
-		    this.page.getNickname(), null);
-	    return true;
+        try {
+            Saros.getDefault().addContact(this.page.getJID(),
+                    this.page.getNickname(), null);
+            return true;
 
-	} catch (Exception e) {
-	    this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
-	    e.printStackTrace();
-	}
+        } catch (Exception e) {
+            this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
+            e.printStackTrace();
+        }
 
-	return false;
+        return false;
     }
 }

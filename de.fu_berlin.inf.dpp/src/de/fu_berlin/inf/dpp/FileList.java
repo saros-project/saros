@@ -62,23 +62,23 @@ public class FileList {
     private final Comparator<IPath> comparator = new PathLengthComprarator();
 
     private class PathLengthComprarator implements Comparator<IPath> {
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.util.Comparator
-	 */
-	public int compare(IPath p1, IPath p2) {
-	    int l1 = p1.toString().length();
-	    int l2 = p2.toString().length();
+        /*
+         * (non-Javadoc)
+         * 
+         * @see java.util.Comparator
+         */
+        public int compare(IPath p1, IPath p2) {
+            int l1 = p1.toString().length();
+            int l2 = p2.toString().length();
 
-	    if (l1 < l2) {
-		return -1;
-	    } else if (l1 > l2) {
-		return 1;
-	    } else {
-		return 0;
-	    }
-	}
+            if (l1 < l2) {
+                return -1;
+            } else if (l1 > l2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     /**
@@ -98,9 +98,9 @@ public class FileList {
      *             given container.
      */
     public FileList(IContainer container) throws CoreException {
-	container.refreshLocal(IResource.DEPTH_INFINITE, null);
-	addMembers(container.members(), this.all, true);
-	this.unaltered.putAll(this.all);
+        container.refreshLocal(IResource.DEPTH_INFINITE, null);
+        addMembers(container.members(), this.all, true);
+        this.unaltered.putAll(this.all);
     }
 
     /**
@@ -116,11 +116,11 @@ public class FileList {
      *             given container.
      */
     public FileList(IContainer container, boolean ignoreDerived)
-	    throws CoreException {
+            throws CoreException {
 
-	container.refreshLocal(IResource.DEPTH_INFINITE, null);
-	addMembers(container.members(), this.all, ignoreDerived);
-	this.unaltered.putAll(this.all);
+        container.refreshLocal(IResource.DEPTH_INFINITE, null);
+        addMembers(container.members(), this.all, ignoreDerived);
+        this.unaltered.putAll(this.all);
     }
 
     /**
@@ -132,8 +132,8 @@ public class FileList {
      */
     public FileList(IResource[] resources) throws CoreException {
 
-	addMembers(resources, this.all, false);
-	this.unaltered.putAll(this.all);
+        addMembers(resources, this.all, false);
+        this.unaltered.putAll(this.all);
     }
 
     /**
@@ -143,57 +143,57 @@ public class FileList {
      * @throws IOException
      */
     public FileList(String xml) throws XmlPullParserException, IOException {
-	MXParser parser = new MXParser();
-	parser.setInput(new StringReader(xml));
+        MXParser parser = new MXParser();
+        parser.setInput(new StringReader(xml));
 
-	Map<IPath, Long> context = this.added;
+        Map<IPath, Long> context = this.added;
 
-	boolean done = false;
-	while (!done) {
-	    int eventType = parser.next();
-	    if (eventType == XmlPullParser.START_TAG) {
+        boolean done = false;
+        while (!done) {
+            int eventType = parser.next();
+            if (eventType == XmlPullParser.START_TAG) {
 
-		if (parser.getName().equals("added")) {
-		    context = this.added;
+                if (parser.getName().equals("added")) {
+                    context = this.added;
 
-		} else if (parser.getName().equals("removed")) {
-		    context = this.removed;
+                } else if (parser.getName().equals("removed")) {
+                    context = this.removed;
 
-		} else if (parser.getName().equals("altered")) {
-		    context = this.altered;
+                } else if (parser.getName().equals("altered")) {
+                    context = this.altered;
 
-		} else if (parser.getName().equals("unaltered")) {
-		    context = this.unaltered;
+                } else if (parser.getName().equals("unaltered")) {
+                    context = this.unaltered;
 
-		} else if (parser.getName().equals("file")) {
-		    IPath path = new Path(parser
-			    .getAttributeValue(null, "path"));
-		    Long checksum = Long.parseLong(parser.getAttributeValue(
-			    null, "checksum"));
+                } else if (parser.getName().equals("file")) {
+                    IPath path = new Path(parser
+                            .getAttributeValue(null, "path"));
+                    Long checksum = Long.parseLong(parser.getAttributeValue(
+                            null, "checksum"));
 
-		    context.put(path, checksum);
+                    context.put(path, checksum);
 
-		    if (context != this.removed) {
-			this.all.put(path, checksum);
-		    }
+                    if (context != this.removed) {
+                        this.all.put(path, checksum);
+                    }
 
-		} else if (parser.getName().equals("folder")) {
-		    IPath path = new Path(parser
-			    .getAttributeValue(null, "path"));
+                } else if (parser.getName().equals("folder")) {
+                    IPath path = new Path(parser
+                            .getAttributeValue(null, "path"));
 
-		    context.put(path, null);
+                    context.put(path, null);
 
-		    if (context != this.removed) {
-			this.all.put(path, null);
-		    }
-		}
+                    if (context != this.removed) {
+                        this.all.put(path, null);
+                    }
+                }
 
-	    } else if (eventType == XmlPullParser.END_TAG) {
-		if (parser.getName().equals("filelist")) {
-		    done = true;
-		}
-	    }
-	}
+            } else if (eventType == XmlPullParser.END_TAG) {
+                if (parser.getName().equals("filelist")) {
+                    done = true;
+                }
+            }
+        }
     }
 
     // TODO invert diff direction
@@ -208,43 +208,43 @@ public class FileList {
      *         get from this FileList to the other FileList.
      */
     public FileList diff(FileList other) {
-	FileList fileList = new FileList();
+        FileList fileList = new FileList();
 
-	for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-	    if (!other.all.containsKey(entry.getKey())) {
-		fileList.removed.put(entry.getKey(), entry.getValue());
-	    }
-	}
+        for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
+            if (!other.all.containsKey(entry.getKey())) {
+                fileList.removed.put(entry.getKey(), entry.getValue());
+            }
+        }
 
-	for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
-	    if (!this.all.containsKey(entry.getKey())) {
-		fileList.added.put(entry.getKey(), entry.getValue());
-	    }
-	}
+        for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
+            if (!this.all.containsKey(entry.getKey())) {
+                fileList.added.put(entry.getKey(), entry.getValue());
+            }
+        }
 
-	for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
-	    IPath path = entry.getKey();
-	    if (other.all.containsKey(path)) {
+        for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
+            IPath path = entry.getKey();
+            if (other.all.containsKey(path)) {
 
-		if (path.hasTrailingSeparator()) {
-		    fileList.unaltered.put(path, null);
+                if (path.hasTrailingSeparator()) {
+                    fileList.unaltered.put(path, null);
 
-		} else {
-		    long checksum = entry.getValue();
-		    long otherChecksum = other.all.get(path);
+                } else {
+                    long checksum = entry.getValue();
+                    long otherChecksum = other.all.get(path);
 
-		    if (checksum == otherChecksum) {
-			fileList.unaltered.put(path, checksum);
-		    } else {
-			fileList.altered.put(path, checksum);
-		    }
-		}
+                    if (checksum == otherChecksum) {
+                        fileList.unaltered.put(path, checksum);
+                    } else {
+                        fileList.altered.put(path, checksum);
+                    }
+                }
 
-	    }
-	}
+            }
+        }
 
-	fileList.all = new HashMap<IPath, Long>(other.all);
-	return fileList;
+        fileList.all = new HashMap<IPath, Long>(other.all);
+        return fileList;
     }
 
     /**
@@ -252,8 +252,8 @@ public class FileList {
      *         files as the other filelist.
      */
     public int match(FileList other) {
-	return getPaths().size() == 0 ? 0 : 100
-		* diff(other).getUnalteredPaths().size() / getPaths().size();
+        return getPaths().size() == 0 ? 0 : 100
+                * diff(other).getUnalteredPaths().size() / getPaths().size();
     }
 
     /**
@@ -261,23 +261,23 @@ public class FileList {
      *         sorted by their character length.
      */
     public List<IPath> getPaths() {
-	return sorted(this.all.keySet());
+        return sorted(this.all.keySet());
     }
 
     public List<IPath> getAddedPaths() {
-	return sorted(this.added.keySet());
+        return sorted(this.added.keySet());
     }
 
     public List<IPath> getRemovedPaths() {
-	return sorted(this.removed.keySet());
+        return sorted(this.removed.keySet());
     }
 
     public List<IPath> getAlteredPaths() {
-	return sorted(this.altered.keySet());
+        return sorted(this.altered.keySet());
     }
 
     public List<IPath> getUnalteredPaths() {
-	return sorted(this.unaltered.keySet());
+        return sorted(this.unaltered.keySet());
     }
 
     /**
@@ -285,101 +285,101 @@ public class FileList {
      *         string to construct the same file list again.
      */
     public String toXML() {
-	StringBuilder sb = new StringBuilder();
-	sb.append("<filelist>");
+        StringBuilder sb = new StringBuilder();
+        sb.append("<filelist>");
 
-	appendFileGroup(sb, "added", this.added);
-	appendFileGroup(sb, "removed", this.removed);
-	appendFileGroup(sb, "altered", this.altered);
-	appendFileGroup(sb, "unaltered", this.unaltered);
+        appendFileGroup(sb, "added", this.added);
+        appendFileGroup(sb, "removed", this.removed);
+        appendFileGroup(sb, "altered", this.altered);
+        appendFileGroup(sb, "unaltered", this.unaltered);
 
-	sb.append("</filelist>");
+        sb.append("</filelist>");
 
-	return sb.toString();
+        return sb.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	}
+        if (this == obj) {
+            return true;
+        }
 
-	if (!(obj instanceof FileList)) {
-	    return false;
-	}
+        if (!(obj instanceof FileList)) {
+            return false;
+        }
 
-	FileList other = (FileList) obj;
-	return this.all.equals(other.all) && this.added.equals(other.added)
-		&& this.removed.equals(other.removed)
-		&& this.altered.equals(other.altered)
-		&& this.unaltered.equals(other.unaltered);
+        FileList other = (FileList) obj;
+        return this.all.equals(other.all) && this.added.equals(other.added)
+                && this.removed.equals(other.removed)
+                && this.altered.equals(other.altered)
+                && this.unaltered.equals(other.unaltered);
     }
 
     @Override
     public String toString() {
-	return "FileList(files:" + this.all.size() + ")";
+        return "FileList(files:" + this.all.size() + ")";
     }
 
     private List<IPath> sorted(Set<IPath> pathSet) {
-	List<IPath> paths = new ArrayList<IPath>(pathSet);
-	Collections.sort(paths, this.comparator);
-	return paths;
+        List<IPath> paths = new ArrayList<IPath>(pathSet);
+        Collections.sort(paths, this.comparator);
+        return paths;
     }
 
     private void addMembers(IResource[] resources, Map<IPath, Long> members,
-	    boolean ignoreDerived) throws CoreException {
+            boolean ignoreDerived) throws CoreException {
 
-	for (IResource resource : resources) {
-	    if (ignoreDerived && resource.isDerived()) {
-		continue;
-	    }
+        for (IResource resource : resources) {
+            if (ignoreDerived && resource.isDerived()) {
+                continue;
+            }
 
-	    if (resource instanceof IFile) {
-		IFile file = (IFile) resource;
-		if (file.exists() == false) {
-		    continue;
-		}
+            if (resource instanceof IFile) {
+                IFile file = (IFile) resource;
+                if (file.exists() == false) {
+                    continue;
+                }
 
-		Long checksum = FileUtil.checksum(file);
-		if (checksum != -1) {
-		    members.put(file.getProjectRelativePath(), checksum);
-		}
+                Long checksum = FileUtil.checksum(file);
+                if (checksum != -1) {
+                    members.put(file.getProjectRelativePath(), checksum);
+                }
 
-	    } else if (resource instanceof IFolder) {
-		IFolder folder = (IFolder) resource;
+            } else if (resource instanceof IFolder) {
+                IFolder folder = (IFolder) resource;
 
-		IPath path = folder.getProjectRelativePath();
-		if (!path.hasTrailingSeparator()) {
-		    path = path.addTrailingSeparator();
-		}
+                IPath path = folder.getProjectRelativePath();
+                if (!path.hasTrailingSeparator()) {
+                    path = path.addTrailingSeparator();
+                }
 
-		members.put(path, null);
-		addMembers(folder.members(), members, ignoreDerived);
-	    }
-	}
+                members.put(path, null);
+                addMembers(folder.members(), members, ignoreDerived);
+            }
+        }
     }
 
     private void appendFileGroup(StringBuilder sb, String element,
-	    Map<IPath, Long> map) {
+            Map<IPath, Long> map) {
 
-	if (map.size() == 0) {
-	    return;
-	}
+        if (map.size() == 0) {
+            return;
+        }
 
-	sb.append('<').append(element).append('>');
-	for (Map.Entry<IPath, Long> entry : map.entrySet()) {
-	    IPath path = entry.getKey();
+        sb.append('<').append(element).append('>');
+        for (Map.Entry<IPath, Long> entry : map.entrySet()) {
+            IPath path = entry.getKey();
 
-	    if (path.hasTrailingSeparator()) {
-		sb.append("<folder path=\"").append(path).append("\"/>");
+            if (path.hasTrailingSeparator()) {
+                sb.append("<folder path=\"").append(path).append("\"/>");
 
-	    } else {
-		long checksum = entry.getValue();
-		sb.append("<file path=\"").append(path).append("\" ");
-		sb.append("checksum=\"").append(checksum).append("\"/>");
-	    }
+            } else {
+                long checksum = entry.getValue();
+                sb.append("<file path=\"").append(path).append("\" ");
+                sb.append("checksum=\"").append(checksum).append("\"/>");
+            }
 
-	}
-	sb.append("</").append(element).append('>');
+        }
+        sb.append("</").append(element).append('>');
     }
 }

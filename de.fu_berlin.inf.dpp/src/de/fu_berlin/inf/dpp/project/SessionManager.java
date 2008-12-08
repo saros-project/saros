@@ -50,7 +50,7 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
  */
 public class SessionManager implements IConnectionListener, ISessionManager {
     private static Logger log = Logger
-	    .getLogger(SessionManager.class.getName());
+            .getLogger(SessionManager.class.getName());
 
     private SharedProject sharedProject;
 
@@ -60,11 +60,11 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     private ITransmitter transmitter;
 
     public ITransmitter getTransmitter() {
-	return transmitter;
+        return transmitter;
     }
 
     public SessionManager() {
-	Saros.getDefault().addListener(this);
+        Saros.getDefault().addListener(this);
     }
 
     /*
@@ -75,21 +75,21 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * .core.resources.IProject)
      */
     public void startSession(IProject project) throws XMPPException {
-	if (!Saros.getDefault().isConnected()) {
-	    throw new XMPPException("No connection");
-	}
+        if (!Saros.getDefault().isConnected()) {
+            throw new XMPPException("No connection");
+        }
 
-	JID myJID = Saros.getDefault().getMyJID();
-	this.sharedProject = new SharedProject(this.transmitter, project, myJID);
-	this.sharedProject.start();
+        JID myJID = Saros.getDefault().getMyJID();
+        this.sharedProject = new SharedProject(this.transmitter, project, myJID);
+        this.sharedProject.start();
 
-	for (ISessionListener listener : this.listeners) {
-	    listener.sessionStarted(this.sharedProject);
-	}
+        for (ISessionListener listener : this.listeners) {
+            listener.sessionStarted(this.sharedProject);
+        }
 
-	this.sharedProject.startInvitation(null);
+        this.sharedProject.startInvitation(null);
 
-	SessionManager.log.info("Session started");
+        SessionManager.log.info("Session started");
     }
 
     /*
@@ -101,19 +101,19 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * de.fu_berlin.inf.dpp.net.JID, java.util.List)
      */
     public ISharedProject joinSession(IProject project, JID host, JID driver,
-	    List<JID> users) {
+            List<JID> users) {
 
-	this.sharedProject = new SharedProject(this.transmitter, project, Saros
-		.getDefault().getMyJID(), host, driver, users);
-	this.sharedProject.start();
+        this.sharedProject = new SharedProject(this.transmitter, project, Saros
+                .getDefault().getMyJID(), host, driver, users);
+        this.sharedProject.start();
 
-	for (ISessionListener listener : this.listeners) {
-	    listener.sessionStarted(this.sharedProject);
-	}
+        for (ISessionListener listener : this.listeners) {
+            listener.sessionStarted(this.sharedProject);
+        }
 
-	SessionManager.log.info("Session joined");
+        SessionManager.log.info("Session joined");
 
-	return this.sharedProject;
+        return this.sharedProject;
     }
 
     /*
@@ -122,24 +122,24 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * @see de.fu_berlin.inf.dpp.project.ISessionManager#leaveSession()
      */
     public void leaveSession() {
-	if (this.sharedProject == null) {
-	    return;
-	}
+        if (this.sharedProject == null) {
+            return;
+        }
 
-	this.transmitter.sendLeaveMessage(this.sharedProject);
-	this.sharedProject.setProjectReadonly(false); // set ressources
-						      // writeable again
+        this.transmitter.sendLeaveMessage(this.sharedProject);
+        this.sharedProject.setProjectReadonly(false); // set ressources
+        // writeable again
 
-	this.sharedProject.stop();
+        this.sharedProject.stop();
 
-	ISharedProject closedProject = this.sharedProject;
-	this.sharedProject = null;
+        ISharedProject closedProject = this.sharedProject;
+        this.sharedProject = null;
 
-	for (ISessionListener listener : this.listeners) {
-	    listener.sessionEnded(closedProject);
-	}
+        for (ISessionListener listener : this.listeners) {
+            listener.sessionEnded(closedProject);
+        }
 
-	SessionManager.log.info("Session left");
+        SessionManager.log.info("Session left");
     }
 
     /*
@@ -148,7 +148,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * @see de.fu_berlin.inf.dpp.project.ISessionManager#getSharedProject()
      */
     public ISharedProject getSharedProject() {
-	return this.sharedProject;
+        return this.sharedProject;
     }
 
     /*
@@ -159,9 +159,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * .inf.dpp.project.ISessionListener)
      */
     public void addSessionListener(ISessionListener listener) {
-	if (!this.listeners.contains(listener)) {
-	    this.listeners.add(listener);
-	}
+        if (!this.listeners.contains(listener)) {
+            this.listeners.add(listener);
+        }
     }
 
     /*
@@ -172,7 +172,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * .fu_berlin.inf.dpp.project.ISessionListener)
      */
     public void removeSessionListener(ISessionListener listener) {
-	this.listeners.remove(listener);
+        this.listeners.remove(listener);
     }
 
     /*
@@ -183,18 +183,18 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * .inf.dpp.net.JID, java.lang.String, java.lang.String)
      */
     public IIncomingInvitationProcess invitationReceived(JID from,
-	    String projectName, String description) {
+            String projectName, String description) {
 
-	IIncomingInvitationProcess process = new IncomingInvitationProcess(
-		this.transmitter, from, projectName, description);
+        IIncomingInvitationProcess process = new IncomingInvitationProcess(
+                this.transmitter, from, projectName, description);
 
-	for (ISessionListener listener : this.listeners) {
-	    listener.invitationReceived(process);
-	}
+        for (ISessionListener listener : this.listeners) {
+            listener.invitationReceived(process);
+        }
 
-	SessionManager.log.info("Received invitation");
+        SessionManager.log.info("Received invitation");
 
-	return process;
+        return process;
     }
 
     /*
@@ -211,67 +211,67 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * de.fu_berlin.inf.dpp.Saros.ConnectionState)
      */
     public void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState) {
+            ConnectionState newState) {
 
-	if (newState == Saros.ConnectionState.CONNECTED) {
-	    if (this.transmitter == null) {
-		this.transmitter = new XMPPChatTransmitter(connection);
-		attachRosterListener();
-	    } else {
-		// TODO: Does this ever happen?
-		this.transmitter.setXMPPConnection(connection);
-	    }
+        if (newState == Saros.ConnectionState.CONNECTED) {
+            if (this.transmitter == null) {
+                this.transmitter = new XMPPChatTransmitter(connection);
+                attachRosterListener();
+            } else {
+                // TODO: Does this ever happen?
+                this.transmitter.setXMPPConnection(connection);
+            }
 
-	} else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
-	    if (this.sharedProject != null) {
-		leaveSession();
-	    }
+        } else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
+            if (this.sharedProject != null) {
+                leaveSession();
+            }
 
-	    this.transmitter = null;
-	}
+            this.transmitter = null;
+        }
     }
 
     private void attachRosterListener() {
-	Roster roster = Saros.getDefault().getRoster();
-	roster.addRosterListener(new RosterListener() {
-	    public void entriesAdded(Collection<String> addresses) {
-	    }
+        Roster roster = Saros.getDefault().getRoster();
+        roster.addRosterListener(new RosterListener() {
+            public void entriesAdded(Collection<String> addresses) {
+            }
 
-	    public void entriesUpdated(Collection<String> addresses) {
-	    }
+            public void entriesUpdated(Collection<String> addresses) {
+            }
 
-	    public void entriesDeleted(Collection<String> addresses) {
-	    }
+            public void entriesDeleted(Collection<String> addresses) {
+            }
 
-	    public void presenceChanged(String XMPPAddress) {
+            public void presenceChanged(String XMPPAddress) {
 
-		if (SessionManager.this.sharedProject == null) {
-		    return;
-		}
+                if (SessionManager.this.sharedProject == null) {
+                    return;
+                }
 
-		Roster roster = Saros.getDefault().getRoster();
-		Presence presence = roster.getPresence(XMPPAddress);
+                Roster roster = Saros.getDefault().getRoster();
+                Presence presence = roster.getPresence(XMPPAddress);
 
-		JID jid = new JID(XMPPAddress);
-		User user = SessionManager.this.sharedProject
-			.getParticipant(jid);
-		if (user != null) {
-		    if (presence == null) {
-			user.setPresence(User.UserConnectionState.OFFLINE);
+                JID jid = new JID(XMPPAddress);
+                User user = SessionManager.this.sharedProject
+                        .getParticipant(jid);
+                if (user != null) {
+                    if (presence == null) {
+                        user.setPresence(User.UserConnectionState.OFFLINE);
 
-		    } else {
-			user.setPresence(User.UserConnectionState.ONLINE);
-		    }
-		}
-	    }
+                    } else {
+                        user.setPresence(User.UserConnectionState.ONLINE);
+                    }
+                }
+            }
 
-	    public void presenceChanged(Presence presence) {
-		// TODO: new Method for Smack 3
-		presenceChanged(presence.getFrom());
+            public void presenceChanged(Presence presence) {
+                // TODO: new Method for Smack 3
+                presenceChanged(presence.getFrom());
 
-	    }
+            }
 
-	});
+        });
     }
 
     /*
@@ -281,16 +281,16 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      */
     public void OnReconnect(int oldtimestamp) {
 
-	if (this.sharedProject == null) {
-	    return;
-	}
+        if (this.sharedProject == null) {
+            return;
+        }
 
-	this.transmitter.sendRemainingFiles();
-	this.transmitter.sendRemainingMessages();
+        this.transmitter.sendRemainingFiles();
+        this.transmitter.sendRemainingMessages();
 
-	// ask for next expected timestamp activities (in case I missed
-	// something while being not available)
-	this.transmitter.sendRequestForActivity(this.sharedProject,
-		oldtimestamp, true);
+        // ask for next expected timestamp activities (in case I missed
+        // something while being not available)
+        this.transmitter.sendRequestForActivity(this.sharedProject,
+                oldtimestamp, true);
     }
 }

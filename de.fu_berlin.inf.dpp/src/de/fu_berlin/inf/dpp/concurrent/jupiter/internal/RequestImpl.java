@@ -48,10 +48,10 @@ public class RequestImpl implements Request {
      *            the operation
      */
     public RequestImpl(int siteId, Timestamp timestamp, Operation operation) {
-	this.siteId = siteId;
-	this.timestamp = timestamp;
-	this.operation = operation;
-	this.jid = null;
+        this.siteId = siteId;
+        this.timestamp = timestamp;
+        this.operation = operation;
+        this.jid = null;
     }
 
     /**
@@ -65,11 +65,11 @@ public class RequestImpl implements Request {
      *            the operation
      */
     public RequestImpl(int siteId, Timestamp timestamp, Operation operation,
-	    JID jid) {
-	this.siteId = siteId;
-	this.timestamp = timestamp;
-	this.operation = operation;
-	this.jid = jid;
+            JID jid) {
+        this.siteId = siteId;
+        this.timestamp = timestamp;
+        this.operation = operation;
+        this.jid = jid;
     }
 
     /*
@@ -78,7 +78,7 @@ public class RequestImpl implements Request {
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getSiteId()
      */
     public int getSiteId() {
-	return this.siteId;
+        return this.siteId;
     }
 
     /*
@@ -87,7 +87,7 @@ public class RequestImpl implements Request {
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getOperation()
      */
     public Operation getOperation() {
-	return this.operation;
+        return this.operation;
     }
 
     /*
@@ -96,7 +96,7 @@ public class RequestImpl implements Request {
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getTimestamp()
      */
     public Timestamp getTimestamp() {
-	return this.timestamp;
+        return this.timestamp;
     }
 
     /*
@@ -106,26 +106,26 @@ public class RequestImpl implements Request {
      */
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	} else if (obj instanceof Request) {
-	    Request request = (Request) obj;
-	    return (this.siteId == request.getSiteId())
-		    && nullSafeEquals(this.timestamp, request.getTimestamp())
-		    && nullSafeEquals(this.operation, request.getOperation());
-	} else {
-	    return false;
-	}
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof Request) {
+            Request request = (Request) obj;
+            return (this.siteId == request.getSiteId())
+                    && nullSafeEquals(this.timestamp, request.getTimestamp())
+                    && nullSafeEquals(this.operation, request.getOperation());
+        } else {
+            return false;
+        }
     }
 
     private boolean nullSafeEquals(Object o1, Object o2) {
-	if (o1 == o2) {
-	    return true;
-	} else if ((o1 == null) || (o2 == null)) {
-	    return false;
-	} else {
-	    return o1.equals(o2);
-	}
+        if (o1 == o2) {
+            return true;
+        } else if ((o1 == null) || (o2 == null)) {
+            return false;
+        } else {
+            return o1.equals(o2);
+        }
     }
 
     /*
@@ -135,12 +135,12 @@ public class RequestImpl implements Request {
      */
     @Override
     public int hashCode() {
-	int hashCode = 13 * this.siteId;
-	hashCode += (this.timestamp != null) ? 17 * this.timestamp.hashCode()
-		: 0;
-	hashCode += (this.operation != null) ? 29 * this.operation.hashCode()
-		: 0;
-	return hashCode;
+        int hashCode = 13 * this.siteId;
+        hashCode += (this.timestamp != null) ? 17 * this.timestamp.hashCode()
+                : 0;
+        hashCode += (this.operation != null) ? 29 * this.operation.hashCode()
+                : 0;
+        return hashCode;
     }
 
     /*
@@ -150,15 +150,15 @@ public class RequestImpl implements Request {
      */
     @Override
     public String toString() {
-	StringBuffer buffer = new StringBuffer();
-	buffer.append("request(");
-	buffer.append(this.siteId);
-	buffer.append(",");
-	buffer.append(this.timestamp);
-	buffer.append(",");
-	buffer.append(this.operation);
-	buffer.append(")");
-	return buffer.toString();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("request(");
+        buffer.append(this.siteId);
+        buffer.append(",");
+        buffer.append(this.timestamp);
+        buffer.append(",");
+        buffer.append(this.operation);
+        buffer.append(")");
+        return buffer.toString();
     }
 
     /*
@@ -167,19 +167,19 @@ public class RequestImpl implements Request {
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getJID()
      */
     public JID getJID() {
-	return this.jid;
+        return this.jid;
     }
 
     public void setJID(JID jid) {
-	this.jid = jid;
+        this.jid = jid;
     }
 
     public IPath getEditorPath() {
-	return this.editor;
+        return this.editor;
     }
 
     public void setEditorPath(IPath editor) {
-	this.editor = editor;
+        this.editor = editor;
     }
 
 }

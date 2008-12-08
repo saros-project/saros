@@ -43,5 +43,5 @@ public interface IConnectionListener {
      *            {@link Saros#getConnectionError()} to get the error message.
      */
     public void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState);
+            ConnectionState newState);
 }

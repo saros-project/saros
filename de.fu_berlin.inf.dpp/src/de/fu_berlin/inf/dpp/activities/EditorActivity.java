@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.IPath;
  */
 public class EditorActivity implements IActivity {
     public static enum Type {
-	Activated, Closed, Saved
+        Activated, Closed, Saved
     };
 
     private final Type type;
@@ -46,13 +46,13 @@ public class EditorActivity implements IActivity {
      *            resource should be deactivated.
      */
     public EditorActivity(Type type, IPath path) {
-	if ((type != Type.Activated) && (path == null)) {
-	    throw new IllegalArgumentException(
-		    "Null path for non-activation type editor activity given.");
-	}
+        if ((type != Type.Activated) && (path == null)) {
+            throw new IllegalArgumentException(
+                    "Null path for non-activation type editor activity given.");
+        }
 
-	this.type = type;
-	this.path = path;
+        this.type = type;
+        this.path = path;
     }
 
     /**
@@ -60,43 +60,43 @@ public class EditorActivity implements IActivity {
      *         activated.
      */
     public IPath getPath() {
-	return this.path;
+        return this.path;
     }
 
     public Type getType() {
-	return this.type;
+        return this.type;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (!(obj instanceof EditorActivity)) {
-	    return false;
-	}
+        if (!(obj instanceof EditorActivity)) {
+            return false;
+        }
 
-	EditorActivity other = (EditorActivity) obj;
-	return (((this.path == null) && (other.path == null)) || this.path
-		.equals(other.path))
-		&& this.type.equals(other.type);
+        EditorActivity other = (EditorActivity) obj;
+        return (((this.path == null) && (other.path == null)) || this.path
+                .equals(other.path))
+                && this.type.equals(other.type);
     }
 
     @Override
     public String toString() {
-	return "EditorActivity(type:" + this.type + ", path:" + this.path + ")";
+        return "EditorActivity(type:" + this.type + ", path:" + this.path + ")";
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
     }
 
     public long getChecksum() {
-	return this.checksum;
+        return this.checksum;
     }
 
     public void setChecksum(long checksum) {
-	this.checksum = checksum;
+        this.checksum = checksum;
     }
 }

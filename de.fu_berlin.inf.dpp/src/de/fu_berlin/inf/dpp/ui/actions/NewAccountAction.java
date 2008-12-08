@@ -38,13 +38,13 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
      * @see org.eclipse.ui.IActionDelegate
      */
     public void run(IAction action) {
-	try {
-	    Shell shell = this.window.getShell();
-	    new WizardDialog(shell, new CreateAccountWizard(true, true, true))
-		    .open();
-	} catch (Exception e) {
-	    Saros.log("Could not create new Account.", e);
-	}
+        try {
+            Shell shell = this.window.getShell();
+            new WizardDialog(shell, new CreateAccountWizard(true, true, true))
+                    .open();
+        } catch (Exception e) {
+            Saros.log("Could not create new Account.", e);
+        }
     }
 
     /*
@@ -53,7 +53,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
      */
     public void init(IWorkbenchWindow window) {
-	this.window = window;
+        this.window = window;
     }
 
     /*

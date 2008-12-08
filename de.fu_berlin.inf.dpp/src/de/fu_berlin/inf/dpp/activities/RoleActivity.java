@@ -28,35 +28,35 @@ public class RoleActivity implements IActivity {
     private final JID driver;
 
     public RoleActivity(JID newDriver) {
-	this.driver = newDriver;
+        this.driver = newDriver;
     }
 
     public JID getDriver() {
-	return this.driver;
+        return this.driver;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof RoleActivity) {
-	    RoleActivity driverChange = (RoleActivity) obj;
+        if (obj instanceof RoleActivity) {
+            RoleActivity driverChange = (RoleActivity) obj;
 
-	    return driverChange.getDriver().equals(this.driver);
-	}
+            return driverChange.getDriver().equals(this.driver);
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "RoleActivity(driver:" + this.driver + ")";
+        return "RoleActivity(driver:" + this.driver + ")";
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
 
     }
 }

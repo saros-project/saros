@@ -31,48 +31,48 @@ public class TextSelectionActivity implements IActivity {
     private IPath editor;
 
     public TextSelectionActivity(int offset, int length, IPath path) {
-	this.offset = offset;
-	this.length = length;
-	this.source = null;
-	this.editor = path;
+        this.offset = offset;
+        this.length = length;
+        this.source = null;
+        this.editor = path;
     }
 
     public int getLength() {
-	return this.length;
+        return this.length;
     }
 
     public int getOffset() {
-	return this.offset;
+        return this.offset;
     }
 
     public IPath getEditor() {
-	return this.editor;
+        return this.editor;
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof TextSelectionActivity) {
-	    TextSelectionActivity activity = (TextSelectionActivity) obj;
-	    return (this.offset == activity.offset)
-		    && (this.length == activity.length)
-		    && (this.source == activity.source)
-		    && (this.editor == activity.editor);
-	}
+        if (obj instanceof TextSelectionActivity) {
+            TextSelectionActivity activity = (TextSelectionActivity) obj;
+            return (this.offset == activity.offset)
+                    && (this.length == activity.length)
+                    && (this.source == activity.source)
+                    && (this.editor == activity.editor);
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "TextSelectionActivity(offset:" + this.offset + ", length:"
-		+ this.length + ", " + this.editor + ")";
+        return "TextSelectionActivity(offset:" + this.offset + ", length:"
+                + this.length + ", " + this.editor + ")";
     }
 }

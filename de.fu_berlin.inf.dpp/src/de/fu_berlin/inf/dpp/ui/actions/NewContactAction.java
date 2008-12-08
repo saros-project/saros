@@ -34,25 +34,25 @@ import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
 public class NewContactAction extends Action implements IConnectionListener {
 
     public NewContactAction() {
-	setToolTipText("Add a new contact");
-	setImageDescriptor(SarosUI.getImageDescriptor("/icons/user_add.png"));
+        setToolTipText("Add a new contact");
+        setImageDescriptor(SarosUI.getImageDescriptor("/icons/user_add.png"));
 
-	Saros.getDefault().addListener(this);
-	updateEnablement();
+        Saros.getDefault().addListener(this);
+        updateEnablement();
     }
 
     @Override
     public void run() {
-	Shell shell = Display.getDefault().getActiveShell();
-	new WizardDialog(shell, new AddContactWizard()).open();
+        Shell shell = Display.getDefault().getActiveShell();
+        new WizardDialog(shell, new AddContactWizard()).open();
     }
 
     public void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState) {
-	updateEnablement();
+            ConnectionState newState) {
+        updateEnablement();
     }
 
     private void updateEnablement() {
-	setEnabled(Saros.getDefault().isConnected());
+        setEnabled(Saros.getDefault().isConnected());
     }
 }

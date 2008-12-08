@@ -12,37 +12,37 @@ public class VetoableVariableProxy<T> extends VariableProxy<T> {
     Set<VetoableVariableProxyListener<? super T>> vetoables = new HashSet<VetoableVariableProxyListener<? super T>>();
 
     public VetoableVariableProxy(T variable) {
-	super(variable);
+        super(variable);
     }
 
     public void addAndNotify(VetoableVariableProxyListener<? super T> listener) {
-	vetoables.add(listener);
-	listener.setVariable(variable, null);
+        vetoables.add(listener);
+        listener.setVariable(variable, null);
     }
 
     public void add(VetoableVariableProxyListener<? super T> listener) {
-	vetoables.add(listener);
+        vetoables.add(listener);
     }
 
     public void remove(VetoableVariableProxyListener<? super T> listener) {
-	vetoables.remove(listener);
+        vetoables.remove(listener);
     }
 
     @Override
     public boolean setVariable(T variable) {
-	T oldValue = this.variable;
-	this.variable = variable;
+        T oldValue = this.variable;
+        this.variable = variable;
 
-	for (VetoableVariableProxyListener<? super T> vpl : vetoables) {
-	    if (!vpl.setVariable(variable, oldValue)) {
-		this.variable = oldValue;
-		return false;
-	    }
-	}
+        for (VetoableVariableProxyListener<? super T> vpl : vetoables) {
+            if (!vpl.setVariable(variable, oldValue)) {
+                this.variable = oldValue;
+                return false;
+            }
+        }
 
-	for (VariableProxyListener<? super T> vpl : nonVetoables) {
-	    vpl.setVariable(variable);
-	}
-	return true;
+        for (VariableProxyListener<? super T> vpl : nonVetoables) {
+            vpl.setVariable(variable);
+        }
+        return true;
     }
 }

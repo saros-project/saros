@@ -33,28 +33,28 @@ public class MessagingAction extends SelectionProviderAction {
     private static Logger logger = Logger.getLogger(MessagingAction.class);
 
     public MessagingAction(ISelectionProvider provider) {
-	super(provider, "Send instant message..");
-	selectionChanged((IStructuredSelection) provider.getSelection());
+        super(provider, "Send instant message..");
+        selectionChanged((IStructuredSelection) provider.getSelection());
 
-	setToolTipText("Start a IM session with this user");
-	setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
+        setToolTipText("Start a IM session with this user");
+        setImageDescriptor(SarosUI.getImageDescriptor("icons/comment.png"));
     }
 
     @Override
     public void run() {
-	Saros.getDefault().getMessagingManager();
+        Saros.getDefault().getMessagingManager();
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-	Object selected = selection.getFirstElement();
+        Object selected = selection.getFirstElement();
 
-	if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-	    setEnabled(true);
-	} else {
-	    setEnabled(false);
-	}
+        if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
+            setEnabled(true);
+        } else {
+            setEnabled(false);
+        }
 
-	// TODO disable if user == self
+        // TODO disable if user == self
     }
 }

@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.net.IReceiver;
 public class PrivateChatManager implements IChatManager {
 
     private static Logger log = Logger.getLogger(PrivateChatManager.class
-	    .getName());
+            .getName());
 
     private XMPPConnection connection;
 
@@ -27,10 +27,10 @@ public class PrivateChatManager implements IChatManager {
      * smack.XMPPConnection, de.fu_berlin.inf.dpp.net.IReceiver)
      */
     public void setConnection(XMPPConnection connection, IReceiver receiver) {
-	this.connection = connection;
-	this.connection.addPacketListener(this, new MessageTypeFilter(
-		Message.Type.chat));
-	setReceiver(receiver);
+        this.connection = connection;
+        this.connection.addPacketListener(this, new MessageTypeFilter(
+                Message.Type.chat));
+        setReceiver(receiver);
 
     }
 
@@ -42,17 +42,17 @@ public class PrivateChatManager implements IChatManager {
      * smack.packet.Packet)
      */
     public void processPacket(Packet packet) {
-	PrivateChatManager.log.debug("incoming packet");
-	Message message = (Message) packet;
+        PrivateChatManager.log.debug("incoming packet");
+        Message message = (Message) packet;
 
-	RequestPacketExtension packetExtension = PacketExtensions
-		.getJupiterRequestExtension(message);
+        RequestPacketExtension packetExtension = PacketExtensions
+                .getJupiterRequestExtension(message);
 
-	if (packetExtension != null) {
-	    this.receiver.processRequest(packet);
-	} else {
-	    this.receiver.processPacket(packet);
-	}
+        if (packetExtension != null) {
+            this.receiver.processRequest(packet);
+        } else {
+            this.receiver.processPacket(packet);
+        }
 
     }
 
@@ -64,7 +64,7 @@ public class PrivateChatManager implements IChatManager {
      * .net.IReceiver)
      */
     public void setReceiver(IReceiver receiver) {
-	this.receiver = receiver;
+        this.receiver = receiver;
 
     }
 
@@ -74,34 +74,34 @@ public class PrivateChatManager implements IChatManager {
      * @see de.fu_berlin.inf.dpp.net.IChatManager#isConnected()
      */
     public boolean isConnected() {
-	if (this.connection.isConnected() && (this.receiver != null)) {
-	    return true;
-	}
-	return false;
+        if (this.connection.isConnected() && (this.receiver != null)) {
+            return true;
+        }
+        return false;
     }
 
     public void sendRequest(Request request) {
-	// TODO Auto-generated method stub
-	// log.info("Sent request: " + request);
-	// try {
-	// /* create new message for multi chat. */
-	// Message newMessage = muc.createMessage();
-	// /* add packet extension. */
-	// newMessage.addExtension(new ActivitiesPacketExtension(activities));
-	// /* add jid property */
-	// newMessage.setProperty(JID_PROPERTY, Saros.getDefault().getMyJID()
-	// .toString());
-	//
-	// // newMessage.setBody("test");
-	// muc.sendMessage(newMessage);
-	// PacketProtokollLogger.getInstance().sendPacket(newMessage);
-	//
-	// } catch (XMPPException e) {
-	//
-	// Saros.getDefault().getLog().log(
-	// new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-	// "Could not send message, message queued", e));
-	// }
+        // TODO Auto-generated method stub
+        // log.info("Sent request: " + request);
+        // try {
+        // /* create new message for multi chat. */
+        // Message newMessage = muc.createMessage();
+        // /* add packet extension. */
+        // newMessage.addExtension(new ActivitiesPacketExtension(activities));
+        // /* add jid property */
+        // newMessage.setProperty(JID_PROPERTY, Saros.getDefault().getMyJID()
+        // .toString());
+        //
+        // // newMessage.setBody("test");
+        // muc.sendMessage(newMessage);
+        // PacketProtokollLogger.getInstance().sendPacket(newMessage);
+        //
+        // } catch (XMPPException e) {
+        //
+        // Saros.getDefault().getLog().log(
+        // new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+        // "Could not send message, message queued", e));
+        // }
     }
 
 }

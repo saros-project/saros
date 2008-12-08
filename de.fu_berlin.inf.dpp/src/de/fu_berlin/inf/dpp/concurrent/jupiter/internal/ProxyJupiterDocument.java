@@ -31,59 +31,59 @@ public class ProxyJupiterDocument implements JupiterClient {
     private IPath editor;
 
     public ProxyJupiterDocument(JID jid, RequestForwarder forwarder) {
-	this.jid = jid;
-	this.jupiter = new Jupiter(false);
-	this.forwarder = forwarder;
+        this.jid = jid;
+        this.jupiter = new Jupiter(false);
+        this.forwarder = forwarder;
     }
 
     public Request generateRequest(Operation op) {
-	Request req = null;
-	ProxyJupiterDocument.logger.debug(this.jid.toString()
-		+ " proxy client generate request for " + op);
-	req = this.jupiter.generateRequest(op);
-	req.setJID(this.jid);
-	req.setEditorPath(this.editor);
-	/* send request */
-	ProxyJupiterDocument.logger.debug(this.jid.toString()
-		+ " proxy client forward request:  " + req);
-	this.forwarder.forwardOutgoingRequest(req);
+        Request req = null;
+        ProxyJupiterDocument.logger.debug(this.jid.toString()
+                + " proxy client generate request for " + op);
+        req = this.jupiter.generateRequest(op);
+        req.setJID(this.jid);
+        req.setEditorPath(this.editor);
+        /* send request */
+        ProxyJupiterDocument.logger.debug(this.jid.toString()
+                + " proxy client forward request:  " + req);
+        this.forwarder.forwardOutgoingRequest(req);
 
-	return req;
+        return req;
     }
 
     public Operation receiveRequest(Request req) throws TransformationException {
-	Operation op = null;
-	ProxyJupiterDocument.logger.debug(this.jid.toString()
-		+ " proxy client receive request " + req.getOperation());
-	/* receive request action */
-	op = this.jupiter.receiveRequest(req);
-	ProxyJupiterDocument.logger.debug(this.jid.toString()
-		+ " proxy client operation of IT: " + op);
-	return op;
+        Operation op = null;
+        ProxyJupiterDocument.logger.debug(this.jid.toString()
+                + " proxy client receive request " + req.getOperation());
+        /* receive request action */
+        op = this.jupiter.receiveRequest(req);
+        ProxyJupiterDocument.logger.debug(this.jid.toString()
+                + " proxy client operation of IT: " + op);
+        return op;
     }
 
     /**
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient#getJID()
      */
     public JID getJID() {
-	return this.jid;
+        return this.jid;
     }
 
     public IPath getEditor() {
-	return this.editor;
+        return this.editor;
     }
 
     public void setEditor(IPath path) {
-	this.editor = path;
+        this.editor = path;
     }
 
     public Timestamp getTimestamp() {
-	return this.jupiter.getTimestamp();
+        return this.jupiter.getTimestamp();
     }
 
     public void updateVectorTime(Timestamp timestamp)
-	    throws TransformationException {
-	this.jupiter.updateVectorTime(timestamp);
+            throws TransformationException {
+        this.jupiter.updateVectorTime(timestamp);
     }
 
 }

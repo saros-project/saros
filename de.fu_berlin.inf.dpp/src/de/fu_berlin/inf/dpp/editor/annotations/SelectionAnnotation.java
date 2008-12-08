@@ -13,11 +13,11 @@ public class SelectionAnnotation extends AnnotationSaros {
     public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 
     public SelectionAnnotation() {
-	this(null, null);
+        this(null, null);
     }
 
     public SelectionAnnotation(String label, String username) {
-	super(SelectionAnnotation.TYPE, false, label, username);
+        super(SelectionAnnotation.TYPE, false, label, username);
 
     }
 

@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/smack.jar"/>
+	<classpathentry kind="lib" path="lib/smack.jar" sourcepath="C:/Development/smack-3_1/source"/>
 	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
 	<classpathentry kind="lib" path="lib/smackx-jingle.jar" sourcepath="C:/Development/smack-3_1/jingle/extension/source"/>
 	<classpathentry kind="lib" path="lib/smackx.jar"/>

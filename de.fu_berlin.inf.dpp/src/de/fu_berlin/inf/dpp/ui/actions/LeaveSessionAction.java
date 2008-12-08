@@ -37,20 +37,20 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 public class LeaveSessionAction extends Action implements ISessionListener {
 
     public LeaveSessionAction() {
-	setToolTipText("Leave the session");
-	setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
+        setToolTipText("Leave the session");
+        setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
 
-	LeaveSessionAction.getSessionManager().addSessionListener(this);
-	updateEnablement();
+        LeaveSessionAction.getSessionManager().addSessionListener(this);
+        updateEnablement();
     }
 
     @Override
     public void run() {
-	try {
-	    LeaveSessionAction.getSessionManager().leaveSession();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}
+        try {
+            LeaveSessionAction.getSessionManager().leaveSession();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -59,7 +59,7 @@ public class LeaveSessionAction extends Action implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-	updateEnablement();
+        updateEnablement();
     }
 
     /*
@@ -68,7 +68,7 @@ public class LeaveSessionAction extends Action implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-	updateEnablement();
+        updateEnablement();
     }
 
     /*
@@ -77,14 +77,14 @@ public class LeaveSessionAction extends Action implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
+        // ignore
     }
 
     private void updateEnablement() {
-	setEnabled(LeaveSessionAction.getSessionManager().getSharedProject() != null);
+        setEnabled(LeaveSessionAction.getSessionManager().getSharedProject() != null);
     }
 
     private static ISessionManager getSessionManager() {
-	return Saros.getDefault().getSessionManager();
+        return Saros.getDefault().getSessionManager();
     }
 }

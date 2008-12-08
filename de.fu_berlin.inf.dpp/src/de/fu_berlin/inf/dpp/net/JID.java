@@ -39,8 +39,8 @@ public class JID implements Serializable {
      *            is optional.
      */
     public JID(String jid) {
-	// TODO check for malformated string
-	this.jid = jid;
+        // TODO check for malformated string
+        this.jid = jid;
     }
 
     /**
@@ -48,7 +48,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseName(String))
      */
     public String getName() {
-	return StringUtils.parseName(this.jid);
+        return StringUtils.parseName(this.jid);
     }
 
     /**
@@ -56,7 +56,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseBareAddress(String)
      */
     public String getBase() {
-	return StringUtils.parseBareAddress(this.jid);
+        return StringUtils.parseBareAddress(this.jid);
     }
 
     /**
@@ -64,7 +64,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseServer(String)
      */
     public String getDomain() {
-	return StringUtils.parseServer(this.jid);
+        return StringUtils.parseServer(this.jid);
     }
 
     /**
@@ -73,7 +73,7 @@ public class JID implements Serializable {
      * @see StringUtils#parseResource(String)
      */
     public String getResource() {
-	return StringUtils.parseResource(this.jid);
+        return StringUtils.parseResource(this.jid);
     }
 
     /**
@@ -82,17 +82,17 @@ public class JID implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof JID) {
-	    JID other = (JID) obj;
-	    return getBase().equals(other.getBase());
-	}
+        if (obj instanceof JID) {
+            JID other = (JID) obj;
+            return getBase().equals(other.getBase());
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public int hashCode() {
-	return getBase().hashCode();
+        return getBase().hashCode();
     }
 
     /**
@@ -102,6 +102,6 @@ public class JID implements Serializable {
      */
     @Override
     public String toString() {
-	return this.jid;
+        return this.jid;
     }
 }

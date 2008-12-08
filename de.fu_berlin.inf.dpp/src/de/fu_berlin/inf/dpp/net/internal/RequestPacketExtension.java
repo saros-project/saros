@@ -52,138 +52,138 @@ public class RequestPacketExtension implements PacketExtension {
     private Request request;
 
     public RequestPacketExtension(Request request) {
-	this.request = request;
+        this.request = request;
     }
 
     public void setRequest(Request request) {
-	this.request = request;
+        this.request = request;
     }
 
     public Request getRequest() {
-	return this.request;
+        return this.request;
     }
 
     public String getElementName() {
-	return RequestPacketExtension.ELEMENT;
+        return RequestPacketExtension.ELEMENT;
     }
 
     public String getNamespace() {
-	return RequestPacketExtension.NAMESPACE;
+        return RequestPacketExtension.NAMESPACE;
     }
 
     public String toXML() {
-	if (this.request == null) {
-	    return "";
-	}
+        if (this.request == null) {
+            return "";
+        }
 
-	StringBuffer buf = new StringBuffer();
-	buf.append("<").append(getElementName());
-	buf.append(" xmlns=\"").append(getNamespace() + "\"");
+        StringBuffer buf = new StringBuffer();
+        buf.append("<").append(getElementName());
+        buf.append(" xmlns=\"").append(getNamespace() + "\"");
 
-	// buf.append(" xmlns=\"").append(getNamespace()).append("\">");
+        // buf.append(" xmlns=\"").append(getNamespace()).append("\">");
 
-	buf.append(">");
+        buf.append(">");
 
-	buf.append(pathToXML());
-	buf.append(jidToXML());
-	buf.append(sideIDToXML());
-	buf.append(vectorTimeToXML());
-	buf.append(operationToXML());
+        buf.append(pathToXML());
+        buf.append(jidToXML());
+        buf.append(sideIDToXML());
+        buf.append(vectorTimeToXML());
+        buf.append(operationToXML());
 
-	// buf.append(requestToXML());
+        // buf.append(requestToXML());
 
-	buf.append("</").append(getElementName()).append(">");
-	return buf.toString();
-	// return "<request></request>";
+        buf.append("</").append(getElementName()).append(">");
+        return buf.toString();
+        // return "<request></request>";
     }
 
     private String pathToXML() {
-	return "<" + RequestPacketExtension.PATH + ">"
-		+ this.request.getEditorPath() + "</"
-		+ RequestPacketExtension.PATH + ">";
+        return "<" + RequestPacketExtension.PATH + ">"
+                + this.request.getEditorPath() + "</"
+                + RequestPacketExtension.PATH + ">";
     }
 
     private String jidToXML() {
-	return "<" + RequestPacketExtension.JID + ">" + this.request.getJID()
-		+ "</" + RequestPacketExtension.JID + ">";
+        return "<" + RequestPacketExtension.JID + ">" + this.request.getJID()
+                + "</" + RequestPacketExtension.JID + ">";
     }
 
     private String sideIDToXML() {
-	return "<" + RequestPacketExtension.SIDE_ID + ">"
-		+ this.request.getSiteId() + "</"
-		+ RequestPacketExtension.SIDE_ID + ">";
+        return "<" + RequestPacketExtension.SIDE_ID + ">"
+                + this.request.getSiteId() + "</"
+                + RequestPacketExtension.SIDE_ID + ">";
     }
 
     private String vectorTimeToXML() {
-	String xml = "";
-	Timestamp timestamp = this.request.getTimestamp();
-	xml += "<" + RequestPacketExtension.VECTOR_TIME + " local=\""
-		+ timestamp.getComponents()[0] + "\" remote=\""
-		+ timestamp.getComponents()[1] + "\"" + "/>";
-	return xml;
+        String xml = "";
+        Timestamp timestamp = this.request.getTimestamp();
+        xml += "<" + RequestPacketExtension.VECTOR_TIME + " local=\""
+                + timestamp.getComponents()[0] + "\" remote=\""
+                + timestamp.getComponents()[1] + "\"" + "/>";
+        return xml;
     }
 
     private String operationToXML() {
-	Operation op = this.request.getOperation();
-	String xml = "";
-	if (op instanceof InsertOperation) {
-	    xml += insertOp(op);
-	}
-	if (op instanceof DeleteOperation) {
-	    xml += deleteOp(op);
-	}
-	if (op instanceof NoOperation) {
-	    // NoOperation no = (NoOperation) op;
-	    xml += "<" + RequestPacketExtension.NO_OP + "/>";
-	}
-	if (op instanceof TimestampOperation) {
-	    xml += "<" + RequestPacketExtension.TIMESTAMP_OP + "/>";
-	}
-	if (op instanceof SplitOperation) {
-	    SplitOperation split = (SplitOperation) op;
+        Operation op = this.request.getOperation();
+        String xml = "";
+        if (op instanceof InsertOperation) {
+            xml += insertOp(op);
+        }
+        if (op instanceof DeleteOperation) {
+            xml += deleteOp(op);
+        }
+        if (op instanceof NoOperation) {
+            // NoOperation no = (NoOperation) op;
+            xml += "<" + RequestPacketExtension.NO_OP + "/>";
+        }
+        if (op instanceof TimestampOperation) {
+            xml += "<" + RequestPacketExtension.TIMESTAMP_OP + "/>";
+        }
+        if (op instanceof SplitOperation) {
+            SplitOperation split = (SplitOperation) op;
 
-	    List<Operation> ops = new Vector<Operation>();
-	    ops.add(split.getFirst());
-	    ops.add(split.getSecond());
+            List<Operation> ops = new Vector<Operation>();
+            ops.add(split.getFirst());
+            ops.add(split.getSecond());
 
-	    xml += "<" + RequestPacketExtension.SPLIT_OP + ">";
-	    for (Operation o : ops) {
-		if (o instanceof InsertOperation) {
-		    xml += insertOp(o);
-		}
-		if (o instanceof DeleteOperation) {
-		    xml += deleteOp(o);
-		}
-		if (o instanceof NoOperation) {
-		    xml += "<" + RequestPacketExtension.NO_OP + "/>";
-		}
-	    }
-	    xml += "</" + RequestPacketExtension.SPLIT_OP + ">";
-	}
-	return xml;
+            xml += "<" + RequestPacketExtension.SPLIT_OP + ">";
+            for (Operation o : ops) {
+                if (o instanceof InsertOperation) {
+                    xml += insertOp(o);
+                }
+                if (o instanceof DeleteOperation) {
+                    xml += deleteOp(o);
+                }
+                if (o instanceof NoOperation) {
+                    xml += "<" + RequestPacketExtension.NO_OP + "/>";
+                }
+            }
+            xml += "</" + RequestPacketExtension.SPLIT_OP + ">";
+        }
+        return xml;
     }
 
     private String insertOp(Operation op) {
-	String xml = "";
-	InsertOperation ins = (InsertOperation) op;
-	xml += "<" + RequestPacketExtension.INSERT_OP + " "
-		+ RequestPacketExtension.POSITION + "=\"" + ins.getPosition()
-		+ "\"" + " " + RequestPacketExtension.ORIGIN + "=\""
-		+ ins.getOrigin() + "\"" + ">";
-	xml += "<![CDATA[" + ins.getText() + "]]>";
-	xml += "</" + RequestPacketExtension.INSERT_OP + ">";
-	return xml;
+        String xml = "";
+        InsertOperation ins = (InsertOperation) op;
+        xml += "<" + RequestPacketExtension.INSERT_OP + " "
+                + RequestPacketExtension.POSITION + "=\"" + ins.getPosition()
+                + "\"" + " " + RequestPacketExtension.ORIGIN + "=\""
+                + ins.getOrigin() + "\"" + ">";
+        xml += "<![CDATA[" + ins.getText() + "]]>";
+        xml += "</" + RequestPacketExtension.INSERT_OP + ">";
+        return xml;
     }
 
     private String deleteOp(Operation op) {
-	String xml = "";
-	DeleteOperation del = (DeleteOperation) op;
-	xml += "<" + RequestPacketExtension.DELETE_OP + " "
-		+ RequestPacketExtension.POSITION + "=\"" + del.getPosition()
-		+ "\"" + ">";
-	xml += "<![CDATA[" + del.getText() + "]]>";
-	xml += "</" + RequestPacketExtension.DELETE_OP + ">";
-	return xml;
+        String xml = "";
+        DeleteOperation del = (DeleteOperation) op;
+        xml += "<" + RequestPacketExtension.DELETE_OP + " "
+                + RequestPacketExtension.POSITION + "=\"" + del.getPosition()
+                + "\"" + ">";
+        xml += "<![CDATA[" + del.getText() + "]]>";
+        xml += "</" + RequestPacketExtension.DELETE_OP + ">";
+        return xml;
     }
 
 }

@@ -26,57 +26,57 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      *            the remote operation count.
      */
     public JupiterVectorTime(int localCnt, int remoteCnt) {
-	if (localCnt < 0) {
-	    throw new IllegalArgumentException(
-		    "local operation count cannot be negative");
-	}
-	if (remoteCnt < 0) {
-	    throw new IllegalArgumentException(
-		    "remote operation count cannot be negative");
-	}
-	this.localOperationCnt = localCnt;
-	this.remoteOperationCnt = remoteCnt;
+        if (localCnt < 0) {
+            throw new IllegalArgumentException(
+                    "local operation count cannot be negative");
+        }
+        if (remoteCnt < 0) {
+            throw new IllegalArgumentException(
+                    "remote operation count cannot be negative");
+        }
+        this.localOperationCnt = localCnt;
+        this.remoteOperationCnt = remoteCnt;
     }
 
     /**
      * @see ch.iserver.ace.algorithm.VectorTime#getAt(int)
      */
     public int getAt(int index) {
-	if (index == 0) {
-	    return getLocalOperationCount();
-	} else if (index == 1) {
-	    return getRemoteOperationCount();
-	} else {
-	    throw new IndexOutOfBoundsException("" + index);
-	}
+        if (index == 0) {
+            return getLocalOperationCount();
+        } else if (index == 1) {
+            return getRemoteOperationCount();
+        } else {
+            throw new IndexOutOfBoundsException("" + index);
+        }
     }
 
     /**
      * @see ch.iserver.ace.algorithm.VectorTime#getLength()
      */
     public int getLength() {
-	return 2;
+        return 2;
     }
 
     /**
      * @see Timestamp#getComponents()
      */
     public int[] getComponents() {
-	return new int[] { getLocalOperationCount(), getRemoteOperationCount() };
+        return new int[] { getLocalOperationCount(), getRemoteOperationCount() };
     }
 
     /**
      * @return Returns the local operation count.
      */
     public int getLocalOperationCount() {
-	return this.localOperationCnt;
+        return this.localOperationCnt;
     }
 
     /**
      * @return Returns the remote operation count.
      */
     public int getRemoteOperationCount() {
-	return this.remoteOperationCnt;
+        return this.remoteOperationCnt;
     }
 
     /**
@@ -85,7 +85,7 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      * @return the counter after increment.
      */
     public int incrementLocalOperationCount() {
-	return ++this.localOperationCnt;
+        return ++this.localOperationCnt;
     }
 
     /**
@@ -94,7 +94,7 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      * @return the counter after increment.
      */
     public int incrementRemoteRequestCount() {
-	return ++this.remoteOperationCnt;
+        return ++this.remoteOperationCnt;
     }
 
     /**
@@ -102,13 +102,13 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      */
     @Override
     public String toString() {
-	StringBuffer buffer = new StringBuffer();
-	buffer.append("[");
-	buffer.append(this.localOperationCnt);
-	buffer.append(",");
-	buffer.append(this.remoteOperationCnt);
-	buffer.append("]");
-	return buffer.toString();
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("[");
+        buffer.append(this.localOperationCnt);
+        buffer.append(",");
+        buffer.append(this.remoteOperationCnt);
+        buffer.append("]");
+        return buffer.toString();
     }
 
     /**
@@ -116,17 +116,17 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      */
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	} else if (obj == null) {
-	    return false;
-	} else if (obj.getClass().equals(getClass())) {
-	    JupiterVectorTime vector = (JupiterVectorTime) obj;
-	    return (vector.localOperationCnt == this.localOperationCnt)
-		    && (vector.remoteOperationCnt == this.remoteOperationCnt);
-	} else {
-	    return false;
-	}
+        if (this == obj) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (obj.getClass().equals(getClass())) {
+            JupiterVectorTime vector = (JupiterVectorTime) obj;
+            return (vector.localOperationCnt == this.localOperationCnt)
+                    && (vector.remoteOperationCnt == this.remoteOperationCnt);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -134,10 +134,10 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      */
     @Override
     public int hashCode() {
-	int hashcode = 17;
-	hashcode = 37 * hashcode + this.localOperationCnt;
-	hashcode = 37 * hashcode + this.remoteOperationCnt;
-	return hashcode;
+        int hashcode = 17;
+        hashcode = 37 * hashcode + this.localOperationCnt;
+        hashcode = 37 * hashcode + this.remoteOperationCnt;
+        return hashcode;
     }
 
     /**
@@ -145,12 +145,12 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      */
     @Override
     public Object clone() {
-	try {
-	    return super.clone();
-	} catch (CloneNotSupportedException e) {
-	    // this shouldn't happen, since we are Cloneable
-	    throw new InternalError();
-	}
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            // this shouldn't happen, since we are Cloneable
+            throw new InternalError();
+        }
     }
 
 }

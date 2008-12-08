@@ -69,7 +69,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
-	IPropertyChangeListener {
+        IPropertyChangeListener {
 
     private TableViewer viewer;
 
@@ -82,189 +82,189 @@ public class SessionView extends ViewPart implements ISessionListener,
     private IPreferenceStore store = null;
 
     private class SessionContentProvider implements IStructuredContentProvider,
-	    ISharedProjectListener {
+            ISharedProjectListener {
 
-	private TableViewer tableViewer;
+        private TableViewer tableViewer;
 
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-	    if (oldInput != null) {
-		ISharedProject oldProject = (ISharedProject) oldInput;
-		oldProject.removeListener(this);
-	    }
+        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+            if (oldInput != null) {
+                ISharedProject oldProject = (ISharedProject) oldInput;
+                oldProject.removeListener(this);
+            }
 
-	    SessionView.this.sharedProject = (ISharedProject) newInput;
-	    if (SessionView.this.sharedProject != null) {
-		SessionView.this.sharedProject.addListener(this);
-	    }
+            SessionView.this.sharedProject = (ISharedProject) newInput;
+            if (SessionView.this.sharedProject != null) {
+                SessionView.this.sharedProject.addListener(this);
+            }
 
-	    this.tableViewer = (TableViewer) v;
-	    this.tableViewer.refresh();
+            this.tableViewer = (TableViewer) v;
+            this.tableViewer.refresh();
 
-	    updateEnablement();
-	}
+            updateEnablement();
+        }
 
-	public Object[] getElements(Object parent) {
-	    if (SessionView.this.sharedProject != null) {
-		return SessionView.this.sharedProject.getParticipants()
-			.toArray();
-	    }
+        public Object[] getElements(Object parent) {
+            if (SessionView.this.sharedProject != null) {
+                return SessionView.this.sharedProject.getParticipants()
+                        .toArray();
+            }
 
-	    return new Object[] {};
-	}
+            return new Object[] {};
+        }
 
-	public void driverChanged(JID driver, boolean replicated) {
-	    refreshTable();
-	}
+        public void driverChanged(JID driver, boolean replicated) {
+            refreshTable();
+        }
 
-	public void userJoined(JID user) {
-	    refreshTable();
-	}
+        public void userJoined(JID user) {
+            refreshTable();
+        }
 
-	public void userLeft(JID user) {
-	    refreshTable();
-	}
+        public void userLeft(JID user) {
+            refreshTable();
+        }
 
-	public void dispose() {
-	}
+        public void dispose() {
+        }
 
-	private void refreshTable() {
-	    Display.getDefault().asyncExec(new Runnable() {
-		public void run() {
-		    SessionContentProvider.this.tableViewer.refresh();
-		}
-	    });
-	}
+        private void refreshTable() {
+            Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    SessionContentProvider.this.tableViewer.refresh();
+                }
+            });
+        }
     }
 
     private class SessionLabelProvider extends LabelProvider implements
-	    ITableLabelProvider, IColorProvider, ITableFontProvider {
+            ITableLabelProvider, IColorProvider, ITableFontProvider {
 
-	private final Image userImage = SarosUI.getImage("icons/user.png");
-	private final Image driverImage = SarosUI
-		.getImage("icons/user_edit.png");
-	private Font boldFont = null;
+        private final Image userImage = SarosUI.getImage("icons/user.png");
+        private final Image driverImage = SarosUI
+                .getImage("icons/user_edit.png");
+        private Font boldFont = null;
 
-	public String getColumnText(Object obj, int index) {
-	    User participant = (User) obj;
+        public String getColumnText(Object obj, int index) {
+            User participant = (User) obj;
 
-	    StringBuffer sb = new StringBuffer(participant.getJid().getName());
-	    // if (participant.equals(sharedProject.getDriver())) {
-	    if (SessionView.this.sharedProject.isDriver(participant)) {
+            StringBuffer sb = new StringBuffer(participant.getJid().getName());
+            // if (participant.equals(sharedProject.getDriver())) {
+            if (SessionView.this.sharedProject.isDriver(participant)) {
 
-		sb.append(" (Driver)");
-	    }
+                sb.append(" (Driver)");
+            }
 
-	    return sb.toString();
-	}
+            return sb.toString();
+        }
 
-	@Override
-	public Image getImage(Object obj) {
-	    User user = (User) obj;
-	    if (SessionView.this.sharedProject.isDriver(user)) {
-		return this.driverImage;
-	    }
-	    // return user.equals(sharedProject.getDriver()) ? driverImage :
-	    // userImage;
-	    return this.userImage;
-	}
+        @Override
+        public Image getImage(Object obj) {
+            User user = (User) obj;
+            if (SessionView.this.sharedProject.isDriver(user)) {
+                return this.driverImage;
+            }
+            // return user.equals(sharedProject.getDriver()) ? driverImage :
+            // userImage;
+            return this.userImage;
+        }
 
-	public Image getColumnImage(Object obj, int index) {
-	    return getImage(obj);
-	}
+        public Image getColumnImage(Object obj, int index) {
+            return getImage(obj);
+        }
 
-	// TODO getting current color doesnt uses when default was changed.
-	public Color getBackground(Object element) {
-	    User user = (User) element;
+        // TODO getting current color doesnt uses when default was changed.
+        public Color getBackground(Object element) {
+            User user = (User) element;
 
-	    if (user.getJid().equals(Saros.getDefault().getMyJID())) {
-		return null;
-	    }
+            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+                return null;
+            }
 
-	    int colorid = user.getColorID();
-	    String mytype = SelectionAnnotation.TYPE + "."
-		    + new Integer(colorid + 1).toString();
+            int colorid = user.getColorID();
+            String mytype = SelectionAnnotation.TYPE + "."
+                    + new Integer(colorid + 1).toString();
 
-	    AnnotationPreferenceLookup lookup = org.eclipse.ui.editors.text.EditorsUI
-		    .getAnnotationPreferenceLookup();
-	    AnnotationPreference ap = lookup.getAnnotationPreference(mytype);
-	    if (ap == null) {
-		return null;
-	    }
+            AnnotationPreferenceLookup lookup = org.eclipse.ui.editors.text.EditorsUI
+                    .getAnnotationPreferenceLookup();
+            AnnotationPreference ap = lookup.getAnnotationPreference(mytype);
+            if (ap == null) {
+                return null;
+            }
 
-	    IPreferenceStore store = EditorsUI.getPreferenceStore();
-	    RGB rgb = PreferenceConverter.getColor(store, ap
-		    .getColorPreferenceKey());
+            IPreferenceStore store = EditorsUI.getPreferenceStore();
+            RGB rgb = PreferenceConverter.getColor(store, ap
+                    .getColorPreferenceKey());
 
-	    return new Color(Display.getDefault(), rgb);
+            return new Color(Display.getDefault(), rgb);
 
-	}
+        }
 
-	public Color getForeground(Object element) {
-	    return null;
-	}
+        public Color getForeground(Object element) {
+            return null;
+        }
 
-	public Font getFont(Object element, int columnIndex) {
-	    if (this.boldFont == null) {
-		Display disp = SessionView.this.viewer.getControl()
-			.getDisplay();
-		FontData[] data = disp.getSystemFont().getFontData();
-		for (FontData fontData : data) {
-		    fontData.setStyle(SWT.BOLD);
-		}
-		this.boldFont = new Font(disp, data);
-	    }
+        public Font getFont(Object element, int columnIndex) {
+            if (this.boldFont == null) {
+                Display disp = SessionView.this.viewer.getControl()
+                        .getDisplay();
+                FontData[] data = disp.getSystemFont().getFontData();
+                for (FontData fontData : data) {
+                    fontData.setStyle(SWT.BOLD);
+                }
+                this.boldFont = new Font(disp, data);
+            }
 
-	    User user = (User) element;
-	    if (user.getJid().equals(Saros.getDefault().getMyJID())) {
-		return this.boldFont;
-	    }
-	    return null;
-	}
+            User user = (User) element;
+            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+                return this.boldFont;
+            }
+            return null;
+        }
 
-	@Override
-	public void dispose() {
-	    if (this.boldFont != null) {
-		this.boldFont.dispose();
-		this.boldFont = null;
-	    }
+        @Override
+        public void dispose() {
+            if (this.boldFont != null) {
+                this.boldFont.dispose();
+                this.boldFont = null;
+            }
 
-	    super.dispose();
-	}
+            super.dispose();
+        }
     }
 
     /**
      * The constructor.
      */
     public SessionView() {
-	this.store = EditorsUI.getPreferenceStore();
-	this.store.addPropertyChangeListener(this);
+        this.store = EditorsUI.getPreferenceStore();
+        this.store.addPropertyChangeListener(this);
     }
 
     @Override
     protected void finalize() throws Throwable {
-	this.store.removePropertyChangeListener(this);
-	super.finalize();
+        this.store.removePropertyChangeListener(this);
+        super.finalize();
     }
 
     public void sessionStarted(final ISharedProject session) {
-	Display.getDefault().asyncExec(new Runnable() {
-	    public void run() {
-		SessionView.this.viewer.setInput(session);
-	    }
-	});
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                SessionView.this.viewer.setInput(session);
+            }
+        });
     }
 
     public void sessionEnded(ISharedProject session) {
-	Display.getDefault().asyncExec(new Runnable() {
-	    public void run() {
-		SessionView.this.viewer.setInput(null);
-	    }
-	});
-	this.sharedProject = null;
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                SessionView.this.viewer.setInput(null);
+            }
+        });
+        this.sharedProject = null;
     }
 
     public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
+        // ignore
     }
 
     /**
@@ -273,21 +273,21 @@ public class SessionView extends ViewPart implements ISessionListener,
      */
     @Override
     public void createPartControl(Composite parent) {
-	this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-		| SWT.V_SCROLL);
-	this.viewer.setContentProvider(new SessionContentProvider());
-	this.viewer.setLabelProvider(new SessionLabelProvider());
-	this.viewer.setInput(null);
+        this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
+                | SWT.V_SCROLL);
+        this.viewer.setContentProvider(new SessionContentProvider());
+        this.viewer.setLabelProvider(new SessionLabelProvider());
+        this.viewer.setInput(null);
 
-	this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer);
-	this.takeDriverRoleAction = new TakeDriverRoleAction(this.viewer);
+        this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer);
+        this.takeDriverRoleAction = new TakeDriverRoleAction(this.viewer);
 
-	contributeToActionBars();
-	hookContextMenu();
-	attachSessionListener();
-	updateEnablement();
+        contributeToActionBars();
+        hookContextMenu();
+        attachSessionListener();
+        updateEnablement();
 
-	setPartName("Shared Project Session");
+        setPartName("Shared Project Session");
     }
 
     /**
@@ -295,61 +295,61 @@ public class SessionView extends ViewPart implements ISessionListener,
      */
     @Override
     public void setFocus() {
-	this.viewer.getControl().setFocus();
+        this.viewer.getControl().setFocus();
     }
 
     /**
      * Needs to called from the UI thread.
      */
     private void updateEnablement() {
-	this.viewer.getControl().setEnabled(this.sharedProject != null);
+        this.viewer.getControl().setEnabled(this.sharedProject != null);
     }
 
     private void attachSessionListener() {
-	ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
 
-	sessionManager.addSessionListener(this);
-	if (sessionManager.getSharedProject() != null) {
-	    this.viewer.setInput(sessionManager.getSharedProject());
-	}
+        sessionManager.addSessionListener(this);
+        if (sessionManager.getSharedProject() != null) {
+            this.viewer.setInput(sessionManager.getSharedProject());
+        }
     }
 
     private void contributeToActionBars() {
-	IActionBars bars = getViewSite().getActionBars();
-	IToolBarManager toolBar = bars.getToolBarManager();
+        IActionBars bars = getViewSite().getActionBars();
+        IToolBarManager toolBar = bars.getToolBarManager();
 
-	toolBar.add(new ConsistencyAction());
-	toolBar.add(new OpenInviteInterface());
-	toolBar.add(new RemoveAllDriverRoleAction());
-	toolBar.add(new FollowModeAction());
-	toolBar.add(new LeaveSessionAction());
+        toolBar.add(new ConsistencyAction());
+        toolBar.add(new OpenInviteInterface());
+        toolBar.add(new RemoveAllDriverRoleAction());
+        toolBar.add(new FollowModeAction());
+        toolBar.add(new LeaveSessionAction());
     }
 
     private void hookContextMenu() {
-	MenuManager menuMgr = new MenuManager("#PopupMenu");
-	menuMgr.setRemoveAllWhenShown(true);
-	menuMgr.addMenuListener(new IMenuListener() {
-	    public void menuAboutToShow(IMenuManager manager) {
-		fillContextMenu(manager);
-	    }
-	});
+        MenuManager menuMgr = new MenuManager("#PopupMenu");
+        menuMgr.setRemoveAllWhenShown(true);
+        menuMgr.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(IMenuManager manager) {
+                fillContextMenu(manager);
+            }
+        });
 
-	Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
+        Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
 
-	this.viewer.getControl().setMenu(menu);
-	getSite().registerContextMenu(menuMgr, this.viewer);
+        this.viewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuMgr, this.viewer);
     }
 
     private void fillContextMenu(IMenuManager manager) {
-	manager.add(this.giveDriverRoleAction);
-	manager.add(this.takeDriverRoleAction);
+        manager.add(this.giveDriverRoleAction);
+        manager.add(this.takeDriverRoleAction);
 
-	// Other plug-ins can contribute there actions here
-	manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        // Other plug-ins can contribute there actions here
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
     public void propertyChange(PropertyChangeEvent event) {
-	this.viewer.refresh();
+        this.viewer.refresh();
 
     }
 }

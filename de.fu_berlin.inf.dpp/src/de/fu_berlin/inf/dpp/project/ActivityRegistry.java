@@ -24,66 +24,66 @@ public class ActivityRegistry {
      * @return the singleton instance of this registry..
      */
     public static ActivityRegistry getDefault() {
-	if (ActivityRegistry.instance == null) {
-	    ActivityRegistry.instance = new ActivityRegistry();
-	}
+        if (ActivityRegistry.instance == null) {
+            ActivityRegistry.instance = new ActivityRegistry();
+        }
 
-	return ActivityRegistry.instance;
+        return ActivityRegistry.instance;
     }
 
     public void addProvider(IActivityProvider provider) {
-	if (!this.activityProviders.contains(provider)) {
-	    this.activityProviders.add(provider);
-	}
+        if (!this.activityProviders.contains(provider)) {
+            this.activityProviders.add(provider);
+        }
     }
 
     /**
      * Converts given XML data into an activity.
      */
     public IActivity parseActivity(XmlPullParser parser) {
-	IActivity activity = null;
-	for (IActivityProvider provider : this.activityProviders) {
-	    activity = provider.fromXML(parser);
+        IActivity activity = null;
+        for (IActivityProvider provider : this.activityProviders) {
+            activity = provider.fromXML(parser);
 
-	    if (activity != null) {
-		return activity;
-	    }
-	}
+            if (activity != null) {
+                return activity;
+            }
+        }
 
-	return null;
+        return null;
     }
 
     /**
      * Converts given activity into a XML format.
      */
     public String toXML(IActivity activity) {
-	String xml;
-	for (IActivityProvider provider : this.activityProviders) {
-	    xml = provider.toXML(activity);
+        String xml;
+        for (IActivityProvider provider : this.activityProviders) {
+            xml = provider.toXML(activity);
 
-	    if (xml != null) {
-		return xml;
-	    }
-	}
+            if (xml != null) {
+                return xml;
+            }
+        }
 
-	return null;
+        return null;
     }
 
     /**
      * Singleton constructor
      */
     private ActivityRegistry() {
-	loadDefaultActivityProviders();
-	loadExtensionPoints();
+        loadDefaultActivityProviders();
+        loadExtensionPoints();
     }
 
     private void loadDefaultActivityProviders() {
-	addProvider(EditorManager.getDefault());
-	addProvider(new SharedResourcesManager());
-	addProvider(new RoleManager());
+        addProvider(EditorManager.getDefault());
+        addProvider(new SharedResourcesManager());
+        addProvider(new RoleManager());
     }
 
     private void loadExtensionPoints() {
-	// TODO load activity providers from the extension-point for Saros
+        // TODO load activity providers from the extension-point for Saros
     }
 }

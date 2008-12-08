@@ -85,12 +85,12 @@ public class PacketExtensions {
 
     public static void hookExtensionProviders() {
 
-	ProviderManager providermanager = ProviderManager.getInstance();
-	providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-		PacketExtensions.NAMESPACE, new ActivitiesProvider());
-	providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
-		RequestPacketExtension.NAMESPACE,
-		new RequestExtensionProvider());
+        ProviderManager providermanager = ProviderManager.getInstance();
+        providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
+                PacketExtensions.NAMESPACE, new ActivitiesProvider());
+        providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
+                RequestPacketExtension.NAMESPACE,
+                new RequestExtensionProvider());
     }
 
     /**
@@ -101,13 +101,13 @@ public class PacketExtensions {
      * @return the packet extension.
      */
     public static PacketExtension createInviteExtension(String projectName,
-	    String description) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.INVITATION, PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.PROJECTNAME, projectName);
-	extension.setValue(PacketExtensions.DESCRIPTION, description);
+            String description) {
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.INVITATION, PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.PROJECTNAME, projectName);
+        extension.setValue(PacketExtensions.DESCRIPTION, description);
 
-	return extension;
+        return extension;
     }
 
     /**
@@ -119,114 +119,114 @@ public class PacketExtensions {
      * @return the packet extension.
      */
     public static PacketExtension createCancelInviteExtension(String error) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.CANCEL_INVITATION, PacketExtensions.NAMESPACE);
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.CANCEL_INVITATION, PacketExtensions.NAMESPACE);
 
-	if ((error != null) && (error.length() > 0)) {
-	    extension.setValue(PacketExtensions.ERROR, error);
-	}
-	return extension;
+        if ((error != null) && (error.length() > 0)) {
+            extension.setValue(PacketExtensions.ERROR, error);
+        }
+        return extension;
     }
 
     public static PacketExtension createRequestForActivityExtension(
-	    int timestamp, boolean andup) {
+            int timestamp, boolean andup) {
 
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.REQUEST_FOR_ACTIVITY,
-		PacketExtensions.NAMESPACE);
-	extension.setValue("ID", (new Integer(timestamp)).toString());
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.REQUEST_FOR_ACTIVITY,
+                PacketExtensions.NAMESPACE);
+        extension.setValue("ID", (new Integer(timestamp)).toString());
 
-	if (andup) {
-	    extension.setValue("ANDUP", "true");
-	}
+        if (andup) {
+            extension.setValue("ANDUP", "true");
+        }
 
-	return extension;
+        return extension;
     }
 
     public static PacketExtension createDataTransferExtension(String name,
-	    String desc, int index, int count, String data) {
+            String desc, int index, int count, String data) {
 
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.DATATRANSFER, PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.DT_NAME, name);
-	extension.setValue(PacketExtensions.DT_DESC, desc);
-	extension.setValue(PacketExtensions.DT_DATA, data);
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.DATATRANSFER, PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.DT_NAME, name);
+        extension.setValue(PacketExtensions.DT_DESC, desc);
+        extension.setValue(PacketExtensions.DT_DATA, data);
 
-	String split = index + "/" + count;
-	extension.setValue(PacketExtensions.DT_SPLIT, split);
+        String split = index + "/" + count;
+        extension.setValue(PacketExtensions.DT_SPLIT, split);
 
-	return extension;
+        return extension;
     }
 
     public static PacketExtension createRequestForFileListExtension() {
-	return PacketExtensions
-		.createExtension(PacketExtensions.REQUEST_FOR_LIST);
+        return PacketExtensions
+                .createExtension(PacketExtensions.REQUEST_FOR_LIST);
     }
 
     public static PacketExtension createJoinExtension() {
-	return PacketExtensions.createExtension(PacketExtensions.JOIN);
+        return PacketExtensions.createExtension(PacketExtensions.JOIN);
     }
 
     public static PacketExtension createLeaveExtension() {
-	return PacketExtensions.createExtension(PacketExtensions.LEAVE);
+        return PacketExtensions.createExtension(PacketExtensions.LEAVE);
     }
 
     public static PacketExtension createChecksumErrorExtension(IPath path) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.FILE_CHECKSUM_ERROR,
-		PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.FILE_CHECKSUM_ERROR,
+                PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
 
-	return extension;
+        return extension;
     }
 
     public static PacketExtension createChecksumsExtension(
-	    Collection<DocumentChecksum> checksums) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.DOC_CHECKSUM, PacketExtensions.NAMESPACE);
+            Collection<DocumentChecksum> checksums) {
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.DOC_CHECKSUM, PacketExtensions.NAMESPACE);
 
-	extension.setValue("quantity", Integer.toString(checksums.size()));
+        extension.setValue("quantity", Integer.toString(checksums.size()));
 
-	int i = 1;
-	for (DocumentChecksum checksum : checksums) {
-	    extension.setValue("path" + Integer.toString(i), checksum.getPath()
-		    .toPortableString());
-	    extension.setValue("length" + Integer.toString(i), Integer
-		    .toString(checksum.getLength()));
-	    extension.setValue("hash" + Integer.toString(i), Integer
-		    .toString(checksum.getHash()));
-	    i++;
-	}
+        int i = 1;
+        for (DocumentChecksum checksum : checksums) {
+            extension.setValue("path" + Integer.toString(i), checksum.getPath()
+                    .toPortableString());
+            extension.setValue("length" + Integer.toString(i), Integer
+                    .toString(checksum.getLength()));
+            extension.setValue("hash" + Integer.toString(i), Integer
+                    .toString(checksum.getHash()));
+            i++;
+        }
 
-	return extension;
+        return extension;
     }
 
     public static PacketExtension createJupiterErrorExtension(IPath path) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.JUPITER_TRANSFORMATION_ERROR,
-		PacketExtensions.NAMESPACE);
-	extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.JUPITER_TRANSFORMATION_ERROR,
+                PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
 
-	return extension;
+        return extension;
     }
 
     public static PacketExtension createUserListExtension(List<User> list) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(
-		PacketExtensions.USER_LIST, PacketExtensions.NAMESPACE);
+        DefaultPacketExtension extension = new DefaultPacketExtension(
+                PacketExtensions.USER_LIST, PacketExtensions.NAMESPACE);
 
-	int count = 0;
-	for (User participant : list) {
-	    JID jid = participant.getJid();
-	    String id = "User" + count;
-	    String role = "UserRole" + count;
-	    String color = "UserColor" + count;
-	    extension.setValue(id, jid.toString());
-	    extension.setValue(role, participant.getUserRole().toString());
-	    extension.setValue(color, participant.getColorID() + "");
-	    count++;
-	}
+        int count = 0;
+        for (User participant : list) {
+            JID jid = participant.getJid();
+            String id = "User" + count;
+            String role = "UserRole" + count;
+            String color = "UserColor" + count;
+            extension.setValue(id, jid.toString());
+            extension.setValue(role, participant.getUserRole().toString());
+            extension.setValue(color, participant.getColorID() + "");
+            count++;
+        }
 
-	return extension;
+        return extension;
     }
 
     /**
@@ -234,8 +234,8 @@ public class PacketExtensions {
      * invite extension has a description field.
      */
     public static DefaultPacketExtension getInviteExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.INVITATION,
-		message);
+        return PacketExtensions.getExtension(PacketExtensions.INVITATION,
+                message);
     }
 
     /**
@@ -243,81 +243,81 @@ public class PacketExtensions {
      * cancel extension can have a error field.
      */
     public static DefaultPacketExtension getCancelInviteExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.CANCEL_INVITATION, message);
+            Message message) {
+        return PacketExtensions.getExtension(
+                PacketExtensions.CANCEL_INVITATION, message);
     }
 
     public static DefaultPacketExtension getJoinExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.JOIN, message);
+        return PacketExtensions.getExtension(PacketExtensions.JOIN, message);
     }
 
     public static DefaultPacketExtension getLeaveExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.LEAVE, message);
+        return PacketExtensions.getExtension(PacketExtensions.LEAVE, message);
     }
 
     public static DefaultPacketExtension getJupiterErrorExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.JUPITER_TRANSFORMATION_ERROR, message);
+            Message message) {
+        return PacketExtensions.getExtension(
+                PacketExtensions.JUPITER_TRANSFORMATION_ERROR, message);
     }
 
     public static DefaultPacketExtension getChecksumErrorExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.FILE_CHECKSUM_ERROR, message);
+            Message message) {
+        return PacketExtensions.getExtension(
+                PacketExtensions.FILE_CHECKSUM_ERROR, message);
     }
 
     public static DefaultPacketExtension getChecksumExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.DOC_CHECKSUM,
-		message);
+        return PacketExtensions.getExtension(PacketExtensions.DOC_CHECKSUM,
+                message);
     }
 
     public static DefaultPacketExtension getUserlistExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.USER_LIST,
-		message);
+        return PacketExtensions.getExtension(PacketExtensions.USER_LIST,
+                message);
     }
 
     public static DefaultPacketExtension getRequestActivityExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(
-		PacketExtensions.REQUEST_FOR_ACTIVITY, message);
+            Message message) {
+        return PacketExtensions.getExtension(
+                PacketExtensions.REQUEST_FOR_ACTIVITY, message);
     }
 
     public static DefaultPacketExtension getRequestExtension(Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.REQUEST_FOR_LIST,
-		message);
+        return PacketExtensions.getExtension(PacketExtensions.REQUEST_FOR_LIST,
+                message);
     }
 
     public static DefaultPacketExtension getDataTransferExtension(
-	    Message message) {
-	return PacketExtensions.getExtension(PacketExtensions.DATATRANSFER,
-		message);
+            Message message) {
+        return PacketExtensions.getExtension(PacketExtensions.DATATRANSFER,
+                message);
     }
 
     public static ActivitiesPacketExtension getActvitiesExtension(
-	    Message message) {
-	return (ActivitiesPacketExtension) message.getExtension(
-		ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            Message message) {
+        return (ActivitiesPacketExtension) message.getExtension(
+                ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
     }
 
     public static RequestPacketExtension getJupiterRequestExtension(
-	    Message message) {
-	return (RequestPacketExtension) message.getExtension(
-		RequestPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            Message message) {
+        return (RequestPacketExtension) message.getExtension(
+                RequestPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
     }
 
     private static DefaultPacketExtension createExtension(String element) {
-	DefaultPacketExtension extension = new DefaultPacketExtension(element,
-		PacketExtensions.NAMESPACE);
-	extension.setValue(element, "");
-	return extension;
+        DefaultPacketExtension extension = new DefaultPacketExtension(element,
+                PacketExtensions.NAMESPACE);
+        extension.setValue(element, "");
+        return extension;
     }
 
     private static DefaultPacketExtension getExtension(String element,
-	    Message message) {
-	return (DefaultPacketExtension) message.getExtension(element,
-		PacketExtensions.NAMESPACE);
+            Message message) {
+        return (DefaultPacketExtension) message.getExtension(element,
+                PacketExtensions.NAMESPACE);
     }
 
 }

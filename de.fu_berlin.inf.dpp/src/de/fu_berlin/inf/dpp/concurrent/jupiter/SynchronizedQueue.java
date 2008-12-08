@@ -17,5 +17,5 @@ public interface SynchronizedQueue {
      * @throws InterruptedException
      */
     public Request getNextRequestInSynchronizedQueue()
-	    throws InterruptedException;
+            throws InterruptedException;
 }

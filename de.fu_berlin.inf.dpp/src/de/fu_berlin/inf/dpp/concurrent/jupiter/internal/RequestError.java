@@ -18,7 +18,7 @@ public class RequestError implements Request {
     private IPath path;
 
     public RequestError(IPath path) {
-	this.path = path;
+        this.path = path;
     }
 
     /**
@@ -27,31 +27,31 @@ public class RequestError implements Request {
     private static final long serialVersionUID = 3111067620344018430L;
 
     public IPath getEditorPath() {
-	return this.path;
+        return this.path;
     }
 
     public JID getJID() {
 
-	return null;
+        return null;
     }
 
     public Operation getOperation() {
 
-	return null;
+        return null;
     }
 
     public int getSiteId() {
 
-	return 0;
+        return 0;
     }
 
     public Timestamp getTimestamp() {
 
-	return null;
+        return null;
     }
 
     public void setEditorPath(IPath editor) {
-	this.path = editor;
+        this.path = editor;
     }
 
     public void setJID(JID jid) {

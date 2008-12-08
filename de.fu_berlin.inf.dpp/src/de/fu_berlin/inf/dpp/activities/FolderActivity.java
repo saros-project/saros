@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IPath;
 
 public class FolderActivity implements IActivity {
     public static enum Type {
-	Created, Removed
+        Created, Removed
     };
 
     private String source;
@@ -14,29 +14,29 @@ public class FolderActivity implements IActivity {
     private final IPath path;
 
     public FolderActivity(Type type, IPath path) {
-	this.type = type;
-	this.path = path;
+        this.type = type;
+        this.path = path;
     }
 
     public IPath getPath() {
-	return this.path;
+        return this.path;
     }
 
     public Type getType() {
-	return this.type;
+        return this.type;
     }
 
     @Override
     public String toString() {
-	return "FolderActivity(type:" + this.type + ", path:" + this.path + ")";
+        return "FolderActivity(type:" + this.type + ", path:" + this.path + ")";
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
 
     }
 }

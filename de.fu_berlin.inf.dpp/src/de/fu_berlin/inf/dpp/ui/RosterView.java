@@ -71,7 +71,7 @@ import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
  * @author rdjemili
  */
 public class RosterView extends ViewPart implements IConnectionListener,
-	IRosterTree {
+        IRosterTree {
     private TreeViewer viewer;
 
     private Roster roster;
@@ -96,35 +96,35 @@ public class RosterView extends ViewPart implements IConnectionListener,
      */
     private interface TreeItem {
 
-	/**
-	 * @return all child items of this tree item.
-	 */
-	Object[] getChildren();
+        /**
+         * @return all child items of this tree item.
+         */
+        Object[] getChildren();
     }
 
     /**
      * A group item which holds a number of users.
      */
     private class GroupItem implements TreeItem {
-	private final RosterGroup group;
+        private final RosterGroup group;
 
-	public GroupItem(RosterGroup group) {
-	    this.group = group;
-	}
+        public GroupItem(RosterGroup group) {
+            this.group = group;
+        }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
-	 */
-	public Object[] getChildren() {
-	    return RosterView.getChildren(this.group.getEntries());
-	}
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
+         */
+        public Object[] getChildren() {
+            return RosterView.getChildren(this.group.getEntries());
+        }
 
-	@Override
-	public String toString() {
-	    return this.group.getName();
-	}
+        @Override
+        public String toString() {
+            return this.group.getName();
+        }
     }
 
     /**
@@ -132,170 +132,170 @@ public class RosterView extends ViewPart implements IConnectionListener,
      */
     private class UnfiledGroupItem implements TreeItem {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
-	 */
-	public Object[] getChildren() {
-	    return RosterView.getChildren(RosterView.this.roster
-		    .getUnfiledEntries());
-	}
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
+         */
+        public Object[] getChildren() {
+            return RosterView.getChildren(RosterView.this.roster
+                    .getUnfiledEntries());
+        }
 
-	@Override
-	public String toString() {
-	    return "Buddies";
-	}
+        @Override
+        public String toString() {
+            return "Buddies";
+        }
     }
 
     /**
      * Provide tree content.
      */
     private class TreeContentProvider implements IStructuredContentProvider,
-	    ITreeContentProvider {
+            ITreeContentProvider {
 
-	/*
-	 * @see org.eclipse.jface.viewers.IContentProvider
-	 */
-	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-	}
+        /*
+         * @see org.eclipse.jface.viewers.IContentProvider
+         */
+        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+        }
 
-	/*
-	 * @see org.eclipse.jface.viewers.IContentProvider
-	 */
-	public void dispose() {
-	}
+        /*
+         * @see org.eclipse.jface.viewers.IContentProvider
+         */
+        public void dispose() {
+        }
 
-	/*
-	 * @see org.eclipse.jface.viewers.IStructuredContentProvider
-	 */
-	public Object[] getElements(Object parent) {
-	    if (parent.equals(getViewSite())
-		    && (RosterView.this.roster != null)) {
-		List<TreeItem> groups = new LinkedList<TreeItem>();
-		// TODO: Änderung für Smack 3
-		for (RosterGroup rg : RosterView.this.roster.getGroups()) {
-		    GroupItem item = new GroupItem(rg);
-		    groups.add(item);
-		}
+        /*
+         * @see org.eclipse.jface.viewers.IStructuredContentProvider
+         */
+        public Object[] getElements(Object parent) {
+            if (parent.equals(getViewSite())
+                    && (RosterView.this.roster != null)) {
+                List<TreeItem> groups = new LinkedList<TreeItem>();
+                // TODO: Änderung für Smack 3
+                for (RosterGroup rg : RosterView.this.roster.getGroups()) {
+                    GroupItem item = new GroupItem(rg);
+                    groups.add(item);
+                }
 
-		// for (Iterator it = roster.getGroups(); it.hasNext();) {
-		// GroupItem item = new GroupItem((RosterGroup) it.next());
-		// groups.add(item);
-		// }
+                // for (Iterator it = roster.getGroups(); it.hasNext();) {
+                // GroupItem item = new GroupItem((RosterGroup) it.next());
+                // groups.add(item);
+                // }
 
-		groups.add(new UnfiledGroupItem());
+                groups.add(new UnfiledGroupItem());
 
-		return groups.toArray();
-	    }
+                return groups.toArray();
+            }
 
-	    return new Object[0];
-	}
+            return new Object[0];
+        }
 
-	/*
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider
-	 */
-	public Object getParent(Object child) {
-	    return null; // TODO
-	}
+        /*
+         * @see org.eclipse.jface.viewers.ITreeContentProvider
+         */
+        public Object getParent(Object child) {
+            return null; // TODO
+        }
 
-	/*
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider
-	 */
-	public Object[] getChildren(Object parent) {
-	    if (parent instanceof TreeItem) {
-		return ((TreeItem) parent).getChildren();
-	    }
+        /*
+         * @see org.eclipse.jface.viewers.ITreeContentProvider
+         */
+        public Object[] getChildren(Object parent) {
+            if (parent instanceof TreeItem) {
+                return ((TreeItem) parent).getChildren();
+            }
 
-	    return new Object[0];
-	}
+            return new Object[0];
+        }
 
-	/*
-	 * @see org.eclipse.jface.viewers.ITreeContentProvider
-	 */
-	public boolean hasChildren(Object parent) {
-	    if (parent instanceof TreeItem) {
-		Object[] children = ((TreeItem) parent).getChildren();
-		return children.length > 0;
-	    }
+        /*
+         * @see org.eclipse.jface.viewers.ITreeContentProvider
+         */
+        public boolean hasChildren(Object parent) {
+            if (parent instanceof TreeItem) {
+                Object[] children = ((TreeItem) parent).getChildren();
+                return children.length > 0;
+            }
 
-	    return false;
-	}
+            return false;
+        }
     }
 
     /**
      * Shows user name and state in parenthesis.
      */
     private class ViewLabelProvider extends LabelProvider {
-	private final Image groupImage = SarosUI.getImage("icons/group.png");
+        private final Image groupImage = SarosUI.getImage("icons/group.png");
 
-	private final Image personImage = SarosUI.getImage("icons/user.png");
+        private final Image personImage = SarosUI.getImage("icons/user.png");
 
-	@Override
-	public String getText(Object obj) {
-	    if (obj instanceof RosterEntry) {
-		RosterEntry entry = (RosterEntry) obj;
+        @Override
+        public String getText(Object obj) {
+            if (obj instanceof RosterEntry) {
+                RosterEntry entry = (RosterEntry) obj;
 
-		String label = entry.getName();
+                String label = entry.getName();
 
-		// show JID if entry has no nickname
-		if (label == null) {
-		    label = entry.getUser();
-		}
+                // show JID if entry has no nickname
+                if (label == null) {
+                    label = entry.getUser();
+                }
 
-		// append presence information if available
-		Presence presence = RosterView.this.roster.getPresence(entry
-			.getUser());
-		if (presence != null) {
-		    label = label + " (" + presence.getType() + ")";
-		}
+                // append presence information if available
+                Presence presence = RosterView.this.roster.getPresence(entry
+                        .getUser());
+                if (presence != null) {
+                    label = label + " (" + presence.getType() + ")";
+                }
 
-		return label;
-	    }
+                return label;
+            }
 
-	    return obj.toString();
-	}
+            return obj.toString();
+        }
 
-	@Override
-	public Image getImage(Object element) {
-	    return element instanceof RosterEntry ? this.personImage
-		    : this.groupImage;
-	}
+        @Override
+        public Image getImage(Object element) {
+            return element instanceof RosterEntry ? this.personImage
+                    : this.groupImage;
+        }
     }
 
     /**
      * A sorter that orders by presence and then by name.
      */
     private class NameSorter extends ViewerSorter {
-	@Override
-	public int compare(Viewer viewer, Object elem1, Object elem2) {
+        @Override
+        public int compare(Viewer viewer, Object elem1, Object elem2) {
 
-	    // sort by presence
-	    if (elem1 instanceof RosterEntry) {
-		RosterEntry entry1 = (RosterEntry) elem1;
+            // sort by presence
+            if (elem1 instanceof RosterEntry) {
+                RosterEntry entry1 = (RosterEntry) elem1;
 
-		if (elem2 instanceof RosterEntry) {
-		    RosterEntry entry2 = (RosterEntry) elem2;
+                if (elem2 instanceof RosterEntry) {
+                    RosterEntry entry2 = (RosterEntry) elem2;
 
-		    String user1 = entry1.getUser();
-		    boolean presence1 = RosterView.this.roster
-			    .getPresence(user1) != null;
+                    String user1 = entry1.getUser();
+                    boolean presence1 = RosterView.this.roster
+                            .getPresence(user1) != null;
 
-		    String user2 = entry2.getUser();
-		    boolean presence2 = RosterView.this.roster
-			    .getPresence(user2) != null;
+                    String user2 = entry2.getUser();
+                    boolean presence2 = RosterView.this.roster
+                            .getPresence(user2) != null;
 
-		    if (presence1 && !presence2) {
-			return -1;
-		    } else if (!presence1 && presence2) {
-			return 1;
-		    }
-		}
-	    }
+                    if (presence1 && !presence2) {
+                        return -1;
+                    } else if (!presence1 && presence2) {
+                        return 1;
+                    }
+                }
+            }
 
-	    // otherwise use default order
-	    return super.compare(viewer, elem1, elem2);
-	}
+            // otherwise use default order
+            return super.compare(viewer, elem1, elem2);
+        }
     }
 
     /**
@@ -310,25 +310,25 @@ public class RosterView extends ViewPart implements IConnectionListener,
      */
     @Override
     public void createPartControl(Composite parent) {
-	this.viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
-		| SWT.V_SCROLL);
-	this.viewer.setContentProvider(new TreeContentProvider());
-	this.viewer.setLabelProvider(new ViewLabelProvider());
-	this.viewer.setSorter(new NameSorter());
-	this.viewer.setInput(getViewSite());
-	this.viewer.expandAll();
+        this.viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
+                | SWT.V_SCROLL);
+        this.viewer.setContentProvider(new TreeContentProvider());
+        this.viewer.setLabelProvider(new ViewLabelProvider());
+        this.viewer.setSorter(new NameSorter());
+        this.viewer.setInput(getViewSite());
+        this.viewer.expandAll();
 
-	makeActions();
-	hookContextMenu();
-	hookDoubleClickAction();
-	contributeToActionBars();
-	updateEnablement();
+        makeActions();
+        hookContextMenu();
+        hookDoubleClickAction();
+        contributeToActionBars();
+        updateEnablement();
 
-	Saros saros = Saros.getDefault();
-	saros.addListener(this);
+        Saros saros = Saros.getDefault();
+        saros.addListener(this);
 
-	connectionStateChanged(saros.getConnection(), saros
-		.getConnectionState());
+        connectionStateChanged(saros.getConnection(), saros
+                .getConnectionState());
     }
 
     /**
@@ -336,7 +336,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
      */
     @Override
     public void setFocus() {
-	this.viewer.getControl().setFocus();
+        this.viewer.getControl().setFocus();
     }
 
     /*
@@ -345,102 +345,102 @@ public class RosterView extends ViewPart implements IConnectionListener,
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-	    final ConnectionState newState) {
-	if (newState == ConnectionState.CONNECTED) {
-	    // roster = Saros.getDefault().getRoster();
-	    this.roster = connection.getRoster();
-	    this.connection = connection;
-	    attachRosterListener();
+            final ConnectionState newState) {
+        if (newState == ConnectionState.CONNECTED) {
+            // roster = Saros.getDefault().getRoster();
+            this.roster = connection.getRoster();
+            this.connection = connection;
+            attachRosterListener();
 
-	} else if (newState == ConnectionState.NOT_CONNECTED) {
-	    this.roster = null;
-	}
+        } else if (newState == ConnectionState.NOT_CONNECTED) {
+            this.roster = null;
+        }
 
-	refreshRosterTree(true);
+        refreshRosterTree(true);
 
-	Display.getDefault().asyncExec(new Runnable() {
-	    public void run() {
-		updateStatusLine(newState);
-		updateEnablement();
-	    }
-	});
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                updateStatusLine(newState);
+                updateEnablement();
+            }
+        });
     }
 
     public static Object[] getChildren(Collection<RosterEntry> entries) {
-	// TODO: new method for smack 3
+        // TODO: new method for smack 3
 
-	List<RosterEntry> users = new LinkedList<RosterEntry>();
+        List<RosterEntry> users = new LinkedList<RosterEntry>();
 
-	for (RosterEntry entry : entries) {
-	    if ((entry.getType() == RosterPacket.ItemType.both)
-		    || (entry.getType() == RosterPacket.ItemType.to)) {
-		users.add(entry);
-	    }
-	}
+        for (RosterEntry entry : entries) {
+            if ((entry.getType() == RosterPacket.ItemType.both)
+                    || (entry.getType() == RosterPacket.ItemType.to)) {
+                users.add(entry);
+            }
+        }
 
-	return users.toArray();
+        return users.toArray();
     }
 
     /**
      * Needs to called from an UI thread.
      */
     private void updateEnablement() {
-	this.viewer.getControl().setEnabled(Saros.getDefault().isConnected());
+        this.viewer.getControl().setEnabled(Saros.getDefault().isConnected());
     }
 
     /**
      * Needs to called from an UI thread.
      */
     private void updateStatusLine(final ConnectionState newState) {
-	IStatusLineManager statusLine = getViewSite().getActionBars()
-		.getStatusLineManager();
-	statusLine.setMessage(SarosUI.getDescription(newState));
+        IStatusLineManager statusLine = getViewSite().getActionBars()
+                .getStatusLineManager();
+        statusLine.setMessage(SarosUI.getDescription(newState));
     }
 
     private void attachRosterListener() {
-	this.roster.addRosterListener(new RosterListenerImpl(this.connection,
-		this));
+        this.roster.addRosterListener(new RosterListenerImpl(this.connection,
+                this));
 
-	// roster.addRosterListener(new RosterListener() {
-	// public void entriesAdded(Collection<String> addresses) {
-	// for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
-	// String address = it.next();
-	// RosterEntry entry = roster.getEntry(address);
-	// //When the entry is only from the other user, then send a
-	// subscription request
-	// if (entry != null && entry.getType() == RosterPacket.ItemType.from) {
-	// try {
-	// System.out.println("Creating entry to: " + entry.getUser());
-	// connection.getRoster().createEntry(entry.getUser(), entry.getUser(),
-	// null);
-	// } catch (XMPPException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// }
-	//				
-	// refreshRosterTree(true);
-	// }
-	//
-	// public void entriesUpdated(Collection<String> addresses) {
-	// refreshRosterTree(false);
-	// }
-	//
-	// public void entriesDeleted(Collection<String> addresses) {
-	// refreshRosterTree(false);
-	// }
-	//
-	// public void presenceChanged(String XMPPAddress) {
-	// refreshRosterTree(true);
-	// }
-	//			
-	//			
-	// public void presenceChanged(Presence presence) {
-	// //TODO: new Method for Smack 3
-	// presenceChanged(presence.getFrom());
-	//				
-	// }
-	// });
+        // roster.addRosterListener(new RosterListener() {
+        // public void entriesAdded(Collection<String> addresses) {
+        // for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
+        // String address = it.next();
+        // RosterEntry entry = roster.getEntry(address);
+        // //When the entry is only from the other user, then send a
+        // subscription request
+        // if (entry != null && entry.getType() == RosterPacket.ItemType.from) {
+        // try {
+        // System.out.println("Creating entry to: " + entry.getUser());
+        // connection.getRoster().createEntry(entry.getUser(), entry.getUser(),
+        // null);
+        // } catch (XMPPException e) {
+        // e.printStackTrace();
+        // }
+        // }
+        // }
+        //				
+        // refreshRosterTree(true);
+        // }
+        //
+        // public void entriesUpdated(Collection<String> addresses) {
+        // refreshRosterTree(false);
+        // }
+        //
+        // public void entriesDeleted(Collection<String> addresses) {
+        // refreshRosterTree(false);
+        // }
+        //
+        // public void presenceChanged(String XMPPAddress) {
+        // refreshRosterTree(true);
+        // }
+        //			
+        //			
+        // public void presenceChanged(Presence presence) {
+        // //TODO: new Method for Smack 3
+        // presenceChanged(presence.getFrom());
+        //				
+        // }
+        // });
     }
 
     /**
@@ -451,74 +451,74 @@ public class RosterView extends ViewPart implements IConnectionListener,
      *            <code>false</code> otherwise.
      */
     public void refreshRosterTree(final boolean updateLabels) {
-	if (this.viewer.getControl().isDisposed()) {
-	    return;
-	}
+        if (this.viewer.getControl().isDisposed()) {
+            return;
+        }
 
-	Display.getDefault().asyncExec(new Runnable() {
-	    public void run() {
-		RosterView.this.viewer.refresh(updateLabels);
-		RosterView.this.viewer.expandAll();
-	    }
-	});
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                RosterView.this.viewer.refresh(updateLabels);
+                RosterView.this.viewer.expandAll();
+            }
+        });
     }
 
     private void hookContextMenu() {
-	MenuManager menuMgr = new MenuManager("#PopupMenu");
-	menuMgr.setRemoveAllWhenShown(true);
-	menuMgr.addMenuListener(new IMenuListener() {
-	    public void menuAboutToShow(IMenuManager manager) {
-		RosterView.this.fillContextMenu(manager);
-	    }
-	});
+        MenuManager menuMgr = new MenuManager("#PopupMenu");
+        menuMgr.setRemoveAllWhenShown(true);
+        menuMgr.addMenuListener(new IMenuListener() {
+            public void menuAboutToShow(IMenuManager manager) {
+                RosterView.this.fillContextMenu(manager);
+            }
+        });
 
-	Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
+        Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
 
-	this.viewer.getControl().setMenu(menu);
-	getSite().registerContextMenu(menuMgr, this.viewer);
+        this.viewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuMgr, this.viewer);
     }
 
     private void hookDoubleClickAction() {
-	this.viewer.addDoubleClickListener(new IDoubleClickListener() {
-	    public void doubleClick(DoubleClickEvent event) {
-		if (RosterView.this.messagingAction.isEnabled()) {
-		    RosterView.this.messagingAction.run();
-		}
-	    }
-	});
+        this.viewer.addDoubleClickListener(new IDoubleClickListener() {
+            public void doubleClick(DoubleClickEvent event) {
+                if (RosterView.this.messagingAction.isEnabled()) {
+                    RosterView.this.messagingAction.run();
+                }
+            }
+        });
     }
 
     private void contributeToActionBars() {
-	IActionBars bars = getViewSite().getActionBars();
+        IActionBars bars = getViewSite().getActionBars();
 
-	IMenuManager menuManager = bars.getMenuManager();
-	menuManager.add(this.messagingAction);
-	menuManager.add(this.inviteAction);
-	// menuManager.add(new TestJoinWizardAction());
-	menuManager.add(new Separator());
+        IMenuManager menuManager = bars.getMenuManager();
+        menuManager.add(this.messagingAction);
+        menuManager.add(this.inviteAction);
+        // menuManager.add(new TestJoinWizardAction());
+        menuManager.add(new Separator());
 
-	IToolBarManager toolBarManager = bars.getToolBarManager();
-	toolBarManager.add(new ConnectDisconnectAction());
-	toolBarManager.add(new NewContactAction());
+        IToolBarManager toolBarManager = bars.getToolBarManager();
+        toolBarManager.add(new ConnectDisconnectAction());
+        toolBarManager.add(new NewContactAction());
     }
 
     private void fillContextMenu(IMenuManager manager) {
-	manager.add(this.messagingAction);
-	manager.add(this.skypeAction);
-	manager.add(this.inviteAction);
-	manager.add(new Separator());
-	manager.add(this.renameContactAction);
-	manager.add(this.deleteContactAction);
+        manager.add(this.messagingAction);
+        manager.add(this.skypeAction);
+        manager.add(this.inviteAction);
+        manager.add(new Separator());
+        manager.add(this.renameContactAction);
+        manager.add(this.deleteContactAction);
 
-	// Other plug-ins can contribute there actions here
-	manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        // Other plug-ins can contribute there actions here
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
     private void makeActions() {
-	this.messagingAction = new MessagingAction(this.viewer);
-	this.skypeAction = new SkypeAction(this.viewer);
-	this.inviteAction = new InviteAction(this.viewer);
-	this.renameContactAction = new RenameContactAction(this.viewer);
-	this.deleteContactAction = new DeleteContactAction(this.viewer);
+        this.messagingAction = new MessagingAction(this.viewer);
+        this.skypeAction = new SkypeAction(this.viewer);
+        this.inviteAction = new InviteAction(this.viewer);
+        this.renameContactAction = new RenameContactAction(this.viewer);
+        this.deleteContactAction = new DeleteContactAction(this.viewer);
     }
 }

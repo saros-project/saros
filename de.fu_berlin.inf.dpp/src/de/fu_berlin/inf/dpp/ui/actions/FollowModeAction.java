@@ -15,48 +15,48 @@ public class FollowModeAction extends Action implements ISessionListener {
     private boolean isFollowMode = false;
 
     public FollowModeAction() {
-	super();
-	setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
-	setToolTipText("Enable/disable follow mode");
+        super();
+        setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
+        setToolTipText("Enable/disable follow mode");
 
-	Saros.getDefault().getSessionManager().addSessionListener(this);
-	updateEnablement();
+        Saros.getDefault().getSessionManager().addSessionListener(this);
+        updateEnablement();
     }
 
     @Override
     public void run() {
-	setFollowMode(!getFollowMode());
+        setFollowMode(!getFollowMode());
     }
 
     public boolean getFollowMode() {
-	return this.isFollowMode;
+        return this.isFollowMode;
     }
 
     public void setFollowMode(boolean isFollowMode) {
-	this.isFollowMode = isFollowMode;
-	EditorManager.getDefault().setEnableFollowing(isFollowMode);
+        this.isFollowMode = isFollowMode;
+        EditorManager.getDefault().setEnableFollowing(isFollowMode);
     }
 
     public void sessionStarted(ISharedProject session) {
-	// Automatically start follow mode at the beginning of a session if
-	// Auto-Follow-Mode is enabled.
-	if (Saros.getDefault().getPreferenceStore().getBoolean(
-		PreferenceConstants.AUTO_FOLLOW_MODE)) {
-	    setFollowMode(true);
-	}
-	updateEnablement();
+        // Automatically start follow mode at the beginning of a session if
+        // Auto-Follow-Mode is enabled.
+        if (Saros.getDefault().getPreferenceStore().getBoolean(
+                PreferenceConstants.AUTO_FOLLOW_MODE)) {
+            setFollowMode(true);
+        }
+        updateEnablement();
     }
 
     public void sessionEnded(ISharedProject session) {
-	updateEnablement();
+        updateEnablement();
     }
 
     public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
+        // ignore
     }
 
     private void updateEnablement() {
-	setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
-	setChecked(getFollowMode());
+        setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
+        setChecked(getFollowMode());
     }
 }

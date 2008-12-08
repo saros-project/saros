@@ -38,8 +38,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
     private List<TimedActivity> activities;
 
     MessageFormat textChangeFormat = new MessageFormat(
-	    "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
-							      // into
+            "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
+
+    // into
 
     // consts
 
@@ -47,7 +48,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
     }
 
     public ActivitiesPacketExtension(List<TimedActivity> activities) {
-	setActivities(activities);
+        setActivities(activities);
     }
 
     /*
@@ -56,7 +57,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
      * @see org.jivesoftware.smack.packet.PacketExtension#getElementName()
      */
     public String getElementName() {
-	return ActivitiesPacketExtension.ELEMENT;
+        return ActivitiesPacketExtension.ELEMENT;
     }
 
     /*
@@ -65,15 +66,15 @@ public class ActivitiesPacketExtension implements PacketExtension {
      * @see org.jivesoftware.smack.packet.PacketExtension#getNamespace()
      */
     public String getNamespace() {
-	return ActivitiesPacketExtension.NAMESPACE;
+        return ActivitiesPacketExtension.NAMESPACE;
     }
 
     public void setActivities(List<TimedActivity> activities) {
-	this.activities = activities;
+        this.activities = activities;
     }
 
     public List<TimedActivity> getActivities() {
-	return this.activities;
+        return this.activities;
     }
 
     /*
@@ -82,25 +83,25 @@ public class ActivitiesPacketExtension implements PacketExtension {
      * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
      */
     public String toXML() {
-	if (this.activities.size() == 0) {
-	    return "";
-	}
+        if (this.activities.size() == 0) {
+            return "";
+        }
 
-	StringBuffer buf = new StringBuffer();
-	buf.append("<").append(getElementName());
-	buf.append(" xmlns=\"").append(getNamespace()).append("\">");
+        StringBuffer buf = new StringBuffer();
+        buf.append("<").append(getElementName());
+        buf.append(" xmlns=\"").append(getNamespace()).append("\">");
 
-	int firstTimestamp = this.activities.get(0).getTimestamp();
-	buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
+        int firstTimestamp = this.activities.get(0).getTimestamp();
+        buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
 
-	ActivityRegistry activityRegistry = ActivityRegistry.getDefault();
-	for (TimedActivity timedActivity : this.activities) {
-	    IActivity activity = timedActivity.getActivity();
-	    buf.append(activityRegistry.toXML(activity));
-	}
+        ActivityRegistry activityRegistry = ActivityRegistry.getDefault();
+        for (TimedActivity timedActivity : this.activities) {
+            IActivity activity = timedActivity.getActivity();
+            buf.append(activityRegistry.toXML(activity));
+        }
 
-	buf.append("</").append(getElementName()).append(">");
-	return buf.toString();
+        buf.append("</").append(getElementName()).append(">");
+        return buf.toString();
     }
 
     /*
@@ -110,12 +111,12 @@ public class ActivitiesPacketExtension implements PacketExtension {
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof ActivitiesPacketExtension) {
-	    ActivitiesPacketExtension other = (ActivitiesPacketExtension) obj;
+        if (obj instanceof ActivitiesPacketExtension) {
+            ActivitiesPacketExtension other = (ActivitiesPacketExtension) obj;
 
-	    return this.activities.equals(other.getActivities());
-	}
+            return this.activities.equals(other.getActivities());
+        }
 
-	return false;
+        return false;
     }
 }

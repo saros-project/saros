@@ -27,7 +27,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
     private ISharedProject sharedProject;
 
     public RoleManager() {
-	Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
     /*
@@ -36,9 +36,9 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-	this.sharedProject = session;
-	this.sharedProject.addListener(this);
-	this.sharedProject.getActivityManager().addProvider(this);
+        this.sharedProject = session;
+        this.sharedProject.addListener(this);
+        this.sharedProject.getActivityManager().addProvider(this);
     }
 
     /*
@@ -47,9 +47,9 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-	this.sharedProject.removeListener(this);
-	this.sharedProject.getActivityManager().removeProvider(this);
-	this.sharedProject = null;
+        this.sharedProject.removeListener(this);
+        this.sharedProject.getActivityManager().removeProvider(this);
+        this.sharedProject = null;
     }
 
     /*
@@ -58,7 +58,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess invitation) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -67,7 +67,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void addActivityListener(IActivityListener listener) {
-	this.activityListeners.add(listener);
+        this.activityListeners.add(listener);
     }
 
     /*
@@ -76,7 +76,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void removeActivityListener(IActivityListener listener) {
-	this.activityListeners.remove(listener);
+        this.activityListeners.remove(listener);
     }
 
     /*
@@ -85,12 +85,12 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(IActivity activity) {
-	if (activity instanceof RoleActivity) {
-	    RoleActivity roleActivity = (RoleActivity) activity;
-	    User user = this.sharedProject.getParticipant(roleActivity
-		    .getDriver());
-	    this.sharedProject.setDriver(user, true);
-	}
+        if (activity instanceof RoleActivity) {
+            RoleActivity roleActivity = (RoleActivity) activity;
+            User user = this.sharedProject.getParticipant(roleActivity
+                    .getDriver());
+            this.sharedProject.setDriver(user, true);
+        }
     }
 
     /*
@@ -99,12 +99,12 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
      */
     public void driverChanged(JID driver, boolean replicated) {
-	if (!replicated) {
-	    IActivity activity = new RoleActivity(driver);
-	    for (IActivityListener listener : this.activityListeners) {
-		listener.activityCreated(activity);
-	    }
-	}
+        if (!replicated) {
+            IActivity activity = new RoleActivity(driver);
+            for (IActivityListener listener : this.activityListeners) {
+                listener.activityCreated(activity);
+            }
+        }
     }
 
     /*
@@ -113,7 +113,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
      */
     public void userJoined(JID user) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -122,7 +122,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
      */
     public void userLeft(JID user) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -131,12 +131,12 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public IActivity fromXML(XmlPullParser parser) {
-	if (parser.getName().equals("driver")) {
-	    JID user = new JID(parser.getAttributeValue(null, "id"));
-	    return new RoleActivity(user);
-	}
+        if (parser.getName().equals("driver")) {
+            JID user = new JID(parser.getAttributeValue(null, "id"));
+            return new RoleActivity(user);
+        }
 
-	return null;
+        return null;
     }
 
     /*
@@ -145,11 +145,11 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public String toXML(IActivity activity) {
-	if (activity instanceof RoleActivity) {
-	    RoleActivity roleActivity = (RoleActivity) activity;
-	    return "<driver id=\"" + roleActivity.getDriver() + "\" />";
-	}
+        if (activity instanceof RoleActivity) {
+            RoleActivity roleActivity = (RoleActivity) activity;
+            return "<driver id=\"" + roleActivity.getDriver() + "\" />";
+        }
 
-	return null;
+        return null;
     }
 }

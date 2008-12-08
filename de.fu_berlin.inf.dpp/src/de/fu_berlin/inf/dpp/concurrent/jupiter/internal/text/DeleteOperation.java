@@ -54,8 +54,8 @@ public class DeleteOperation implements Operation {
      *            the text to be deleted
      */
     public DeleteOperation(int position, String text) {
-	setPosition(position);
-	setText(text);
+        setPosition(position);
+        setText(text);
     }
 
     /**
@@ -69,8 +69,8 @@ public class DeleteOperation implements Operation {
      *            flag to indicate whether this operation is an undo
      */
     public DeleteOperation(int position, String text, boolean isUndo) {
-	setPosition(position);
-	setText(text);
+        setPosition(position);
+        setText(text);
     }
 
     /**
@@ -79,7 +79,7 @@ public class DeleteOperation implements Operation {
      * @return the position
      */
     public int getPosition() {
-	return this.position;
+        return this.position;
     }
 
     /**
@@ -89,10 +89,10 @@ public class DeleteOperation implements Operation {
      *            the position to set
      */
     public void setPosition(int position) {
-	if (position < 0) {
-	    throw new IllegalArgumentException("position index must be >= 0");
-	}
-	this.position = position;
+        if (position < 0) {
+            throw new IllegalArgumentException("position index must be >= 0");
+        }
+        this.position = position;
     }
 
     /**
@@ -101,7 +101,7 @@ public class DeleteOperation implements Operation {
      * @return the length of the text
      */
     public int getTextLength() {
-	return this.text.length();
+        return this.text.length();
     }
 
     /**
@@ -110,7 +110,7 @@ public class DeleteOperation implements Operation {
      * @return the text to be deleted
      */
     public String getText() {
-	return this.text;
+        return this.text;
     }
 
     /**
@@ -120,10 +120,10 @@ public class DeleteOperation implements Operation {
      *            the text to be deleted
      */
     public void setText(String text) {
-	if (text == null) {
-	    throw new IllegalArgumentException("text may not be null");
-	}
-	this.text = text;
+        if (text == null) {
+            throw new IllegalArgumentException("text may not be null");
+        }
+        this.text = text;
     }
 
     /**
@@ -131,7 +131,7 @@ public class DeleteOperation implements Operation {
      */
     @Override
     public String toString() {
-	return "Delete(" + this.position + ",'" + this.text + "')";
+        return "Delete(" + this.position + ",'" + this.text + "')";
     }
 
     /**
@@ -139,16 +139,16 @@ public class DeleteOperation implements Operation {
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	} else if (obj == null) {
-	    return false;
-	} else if (obj.getClass().equals(getClass())) {
-	    DeleteOperation op = (DeleteOperation) obj;
-	    return (op.position == this.position) && op.text.equals(this.text);
-	} else {
-	    return false;
-	}
+        if (obj == this) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (obj.getClass().equals(getClass())) {
+            DeleteOperation op = (DeleteOperation) obj;
+            return (op.position == this.position) && op.text.equals(this.text);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -156,8 +156,8 @@ public class DeleteOperation implements Operation {
      */
     @Override
     public int hashCode() {
-	int hashcode = this.position;
-	hashcode += 13 * this.text.hashCode();
-	return hashcode;
+        int hashcode = this.position;
+        hashcode += 13 * this.text.hashCode();
+        return hashcode;
     }
 }

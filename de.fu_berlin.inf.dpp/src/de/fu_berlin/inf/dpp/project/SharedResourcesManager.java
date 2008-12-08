@@ -58,10 +58,10 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
  * @author rdjemili
  */
 public class SharedResourcesManager implements IResourceChangeListener,
-	IActivityProvider {
+        IActivityProvider {
 
     private static Logger log = Logger.getLogger(SharedResourcesManager.class
-	    .getName());
+            .getName());
 
     /**
      * Should be set to <code>true</code> while executing resource changes to
@@ -80,98 +80,98 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IResourceDeltaVisitor
-	 */
-	public boolean visit(IResourceDelta delta) {
-	    assert SharedResourcesManager.this.sharedProject != null;
+        /*
+         * (non-Javadoc)
+         * 
+         * @see org.eclipse.core.resources.IResourceDeltaVisitor
+         */
+        public boolean visit(IResourceDelta delta) {
+            assert SharedResourcesManager.this.sharedProject != null;
 
-	    if (SharedResourcesManager.this.replicationInProgess
-		    || !SharedResourcesManager.this.sharedProject.isDriver()) {
-		return false;
-	    }
+            if (SharedResourcesManager.this.replicationInProgess
+                    || !SharedResourcesManager.this.sharedProject.isDriver()) {
+                return false;
+            }
 
-	    IResource resource = delta.getResource();
-	    if (resource.getProject() == null) {
-		return true;
-	    }
+            IResource resource = delta.getResource();
+            if (resource.getProject() == null) {
+                return true;
+            }
 
-	    if (resource.getProject() != SharedResourcesManager.this.sharedProject
-		    .getProject()) {
-		return false;
-	    }
+            if (resource.getProject() != SharedResourcesManager.this.sharedProject
+                    .getProject()) {
+                return false;
+            }
 
-	    if (resource.isDerived()) {
-		return false;
-	    }
+            if (resource.isDerived()) {
+                return false;
+            }
 
-	    IPath path = delta.getProjectRelativePath();
-	    int kind = delta.getKind();
+            IPath path = delta.getProjectRelativePath();
+            int kind = delta.getKind();
 
-	    IActivity activity = null;
-	    if (resource instanceof IFile) {
-		activity = handleFileDelta(path, kind);
+            IActivity activity = null;
+            if (resource instanceof IFile) {
+                activity = handleFileDelta(path, kind);
 
-	    } else if (resource instanceof IFolder) {
-		activity = handleFolderDelta(path, kind);
-	    }
+            } else if (resource instanceof IFolder) {
+                activity = handleFolderDelta(path, kind);
+            }
 
-	    fireActivity(activity);
-	    closeRemovedEditors();
+            fireActivity(activity);
+            closeRemovedEditors();
 
-	    return delta.getKind() > 0;
-	}
+            return delta.getKind() > 0;
+        }
 
-	private IActivity handleFolderDelta(IPath path, int kind) {
-	    switch (kind) {
-	    case IResourceDelta.ADDED:
-		return new FolderActivity(FolderActivity.Type.Created, path);
+        private IActivity handleFolderDelta(IPath path, int kind) {
+            switch (kind) {
+            case IResourceDelta.ADDED:
+                return new FolderActivity(FolderActivity.Type.Created, path);
 
-	    case IResourceDelta.REMOVED:
-		return new FolderActivity(FolderActivity.Type.Removed, path);
+            case IResourceDelta.REMOVED:
+                return new FolderActivity(FolderActivity.Type.Removed, path);
 
-	    default:
-		return null;
-	    }
-	}
+            default:
+                return null;
+            }
+        }
 
-	private IActivity handleFileDelta(IPath path, int kind) {
-	    switch (kind) {
-	    case IResourceDelta.CHANGED:
-	    case IResourceDelta.ADDED:
-		// ignore opened files because otherwise we might send CHANGED
-		// events for files that are also handled by the editor manager.
-		if (EditorManager.getDefault().isOpened(path)) {
-		    return null;
-		}
+        private IActivity handleFileDelta(IPath path, int kind) {
+            switch (kind) {
+            case IResourceDelta.CHANGED:
+            case IResourceDelta.ADDED:
+                // ignore opened files because otherwise we might send CHANGED
+                // events for files that are also handled by the editor manager.
+                if (EditorManager.getDefault().isOpened(path)) {
+                    return null;
+                }
 
-		// fall through
+                // fall through
 
-		return new FileActivity(FileActivity.Type.Created, path);
+                return new FileActivity(FileActivity.Type.Created, path);
 
-	    case IResourceDelta.REMOVED:
-		return new FileActivity(FileActivity.Type.Removed, path);
+            case IResourceDelta.REMOVED:
+                return new FileActivity(FileActivity.Type.Removed, path);
 
-	    default:
-		return null;
-	    }
-	}
+            default:
+                return null;
+            }
+        }
 
-	private void fireActivity(IActivity activity) {
-	    if (activity == null) {
-		return;
-	    }
+        private void fireActivity(IActivity activity) {
+            if (activity == null) {
+                return;
+            }
 
-	    for (IActivityListener listener : SharedResourcesManager.this.listeners) {
-		listener.activityCreated(activity);
-	    }
-	}
+            for (IActivityListener listener : SharedResourcesManager.this.listeners) {
+                listener.activityCreated(activity);
+            }
+        }
     }
 
     public SharedResourcesManager() {
-	Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
     /*
@@ -180,9 +180,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-	this.sharedProject = session;
-	this.sharedProject.getActivityManager().addProvider(this);
-	ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+        this.sharedProject = session;
+        this.sharedProject.getActivityManager().addProvider(this);
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
     }
 
     /*
@@ -191,9 +191,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-	ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-	this.sharedProject.getActivityManager().removeProvider(this);
-	this.sharedProject = null;
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        this.sharedProject.getActivityManager().removeProvider(this);
+        this.sharedProject = null;
     }
 
     /*
@@ -202,7 +202,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess invitation) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -211,9 +211,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void addActivityListener(IActivityListener listener) {
-	if (!this.listeners.contains(listener)) {
-	    this.listeners.add(listener);
-	}
+        if (!this.listeners.contains(listener)) {
+            this.listeners.add(listener);
+        }
     }
 
     /*
@@ -222,7 +222,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void removeActivityListener(IActivityListener listener) {
-	this.listeners.remove(listener);
+        this.listeners.remove(listener);
     }
 
     /*
@@ -231,12 +231,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see org.eclipse.core.resources.IResourceChangeListener
      */
     public void resourceChanged(IResourceChangeEvent event) {
-	try {
-	    event.getDelta().accept(this.visitor);
-	} catch (CoreException e) {
-	    SharedResourcesManager.log.log(Level.SEVERE,
-		    "Couldn't handle resource change.", e);
-	}
+        try {
+            event.getDelta().accept(this.visitor);
+        } catch (CoreException e) {
+            SharedResourcesManager.log.log(Level.SEVERE,
+                    "Couldn't handle resource change.", e);
+        }
     }
 
     /*
@@ -245,22 +245,22 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(IActivity activity) {
-	try {
-	    this.replicationInProgess = true;
+        try {
+            this.replicationInProgess = true;
 
-	    if (activity instanceof FileActivity) {
-		exec((FileActivity) activity);
-	    } else if (activity instanceof FolderActivity) {
-		exec((FolderActivity) activity);
-	    }
+            if (activity instanceof FileActivity) {
+                exec((FileActivity) activity);
+            } else if (activity instanceof FolderActivity) {
+                exec((FolderActivity) activity);
+            }
 
-	} catch (CoreException e) {
-	    SharedResourcesManager.log.log(Level.SEVERE,
-		    "Failed to execute resource activity.", e);
+        } catch (CoreException e) {
+            SharedResourcesManager.log.log(Level.SEVERE,
+                    "Failed to execute resource activity.", e);
 
-	} finally {
-	    this.replicationInProgess = false;
-	}
+        } finally {
+            this.replicationInProgess = false;
+        }
     }
 
     /*
@@ -269,21 +269,21 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public IActivity fromXML(XmlPullParser parser) {
-	try {
-	    if (parser.getName().equals("file")) {
-		return parseFile(parser);
+        try {
+            if (parser.getName().equals("file")) {
+                return parseFile(parser);
 
-	    } else if (parser.getName().equals("folder")) {
-		return parseFolder(parser);
-	    }
+            } else if (parser.getName().equals("folder")) {
+                return parseFolder(parser);
+            }
 
-	} catch (IOException e) {
-	    SharedResourcesManager.log.severe("Couldn't parse message");
-	} catch (XmlPullParserException e) {
-	    SharedResourcesManager.log.severe("Couldn't parse message");
-	}
+        } catch (IOException e) {
+            SharedResourcesManager.log.severe("Couldn't parse message");
+        } catch (XmlPullParserException e) {
+            SharedResourcesManager.log.severe("Couldn't parse message");
+        }
 
-	return null;
+        return null;
     }
 
     /*
@@ -292,66 +292,66 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public String toXML(IActivity activity) {
-	if (activity instanceof FileActivity) {
-	    FileActivity fileActivity = (FileActivity) activity;
-	    return "<file " + "path=\"" + fileActivity.getPath() + "\" "
-		    + "type=\"" + fileActivity.getType() + "\" />";
+        if (activity instanceof FileActivity) {
+            FileActivity fileActivity = (FileActivity) activity;
+            return "<file " + "path=\"" + fileActivity.getPath() + "\" "
+                    + "type=\"" + fileActivity.getType() + "\" />";
 
-	} else if (activity instanceof FolderActivity) {
-	    FolderActivity folderActivity = (FolderActivity) activity;
-	    return "<folder " + "path=\"" + folderActivity.getPath() + "\" "
-		    + "type=\"" + folderActivity.getType() + "\" />";
-	}
+        } else if (activity instanceof FolderActivity) {
+            FolderActivity folderActivity = (FolderActivity) activity;
+            return "<folder " + "path=\"" + folderActivity.getPath() + "\" "
+                    + "type=\"" + folderActivity.getType() + "\" />";
+        }
 
-	return null;
+        return null;
     }
 
     private void exec(FileActivity activity) throws CoreException {
-	IProject project = this.sharedProject.getProject();
-	IFile file = project.getFile(activity.getPath());
+        IProject project = this.sharedProject.getProject();
+        IFile file = project.getFile(activity.getPath());
 
-	if (activity.getType() == FileActivity.Type.Created) {
-	    InputStream in = activity.getContents();
-	    if (file.exists()) {
-		file.setContents(in, IResource.FORCE, null);
-	    } else {
-		file.create(in, true, new NullProgressMonitor());
-	    }
+        if (activity.getType() == FileActivity.Type.Created) {
+            InputStream in = activity.getContents();
+            if (file.exists()) {
+                file.setContents(in, IResource.FORCE, null);
+            } else {
+                file.create(in, true, new NullProgressMonitor());
+            }
 
-	} else if (activity.getType() == FileActivity.Type.Removed) {
-	    file.delete(false, new NullProgressMonitor());
-	}
+        } else if (activity.getType() == FileActivity.Type.Removed) {
+            file.delete(false, new NullProgressMonitor());
+        }
 
-	closeRemovedEditors();
+        closeRemovedEditors();
     }
 
     private void exec(FolderActivity activity) throws CoreException {
-	IProject project = this.sharedProject.getProject();
-	IFolder folder = project.getFolder(activity.getPath());
+        IProject project = this.sharedProject.getProject();
+        IFolder folder = project.getFolder(activity.getPath());
 
-	if (activity.getType() == FolderActivity.Type.Created) {
-	    folder.create(true, true, new NullProgressMonitor());
-	} else if (activity.getType() == FolderActivity.Type.Removed) {
-	    folder.delete(true, new NullProgressMonitor());
-	}
+        if (activity.getType() == FolderActivity.Type.Created) {
+            folder.create(true, true, new NullProgressMonitor());
+        } else if (activity.getType() == FolderActivity.Type.Removed) {
+            folder.delete(true, new NullProgressMonitor());
+        }
     }
 
     private FileActivity parseFile(XmlPullParser parser)
-	    throws XmlPullParserException, IOException {
+            throws XmlPullParserException, IOException {
 
-	IPath path = new Path(parser.getAttributeValue(null, "path"));
-	return new FileActivity(FileActivity.Type.valueOf(parser
-		.getAttributeValue(null, "type")), path);
+        IPath path = new Path(parser.getAttributeValue(null, "path"));
+        return new FileActivity(FileActivity.Type.valueOf(parser
+                .getAttributeValue(null, "type")), path);
     }
 
     private FolderActivity parseFolder(XmlPullParser parser) {
-	Path path = new Path(parser.getAttributeValue(null, "path"));
+        Path path = new Path(parser.getAttributeValue(null, "path"));
 
-	return new FolderActivity(FolderActivity.Type.valueOf(parser
-		.getAttributeValue(null, "type")), path);
+        return new FolderActivity(FolderActivity.Type.valueOf(parser
+                .getAttributeValue(null, "type")), path);
     }
 
     private void closeRemovedEditors() {
-	// TODO
+        // TODO
     }
 }

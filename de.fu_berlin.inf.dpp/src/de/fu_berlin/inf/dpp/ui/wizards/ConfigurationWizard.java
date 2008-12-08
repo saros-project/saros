@@ -31,39 +31,39 @@ import org.eclipse.jface.wizard.Wizard;
 public class ConfigurationWizard extends Wizard {
 
     public ConfigurationWizard() {
-	setWindowTitle("Saros Configuration");
-	setHelpAvailable(false);
-	setNeedsProgressMonitor(true);
+        setWindowTitle("Saros Configuration");
+        setHelpAvailable(false);
+        setNeedsProgressMonitor(true);
 
-	this.wizards.add(new RegisterAccountPage(false, false, true));
-	this.wizards.add(new NetworkSettingsPage());
+        this.wizards.add(new RegisterAccountPage(false, false, true));
+        this.wizards.add(new NetworkSettingsPage());
     }
 
     List<IWizardPage2> wizards = new LinkedList<IWizardPage2>();
 
     @Override
     public void addPages() {
-	for (IWizardPage2 wizard : this.wizards) {
-	    addPage(wizard);
-	}
+        for (IWizardPage2 wizard : this.wizards) {
+            addPage(wizard);
+        }
     }
 
     @Override
     public boolean performFinish() {
 
-	for (IWizardPage2 wizard : this.wizards) {
-	    if (!wizard.performFinish()) {
-		getContainer().showPage(wizard);
-		return false;
-	    }
-	}
+        for (IWizardPage2 wizard : this.wizards) {
+            if (!wizard.performFinish()) {
+                getContainer().showPage(wizard);
+                return false;
+            }
+        }
 
-	return true;
+        return true;
     }
 
     @Override
     public boolean performCancel() {
-	return true;
+        return true;
     }
 
 }

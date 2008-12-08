@@ -52,99 +52,99 @@ public class MessagingWindow extends ApplicationWindow {
     private StyledText textInput;
 
     public MessagingWindow(MessagingManager.SessionProvider session) {
-	super(null); // top-level window
+        super(null); // top-level window
 
-	this.session = session;
+        this.session = session;
     }
 
     @Override
     protected Control createContents(Composite parent) {
-	// main composite
-	Composite composite = new Composite(parent, SWT.None);
-	FillLayout fillLayout = new FillLayout();
-	// fillLayout.marginHeight = 5;
-	// fillLayout.marginWidth = 5;
-	composite.setLayout(fillLayout);
+        // main composite
+        Composite composite = new Composite(parent, SWT.None);
+        FillLayout fillLayout = new FillLayout();
+        // fillLayout.marginHeight = 5;
+        // fillLayout.marginWidth = 5;
+        composite.setLayout(fillLayout);
 
-	SashForm form = new SashForm(composite, SWT.VERTICAL);
+        SashForm form = new SashForm(composite, SWT.VERTICAL);
 
-	this.historyViewer = new TextViewer(form, SWT.READ_ONLY | SWT.V_SCROLL
-		| SWT.BORDER);
-	this.historyViewer.setDocument(new Document());
+        this.historyViewer = new TextViewer(form, SWT.READ_ONLY | SWT.V_SCROLL
+                | SWT.BORDER);
+        this.historyViewer.setDocument(new Document());
 
-	this.textInput = new StyledText(form, SWT.MULTI | SWT.BORDER);
-	this.textInput.addKeyListener(new KeyListener() {
-	    public void keyPressed(KeyEvent e) {
-		if (e.character == SWT.CR) {
-		    e.doit = false;
-		    sendInput();
-		}
-	    }
+        this.textInput = new StyledText(form, SWT.MULTI | SWT.BORDER);
+        this.textInput.addKeyListener(new KeyListener() {
+            public void keyPressed(KeyEvent e) {
+                if (e.character == SWT.CR) {
+                    e.doit = false;
+                    sendInput();
+                }
+            }
 
-	    public void keyReleased(KeyEvent e) {
-		// ignore
-	    }
-	});
-	this.textInput.setFocus();
+            public void keyReleased(KeyEvent e) {
+                // ignore
+            }
+        });
+        this.textInput.setFocus();
 
-	form.setWeights(new int[] { 5, 1 });
+        form.setWeights(new int[] { 5, 1 });
 
-	// fill textViewer
-	for (MessagingManager.ChatLine chatLine : this.session.getHistory()) {
-	    addChatLine(chatLine);
-	}
+        // fill textViewer
+        for (MessagingManager.ChatLine chatLine : this.session.getHistory()) {
+            addChatLine(chatLine);
+        }
 
-	return composite;
+        return composite;
     }
 
     @Override
     protected void configureShell(Shell shell) {
-	super.configureShell(shell);
+        super.configureShell(shell);
 
-	shell.setText("Talking to " + this.session.getName());
-	shell.setSize(500, 400);
-	shell.setImage(SarosUI.getImage("icons/comment.png"));
+        shell.setText("Talking to " + this.session.getName());
+        shell.setSize(500, 400);
+        shell.setImage(SarosUI.getImage("icons/comment.png"));
     }
 
     private void sendInput() {
-	String msg = this.textInput.getText().trim();
-	this.textInput.setText("");
+        String msg = this.textInput.getText().trim();
+        this.textInput.setText("");
 
-	this.session.sendMessage(msg);
+        this.session.sendMessage(msg);
     }
 
     /**
      * Add a chat line to the text viewer.
      */
     public void addChatLine(MessagingManager.ChatLine line) {
-	String sender = line.sender;
-	String text = line.text;
+        String sender = line.sender;
+        String text = line.text;
 
-	IDocument document = this.historyViewer.getDocument();
-	int start = document.getLength();
+        IDocument document = this.historyViewer.getDocument();
+        int start = document.getLength();
 
-	// build and append new chat line string
-	StringBuffer newLine = new StringBuffer();
-	if (start > 0) {
-	    newLine.append('\n');
-	    start++;
-	}
-	newLine.append(sender);
-	newLine.append(": ");
-	newLine.append(text);
+        // build and append new chat line string
+        StringBuffer newLine = new StringBuffer();
+        if (start > 0) {
+            newLine.append('\n');
+            start++;
+        }
+        newLine.append(sender);
+        newLine.append(": ");
+        newLine.append(text);
 
-	try {
-	    document.replace(document.getLength(), 0, newLine.toString());
-	} catch (BadLocationException e) {
-	    Saros.log("Could not update chat window", e);
-	}
+        try {
+            document.replace(document.getLength(), 0, newLine.toString());
+        } catch (BadLocationException e) {
+            Saros.log("Could not update chat window", e);
+        }
 
-	// Show sender in bold
-	StyledText styledText = this.historyViewer.getTextWidget();
-	StyleRange styleRange = new StyleRange();
-	styleRange.start = start;
-	styleRange.length = sender.length();
-	styleRange.fontStyle = SWT.BOLD;
-	styledText.setStyleRange(styleRange);
+        // Show sender in bold
+        StyledText styledText = this.historyViewer.getTextWidget();
+        StyleRange styleRange = new StyleRange();
+        styleRange.start = start;
+        styleRange.length = sender.length();
+        styleRange.fontStyle = SWT.BOLD;
+        styledText.setStyleRange(styleRange);
     }
 }

@@ -58,7 +58,7 @@ public interface IEditorAPI {
      * Sets the text selection in given editor.
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
-	    String source);
+            String source);
 
     /**
      * Returns the current text selection for given editor.
@@ -78,7 +78,7 @@ public interface IEditorAPI {
     public IResource getEditorResource(IEditorPart editorPart);
 
     public void setViewport(IEditorPart editorPart, boolean jumpTo, int top,
-	    int bottom, String source);
+            int bottom, String source);
 
     /**
      * Return the viewport for given editor.

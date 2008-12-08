@@ -36,52 +36,52 @@ import org.jivesoftware.smack.RosterEntry;
  */
 public class RenameContactAction extends SelectionProviderAction {
     private class InputValidator implements IInputValidator {
-	public String isValid(String newText) {
-	    return null;
-	}
+        public String isValid(String newText) {
+            return null;
+        }
     }
 
     private RosterEntry rosterEntry;
 
     public RenameContactAction(ISelectionProvider provider) {
-	super(provider, "Rename...");
-	selectionChanged((IStructuredSelection) provider.getSelection());
+        super(provider, "Rename...");
+        selectionChanged((IStructuredSelection) provider.getSelection());
 
-	setToolTipText("Set the nickname of this contact.");
+        setToolTipText("Set the nickname of this contact.");
     }
 
     @Override
     public void run() {
-	Shell shell = Display.getDefault().getActiveShell();
-	if ((shell == null) || (this.rosterEntry == null)) {
-	    return;
-	}
+        Shell shell = Display.getDefault().getActiveShell();
+        if ((shell == null) || (this.rosterEntry == null)) {
+            return;
+        }
 
-	InputDialog dialog = new InputDialog(shell, "Set new nickname",
-		"Enter the new nickname of this contact '"
-			+ this.rosterEntry.getName() + "' ('"
-			+ this.rosterEntry.getUser() + "'):", this.rosterEntry
-			.getName(), new InputValidator());
+        InputDialog dialog = new InputDialog(shell, "Set new nickname",
+                "Enter the new nickname of this contact '"
+                        + this.rosterEntry.getName() + "' ('"
+                        + this.rosterEntry.getUser() + "'):", this.rosterEntry
+                        .getName(), new InputValidator());
 
-	if (dialog.open() == Window.OK) {
-	    String name = (dialog.getValue().length() == 0) ? "" : dialog
-		    .getValue();
-	    this.rosterEntry.setName(name);
-	}
+        if (dialog.open() == Window.OK) {
+            String name = (dialog.getValue().length() == 0) ? "" : dialog
+                    .getValue();
+            this.rosterEntry.setName(name);
+        }
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-	Object selected = selection.getFirstElement();
+        Object selected = selection.getFirstElement();
 
-	if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-	    this.rosterEntry = (RosterEntry) selected;
-	    setEnabled(true);
-	} else {
-	    this.rosterEntry = null;
-	    setEnabled(false);
-	}
+        if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
+            this.rosterEntry = (RosterEntry) selected;
+            setEnabled(true);
+        } else {
+            this.rosterEntry = null;
+            setEnabled(false);
+        }
 
-	// TODO disable if user == self
+        // TODO disable if user == self
     }
 }

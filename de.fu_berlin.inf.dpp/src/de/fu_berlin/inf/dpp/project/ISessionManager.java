@@ -38,7 +38,7 @@ public interface ISessionManager {
      * @return the shared project.
      */
     public abstract ISharedProject joinSession(IProject project, JID host,
-	    JID driver, List<JID> users);
+            JID driver, List<JID> users);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -84,7 +84,7 @@ public interface ISessionManager {
      *         further interaction with the invitation.
      */
     public abstract IIncomingInvitationProcess invitationReceived(JID from,
-	    String projectName, String description);
+            String projectName, String description);
 
     /*
      * (non-Javadoc)
@@ -92,7 +92,7 @@ public interface ISessionManager {
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public abstract void connectionStateChanged(XMPPConnection connection,
-	    ConnectionState newState);
+            ConnectionState newState);
 
     public abstract void OnReconnect(int oldtimestamp);
 

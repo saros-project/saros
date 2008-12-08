@@ -27,30 +27,30 @@ public interface IInvitationProcess extends IFileTransferCallback {
      */
     public interface IInvitationUI {
 
-	/**
-	 * 
-	 * @param errorMsg
-	 *            Is null if the cancelation was due to a user action.
-	 * @param replicated
-	 *            Is true if this message originated on the remote side or
-	 *            false if the message originated on the local side.
-	 */
-	public void cancel(String errorMsg, boolean replicated);
+        /**
+         * 
+         * @param errorMsg
+         *            Is null if the cancelation was due to a user action.
+         * @param replicated
+         *            Is true if this message originated on the remote side or
+         *            false if the message originated on the local side.
+         */
+        public void cancel(String errorMsg, boolean replicated);
 
-	public void updateInvitationProgress(final JID jid);
+        public void updateInvitationProgress(final JID jid);
 
-	public void runGUIAsynch(final Runnable runnable);
+        public void runGUIAsynch(final Runnable runnable);
     }
 
     /**
      * All states that an invitiation process can possibly have.
      */
     public static enum State {
-	INITIALIZED, INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
+        INITIALIZED, INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
     }
 
     public static enum TransferMode {
-	JINGLE, IBB, DEFAULT
+        JINGLE, IBB, DEFAULT
     }
 
     /**

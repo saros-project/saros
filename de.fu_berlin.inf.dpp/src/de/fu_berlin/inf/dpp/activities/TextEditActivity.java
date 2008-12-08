@@ -51,10 +51,10 @@ public class TextEditActivity implements IActivity {
      *            the source ID of this activity
      */
     public TextEditActivity(int offset, String text, int replace) {
-	this.offset = offset;
-	this.text = text;
-	this.replace = replace;
-	this.source = null;
+        this.offset = offset;
+        this.text = text;
+        this.replace = replace;
+        this.source = null;
     }
 
     /**
@@ -68,39 +68,39 @@ public class TextEditActivity implements IActivity {
      *            the source ID of this activity
      */
     public TextEditActivity(int offset, String text, int replace, IPath editor) {
-	this.offset = offset;
-	this.text = text;
-	this.replace = replace;
-	this.source = null;
-	this.editor = editor;
+        this.offset = offset;
+        this.text = text;
+        this.replace = replace;
+        this.source = null;
+        this.editor = editor;
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof TextEditActivity) {
-	    TextEditActivity other = (TextEditActivity) obj;
-	    return (this.offset == other.offset)
-		    && this.text.equals(other.text)
-		    && (this.replace == other.replace)
-		    && (this.source == other.source);
-	}
+        if (obj instanceof TextEditActivity) {
+            TextEditActivity other = (TextEditActivity) obj;
+            return (this.offset == other.offset)
+                    && this.text.equals(other.text)
+                    && (this.replace == other.replace)
+                    && (this.source == other.source);
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "TextEditActivity(offset:" + this.offset + ",text:" + this.text
-		+ ",replace:" + this.replace + ", path : "
-		+ this.editor.toString() + ")";
+        return "TextEditActivity(offset:" + this.offset + ",text:" + this.text
+                + ",replace:" + this.replace + ", path : "
+                + this.editor.toString() + ")";
     }
 
     /**
@@ -111,22 +111,22 @@ public class TextEditActivity implements IActivity {
      * @return true if edit information equals. false otherwise.
      */
     public boolean sameLike(Object obj) {
-	if (obj instanceof TextEditActivity) {
-	    TextEditActivity other = (TextEditActivity) obj;
-	    return (this.offset == other.offset)
-		    && ((this.editor != null) && (other.editor != null) && this.editor
-			    .equals(other.editor))
-		    && this.text.equals(other.text)
-		    && (this.replace == other.replace);
-	}
-	return false;
+        if (obj instanceof TextEditActivity) {
+            TextEditActivity other = (TextEditActivity) obj;
+            return (this.offset == other.offset)
+                    && ((this.editor != null) && (other.editor != null) && this.editor
+                            .equals(other.editor))
+                    && this.text.equals(other.text)
+                    && (this.replace == other.replace);
+        }
+        return false;
     }
 
     public IPath getEditor() {
-	return this.editor;
+        return this.editor;
     }
 
     public void setEditor(IPath editor) {
-	this.editor = editor;
+        this.editor = editor;
     }
 }

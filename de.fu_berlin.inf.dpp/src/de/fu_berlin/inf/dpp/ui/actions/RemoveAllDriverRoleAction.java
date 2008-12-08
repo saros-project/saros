@@ -39,29 +39,29 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * 
  */
 public class RemoveAllDriverRoleAction extends Action implements
-	ISharedProjectListener, ISessionListener {
+        ISharedProjectListener, ISessionListener {
 
     public RemoveAllDriverRoleAction() {
-	super("Take remote user driver roles");
-	setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
-	setToolTipText("Take remote driver roles");
+        super("Take remote user driver roles");
+        setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
+        setToolTipText("Take remote driver roles");
 
-	Saros.getDefault().getSessionManager().addSessionListener(this);
-	updateEnablement();
+        Saros.getDefault().getSessionManager().addSessionListener(this);
+        updateEnablement();
     }
 
     @Override
     public void run() {
-	// getSharedProject().setDriver(getSharedProject().getHost(), false);
-	ISharedProject project = Saros.getDefault().getSessionManager()
-		.getSharedProject();
-	for (User user : project.getParticipants()) {
+        // getSharedProject().setDriver(getSharedProject().getHost(), false);
+        ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
+        for (User user : project.getParticipants()) {
 
-	    if ((user.getUserRole() == UserRole.DRIVER)
-		    && !project.getHost().equals(user)) {
-		project.removeDriver(user, false);
-	    }
-	}
+            if ((user.getUserRole() == UserRole.DRIVER)
+                    && !project.getHost().equals(user)) {
+                project.removeDriver(user, false);
+            }
+        }
     }
 
     /*
@@ -70,8 +70,8 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-	session.addListener(this);
-	updateEnablement();
+        session.addListener(this);
+        updateEnablement();
     }
 
     /*
@@ -80,8 +80,8 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-	session.removeListener(this);
-	updateEnablement();
+        session.removeListener(this);
+        updateEnablement();
     }
 
     /*
@@ -90,7 +90,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -99,7 +99,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void driverChanged(JID driver, boolean replicated) {
-	updateEnablement();
+        updateEnablement();
     }
 
     /*
@@ -108,7 +108,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void userJoined(JID user) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -117,18 +117,18 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void userLeft(JID user) {
-	// ignore
+        // ignore
     }
 
     private void updateEnablement() {
-	ISharedProject project = getSharedProject();
-	boolean enabled = ((project != null) && project.isHost());
-	setEnabled(enabled);
-	// setEnabled(project != null && project.isHost() &&
-	// !project.isDriver());
+        ISharedProject project = getSharedProject();
+        boolean enabled = ((project != null) && project.isHost());
+        setEnabled(enabled);
+        // setEnabled(project != null && project.isHost() &&
+        // !project.isDriver());
     }
 
     private ISharedProject getSharedProject() {
-	return Saros.getDefault().getSessionManager().getSharedProject();
+        return Saros.getDefault().getSessionManager().getSharedProject();
     }
 }

@@ -64,9 +64,9 @@ public class InsertOperation implements Operation {
      *            the text to be inserted
      */
     public InsertOperation(int position, String text) {
-	setPosition(position);
-	setText(text);
-	this.origin = getPosition();
+        setPosition(position);
+        setText(text);
+        this.origin = getPosition();
     }
 
     /**
@@ -80,8 +80,8 @@ public class InsertOperation implements Operation {
      *            flag to indicate an undo operation
      */
     public InsertOperation(int position, String text, boolean isUndo) {
-	this(position, text);
-	this.origin = getPosition();
+        this(position, text);
+        this.origin = getPosition();
     }
 
     /**
@@ -95,8 +95,8 @@ public class InsertOperation implements Operation {
      *            the origin position of this insert operation
      */
     public InsertOperation(int position, String text, int origin) {
-	this(position, text);
-	this.origin = origin;
+        this(position, text);
+        this.origin = origin;
     }
 
     /**
@@ -110,7 +110,7 @@ public class InsertOperation implements Operation {
      *            flag to indicate an undo operation
      */
     public InsertOperation(int position, String text, int origin, boolean isUndo) {
-	this(position, text, origin);
+        this(position, text, origin);
     }
 
     /**
@@ -119,7 +119,7 @@ public class InsertOperation implements Operation {
      * @return the position
      */
     public int getPosition() {
-	return this.position;
+        return this.position;
     }
 
     /**
@@ -129,10 +129,10 @@ public class InsertOperation implements Operation {
      *            the position to set
      */
     public void setPosition(int position) {
-	if (position < 0) {
-	    throw new IllegalArgumentException("position index must be >= 0");
-	}
-	this.position = position;
+        if (position < 0) {
+            throw new IllegalArgumentException("position index must be >= 0");
+        }
+        this.position = position;
     }
 
     /**
@@ -141,7 +141,7 @@ public class InsertOperation implements Operation {
      * @return the text to be deleted
      */
     public String getText() {
-	return this.text;
+        return this.text;
     }
 
     /**
@@ -150,7 +150,7 @@ public class InsertOperation implements Operation {
      * @return the length of the text
      */
     public int getTextLength() {
-	return this.text.length();
+        return this.text.length();
     }
 
     /**
@@ -159,7 +159,7 @@ public class InsertOperation implements Operation {
      * @return the origin position
      */
     public int getOrigin() {
-	return this.origin;
+        return this.origin;
     }
 
     /**
@@ -169,10 +169,10 @@ public class InsertOperation implements Operation {
      *            the origin position to set
      */
     public void setOrigin(int origin) {
-	if (origin < 0) {
-	    throw new IllegalArgumentException("origin index must be >= 0");
-	}
-	this.origin = origin;
+        if (origin < 0) {
+            throw new IllegalArgumentException("origin index must be >= 0");
+        }
+        this.origin = origin;
     }
 
     /**
@@ -182,10 +182,10 @@ public class InsertOperation implements Operation {
      *            the text to be deleted
      */
     public void setText(String text) {
-	if (text == null) {
-	    throw new IllegalArgumentException("text may not be null");
-	}
-	this.text = text;
+        if (text == null) {
+            throw new IllegalArgumentException("text may not be null");
+        }
+        this.text = text;
     }
 
     /**
@@ -193,12 +193,12 @@ public class InsertOperation implements Operation {
      */
     @Override
     public String toString() {
-	return "Insert("
-		+ this.position
-		+ ",'"
-		+ (this.text != null ? ((this.text.length() > 20) ? this.text
-			.substring(0, 20)
-			+ "..." : this.text) : "") + "'," + this.origin + ")";
+        return "Insert("
+                + this.position
+                + ",'"
+                + (this.text != null ? ((this.text.length() > 20) ? this.text
+                        .substring(0, 20)
+                        + "..." : this.text) : "") + "'," + this.origin + ")";
     }
 
     /**
@@ -206,17 +206,17 @@ public class InsertOperation implements Operation {
      */
     @Override
     public boolean equals(Object obj) {
-	if (this == obj) {
-	    return true;
-	} else if (obj == null) {
-	    return false;
-	} else if (obj.getClass().equals(getClass())) {
-	    InsertOperation op = (InsertOperation) obj;
-	    return (op.position == this.position) && op.text.equals(this.text)
-		    && (op.origin == this.origin);
-	} else {
-	    return false;
-	}
+        if (this == obj) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (obj.getClass().equals(getClass())) {
+            InsertOperation op = (InsertOperation) obj;
+            return (op.position == this.position) && op.text.equals(this.text)
+                    && (op.origin == this.origin);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -224,10 +224,10 @@ public class InsertOperation implements Operation {
      */
     @Override
     public int hashCode() {
-	int hashcode = this.position;
-	hashcode += 13 * this.origin;
-	hashcode += 13 * this.text.hashCode();
-	return hashcode;
+        int hashcode = this.position;
+        hashcode += 13 * this.origin;
+        hashcode += 13 * this.text.hashCode();
+        return hashcode;
     }
 
 }

@@ -10,7 +10,7 @@ public class TransformationException extends Exception {
      * Creates a new TransformationException.
      */
     public TransformationException() {
-	super();
+        super();
     }
 
     /**
@@ -20,7 +20,7 @@ public class TransformationException extends Exception {
      *            the detail message
      */
     public TransformationException(String message) {
-	super(message);
+        super(message);
     }
 
     /**
@@ -30,7 +30,7 @@ public class TransformationException extends Exception {
      *            the cause of this exception
      */
     public TransformationException(Throwable cause) {
-	super(cause);
+        super(cause);
     }
 
     /**
@@ -42,7 +42,7 @@ public class TransformationException extends Exception {
      *            the cause of this exception
      */
     public TransformationException(String message, Throwable cause) {
-	super(message, cause);
+        super(message, cause);
     }
 
 }

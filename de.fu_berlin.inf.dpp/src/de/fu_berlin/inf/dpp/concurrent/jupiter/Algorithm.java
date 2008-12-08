@@ -49,7 +49,7 @@ public interface Algorithm {
      * @throws TransformationException
      */
     void acknowledge(int siteId, Timestamp timestamp)
-	    throws TransformationException;
+            throws TransformationException;
 
     /**
      * Transform the array of indices from the state indicated by the timestamp
@@ -63,7 +63,7 @@ public interface Algorithm {
      * @return the transformed array of indices
      */
     int[] transformIndices(Timestamp timestamp, int[] indices)
-	    throws TransformationException;
+            throws TransformationException;
 
     /**
      * 

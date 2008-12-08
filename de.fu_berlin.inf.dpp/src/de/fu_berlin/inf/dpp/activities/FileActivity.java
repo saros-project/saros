@@ -8,7 +8,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class FileActivity implements IActivity {
     public static enum Type {
-	Created, Removed, Error
+        Created, Removed, Error
     };
 
     private String source;
@@ -23,8 +23,8 @@ public class FileActivity implements IActivity {
     private InputStream inputStream;
 
     public FileActivity(Type type, IPath path) {
-	this.type = type;
-	this.path = path;
+        this.type = type;
+        this.path = path;
     }
 
     /**
@@ -35,25 +35,25 @@ public class FileActivity implements IActivity {
      * @param to
      */
     public FileActivity(Type type, IPath path, JID to) {
-	this(type, path);
-	this.errorRecipient = to;
+        this(type, path);
+        this.errorRecipient = to;
     }
 
     public FileActivity(Type type, IPath path, InputStream in) {
-	this(type, path);
-	this.inputStream = in;
+        this(type, path);
+        this.inputStream = in;
     }
 
     public IPath getPath() {
-	return this.path;
+        return this.path;
     }
 
     public Type getType() {
-	return this.type;
+        return this.type;
     }
 
     public JID getRecipient() {
-	return this.errorRecipient;
+        return this.errorRecipient;
     }
 
     /**
@@ -61,31 +61,31 @@ public class FileActivity implements IActivity {
      *         creation activities. <code>null</code> otherwise.
      */
     public InputStream getContents() {
-	return this.inputStream;
+        return this.inputStream;
     }
 
     @Override
     public String toString() {
-	return "FileActivity(type:" + this.type + ", path:" + this.path + ")";
+        return "FileActivity(type:" + this.type + ", path:" + this.path + ")";
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof FileActivity) {
-	    FileActivity activity = (FileActivity) obj;
+        if (obj instanceof FileActivity) {
+            FileActivity activity = (FileActivity) obj;
 
-	    return (getPath().equals(activity.getPath()) && getType().equals(
-		    activity.getType()));
-	}
+            return (getPath().equals(activity.getPath()) && getType().equals(
+                    activity.getType()));
+        }
 
-	return false;
+        return false;
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
     }
 }

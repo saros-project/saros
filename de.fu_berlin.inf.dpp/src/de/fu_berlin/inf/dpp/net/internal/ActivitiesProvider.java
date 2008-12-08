@@ -35,44 +35,44 @@ import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 public class ActivitiesProvider implements PacketExtensionProvider {
 
     public ActivitiesPacketExtension parseExtension(XmlPullParser parser)
-	    throws XmlPullParserException, IOException {
+            throws XmlPullParserException, IOException {
 
-	List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-	int time = -1;
+        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
+        int time = -1;
 
-	boolean done = false;
-	while (!done) {
-	    int eventType = parser.next();
-	    if (eventType == XmlPullParser.START_TAG) {
+        boolean done = false;
+        while (!done) {
+            int eventType = parser.next();
+            if (eventType == XmlPullParser.START_TAG) {
 
-		if (parser.getName().equals("timestamp")) {
-		    time = parseTime(parser);
-		}
+                if (parser.getName().equals("timestamp")) {
+                    time = parseTime(parser);
+                }
 
-		ActivityRegistry activityRegistry = ActivityRegistry
-			.getDefault();
-		IActivity activity = activityRegistry.parseActivity(parser);
-		if (activity != null) {
-		    timedActivities.add(new TimedActivity(activity, time));
-		    time++;
-		}
+                ActivityRegistry activityRegistry = ActivityRegistry
+                        .getDefault();
+                IActivity activity = activityRegistry.parseActivity(parser);
+                if (activity != null) {
+                    timedActivities.add(new TimedActivity(activity, time));
+                    time++;
+                }
 
-	    } else if (eventType == XmlPullParser.END_TAG) {
-		if (parser.getName().equals("activities")) {
-		    done = true;
-		}
-	    }
-	}
+            } else if (eventType == XmlPullParser.END_TAG) {
+                if (parser.getName().equals("activities")) {
+                    done = true;
+                }
+            }
+        }
 
-	return new ActivitiesPacketExtension(timedActivities);
+        return new ActivitiesPacketExtension(timedActivities);
     }
 
     private int parseTime(XmlPullParser parser) throws XmlPullParserException,
-	    IOException {
-	parser.next(); // read text
-	int time = Integer.parseInt(parser.getText());
-	parser.next(); // read end tag
+            IOException {
+        parser.next(); // read text
+        int time = Integer.parseInt(parser.getText());
+        parser.next(); // read end tag
 
-	return time;
+        return time;
     }
 }

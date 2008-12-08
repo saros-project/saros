@@ -12,45 +12,45 @@ public class ViewportActivity implements IActivity {
     private IPath editor;
 
     public ViewportActivity(int topIndex, int bottomIndex, IPath editor) {
-	this.topIndex = topIndex;
-	this.bottomIndex = bottomIndex;
-	this.editor = editor;
+        this.topIndex = topIndex;
+        this.bottomIndex = bottomIndex;
+        this.editor = editor;
     }
 
     public int getBottomIndex() {
-	return this.bottomIndex;
+        return this.bottomIndex;
     }
 
     public int getTopIndex() {
-	return this.topIndex;
+        return this.topIndex;
     }
 
     public IPath getEditor() {
-	return this.editor;
+        return this.editor;
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof ViewportActivity) {
-	    ViewportActivity other = (ViewportActivity) obj;
-	    return (this.topIndex == other.topIndex)
-		    && (this.bottomIndex == other.bottomIndex);
-	}
+        if (obj instanceof ViewportActivity) {
+            ViewportActivity other = (ViewportActivity) obj;
+            return (this.topIndex == other.topIndex)
+                    && (this.bottomIndex == other.bottomIndex);
+        }
 
-	return false;
+        return false;
     }
 
     @Override
     public String toString() {
-	return "ViewportActivity(top:" + this.topIndex + ",bottom:"
-		+ this.bottomIndex + ")";
+        return "ViewportActivity(top:" + this.topIndex + ",bottom:"
+                + this.bottomIndex + ")";
     }
 
     public String getSource() {
-	return this.source;
+        return this.source;
     }
 
     public void setSource(String source) {
-	this.source = source;
+        this.source = source;
     }
 }

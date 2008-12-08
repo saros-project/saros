@@ -59,8 +59,8 @@ public class SarosUI implements ISessionListener {
     private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
     public SarosUI(ISessionManager sessionManager) {
-	setupCompilationUnitDocumentProvider();
-	sessionManager.addSessionListener(this);
+        setupCompilationUnitDocumentProvider();
+        sessionManager.addSessionListener(this);
     }
 
     /*
@@ -69,7 +69,7 @@ public class SarosUI implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-	// ignore
+        // ignore
     }
 
     /*
@@ -78,24 +78,24 @@ public class SarosUI implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(final IIncomingInvitationProcess process) {
-	Display.getDefault().asyncExec(new Runnable() {
-	    public void run() {
-		try {
-		    Shell shell = Display.getDefault().getActiveShell();
-		    JoinSessionWizard jsw = new JoinSessionWizard(process);
-		    WizardDialogAccessable wd = new WizardDialogAccessable(
-			    shell, jsw);
-		    jsw.setWizardDlg(wd);
-		    process.setInvitationUI(jsw.getInvitationUI());
-		    wd.open();
-		} catch (Exception e) {
-		    Saros.getDefault().getLog().log(
-			    new Status(IStatus.ERROR, Saros.SAROS,
-				    IStatus.ERROR,
-				    "Error while joining a session", e));
-		}
-	    }
-	});
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                try {
+                    Shell shell = Display.getDefault().getActiveShell();
+                    JoinSessionWizard jsw = new JoinSessionWizard(process);
+                    WizardDialogAccessable wd = new WizardDialogAccessable(
+                            shell, jsw);
+                    jsw.setWizardDlg(wd);
+                    process.setInvitationUI(jsw.getInvitationUI());
+                    wd.open();
+                } catch (Exception e) {
+                    Saros.getDefault().getLog().log(
+                            new Status(IStatus.ERROR, Saros.SAROS,
+                                    IStatus.ERROR,
+                                    "Error while joining a session", e));
+                }
+            }
+        });
     }
 
     /*
@@ -104,38 +104,38 @@ public class SarosUI implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-	Display.getDefault().syncExec(new Runnable() {
-	    public void run() {
-		try {
-		    // Create Session View
-		    IWorkbench workbench = PlatformUI.getWorkbench();
-		    IWorkbenchWindow window = workbench
-			    .getActiveWorkbenchWindow();
-		    window.getActivePage().showView(SarosUI.SESSION_VIEW, null,
-			    IWorkbenchPage.VIEW_CREATE);
-		} catch (PartInitException e) {
-		    Saros.getDefault().getLog().log(
-			    new Status(IStatus.ERROR, Saros.SAROS,
-				    IStatus.ERROR,
-				    "Could not create Session View", e));
-		}
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                try {
+                    // Create Session View
+                    IWorkbench workbench = PlatformUI.getWorkbench();
+                    IWorkbenchWindow window = workbench
+                            .getActiveWorkbenchWindow();
+                    window.getActivePage().showView(SarosUI.SESSION_VIEW, null,
+                            IWorkbenchPage.VIEW_CREATE);
+                } catch (PartInitException e) {
+                    Saros.getDefault().getLog().log(
+                            new Status(IStatus.ERROR, Saros.SAROS,
+                                    IStatus.ERROR,
+                                    "Could not create Session View", e));
+                }
 
-		try {
-		    // Open Roster so that a participant can be invited
-		    IWorkbench workbench = PlatformUI.getWorkbench();
-		    IWorkbenchWindow window = workbench
-			    .getActiveWorkbenchWindow();
-		    window.getActivePage().showView(SarosUI.ROSTER_VIEW, null,
-			    IWorkbenchPage.VIEW_ACTIVATE);
-		} catch (PartInitException e) {
-		    Saros.getDefault().getLog().log(
-			    new Status(IStatus.ERROR, Saros.SAROS,
-				    IStatus.ERROR,
-				    "Could not activate Roster View", e));
-		}
+                try {
+                    // Open Roster so that a participant can be invited
+                    IWorkbench workbench = PlatformUI.getWorkbench();
+                    IWorkbenchWindow window = workbench
+                            .getActiveWorkbenchWindow();
+                    window.getActivePage().showView(SarosUI.ROSTER_VIEW, null,
+                            IWorkbenchPage.VIEW_ACTIVATE);
+                } catch (PartInitException e) {
+                    Saros.getDefault().getLog().log(
+                            new Status(IStatus.ERROR, Saros.SAROS,
+                                    IStatus.ERROR,
+                                    "Could not activate Roster View", e));
+                }
 
-	    }
-	});
+            }
+        });
     }
 
     /**
@@ -144,39 +144,39 @@ public class SarosUI implements ISessionListener {
      *         to be shown in labels (e.g. CONNECTING becomes "Connecting..").
      */
     public static String getDescription(ConnectionState state) {
-	switch (state) {
-	case NOT_CONNECTED:
-	    return "Not connected";
-	case CONNECTING:
-	    return "Connecting...";
-	case CONNECTED:
-	    return "Connected (as "
-		    + Saros.getDefault().getConnection().getUser() + ")";
-	case DISCONNECTING:
-	    return "Disconnecting...";
-	case ERROR:
-	    return "Error (" + Saros.getDefault().getConnectionError() + ")";
-	}
+        switch (state) {
+        case NOT_CONNECTED:
+            return "Not connected";
+        case CONNECTING:
+            return "Connecting...";
+        case CONNECTED:
+            return "Connected (as "
+                    + Saros.getDefault().getConnection().getUser() + ")";
+        case DISCONNECTING:
+            return "Disconnecting...";
+        case ERROR:
+            return "Error (" + Saros.getDefault().getConnectionError() + ")";
+        }
 
-	return "";
+        return "";
     }
 
     public static Composite createLabelComposite(Composite parent, String text) {
-	Composite composite = new Composite(parent, SWT.NONE);
+        Composite composite = new Composite(parent, SWT.NONE);
 
-	FillLayout layout = new FillLayout(SWT.NONE);
-	layout.marginHeight = 20;
-	composite.setLayout(layout);
+        FillLayout layout = new FillLayout(SWT.NONE);
+        layout.marginHeight = 20;
+        composite.setLayout(layout);
 
-	Label label = new Label(composite, SWT.NONE);
-	label.setText(text);
+        Label label = new Label(composite, SWT.NONE);
+        label.setText(text);
 
-	return composite;
+        return composite;
     }
 
     public static Image getImage(String path) {
-	return new Image(Display.getDefault(), SarosUI.getImageDescriptor(path)
-		.getImageData());
+        return new Image(Display.getDefault(), SarosUI.getImageDescriptor(path)
+                .getImageData());
     }
 
     /**
@@ -188,22 +188,22 @@ public class SarosUI implements ISessionListener {
      * @return the image descriptor
      */
     public static ImageDescriptor getImageDescriptor(String path) {
-	return AbstractUIPlugin.imageDescriptorFromPlugin(
-		"de.fu_berlin.inf.dpp", path);
+        return AbstractUIPlugin.imageDescriptorFromPlugin(
+                "de.fu_berlin.inf.dpp", path);
     }
 
     @SuppressWarnings("restriction")
     private void setupCompilationUnitDocumentProvider() { // UGLY HACK
-	CompilationUnitDocumentProvider cuProvider = (CompilationUnitDocumentProvider) JavaPlugin
-		.getDefault().getCompilationUnitDocumentProvider();
+        CompilationUnitDocumentProvider cuProvider = (CompilationUnitDocumentProvider) JavaPlugin
+                .getDefault().getCompilationUnitDocumentProvider();
 
-	SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
+        SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
 
-	IDocumentSetupParticipant setupParticipant = new JavaDocumentSetupParticipant();
-	ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
-		IJavaPartitions.JAVA_PARTITIONING, setupParticipant,
-		sharedProvider);
+        IDocumentSetupParticipant setupParticipant = new JavaDocumentSetupParticipant();
+        ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
+                IJavaPartitions.JAVA_PARTITIONING, setupParticipant,
+                sharedProvider);
 
-	cuProvider.setParentDocumentProvider(parentProvider);
+        cuProvider.setParentDocumentProvider(parentProvider);
     }
 }

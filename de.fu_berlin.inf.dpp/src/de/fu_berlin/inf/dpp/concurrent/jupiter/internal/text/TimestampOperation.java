@@ -22,7 +22,7 @@ public class TimestampOperation implements Operation {
      * @return the position
      */
     public int getPosition() {
-	return 0;
+        return 0;
     }
 
     /**
@@ -32,7 +32,7 @@ public class TimestampOperation implements Operation {
      *            the position to set
      */
     public void setPosition(int position) {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -41,7 +41,7 @@ public class TimestampOperation implements Operation {
      * @return the length of the text
      */
     public int getTextLength() {
-	return 0;
+        return 0;
     }
 
     /**
@@ -50,7 +50,7 @@ public class TimestampOperation implements Operation {
      * @return the text to be deleted
      */
     public String getText() {
-	return "";
+        return "";
     }
 
     /**
@@ -60,7 +60,7 @@ public class TimestampOperation implements Operation {
      *            the text to be deleted
      */
     public void setText(String text) {
-	throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -68,7 +68,7 @@ public class TimestampOperation implements Operation {
      */
     @Override
     public String toString() {
-	return "Timestamp(0,'')";
+        return "Timestamp(0,'')";
     }
 
     /**
@@ -76,15 +76,15 @@ public class TimestampOperation implements Operation {
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	} else if (obj == null) {
-	    return false;
-	} else if (obj.getClass().equals(getClass())) {
-	    return true;
-	} else {
-	    return false;
-	}
+        if (obj == this) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (obj.getClass().equals(getClass())) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -92,7 +92,7 @@ public class TimestampOperation implements Operation {
      */
     @Override
     public int hashCode() {
-	int hashcode = 38;
-	return hashcode;
+        int hashcode = 38;
+        return hashcode;
     }
 }

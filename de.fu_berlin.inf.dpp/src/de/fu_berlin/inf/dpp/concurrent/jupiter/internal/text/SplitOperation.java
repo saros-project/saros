@@ -55,8 +55,8 @@ public class SplitOperation implements Operation {
      *            the second operation
      */
     public SplitOperation(Operation op1, Operation op2) {
-	this.op1 = op1;
-	this.op2 = op2;
+        this.op1 = op1;
+        this.op2 = op2;
     }
 
     /**
@@ -65,7 +65,7 @@ public class SplitOperation implements Operation {
      * @return the first operation
      */
     public Operation getFirst() {
-	return this.op1;
+        return this.op1;
     }
 
     /**
@@ -75,7 +75,7 @@ public class SplitOperation implements Operation {
      *            the first operation
      */
     public void setFirst(Operation op1) {
-	this.op1 = op1;
+        this.op1 = op1;
     }
 
     /**
@@ -84,7 +84,7 @@ public class SplitOperation implements Operation {
      * @return the second operation
      */
     public Operation getSecond() {
-	return this.op2;
+        return this.op2;
     }
 
     /**
@@ -94,7 +94,7 @@ public class SplitOperation implements Operation {
      *            the second operation
      */
     public void setSecond(Operation op2) {
-	this.op2 = op2;
+        this.op2 = op2;
     }
 
     /**
@@ -102,7 +102,7 @@ public class SplitOperation implements Operation {
      */
     @Override
     public String toString() {
-	return "Split(" + this.op1 + ", " + this.op2 + ")";
+        return "Split(" + this.op1 + ", " + this.op2 + ")";
     }
 
     /**
@@ -110,17 +110,17 @@ public class SplitOperation implements Operation {
      */
     @Override
     public boolean equals(Object obj) {
-	if (obj == this) {
-	    return true;
-	} else if (obj == null) {
-	    return false;
-	} else if (obj.getClass().equals(getClass())) {
-	    SplitOperation op = (SplitOperation) obj;
-	    return op.getFirst().equals(this.op1)
-		    && op.getSecond().equals(this.op2);
-	} else {
-	    return false;
-	}
+        if (obj == this) {
+            return true;
+        } else if (obj == null) {
+            return false;
+        } else if (obj.getClass().equals(getClass())) {
+            SplitOperation op = (SplitOperation) obj;
+            return op.getFirst().equals(this.op1)
+                    && op.getSecond().equals(this.op2);
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -128,9 +128,9 @@ public class SplitOperation implements Operation {
      */
     @Override
     public int hashCode() {
-	int hashcode = this.op1.hashCode();
-	hashcode += 17 * this.op2.hashCode();
-	return hashcode;
+        int hashcode = this.op1.hashCode();
+        hashcode += 17 * this.op2.hashCode();
+        return hashcode;
     }
 
 }

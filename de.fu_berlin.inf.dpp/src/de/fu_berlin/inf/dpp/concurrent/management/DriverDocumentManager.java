@@ -29,10 +29,10 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * 
  */
 public class DriverDocumentManager implements IDriverDocumentManager,
-	ISessionListener {
+        ISessionListener {
 
     private static Logger logger = Logger
-	    .getLogger(DriverDocumentManager.class);
+            .getLogger(DriverDocumentManager.class);
 
     /* list of all active driver. */
     private final List<JID> activeDriver;
@@ -46,9 +46,9 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * private constructor for singleton pattern.
      */
     private DriverDocumentManager() {
-	this.activeDriver = new Vector<JID>();
-	this.documents = new HashMap<IPath, DriverDocument>();
-	Saros.getDefault().getSessionManager().addSessionListener(this);
+        this.activeDriver = new Vector<JID>();
+        this.documents = new HashMap<IPath, DriverDocument>();
+        Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
     /**
@@ -57,11 +57,11 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * @return instance of DriverDocumentManager
      */
     public static DriverDocumentManager getInstance() {
-	/* at first time, create new manager. */
-	if (DriverDocumentManager.manager == null) {
-	    DriverDocumentManager.manager = new DriverDocumentManager();
-	}
-	return DriverDocumentManager.manager;
+        /* at first time, create new manager. */
+        if (DriverDocumentManager.manager == null) {
+            DriverDocumentManager.manager = new DriverDocumentManager();
+        }
+        return DriverDocumentManager.manager;
     }
 
     /**
@@ -70,12 +70,12 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * @return true if driver exists in active driver list, false otherwise
      */
     public boolean isDriver(JID jid) {
-	if (jid != null) {
-	    return this.activeDriver.contains(jid);
-	} else {
-	    System.out.println("jid null");
-	}
-	return false;
+        if (jid != null) {
+            return this.activeDriver.contains(jid);
+        } else {
+            System.out.println("jid null");
+        }
+        return false;
     }
 
     /*
@@ -86,11 +86,11 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * (org.eclipse.core.runtime.IPath)
      */
     public List<JID> getDriverForDocument(IPath path) {
-	if (this.documents.containsKey(path)) {
-	    List<JID> drivers = this.documents.get(path).getActiveDriver();
-	    return drivers;
-	}
-	return new Vector<JID>();
+        if (this.documents.containsKey(path)) {
+            List<JID> drivers = this.documents.get(path).getActiveDriver();
+            return drivers;
+        }
+        return new Vector<JID>();
     }
 
     /*
@@ -99,47 +99,47 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
      */
     public List<JID> getActiveDriver() {
-	return this.activeDriver;
+        return this.activeDriver;
     }
 
     public void addDriver(JID jid) {
-	// if (user.getUserRole() == UserRole.OBSERVER) {
-	// logger.error("User " + user.getJid() + " has not driver status! ");
-	// }
-	DriverDocumentManager.logger.debug("add driver for jid: " + jid);
-	if (!this.activeDriver.contains(jid)) {
-	    this.activeDriver.add(jid);
-	}
+        // if (user.getUserRole() == UserRole.OBSERVER) {
+        // logger.error("User " + user.getJid() + " has not driver status! ");
+        // }
+        DriverDocumentManager.logger.debug("add driver for jid: " + jid);
+        if (!this.activeDriver.contains(jid)) {
+            this.activeDriver.add(jid);
+        }
     }
 
     public void addDriverToDocument(IPath path, JID jid) {
-	addDriver(jid);
+        addDriver(jid);
 
-	DriverDocumentManager.logger.debug("add activer driver " + jid
-		+ " to document " + path.lastSegment().toString());
-	/* add driver to new document. */
-	DriverDocument doc = this.documents.get(path);
-	if ((doc == null) || !this.documents.containsKey(path)) {
-	    DriverDocumentManager.logger.debug("New document creates for "
-		    + path.lastSegment().toString());
-	    /* create new instance of this documents. */
-	    doc = new DriverDocument(path);
-	    this.documents.put(path, doc);
-	}
-	if (!doc.isDriver(jid)) {
-	    doc.addDriver(jid);
-	}
+        DriverDocumentManager.logger.debug("add activer driver " + jid
+                + " to document " + path.lastSegment().toString());
+        /* add driver to new document. */
+        DriverDocument doc = this.documents.get(path);
+        if ((doc == null) || !this.documents.containsKey(path)) {
+            DriverDocumentManager.logger.debug("New document creates for "
+                    + path.lastSegment().toString());
+            /* create new instance of this documents. */
+            doc = new DriverDocument(path);
+            this.documents.put(path, doc);
+        }
+        if (!doc.isDriver(jid)) {
+            doc.addDriver(jid);
+        }
     }
 
     public void removeDriver(JID jid) {
-	DriverDocumentManager.logger.debug("remove driver " + jid);
+        DriverDocumentManager.logger.debug("remove driver " + jid);
 
-	/* remove driver from all documents */
-	for (IPath path : this.documents.keySet()) {
-	    removeDriverFromDocument(path, jid);
-	}
+        /* remove driver from all documents */
+        for (IPath path : this.documents.keySet()) {
+            removeDriverFromDocument(path, jid);
+        }
 
-	this.activeDriver.remove(jid);
+        this.activeDriver.remove(jid);
 
     }
 
@@ -152,18 +152,18 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      *            removable driver
      */
     private void removeDriverFromDocument(IPath path, JID jid) {
-	DriverDocument doc = this.documents.get(path);
-	if (doc.isDriver(jid)) {
-	    doc.removeDriver(jid);
-	}
-	/* check for other driver or delete if no other driver exists. */
-	if (doc.noDriver()) {
-	    DriverDocumentManager.logger.debug("no driver exists for document "
-		    + path.lastSegment().toString()
-		    + ". Document delete from driver manager.");
-	    /* delete driver document. */
-	    this.documents.remove(doc.getEditor());
-	}
+        DriverDocument doc = this.documents.get(path);
+        if (doc.isDriver(jid)) {
+            doc.removeDriver(jid);
+        }
+        /* check for other driver or delete if no other driver exists. */
+        if (doc.noDriver()) {
+            DriverDocumentManager.logger.debug("no driver exists for document "
+                    + path.lastSegment().toString()
+                    + ". Document delete from driver manager.");
+            /* delete driver document. */
+            this.documents.remove(doc.getEditor());
+        }
     }
 
     /**
@@ -172,74 +172,74 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * @param activity
      */
     public void receiveActivity(IActivity activity) {
-	JID jid = new JID(activity.getSource());
+        JID jid = new JID(activity.getSource());
 
-	/* if user is an active driver */
-	if (isDriver(jid)) {
+        /* if user is an active driver */
+        if (isDriver(jid)) {
 
-	    /* editor activities. */
-	    if (activity instanceof EditorActivity) {
-		EditorActivity edit = (EditorActivity) activity;
+            /* editor activities. */
+            if (activity instanceof EditorActivity) {
+                EditorActivity edit = (EditorActivity) activity;
 
-		DriverDocumentManager.logger.debug("receive activity of " + jid
-			+ " for editor " + edit.getPath().lastSegment()
-			+ " and action " + edit.getType());
+                DriverDocumentManager.logger.debug("receive activity of " + jid
+                        + " for editor " + edit.getPath().lastSegment()
+                        + " and action " + edit.getType());
 
-		/* editor has activated. */
-		if (edit.getType() == EditorActivity.Type.Activated) {
-		    /* add driver to new document. */
-		    addDriverToDocument(edit.getPath(), jid);
-		}
-		/* editor has closed. */
-		if (edit.getType() == EditorActivity.Type.Closed) {
-		    /* remove driver */
-		    if (this.documents.containsKey(edit.getPath())) {
+                /* editor has activated. */
+                if (edit.getType() == EditorActivity.Type.Activated) {
+                    /* add driver to new document. */
+                    addDriverToDocument(edit.getPath(), jid);
+                }
+                /* editor has closed. */
+                if (edit.getType() == EditorActivity.Type.Closed) {
+                    /* remove driver */
+                    if (this.documents.containsKey(edit.getPath())) {
 
-			removeDriverFromDocument(edit.getPath(), jid);
+                        removeDriverFromDocument(edit.getPath(), jid);
 
-		    } else {
-			DriverDocumentManager.logger
-				.warn("No driver document exists for "
-					+ edit.getPath());
-		    }
-		}
-	    }
-	    if (activity instanceof RoleActivity) {
+                    } else {
+                        DriverDocumentManager.logger
+                                .warn("No driver document exists for "
+                                        + edit.getPath());
+                    }
+                }
+            }
+            if (activity instanceof RoleActivity) {
 
-	    }
+            }
 
-	    if (activity instanceof FileActivity) {
-		FileActivity file = (FileActivity) activity;
-		/* if file has been removed, delete appropriate driver document. */
-		if (file.getType() == FileActivity.Type.Removed) {
-		    this.documents.remove(file.getPath());
-		}
-	    }
-	} else {
-	    DriverDocumentManager.logger.debug("JID " + jid
-		    + " isn't an active driver.");
-	}
+            if (activity instanceof FileActivity) {
+                FileActivity file = (FileActivity) activity;
+                /* if file has been removed, delete appropriate driver document. */
+                if (file.getType() == FileActivity.Type.Removed) {
+                    this.documents.remove(file.getPath());
+                }
+            }
+        } else {
+            DriverDocumentManager.logger.debug("JID " + jid
+                    + " isn't an active driver.");
+        }
     }
 
     public void driverChanged(JID driver, boolean replicated) {
-	if (isDriver(driver)) {
-	    removeDriver(driver);
-	} else {
-	    addDriver(driver);
-	}
+        if (isDriver(driver)) {
+            removeDriver(driver);
+        } else {
+            addDriver(driver);
+        }
 
     }
 
     public void userJoined(JID user) {
-	// nothing to do
+        // nothing to do
 
     }
 
     public void userLeft(JID user) {
-	if (isDriver(user)) {
-	    /* remove driver status. */
-	    removeDriver(user);
-	}
+        if (isDriver(user)) {
+            /* remove driver status. */
+            removeDriver(user);
+        }
 
     }
 
@@ -249,32 +249,32 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#exclusiveDriver()
      */
     public boolean exclusiveDriver() {
-	boolean result = true;
-	if (this.activeDriver.size() > 1) {
-	    result = false;
-	}
-	return result;
+        boolean result = true;
+        if (this.activeDriver.size() > 1) {
+            result = false;
+        }
+        return result;
     }
 
     public void invitationReceived(IIncomingInvitationProcess invitation) {
-	// ignore
+        // ignore
     }
 
     public void sessionEnded(ISharedProject session) {
-	activeDriver.clear();
+        activeDriver.clear();
     }
 
     public void sessionStarted(ISharedProject session) {
 
-	// when this is called the host is already active Driver, remove all
-	// other
-	if (activeDriver.size() > 1) {
-	    for (JID participant : activeDriver) {
-		if (!participant.equals(session.getHost().getJid())) {
-		    activeDriver.remove(participant);
-		}
-	    }
-	}
+        // when this is called the host is already active Driver, remove all
+        // other
+        if (activeDriver.size() > 1) {
+            for (JID participant : activeDriver) {
+                if (!participant.equals(session.getHost().getJid())) {
+                    activeDriver.remove(participant);
+                }
+            }
+        }
     }
 
 }

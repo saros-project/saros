@@ -23,11 +23,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class User {
     public enum UserConnectionState {
-	UNKNOWN, ONLINE, OFFLINE
+        UNKNOWN, ONLINE, OFFLINE
     };
 
     public enum UserRole {
-	DRIVER, OBSERVER
+        DRIVER, OBSERVER
     };
 
     private UserConnectionState presence = UserConnectionState.UNKNOWN;
@@ -38,11 +38,11 @@ public class User {
     private UserRole role = UserRole.OBSERVER;
 
     public User(JID jid) {
-	this.jid = jid;
+        this.jid = jid;
     }
 
     public JID getJid() {
-	return this.jid;
+        return this.jid;
     }
 
     /**
@@ -52,7 +52,7 @@ public class User {
      *            (Driver, Observer)
      */
     public void setUserRole(UserRole role) {
-	this.role = role;
+        this.role = role;
     }
 
     /**
@@ -61,45 +61,45 @@ public class User {
      * @return role (Driver, Observer)
      */
     public UserRole getUserRole() {
-	return this.role;
+        return this.role;
     }
 
     @Override
     public String toString() {
-	return this.jid.getName();
+        return this.jid.getName();
     }
 
     @Override
     public boolean equals(Object obj) {
-	if (obj instanceof User) {
-	    User other = (User) obj;
-	    return this.jid.equals(other.jid);
-	}
+        if (obj instanceof User) {
+            User other = (User) obj;
+            return this.jid.equals(other.jid);
+        }
 
-	return false;
+        return false;
     }
 
     public int getColorID() {
-	return this.colorid;
+        return this.colorid;
     }
 
     public void setColorID(int c) {
-	this.colorid = c;
+        this.colorid = c;
     }
 
     public UserConnectionState getPresence() {
-	return this.presence;
+        return this.presence;
     }
 
     public void setPresence(UserConnectionState p) {
-	this.presence = p;
-	if (this.presence == User.UserConnectionState.OFFLINE) {
-	    this.offlineTime = (new java.util.Date().getTime());
-	}
+        this.presence = p;
+        if (this.presence == User.UserConnectionState.OFFLINE) {
+            this.offlineTime = (new java.util.Date().getTime());
+        }
     }
 
     public int getOfflineSecs() {
-	return (int) (((new java.util.Date().getTime()) - this.offlineTime) / 1000);
+        return (int) (((new java.util.Date().getTime()) - this.offlineTime) / 1000);
     }
 
 }

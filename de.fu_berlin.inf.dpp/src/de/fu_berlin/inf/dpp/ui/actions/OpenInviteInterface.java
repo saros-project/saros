@@ -11,52 +11,52 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class OpenInviteInterface extends Action implements
-	ISharedProjectListener, ISessionListener {
+        ISharedProjectListener, ISessionListener {
 
     public OpenInviteInterface() {
-	super();
-	setImageDescriptor(SarosUI.getImageDescriptor("/icons/invites.png"));
-	setToolTipText("Open invitation interface");
+        super();
+        setImageDescriptor(SarosUI.getImageDescriptor("/icons/invites.png"));
+        setToolTipText("Open invitation interface");
 
-	Saros.getDefault().getSessionManager().addSessionListener(this);
-	updateEnablement();
+        Saros.getDefault().getSessionManager().addSessionListener(this);
+        updateEnablement();
     }
 
     @Override
     public void run() {
-	Saros.getDefault().getSessionManager().getSharedProject()
-		.startInvitation(null);
+        Saros.getDefault().getSessionManager().getSharedProject()
+                .startInvitation(null);
     }
 
     public void sessionStarted(ISharedProject session) {
-	session.addListener(this);
-	updateEnablement();
+        session.addListener(this);
+        updateEnablement();
     }
 
     public void sessionEnded(ISharedProject session) {
-	session.removeListener(this);
-	updateEnablement();
+        session.removeListener(this);
+        updateEnablement();
     }
 
     public void invitationReceived(IIncomingInvitationProcess process) {
-	// ignore
+        // ignore
     }
 
     private void updateEnablement() {
-	ISharedProject project = Saros.getDefault().getSessionManager()
-		.getSharedProject();
-	setEnabled((project != null) && project.isDriver());
+        ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
+        setEnabled((project != null) && project.isDriver());
     }
 
     public void driverChanged(JID driver, boolean replicated) {
-	updateEnablement();
+        updateEnablement();
     }
 
     public void userJoined(JID user) {
-	// ignore
+        // ignore
     }
 
     public void userLeft(JID user) {
-	// ignore
+        // ignore
     }
 }

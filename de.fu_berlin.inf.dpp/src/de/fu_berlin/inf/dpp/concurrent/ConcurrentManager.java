@@ -15,10 +15,10 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * 
  */
 public interface ConcurrentManager extends IRequestManager,
-	ISharedProjectListener {
+        ISharedProjectListener {
 
     public static enum Side {
-	CLIENT_SIDE, HOST_SIDE
+        CLIENT_SIDE, HOST_SIDE
     }
 
     public void setActivitySequencer(IActivitySequencer sequencer);

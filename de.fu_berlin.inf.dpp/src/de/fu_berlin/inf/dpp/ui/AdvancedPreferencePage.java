@@ -17,33 +17,33 @@ import de.fu_berlin.inf.dpp.Saros;
  * @author rdjemili
  */
 public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
-	IWorkbenchPreferencePage {
+        IWorkbenchPreferencePage {
 
     public AdvancedPreferencePage() {
-	super(FieldEditorPreferencePage.GRID);
-	setPreferenceStore(Saros.getDefault().getPreferenceStore());
-	setDescription("Advanced settings geared toward developers and power users.");
+        super(FieldEditorPreferencePage.GRID);
+        setPreferenceStore(Saros.getDefault().getPreferenceStore());
+        setDescription("Advanced settings geared toward developers and power users.");
     }
 
     @Override
     protected void createFieldEditors() {
-	addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
-		"Skype name:", getFieldEditorParent()));
+        addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
+                "Skype name:", getFieldEditorParent()));
 
-	addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
-		"File transfer port (needs reconnect):", getFieldEditorParent()));
+        addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
+                "File transfer port (needs reconnect):", getFieldEditorParent()));
 
-	addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
-		"Show Jabber debug window (needs restart).",
-		getFieldEditorParent()));
+        addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
+                "Show Jabber debug window (needs restart).",
+                getFieldEditorParent()));
 
-	addField(new BooleanFieldEditor(
-		PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
-		"Avoid direct file transfer connection", getFieldEditorParent()));
+        addField(new BooleanFieldEditor(
+                PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
+                "Avoid direct file transfer connection", getFieldEditorParent()));
 
-	addField(new IntegerFieldEditor(
-		PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
-		"Chunk size for chat data transfer", getFieldEditorParent()));
+        addField(new IntegerFieldEditor(
+                PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
+                "Chunk size for chat data transfer", getFieldEditorParent()));
     }
 
     /*

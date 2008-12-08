@@ -9,11 +9,11 @@ public class ContributionAnnotation extends AnnotationSaros {
     public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
 
     public ContributionAnnotation() {
-	this("", "");
+        this("", "");
     }
 
     public ContributionAnnotation(String label, String source) {
-	super(ContributionAnnotation.TYPE, false, label, source);
+        super(ContributionAnnotation.TYPE, false, label, source);
 
     }
 }
