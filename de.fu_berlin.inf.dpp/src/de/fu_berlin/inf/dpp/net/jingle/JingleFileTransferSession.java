@@ -339,14 +339,17 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void stopTrasmit() {
 	logger.debug("JingleFileTransferSesseion: stop transmitting");
-	try {
-	    if (udpSocket != null)
-		udpSocket.close();
-	    if (tcpSocket != null)
-		tcpSocket.close();
-	} catch (IOException e) {
-	    logger.warn("Failed to close sockets");
-	}
+	closeSocket(tcpSocket);
+	closeSocket(udpSocket);
+    }
+
+    private void closeSocket(Socket s) {
+	if (s != null)
+	    try {
+		s.close();
+	    } catch (IOException e) {
+		logger.warn("Failed to close socket");
+	    }
     }
 
     @Override
