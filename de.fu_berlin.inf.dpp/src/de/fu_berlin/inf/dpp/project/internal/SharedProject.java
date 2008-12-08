@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -76,7 +77,7 @@ public class SharedProject implements ISharedProject {
 
     protected JID myID;
 
-    protected List<User> participants = new ArrayList<User>();
+    protected CopyOnWriteArrayList<User> participants = new CopyOnWriteArrayList<User>();
 
     private final IProject project;
 
