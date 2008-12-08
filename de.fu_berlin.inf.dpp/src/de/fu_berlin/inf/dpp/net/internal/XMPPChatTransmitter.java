@@ -135,6 +135,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     private JingleFileTransferManager jingleManager;
 
+    private Thread startingJingleThread;
+
     /**
      * A simple struct that is used to queue file transfers.
      */
@@ -180,7 +182,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         setXMPPConnection(connection);
     }
 
-    public void setXMPPConnection(XMPPConnection connection) {
+    public void setXMPPConnection(final XMPPConnection connection) {
         this.connection = connection;
         this.chatmanager = connection.getChatManager();
         this.fileTransferManager = new FileTransferManager(connection);
@@ -190,7 +192,16 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
         this.privatechatmanager = new PrivateChatManager();
         this.privatechatmanager.setConnection(connection, this);
-        this.jingleManager = new JingleFileTransferManager(connection, this);
+
+        // Start Jingle Manager asynchronous
+        this.startingJingleThread = new Thread(new Runnable() {
+            public void run() {
+                XMPPChatTransmitter.this.jingleManager = new JingleFileTransferManager(
+                        connection, XMPPChatTransmitter.this);
+                log.debug("Jingle Manager started");
+            }
+        });
+        startingJingleThread.start();
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
@@ -419,17 +430,24 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             }
 
         } else { // transfer file list with jingle
-            JingleFileTransferData data = new JingleFileTransferData();
+            try {
+                startingJingleThread.join();
+            } catch (InterruptedException e) {
+                log.debug("Interrupted while waiting of jingleManager");
+            }
+            if (jingleManager.getState(recipient) != JingleConnectionState.ERROR) {
+                JingleFileTransferData data = new JingleFileTransferData();
 
-            data.file_list_content = xml;
-            data.type = FileTransferType.FILELIST_TRANSFER;
-            data.recipient = recipient;
-            data.sender = new JID(connection.getUser());
-            data.file_project_path = FileTransferType.FILELIST_TRANSFER
-                    .toString();
+                data.file_list_content = xml;
+                data.type = FileTransferType.FILELIST_TRANSFER;
+                data.recipient = recipient;
+                data.sender = new JID(connection.getUser());
+                data.file_project_path = FileTransferType.FILELIST_TRANSFER
+                        .toString();
 
-            jingleManager.createOutgoingJingleFileTransfer(recipient,
-                    new JingleFileTransferData[] { data });
+                jingleManager.createOutgoingJingleFileTransfer(recipient,
+                        new JingleFileTransferData[] { data });
+            }
 
             // TODO CJ: Fallback to IBB when jingle fails
         }
@@ -1448,9 +1466,12 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         if (getFileTransferModeViaChat()) {
             sendSingleFileWithIBB(transferData);
         } else {
-            log.error("Jingle File Trandfer not yet implemented..");
-
-            if ((jingleManager.getState(recipient) != JingleConnectionState.ERROR)) {
+            try {
+                startingJingleThread.join();
+            } catch (InterruptedException e) {
+                log.debug("Interrupted while waiting of jingleManager");
+            }
+            if (jingleManager.getState(recipient) != JingleConnectionState.ERROR) {
                 log.info("Send file " + transferData.path + " (with Jingle)");
 
                 /* create file transfer. */

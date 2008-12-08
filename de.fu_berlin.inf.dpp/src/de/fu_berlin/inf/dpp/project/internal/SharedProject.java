@@ -99,6 +99,8 @@ public class SharedProject implements ISharedProject {
     // private ConcurrentManager concurrentManager;
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
+        assert (transmitter != null && myID != null);
+
         this.transmitter = transmitter;
 
         // concurrentManager = new ConcurrentDocumentManager();
