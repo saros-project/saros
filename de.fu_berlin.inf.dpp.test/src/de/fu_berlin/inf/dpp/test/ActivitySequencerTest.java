@@ -144,30 +144,39 @@ public class ActivitySequencerTest extends TestCase {
 
     public void testSimpleStripRedundantTextOffsets() {
 	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
-	sequencer.activityCreated(new TextSelectionActivity(6, 0));
+	sequencer.activityCreated(new TextSelectionActivity(6, 0, new Path(
+		"/foo/text.txt")));
 
 	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
     }
 
     public void testStripReverseRedundantTextOffsets() {
-	sequencer.activityCreated(new TextSelectionActivity(5, 0));
+	sequencer.activityCreated(new TextSelectionActivity(5, 0, new Path(
+		"/foo/text.txt")));
 	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
 
 	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
     }
 
     public void testStripTextOffsetsWhenNoOtherActivitiesInBetween() {
-	sequencer.activityCreated(new TextSelectionActivity(5, 0));
-	sequencer.activityCreated(new TextSelectionActivity(15, 0));
-	sequencer.activityCreated(new TextSelectionActivity(16, 0));
+	sequencer.activityCreated(new TextSelectionActivity(5, 0, new Path(
+		"/foo/text.txt")));
+	sequencer.activityCreated(new TextSelectionActivity(15, 0, new Path(
+		"/foo/text.txt")));
+	sequencer.activityCreated(new TextSelectionActivity(16, 0, new Path(
+		"/foo/text.txt")));
 
-	assertFlush(new IActivity[] { new TextSelectionActivity(16, 0) });
+	assertFlush(new IActivity[] { new TextSelectionActivity(16, 0,
+		new Path("/foo/text.txt")) });
     }
 
     public void testStripRedundantTextOffsetsAndConsiderStartOffset() {
-	sequencer.activityCreated(new TextSelectionActivity(3, 2));
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
-	sequencer.activityCreated(new TextSelectionActivity(6, 0));
+	sequencer.activityCreated(new TextSelectionActivity(3, 2, new Path(
+		"/foo/text.txt")));
+	sequencer.activityCreated(new TextEditActivity(5, "a", 0, new Path(
+		"/foo/text.txt")));
+	sequencer.activityCreated(new TextSelectionActivity(6, 0, new Path(
+		"/foo/text.txt")));
 
 	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
     }

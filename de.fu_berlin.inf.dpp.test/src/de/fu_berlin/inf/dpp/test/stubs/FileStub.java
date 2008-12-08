@@ -402,31 +402,26 @@ public class FileStub implements IFile {
 	return 0;
     }
 
-    @Override
     public Map getPersistentProperties() throws CoreException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
-    @Override
     public Map getSessionProperties() throws CoreException {
 	// TODO Auto-generated method stub
 	return null;
     }
 
-    @Override
     public boolean isDerived(int options) {
 	// TODO Auto-generated method stub
 	return false;
     }
 
-    @Override
     public boolean isHidden() {
 	// TODO Auto-generated method stub
 	return false;
     }
 
-    @Override
     public void setHidden(boolean isHidden) throws CoreException {
 	// TODO Auto-generated method stub
 

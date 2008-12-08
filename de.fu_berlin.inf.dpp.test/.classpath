@@ -13,5 +13,11 @@
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker-1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="lib/lw-rudp.jar"/>
+	<classpathentry kind="lib" path="lib/lw-collection.jar"/>
+	<classpathentry kind="lib" path="lib/lw-common.jar"/>
+	<classpathentry kind="lib" path="lib/lw-io.jar"/>
+	<classpathentry kind="lib" path="lib/lw-nio.jar"/>
+	<classpathentry kind="lib" path="lib/lw-test-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

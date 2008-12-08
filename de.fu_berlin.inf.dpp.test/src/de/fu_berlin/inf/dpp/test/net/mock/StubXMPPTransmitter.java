@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.test.net.mock;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -14,6 +15,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -131,14 +133,17 @@ public class StubXMPPTransmitter implements ITransmitter, FileTransferListener {
 
     }
 
-    @Override
     public void sendFileChecksumError(JID to, IPath path) {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void sendJupiterTransformationError(JID to, IPath path) {
+	// TODO Auto-generated method stub
+
+    }
+
+    public void sendDocChecksums(JID to, Collection<DocumentChecksum> collection) {
 	// TODO Auto-generated method stub
 
     }

@@ -109,7 +109,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testSingleTextSelectionActivity()
 	    throws XmlPullParserException, IOException {
-	activities.add(new TextSelectionActivity(2, 23));
+	activities.add(new TextSelectionActivity(2, 23, new Path(
+		"/foo/text.txt")));
 
 	assertCreateAndParseActivities();
     }

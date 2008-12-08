@@ -18,6 +18,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
@@ -165,7 +166,6 @@ public class TestActions extends TestCase {
 	    monitor.done();
 	}
 
-	@Override
 	public void accept(IProject baseProject, String newProjectName,
 		IProgressMonitor monitor) {
 	    // TODO Auto-generated method stub
@@ -221,6 +221,11 @@ public class TestActions extends TestCase {
 	public void startSession(IProject project) throws XMPPException {
 	    // TODO Auto-generated method stub
 
+	}
+
+	public ITransmitter getTransmitter() {
+	    // TODO Auto-generated method stub
+	    return null;
 	}
 
     }

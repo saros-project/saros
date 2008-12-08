@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.test.net;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,6 +23,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -136,7 +138,6 @@ public class XMPPTransmitterTest extends TestCase implements
     // public void testReceivedRessource() {
     // sendFileWithFileTransfer();
     // }
-
     /* file transfer methods */
 
     public void fileTransferRequest(FileTransferRequest request) {
@@ -351,14 +352,17 @@ public class XMPPTransmitterTest extends TestCase implements
 
     }
 
-    @Override
     public void sendFileChecksumError(JID to, IPath path) {
 	// TODO Auto-generated method stub
 
     }
 
-    @Override
     public void sendJupiterTransformationError(JID to, IPath path) {
+	// TODO Auto-generated method stub
+
+    }
+
+    public void sendDocChecksums(JID to, Collection<DocumentChecksum> collection) {
 	// TODO Auto-generated method stub
 
     }
