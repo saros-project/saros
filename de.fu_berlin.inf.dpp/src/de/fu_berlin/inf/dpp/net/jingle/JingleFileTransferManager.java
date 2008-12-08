@@ -158,42 +158,6 @@ public class JingleFileTransferManager {
 
     }
 
-    /**
-     * control time out of jingle session initiation
-     * 
-     * @param jid
-     */
-    private void timeOutCheck(final JID jid, final int timeout) {
-	int count = 0;
-	new Thread(new Runnable() {
-
-	    public void run() {
-		int count = 0;
-		while (getState(jid) != (JingleConnectionState.ESTABLISHED)) {
-		    try {
-			Thread.sleep(200);
-
-			if (count < timeout) {
-			    count += 200;
-			} else {
-			    logger.error("Time out for : " + jid
-				    + " with current state : " + getState(jid));
-			    connectionStates.remove(jid);
-			    connectionStates.put(jid,
-				    JingleConnectionState.ERROR);
-			    terminateJingleSession(jid);
-			    return;
-			}
-		    } catch (InterruptedException e) {
-			e.printStackTrace();
-		    }
-		}
-
-	    }
-	}).start();
-
-    }
-
     private void initJingleListener(JingleSession js, final JID jid) {
 
 	connectionStates.put(jid, JingleConnectionState.INIT);
