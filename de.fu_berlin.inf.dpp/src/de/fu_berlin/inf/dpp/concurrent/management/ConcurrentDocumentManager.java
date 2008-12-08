@@ -139,14 +139,16 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 	    // send checksums to all clients
 	    ISharedProject project = Saros.getDefault().getSessionManager()
 		    .getSharedProject();
-	    List<User> participants = project.getParticipants();
-	    if (project != null && participants != null) {
-		for (User participant : participants) {
-		    ITransmitter transmit = Saros.getDefault()
-			    .getSessionManager().getTransmitter();
-		    if (!isHost(participant.getJid())) {
-			transmit.sendDocChecksums(participant.getJid(),
-				docsChecksums.values());
+	    if (project != null) {
+		List<User> participants = project.getParticipants();
+		if (participants != null) {
+		    for (User participant : participants) {
+			ITransmitter transmit = Saros.getDefault()
+				.getSessionManager().getTransmitter();
+			if (!isHost(participant.getJid())) {
+			    transmit.sendDocChecksums(participant.getJid(),
+				    docsChecksums.values());
+			}
 		    }
 		}
 	    }
