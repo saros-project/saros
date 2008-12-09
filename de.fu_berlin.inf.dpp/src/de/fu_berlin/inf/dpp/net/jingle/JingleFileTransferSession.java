@@ -2,10 +2,8 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -49,33 +47,28 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     private class Receive extends Thread {
 
-        private InputStream input;
+        private ObjectInputStream input;
 
-        public Receive(InputStream inputStream) {
-            this.input = inputStream;
+        public Receive(ObjectInputStream ii) {
+            this.input = ii;
         }
 
         public void run() {
             try {
+
                 while (true) {
                     logger.debug("waiting on port " + local.getPort());
 
                     /* get number of file to be transfer. */
                     int fileNumber;
 
-                    if (-1 == (fileNumber = input.read())) {
-                        // end of stream
-                        logger.error("end of stream received!");
-                        break;
-                    }
+                    fileNumber = input.readInt();
                     logger.debug("incoming file number: " + fileNumber);
 
                     for (int i = 0; i < fileNumber; i++) {
 
-                        ObjectInputStream ii = new ObjectInputStream(input);
-
                         /* receive file data */
-                        JingleFileTransferData data = (JingleFileTransferData) ii
+                        JingleFileTransferData data = (JingleFileTransferData) input
                                 .readObject();
 
                         if (data.type == FileTransferType.FILELIST_TRANSFER) {
@@ -110,11 +103,14 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private Receive tcpReceiveThread;
     private Receive udpReceiveThread;
     private JingleFileTransferData[] transferList;
-    private JingleFileTransferData currentSending;
     private IJingleFileTransferListener listener;
     private UDPSelectorProvider udpSelectorProvider;
     private Socket udpSocket;
     private Socket tcpSocket;
+    private ObjectOutputStream tcpObjectOutputStream;
+    private ObjectOutputStream udpObjectOutputStream;
+    private ObjectInputStream tcpObjectInputStream;
+    private ObjectInputStream udpObjectInputStream;
 
     /**
      * TODO CJ: write javadoc
@@ -163,6 +159,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
             } else { // client side
                 this.tcpSocket = new Socket(remote.getIp(), remote.getPort());
             }
+            this.tcpObjectOutputStream = new ObjectOutputStream(tcpSocket
+                    .getOutputStream());
+            this.tcpObjectInputStream = new ObjectInputStream(tcpSocket
+                    .getInputStream());
             logger.debug("successfully connected with TCP");
         } catch (UnknownHostException e) {
             logger.debug("Invalid IP-address of jingle remote (TCP)");
@@ -203,6 +203,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         .getByName(remote.getIp()), remote.getPort()));
                 this.udpSocket = usock;
             }
+            this.udpObjectOutputStream = new ObjectOutputStream(udpSocket
+                    .getOutputStream());
+            this.udpObjectInputStream = new ObjectInputStream(udpSocket
+                    .getInputStream());
             logger.debug("successfully connected with UDP");
         } catch (UnknownHostException e1) {
             logger.debug("Invalid IP-address of jingle remote (UDP)");
@@ -216,8 +220,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * This method is called from the JingleFileTransferManager to send files
      * with this session. This method tries to transmit the files with TCP. When
      * this fails it tries to send the files with UDP/RUDP.
+     * 
+     * @throws JingleSessionException
      */
-    public void sendFiles(JingleFileTransferData[] transferData) {
+    public void sendFiles(JingleFileTransferData[] transferData)
+            throws JingleSessionException {
 
         this.transferList = transferData;
 
@@ -226,7 +233,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     + remote.getPort());
             try {
                 logger.debug("sending with TCP..");
-                transmit(tcpSocket.getOutputStream());
+                transmit(tcpObjectOutputStream);
                 return;
             } catch (IOException e) {
                 logger.debug("sending with TCP failed, use UDP instead..", e);
@@ -237,12 +244,14 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     + remote.getPort());
             try {
                 logger.debug("sending with UDP..");
-                transmit(udpSocket.getOutputStream());
+                transmit(udpObjectOutputStream);
+                return;
             } catch (IOException e) {
                 logger.debug("sending with UDP failed, use IBB instead..", e);
                 // TODO CJ: fallback to IBB
             }
         }
+        throw new JingleSessionException("Failed to send files with Jingle");
     }
 
     /**
@@ -255,22 +264,14 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         logger.debug("JingleFileTransferSesseion: start receiving");
 
-        if (this.tcpSocket != null) {
-            try { // start TCP Thread
-                this.tcpReceiveThread = new Receive(tcpSocket.getInputStream());
-                this.tcpReceiveThread.start();
-            } catch (IOException e) {
-                logger.error("Error while creating TCP-receiver thread");
-            }
+        if (tcpSocket != null && tcpObjectInputStream != null) {
+            this.tcpReceiveThread = new Receive(tcpObjectInputStream);
+            this.tcpReceiveThread.start();
         }
 
-        if (this.udpSocket != null) {
-            try { // start UDP Thread
-                this.udpReceiveThread = new Receive(udpSocket.getInputStream());
-                this.udpReceiveThread.start();
-            } catch (IOException e) {
-                logger.error("Error while creating UDP-receiver thread");
-            }
+        if (udpSocket != null && udpObjectInputStream != null) {
+            this.udpReceiveThread = new Receive(udpObjectInputStream);
+            this.udpReceiveThread.start();
         }
     }
 
@@ -289,7 +290,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         if (tcpSocket != null) {
             try {
                 logger.debug("sending with TCP..");
-                transmit(tcpSocket.getOutputStream());
+                transmit(tcpObjectOutputStream);
                 return;
             } catch (IOException e) {
                 logger.debug("sending with TCP failed, use UDP instead..", e);
@@ -298,7 +299,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
         if (udpSocket != null) {
             try {
                 logger.debug("sending with UDP..");
-                transmit(udpSocket.getOutputStream());
+
+                transmit(udpObjectOutputStream);
             } catch (IOException e) {
                 logger.warn("sending with UDP failed, use UDP instead..", e);
                 // TODO CJ: fallback to IBB
@@ -307,18 +309,16 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     }
 
-    private void transmit(OutputStream output) throws IOException {
+    private void transmit(ObjectOutputStream oo) throws IOException {
+        assert (oo != null);
 
-        output.write(transferList.length);
+        oo.writeInt(transferList.length);
+        oo.flush();
         logger.debug("sent transfer number : " + transferList.length);
 
         for (JingleFileTransferData data : transferList) {
 
-            /* save current packet for error handling */
-            currentSending = data;
-
             /* send data */
-            ObjectOutputStream oo = new ObjectOutputStream(output);
             oo.writeObject(data);
             oo.flush();
             logger.debug("sent data for : " + data.file_project_path);
@@ -339,17 +339,31 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void stopTrasmit() {
         logger.debug("JingleFileTransferSesseion: stop transmitting");
-        closeSocket(tcpSocket);
-        closeSocket(udpSocket);
-    }
+        try {
 
-    private void closeSocket(Socket s) {
-        if (s != null)
-            try {
-                s.close();
-            } catch (IOException e) {
-                logger.warn("Failed to close socket");
+            if (tcpSocket != null) {
+                try {
+                    tcpReceiveThread.join();
+                } catch (InterruptedException e) {
+                } finally {
+                    tcpObjectOutputStream.close();
+                    tcpObjectInputStream.close();
+                    tcpSocket.close();
+                }
             }
+            if (udpSocket != null) {
+                try {
+                    udpReceiveThread.join();
+                } catch (InterruptedException e) {
+                } finally {
+                    udpObjectOutputStream.close();
+                    udpObjectInputStream.close();
+                    udpSocket.close();
+                }
+            }
+        } catch (IOException e) {
+            logger.debug("Failed to close all sockets");
+        }
     }
 
     @Override

@@ -73,7 +73,8 @@ public class JingleFileTransferManager {
             this.transferData = transferData;
         }
 
-        public void transferFiles(JingleFileTransferData[] transferData, JID jid) {
+        public void transferFiles(JingleFileTransferData[] transferData, JID jid)
+                throws JingleSessionException {
             JingleFileTransferSession session = sessions.get(jid);
             if (session != null) {
                 session.sendFiles(transferData);
@@ -294,9 +295,11 @@ public class JingleFileTransferManager {
      * @param jid
      * @param transferData
      * @param monitor
+     * @throws XMPPException
      */
     public void createOutgoingJingleFileTransfer(JID jid,
-            JingleFileTransferData[] transferData) {
+            JingleFileTransferData[] transferData)
+            throws JingleSessionException {
 
         JingleSession outgoing = outgoingSessions.get(jid);
         JingleSession incoming = incomingSessions.get(jid);
@@ -312,8 +315,9 @@ public class JingleFileTransferManager {
             return;
         }
 
+        mediaManager.setTransferFile(transferData);
+
         try {
-            mediaManager.setTransferFile(transferData);
             outgoing = jm.createOutgoingJingleSession(jid.toString());
 
             initJingleListener(outgoing, jid);
@@ -322,10 +326,8 @@ public class JingleFileTransferManager {
             outgoingSessions.put(jid, outgoing);
 
             outgoing.startOutgoing();
-
         } catch (XMPPException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new JingleSessionException("Can't connect with Jingle");
         }
 
     }
