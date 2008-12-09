@@ -83,8 +83,9 @@ public class MultiUserChatManager implements PacketListener {
                     Form submitForm = form.createAnswerForm();
 
                     // Add default answers to the form to submit
-                    for (Iterator fields = form.getFields(); fields.hasNext();) {
-                        FormField field = (FormField) fields.next();
+                    for (Iterator<FormField> fields = form.getFields(); fields
+                            .hasNext();) {
+                        FormField field = fields.next();
                         if (!FormField.TYPE_HIDDEN.equals(field.getType())
                                 && (field.getVariable() != null)) {
                             // Sets the default value as the answer
