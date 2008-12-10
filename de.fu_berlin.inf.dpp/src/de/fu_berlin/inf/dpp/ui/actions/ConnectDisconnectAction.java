@@ -19,9 +19,13 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -58,8 +62,36 @@ public class ConnectDisconnectAction extends Action implements
                 if (saros.isConnected()) {
                     saros.disconnect(null);
                 } else {
+
+                    // display task progress information (begin) in status line
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            IStatusLineManager slm = getStatusmanager();
+                            IProgressMonitor monitor = slm.getProgressMonitor();
+                            monitor.beginTask("Connecting...",
+                                    IProgressMonitor.UNKNOWN);
+                        }
+                    });
+
                     saros.connect();
+
+                    // display task progress information (end) in status line
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            IStatusLineManager slm = getStatusmanager();
+                            slm.setMessage("Connecting..");
+                            IProgressMonitor monitor = slm.getProgressMonitor();
+                            monitor.done();
+                        }
+                    });
+
                 }
+            }
+
+            private IStatusLineManager getStatusmanager() {
+                return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getActivePage().getViewReferences()[0].getView(false)
+                        .getViewSite().getActionBars().getStatusLineManager();
             }
         }).start();
     }
