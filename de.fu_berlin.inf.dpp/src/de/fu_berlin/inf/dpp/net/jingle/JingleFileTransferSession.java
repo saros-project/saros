@@ -25,6 +25,7 @@ import org.limewire.rudp.UDPSelectorProvider;
 import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
 
 /**
@@ -111,6 +112,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private ObjectOutputStream udpObjectOutputStream;
     private ObjectInputStream tcpObjectInputStream;
     private ObjectInputStream udpObjectInputStream;
+    private JID remoteJid;
 
     /**
      * TODO CJ: write javadoc
@@ -126,12 +128,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public JingleFileTransferSession(PayloadType payloadType,
             TransportCandidate remote, TransportCandidate local,
             String mediaLocator, JingleSession jingleSession,
-            JingleFileTransferData[] transferData,
+            JingleFileTransferData[] transferData, JID remoteJid,
             IJingleFileTransferListener listener) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
         this.jingleSession = jingleSession;
         this.local = local;
         this.remote = remote;
+        this.remoteJid = remoteJid;
         this.transferList = transferData;
         this.listener = listener;
         logger.debug("JingleFileTransferSesseion created " + local.getIp()
@@ -309,13 +312,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
         if (udpSocket != null) {
             try {
                 logger.debug("sending with UDP..");
-
                 transmit(udpObjectOutputStream);
+                return;
             } catch (IOException e) {
                 logger.warn("sending with UDP failed, use UDP instead..", e);
-                // TODO CJ: fallback to IBB
             }
         }
+        listener.failedToSendFileListWithJingle(remoteJid, transferList);
 
     }
 

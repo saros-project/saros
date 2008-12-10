@@ -19,8 +19,8 @@ import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
 import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
+import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
-import org.jivesoftware.smackx.jingle.nat.STUNTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -48,14 +48,14 @@ public class JingleFileTransferManager {
                 TransportCandidate tc1, TransportCandidate tc2,
                 JingleSession jingleSession) {
 
-            JingleFileTransferSession newSession = new JingleFileTransferSession(
-                    payload, tc1, tc2, null, jingleSession, transferData,
-                    listener);
-
             // get JID from other side
             JID jid = Saros.getDefault().getMyJID().toString().equals(
                     jingleSession.getInitiator()) ? new JID(jingleSession
                     .getResponder()) : new JID(jingleSession.getInitiator());
+
+            JingleFileTransferSession newSession = new JingleFileTransferSession(
+                    payload, tc1, tc2, null, jingleSession, transferData, jid,
+                    listener);
 
             sessions.put(jid, newSession);
 
@@ -116,12 +116,13 @@ public class JingleFileTransferManager {
 
     public void initialize() {
 
-        // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-        // "jivesoftware.com", 3478);
+        // TODO CJ: use META-INF/stun-config
+        ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
+                "jivesoftware.com", 3478);
 
-        STUNTransportManager stun = new STUNTransportManager();
+        // STUNTransportManager stun = new STUNTransportManager();
 
-        mediaManager = new FileMediaManager(stun);
+        mediaManager = new FileMediaManager(icetm0);
         mediaManager.listener = listener;
 
         List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
@@ -180,24 +181,6 @@ public class JingleFileTransferManager {
                 // notifyAll();
             }
         });
-
-        // /* add state listener. */
-        // js.addStateListener(new JingleSessionStateListener() {
-        //
-        // public void afterChanged(State old, State newOne) {
-        // // logger.debug("session state after change new state :
-        // // "+newOne.toString()+" JID: "+jid_string);
-        //
-        // }
-        //
-        // public void beforeChange(State old, State newOne)
-        // throws JingleException {
-        // // logger.debug("session state before change :
-        // // "+old.toString()+" new : "+newOne.toString()+" JID:
-        // // "+jid_string);
-        //
-        // }
-        // });
 
         js.addListener(new JingleSessionListener() {
 

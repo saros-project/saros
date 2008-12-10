@@ -1740,4 +1740,17 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     }
 
+    public void failedToSendFileListWithJingle(JID jid,
+            JingleFileTransferData[] transferList) {
+        for (JingleFileTransferData data : transferList) {
+            try {
+                sendFileListWithIBB(data.file_list_content, jid);
+            } catch (XMPPException e) {
+                log.error("Failed to send file list with IBB");
+            }
+
+        }
+
+    }
+
 }
