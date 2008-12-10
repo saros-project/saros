@@ -154,9 +154,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     jingleSession.getConnection().getUser())) {
                 // create TCP Socket and listen
                 ServerSocket serverSocket = new ServerSocket(local.getPort());
-                serverSocket.setSoTimeout(1000);
+                serverSocket.setSoTimeout(2000);
                 this.tcpSocket = serverSocket.accept();
             } else { // client side
+                try { // give server a little time to come up
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // do nothing
+                }
+
                 this.tcpSocket = new Socket(remote.getIp(), remote.getPort());
             }
             this.tcpObjectOutputStream = new ObjectOutputStream(tcpSocket
@@ -190,12 +196,17 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     jingleSession.getConnection().getUser())) {
                 Socket usock = udpSelectorProvider.openAcceptorSocketChannel()
                         .socket();
+                usock.setSoTimeout(0);
                 usock.connect(new InetSocketAddress(InetAddress
                         .getByName(remote.getIp()), remote.getPort()));
-                usock.setSoTimeout(0);
                 usock.setKeepAlive(true);
                 this.udpSocket = usock;
             } else { // client side
+                try { // give server a little time to come up
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    // do nothing
+                }
                 Socket usock = udpSelectorProvider.openSocketChannel().socket();
                 usock.setSoTimeout(0);
                 usock.setKeepAlive(true);
@@ -248,7 +259,6 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 return;
             } catch (IOException e) {
                 logger.debug("sending with UDP failed, use IBB instead..", e);
-                // TODO CJ: fallback to IBB
             }
         }
         throw new JingleSessionException("Failed to send files with Jingle");
@@ -309,7 +319,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     }
 
-    private void transmit(ObjectOutputStream oo) throws IOException {
+    private synchronized void transmit(ObjectOutputStream oo)
+            throws IOException {
         assert (oo != null);
 
         oo.writeInt(transferList.length);
