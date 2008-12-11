@@ -20,5 +20,5 @@ public interface IJingleFileTransferListener {
     public void exceptionOccured(JingleSessionException exception);
 
     public void failedToSendFileListWithJingle(JID jid,
-            JingleFileTransferData[] transferList);
+            JingleFileTransferData transferList);
 }

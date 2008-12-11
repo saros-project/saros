@@ -1098,6 +1098,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
         }
 
+        // TODO CJ: Leave Project Message must be handled better
         else if (PacketExtensions.getLeaveExtension(message) != null) {
             if (project != null) {
                 project.removeUser(new User(fromJID)); // HACK
@@ -1515,7 +1516,16 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 } catch (JingleSessionException e) {
                     log
                             .info("Failed to send file with jingle, fall back to IBB");
-                    sendSingleFileWithIBB(transferData);
+                    int attempt = 0;
+                    while (attempt < 5) {
+                        try {
+                            sendSingleFileWithIBB(transferData);
+                            break;
+                        } catch (XMPPException ee) {
+                            log.error("Failed to send file list with IBB");
+                            attempt++;
+                        }
+                    }
                 }
             }
         }
@@ -1741,16 +1751,17 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     }
 
     public void failedToSendFileListWithJingle(JID jid,
-            JingleFileTransferData[] transferList) {
-        for (JingleFileTransferData data : transferList) {
+            JingleFileTransferData transferList) {
+        int attempt = 0;
+        while (attempt < 5) {
             try {
-                sendFileListWithIBB(data.file_list_content, jid);
+                sendFileListWithIBB(transferList.file_list_content, jid);
+                break;
             } catch (XMPPException e) {
                 log.error("Failed to send file list with IBB");
+                attempt++;
             }
-
         }
-
     }
 
 }
