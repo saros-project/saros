@@ -244,7 +244,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     public boolean performInvitation() {
 
         this.inviteStep = InvState.INVITING;
-        setInviteable(false);
         this.cancelButton.setEnabled(true);
         getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
@@ -321,6 +320,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             // }
             this.inviteStep = InvState.DONE;
             getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
+            setInviteable(false);
 
         }
         this.cancelButton.setEnabled(isSelectionCancelable()
@@ -455,7 +455,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             }
 
             public void presenceChanged(Presence presence) {
-                // TODO: new Method for Smack 3
                 presenceChanged(presence.getFrom());
 
             }
