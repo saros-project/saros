@@ -171,11 +171,13 @@ public class PacketExtensions {
         return PacketExtensions.createExtension(PacketExtensions.LEAVE);
     }
 
-    public static PacketExtension createChecksumErrorExtension(IPath path) {
+    public static PacketExtension createChecksumErrorExtension(IPath path,
+            boolean resolved) {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.FILE_CHECKSUM_ERROR,
                 PacketExtensions.NAMESPACE);
         extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
+        extension.setValue("resolved", resolved ? "true" : "false");
 
         return extension;
     }

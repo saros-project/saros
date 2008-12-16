@@ -182,6 +182,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
             document.addDocumentListener(EditorManager.this.documentListener);
             editors.add(editorPart);
+            lastEditTimes.put(path, System.currentTimeMillis());
+            lastRemoteEditTimes.put(path, System.currentTimeMillis());
         }
 
         private void convertLineDelimiters(IEditorPart editorPart) {
@@ -254,12 +256,19 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private class DocumentListener implements IDocumentListener {
+
         /*
          * (non-Javadoc)
          * 
          * @see org.eclipse.jface.text.IDocumentListener
          */
         public void documentAboutToBeChanged(final DocumentEvent event) {
+            boolean checksumErrorHandling = Saros.getDefault()
+                    .getSessionManager().getSharedProject()
+                    .getConcurrentDocumentManager()
+                    .getExecutingChecksumErrorHandling();
+            if (checksumErrorHandling)
+                return;
             String text = event.getText() == null ? "" : event.getText();
             textAboutToBeChanged(event.getOffset(), text, event.getLength(),
                     event.getDocument());
@@ -308,6 +317,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /* this activity has arrived and will be execute now. */
     private IActivity currentExecuteActivity;
 
+    public HashMap<IPath, Long> lastEditTimes;
+    public HashMap<IPath, Long> lastRemoteEditTimes;
+
     public static EditorManager getDefault() {
         if (EditorManager.instance == null) {
             EditorManager.instance = new EditorManager();
@@ -349,6 +361,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.sharedProject.getActivityManager().removeProvider(this);
         this.sharedProject = null;
         this.editorPool.removeAllEditors();
+        this.lastEditTimes.clear();
+        this.lastRemoteEditTimes.clear();
     }
 
     /*
@@ -498,6 +512,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 this.currentExecuteActivity = null;
                 return;
             }
+
+            EditorManager.this.lastEditTimes.put(path, System
+                    .currentTimeMillis());
 
             fireActivity(activity);
 
@@ -790,6 +807,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         } else if (activity instanceof TextSelectionActivity) {
             TextSelectionActivity textSelection = (TextSelectionActivity) activity;
+            assert textSelection.getEditor() != null;
             return "<textSelection " + "offset=\"" + textSelection.getOffset()
                     + "\" " + "length=\"" + textSelection.getLength() + "\" "
                     + "editor=\""
@@ -797,6 +815,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         } else if (activity instanceof ViewportActivity) {
             ViewportActivity viewportActvity = (ViewportActivity) activity;
+            assert viewportActvity.getEditor() != null;
             return "<viewport " + "top=\"" + viewportActvity.getTopIndex()
                     + "\" " + "bottom=\"" + viewportActvity.getBottomIndex()
                     + "\" " + "editor=\""
@@ -880,6 +899,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             IDocument doc = provider.getDocument(input);
             doc.replace(offset, replace, text);
+            EditorManager.this.lastRemoteEditTimes.put(file
+                    .getProjectRelativePath(), System.currentTimeMillis());
 
             IAnnotationModel model = provider.getAnnotationModel(input);
             ContributionHelper.insertAnnotation(model, offset, text.length(),
@@ -925,10 +946,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            the path to the resource that the driver was editing.
      * @param replicated
      *            <code>false</code> if this action originates on this client.
-     *            <code>false</code> if it is an replication of an action from
+     *            <code>true</code> if it is an replication of an action from
      *            another participant of the shared project.
      */
-    private void saveText(IPath path, boolean replicated) {
+    public void saveText(IPath path, boolean replicated) {
         for (ISharedEditorListener listener : this.editorListeners) {
             listener.driverEditorSaved(path, replicated);
         }
@@ -1074,6 +1095,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if ((Saros.getDefault() != null)
                 && (Saros.getDefault().getSessionManager() != null)) {
             Saros.getDefault().getSessionManager().addSessionListener(this);
+            this.lastEditTimes = new HashMap<IPath, Long>();
+            this.lastRemoteEditTimes = new HashMap<IPath, Long>();
         }
     }
 
@@ -1170,4 +1193,27 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private void setDriverTextSelection(ITextSelection selection) {
         this.driverTextSelection = selection;
     }
+
+    /**
+     * To get the java system time of the last local edit operation.
+     * 
+     * @param path
+     *            the project relative path of the resource
+     * @return java system time of last local edit
+     */
+    public long getLastEditTime(IPath path) {
+        return this.lastEditTimes.get(path);
+    }
+
+    /**
+     * To get the java system time of the last remote edit operation.
+     * 
+     * @param path
+     *            the project relative path of the resource
+     * @return java system time of last remote edit
+     */
+    public long getLastRemoteEditTime(IPath path) {
+        return this.lastRemoteEditTimes.get(path);
+    }
+
 }

@@ -256,24 +256,25 @@ public interface ITransmitter {
             Request request, JID jid);
 
     /**
-     * Sends error message of checksum error.
+     * Sends error message of checksum error to all clients.
      * 
-     * @param to
-     *            the recipient
      * @param path
      *            appropriate file for checksum error
+     * @param resolved
+     *            if true then the inconsistency is resolved
      */
-    public void sendFileChecksumError(JID to, IPath path);
+    public void sendFileChecksumErrorMessage(IPath path, boolean resolved);
 
     /**
-     * Sends the checksum of all concurrent documents.
+     * Sends the checksum of all concurrent documents to all clients.
      * 
      * @param to
      *            the recipient
      * @param collection
      *            the checksums
      */
-    public void sendDocChecksums(JID to, Collection<DocumentChecksum> collection);
+    public void sendDocChecksumsToClients(
+            Collection<DocumentChecksum> collection);
 
     /**
      * Sends error messge of transformation error.

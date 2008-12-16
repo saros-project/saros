@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ui.IEditorPart;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
@@ -66,6 +67,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -307,21 +309,19 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             if (activity instanceof FileActivity) {
                 FileActivity fileAdd = (FileActivity) activity;
 
-                /* send file checksum error message to exclusive recipient */
-                if (fileAdd.getType().equals(FileActivity.Type.Error)) {
-                    sendFileChecksumError(fileAdd.getRecipient(), fileAdd
-                            .getPath());
-                }
+                // /* send file checksum error message to exclusive recipient */
+                // if (fileAdd.getType().equals(FileActivity.Type.Error)) {
+                // sendFileChecksumErrorMessage(fileAdd.getPath(), false);
+                // }
                 /* send file to solve checksum error to single recipient */
-                if (fileAdd.getType().equals(FileActivity.Type.Created)
-                        && (fileAdd.getRecipient() != null)) {
-                    int time = timedActivity.getTimestamp();
-                    sendFile(fileAdd.getRecipient(),
-                            sharedProject.getProject(), fileAdd.getPath(),
-                            time, null);
-                    return;
-                }
-
+                // if (fileAdd.getType().equals(FileActivity.Type.Created)
+                // && (fileAdd.getRecipient() != null)) {
+                // int time = timedActivity.getTimestamp();
+                // sendFile(fileAdd.getRecipient(),
+                // sharedProject.getProject(), fileAdd.getPath(),
+                // time, null);
+                // return;
+                // }
                 if (fileAdd.getType().equals(FileActivity.Type.Created)) {
                     JID myJID = Saros.getDefault().getMyJID();
 
@@ -853,29 +853,55 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
      * (non-Javadoc)
      * 
      * @see
-     * de.fu_berlin.inf.dpp.net.ITransmitter#sendFileChecksumError(de.fu_berlin
-     * .inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+     * de.fu_berlin.inf.dpp.net.ITransmitter#sendFileChecksumErrorMessage(org
+     * .eclipse .core.runtime.IPath)
      */
-    public void sendFileChecksumError(JID to, IPath path) {
-        XMPPChatTransmitter.log.debug("Sending checksum error message to " + to
-                + " of file " + path.lastSegment());
-        sendMessage(to, PacketExtensions.createChecksumErrorExtension(path));
+    public void sendFileChecksumErrorMessage(IPath path, boolean resolved) {
+
+        List<User> participants = Saros.getDefault().getSessionManager()
+                .getSharedProject().getParticipants();
+
+        XMPPChatTransmitter.log.debug("Sending checksum error message of file "
+                + path.lastSegment() + " to all");
+        for (User user : participants) {
+            if (!Saros.getDefault().getMyJID().equals(user.getJid()))
+                sendMessage(user.getJid(), PacketExtensions
+                        .createChecksumErrorExtension(path, resolved));
+        }
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see de.fu_berlin.inf.dpp.net.ITransmitter#sendDocChecksums(de.fu_berlin
-     * .inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
+     * @see
+     * de.fu_berlin.inf.dpp.net.ITransmitter#sendDocChecksumsToClients(org.eclipse
+     * .core.runtime.IPath)
      */
-    public void sendDocChecksums(JID to, Collection<DocumentChecksum> checksums) {
-        XMPPChatTransmitter.log.debug("Sending checksums to " + to);
-        Message m = new Message();
-        m.addExtension(PacketExtensions.createChecksumsExtension(checksums));
-        try {
-            getChat(to).sendMessage(m);
-        } catch (XMPPException e) {
-            log.error("Can't send checksums to " + to);
+    public void sendDocChecksumsToClients(Collection<DocumentChecksum> checksums) {
+        // send checksums to all clients
+        ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
+        if (project != null) {
+            List<User> participants = project.getParticipants();
+            if (participants != null) {
+                for (User participant : participants) {
+                    if (!Saros.getDefault().getSessionManager()
+                            .getSharedProject().getHost().getJid().equals(
+                                    participant.getJid())) {
+                        JID jid = participant.getJid();
+                        XMPPChatTransmitter.log.debug("Sending checksums to "
+                                + jid);
+                        Message m = new Message();
+                        m.addExtension(PacketExtensions
+                                .createChecksumsExtension(checksums));
+                        try {
+                            getChat(jid).sendMessage(m);
+                        } catch (XMPPException e) {
+                            log.error("Can't send checksums to " + jid);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -1015,12 +1041,12 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
      * @see org.jivesoftware.smack.PacketListener
      */
     public void processPacket(Packet packet) {
-        Message message = (Message) packet;
+        final Message message = (Message) packet;
 
         JID fromJID = new JID(message.getFrom());
         // Change the input method to get the right chats
         putIncomingChat(fromJID, message.getThread());
-        ISharedProject project = Saros.getDefault().getSessionManager()
+        final ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
 
         ActivitiesPacketExtension activitiesPacket = PacketExtensions
@@ -1064,20 +1090,28 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         }
 
         if (PacketExtensions.getChecksumExtension(message) != null) {
-            DefaultPacketExtension ext = PacketExtensions
+            final DefaultPacketExtension ext = PacketExtensions
                     .getChecksumExtension(message);
             log.debug("Received checksums");
 
-            int count = Integer.parseInt(ext.getValue("quantity"));
-            DocumentChecksum[] checksums = new DocumentChecksum[count];
+            new Thread() {
+                public void run() {
+                    int count = Integer.parseInt(ext.getValue("quantity"));
+                    DocumentChecksum[] checksums = new DocumentChecksum[count];
 
-            for (int i = 1; i <= count; i++) {
-                IPath path = Path.fromPortableString(ext.getValue("path" + i));
-                int length = Integer.parseInt(ext.getValue("length" + i));
-                int hash = Integer.parseInt(ext.getValue("hash" + i));
-                checksums[i - 1] = new DocumentChecksum(path, length, hash);
-            }
-            project.getConcurrentDocumentManager().checkConsistency(checksums);
+                    for (int i = 1; i <= count; i++) {
+                        IPath path = Path.fromPortableString(ext
+                                .getValue("path" + i));
+                        int length = Integer.parseInt(ext
+                                .getValue("length" + i));
+                        int hash = Integer.parseInt(ext.getValue("hash" + i));
+                        checksums[i - 1] = new DocumentChecksum(path, length,
+                                hash);
+                    }
+                    project.getConcurrentDocumentManager().checkConsistency(
+                            checksums);
+                }
+            }.start();
         }
 
         if (PacketExtensions.getJoinExtension(message) != null) {
@@ -1216,13 +1250,62 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
             }
 
-        } else if (PacketExtensions.getChecksumErrorExtension(message) != null) {
+        }
+        /**
+         * Checksum Error Message
+         */
+        else if (PacketExtensions.getChecksumErrorExtension(message) != null) {
             DefaultPacketExtension checksumErrorExtension = PacketExtensions
                     .getChecksumErrorExtension(message);
-            String path = checksumErrorExtension
+
+            final String path = checksumErrorExtension
                     .getValue(PacketExtensions.FILE_PATH);
-            System.out.println("Checksum Error for " + path);
+
+            final boolean resolved = Boolean
+                    .parseBoolean(checksumErrorExtension.getValue("resolved"));
+
+            if (resolved) {
+                log.debug("synchronisation completed, inconsistency resolved");
+                ErrorMessageDialog.closeChecksumErrorMessage();
+                return;
+            }
+
             ErrorMessageDialog.showChecksumErrorMessage(path);
+
+            // Host
+            if (Saros.getDefault().getSessionManager().getSharedProject()
+                    .isHost()) {
+                log.warn("Checksum Error for " + path);
+
+                IEditorPart editor = (IEditorPart) EditorManager.getDefault()
+                        .getEditors(new Path(path)).toArray()[0];
+
+                new Thread() {
+                    public void run() {
+                        // wait until no more activities are received
+                        while (System.currentTimeMillis()
+                                - EditorManager.getDefault()
+                                        .getLastRemoteEditTime(new Path(path)) < 1000) {
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        EditorManager.getDefault().saveText(new Path(path),
+                                true);
+
+                        // TODO CJ: thinking about a better solution with
+                        // activity sequencer and jupiter
+
+                        log.debug("Sending file to clients");
+                        sendFile(new JID(message.getFrom()), Saros.getDefault()
+                                .getSessionManager().getSharedProject()
+                                .getProject(), new Path(path), null);
+                    }
+                }.start();
+            }
         }
 
     }

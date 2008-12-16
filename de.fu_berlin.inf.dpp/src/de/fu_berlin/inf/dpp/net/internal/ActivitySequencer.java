@@ -438,6 +438,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     // TODO extract this into the activities themselves
+    // TODO CJ: review needed
     private List<IActivity> optimize(List<IActivity> activities) {
         List<IActivity> result = new ArrayList<IActivity>(activities.size());
 
@@ -473,12 +474,16 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 source = viewport.getSource();
                 selection = addSelection(result, selection, source, path);
                 result.add(activity);
+            } else if (activity instanceof EditorActivity) {
+                EditorActivity editor = (EditorActivity) activity;
+                path = editor.getPath();
+                source = editor.getSource();
             } else {
-                selection = addSelection(result, selection, source, path);
+                // selection = addSelection(result, selection, source, path);
                 result.add(activity);
             }
-
-            selection = addSelection(result, selection, source, path);
+            if (!result.isEmpty())
+                selection = addSelection(result, selection, source, path);
         }
 
         return result;

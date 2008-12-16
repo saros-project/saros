@@ -45,21 +45,40 @@ public class ErrorMessageDialog {
         });
     }
 
+    protected static MessageDialog actualChecksumerrorDialog = null;
+
     /**
-     * show error message dialog.
+     * TODO CJ: write javadoc
      * 
-     * @param exception
      */
     public static void showChecksumErrorMessage(final String fileName) {
-        Display.getDefault().syncExec(new Runnable() {
+
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                MessageDialog.openWarning(
-                        Display.getDefault().getActiveShell(),
-                        "Consistency Problem!",
-                        "Inconsitent file state has detected. File " + fileName
-                                + " has to synchronized with project host");
+                actualChecksumerrorDialog = new MessageDialog(Display
+                        .getDefault().getActiveShell(), "Consistency Problem!",
+                        null, "Inconsitent file state has detected. File "
+                                + fileName
+                                + " has to synchronized with project host",
+                        MessageDialog.WARNING, new String[0], 0);
+                actualChecksumerrorDialog.open();
             }
         });
     }
 
+    /**
+     * TODO CJ: write javadoc
+     * 
+     */
+    public static void closeChecksumErrorMessage() {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                if (actualChecksumerrorDialog != null) {
+                    actualChecksumerrorDialog.close();
+                    actualChecksumerrorDialog = null;
+                }
+
+            }
+        });
+    }
 }
