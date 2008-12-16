@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
@@ -59,6 +60,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     private ITransmitter transmitter;
 
+    private String sessionID;
+
     public ITransmitter getTransmitter() {
         return transmitter;
     }
@@ -80,6 +83,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
 
         JID myJID = Saros.getDefault().getMyJID();
+        this.sessionID = String.valueOf(new Random(System.currentTimeMillis())
+                .nextInt());
         this.sharedProject = new SharedProject(this.transmitter, project, myJID);
         this.sharedProject.start();
 
@@ -90,6 +95,15 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.sharedProject.startInvitation(null);
 
         SessionManager.log.info("Session started");
+    }
+
+    /**
+     * Every Session is identified by an int as identifier.
+     * 
+     * @return the session id of this session
+     */
+    public String getSessionID() {
+        return sessionID;
     }
 
     /*
@@ -183,7 +197,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * .inf.dpp.net.JID, java.lang.String, java.lang.String)
      */
     public IIncomingInvitationProcess invitationReceived(JID from,
-            String projectName, String description) {
+            String sessionID, String projectName, String description) {
+
+        this.sessionID = sessionID;
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
                 this.transmitter, from, projectName, description);

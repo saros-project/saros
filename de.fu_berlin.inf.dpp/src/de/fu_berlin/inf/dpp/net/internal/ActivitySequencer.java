@@ -474,16 +474,12 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 source = viewport.getSource();
                 selection = addSelection(result, selection, source, path);
                 result.add(activity);
-            } else if (activity instanceof EditorActivity) {
-                EditorActivity editor = (EditorActivity) activity;
-                path = editor.getPath();
-                source = editor.getSource();
             } else {
-                // selection = addSelection(result, selection, source, path);
+                selection = addSelection(result, selection, source, path);
                 result.add(activity);
             }
-            if (!result.isEmpty())
-                selection = addSelection(result, selection, source, path);
+
+            selection = addSelection(result, selection, source, path);
         }
 
         return result;

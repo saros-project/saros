@@ -24,6 +24,13 @@ public interface ISessionManager {
     public abstract void startSession(IProject project) throws XMPPException;
 
     /**
+     * Every Session is identified by an int as identifier.
+     * 
+     * @return the session id of this session
+     */
+    public String getSessionID();
+
+    /**
      * Joins an remotly already running shared project.
      * 
      * @param project
@@ -80,11 +87,13 @@ public interface ISessionManager {
      * @param description
      *            the informal description text that can be given with
      *            invitations.
+     * @param sessionID
+     *            the id of the session
      * @return the process that represents the invitation and which handles the
      *         further interaction with the invitation.
      */
     public abstract IIncomingInvitationProcess invitationReceived(JID from,
-            String projectName, String description);
+            String sessionID, String projectName, String description);
 
     /*
      * (non-Javadoc)

@@ -132,7 +132,9 @@ public class MultiUserChatManager implements PacketListener {
             /* create new message for multi chat. */
             Message newMessage = this.muc.createMessage();
             /* add packet extension. */
-            newMessage.addExtension(new ActivitiesPacketExtension(activities));
+            newMessage.addExtension(new ActivitiesPacketExtension(Saros
+                    .getDefault().getSessionManager().getSessionID(),
+                    activities));
             /* add jid property */
             newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, Saros
                     .getDefault().getMyJID().toString());

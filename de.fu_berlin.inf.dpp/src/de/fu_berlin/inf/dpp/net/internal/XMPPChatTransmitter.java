@@ -355,7 +355,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         XMPPChatTransmitter.log.info("Sent activities: " + timedActivities);
 
         if (timedActivities != null) {
-            sendMessageToAll(sharedProject, new ActivitiesPacketExtension(
+            sendMessageToAll(sharedProject, new ActivitiesPacketExtension(Saros
+                    .getDefault().getSessionManager().getSessionID(),
                     timedActivities));
         }
 
@@ -974,7 +975,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             }
 
             if (sent) {
-                PacketExtension extension = new ActivitiesPacketExtension(
+                PacketExtension extension = new ActivitiesPacketExtension(Saros
+                        .getDefault().getSessionManager().getSessionID(),
                         tempActivities);
                 sendMessage(jid, extension);
             }
@@ -1011,7 +1013,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             Request request, JID jid) {
         XMPPChatTransmitter.log.info("send request to : " + jid + " request: "
                 + request);
-        sendMessage(jid, new RequestPacketExtension(request));
+        sendMessage(jid, new RequestPacketExtension(Saros.getDefault()
+                .getSessionManager().getSessionID(), request));
     }
 
     public void processRequest(Packet packet) {
@@ -1044,6 +1047,31 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         final Message message = (Message) packet;
 
         JID fromJID = new JID(message.getFrom());
+
+        if (PacketExtensions.getInviteExtension(message) != null) {
+            DefaultPacketExtension inviteExtension = PacketExtensions
+                    .getInviteExtension(message);
+            String desc = inviteExtension
+                    .getValue(PacketExtensions.DESCRIPTION);
+            String pName = inviteExtension
+                    .getValue(PacketExtensions.PROJECTNAME);
+            String sessionID = inviteExtension
+                    .getValue(PacketExtensions.SESSION_ID);
+
+            ISessionManager sm = Saros.getDefault().getSessionManager();
+            log.debug("Received invitation with session id "
+                    + inviteExtension.getValue(PacketExtensions.SESSION_ID));
+            sm.invitationReceived(fromJID, sessionID, pName, desc);
+            return;
+        }
+
+        if (!Saros.getDefault().getSessionManager().getSessionID().equals(
+                PacketExtensions.getSessionID(message))) {
+            log.debug("received message with wrong session id ("
+                    + PacketExtensions.getSessionID(message) + "), drop it..");
+            return;
+        }
+
         // Change the input method to get the right chats
         putIncomingChat(fromJID, message.getThread());
         final ISharedProject project = Saros.getDefault().getSessionManager()
@@ -1223,18 +1251,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 // received order
                 count++;
             }
-        }
-
-        else if (PacketExtensions.getInviteExtension(message) != null) {
-            DefaultPacketExtension inviteExtension = PacketExtensions
-                    .getInviteExtension(message);
-            String desc = inviteExtension
-                    .getValue(PacketExtensions.DESCRIPTION);
-            String pName = inviteExtension
-                    .getValue(PacketExtensions.PROJECTNAME);
-
-            ISessionManager sm = Saros.getDefault().getSessionManager();
-            sm.invitationReceived(fromJID, pName, desc);
         }
 
         else if (PacketExtensions.getCancelInviteExtension(message) != null) {

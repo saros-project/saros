@@ -31,6 +31,8 @@ import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 public class ActivitiesPacketExtension implements PacketExtension {
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
+    public static final String SESSION_ID = "sessionID";
+
     public static final String ELEMENT = "activities";
 
     public static final String TEXT_CHANGE_TAG = "edit";
@@ -40,6 +42,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
     MessageFormat textChangeFormat = new MessageFormat(
             "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
 
+    private String sessionID;
+
     // into
 
     // consts
@@ -47,7 +51,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
     public ActivitiesPacketExtension() {
     }
 
-    public ActivitiesPacketExtension(List<TimedActivity> activities) {
+    public ActivitiesPacketExtension(String sessionID,
+            List<TimedActivity> activities) {
+        this.sessionID = sessionID;
         setActivities(activities);
     }
 
@@ -91,6 +97,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
         buf.append("<").append(getElementName());
         buf.append(" xmlns=\"").append(getNamespace()).append("\">");
 
+        buf.append(sessionIdToXML());
+
         int firstTimestamp = this.activities.get(0).getTimestamp();
         buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
 
@@ -102,6 +110,11 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
         buf.append("</").append(getElementName()).append(">");
         return buf.toString();
+    }
+
+    private String sessionIdToXML() {
+        return "<" + ActivitiesPacketExtension.SESSION_ID + ">" + sessionID
+                + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
     }
 
     /*
@@ -118,5 +131,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
         }
 
         return false;
+    }
+
+    public String getSessionID() {
+        return sessionID;
     }
 }

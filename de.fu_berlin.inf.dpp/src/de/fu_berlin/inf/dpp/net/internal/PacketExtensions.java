@@ -28,6 +28,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -42,6 +43,7 @@ public class PacketExtensions {
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
     // elements
+
     private static final String INVITATION = "invite";
 
     private static final String CANCEL_INVITATION = "cancelInvite";
@@ -65,6 +67,8 @@ public class PacketExtensions {
     private static final String JUPITER_TRANSFORMATION_ERROR = "JupiterTransformationError";
 
     // attributes
+    public static final String SESSION_ID = "sessionID";
+
     public static final String DESCRIPTION = "description";
 
     public static final String PROJECTNAME = "description";
@@ -93,6 +97,10 @@ public class PacketExtensions {
                 new RequestExtensionProvider());
     }
 
+    private static String getSessionID() {
+        return Saros.getDefault().getSessionManager().getSessionID();
+    }
+
     /**
      * Creates the packet extension for new invitations.
      * 
@@ -104,6 +112,7 @@ public class PacketExtensions {
             String description) {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.INVITATION, PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue(PacketExtensions.PROJECTNAME, projectName);
         extension.setValue(PacketExtensions.DESCRIPTION, description);
 
@@ -122,6 +131,8 @@ public class PacketExtensions {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.CANCEL_INVITATION, PacketExtensions.NAMESPACE);
 
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
+
         if ((error != null) && (error.length() > 0)) {
             extension.setValue(PacketExtensions.ERROR, error);
         }
@@ -134,6 +145,7 @@ public class PacketExtensions {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.REQUEST_FOR_ACTIVITY,
                 PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue("ID", (new Integer(timestamp)).toString());
 
         if (andup) {
@@ -148,6 +160,7 @@ public class PacketExtensions {
 
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.DATATRANSFER, PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue(PacketExtensions.DT_NAME, name);
         extension.setValue(PacketExtensions.DT_DESC, desc);
         extension.setValue(PacketExtensions.DT_DATA, data);
@@ -176,6 +189,7 @@ public class PacketExtensions {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.FILE_CHECKSUM_ERROR,
                 PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
         extension.setValue("resolved", resolved ? "true" : "false");
 
@@ -187,6 +201,7 @@ public class PacketExtensions {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.DOC_CHECKSUM, PacketExtensions.NAMESPACE);
 
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue("quantity", Integer.toString(checksums.size()));
 
         int i = 1;
@@ -207,6 +222,7 @@ public class PacketExtensions {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.JUPITER_TRANSFORMATION_ERROR,
                 PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
 
         return extension;
@@ -215,6 +231,7 @@ public class PacketExtensions {
     public static PacketExtension createUserListExtension(List<User> list) {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.USER_LIST, PacketExtensions.NAMESPACE);
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
 
         int count = 0;
         for (User participant : list) {
@@ -312,7 +329,7 @@ public class PacketExtensions {
     private static DefaultPacketExtension createExtension(String element) {
         DefaultPacketExtension extension = new DefaultPacketExtension(element,
                 PacketExtensions.NAMESPACE);
-        extension.setValue(element, "");
+        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         return extension;
     }
 
@@ -322,4 +339,24 @@ public class PacketExtensions {
                 PacketExtensions.NAMESPACE);
     }
 
+    /**
+     * TODO CJ: write javadoc
+     * 
+     * @param message
+     * @return
+     */
+    public static String getSessionID(Message message) {
+        PacketExtension extension = message.getExtension(
+                ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+        if (extension != null) {
+            return ((ActivitiesPacketExtension) extension).getSessionID();
+        }
+        extension = message.getExtension(RequestPacketExtension.ELEMENT,
+                PacketExtensions.NAMESPACE);
+        if (extension != null) {
+            return ((RequestPacketExtension) extension).getSessionID();
+        }
+        extension = message.getExtension(PacketExtensions.NAMESPACE);
+        return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
+    }
 }

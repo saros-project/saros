@@ -19,6 +19,8 @@ public class RequestPacketExtension implements PacketExtension {
 
     public static final String ELEMENT = "request";
 
+    public static final String SESSION_ID = "sessionID";
+
     public static final String PATH = "path";
 
     public static final String JID = "jid";
@@ -51,7 +53,10 @@ public class RequestPacketExtension implements PacketExtension {
 
     private Request request;
 
-    public RequestPacketExtension(Request request) {
+    private String sessionID;
+
+    public RequestPacketExtension(String sessionID, Request request) {
+        this.sessionID = sessionID;
         this.request = request;
     }
 
@@ -84,6 +89,7 @@ public class RequestPacketExtension implements PacketExtension {
 
         buf.append(">");
 
+        buf.append(sessionIdToXML());
         buf.append(pathToXML());
         buf.append(jidToXML());
         buf.append(sideIDToXML());
@@ -95,6 +101,11 @@ public class RequestPacketExtension implements PacketExtension {
         buf.append("</").append(getElementName()).append(">");
         return buf.toString();
         // return "<request></request>";
+    }
+
+    private String sessionIdToXML() {
+        return "<" + RequestPacketExtension.SESSION_ID + ">" + sessionID + "</"
+                + RequestPacketExtension.SESSION_ID + ">";
     }
 
     private String pathToXML() {
@@ -184,6 +195,10 @@ public class RequestPacketExtension implements PacketExtension {
         xml += "<![CDATA[" + del.getText() + "]]>";
         xml += "</" + RequestPacketExtension.DELETE_OP + ">";
         return xml;
+    }
+
+    public String getSessionID() {
+        return sessionID;
     }
 
 }

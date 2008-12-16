@@ -39,12 +39,17 @@ public class ActivitiesProvider implements PacketExtensionProvider {
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
         int time = -1;
+        String sessionID = null;
 
         boolean done = false;
         while (!done) {
             int eventType = parser.next();
             if (eventType == XmlPullParser.START_TAG) {
 
+                if (parser.getName().equals(
+                        ActivitiesPacketExtension.SESSION_ID)) {
+                    sessionID = parseSessionId(parser);
+                }
                 if (parser.getName().equals("timestamp")) {
                     time = parseTime(parser);
                 }
@@ -64,7 +69,16 @@ public class ActivitiesProvider implements PacketExtensionProvider {
             }
         }
 
-        return new ActivitiesPacketExtension(timedActivities);
+        return new ActivitiesPacketExtension(sessionID, timedActivities);
+    }
+
+    private String parseSessionId(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        parser.next(); // read text
+        String sessionID = parser.getText();
+        parser.next(); // read end tag
+
+        return sessionID;
     }
 
     private int parseTime(XmlPullParser parser) throws XmlPullParserException,

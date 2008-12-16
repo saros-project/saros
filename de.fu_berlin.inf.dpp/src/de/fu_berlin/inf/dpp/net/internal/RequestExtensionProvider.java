@@ -26,6 +26,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
             throws XmlPullParserException, IOException {
 
         Request request = null;
+        String sessionID = null;
         String path = null;
         String jid = null;
         try {
@@ -35,6 +36,12 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
                 if (eventType == XmlPullParser.START_TAG) {
 
                     if (parser.getName().equals(RequestPacketExtension.ELEMENT)) {
+                        parser.next();
+                    }
+
+                    if (parser.getName().equals(
+                            RequestPacketExtension.SESSION_ID)) {
+                        sessionID = parseSessionId(parser);
                         parser.next();
                     }
 
@@ -64,8 +71,17 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
             e.printStackTrace();
         }
 
-        return new RequestPacketExtension(request);
+        return new RequestPacketExtension(sessionID, request);
         // return null;
+    }
+
+    private String parseSessionId(XmlPullParser parser)
+            throws XmlPullParserException, IOException {
+        parser.next(); // read text
+        String sessionID = parser.getText();
+        parser.next(); // read end tag
+
+        return sessionID;
     }
 
     private String parsePath(XmlPullParser parser)
