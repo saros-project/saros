@@ -165,8 +165,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
                 IDocument doc = EditorManager.getDefault().getDocument(path);
 
-                assert (doc != null) : ("Couldn't get Document" + path
-                        .toOSString());
+                // if doc == null there is no editor with this resource open
+                if (doc == null)
+                    continue;
 
                 if ((doc.getLength() != checksum.getLength())
                         || (doc.get().hashCode() != checksum.getHash())) {
@@ -217,8 +218,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                         Saros.getDefault().getSessionManager().getTransmitter()
                                 .sendFileChecksumErrorMessage(path, true);
 
-                        executingChecksumErrorHandling = false;
-
                         // save editor information for later
                         final Set<IEditorPart> editors = EditorManager
                                 .getDefault().getEditors(path);
@@ -257,6 +256,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                                 }
                             }
                         });
+
+                        executingChecksumErrorHandling = false;
                     }
                 }
             }

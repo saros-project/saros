@@ -118,7 +118,7 @@ public class JingleFileTransferManager {
 
         // TODO CJ: use META-INF/stun-config
         ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-                "jivesoftware.com", 3478);
+                "stun.xten.net", 3478);
 
         // STUNTransportManager stun = new STUNTransportManager();
 
