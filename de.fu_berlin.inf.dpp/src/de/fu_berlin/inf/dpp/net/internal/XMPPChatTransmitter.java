@@ -1646,12 +1646,14 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                     while (attempt < 5) {
                         try {
                             sendSingleFileWithIBB(transferData);
-                            break;
+                            return;
                         } catch (XMPPException ee) {
-                            log.error("Failed to send file list with IBB");
+                            log.error("Failed to send file with IBB");
                             attempt++;
                         }
                     }
+                    ErrorMessageDialog.showErrorMessage("Failed to send file "
+                            + transferData.path + ".");
                 }
             }
         }
@@ -1882,12 +1884,13 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         while (attempt < 5) {
             try {
                 sendFileListWithIBB(transferList.file_list_content, jid);
-                break;
+                return;
             } catch (XMPPException e) {
                 log.error("Failed to send file list with IBB");
                 attempt++;
             }
         }
+        ErrorMessageDialog.showErrorMessage("Failed to send file list");
     }
 
 }
