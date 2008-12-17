@@ -30,8 +30,6 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -60,7 +58,6 @@ import de.fu_berlin.inf.dpp.net.internal.RosterListenerImpl;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
-import de.fu_berlin.inf.dpp.ui.actions.MessagingAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
@@ -79,7 +76,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     private XMPPConnection connection;
 
     // actions
-    private Action messagingAction;
+    // private Action messagingAction;
 
     private Action inviteAction;
 
@@ -320,7 +317,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         makeActions();
         hookContextMenu();
-        hookDoubleClickAction();
+        // hookDoubleClickAction();
         contributeToActionBars();
         updateEnablement();
 
@@ -478,21 +475,21 @@ public class RosterView extends ViewPart implements IConnectionListener,
         getSite().registerContextMenu(menuMgr, this.viewer);
     }
 
-    private void hookDoubleClickAction() {
-        this.viewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
-                if (RosterView.this.messagingAction.isEnabled()) {
-                    RosterView.this.messagingAction.run();
-                }
-            }
-        });
-    }
+    // private void hookDoubleClickAction() {
+    // this.viewer.addDoubleClickListener(new IDoubleClickListener() {
+    // public void doubleClick(DoubleClickEvent event) {
+    // if (RosterView.this.messagingAction.isEnabled()) {
+    // RosterView.this.messagingAction.run();
+    // }
+    // }
+    // });
+    // }
 
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
 
         IMenuManager menuManager = bars.getMenuManager();
-        menuManager.add(this.messagingAction);
+        // menuManager.add(this.messagingAction);
         menuManager.add(this.inviteAction);
         // menuManager.add(new TestJoinWizardAction());
         menuManager.add(new Separator());
@@ -503,7 +500,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     private void fillContextMenu(IMenuManager manager) {
-        manager.add(this.messagingAction);
+        // manager.add(this.messagingAction);
         manager.add(this.skypeAction);
         manager.add(this.inviteAction);
         manager.add(new Separator());
@@ -515,7 +512,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     private void makeActions() {
-        this.messagingAction = new MessagingAction(this.viewer);
+        // this.messagingAction = new MessagingAction(this.viewer);
         this.skypeAction = new SkypeAction(this.viewer);
         this.inviteAction = new InviteAction(this.viewer);
         this.renameContactAction = new RenameContactAction(this.viewer);
