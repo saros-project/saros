@@ -139,6 +139,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     private Thread startingJingleThread;
 
+    protected long lastReceivedActivityTime;
+
     /**
      * A simple struct that is used to queue file transfers.
      */
@@ -865,9 +867,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         XMPPChatTransmitter.log.debug("Sending checksum error message of file "
                 + path.lastSegment() + " to all");
         for (User user : participants) {
-            if (!Saros.getDefault().getMyJID().equals(user.getJid()))
-                sendMessage(user.getJid(), PacketExtensions
-                        .createChecksumErrorExtension(path, resolved));
+            sendMessage(user.getJid(), PacketExtensions
+                    .createChecksumErrorExtension(path, resolved));
         }
     }
 
@@ -1024,6 +1025,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 .getJupiterRequestExtension(message);
 
         if (packetExtension != null) {
+            this.lastReceivedActivityTime = System.currentTimeMillis();
             ISharedProject project = Saros.getDefault().getSessionManager()
                     .getSharedProject();
             XMPPChatTransmitter.log.info("Received request : "
@@ -1297,11 +1299,11 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                         .getEditors(new Path(path)).toArray()[0];
 
                 new Thread() {
+
                     public void run() {
                         // wait until no more activities are received
                         while (System.currentTimeMillis()
-                                - EditorManager.getDefault()
-                                        .getLastRemoteEditTime(new Path(path)) < 1000) {
+                                - XMPPChatTransmitter.this.lastReceivedActivityTime < 1500) {
                             try {
                                 Thread.sleep(200);
                             } catch (InterruptedException e) {
@@ -1312,8 +1314,33 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                         EditorManager.getDefault().saveText(new Path(path),
                                 true);
 
+                        // IPath fullPath =
+                        // Saros.getDefault().getSessionManager()
+                        // .getSharedProject().getProject().findMember(
+                        // path).getFullPath();
+                        // ITextFileBuffer fileBuff = FileBuffers
+                        // .getTextFileBufferManager().getTextFileBuffer(
+                        // fullPath, LocationKind.IFILE);
+                        //
+                        // if (fileBuff == null) {
+                        // log.error("Can't get File Buffer");
+                        // }
+                        // if (fileBuff.isDirty())
+                        // try {
+                        // fileBuff
+                        // .commit(new NullProgressMonitor(), true);
+                        // } catch (CoreException e) {
+                        // // TODO Auto-generated catch block
+                        // e.printStackTrace();
+                        // }
+
                         // TODO CJ: thinking about a better solution with
                         // activity sequencer and jupiter
+
+                        // Saros.getDefault().getSessionManager()
+                        // .getSharedProject()
+                        // .getConcurrentDocumentManager()
+                        // .resetJupiterDocument(new Path(path));
 
                         log.debug("Sending file to clients");
                         sendFile(new JID(message.getFrom()), Saros.getDefault()

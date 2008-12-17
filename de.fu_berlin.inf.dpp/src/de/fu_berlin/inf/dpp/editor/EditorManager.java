@@ -263,12 +263,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
          * @see org.eclipse.jface.text.IDocumentListener
          */
         public void documentAboutToBeChanged(final DocumentEvent event) {
-            boolean checksumErrorHandling = Saros.getDefault()
-                    .getSessionManager().getSharedProject()
-                    .getConcurrentDocumentManager()
-                    .getExecutingChecksumErrorHandling();
-            if (checksumErrorHandling)
-                return;
+            // boolean checksumErrorHandling = Saros.getDefault()
+            // .getSessionManager().getSharedProject()
+            // .getConcurrentDocumentManager()
+            // .getExecutingChecksumErrorHandling();
+            // if (checksumErrorHandling)
+            // return;
             String text = event.getText() == null ? "" : event.getText();
             textAboutToBeChanged(event.getOffset(), text, event.getLength(),
                     event.getDocument());

@@ -4,8 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -13,10 +17,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -48,7 +48,6 @@ import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 
 public class ConcurrentDocumentManager implements ConcurrentManager,
@@ -82,6 +81,11 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
             "ConsistencyWatchdog");
 
+    private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
+            false);
+
+    private Set<IPath> pathesWithWrongChecksums;
+
     /**
      * This class consists of two parts. The first is a run-method which runs as
      * an eclipse job on the host side. Once started with schedule() the job is
@@ -92,9 +96,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
      * @author chjacob
      */
     private class ConsistencyWatchdog extends Job {
-
-        private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
-                false);
 
         private boolean executingChecksumErrorHandling;
 
@@ -120,7 +121,21 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
             // for all documents
             for (IPath docPath : docs) {
 
-                IDocument doc = EditorManager.getDefault().getDocument(docPath);
+                // get document
+                IPath fullPath = Saros.getDefault().getSessionManager()
+                        .getSharedProject().getProject().findMember(docPath)
+                        .getFullPath();
+                ITextFileBuffer fileBuff = FileBuffers
+                        .getTextFileBufferManager().getTextFileBuffer(fullPath,
+                                LocationKind.IFILE);
+
+                // HACK
+                if (fileBuff == null) {
+                    logger.error("Can't get File Buffer");
+                    docsChecksums.remove(docPath);
+                    continue;
+                }
+                IDocument doc = fileBuff.getDocument();
 
                 // if no entry for this document exists create a new one
                 if (docsChecksums.get(docPath) == null) {
@@ -172,16 +187,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                 if ((doc.getLength() != checksum.getLength())
                         || (doc.get().hashCode() != checksum.getHash())) {
 
-                    logger.debug("Inconsistency detected in document "
-                            + path.toOSString());
-
                     logger.debug(path.toString() + ": " + doc.getLength() + "/"
                             + checksum.getLength() + " ; "
                             + doc.get().hashCode() + "/" + checksum.getHash());
-
-                    if (!inconsistencyToResolve.getVariable()) {
-                        this.inconsistencyToResolve.setVariable(true);
-                    }
 
                     long lastEdited = (EditorManager.getDefault()
                             .getLastEditTime(path));
@@ -189,76 +197,29 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                     long lastRemoteEdited = (EditorManager.getDefault()
                             .getLastRemoteEditTime(path));
 
-                    if ((System.currentTimeMillis() - lastEdited) > 5000
+                    if ((System.currentTimeMillis() - lastEdited) > 2000
                             && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
-                        if (!executingChecksumErrorHandling) {
-                            Saros.getDefault().getSessionManager()
-                                    .getTransmitter()
-                                    .sendFileChecksumErrorMessage(path, false);
-
-                            executingChecksumErrorHandling = true;
-
-                            ErrorMessageDialog.showChecksumErrorMessage(path
-                                    .toOSString());
+                        logger.debug("Inconsistency detected in document "
+                                + path.toOSString());
+                        ConcurrentDocumentManager.this.pathesWithWrongChecksums
+                                .add(path);
+                        if (!inconsistencyToResolve.getVariable()) {
+                            ConcurrentDocumentManager.this.inconsistencyToResolve
+                                    .setVariable(true);
                         }
                     }
                     return;
                 }
+                logger.debug("All Inconsistencies are resolved");
                 logger.debug(path.toString() + ": " + doc.getLength() + "/"
                         + checksum.getLength() + " ; " + doc.get().hashCode()
                         + "/" + checksum.getHash());
 
+                ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
+
                 if (inconsistencyToResolve.getVariable()) {
-                    logger.debug("All Inconsistencies are resolved");
-                    this.inconsistencyToResolve.setVariable(false);
-
-                    if (executingChecksumErrorHandling) {
-
-                        // send all client that inconsistency are resolved
-                        Saros.getDefault().getSessionManager().getTransmitter()
-                                .sendFileChecksumErrorMessage(path, true);
-
-                        // save editor information for later
-                        final Set<IEditorPart> editors = EditorManager
-                                .getDefault().getEditors(path);
-                        final IEditorInput input = ((IEditorPart) editors
-                                .toArray()[0]).getEditorInput();
-                        final String editorId = ((IEditorPart) editors
-                                .toArray()[0]).getSite().getId();
-
-                        // close all open editors of resource
-                        Display.getDefault().syncExec(new Runnable() {
-                            public void run() {
-
-                                for (IEditorPart editor : editors) {
-                                    PlatformUI.getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage().closeEditor(
-                                                    editor, false);
-                                }
-                            }
-                        });
-
-                        // close Message
-                        ErrorMessageDialog.closeChecksumErrorMessage();
-
-                        // open a new editor for the resource
-                        Display.getDefault().syncExec(new Runnable() {
-                            public void run() {
-                                try {
-                                    PlatformUI.getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage().openEditor(input,
-                                                    editorId);
-                                } catch (PartInitException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-
-                        executingChecksumErrorHandling = false;
-                    }
+                    ConcurrentDocumentManager.this.inconsistencyToResolve
+                            .setVariable(false);
                 }
             }
         }
@@ -397,6 +358,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
         return false;
     }
 
+    // TODO CJ: review
     private void execTextEditActivity(final Request request) {
 
         // if (!isHostSide()) {
@@ -843,11 +805,11 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
     public void sessionEnded(ISharedProject session) {
         this.consistencyWatchdog.cancel();
+        pathesWithWrongChecksums.clear();
     }
 
     public void sessionStarted(ISharedProject session) {
-        // TODO Auto-generated method stub
-
+        this.pathesWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
     }
 
     /**
@@ -868,7 +830,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
      * 
      */
     public VariableProxy<Boolean> getConsistencyToResolve() {
-        return consistencyWatchdog.inconsistencyToResolve;
+        return this.inconsistencyToResolve;
     }
 
     /**
@@ -877,5 +839,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
      */
     public boolean getExecutingChecksumErrorHandling() {
         return consistencyWatchdog.executingChecksumErrorHandling;
+    }
+
+    public Set<IPath> getPathesWithWrongChecksums() {
+        return this.pathesWithWrongChecksums;
     }
 }

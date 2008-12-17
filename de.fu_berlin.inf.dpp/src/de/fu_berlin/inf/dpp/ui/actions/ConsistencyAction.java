@@ -1,5 +1,10 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -12,6 +17,12 @@ import de.fu_berlin.inf.dpp.util.VariableProxy;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
 public class ConsistencyAction extends Action implements ISessionListener {
+
+    private static Logger logger = Logger.getLogger(ConsistencyAction.class);
+
+    private boolean executingChecksumErrorHandling;
+
+    private static Set<IPath> pathes;
 
     public ConsistencyAction() {
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
@@ -32,13 +43,40 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 setToolTipText("Inconsistency Detected!");
             } else {
                 setToolTipText("");
+                logger.debug("All Inconsistencies are resolved");
+                if (executingChecksumErrorHandling) {
+                    for (IPath path : pathes) {
+                        Saros.getDefault().getSessionManager().getTransmitter()
+                                .sendFileChecksumErrorMessage(path, true);
+                    }
+                    pathes.clear();
+                    executingChecksumErrorHandling = false;
+                }
             }
         }
 
     };
 
+    @Override
+    public void run() {
+        super.run();
+
+        executingChecksumErrorHandling = true;
+
+        pathes = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
+                .getSessionManager().getSharedProject()
+                .getConcurrentDocumentManager().getPathesWithWrongChecksums());
+
+        for (IPath path : pathes) {
+            Saros.getDefault().getSessionManager().getTransmitter()
+                    .sendFileChecksumErrorMessage(path, false);
+        }
+
+    }
+
     public void sessionStarted(ISharedProject session) {
 
+        ConsistencyAction.pathes = new CopyOnWriteArraySet<IPath>();
         if (proxy != null) {
             proxy.remove(listener);
         }
@@ -54,6 +92,8 @@ public class ConsistencyAction extends Action implements ISessionListener {
     }
 
     public void sessionEnded(ISharedProject session) {
+
+        ConsistencyAction.pathes.clear();
 
         if (proxy != null) {
             proxy.remove(listener);

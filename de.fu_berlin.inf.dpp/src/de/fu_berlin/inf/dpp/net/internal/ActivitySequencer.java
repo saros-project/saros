@@ -531,10 +531,13 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             }
         }
 
-        TextSelectionActivity newSel = new TextSelectionActivity(selection
-                .getOffset(), selection.getLength(), path);
-        newSel.setSource(source);
-        result.add(newSel);
+        // HACK TODO CJ: review
+        if (path != null) {
+            TextSelectionActivity newSel = new TextSelectionActivity(selection
+                    .getOffset(), selection.getLength(), path);
+            newSel.setSource(source);
+            result.add(newSel);
+        }
 
         selection = null;
         return selection;
