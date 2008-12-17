@@ -35,6 +35,7 @@ public class FollowModeAction extends Action implements ISessionListener {
     public void setFollowMode(boolean isFollowMode) {
         this.isFollowMode = isFollowMode;
         EditorManager.getDefault().setEnableFollowing(isFollowMode);
+        updateEnablement();
     }
 
     public void sessionStarted(ISharedProject session) {

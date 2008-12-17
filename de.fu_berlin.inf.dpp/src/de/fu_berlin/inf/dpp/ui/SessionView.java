@@ -81,6 +81,8 @@ public class SessionView extends ViewPart implements ISessionListener,
 
     private IPreferenceStore store = null;
 
+    private FollowModeAction followModeAction;
+
     private class SessionContentProvider implements IStructuredContentProvider,
             ISharedProjectListener {
 
@@ -113,6 +115,14 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
 
         public void driverChanged(JID driver, boolean replicated) {
+            User participant = SessionView.this.sharedProject
+                    .getParticipant(driver);
+
+            // if the local host become driver leave follow mode
+            if (participant.getJid().equals(Saros.getDefault().getMyJID())) {
+                if (SessionView.this.sharedProject.isDriver(participant))
+                    followModeAction.setFollowMode(false);
+            }
             refreshTable();
         }
 
@@ -318,10 +328,11 @@ public class SessionView extends ViewPart implements ISessionListener,
         IActionBars bars = getViewSite().getActionBars();
         IToolBarManager toolBar = bars.getToolBarManager();
 
+        this.followModeAction = new FollowModeAction();
         toolBar.add(new ConsistencyAction());
         toolBar.add(new OpenInviteInterface());
         toolBar.add(new RemoveAllDriverRoleAction());
-        toolBar.add(new FollowModeAction());
+        toolBar.add(followModeAction);
         toolBar.add(new LeaveSessionAction());
     }
 
