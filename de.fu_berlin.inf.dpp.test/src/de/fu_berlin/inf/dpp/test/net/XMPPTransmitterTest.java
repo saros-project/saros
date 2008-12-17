@@ -37,14 +37,14 @@ import de.fu_berlin.inf.dpp.test.util.FileListHelper;
 import de.fu_berlin.inf.dpp.test.util.ResourceHelper;
 
 public class XMPPTransmitterTest extends TestCase implements
-	FileTransferListener, ITransmitter, IFileTransferCallback {
+        FileTransferListener, ITransmitter, IFileTransferCallback {
 
     static {
-	XMPPConnection.DEBUG_ENABLED = true;
+        XMPPConnection.DEBUG_ENABLED = true;
     }
 
     private static Logger logger = Logger.getLogger(XMPPTransmitterTest.class
-	    .toString());
+            .toString());
 
     private XMPPConnection connection1;
     private FileTransferManager transferManager1;
@@ -56,80 +56,80 @@ public class XMPPTransmitterTest extends TestCase implements
 
     @Override
     public void setUp() throws Exception {
-	// PropertyConfigurator.configureAndWatch("log4j.properties", 60 *
-	// 1000);
-	// Logger logger = Logger.getLogger("de.fu_berlin.inf.dpp");
+        // PropertyConfigurator.configureAndWatch("log4j.properties", 60 *
+        // 1000);
+        // Logger logger = Logger.getLogger("de.fu_berlin.inf.dpp");
 
-	connection1 = new XMPPConnection("jabber.cc");
-	// while (!connection1.isAuthenticated()) {
-	// System.out.println("connecting user1");
-	connection1.connect();
-	connection1.login("ori79", "123456");
-	// }
-	transferManager1 = new FileTransferManager(connection1);
-	logger.info("connection 1 established.");
-	Thread.sleep(1000);
+        connection1 = new XMPPConnection("jabber.cc");
+        // while (!connection1.isAuthenticated()) {
+        // System.out.println("connecting user1");
+        connection1.connect();
+        connection1.login("ori79", "123456");
+        // }
+        transferManager1 = new FileTransferManager(connection1);
+        logger.info("connection 1 established.");
+        Thread.sleep(1000);
 
-	connection2 = new XMPPConnection("jabber.cc");
-	// while (!connection2.isAuthenticated()) {
+        connection2 = new XMPPConnection("jabber.cc");
+        // while (!connection2.isAuthenticated()) {
 
-	connection2.connect();
-	connection2.login("ori78", "123456");
-	// }
-	logger.info("connection 1 established.");
-	transferManager2 = new FileTransferManager(connection2);
+        connection2.connect();
+        connection2.login("ori78", "123456");
+        // }
+        logger.info("connection 1 established.");
+        transferManager2 = new FileTransferManager(connection2);
 
-	Thread.sleep(1000);
+        Thread.sleep(1000);
 
-	// mock = new MockInvitationProcess(this, null, null);
+        // mock = new MockInvitationProcess(this, null, null);
     }
 
     @Override
     public void tearDown() {
-	connection1.disconnect();
-	connection2.disconnect();
+        connection1.disconnect();
+        connection2.disconnect();
     }
 
     public void testSendFileList() throws CoreException, XMPPException {
-	// transferManager2.addFileTransferListener(new
-	// ReceivedSingleFileListener());
-	transferManager2
-		.addFileTransferListener(new ReceiveFileListFileTransferListener());
+        // transferManager2.addFileTransferListener(new
+        // ReceivedSingleFileListener());
+        transferManager2
+                .addFileTransferListener(new ReceiveFileListFileTransferListener());
 
-	ITransmitter transfer = new XMPPChatTransmitter(connection1);
-	FileList list = FileListHelper.createFileListForDefaultProject();
-	transfer.sendFileList(new JID(connection2.getUser()), list);
+        ITransmitter transfer = new XMPPChatTransmitter(connection1);
+        FileList list = FileListHelper.createFileListForDefaultProject();
+        transfer.sendFileList(new JID(connection2.getUser()), list);
 
     }
 
     public void xtestTransferFileFunction() throws CoreException, XMPPException {
-	transferManager2
-		.addFileTransferListener(new ReceivedSingleFileListener());
+        transferManager2
+                .addFileTransferListener(new ReceivedSingleFileListener());
 
-	ITransmitter transfer = new XMPPChatTransmitter(connection1);
-	// TODO: project initialisieren
-	// transfer.sendFile(new JID(connection2.getUser()),
-	// ResourceHelper.getDefaultProject(),
-	// ResourceHelper.getDefaultFile().getProjectRelativePath(), null);
-	transfer.sendFile(new JID(connection2.getUser()), ResourceHelper
-		.getDefaultProject(), ResourceHelper.getFile("src/First.java")
-		.getProjectRelativePath(), null);
-	try {
-	    Thread.sleep(1000);
-	} catch (InterruptedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        ITransmitter transfer = new XMPPChatTransmitter(connection1);
+        // TODO: project initialisieren
+        // transfer.sendFile(new JID(connection2.getUser()),
+        // ResourceHelper.getDefaultProject(),
+        // ResourceHelper.getDefaultFile().getProjectRelativePath(), null);
+        transfer.sendFile(new JID(connection2.getUser()), ResourceHelper
+                .getDefaultProject(), ResourceHelper.getFile("src/First.java")
+                .getProjectRelativePath(), null);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void xtestReceivedFileList() throws CoreException, XMPPException {
-	// transferManager2.addFileTransferListener(new
-	// ReceiveFileListFileTransferListener());
+        // transferManager2.addFileTransferListener(new
+        // ReceiveFileListFileTransferListener());
 
-	ITransmitter transfer = new XMPPChatTransmitter(connection1);
+        ITransmitter transfer = new XMPPChatTransmitter(connection1);
 
-	FileList list = FileListHelper.createFileListForDefaultProject();
-	transfer.sendFileList(new JID(connection2.getUser()), list);
+        FileList list = FileListHelper.createFileListForDefaultProject();
+        transfer.sendFileList(new JID(connection2.getUser()), list);
     }
 
     /*
@@ -142,48 +142,48 @@ public class XMPPTransmitterTest extends TestCase implements
 
     public void fileTransferRequest(FileTransferRequest request) {
 
-	IncomingFileTransfer transfer = request.accept();
-	String filename = request.getFileName()
-		+ "."
-		+ request.getRequestor().substring(0,
-			request.getRequestor().indexOf("@"));
-	logger.log(Level.FINE, filename);
+        IncomingFileTransfer transfer = request.accept();
+        String filename = request.getFileName()
+                + "."
+                + request.getRequestor().substring(0,
+                        request.getRequestor().indexOf("@"));
+        logger.log(Level.FINE, filename);
 
-	try {
-	    InputStream input = transfer.recieveFile();
+        try {
+            InputStream input = transfer.recieveFile();
 
-	} catch (XMPPException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+        } catch (XMPPException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	// // TODO Auto-generated method stub
-	// // Check to see if the request should be accepted
-	// // if(shouldAccept(request)) {
-	// // Accept it
-	//
-	//		
-	//		
-	// logger.info("Incomming file "+request.getRequestor());
-	// IncomingFileTransfer transfer = request.accept();
-	// String filename =
-	// request.getFileName()+"."+request.getRequestor().substring(0,
-	// request.getRequestor().indexOf("@"));
-	// try {
-	//			
-	// // transfer.recieveFile(new File(filename));
-	// InputStream input = transfer.recieveFile();
-	// mock.resourceReceived(null, new
-	// Path(transfer.getFileName()+".received"), input);
-	// } catch (XMPPException e) {
-	// // TODO Auto-generated catch block
-	// logger.log(Level.ALL,e.getMessage());
-	// }
-	//
-	// // if (new File(filename).exists()) {
-	// //// new File("Testfile2.txt").deleteOnExit();
-	// // logger.debug("File exists and will delete.");
-	// // }
+        // // TODO Auto-generated method stub
+        // // Check to see if the request should be accepted
+        // // if(shouldAccept(request)) {
+        // // Accept it
+        //
+        //		
+        //		
+        // logger.info("Incomming file "+request.getRequestor());
+        // IncomingFileTransfer transfer = request.accept();
+        // String filename =
+        // request.getFileName()+"."+request.getRequestor().substring(0,
+        // request.getRequestor().indexOf("@"));
+        // try {
+        //			
+        // // transfer.recieveFile(new File(filename));
+        // InputStream input = transfer.recieveFile();
+        // mock.resourceReceived(null, new
+        // Path(transfer.getFileName()+".received"), input);
+        // } catch (XMPPException e) {
+        // // TODO Auto-generated catch block
+        // logger.log(Level.ALL,e.getMessage());
+        // }
+        //
+        // // if (new File(filename).exists()) {
+        // //// new File("Testfile2.txt").deleteOnExit();
+        // // logger.debug("File exists and will delete.");
+        // // }
     }
 
     // /* helper methods. */
@@ -225,145 +225,151 @@ public class XMPPTransmitterTest extends TestCase implements
     // }
 
     public void addInvitationProcess(IInvitationProcess invitation) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void removeInvitationProcess(IInvitationProcess invitation) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendActivities(ISharedProject sharedProject,
-	    List<TimedActivity> activities) {
-	// TODO Auto-generated method stub
+            List<TimedActivity> activities) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendCancelInvitationMessage(JID jid, String errorMsg) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendFile(JID recipient, IProject project, IPath path,
-	    IFileTransferCallback callback) {
-	// TODO Auto-generated method stub
+            IFileTransferCallback callback) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendFile(JID recipient, IProject project, IPath path,
-	    int timestamp, IFileTransferCallback callback) {
-	// TODO Auto-generated method stub
+            int timestamp, IFileTransferCallback callback) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendFileList(JID jid, FileList fileList) throws XMPPException {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-	    String description) {
-	// TODO Auto-generated method stub
+            String description) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendJoinMessage(ISharedProject sharedProject) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendLeaveMessage(ISharedProject sharedProject) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendRemainingFiles() {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendRemainingMessages() {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendRequestForActivity(ISharedProject sharedProject,
-	    int timestamp, boolean andup) {
-	// TODO Auto-generated method stub
+            int timestamp, boolean andup) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendRequestForFileListMessage(JID recipient) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendUserListTo(JID to, List<User> participants) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void setXMPPConnection(XMPPConnection connection) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void fileSent(IPath path) {
-	logger.log(Level.FINE, "File sent " + path);
+        logger.log(Level.FINE, "File sent " + path);
 
     }
 
     public void fileTransferFailed(IPath path, Exception e) {
-	logger.log(Level.WARNING, "File transfer failed: " + e.getMessage());
+        logger.log(Level.WARNING, "File transfer failed: " + e.getMessage());
 
     }
 
     public void sendProjectArchive(JID recipient, IProject project,
-	    File archive, IFileTransferCallback callback) {
-	// TODO Auto-generated method stub
+            File archive, IFileTransferCallback callback) {
+        // TODO Auto-generated method stub
 
     }
 
     public void transferProgress(int transfered) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void jingleFallback() {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void setTransferMode(TransferMode mode) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendActivitiyTo(ISharedProject sharedProject,
-	    IActivity activity, JID jid) {
-	// TODO Auto-generated method stub
+            IActivity activity, JID jid) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendJupiterRequest(ISharedProject sharedProject,
-	    Request request, JID jid) {
-	// TODO Auto-generated method stub
+            Request request, JID jid) {
+        // TODO Auto-generated method stub
 
     }
 
     public void sendFileChecksumError(JID to, IPath path) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     public void sendJupiterTransformationError(JID to, IPath path) {
-	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
-    public void sendDocChecksums(JID to, Collection<DocumentChecksum> collection) {
-	// TODO Auto-generated method stub
+    public void sendDocChecksumsToClients(
+            Collection<DocumentChecksum> collection) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void sendFileChecksumErrorMessage(IPath path, boolean resolved) {
+        // TODO Auto-generated method stub
 
     }
 }

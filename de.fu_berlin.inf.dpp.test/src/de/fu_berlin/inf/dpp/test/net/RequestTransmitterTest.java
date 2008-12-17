@@ -27,92 +27,92 @@ import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 
 public class RequestTransmitterTest extends TestCase implements PacketListener,
-	MessageListener {
+        MessageListener {
 
     static {
-	XMPPConnection.DEBUG_ENABLED = true;
-	ProviderManager providermanager = ProviderManager.getInstance();
-	providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
-		RequestPacketExtension.NAMESPACE,
-		new RequestExtensionProvider());
+        XMPPConnection.DEBUG_ENABLED = true;
+        ProviderManager providermanager = ProviderManager.getInstance();
+        providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
+                RequestPacketExtension.NAMESPACE,
+                new RequestExtensionProvider());
     }
     private XMPPConnection connection1;
     private XMPPConnection connection2;
     Request req;
 
     public RequestTransmitterTest(String name) {
-	super(name);
+        super(name);
     }
 
     @Override
     protected void setUp() throws Exception {
-	super.setUp();
-	connection1 = new XMPPConnection("jabber.cc");
-	connection1.connect();
-	connection1.login("ori78", "123456");
+        super.setUp();
+        connection1 = new XMPPConnection("jabber.cc");
+        connection1.connect();
+        connection1.login("ori78", "123456");
 
-	connection2 = new XMPPConnection("jabber.cc");
-	connection2.connect();
-	connection2.login("ori79", "123456");
-	connection2.addPacketListener(this, new MessageTypeFilter(
-		Message.Type.chat));
+        connection2 = new XMPPConnection("jabber.cc");
+        connection2.connect();
+        connection2.login("ori79", "123456");
+        connection2.addPacketListener(this, new MessageTypeFilter(
+                Message.Type.chat));
 
-	req = new RequestImpl(1, new JupiterVectorTime(1, 3),
-		new DeleteOperation(34, "insert text"));
-	req.setEditorPath(new Path("hello"));
-	req.setJID(new JID("ori78@jabber.cc"));
+        req = new RequestImpl(1, new JupiterVectorTime(1, 3),
+                new DeleteOperation(34, "insert text"));
+        req.setEditorPath(new Path("hello"));
+        req.setJID(new JID("ori78@jabber.cc"));
     }
 
     @Override
     protected void tearDown() throws Exception {
-	super.tearDown();
+        super.tearDown();
     }
 
     public void testSendRequest() throws XMPPException, Exception {
-	ChatManager chatmanager = connection1.getChatManager();
-	Chat newChat = chatmanager.createChat(connection2.getUser(), this);
+        ChatManager chatmanager = connection1.getChatManager();
+        Chat newChat = chatmanager.createChat(connection2.getUser(), this);
 
-	try {
-	    Message message = new Message();
-	    // Request req = new RequestImpl(1,new JupiterVectorTime(1,3),new
-	    // DeleteOperation(34,"insert text"));
-	    // req.setEditorPath(new Path("hello"));
-	    // req.setJID(new JID("ori78@jabber.cc"));
-	    message.addExtension(new RequestPacketExtension(req));
-	    newChat.sendMessage(message);
-	} catch (XMPPException e) {
-	    System.out.println("Error Delivering block");
-	}
-	Thread.sleep(300);
+        try {
+            Message message = new Message();
+            // Request req = new RequestImpl(1,new JupiterVectorTime(1,3),new
+            // DeleteOperation(34,"insert text"));
+            // req.setEditorPath(new Path("hello"));
+            // req.setJID(new JID("ori78@jabber.cc"));
+            message.addExtension(new RequestPacketExtension("1", req));
+            newChat.sendMessage(message);
+        } catch (XMPPException e) {
+            System.out.println("Error Delivering block");
+        }
+        Thread.sleep(300);
     }
 
     public void processPacket(Packet packet) {
 
-	Message message = (Message) packet;
+        Message message = (Message) packet;
 
-	RequestPacketExtension packetExtension = (RequestPacketExtension) message
-		.getExtension(RequestPacketExtension.ELEMENT,
-			RequestPacketExtension.NAMESPACE);
-	if (packetExtension != null) {
-	    System.out.println("Received request : "
-		    + packetExtension.getRequest().toString());
-	    assertEquals(req, packetExtension.getRequest());
-	} else {
-	    System.out.println("Failure in request packet extension.");
-	}
+        RequestPacketExtension packetExtension = (RequestPacketExtension) message
+                .getExtension(RequestPacketExtension.ELEMENT,
+                        RequestPacketExtension.NAMESPACE);
+        if (packetExtension != null) {
+            System.out.println("Received request : "
+                    + packetExtension.getRequest().toString());
+            assertEquals(req, packetExtension.getRequest());
+        } else {
+            System.out.println("Failure in request packet extension.");
+        }
     }
 
     public void processMessage(Chat chat, Message message) {
-	RequestPacketExtension packetExtension = (RequestPacketExtension) message
-		.getExtension(RequestPacketExtension.ELEMENT,
-			RequestPacketExtension.NAMESPACE);
-	if (packetExtension != null) {
-	    System.out.println("Received request : "
-		    + packetExtension.getRequest().toString());
-	    assertEquals(req, packetExtension.getRequest());
-	} else {
-	    System.out.println("Failure in request packet extension.");
-	}
+        RequestPacketExtension packetExtension = (RequestPacketExtension) message
+                .getExtension(RequestPacketExtension.ELEMENT,
+                        RequestPacketExtension.NAMESPACE);
+        if (packetExtension != null) {
+            System.out.println("Received request : "
+                    + packetExtension.getRequest().toString());
+            assertEquals(req, packetExtension.getRequest());
+        } else {
+            System.out.println("Failure in request packet extension.");
+        }
     }
 
 }
