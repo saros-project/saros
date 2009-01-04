@@ -40,6 +40,7 @@ import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.osgi.framework.BundleContext;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -222,6 +223,9 @@ public class Saros extends AbstractUIPlugin {
 
             this.connection.login(username, password);
 
+            this.connection.getRoster().setSubscriptionMode(
+                    SubscriptionMode.manual);
+
             this.connection.addConnectionListener(this.smackConnectionListener);
             setConnectionState(ConnectionState.CONNECTED, null);
 
@@ -322,8 +326,28 @@ public class Saros extends AbstractUIPlugin {
     public void addContact(JID jid, String nickname, String[] groups)
             throws XMPPException {
         assertConnection();
-        this.connection.getRoster().createEntry(jid.toString(), nickname,
-                groups);
+
+        // if roster already contains user with this jid do nothing
+        if (!connection.getRoster().contains(jid.toString())) {
+            ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(
+                    connection);
+            try {
+                // if discovering user information is successful add contact to
+                // roster
+                if (sdm.discoverInfo(jid.toString()).getIdentities().hasNext()) {
+                    connection.getRoster().createEntry(jid.toString(),
+                            nickname, groups);
+                }
+            } catch (XMPPException e) {
+                // if server doesn't support to get information add contact
+                // anyway (if entry would't exist it should be an error 404)
+                if (e.getMessage().contains("501"))/* feature-not-implemented */{
+                    connection.getRoster().createEntry(jid.toString(),
+                            nickname, groups);
+                } else
+                    throw e;
+            }
+        }
     }
 
     /**

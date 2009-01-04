@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -47,14 +48,16 @@ import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
+import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.internal.RosterListenerImpl;
+import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
@@ -69,6 +72,9 @@ import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
  */
 public class RosterView extends ViewPart implements IConnectionListener,
         IRosterTree {
+
+    private static Logger logger = Logger.getLogger(RosterView.class);
+
     private TreeViewer viewer;
 
     private Roster roster;
@@ -115,7 +121,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
          * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
          */
         public Object[] getChildren() {
-            return RosterView.getChildren(this.group.getEntries());
+            return this.group.getEntries().toArray();
         }
 
         @Override
@@ -135,8 +141,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
          * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
          */
         public Object[] getChildren() {
-            return RosterView.getChildren(RosterView.this.roster
-                    .getUnfiledEntries());
+            return RosterView.this.roster.getUnfiledEntries().toArray();
         }
 
         @Override
@@ -170,7 +175,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
             if (parent.equals(getViewSite())
                     && (RosterView.this.roster != null)) {
                 List<TreeItem> groups = new LinkedList<TreeItem>();
-                // TODO: Änderung für Smack 3
                 for (RosterGroup rg : RosterView.this.roster.getGroups()) {
                     GroupItem item = new GroupItem(rg);
                     groups.add(item);
@@ -243,7 +247,11 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 // append presence information if available
                 Presence presence = RosterView.this.roster.getPresence(entry
                         .getUser());
-                if (presence != null) {
+                RosterEntry e = RosterView.this.roster
+                        .getEntry(entry.getUser());
+                if (e.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
+                    label = label + " (wait for permission)";
+                } else if (presence != null) {
                     label = label + " (" + presence.getType() + ")";
                 }
 
@@ -363,21 +371,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
         });
     }
 
-    public static Object[] getChildren(Collection<RosterEntry> entries) {
-        // TODO: new method for smack 3
-
-        List<RosterEntry> users = new LinkedList<RosterEntry>();
-
-        for (RosterEntry entry : entries) {
-            if ((entry.getType() == RosterPacket.ItemType.both)
-                    || (entry.getType() == RosterPacket.ItemType.to)) {
-                users.add(entry);
-            }
-        }
-
-        return users.toArray();
-    }
-
     /**
      * Needs to called from an UI thread.
      */
@@ -395,49 +388,37 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     private void attachRosterListener() {
-        this.roster.addRosterListener(new RosterListenerImpl(this.connection,
-                this));
 
-        // roster.addRosterListener(new RosterListener() {
-        // public void entriesAdded(Collection<String> addresses) {
-        // for (Iterator<String> it = addresses.iterator(); it.hasNext();) {
-        // String address = it.next();
-        // RosterEntry entry = roster.getEntry(address);
-        // //When the entry is only from the other user, then send a
-        // subscription request
-        // if (entry != null && entry.getType() == RosterPacket.ItemType.from) {
-        // try {
-        // System.out.println("Creating entry to: " + entry.getUser());
-        // connection.getRoster().createEntry(entry.getUser(), entry.getUser(),
-        // null);
-        // } catch (XMPPException e) {
-        // e.printStackTrace();
-        // }
-        // }
-        // }
-        //				
-        // refreshRosterTree(true);
-        // }
-        //
-        // public void entriesUpdated(Collection<String> addresses) {
-        // refreshRosterTree(false);
-        // }
-        //
-        // public void entriesDeleted(Collection<String> addresses) {
-        // refreshRosterTree(false);
-        // }
-        //
-        // public void presenceChanged(String XMPPAddress) {
-        // refreshRosterTree(true);
-        // }
-        //			
-        //			
-        // public void presenceChanged(Presence presence) {
-        // //TODO: new Method for Smack 3
-        // presenceChanged(presence.getFrom());
-        //				
-        // }
-        // });
+        this.connection.addPacketListener(new SubscriptionListener(
+                this.connection, this), new PacketTypeFilter(Presence.class));
+
+        this.connection.getRoster().addRosterListener(new RosterListener() {
+            public void entriesAdded(Collection<String> addresses) {
+            }
+
+            public void entriesUpdated(Collection<String> addresses) {
+                for (String address : addresses) {
+                    logger.debug(address
+                            + ": "
+                            + connection.getRoster().getEntry(address)
+                                    .getType()
+                            + ", "
+                            + connection.getRoster().getEntry(address)
+                                    .getStatus());
+                }
+
+                refreshRosterTree(true);
+            }
+
+            public void entriesDeleted(Collection<String> addresses) {
+                refreshRosterTree(false);
+            }
+
+            public void presenceChanged(Presence presence) {
+                logger.debug(presence.getFrom() + ": " + presence);
+                refreshRosterTree(true);
+            }
+        });
     }
 
     /**

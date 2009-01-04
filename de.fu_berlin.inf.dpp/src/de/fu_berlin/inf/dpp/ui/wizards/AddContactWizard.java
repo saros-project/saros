@@ -30,6 +30,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -119,9 +120,13 @@ public class AddContactWizard extends Wizard {
                     this.page.getNickname(), null);
             return true;
 
-        } catch (Exception e) {
-            this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
-            e.printStackTrace();
+        } catch (XMPPException e) {
+            // contact not found
+            if (e.getMessage().contains("item-not-found"))
+                this.page.setMessage("Contact not found!",
+                        IMessageProvider.ERROR);
+            else
+                this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
         }
 
         return false;
