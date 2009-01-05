@@ -321,32 +321,34 @@ public class Saros extends AbstractUIPlugin {
      *            the groups to which the new contact should belong to. This
      *            information will be saved on the server.
      * @throws XMPPException
-     *             is thrown if no connection is establised.
+     *             is thrown if no connection is established or the contact
+     *             doesn't exist
      */
     public void addContact(JID jid, String nickname, String[] groups)
             throws XMPPException {
         assertConnection();
 
         // if roster already contains user with this jid do nothing
-        if (!connection.getRoster().contains(jid.toString())) {
-            ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(
-                    connection);
-            try {
-                // if discovering user information is successful add contact to
-                // roster
-                if (sdm.discoverInfo(jid.toString()).getIdentities().hasNext()) {
-                    connection.getRoster().createEntry(jid.toString(),
-                            nickname, groups);
-                }
-            } catch (XMPPException e) {
-                // if server doesn't support to get information add contact
-                // anyway (if entry would't exist it should be an error 404)
-                if (e.getMessage().contains("501"))/* feature-not-implemented */{
-                    connection.getRoster().createEntry(jid.toString(),
-                            nickname, groups);
-                } else
-                    throw e;
+        if (connection.getRoster().contains(jid.toString())) {
+            return;
+        }
+
+        // if discovering user information is successful add contact to
+        // roster
+        ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(connection);
+        try {
+            if (sdm.discoverInfo(jid.toString()).getIdentities().hasNext()) {
+                connection.getRoster().createEntry(jid.toString(), nickname,
+                        groups);
             }
+        } catch (XMPPException e) {
+            // if server doesn't support to get information add contact
+            // anyway (if entry would't exist it should be an error 404)
+            if (e.getMessage().contains("501"))/* feature-not-implemented */{
+                connection.getRoster().createEntry(jid.toString(), nickname,
+                        groups);
+            } else
+                throw e;
         }
     }
 
