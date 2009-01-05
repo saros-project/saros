@@ -45,19 +45,16 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
 
     }
 
-    @Override
     public void transportClosed(TransportCandidate cand) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void transportClosedOnError(XMPPException e) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void transportEstablished(TransportCandidate local,
             TransportCandidate remote) {
         log.append("Jingle transport estabblished: " + local.getLocalIp()
@@ -65,7 +62,6 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
 
     }
 
-    @Override
     public void connected(final String protocol, final String remote) {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
@@ -75,31 +71,26 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
         });
     }
 
-    @Override
     public void exceptionOccured(JingleSessionException exception) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void failedToSendFileListWithJingle(JID jid,
             JingleFileTransferData transferList) {
         log.append("Failed to send File with Jingle to " + jid);
     }
 
-    @Override
     public void incomingFileList(String fileList_content, JID sender) {
         // TODO Auto-generated method stub
     }
 
-    @Override
     public void incomingResourceFile(JingleFileTransferData data,
             InputStream input) {
         // TODO Auto-generated method stub
 
     }
 
-    @Override
     public void connectionStateChanged(XMPPConnection connection,
             ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
