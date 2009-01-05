@@ -21,4 +21,6 @@ public interface IJingleFileTransferListener {
 
     public void failedToSendFileListWithJingle(JID jid,
             JingleFileTransferData transferList);
+
+    public void connected(String protocol, String remote);
 }

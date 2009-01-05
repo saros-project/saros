@@ -137,6 +137,15 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     private JingleFileTransferManager jingleManager;
 
+    public JingleFileTransferManager getJingleManager() {
+        try {
+            startingJingleThread.join();
+        } catch (InterruptedException e) {
+            // do nothing
+        }
+        return jingleManager;
+    }
+
     private Thread startingJingleThread;
 
     protected long lastReceivedActivityTime;
@@ -1891,6 +1900,12 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             }
         }
         ErrorMessageDialog.showErrorMessage("Failed to send file list");
+    }
+
+    @Override
+    public void connected(String protocol, String remote) {
+        // TODO Auto-generated method stub
+
     }
 
 }

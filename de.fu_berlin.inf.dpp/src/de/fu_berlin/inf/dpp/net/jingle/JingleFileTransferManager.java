@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -34,7 +36,6 @@ public class JingleFileTransferManager {
     private class FileMediaManager extends JingleMediaManager {
 
         private JingleFileTransferData[] transferData;
-        private IJingleFileTransferListener listener;
         private HashMap<JID, JingleFileTransferSession> sessions;
         private JingleFileTransferSession session;
 
@@ -55,7 +56,7 @@ public class JingleFileTransferManager {
 
             JingleFileTransferSession newSession = new JingleFileTransferSession(
                     payload, tc1, tc2, null, jingleSession, transferData, jid,
-                    listener);
+                    listeners);
 
             sessions.put(jid, newSession);
 
@@ -97,7 +98,7 @@ public class JingleFileTransferManager {
      */
     private HashMap<JID, JingleConnectionState> connectionStates = null;
     private FileMediaManager mediaManager = null;
-    private IJingleFileTransferListener listener;
+    private Set<IJingleFileTransferListener> listeners;
 
     public enum JingleConnectionState {
         INIT, ESTABLISHED, CLOSED, ERROR, DEFAULT
@@ -109,7 +110,8 @@ public class JingleFileTransferManager {
         incomingSessions = new HashMap<JID, JingleSession>();
         outgoingSessions = new HashMap<JID, JingleSession>();
         connectionStates = new HashMap<JID, JingleConnectionState>();
-        this.listener = listener;
+        this.listeners = new HashSet<IJingleFileTransferListener>();
+        this.listeners.add(listener);
         logger.debug("initialized jingle file transfer manager.");
         initialize();
     }
@@ -118,13 +120,12 @@ public class JingleFileTransferManager {
 
         // TODO CJ: use META-INF/stun-config
         ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-        // "stun.xten.net", 3478);
-                "jivesoftware.com", 3478);
+                "stun.xten.net", 3478);
+        // "jivesoftware.com", 3478);
 
         // STUNTransportManager stun = new STUNTransportManager();
 
         mediaManager = new FileMediaManager(icetm0);
-        mediaManager.listener = listener;
 
         List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
         medias.add(mediaManager);
@@ -431,5 +432,10 @@ public class JingleFileTransferManager {
         } else {
             logger.warn("JID is null. Jingle error state couldn't be set.");
         }
+    }
+
+    public void addJingleFileTransferListener(
+            IJingleFileTransferListener listener) {
+        listeners.add(listener);
     }
 }

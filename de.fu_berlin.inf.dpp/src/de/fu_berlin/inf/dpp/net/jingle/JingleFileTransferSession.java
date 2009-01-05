@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.jingle.JingleSession;
@@ -76,14 +77,18 @@ public class JingleFileTransferSession extends JingleMediaSession {
                             logger.debug("received file List");
                             logger.debug(data.file_list_content);
                             /* inform listener. */
-                            listener.incomingFileList(data.file_list_content,
-                                    data.sender);
+                            for (IJingleFileTransferListener listener : listeners) {
+                                listener.incomingFileList(
+                                        data.file_list_content, data.sender);
+                            }
 
                         } else if (data.type == FileTransferType.RESOURCE_TRANSFER) {
                             logger.debug("received resource "
                                     + data.file_project_path);
-                            listener.incomingResourceFile(data,
-                                    new ByteArrayInputStream(data.content));
+                            for (IJingleFileTransferListener listener : listeners) {
+                                listener.incomingResourceFile(data,
+                                        new ByteArrayInputStream(data.content));
+                            }
                         }
                     }
                 }
@@ -104,7 +109,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private Receive tcpReceiveThread;
     private Receive udpReceiveThread;
     private JingleFileTransferData[] transferList;
-    private IJingleFileTransferListener listener;
+    private Set<IJingleFileTransferListener> listeners;
     private UDPSelectorProvider udpSelectorProvider;
     private Socket udpSocket;
     private Socket tcpSocket;
@@ -123,20 +128,20 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * @param mediaLocator
      * @param jingleSession
      * @param transferData
-     * @param listener
+     * @param listeners
      */
     public JingleFileTransferSession(PayloadType payloadType,
             TransportCandidate remote, TransportCandidate local,
             String mediaLocator, JingleSession jingleSession,
             JingleFileTransferData[] transferData, JID remoteJid,
-            IJingleFileTransferListener listener) {
+            Set<IJingleFileTransferListener> listeners) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
         this.jingleSession = jingleSession;
         this.local = local;
         this.remote = remote;
         this.remoteJid = remoteJid;
         this.transferList = transferData;
-        this.listener = listener;
+        this.listeners = listeners;
         logger.debug("JingleFileTransferSesseion created " + local.getIp()
                 + ":" + local.getPort() + " <-> " + remote.getIp() + ":"
                 + remote.getPort());
@@ -151,87 +156,126 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void initialize() {
 
-        try { // to create a tcp socket
-            // server side
-            if (jingleSession.getInitiator().equals(
-                    jingleSession.getConnection().getUser())) {
-                // create TCP Socket and listen
-                ServerSocket serverSocket = new ServerSocket(local.getPort());
-                serverSocket.setSoTimeout(2000);
-                this.tcpSocket = serverSocket.accept();
-            } else { // client side
-                try { // give server a little time to come up
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // do nothing
-                }
-
-                this.tcpSocket = new Socket(remote.getIp(), remote.getPort());
-            }
-            this.tcpObjectOutputStream = new ObjectOutputStream(tcpSocket
-                    .getOutputStream());
-            this.tcpObjectInputStream = new ObjectInputStream(tcpSocket
-                    .getInputStream());
-            logger.debug("successfully connected with TCP");
-        } catch (UnknownHostException e) {
-            logger.debug("Invalid IP-address of jingle remote (TCP)");
+        // create RUDP service
+        RudpMessageDispatcher dispatcher = new RudpMessageDispatcher();
+        DefaultUDPService service = new DefaultUDPService(dispatcher);
+        RUDPMessageFactory factory = new DefaultMessageFactory();
+        udpSelectorProvider = new UDPSelectorProvider(new DefaultRUDPContext(
+                factory, NIODispatcher.instance().getTransportListener(),
+                service, new DefaultRUDPSettings()));
+        UDPMultiplexor udpMultiplexor = udpSelectorProvider.openSelector();
+        dispatcher.setUDPMultiplexor(udpMultiplexor);
+        NIODispatcher.instance().registerSelector(udpMultiplexor,
+                udpSelectorProvider.getUDPSocketChannelClass());
+        try {
+            service.start(local.getPort());
         } catch (IOException e) {
-            logger.debug("Failed to connect with TCP");
+            logger.debug("Failed to create RUDP service");
         }
 
-        if (tcpSocket == null) {
-            try { // to create a udp socket
-                RudpMessageDispatcher dispatcher = new RudpMessageDispatcher();
-                DefaultUDPService service = new DefaultUDPService(dispatcher);
-                RUDPMessageFactory factory = new DefaultMessageFactory();
-                udpSelectorProvider = new UDPSelectorProvider(
-                        new DefaultRUDPContext(factory, NIODispatcher
-                                .instance().getTransportListener(), service,
-                                new DefaultRUDPSettings()));
-                UDPMultiplexor udpMultiplexor = udpSelectorProvider
-                        .openSelector();
-                dispatcher.setUDPMultiplexor(udpMultiplexor);
-                NIODispatcher.instance().registerSelector(udpMultiplexor,
-                        udpSelectorProvider.getUDPSocketChannelClass());
+        // server side
+        if (jingleSession.getInitiator().equals(
+                jingleSession.getConnection().getUser())) {
 
-                service.start(local.getPort());
-
-                // server side
-                if (jingleSession.getInitiator().equals(
-                        jingleSession.getConnection().getUser())) {
-                    Socket usock = udpSelectorProvider
-                            .openAcceptorSocketChannel().socket();
-                    usock.setSoTimeout(0);
-                    usock.connect(new InetSocketAddress(InetAddress
-                            .getByName(remote.getIp()), remote.getPort()));
-                    usock.setKeepAlive(true);
-                    this.udpSocket = usock;
-                } else { // client side
-                    try { // give server a little time to come up
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        // do nothing
+            // create TCP Socket and listen
+            Thread createTcpSocket = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        ServerSocket serverSocket = new ServerSocket(local
+                                .getPort());
+                        // serverSocket.setSoTimeout(2000);
+                        JingleFileTransferSession.this.tcpSocket = serverSocket
+                                .accept();
+                        JingleFileTransferSession.this.tcpObjectOutputStream = new ObjectOutputStream(
+                                tcpSocket.getOutputStream());
+                        JingleFileTransferSession.this.tcpObjectInputStream = new ObjectInputStream(
+                                tcpSocket.getInputStream());
+                        informListenersAboutConnection("TCP");
+                    } catch (IOException e) {
+                        logger.debug("Failed to listen with TCP");
                     }
-                    Socket usock = udpSelectorProvider.openSocketChannel()
-                            .socket();
-                    usock.setSoTimeout(0);
-                    usock.setKeepAlive(true);
-                    usock.connect(new InetSocketAddress(InetAddress
-                            .getByName(remote.getIp()), remote.getPort()));
-                    this.udpSocket = usock;
                 }
+            });
+            createTcpSocket.start();
+
+            Thread createUdpSocket = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        Socket usock = udpSelectorProvider
+                                .openAcceptorSocketChannel().socket();
+                        usock.setSoTimeout(0);
+                        usock.connect(new InetSocketAddress(InetAddress
+                                .getByName(remote.getIp()), remote.getPort()));
+                        usock.setKeepAlive(true);
+                        JingleFileTransferSession.this.udpSocket = usock;
+                        JingleFileTransferSession.this.udpObjectOutputStream = new ObjectOutputStream(
+                                udpSocket.getOutputStream());
+                        JingleFileTransferSession.this.udpObjectInputStream = new ObjectInputStream(
+                                udpSocket.getInputStream());
+                        informListenersAboutConnection("UDP");
+                    } catch (IOException e) {
+                        logger.debug("Failed to listen with UDP");
+                    }
+                }
+            });
+            createUdpSocket.start();
+
+            try { // give client a little time to connect
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+
+        } else { // client side
+            try { // give server a little time to come up
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                // do nothing
+            }
+            try { // to create a tcp socket
+                this.tcpSocket = new Socket(remote.getIp(), remote.getPort());
+                this.tcpObjectOutputStream = new ObjectOutputStream(tcpSocket
+                        .getOutputStream());
+                this.tcpObjectInputStream = new ObjectInputStream(tcpSocket
+                        .getInputStream());
+                logger.debug("successfully connected with TCP");
+                informListenersAboutConnection("TCP");
+                logger.debug("JingleFileTransferSesseion initialized");
+                return;
+
+            } catch (UnknownHostException e) {
+                logger.debug("Invalid IP-address of jingle remote (TCP)");
+            } catch (IOException e) {
+                logger.debug("Failed to connect with TCP");
+            }
+
+            try { // to create a udp socket
+
+                Socket usock = udpSelectorProvider.openSocketChannel().socket();
+                usock.setSoTimeout(0);
+                usock.setKeepAlive(true);
+                usock.connect(new InetSocketAddress(InetAddress
+                        .getByName(remote.getIp()), remote.getPort()));
+                this.udpSocket = usock;
                 this.udpObjectOutputStream = new ObjectOutputStream(udpSocket
                         .getOutputStream());
                 this.udpObjectInputStream = new ObjectInputStream(udpSocket
                         .getInputStream());
                 logger.debug("successfully connected with UDP");
+                informListenersAboutConnection("UDP");
+                logger.debug("JingleFileTransferSesseion initialized");
             } catch (UnknownHostException e1) {
                 logger.debug("Invalid IP-address of jingle remote (UDP)");
             } catch (IOException e1) {
                 logger.debug("Failed to connect with UDP");
             }
         }
-        logger.debug("JingleFileTransferSesseion initialized");
+    }
+
+    private void informListenersAboutConnection(String protocol) {
+        for (IJingleFileTransferListener listener : listeners) {
+            listener.connected(protocol, remote.getIp());
+        }
     }
 
     /**
@@ -279,7 +323,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void startReceive() {
 
-        logger.debug("JingleFileTransferSesseion: start receiving");
+        logger.debug("start receiving");
 
         if (tcpSocket != null && tcpObjectInputStream != null) {
             this.tcpReceiveThread = new Receive(tcpObjectInputStream);
@@ -322,8 +366,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 logger.warn("sending with UDP failed, use UDP instead..", e);
             }
         }
-        listener.failedToSendFileListWithJingle(remoteJid, transferList[0]);
-
+        for (IJingleFileTransferListener listener : listeners) {
+            listener.failedToSendFileListWithJingle(remoteJid, transferList[0]);
+        }
     }
 
     private synchronized void transmit(ObjectOutputStream oo)
