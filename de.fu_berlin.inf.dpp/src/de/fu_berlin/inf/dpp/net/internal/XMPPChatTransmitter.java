@@ -1902,7 +1902,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         ErrorMessageDialog.showErrorMessage("Failed to send file list");
     }
 
-    @Override
     public void connected(String protocol, String remote) {
         // TODO Auto-generated method stub
 
