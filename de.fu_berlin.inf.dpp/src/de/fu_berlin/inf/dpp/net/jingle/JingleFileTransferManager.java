@@ -122,7 +122,7 @@ public class JingleFileTransferManager {
         IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
         final String stunServer = prefStore.getString(PreferenceConstants.STUN);
         final int stunServerPort = Integer.parseInt(prefStore
-                .getString(PreferenceConstants.STUN));
+                .getString(PreferenceConstants.STUN_PORT));
 
         ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
                 stunServer, stunServerPort);
