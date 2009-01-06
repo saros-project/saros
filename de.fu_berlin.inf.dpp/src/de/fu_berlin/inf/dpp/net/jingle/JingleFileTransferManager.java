@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.JingleManager;
@@ -25,6 +26,7 @@ import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -117,11 +119,13 @@ public class JingleFileTransferManager {
     }
 
     public void initialize() {
+        IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
+        final String stunServer = prefStore.getString(PreferenceConstants.STUN);
+        final int stunServerPort = Integer.parseInt(prefStore
+                .getString(PreferenceConstants.STUN));
 
-        // TODO CJ: use META-INF/stun-config
         ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-                "stun.xten.net", 3478);
-        // "jivesoftware.com", 3478);
+                stunServer, stunServerPort);
 
         // STUNTransportManager stun = new STUNTransportManager();
 
