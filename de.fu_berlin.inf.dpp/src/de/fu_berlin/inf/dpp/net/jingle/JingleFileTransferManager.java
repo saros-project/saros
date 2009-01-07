@@ -204,11 +204,18 @@ public class JingleFileTransferManager {
                             + jid + " with current state : " + getState(jid));
                     connectionStates.remove(jid);
                     connectionStates.put(jid, JingleConnectionState.ERROR);
+                    for (IJingleFileTransferListener listener : listeners) {
+                        if (mediaManager.transferData != null) {
+                            listener.failedToSendFileListWithJingle(jid,
+                                    mediaManager.transferData[0]);
+                        }
+                    }
 
+                } else {
+                    connectionStates.remove(jid);
+                    connectionStates.put(jid, JingleConnectionState.CLOSED);
                 }
-                connectionStates.remove(jid);
-                connectionStates.put(jid, JingleConnectionState.CLOSED);
-
+                terminateJingleSession(jid);
             }
 
             public void sessionClosedOnError(XMPPException arg0,
@@ -216,12 +223,14 @@ public class JingleFileTransferManager {
                 logger.error("session closed on error : " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.ERROR);
-
+                terminateJingleSession(jid);
             }
 
             public void sessionDeclined(String arg0, JingleSession arg1) {
-                // TODO Auto-generated method stub
-
+                logger.error("session declined : " + jid.toString());
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.ERROR);
+                terminateJingleSession(jid);
             }
 
             public void sessionEstablished(PayloadType arg0,
@@ -230,17 +239,14 @@ public class JingleFileTransferManager {
                 logger.debug("session established : " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
-
             }
 
             public void sessionMediaReceived(JingleSession arg0, String arg1) {
-                // TODO Auto-generated method stub
-
+                // do nothing
             }
 
             public void sessionRedirected(String arg0, JingleSession arg1) {
-                // TODO Auto-generated method stub
-
+                // do nothing
             }
 
         });

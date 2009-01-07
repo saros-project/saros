@@ -93,7 +93,9 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
     public void sessionEnded(ISharedProject session) {
 
-        ConsistencyAction.pathes.clear();
+        if (pathes != null) {
+            ConsistencyAction.pathes.clear();
+        }
 
         if (proxy != null) {
             proxy.remove(listener);
