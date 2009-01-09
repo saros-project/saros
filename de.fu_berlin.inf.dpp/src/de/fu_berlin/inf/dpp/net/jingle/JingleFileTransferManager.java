@@ -399,7 +399,6 @@ public class JingleFileTransferManager {
                         "Error during terminate outgoing jingle session with JID : "
                                 + jid, e1);
             } finally {
-                outgoing = null;
                 mediaManager.removeJingleSession(jid);
                 outgoingSessions.get(jid).close();
                 outgoingSessions.remove(jid);
@@ -418,7 +417,6 @@ public class JingleFileTransferManager {
                         "Error during terminate incoming jingle session with JID : "
                                 + jid, e1);
             } finally {
-                incoming = null;
                 mediaManager.removeJingleSession(jid);
                 incomingSessions.remove(jid);
                 logger.debug("Terminate incoming jingle session with JID : "
