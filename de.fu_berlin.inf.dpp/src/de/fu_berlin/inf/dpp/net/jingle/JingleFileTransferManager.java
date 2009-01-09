@@ -21,6 +21,7 @@ import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
 import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
+import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.STUNTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
@@ -154,7 +155,6 @@ public class JingleFileTransferManager {
         // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
         // "10.47.47.53", 3478);
 
-        // TODO: Make STUN Server configurable
         STUNTransportManager stun = new STUNTransportManager();
         mediaManager = new FileMediaManager(stun);
 
@@ -236,7 +236,6 @@ public class JingleFileTransferManager {
                 }
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.CLOSED);
-                terminateJingleSession(jid);
             }
 
             public void sessionClosedOnError(XMPPException arg0,
@@ -244,14 +243,12 @@ public class JingleFileTransferManager {
                 logger.error("session closed on error : " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.ERROR);
-                terminateJingleSession(jid);
             }
 
             public void sessionDeclined(String arg0, JingleSession arg1) {
                 logger.error("session declined : " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.ERROR);
-                terminateJingleSession(jid);
             }
 
             public void sessionEstablished(PayloadType arg0,
@@ -356,7 +353,6 @@ public class JingleFileTransferManager {
                 } catch (XMPPException e1) {
                     e1.printStackTrace();
                 } finally {
-                    outgoing = null;
                     mediaManager.removeJingleSession(jid);
                     outgoingSessions.remove(jid);
                 }
@@ -372,7 +368,6 @@ public class JingleFileTransferManager {
                 } catch (XMPPException e1) {
                     e1.printStackTrace();
                 } finally {
-                    incoming = null;
                     mediaManager.removeJingleSession(jid);
                     incomingSessions.remove(jid);
                 }
@@ -400,7 +395,6 @@ public class JingleFileTransferManager {
                                 + jid, e1);
             } finally {
                 mediaManager.removeJingleSession(jid);
-                outgoingSessions.get(jid).close();
                 outgoingSessions.remove(jid);
                 logger.debug("Terminate outgoing jingle session with JID : "
                         + jid);

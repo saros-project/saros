@@ -379,8 +379,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 logger.warn("sending with UDP failed, use UDP instead..", e);
             }
         }
-        for (IJingleFileTransferListener listener : listeners) {
-            listener.failedToSendFileListWithJingle(remoteJid, transferList[0]);
+        if (transferList.length > 0) {
+            for (IJingleFileTransferListener listener : listeners) {
+                listener.failedToSendFileListWithJingle(remoteJid,
+                        transferList[0]);
+            }
         }
     }
 
