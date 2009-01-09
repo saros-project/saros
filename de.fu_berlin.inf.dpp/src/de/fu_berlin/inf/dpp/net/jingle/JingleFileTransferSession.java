@@ -59,7 +59,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             try {
 
                 while (true) {
-                    logger.debug("waiting on port " + local.getPort());
+                    logger.debug("waiting on port " + localPort);
 
                     /* get number of file to be transfer. */
                     int fileNumber;
@@ -103,9 +103,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     private static Logger logger = Logger
             .getLogger(JingleFileTransferSession.class);
-    private JingleSession jingleSession;
-    private TransportCandidate local;
-    private TransportCandidate remote;
+
     private Receive tcpReceiveThread;
     private Receive udpReceiveThread;
     private JingleFileTransferData[] transferList;
@@ -118,6 +116,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private ObjectInputStream tcpObjectInputStream;
     private ObjectInputStream udpObjectInputStream;
     private JID remoteJid;
+    private String ip;
+    private String localIp;
+    private int localPort;
+    private int remotePort;
 
     /**
      * TODO CJ: write javadoc
@@ -136,9 +138,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             JingleFileTransferData[] transferData, JID remoteJid,
             Set<IJingleFileTransferListener> listeners) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
-        this.jingleSession = jingleSession;
-        this.local = local;
-        this.remote = remote;
+
         this.remoteJid = remoteJid;
         this.transferList = transferData;
         this.listeners = listeners;
@@ -156,6 +156,22 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void initialize() {
 
+        if (this.getLocal().getSymmetric() != null) {
+            ip = this.getLocal().getIp();
+            localIp = this.getLocal().getLocalIp();
+            localPort = getFreePort();
+            remotePort = this.getLocal().getSymmetric().getPort();
+
+            logger.debug(this.getLocal().getConnection() + " " + ip + ": "
+                    + localPort + "->" + remotePort);
+
+        } else {
+            ip = this.getRemote().getIp();
+            localIp = this.getLocal().getLocalIp();
+            localPort = this.getLocal().getPort();
+            remotePort = this.getRemote().getPort();
+        }
+
         // create RUDP service
         RudpMessageDispatcher dispatcher = new RudpMessageDispatcher();
         DefaultUDPService service = new DefaultUDPService(dispatcher);
@@ -168,21 +184,20 @@ public class JingleFileTransferSession extends JingleMediaSession {
         NIODispatcher.instance().registerSelector(udpMultiplexor,
                 udpSelectorProvider.getUDPSocketChannelClass());
         try {
-            service.start(local.getPort());
+            service.start(localPort);
         } catch (IOException e) {
             logger.debug("Failed to create RUDP service");
         }
 
         // server side
-        if (jingleSession.getInitiator().equals(
-                jingleSession.getConnection().getUser())) {
+        if (getJingleSession().getInitiator().equals(
+                getJingleSession().getConnection().getUser())) {
 
             // create TCP Socket and listen
             Thread createTcpSocket = new Thread(new Runnable() {
                 public void run() {
                     try {
-                        ServerSocket serverSocket = new ServerSocket(local
-                                .getPort());
+                        ServerSocket serverSocket = new ServerSocket(localPort);
                         // serverSocket.setSoTimeout(2000);
                         JingleFileTransferSession.this.tcpSocket = serverSocket
                                 .accept();
@@ -205,7 +220,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                                 .openAcceptorSocketChannel().socket();
                         usock.setSoTimeout(0);
                         usock.connect(new InetSocketAddress(InetAddress
-                                .getByName(remote.getIp()), remote.getPort()));
+                                .getByName(ip), remotePort));
                         usock.setKeepAlive(true);
                         JingleFileTransferSession.this.udpSocket = usock;
                         JingleFileTransferSession.this.udpObjectOutputStream = new ObjectOutputStream(
@@ -233,7 +248,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 // do nothing
             }
             try { // to create a tcp socket
-                this.tcpSocket = new Socket(remote.getIp(), remote.getPort());
+                this.tcpSocket = new Socket(ip, remotePort);
                 this.tcpObjectOutputStream = new ObjectOutputStream(tcpSocket
                         .getOutputStream());
                 this.tcpObjectInputStream = new ObjectInputStream(tcpSocket
@@ -254,8 +269,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 Socket usock = udpSelectorProvider.openSocketChannel().socket();
                 usock.setSoTimeout(0);
                 usock.setKeepAlive(true);
-                usock.connect(new InetSocketAddress(InetAddress
-                        .getByName(remote.getIp()), remote.getPort()));
+                usock.connect(new InetSocketAddress(InetAddress.getByName(ip),
+                        remotePort));
                 this.udpSocket = usock;
                 this.udpObjectOutputStream = new ObjectOutputStream(udpSocket
                         .getOutputStream());
@@ -274,7 +289,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     private void informListenersAboutConnection(String protocol) {
         for (IJingleFileTransferListener listener : listeners) {
-            listener.connected(protocol, remote.getIp());
+            listener.connected(protocol, ip);
         }
     }
 
@@ -291,8 +306,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         this.transferList = transferData;
 
         if (tcpSocket != null) {
-            logger.debug("sending with TCP to " + remote.getIp() + ":"
-                    + remote.getPort());
+            logger.debug("sending with TCP to " + ip + ":" + remotePort);
             try {
                 logger.debug("sending with TCP..");
                 transmit(tcpObjectOutputStream);
@@ -302,8 +316,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             }
         }
         if (udpSocket != null) {
-            logger.debug("sending with UDP to " + remote.getIp() + ":"
-                    + remote.getPort());
+            logger.debug("sending with UDP to " + ip + ":" + remotePort);
             try {
                 logger.debug("sending with UDP..");
                 transmit(udpObjectOutputStream);
@@ -433,5 +446,36 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public void setTrasmit(boolean active) {
         logger.debug("JingleFileTransferSesseion: set transmit to " + active);
         // TODO CJ: What have to do here?
+    }
+
+    /**
+     * Obtain a free port we can use.
+     * 
+     * @return A free port number.
+     */
+    protected int getFreePort() {
+        ServerSocket ss;
+        int freePort = 0;
+
+        for (int i = 0; i < 10; i++) {
+            freePort = (int) (10000 + Math.round(Math.random() * 10000));
+            freePort = freePort % 2 == 0 ? freePort : freePort + 1;
+            try {
+                ss = new ServerSocket(freePort);
+                freePort = ss.getLocalPort();
+                ss.close();
+                return freePort;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            ss = new ServerSocket(0);
+            freePort = ss.getLocalPort();
+            ss.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return freePort;
     }
 }

@@ -405,7 +405,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             data.file_project_path = FileTransferType.FILELIST_TRANSFER
                     .toString();
 
-            if (jingleManager.getState(recipient) != JingleConnectionState.ERROR) {
+            if (jingleManager.getState(recipient) != JingleConnectionState.ERROR
+                    && jingleManager.getState(recipient) != JingleConnectionState.CLOSED) {
                 try {
                     jingleManager.createOutgoingJingleFileTransfer(recipient,
                             new JingleFileTransferData[] { data });
@@ -416,7 +417,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
             }
             // failed to send with jingle (otherwise had returned)
-            failedToSendFileListWithJingle(recipient, data);
+            // failedToSendFileListWithJingle(recipient, data);
+            sendFileListWithIBB(xml, recipient);
         }
     }
 

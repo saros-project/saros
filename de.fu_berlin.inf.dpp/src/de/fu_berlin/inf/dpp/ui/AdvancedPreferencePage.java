@@ -45,11 +45,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
                 PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
                 "Chunk size for chat data transfer", getFieldEditorParent()));
 
-        addField(new StringFieldEditor(PreferenceConstants.STUN,
-                "STUN Server:", getFieldEditorParent()));
-
-        addField(new IntegerFieldEditor(PreferenceConstants.STUN_PORT,
-                "STUN server port", getFieldEditorParent()));
+        // addField(new StringFieldEditor(PreferenceConstants.STUN,
+        // "STUN Server:", getFieldEditorParent()));
+        //
+        // addField(new IntegerFieldEditor(PreferenceConstants.STUN_PORT,
+        // "STUN server port", getFieldEditorParent()));
     }
 
     /*

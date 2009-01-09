@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.JingleManager;
@@ -22,22 +21,39 @@ import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
 import org.jivesoftware.smackx.jingle.media.JingleMediaManager;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
-import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
+import org.jivesoftware.smackx.jingle.nat.STUNTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
-import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * This class manages all Jingle Peer to Peer Sessions. Jingle is a
+ * XMPP-extension with id XEP-0166. Documentation can be found at
+ * http://xmpp.org/extensions/xep-0166.html .
+ * 
+ * The main method is createOutgoingJingleFileTransfer which creates a Jingle
+ * Session. To support file transfer even a user is behind a NAT, it uses a STUN
+ * server to resolve the IP-addresses.
+ * 
+ * @author orieger
+ * @author chjacob
+ */
 public class JingleFileTransferManager {
 
     private static Logger logger = Logger
             .getLogger(JingleFileTransferManager.class);
 
+    /**
+     * The FileMediaManager manages all FileTransferSessions. When a Jingle
+     * Session is established the SMACK API calls the createMediaSessions method
+     * and a new JingleFileTransferSession is created. To send a file with an
+     * existing session use the transferFiles method.
+     */
     private class FileMediaManager extends JingleMediaManager {
 
-        private JingleFileTransferData[] transferData;
+        private JingleFileTransferData[] transferData = new JingleFileTransferData[0];
         private HashMap<JID, JingleFileTransferSession> sessions;
         private JingleFileTransferSession session;
 
@@ -61,7 +77,6 @@ public class JingleFileTransferManager {
                     listeners);
 
             sessions.put(jid, newSession);
-
             return newSession;
         }
 
@@ -81,7 +96,13 @@ public class JingleFileTransferManager {
             JingleFileTransferSession session = sessions.get(jid);
             if (session != null) {
                 session.sendFiles(transferData);
+                transferData = null;
             }
+        }
+
+        public void removeJingleSession(JID jid) {
+            if (sessions.containsKey(jid))
+                sessions.remove(jid);
         }
     }
 
@@ -119,17 +140,23 @@ public class JingleFileTransferManager {
     }
 
     public void initialize() {
-        IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
-        final String stunServer = prefStore.getString(PreferenceConstants.STUN);
-        final int stunServerPort = Integer.parseInt(prefStore
-                .getString(PreferenceConstants.STUN_PORT));
 
-        ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-                stunServer, stunServerPort);
+        // get STUN Server from Preferences
+        // IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
+        // final String stunServer =
+        // prefStore.getString(PreferenceConstants.STUN);
+        // final int stunServerPort = Integer.parseInt(prefStore
+        // .getString(PreferenceConstants.STUN_PORT));
 
-        // STUNTransportManager stun = new STUNTransportManager();
+        // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
+        // stunServer, stunServerPort);
 
-        mediaManager = new FileMediaManager(icetm0);
+        // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
+        // "10.47.47.53", 3478);
+
+        // TODO: Make STUN Server configurable
+        STUNTransportManager stun = new STUNTransportManager();
+        mediaManager = new FileMediaManager(stun);
 
         List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
         medias.add(mediaManager);
@@ -147,7 +174,6 @@ public class JingleFileTransferManager {
                     return;
 
                 try {
-
                     // Accept the call
                     incoming = request.accept();
 
@@ -160,7 +186,6 @@ public class JingleFileTransferManager {
                 } catch (XMPPException e) {
                     e.printStackTrace();
                 }
-
             }
         });
 
@@ -175,46 +200,42 @@ public class JingleFileTransferManager {
 
             public void mediaClosed(PayloadType cand) {
                 logger.debug("media closed : " + jid.toString());
-
-                // NEGOTIATION = false;
-                // notifyAll();
             }
 
             public void mediaEstablished(PayloadType pt) {
                 logger.debug("media established : " + jid.toString());
-
-                // NEGOTIATION = false;
-                // notifyAll();
             }
         });
 
+        /**
+         * Jingle Session Listener
+         */
         js.addListener(new JingleSessionListener() {
 
-            public void sessionClosed(String arg0, JingleSession arg1) {
+            public void sessionClosed(String arg0, JingleSession session) {
                 logger.info("session closed : " + jid.toString());
 
                 /*
                  * if session closed during pending process, fallback to
                  * XEP-0096 transfer
                  */
-                if (arg1.getNegotiatorState() == JingleNegotiatorState.PENDING
-                        && (connectionStates.get(jid) != JingleConnectionState.ESTABLISHED && connectionStates
-                                .get(jid) != JingleConnectionState.ERROR)) {
+                if (session.getNegotiatorState() == JingleNegotiatorState.PENDING
+                        && (connectionStates.get(jid) == JingleConnectionState.INIT)) {
                     logger.error("Session closed during pending process : "
                             + jid + " with current state : " + getState(jid));
                     connectionStates.remove(jid);
                     connectionStates.put(jid, JingleConnectionState.ERROR);
                     for (IJingleFileTransferListener listener : listeners) {
-                        if (mediaManager.transferData != null) {
+                        if (session.getInitiator().equals(
+                                session.getConnection().getUser())) {
                             listener.failedToSendFileListWithJingle(jid,
                                     mediaManager.transferData[0]);
                         }
                     }
 
-                } else {
-                    connectionStates.remove(jid);
-                    connectionStates.put(jid, JingleConnectionState.CLOSED);
                 }
+                connectionStates.remove(jid);
+                connectionStates.put(jid, JingleConnectionState.CLOSED);
                 terminateJingleSession(jid);
             }
 
@@ -248,26 +269,23 @@ public class JingleFileTransferManager {
             public void sessionRedirected(String arg0, JingleSession arg1) {
                 // do nothing
             }
-
         });
 
-        /* transport events */
+        /**
+         * Transport Listener
+         */
         js.addTransportListener(new JingleTransportListener() {
 
             public void transportClosed(TransportCandidate cand) {
                 logger.debug("transport closed: " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.CLOSED);
-                // NEGOTIATION = false;
-                // notifyAll();
             }
 
             public void transportClosedOnError(XMPPException e) {
                 logger.error("transport closed on error : " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.ERROR);
-                // NEGOTIATION = false;
-                // notifyAll();
             }
 
             public void transportEstablished(TransportCandidate local,
@@ -275,17 +293,12 @@ public class JingleFileTransferManager {
                 logger.debug("transport established : " + jid.toString());
                 connectionStates.remove(jid);
                 connectionStates.put(jid, JingleConnectionState.ESTABLISHED);
-                // NEGOTIATION = false;
-                // notifyAll();
             }
         });
-
-        /* time out. */
-        // timeOutCheck(jid, JINGLE_TIME_OUT);
     }
 
     /**
-     * intiate a jingle session
+     * initiate a jingle session
      * 
      * @param jid
      * @param transferData
@@ -344,7 +357,7 @@ public class JingleFileTransferManager {
                     e1.printStackTrace();
                 } finally {
                     outgoing = null;
-                    // mediaManager.removeJingleSession(jid);
+                    mediaManager.removeJingleSession(jid);
                     outgoingSessions.remove(jid);
                 }
             }
@@ -360,7 +373,7 @@ public class JingleFileTransferManager {
                     e1.printStackTrace();
                 } finally {
                     incoming = null;
-                    // mediaManager..removeJingleSession(jid);
+                    mediaManager.removeJingleSession(jid);
                     incomingSessions.remove(jid);
                 }
             }
@@ -387,7 +400,7 @@ public class JingleFileTransferManager {
                                 + jid, e1);
             } finally {
                 outgoing = null;
-                // mediaManager.removeJingleSession(jid);
+                mediaManager.removeJingleSession(jid);
                 outgoingSessions.get(jid).close();
                 outgoingSessions.remove(jid);
                 logger.debug("Terminate outgoing jingle session with JID : "
@@ -406,7 +419,7 @@ public class JingleFileTransferManager {
                                 + jid, e1);
             } finally {
                 incoming = null;
-                // mediaManager.removeJingleSession(jid);
+                mediaManager.removeJingleSession(jid);
                 incomingSessions.remove(jid);
                 logger.debug("Terminate incoming jingle session with JID : "
                         + jid);
@@ -444,6 +457,11 @@ public class JingleFileTransferManager {
         }
     }
 
+    /**
+     * to add a JingleFileTransferListener
+     * 
+     * @param listener
+     */
     public void addJingleFileTransferListener(
             IJingleFileTransferListener listener) {
         listeners.add(listener);
