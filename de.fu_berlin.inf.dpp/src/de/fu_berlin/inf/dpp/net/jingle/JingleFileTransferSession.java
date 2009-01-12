@@ -190,7 +190,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         }
 
         // server side
-        if (getJingleSession().getInitiator().equals(
+        if (!getJingleSession().getInitiator().equals(
                 getJingleSession().getConnection().getUser())) {
 
             // create TCP Socket and listen
@@ -356,10 +356,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
      */
     @Override
     public void startTrasmit() {
+        logger.debug("JingleFileTransferSesseion: start transmitting");
+
         if (transferList == null)
             return;
-
-        logger.debug("JingleFileTransferSesseion: start transmitting");
 
         if (tcpSocket != null) {
             try {
@@ -419,26 +419,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public void stopTrasmit() {
         logger.debug("JingleFileTransferSesseion: stop transmitting");
         try {
-
             if (tcpSocket != null) {
-                try {
-                    tcpReceiveThread.join();
-                } catch (InterruptedException e) {
-                } finally {
-                    tcpObjectOutputStream.close();
-                    tcpObjectInputStream.close();
-                    tcpSocket.close();
-                }
+                tcpObjectOutputStream.close();
+                tcpObjectInputStream.close();
+                tcpSocket.close();
             }
             if (udpSocket != null) {
-                try {
-                    udpReceiveThread.join();
-                } catch (InterruptedException e) {
-                } finally {
-                    udpObjectOutputStream.close();
-                    udpObjectInputStream.close();
-                    udpSocket.close();
-                }
+                udpObjectOutputStream.close();
+                udpObjectInputStream.close();
+                udpSocket.close();
             }
         } catch (IOException e) {
             logger.debug("Failed to close all sockets");

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.JingleManager;
@@ -23,9 +24,9 @@ import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
 import org.jivesoftware.smackx.jingle.nat.ICETransportManager;
 import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
-import org.jivesoftware.smackx.jingle.nat.STUNTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -143,20 +144,19 @@ public class JingleFileTransferManager {
     public void initialize() {
 
         // get STUN Server from Preferences
-        // IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
-        // final String stunServer =
-        // prefStore.getString(PreferenceConstants.STUN);
-        // final int stunServerPort = Integer.parseInt(prefStore
-        // .getString(PreferenceConstants.STUN_PORT));
+        IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
+        final String stunServer = prefStore.getString(PreferenceConstants.STUN);
+        final int stunServerPort = Integer.parseInt(prefStore
+                .getString(PreferenceConstants.STUN_PORT));
+
+        ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
+                stunServer, stunServerPort);
 
         // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-        // stunServer, stunServerPort);
+        // "stunserver.org", 3478);
+        // STUNTransportManager stun = new STUNTransportManager();
 
-        // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-        // "10.47.47.53", 3478);
-
-        STUNTransportManager stun = new STUNTransportManager();
-        mediaManager = new FileMediaManager(stun);
+        mediaManager = new FileMediaManager(icetm0);
 
         List<JingleMediaManager> medias = new Vector<JingleMediaManager>();
         medias.add(mediaManager);

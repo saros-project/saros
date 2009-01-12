@@ -46,7 +46,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
         store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
         store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
-        // store.setDefault(PreferenceConstants.STUN, "stun.xten.net");
-        // store.setDefault(PreferenceConstants.STUN_PORT, 3478);
+        store.setDefault(PreferenceConstants.STUN, "");
+        store.setDefault(PreferenceConstants.STUN_PORT, 3478);
     }
 }
