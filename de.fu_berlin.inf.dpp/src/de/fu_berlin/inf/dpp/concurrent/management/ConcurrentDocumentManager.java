@@ -237,9 +237,9 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
         if (side == Side.HOST_SIDE) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
             logger.debug("starting consistency watchdog");
-            consistencyWatchdog.setSystem(true);
-            consistencyWatchdog.setPriority(Job.SHORT);
-            consistencyWatchdog.schedule();
+            // consistencyWatchdog.setSystem(true);
+            // consistencyWatchdog.setPriority(Job.SHORT);
+            // consistencyWatchdog.schedule();
         }
 
         Saros.getDefault().getSessionManager().addSessionListener(this);
