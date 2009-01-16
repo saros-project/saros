@@ -19,10 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.eclipse.cdt.core.model.ICProject;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -94,8 +94,8 @@ public class NewSessionAction implements IObjectActionDelegate {
         Object element = ((IStructuredSelection) selection).getFirstElement();
         if (element instanceof IProject) {
             return (IProject) element;
-        } else if (element instanceof IJavaProject) {
-            return ((IJavaProject) element).getProject();
+        } else if (element instanceof ICProject) {
+            return ((ICProject) element).getProject();
         }
 
         return null;

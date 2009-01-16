@@ -19,13 +19,13 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import org.eclipse.cdt.internal.ui.editor.CDocumentProvider;
+import org.eclipse.cdt.internal.ui.editor.CDocumentSetupParticipant;
+import org.eclipse.cdt.ui.CUIPlugin;
+import org.eclipse.cdt.ui.text.ICPartitions;
 import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.internal.ui.JavaPlugin;
-import org.eclipse.jdt.internal.ui.javaeditor.CompilationUnitDocumentProvider;
-import org.eclipse.jdt.internal.ui.javaeditor.JavaDocumentSetupParticipant;
-import org.eclipse.jdt.ui.text.IJavaPartitions;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -194,16 +194,14 @@ public class SarosUI implements ISessionListener {
 
     @SuppressWarnings("restriction")
     private void setupCompilationUnitDocumentProvider() { // UGLY HACK
-        CompilationUnitDocumentProvider cuProvider = (CompilationUnitDocumentProvider) JavaPlugin
-                .getDefault().getCompilationUnitDocumentProvider();
+        CDocumentProvider docProvider = CUIPlugin.getDefault()
+                .getDocumentProvider();
 
         SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
 
-        IDocumentSetupParticipant setupParticipant = new JavaDocumentSetupParticipant();
+        IDocumentSetupParticipant setupParticipant = new CDocumentSetupParticipant();
         ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
-                IJavaPartitions.JAVA_PARTITIONING, setupParticipant,
-                sharedProvider);
-
-        cuProvider.setParentDocumentProvider(parentProvider);
+                ICPartitions.C_PARTITIONING, setupParticipant, sharedProvider);
+        docProvider.setParentDocumentProvider(parentProvider);
     }
 }

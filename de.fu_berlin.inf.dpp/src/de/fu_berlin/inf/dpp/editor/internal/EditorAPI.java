@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.cdt.ui.CUIPlugin;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextOperationTarget;
@@ -315,8 +315,16 @@ public class EditorAPI implements IEditorAPI {
 
             String fileExtension = file.getFileExtension();
             if ((fileExtension != null) && fileExtension.equals("java")) {
-                JavaPlugin javaPlugin = JavaPlugin.getDefault();
-                return javaPlugin.getCompilationUnitDocumentProvider();
+                // JavaPlugin javaPlugin = JavaPlugin.getDefault();
+                // return javaPlugin.getCompilationUnitDocumentProvider();
+            } else if ((fileExtension != null)
+                    && (fileExtension.equals("c") || fileExtension.equals("h")
+                            || fileExtension.equals("cpp")
+                            || fileExtension.equals("cxx") || fileExtension
+                            .equals("hxx"))) {
+
+                CUIPlugin cPlugin = CUIPlugin.getDefault();
+                return cPlugin.getDocumentProvider();
             }
         }
 
