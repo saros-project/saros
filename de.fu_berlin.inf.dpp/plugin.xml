@@ -66,7 +66,7 @@
          <visibility>
             <or>
                <objectClass name="org.eclipse.core.resources.IProject"/>
-               <objectClass name="org.eclipse.jdt.core.IJavaProject"/>
+               <objectClass name="org.eclipse.cdt.core.ICProject"/>
             </or>
          </visibility>
       </objectContribution>
