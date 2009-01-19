@@ -32,6 +32,7 @@ public class TakeDriverRoleAction extends SelectionProviderAction implements
                 .getSharedProject();
         // project.setDriver(selectedUser, false);
         project.removeDriver(this.selectedUser, false);
+        updateEnablemnet();
     }
 
     @Override
