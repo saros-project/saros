@@ -83,8 +83,6 @@ public class SharedProject implements ISharedProject {
 
     private final List<ISharedProjectListener> listeners = new ArrayList<ISharedProjectListener>();
 
-    private User driver;
-
     private User host;
 
     private final ITransmitter transmitter;
@@ -108,7 +106,7 @@ public class SharedProject implements ISharedProject {
         this.myID = myID;
         User u = new User(myID);
         u.setUserRole(UserRole.DRIVER);
-        this.driver = this.host = u;
+        this.host = u;
 
         this.participants.add(this.host);
 
@@ -135,7 +133,6 @@ public class SharedProject implements ISharedProject {
         this.myID = myID;
 
         this.host = new User(host);
-        this.driver = new User(driver);
 
         this.activitySequencer.initConcurrentManager(
                 ConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
@@ -199,23 +196,17 @@ public class SharedProject implements ISharedProject {
             if ((this.activitySequencer.getConcurrentManager() != null)
                     && this.activitySequencer.getConcurrentManager()
                             .isHostSide()) {
-                // if replicated=false check for privileges
-                if (driver.equals(this.driver)) {
-                    return;
-                }
-
-                /* add new driver to list. */
-                // TODO: durch hinzufügen von isharedprojectlistener zum
-                // concurrentmanager
-                // könnte dieser punkt ausgelagert werden.
-                // activitySequencer.getConcurrentManager().addDriver(driver.getJid());
+                // // if replicated=false check for privileges
+                // if (driver.equals(this.driver)) {
+                // return;
+                // }
             }
             // client
             else {
-                // if replicated=false check for privileges
-                if (driver.equals(this.driver)) {
-                    return;
-                }
+                // // if replicated=false check for privileges
+                // if (driver.equals(this.driver)) {
+                // return;
+                // }
 
                 /*
                  * set driver in client to observer driver actions or to set the
@@ -238,14 +229,13 @@ public class SharedProject implements ISharedProject {
             }
 
         } else {
-            /* changed state form observer to driver */
+            /* changed state form driver to observer */
             if (getParticipant(driver.getJid()).getUserRole() == UserRole.DRIVER) {
 
                 /* set the local driver state to observer */
                 if (driver.getJid().equals(this.myID)
                         && isDriver(new User(this.myID))) {
                     setProjectReadonly(true);
-                    this.driver = this.host;
                 }
 
                 /* set observer state. */
@@ -265,7 +255,6 @@ public class SharedProject implements ISharedProject {
         /* set new observer status in participant list of sharedProject. */
         getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
 
-        this.driver = this.host;
         /**
          * communicate driver role change to listener.
          */
@@ -274,15 +263,6 @@ public class SharedProject implements ISharedProject {
             listener.driverChanged(jid, replicated);
         }
 
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
-    public User getDriver() {
-        return this.driver;
     }
 
     /*
@@ -400,9 +380,7 @@ public class SharedProject implements ISharedProject {
         // free colorid
         this.colorlist[user.getColorID()] = 0;
 
-        if (this.driver.equals(user)) {
-            setDriver(this.participants.get(0), true);
-        }
+        // TODO what is to do here if no driver exists anymore?
 
         for (ISharedProjectListener listener : this.listeners) {
             listener.userLeft(user.getJid());

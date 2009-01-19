@@ -101,9 +101,7 @@ public class TakeDriverRoleAction extends SelectionProviderAction implements
                 .getSharedProject();
 
         boolean enabled = ((project != null) && (this.selectedUser != null)
-                && project.isHost()
-                && !project.getHost().equals(this.selectedUser) && project
-                .isDriver(this.selectedUser));
+                && project.isHost() && project.isDriver(this.selectedUser));
         setEnabled(enabled);
         // setEnabled(project != null && (project.isDriver() /*||
         // project.isHost()*/)

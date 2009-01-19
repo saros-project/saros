@@ -73,13 +73,6 @@ public interface ISharedProject {
     public void removeDriver(User driver, boolean replicated);
 
     /**
-     * The driver is the person that is currently allowed to edit the resources.
-     * 
-     * @return the driver.
-     */
-    public User getDriver();
-
-    /**
      * @return <code>true</code> if the local client is the current driver of
      *         this shared project. <code>false</code> otherwise.
      */

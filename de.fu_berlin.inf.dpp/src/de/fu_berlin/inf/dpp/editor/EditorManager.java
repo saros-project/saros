@@ -686,14 +686,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         int top = viewport.getTopIndex();
         int bottom = viewport.getBottomIndex();
         IPath path = viewport.getEditor();
+        String source = viewport.getSource();
 
         Set<IEditorPart> editors = EditorManager.this.editorPool
                 .getEditors(path);
         for (IEditorPart editorPart : editors) {
             EditorManager.this.editorAPI.setViewport(editorPart,
-                    EditorManager.this.isFollowing, top, bottom,
-                    EditorManager.this.sharedProject.getDriver().getJid()
-                            .toString());
+                    EditorManager.this.isFollowing, top, bottom, source);
         }
     }
 
