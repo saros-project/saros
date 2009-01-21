@@ -22,7 +22,7 @@ public class AnnotationSaros extends Annotation {
 
             // TODO: improve color assingment and dynamic handling
             int colorid = getColorIdForUser(source) + 1;
-            String mytype = type + "." + new Integer(colorid).toString();
+            String mytype = type + "." + colorid;
 
             setType(mytype);
         }
@@ -45,7 +45,7 @@ public class AnnotationSaros extends Annotation {
         User user = Saros.getDefault().getSessionManager().getSharedProject()
                 .getParticipant(new JID(username));
 
-        int colorid = 1;
+        int colorid = 0;
         if (user != null) {
             colorid = user.getColorID();
         }

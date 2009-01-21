@@ -1249,6 +1249,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                         .valueOf(userRole));
 
                 String color = userlistExtension.getValue("UserColor" + count);
+                XMPPChatTransmitter.log.debug("   color: " + color);
                 try {
                     user.setColorID(Integer.parseInt(color));
                 } catch (NumberFormatException nfe) {

@@ -241,7 +241,8 @@ public class PacketExtensions {
             String color = "UserColor" + count;
             extension.setValue(id, jid.toString());
             extension.setValue(role, participant.getUserRole().toString());
-            extension.setValue(color, participant.getColorID() + "");
+            participant.setColorID(count);
+            extension.setValue(color, count + "");
             count++;
         }
 

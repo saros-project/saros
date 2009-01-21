@@ -92,7 +92,7 @@ public class SharedProject implements ISharedProject {
     private final ActivitySequencer activitySequencer = new ActivitySequencer();
 
     private static final int MAX_USERCOLORS = 5;
-    private final int colorlist[] = new int[SharedProject.MAX_USERCOLORS + 1];
+    private final boolean colorlist[] = new boolean[SharedProject.MAX_USERCOLORS + 1];
 
     // private ConcurrentManager concurrentManager;
 
@@ -378,7 +378,7 @@ public class SharedProject implements ISharedProject {
         this.participants.remove(user);
 
         // free colorid
-        this.colorlist[user.getColorID()] = 0;
+        this.colorlist[user.getColorID()] = false;
 
         // TODO what is to do here if no driver exists anymore?
 
@@ -531,22 +531,20 @@ public class SharedProject implements ISharedProject {
         return null;
     }
 
-    boolean assignColorId(User user) {
-
+    void assignColorId(User user) {
+        if (true) return;
         // already has a color assigned
+        // TODO Is the user id *ever* set to -1?
         if (user.getColorID() == -1) {
-            return true;
+            return;
         }
 
         for (int i = 0; i < SharedProject.MAX_USERCOLORS; i++) {
-            if (this.colorlist[i] == 0) {
+            if (this.colorlist[i] == false) {
                 user.setColorID(i);
-                this.colorlist[user.getColorID()] = 1;
-                return true;
+                this.colorlist[i] = true;
             }
         }
-
-        return false;
     }
 
     public void startInvitation(final JID jid) {
