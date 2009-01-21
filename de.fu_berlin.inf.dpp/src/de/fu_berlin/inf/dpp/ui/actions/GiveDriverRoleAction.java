@@ -17,6 +17,21 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
 
     protected User selectedUser;
 
+    private ISharedProjectListener projectListener = new ISharedProjectListener() {
+
+        public void driverChanged(JID driver, boolean replicated) {
+            updateEnablemnet();
+        }
+
+        public void userJoined(JID user) {
+            // ignore
+        }
+
+        public void userLeft(JID user) {
+            // ignore
+        }
+    };
+
     public GiveDriverRoleAction(ISelectionProvider provider, String text) {
         super(provider, text);
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
@@ -24,21 +39,6 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
 
         Saros.getDefault().getSessionManager().addSessionListener(
                 new ISessionListener() {
-
-                    private ISharedProjectListener projectListener = new ISharedProjectListener() {
-
-                        public void driverChanged(JID driver, boolean replicated) {
-                            updateEnablemnet();
-                        }
-
-                        public void userJoined(JID user) {
-                            // ignore
-                        }
-
-                        public void userLeft(JID user) {
-                            // ignore
-                        }
-                    };
 
                     public void invitationReceived(
                             IIncomingInvitationProcess invitation) {

@@ -67,7 +67,7 @@ import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
         IPropertyChangeListener {
@@ -80,7 +80,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
     private GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
 
-    private TakeDriverRoleAction takeDriverRoleAction;
+    private RemoveDriverRoleAction takeDriverRoleAction;
 
     private IPreferenceStore store = null;
 
@@ -296,7 +296,7 @@ public class SessionView extends ViewPart implements ISessionListener,
                 "Give driver role");
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
                 this.viewer, "Give exclusive driver role");
-        this.takeDriverRoleAction = new TakeDriverRoleAction(this.viewer);
+        this.takeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
 
         contributeToActionBars();
         hookContextMenu();
