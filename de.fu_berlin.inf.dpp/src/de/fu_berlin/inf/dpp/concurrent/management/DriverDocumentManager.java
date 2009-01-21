@@ -103,9 +103,9 @@ public class DriverDocumentManager implements IDriverDocumentManager,
     }
 
     public void addDriver(JID jid) {
-        // if (user.getUserRole() == UserRole.OBSERVER) {
-        // logger.error("User " + user.getJid() + " has not driver status! ");
-        // }
+
+        assert jid != null;
+
         DriverDocumentManager.logger.debug("add driver for jid: " + jid);
         if (!this.activeDriver.contains(jid)) {
             this.activeDriver.add(jid);

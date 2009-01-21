@@ -709,6 +709,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     }
 
     public void driverChanged(JID driver, boolean replicated) {
+        if (isHost(driver))
+            return;
         /*
          * 1. check if driver exists. 2. add new driver or remove driver. 3.
          */

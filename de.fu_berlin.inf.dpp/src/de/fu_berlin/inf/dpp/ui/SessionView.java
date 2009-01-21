@@ -63,6 +63,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
@@ -76,6 +77,8 @@ public class SessionView extends ViewPart implements ISessionListener,
     private ISharedProject sharedProject;
 
     private GiveDriverRoleAction giveDriverRoleAction;
+
+    private GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
 
     private TakeDriverRoleAction takeDriverRoleAction;
 
@@ -289,7 +292,10 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.viewer.setLabelProvider(new SessionLabelProvider());
         this.viewer.setInput(null);
 
-        this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer);
+        this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
+                "Give driver role");
+        this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
+                this.viewer, "Give exclusive driver role");
         this.takeDriverRoleAction = new TakeDriverRoleAction(this.viewer);
 
         contributeToActionBars();
@@ -353,6 +359,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
     private void fillContextMenu(IMenuManager manager) {
         manager.add(this.giveDriverRoleAction);
+        manager.add(this.giveExclusiveDriverRoleAction);
         manager.add(this.takeDriverRoleAction);
 
         // Other plug-ins can contribute there actions here
