@@ -161,9 +161,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             User participant = (User) obj;
 
             StringBuffer sb = new StringBuffer(participant.getJid().getName());
-            // if (participant.equals(sharedProject.getDriver())) {
             if (SessionView.this.sharedProject.isDriver(participant)) {
-
                 sb.append(" (Driver)");
             }
 
@@ -175,10 +173,9 @@ public class SessionView extends ViewPart implements ISessionListener,
             User user = (User) obj;
             if (SessionView.this.sharedProject.isDriver(user)) {
                 return this.driverImage;
+            } else {
+                return this.userImage;
             }
-            // return user.equals(sharedProject.getDriver()) ? driverImage :
-            // userImage;
-            return this.userImage;
         }
 
         public Image getColumnImage(Object obj, int index) {
@@ -191,8 +188,20 @@ public class SessionView extends ViewPart implements ISessionListener,
 
             if (user.getJid().equals(Saros.getDefault().getMyJID())) {
                 return null;
+            } else {
+                return getUserColor(user);
             }
+        }
 
+        public Color getForeground(Object element) {
+            User user = (User) element;
+            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+                return getUserColor(user);
+            }
+            return null;
+        }
+
+        private Color getUserColor(User user) {
             int colorid = user.getColorID();
             String mytype = SelectionAnnotation.TYPE + "."
                     + new Integer(colorid + 1).toString();
@@ -209,11 +218,6 @@ public class SessionView extends ViewPart implements ISessionListener,
                     .getColorPreferenceKey());
 
             return new Color(Display.getDefault(), rgb);
-
-        }
-
-        public Color getForeground(Object element) {
-            return null;
         }
 
         public Font getFont(Object element, int columnIndex) {
