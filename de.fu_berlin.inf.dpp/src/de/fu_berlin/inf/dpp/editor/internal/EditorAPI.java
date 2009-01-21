@@ -220,8 +220,7 @@ public class EditorAPI implements IEditorAPI {
                 this.lastViewportTop = top;
                 this.lastViewportBottom = bottom;
 
-                EditorAPI.this.editorManager.viewportChanged(this.viewer
-                        .getTopIndex(), this.viewer.getBottomIndex(), editor);
+                EditorAPI.this.editorManager.viewportChanged(top, bottom, editor);
             }
         }
     }
@@ -575,16 +574,16 @@ public class EditorAPI implements IEditorAPI {
         ISourceViewer sourceViewer = (ISourceViewer) viewer;
         IAnnotationModel model = sourceViewer.getAnnotationModel();
 
-        try {
-            IDocument document = viewer.getDocument();
-            for (@SuppressWarnings("unchecked")
-            Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-                Annotation ann = (Annotation) it.next();
-                if (ann.getType().equals(ViewportAnnotation.TYPE)) {
-                    model.removeAnnotation(ann);
-                }
+        IDocument document = viewer.getDocument();
+        for (@SuppressWarnings("unchecked")
+        Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+            Annotation ann = (Annotation) it.next();
+            if (ann.getType().equals(ViewportAnnotation.TYPE)) {
+                model.removeAnnotation(ann);
             }
-
+        }
+        
+        try {
             int start = document.getLineOffset(top);
             int end = document.getLineOffset(bottom);
 
