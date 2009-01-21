@@ -66,7 +66,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     private TableViewer tableviewer;
     private Table table;
-    private ArrayList<inviterdata> input;
+    private ArrayList<InviterData> input;
     private Button cancelButton;
 
     private Roster roster = Saros.getDefault().getRoster();
@@ -79,7 +79,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     }
 
     // assigned to any of the entries of the invite-tableview
-    private class inviterdata {
+    private class InviterData {
         JID jid;
         String name;
         IOutgoingInvitationProcess outginvatationProc;
@@ -94,7 +94,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
 
         public String getColumnText(Object element, int columnIndex) {
-            inviterdata item = (inviterdata) element;
+            InviterData item = (InviterData) element;
 
             switch (columnIndex) {
             case 0:
@@ -172,7 +172,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
         // table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        this.input = new ArrayList<inviterdata>();
+        this.input = new ArrayList<InviterData>();
         this.tableviewer.setInput(this.input);
 
         this.cancelButton = new Button(composite, SWT.NONE);
@@ -194,15 +194,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.table.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                if (InvitationDialog.this.inviteStep == InvState.SELECTION) {
-                    setInviteable((InvitationDialog.this.table
-                            .getSelectionCount() > 0));
-                } else if (InvitationDialog.this.inviteStep == InvState.INVITING) {
-                    InvitationDialog.this.cancelButton
-                            .setEnabled(isSelectionCancelable());
-                } else {
-                    InvitationDialog.this.cancelButton.setEnabled(false);
-                }
+                InvitationDialog.this.cancelButton
+                        .setEnabled(isSelectionCancelable());
+
+                InviterData data = (InviterData) InvitationDialog.this.table
+                        .getSelection()[0].getData();
+
+                setInviteable(InvitationDialog.this.table.getSelectionCount() > 0
+                        && data.outginvatationProc == null);
             }
 
             @Override
@@ -239,6 +238,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     @Override
     protected void okPressed() {
         performInvitation();
+        setInviteable(false);
     }
 
     public boolean performInvitation() {
@@ -257,7 +257,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             for (TableItem ti : cursel) {
                 Object o = ti.getData();
 
-                inviterdata invdat = (inviterdata) o;
+                InviterData invdat = (InviterData) o;
                 invdat.outginvatationProc = project.invite(invdat.jid, name,
                         true, this);
             }
@@ -287,14 +287,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
      */
     private void updateInvitationProgressRunASyn(JID jid) {
         boolean alldone = true;
-        inviterdata invdat = null;
+        InviterData invdat = null;
         int index;
 
         for (index = 0; index < this.table.getItemCount(); index++) {
 
             TableItem ti = this.table.getItem(index);
             Object o = ti.getData();
-            invdat = (inviterdata) o;
+            invdat = (InviterData) o;
 
             if ((invdat.outginvatationProc != null)
                     && (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE)
@@ -337,7 +337,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         TableItem[] cursel = this.table.getSelection();
         for (TableItem ti : cursel) {
             Object o = ti.getData();
-            inviterdata invdat = (inviterdata) o;
+            InviterData invdat = (InviterData) o;
             if ((invdat.outginvatationProc == null)
                     || ((invdat.outginvatationProc.getState() == State.INITIALIZED)
                             || (invdat.outginvatationProc.getState() == State.SYNCHRONIZING_DONE)
@@ -353,7 +353,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         TableItem[] cursel = this.table.getSelection();
         for (TableItem ti : cursel) {
             Object o = ti.getData();
-            inviterdata invdat = (inviterdata) o;
+            InviterData invdat = (InviterData) o;
             if (invdat.outginvatationProc == null) {
                 continue;
             }
@@ -487,7 +487,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         // save selection
         TableItem[] curselTIs = this.table.getSelection();
         for (TableItem curselTI : curselTIs) {
-            curselA.add(((inviterdata) curselTI.getData()).jid);
+            curselA.add(((InviterData) curselTI.getData()).jid);
         }
 
         this.input.clear();
@@ -511,7 +511,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             if ((presence != null)
                     && presence.getType().equals(Presence.Type.available)
                     && (user == null)) {
-                inviterdata invdat = new inviterdata();
+                InviterData invdat = new InviterData();
                 invdat.jid = new JID(entry.getUser());
                 String name = entry.getName();
                 invdat.name = (name == null) ? entry.getUser() : name;
