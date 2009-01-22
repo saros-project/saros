@@ -11,7 +11,7 @@ public interface IJDTSupport {
     public void installSharedDocumentProvider();
 
     /**
-     * Will return the CDocumentProvider from the JDT Plugin by calling
+     * Will return the IDocumentProvider from the JDT Plugin by calling
      *  JavaPlugin.getDefault().getCompilationUnitDocumentProvider();
      */
     public IDocumentProvider getDocumentProvider();

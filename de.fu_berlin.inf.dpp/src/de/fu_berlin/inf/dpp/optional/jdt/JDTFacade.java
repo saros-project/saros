@@ -30,17 +30,17 @@ public class JDTFacade implements IJDTSupport {
 
     public JDTFacade() {
 
-        // Check for CDT Bundle
+        // Check for JDT Bundle
         if (Platform.getBundle("org.eclipse.jdt.ui") != null
                 && Platform.getBundle("org.eclipse.jdt.core") != null) {
             // We cannot just create a new instance, because this instance
-            // cannot be created if CDT is missing.
+            // cannot be created if JDT is missing.
             try {
                 jdtSupport = (IJDTSupport) Class.forName(
                         "de.fu_berlin.inf.dpp.optional.jdt.JDTSupport")
                         .newInstance();
             } catch (Exception e) {
-                // We were unable to enable the CDT-Support
+                // We were unable to enable the JDT-Support
                 log
                         .warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");
             }
@@ -50,7 +50,7 @@ public class JDTFacade implements IJDTSupport {
     public void installSharedDocumentProvider() {
 
         if (!isJDTAvailable())
-            throw new IllegalStateException("CDT Plugin is not available");
+            throw new IllegalStateException("JDT Plugin is not available");
 
         jdtSupport.installSharedDocumentProvider();
     }
@@ -58,7 +58,7 @@ public class JDTFacade implements IJDTSupport {
     public IDocumentProvider getDocumentProvider() {
 
         if (!isJDTAvailable())
-            throw new IllegalStateException("CDT Plugin is not available");
+            throw new IllegalStateException("JDT Plugin is not available");
 
         return jdtSupport.getDocumentProvider();
     }
