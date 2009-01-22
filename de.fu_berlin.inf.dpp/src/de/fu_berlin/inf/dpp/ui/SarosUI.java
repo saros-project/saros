@@ -19,11 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
-import org.eclipse.cdt.internal.ui.editor.CDocumentProvider;
-import org.eclipse.cdt.internal.ui.editor.CDocumentSetupParticipant;
-import org.eclipse.cdt.ui.CUIPlugin;
-import org.eclipse.cdt.ui.text.ICPartitions;
-import org.eclipse.core.filebuffers.IDocumentSetupParticipant;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -39,13 +34,13 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.editors.text.ForwardingDocumentProvider;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
-import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
+import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -58,8 +53,18 @@ public class SarosUI implements ISessionListener {
 
     private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
-    public SarosUI(ISessionManager sessionManager) {
-        setupCompilationUnitDocumentProvider();
+    public SarosUI(ISessionManager sessionManager, JDTFacade jdtFacade, CDTFacade cdtFacade) {
+        
+        // TODO: [CO] We don't know what this actually is for.
+        // It would be nice to eliminiate these, because they cause dependencies to the JDT and CDT
+        if (jdtFacade.isJDTAvailable()){
+            jdtFacade.installSharedDocumentProvider();
+        }
+        
+        if (cdtFacade.isCDTAvailable()){
+            cdtFacade.installSharedDocumentProvider();
+        }
+        
         sessionManager.addSessionListener(this);
     }
 
@@ -190,18 +195,5 @@ public class SarosUI implements ISessionListener {
     public static ImageDescriptor getImageDescriptor(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(
                 "de.fu_berlin.inf.dpp", path);
-    }
-
-    @SuppressWarnings("restriction")
-    private void setupCompilationUnitDocumentProvider() { // UGLY HACK
-        CDocumentProvider docProvider = CUIPlugin.getDefault()
-                .getDocumentProvider();
-
-        SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
-
-        IDocumentSetupParticipant setupParticipant = new CDocumentSetupParticipant();
-        ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
-                ICPartitions.C_PARTITIONING, setupParticipant, sharedProvider);
-        docProvider.setParentDocumentProvider(parentProvider);
     }
 }

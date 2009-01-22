@@ -42,10 +42,18 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.osgi.framework.BundleContext;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.PicoBuilder;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.injectors.AnnotatedFieldInjection;
+import org.picocontainer.injectors.CompositeInjection;
+import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
+import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
+import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -68,7 +76,7 @@ public class Saros extends AbstractUIPlugin {
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
-    private static SarosUI uiInstance;
+    private MutablePicoContainer container;
 
     private XMPPConnection connection;
 
@@ -77,10 +85,6 @@ public class Saros extends AbstractUIPlugin {
     private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
     private String connectionError;
-
-    private MessagingManager messagingManager;
-
-    private ISessionManager sessionManager;
 
     private final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
@@ -99,6 +103,16 @@ public class Saros extends AbstractUIPlugin {
      */
     public Saros() {
         Saros.plugin = this;
+
+        this.container = new PicoBuilder(new CompositeInjection(
+                new ConstructorInjection(), new AnnotatedFieldInjection()))
+                .withCaching().build();
+
+        this.container.addComponent(Saros.class, this).addComponent(
+                CDTFacade.class).addComponent(JDTFacade.class).addComponent(
+                MessagingManager.class).addComponent(SessionManager.class)
+                .addComponent(SarosUI.class);
+
     }
 
     /**
@@ -112,13 +126,11 @@ public class Saros extends AbstractUIPlugin {
 
         setupLoggers();
 
-        this.messagingManager = new MessagingManager();
-        this.sessionManager = new SessionManager();
-
         ActivityRegistry.getDefault();
         SkypeManager.getDefault();
 
-        Saros.uiInstance = new SarosUI(this.sessionManager);
+        // Make sure that all components in the container are instantiated
+        container.getComponents(Object.class);
 
         boolean hasUserName = getPreferenceStore().getString(
                 PreferenceConstants.USERNAME).length() > 0;
@@ -136,7 +148,7 @@ public class Saros extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         super.stop(context);
 
-        this.sessionManager.leaveSession();
+        getSessionManager().leaveSession();
         disconnect(null);
 
         Saros.plugin = null;
@@ -149,6 +161,18 @@ public class Saros extends AbstractUIPlugin {
      */
     public static Saros getDefault() {
         return Saros.plugin;
+    }
+
+    /**
+     * Return the PicoContainer that can be asked for all Singleton objects
+     * relative to this Saros instance (see the constructor for a complete liste
+     * of components in this container):
+     * 
+     * @return The PicoContainer containing all Singleton objects of this Saros
+     *         plug-in instance.
+     */
+    public PicoContainer getContainer() {
+        return container;
     }
 
     public JID getMyJID() {
@@ -168,14 +192,24 @@ public class Saros extends AbstractUIPlugin {
      *         messaging. Is never <code>null</code>.
      */
     public MessagingManager getMessagingManager() {
-        return this.messagingManager;
+        // TODO: [PICO] Rather everybody should get their own instance
+        return getContainer().getComponent(MessagingManager.class);
+    }
+
+    /**
+     * @return the SarosUI which is the central class responsible for handling
+     *         UI events because of Sessions. Is never <code>null</code>.
+     */
+    public SarosUI getSarosUI() {
+        return getContainer().getComponent(SarosUI.class);
     }
 
     /**
      * @return the SessionManager. Is never <code>null</code>.
      */
     public ISessionManager getSessionManager() {
-        return this.sessionManager;
+        // TODO: [PICO] Rather everybody should get their own instance
+        return getContainer().getComponent(SessionManager.class);
     }
 
     public void asyncConnect() {
@@ -483,8 +517,8 @@ public class Saros extends AbstractUIPlugin {
                     public void run() {
 
                         int offlineAtTS = 0;
-                        if (Saros.this.sessionManager.getSharedProject() != null) {
-                            offlineAtTS = Saros.this.sessionManager
+                        if (getSessionManager().getSharedProject() != null) {
+                            offlineAtTS = getSessionManager()
                                     .getSharedProject().getSequencer()
                                     .getTimestamp();
                         }
@@ -499,7 +533,7 @@ public class Saros extends AbstractUIPlugin {
 
                             } while (!Saros.this.connection.isConnected());
 
-                            Saros.this.sessionManager.OnReconnect(offlineAtTS);
+                            getSessionManager().OnReconnect(offlineAtTS);
                             setConnectionState(ConnectionState.CONNECTED, null);
                             logger.debug("XMPP reconnected");
 

@@ -4,15 +4,16 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/smack.jar" sourcepath="../../smack-3_1/source"/>
+	<classpathentry kind="lib" path="lib/smack.jar" sourcepath="/smack-3_1/source"/>
 	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-jingle.jar" sourcepath="../../smack-3_1/jingle/extension/source"/>
-	<classpathentry kind="lib" path="lib/smackx.jar" sourcepath="../../smack-3_1/source"/>
-	<classpathentry kind="lib" path="lib/lw-rudp.jar" sourcepath="../../limewire/components/rudp/src"/>
-	<classpathentry kind="lib" path="lib/lw-nio.jar" sourcepath="../../limewire/components/nio/src/main/java"/>
+	<classpathentry kind="lib" path="lib/smackx-jingle.jar" sourcepath="/smack-3_1/jingle/extension/source"/>
+	<classpathentry kind="lib" path="lib/smackx.jar" sourcepath="/smack-3_1/source"/>
+	<classpathentry kind="lib" path="lib/lw-rudp.jar" sourcepath="/limewire/components/rudp/src"/>
+	<classpathentry kind="lib" path="lib/lw-nio.jar" sourcepath="/limewire/components/nio/src/main/java"/>
 	<classpathentry kind="lib" path="lib/lw-common.jar"/>
 	<classpathentry kind="lib" path="lib/lw-io.jar"/>
 	<classpathentry kind="lib" path="lib/lw-collection.jar"/>
 	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/picocontainer-2.5.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

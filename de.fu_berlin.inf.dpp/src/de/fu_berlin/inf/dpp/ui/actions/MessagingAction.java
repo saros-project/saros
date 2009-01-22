@@ -42,6 +42,7 @@ public class MessagingAction extends SelectionProviderAction {
 
     @Override
     public void run() {
+        // TODO This cannot work
         Saros.getDefault().getMessagingManager();
     }
 

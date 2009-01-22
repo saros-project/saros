@@ -11,8 +11,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.core.resources,
  org.eclipse.ui.ide,
- org.eclipse.cdt.ui,
- org.eclipse.cdt.core
+ org.eclipse.cdt.ui;resolution:=optional,
+ org.eclipse.cdt.core;resolution:=optional,
+ org.eclipse.jdt.core;bundle-version="3.4.0";resolution:=optional,
+ org.eclipse.jdt.ui;bundle-version="3.4.0";resolution:=optional
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: bin/,
  lib/log4j-1.2.15.jar,
@@ -26,7 +28,8 @@ Bundle-ClassPath: bin/,
  lib/lw-io.jar,
  lib/lw-common.jar,
  lib/lw-collection.jar,
- lib/commons-logging.jar
+ lib/commons-logging.jar,
+ lib/picocontainer-2.5.1.jar
 Export-Package: com.jcraft.jzlib,
  de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
