@@ -63,6 +63,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
@@ -860,7 +861,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         }).start();
     }
 
-    public void sendUserListTo(JID to, List<User> participants) {
+    public void sendUserListTo(JID to, Collection<User> participants) {
         XMPPChatTransmitter.log.debug("Sending user list to " + to.toString());
 
         sendMessage(to, PacketExtensions.createUserListExtension(participants));
@@ -875,7 +876,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
      */
     public void sendFileChecksumErrorMessage(IPath path, boolean resolved) {
 
-        List<User> participants = Saros.getDefault().getSessionManager()
+        Collection<User> participants = Saros.getDefault().getSessionManager()
                 .getSharedProject().getParticipants();
 
         XMPPChatTransmitter.log.debug("Sending checksum error message of file "
@@ -898,7 +899,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
         if (project != null) {
-            List<User> participants = project.getParticipants();
+            Collection<User> participants = project.getParticipants();
             if (participants != null) {
                 for (User participant : participants) {
                     if (!Saros.getDefault().getSessionManager()
@@ -1184,7 +1185,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         // TODO CJ: Leave Project Message must be handled better
         else if (PacketExtensions.getLeaveExtension(message) != null) {
             if (project != null) {
-                project.removeUser(new User(fromJID)); // HACK
+                project.removeUser(project.getParticipant(fromJID)); // HACK
             }
         }
 
@@ -1247,12 +1248,18 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 XMPPChatTransmitter.log.debug("   *:" + jidS);
 
                 JID jid = new JID(jidS);
-                User user = new User(jid);
+
+                User user = project.getParticipant(jid);
+
+                if (user == null) {
+                    // This user is new, we have to send him a message later
+                    // and add him to the project
+                    user = new User(jid);
+                }
 
                 String userRole = userlistExtension
                         .getValue("UserRole" + count);
-                user.setUserRole(de.fu_berlin.inf.dpp.User.UserRole
-                        .valueOf(userRole));
+                user.setUserRole(UserRole.valueOf(userRole));
 
                 String color = userlistExtension.getValue("UserColor" + count);
                 XMPPChatTransmitter.log.debug("   color: " + color);
@@ -1265,11 +1272,12 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
 
                 if (project.getParticipant(jid) == null) {
+                    project.addUser(user);
+
                     sendMessage(jid, PacketExtensions.createJoinExtension(Saros
                             .getDefault().getMe().getColorID()));
                 }
 
-                project.addUser(user); // add user to internal user
                 count++;
             }
         }

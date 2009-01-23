@@ -33,7 +33,11 @@ public class User {
     private UserConnectionState presence = UserConnectionState.UNKNOWN;
 
     private final JID jid;
-    private int colorid = 0;
+
+    public static final int UNKNOWN_COLOR = -1;
+
+    private int colorid = UNKNOWN_COLOR;
+
     private long offlineTime = 0;
     private UserRole role = UserRole.OBSERVER;
 

@@ -182,7 +182,7 @@ public interface ITransmitter {
      * @param participants
      *            List of Users, of current shared project participants
      */
-    public void sendUserListTo(JID to, List<User> participants);
+    public void sendUserListTo(JID to, Collection<User> participants);
 
     /**
      * Sets my XMPP connection to the given connection - for changing the

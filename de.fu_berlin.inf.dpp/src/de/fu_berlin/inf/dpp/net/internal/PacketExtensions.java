@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
@@ -234,7 +233,7 @@ public class PacketExtensions {
         return extension;
     }
 
-    public static PacketExtension createUserListExtension(List<User> list) {
+    public static PacketExtension createUserListExtension(Collection<User> list) {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.USER_LIST, PacketExtensions.NAMESPACE);
         extension.setValue(PacketExtensions.SESSION_ID, getSessionID());

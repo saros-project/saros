@@ -21,12 +21,14 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -79,7 +81,7 @@ public class SharedProject implements ISharedProject {
 
     protected JID myID;
 
-    protected CopyOnWriteArrayList<User> participants = new CopyOnWriteArrayList<User>();
+    protected LinkedHashMap<JID, User> participants = new LinkedHashMap<JID, User>();
 
     private final IProject project;
 
@@ -96,7 +98,10 @@ public class SharedProject implements ISharedProject {
     private static final int MAX_USERCOLORS = 5;
     private Queue<Integer> freeColors = null;
 
-    public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
+    /**
+     * Constructor called for SharedProject of the host
+     */
+    public SharedProject(ITransmitter transmitter, IProject project, JID myID) {
         assert (transmitter != null && myID != null);
 
         this.transmitter = transmitter;
@@ -112,7 +117,7 @@ public class SharedProject implements ISharedProject {
         u.setColorID(0);
         this.host = u;
 
-        this.participants.add(this.host);
+        this.participants.put(this.host.getJid(), this.host);
 
         /* add host to driver list. */
         this.activitySequencer.initConcurrentManager(
@@ -136,19 +141,18 @@ public class SharedProject implements ISharedProject {
 
         this.myID = myID;
 
-        this.host = new User(host);
-        this.host.setColorID(0);
+        // Create users for all participants
+        for (JID jid : allParticipants) {
+            this.participants.put(jid, new User(jid));
+        }
+
+        this.host = getParticipant(host);
+
+        User myself = getParticipant(myID);
+        myself.setColorID(myColorID);
 
         this.activitySequencer.initConcurrentManager(
                 ConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
-
-        for (JID jid : allParticipants) { // HACK
-            User user = new User(jid);
-            if (user.getJid().equals(myID)) {
-                user.setColorID(myColorID);
-            }
-            this.participants.add(user);
-        }
 
         this.project = project;
     }
@@ -158,8 +162,8 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public List<User> getParticipants() {
-        return this.participants;
+    public Collection<User> getParticipants() {
+        return this.participants.values();
     }
 
     /*
@@ -185,69 +189,35 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public void setDriver(User driver, boolean replicated) {
+    public void toggleDriverRole(User driver, boolean replicated) {
+
         assert driver != null;
 
+        User myself = getParticipant(this.myID);
+
         /* if user has current role observer */
-        if (getParticipant(driver.getJid()).getUserRole() == UserRole.OBSERVER) {
+        if (driver.getUserRole() == UserRole.OBSERVER) {
 
             /* set new driver status in participant list of sharedProject. */
-            getParticipant(driver.getJid()).setUserRole(UserRole.DRIVER);
-
-            /*
-             * TODO: 1. actual the host never lost the driver status and added
-             * new driver to driverlist
-             */
-
-            // host
-            if ((this.activitySequencer.getConcurrentManager() != null)
-                    && this.activitySequencer.getConcurrentManager()
-                            .isHostSide()) {
-                // // if replicated=false check for privileges
-                // if (driver.equals(this.driver)) {
-                // return;
-                // }
-            }
-            // client
-            else {
-                // // if replicated=false check for privileges
-                // if (driver.equals(this.driver)) {
-                // return;
-                // }
-
-                /*
-                 * set driver in client to observer driver actions or to set the
-                 * local driver status.
-                 */
-
-                /* currently, no other driver than host can be followed. */
-                // this.driver = driver;
-            }
-
-            // // TODO if replicated=false check for privileges
-            // if (driver.equals(this.driver))
-            // return;
-            //
-            // this.driver = driver;
+            driver.setUserRole(UserRole.DRIVER);
 
             /* set local file settings. */
-            if (driver.getJid().equals(this.myID)) {
+            if (driver.equals(myself)) {
                 setProjectReadonly(!isDriver());
             }
 
         } else {
+
             /* changed state form driver to observer */
-            if (getParticipant(driver.getJid()).getUserRole() == UserRole.DRIVER) {
+            if (driver.getUserRole() == UserRole.DRIVER) {
 
                 /* set the local driver state to observer */
-                if (driver.getJid().equals(this.myID)
-                        && isDriver(new User(this.myID))) {
+                if (driver.equals(myself) && isDriver(myself)) {
                     setProjectReadonly(true);
                 }
 
                 /* set observer state. */
-                getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
-
+                driver.setUserRole(UserRole.OBSERVER);
             }
         }
 
@@ -341,10 +311,16 @@ public class SharedProject implements ISharedProject {
     }
 
     public void addUser(User user) {
-        if (this.participants.contains(user)) {
-            this.participants.remove(user);
+
+        if (this.participants.containsKey(user.getJid())) {
+            log.warn("User " + user.getJid() + " added twice to SharedProject");
         }
-        this.participants.add(user);
+
+        if (this.participants.containsKey(user.getJid())) {
+            this.participants.remove(user.getJid());
+        }
+        this.participants.put(user.getJid(), user);
+
         for (ISharedProjectListener listener : this.listeners) {
             listener.userJoined(user.getJid());
         }
@@ -499,15 +475,7 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public User getParticipant(JID jid) {
-        if (participants != null) {
-            for (User participant : this.participants) {
-                if (participant.getJid().equals(jid)) {
-                    return participant;
-                }
-            }
-        }
-
-        return null;
+        return this.participants.get(jid);
     }
 
     public void startInvitation(final JID jid) {
@@ -701,6 +669,15 @@ public class SharedProject implements ISharedProject {
     }
 
     public int getFreeColor() {
-        return freeColors.remove();
+        try {
+            return freeColors.remove();
+        } catch (NoSuchElementException e) {
+            return MAX_USERCOLORS - 1;
+        }
+    }
+
+    @Override
+    public void returnColor(int colorID) {
+        freeColors.add(colorID);
     }
 }

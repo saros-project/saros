@@ -61,7 +61,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
-        project.setDriver(this.selectedUser, false);
+        project.toggleDriverRole(this.selectedUser, false);
     }
 
     @Override

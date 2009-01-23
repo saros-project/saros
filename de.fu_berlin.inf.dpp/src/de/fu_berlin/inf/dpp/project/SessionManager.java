@@ -70,13 +70,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         Saros.getDefault().addListener(this);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISessionManager#startSession(org.eclipse
-     * .core.resources.IProject)
-     */
     public void startSession(IProject project) throws XMPPException {
         if (!Saros.getDefault().isConnected()) {
             throw new XMPPException("No connection");
@@ -106,14 +99,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return sessionID;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISessionManager#joinSession(org.eclipse.
-     * core.resources.IProject, de.fu_berlin.inf.dpp.net.JID,
-     * de.fu_berlin.inf.dpp.net.JID, java.util.List)
-     */
     public ISharedProject joinSession(IProject project, JID host, JID driver,
             List<JID> users, int colorID) {
 
@@ -130,11 +115,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return this.sharedProject;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionManager#leaveSession()
-     */
     public void leaveSession() {
         if (this.sharedProject == null) {
             return;
@@ -156,46 +136,20 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         SessionManager.log.info("Session left");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionManager#getSharedProject()
-     */
     public ISharedProject getSharedProject() {
         return this.sharedProject;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISessionManager#addSessionListener(de.fu_berlin
-     * .inf.dpp.project.ISessionListener)
-     */
     public void addSessionListener(ISessionListener listener) {
         if (!this.listeners.contains(listener)) {
             this.listeners.add(listener);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISessionManager#removeSessionListener(de
-     * .fu_berlin.inf.dpp.project.ISessionListener)
-     */
     public void removeSessionListener(ISessionListener listener) {
         this.listeners.remove(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISessionManager#invitationReceived(de.fu_berlin
-     * .inf.dpp.net.JID, java.lang.String, java.lang.String)
-     */
     public IIncomingInvitationProcess invitationReceived(JID from,
             String sessionID, String projectName, String description,
             int colorID) {
@@ -214,19 +168,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return process;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-     */
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISessionManager#connectionStateChanged(org
-     * .jivesoftware.smack.XMPPConnection,
-     * de.fu_berlin.inf.dpp.Saros.ConnectionState)
-     */
     public void connectionStateChanged(XMPPConnection connection,
             ConnectionState newState) {
 
@@ -291,11 +232,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         });
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionManager#OnReconnect(int)
-     */
     public void OnReconnect(int oldtimestamp) {
 
         if (this.sharedProject == null) {

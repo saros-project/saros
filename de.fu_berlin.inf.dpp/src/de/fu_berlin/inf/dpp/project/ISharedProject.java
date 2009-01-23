@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -45,7 +45,7 @@ public interface ISharedProject {
      * @return a list of all participants of the shared project. This list
      *         includes yourself.
      */
-    public List<User> getParticipants();
+    public Collection<User> getParticipants();
 
     /**
      * Sets the new driver. If given driver is already driver the call is
@@ -58,7 +58,7 @@ public interface ISharedProject {
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void setDriver(User driver, boolean replicated);
+    public void toggleDriverRole(User driver, boolean replicated);
 
     /**
      * Remove driver role for given User.
@@ -203,8 +203,8 @@ public interface ISharedProject {
      * Sets all resources of the project to a readonly state on the local file
      * system.
      * 
-     * @param The
-     *            readonly state to set the file to.
+     * @param readonly
+     *            The readonly state to set the file to.
      */
     public void setProjectReadonly(boolean readonly);
 
@@ -223,5 +223,18 @@ public interface ISharedProject {
      */
     public ConcurrentDocumentManager getConcurrentDocumentManager();
 
+    /**
+     * Get a free color from the pool.
+     * 
+     * @return an unused color ID or a default ID if all color IDs are in use.
+     */
     public int getFreeColor();
+
+    /**
+     * Returns a color to the pool of available colors.
+     * 
+     * @param colorID
+     *            the color id that should be returned to the pool.
+     */
+    public void returnColor(int colorID);
 }

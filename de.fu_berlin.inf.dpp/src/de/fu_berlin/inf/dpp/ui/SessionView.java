@@ -202,20 +202,32 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
 
         private Color getUserColor(User user) {
-            int colorid = user.getColorID();
-            String mytype = SelectionAnnotation.TYPE + "."
-                    + new Integer(colorid + 1).toString();
 
-            AnnotationPreferenceLookup lookup = org.eclipse.ui.editors.text.EditorsUI
+            int colorID = user.getColorID();
+
+            if (colorID == User.UNKNOWN_COLOR) {
+                return null;
+            }
+
+            String annotationType = SelectionAnnotation.TYPE + "."
+                    + new Integer(colorID + 1).toString();
+
+            AnnotationPreferenceLookup lookup = EditorsUI
                     .getAnnotationPreferenceLookup();
-            AnnotationPreference ap = lookup.getAnnotationPreference(mytype);
+            AnnotationPreference ap = lookup
+                    .getAnnotationPreference(annotationType);
             if (ap == null) {
                 return null;
             }
 
-            IPreferenceStore store = EditorsUI.getPreferenceStore();
-            RGB rgb = PreferenceConverter.getColor(store, ap
-                    .getColorPreferenceKey());
+            RGB rgb;
+            try {
+                IPreferenceStore store = EditorsUI.getPreferenceStore();
+                rgb = PreferenceConverter.getColor(store, ap
+                        .getColorPreferenceKey());
+            } catch (RuntimeException e) {
+                return null;
+            }
 
             return new Color(Display.getDefault(), rgb);
         }
