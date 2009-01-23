@@ -205,7 +205,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * 
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
-    public void joinReceived(JID fromD) {
+    public void joinReceived(JID from) {
         failState();
     }
 

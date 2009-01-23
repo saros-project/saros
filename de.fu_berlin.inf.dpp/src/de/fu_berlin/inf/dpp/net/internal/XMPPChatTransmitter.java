@@ -1078,7 +1078,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
             ISessionManager sm = Saros.getDefault().getSessionManager();
             log.debug("Received invitation with session id " + sessionID);
-            log.debug("and ColorID: " + colorID);
+            log.debug("and ColorID: " + colorID + ", i'm "
+                    + Saros.getDefault().getMyJID());
             sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
             return;
         }
@@ -1170,7 +1171,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             for (IInvitationProcess process : this.processes) {
                 if (process.getPeer().equals(fromJID)) {
                     process.joinReceived(fromJID);
-                    break;
+                    return;
                 }
             }
             if (project != null) {
