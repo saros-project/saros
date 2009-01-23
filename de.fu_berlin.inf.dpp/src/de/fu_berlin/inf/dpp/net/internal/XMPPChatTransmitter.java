@@ -275,9 +275,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
-            String description) {
+            String description, int colorID) {
         sendMessage(guest, PacketExtensions.createInviteExtension(sharedProject
-                .getProject().getName(), description));
+                .getProject().getName(), description, colorID));
     }
 
     /*
@@ -292,7 +292,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         } catch (InterruptedException e) {
             XMPPChatTransmitter.log.error(e);
         }
-        sendMessageToAll(sharedProject, PacketExtensions.createJoinExtension());
+        sendMessageToAll(sharedProject, PacketExtensions
+                .createJoinExtension(Saros.getDefault().getMe().getColorID()));
     }
 
     /*
@@ -1072,11 +1073,13 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                     .getValue(PacketExtensions.PROJECTNAME);
             String sessionID = inviteExtension
                     .getValue(PacketExtensions.SESSION_ID);
+            int colorID = Integer.parseInt(inviteExtension
+                    .getValue(PacketExtensions.COLOR_ID));
 
             ISessionManager sm = Saros.getDefault().getSessionManager();
-            log.debug("Received invitation with session id "
-                    + inviteExtension.getValue(PacketExtensions.SESSION_ID));
-            sm.invitationReceived(fromJID, sessionID, pName, desc);
+            log.debug("Received invitation with session id " + sessionID);
+            log.debug("and ColorID: " + colorID);
+            sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
             return;
         }
 
@@ -1159,20 +1162,22 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
         if (PacketExtensions.getJoinExtension(message) != null) {
 
-            boolean iAmInviter = false;
+            int colorID = Integer.parseInt(PacketExtensions.getJoinExtension(
+                    message).getValue("ColorID"));
+
+            log.debug("Join: ColorID: " + colorID);
 
             for (IInvitationProcess process : this.processes) {
                 if (process.getPeer().equals(fromJID)) {
                     process.joinReceived(fromJID);
-                    iAmInviter = true;
+                    break;
                 }
             }
-            if (!iAmInviter && (project != null)) {
-                project.addUser(new User(fromJID)); // a new user joined this
-                // session
-
+            if (project != null) {
+                User user = new User(fromJID);
+                user.setColorID(colorID);
+                project.addUser(user); // a new user joined this session
             }
-
         }
 
         // TODO CJ: Leave Project Message must be handled better
@@ -1259,12 +1264,11 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
 
                 if (project.getParticipant(jid) == null) {
-                    sendMessage(jid, PacketExtensions.createJoinExtension());
+                    sendMessage(jid, PacketExtensions.createJoinExtension(Saros
+                            .getDefault().getMe().getColorID()));
                 }
 
-                project.addUser(user, count - 1); // add user to internal user
-                // list, maintaining the
-                // received order
+                project.addUser(user); // add user to internal user
                 count++;
             }
         }

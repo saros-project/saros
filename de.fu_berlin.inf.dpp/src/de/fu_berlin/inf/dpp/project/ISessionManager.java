@@ -42,10 +42,11 @@ public interface ISessionManager {
      *            the driver of the shared project.
      * @param users
      *            the participants of the shared project.
+     * @param myColorID
      * @return the shared project.
      */
     public abstract ISharedProject joinSession(IProject project, JID host,
-            JID driver, List<JID> users);
+            JID driver, List<JID> users, int myColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -89,11 +90,14 @@ public interface ISessionManager {
      *            invitations.
      * @param sessionID
      *            the id of the session
+     * @param colorID
+     *            the assigned color id for the invited participant.
      * @return the process that represents the invitation and which handles the
      *         further interaction with the invitation.
      */
     public abstract IIncomingInvitationProcess invitationReceived(JID from,
-            String sessionID, String projectName, String description);
+            String sessionID, String projectName, String description,
+            int colorID);
 
     /*
      * (non-Javadoc)

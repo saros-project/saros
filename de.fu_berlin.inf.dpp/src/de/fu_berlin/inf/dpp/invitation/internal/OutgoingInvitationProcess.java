@@ -67,6 +67,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     /** size of current transfered part of archive file. */
     private long transferedFileSize = 0;
 
+    private int colorID;
+
     public int getProgressCurrent() {
         // TODO CJ: Jingle File Transfer progrss information
         if (this.tmode == TransferMode.IBB) {
@@ -107,15 +109,17 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
             ISharedProject sharedProject, String description, boolean startNow,
-            IInvitationUI inviteUI) {
+            IInvitationUI inviteUI, int colorID) {
 
         super(transmitter, to, description);
 
         this.invitationUI = inviteUI;
         this.sharedProject = sharedProject;
+        this.colorID = colorID;
 
         if (startNow) {
-            transmitter.sendInviteMessage(sharedProject, to, description);
+            transmitter.sendInviteMessage(sharedProject, to, description,
+                    colorID);
             setState(State.INVITATION_SENT);
         } else {
             setState(State.INITIALIZED);
@@ -214,7 +218,9 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     public void joinReceived(JID from) {
         assertState(State.SYNCHRONIZING_DONE);
 
-        this.sharedProject.addUser(new User(from));
+        User user = new User(from);
+        user.setColorID(this.colorID);
+        this.sharedProject.addUser(user);
         setState(State.DONE);
 
         sendDriverEditors();

@@ -561,4 +561,9 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
+    public User getMe() {
+        return getSessionManager().getSharedProject().getParticipant(
+                Saros.getDefault().getMyJID());
+    }
+
 }

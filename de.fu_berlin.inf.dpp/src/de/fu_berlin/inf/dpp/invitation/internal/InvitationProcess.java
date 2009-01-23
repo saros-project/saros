@@ -132,8 +132,8 @@ public abstract class InvitationProcess implements IInvitationProcess {
     }
 
     /**
-     * Should be called if an exception occured. This saves the exception and
-     * sets the invitation to cancelled.
+     * Should be called if an exception occurred. This saves the exception and
+     * sets the invitation to canceled.
      */
     protected void failed(Exception e) {
         this.exception = e;
@@ -142,7 +142,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
     }
 
     /**
-     * Asssert that the process is in given state or throw an exception
+     * Assert that the process is in given state or throw an exception
      * otherwise.
      * 
      * @param expected

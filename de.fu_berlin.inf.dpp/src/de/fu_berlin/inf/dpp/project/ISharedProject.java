@@ -106,8 +106,6 @@ public interface ISharedProject {
      */
     public void addUser(User user);
 
-    public void addUser(User user, int index);
-
     /**
      * Removes the user.
      * 
@@ -126,10 +124,12 @@ public interface ISharedProject {
      *            makes the decision to accept or decline the invitation.
      * @param inviteUI
      *            user interface of the invitation for feedback calls.
+     * @param colorID
+     *            the color of the new participant
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI);
+            boolean inactive, IInvitationUI inviteUI, int colorID);
 
     /**
      * Adds the given shared project listener. This call is ignored if the
@@ -222,4 +222,6 @@ public interface ISharedProject {
      * @return the concurrent document manager
      */
     public ConcurrentDocumentManager getConcurrentDocumentManager();
+
+    public int getFreeColor();
 }

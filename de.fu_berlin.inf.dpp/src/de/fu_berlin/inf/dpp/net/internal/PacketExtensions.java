@@ -87,6 +87,8 @@ public class PacketExtensions {
 
     private static final String DOC_CHECKSUM = "DocChecksum";
 
+    public static final String COLOR_ID = "ColorID";
+
     public static void hookExtensionProviders() {
 
         ProviderManager providermanager = ProviderManager.getInstance();
@@ -109,12 +111,13 @@ public class PacketExtensions {
      * @return the packet extension.
      */
     public static PacketExtension createInviteExtension(String projectName,
-            String description) {
+            String description, int colorID) {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.INVITATION, PacketExtensions.NAMESPACE);
         extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
         extension.setValue(PacketExtensions.PROJECTNAME, projectName);
         extension.setValue(PacketExtensions.DESCRIPTION, description);
+        extension.setValue(PacketExtensions.COLOR_ID, "" + colorID);
 
         return extension;
     }
@@ -176,8 +179,11 @@ public class PacketExtensions {
                 .createExtension(PacketExtensions.REQUEST_FOR_LIST);
     }
 
-    public static PacketExtension createJoinExtension() {
-        return PacketExtensions.createExtension(PacketExtensions.JOIN);
+    public static PacketExtension createJoinExtension(int colorID) {
+        DefaultPacketExtension extension = PacketExtensions
+                .createExtension(PacketExtensions.JOIN);
+        extension.setValue(PacketExtensions.COLOR_ID, "" + colorID);
+        return extension;
     }
 
     public static PacketExtension createLeaveExtension() {

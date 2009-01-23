@@ -115,10 +115,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * de.fu_berlin.inf.dpp.net.JID, java.util.List)
      */
     public ISharedProject joinSession(IProject project, JID host, JID driver,
-            List<JID> users) {
+            List<JID> users, int colorID) {
 
         this.sharedProject = new SharedProject(this.transmitter, project, Saros
-                .getDefault().getMyJID(), host, driver, users);
+                .getDefault().getMyJID(), host, driver, users, colorID);
         this.sharedProject.start();
 
         for (ISessionListener listener : this.listeners) {
@@ -197,12 +197,13 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * .inf.dpp.net.JID, java.lang.String, java.lang.String)
      */
     public IIncomingInvitationProcess invitationReceived(JID from,
-            String sessionID, String projectName, String description) {
+            String sessionID, String projectName, String description,
+            int colorID) {
 
         this.sessionID = sessionID;
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
-                this.transmitter, from, projectName, description);
+                this.transmitter, from, projectName, description, colorID);
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);

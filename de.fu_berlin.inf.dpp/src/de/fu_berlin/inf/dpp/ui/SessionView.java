@@ -80,7 +80,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
     private GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
 
-    private RemoveDriverRoleAction takeDriverRoleAction;
+    private RemoveDriverRoleAction removeDriverRoleAction;
 
     private IPreferenceStore store = null;
 
@@ -300,7 +300,7 @@ public class SessionView extends ViewPart implements ISessionListener,
                 "Give driver role");
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
                 this.viewer, "Give exclusive driver role");
-        this.takeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
+        this.removeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
 
         contributeToActionBars();
         hookContextMenu();
@@ -362,9 +362,9 @@ public class SessionView extends ViewPart implements ISessionListener,
     }
 
     private void fillContextMenu(IMenuManager manager) {
-        manager.add(this.giveDriverRoleAction);
+        // manager.add(this.giveDriverRoleAction);
         manager.add(this.giveExclusiveDriverRoleAction);
-        manager.add(this.takeDriverRoleAction);
+        // manager.add(this.removeDriverRoleAction);
 
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

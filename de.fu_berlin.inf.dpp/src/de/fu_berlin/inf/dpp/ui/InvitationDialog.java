@@ -259,7 +259,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
                 InviterData invdat = (InviterData) o;
                 invdat.outginvatationProc = project.invite(invdat.jid, name,
-                        true, this);
+                        true, this, project.getFreeColor());
             }
 
             return false; // we wanna wait (and block) until all invites are

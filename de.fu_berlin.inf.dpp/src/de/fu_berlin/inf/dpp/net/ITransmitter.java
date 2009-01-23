@@ -74,7 +74,7 @@ public interface ITransmitter {
      *            invitation. Can not be <code>null</code>.
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-            String description);
+            String description, int colorID);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation

@@ -22,8 +22,10 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
@@ -92,20 +94,22 @@ public class SharedProject implements ISharedProject {
     private final ActivitySequencer activitySequencer = new ActivitySequencer();
 
     private static final int MAX_USERCOLORS = 5;
-    private final boolean colorlist[] = new boolean[SharedProject.MAX_USERCOLORS + 1];
-
-    // private ConcurrentManager concurrentManager;
+    private Queue<Integer> freeColors = null;
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
         assert (transmitter != null && myID != null);
 
         this.transmitter = transmitter;
 
-        // concurrentManager = new ConcurrentDocumentManager();
+        this.freeColors = new ConcurrentLinkedQueue<Integer>();
+        for (int i = 1; i < SharedProject.MAX_USERCOLORS; i++) {
+            freeColors.add(i);
+        }
 
         this.myID = myID;
         User u = new User(myID);
         u.setUserRole(UserRole.DRIVER);
+        u.setColorID(0);
         this.host = u;
 
         this.participants.add(this.host);
@@ -126,21 +130,24 @@ public class SharedProject implements ISharedProject {
     }
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
-            JID host, JID driver, List<JID> allParticipants) {
+            JID host, JID driver, List<JID> allParticipants, int myColorID) {
 
         this.transmitter = transmitter;
 
         this.myID = myID;
 
         this.host = new User(host);
+        this.host.setColorID(0);
 
         this.activitySequencer.initConcurrentManager(
                 ConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
 
         for (JID jid : allParticipants) { // HACK
             User user = new User(jid);
+            if (user.getJid().equals(myID)) {
+                user.setColorID(myColorID);
+            }
             this.participants.add(user);
-            assignColorId(user);
         }
 
         this.project = project;
@@ -333,39 +340,14 @@ public class SharedProject implements ISharedProject {
         return this.driverManager.exclusiveDriver();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public void addUser(User user) {
-        addUser(user, -1);
-    }
-
-    public void addUser(User user, int index) {
         if (this.participants.contains(user)) {
-            if ((index >= 0) && (this.participants.indexOf(user) != index)) {
-                this.participants.remove(user);
-                this.participants.add(index, user);
-            }
-            /* update exists user. */
             this.participants.remove(user);
-            this.participants.add(user);
-            for (ISharedProjectListener listener : this.listeners) {
-                listener.userJoined(user.getJid());
-            }
-            return;
         }
-
         this.participants.add(user);
-
-        // find free color and assign it to user
-        assignColorId(user);
-
         for (ISharedProjectListener listener : this.listeners) {
             listener.userJoined(user.getJid());
         }
-
         SharedProject.log.info("User " + user.getJid() + " joined session");
     }
 
@@ -376,9 +358,6 @@ public class SharedProject implements ISharedProject {
      */
     public void removeUser(User user) {
         this.participants.remove(user);
-
-        // free colorid
-        this.colorlist[user.getColorID()] = false;
 
         // TODO what is to do here if no driver exists anymore?
 
@@ -395,9 +374,9 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI) {
+            boolean inactive, IInvitationUI inviteUI, int colorID) {
         return new OutgoingInvitationProcess(this.transmitter, jid, this,
-                description, inactive, inviteUI);
+                description, inactive, inviteUI, colorID);
     }
 
     /*
@@ -529,22 +508,6 @@ public class SharedProject implements ISharedProject {
         }
 
         return null;
-    }
-
-    void assignColorId(User user) {
-        if (true) return;
-        // already has a color assigned
-        // TODO Is the user id *ever* set to -1?
-        if (user.getColorID() == -1) {
-            return;
-        }
-
-        for (int i = 0; i < SharedProject.MAX_USERCOLORS; i++) {
-            if (this.colorlist[i] == false) {
-                user.setColorID(i);
-                this.colorlist[i] = true;
-            }
-        }
     }
 
     public void startInvitation(final JID jid) {
@@ -737,4 +700,7 @@ public class SharedProject implements ISharedProject {
 
     }
 
+    public int getFreeColor() {
+        return freeColors.remove();
+    }
 }

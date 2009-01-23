@@ -73,12 +73,15 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
     protected String projectName;
 
+    private int myColorID;
+
     public IncomingInvitationProcess(ITransmitter transmitter, JID from,
-            String projectName, String description) {
+            String projectName, String description, int colorID) {
 
         super(transmitter, from, description);
 
         this.projectName = projectName;
+        this.myColorID = colorID;
         setState(State.INVITATION_SENT);
 
     }
@@ -202,7 +205,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * 
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
-    public void joinReceived(JID from) {
+    public void joinReceived(JID fromD) {
         failState();
     }
 
@@ -458,7 +461,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.joinSession(
-                this.localProject, host, driver, users);
+                this.localProject, host, driver, users, myColorID);
 
         this.transmitter.sendJoinMessage(sharedProject);
         this.transmitter.removeInvitationProcess(this); // HACK

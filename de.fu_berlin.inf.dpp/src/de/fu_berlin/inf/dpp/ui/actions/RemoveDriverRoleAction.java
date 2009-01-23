@@ -34,7 +34,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     };
 
     public RemoveDriverRoleAction(ISelectionProvider provider) {
-        super(provider, "Take driver role");
+        super(provider, "Remove driver role");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user.png"));
         setToolTipText("Take the driver role from this user.");
 
