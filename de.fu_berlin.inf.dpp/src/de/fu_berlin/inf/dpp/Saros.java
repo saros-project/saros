@@ -561,7 +561,14 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
-    public User getMe() {
+    /**
+     * @return the jid of the local user or null if not connected with a jabber
+     *         server
+     */
+    public User getLocalUser() {
+        if (!isConnected())
+            return null;
+
         return getSessionManager().getSharedProject().getParticipant(
                 Saros.getDefault().getMyJID());
     }

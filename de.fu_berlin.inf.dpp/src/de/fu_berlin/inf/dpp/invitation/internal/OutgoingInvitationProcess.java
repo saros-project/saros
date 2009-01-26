@@ -67,8 +67,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     /** size of current transfered part of archive file. */
     private long transferedFileSize = 0;
 
-    private final int colorID;
-
     public int getProgressCurrent() {
         // TODO CJ: Jingle File Transfer progrss information
         if (this.tmode == TransferMode.IBB) {
@@ -111,11 +109,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             ISharedProject sharedProject, String description, boolean startNow,
             IInvitationUI inviteUI, int colorID) {
 
-        super(transmitter, to, description);
+        super(transmitter, to, description, colorID);
 
         this.invitationUI = inviteUI;
         this.sharedProject = sharedProject;
-        this.colorID = colorID;
 
         if (startNow) {
             transmitter.sendInviteMessage(sharedProject, to, description,

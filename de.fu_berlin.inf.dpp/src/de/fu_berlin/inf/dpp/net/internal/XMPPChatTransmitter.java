@@ -294,7 +294,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             XMPPChatTransmitter.log.error(e);
         }
         sendMessageToAll(sharedProject, PacketExtensions
-                .createJoinExtension(Saros.getDefault().getMe().getColorID()));
+                .createJoinExtension(Saros.getDefault().getLocalUser().getColorID()));
     }
 
     /*
@@ -1275,7 +1275,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                     project.addUser(user);
 
                     sendMessage(jid, PacketExtensions.createJoinExtension(Saros
-                            .getDefault().getMe().getColorID()));
+                            .getDefault().getLocalUser().getColorID()));
                 }
 
                 count++;

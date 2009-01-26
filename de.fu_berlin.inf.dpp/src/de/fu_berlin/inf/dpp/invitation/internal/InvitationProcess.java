@@ -47,11 +47,14 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
     protected String description;
 
+    protected final int colorID;
+
     public InvitationProcess(ITransmitter transmitter, JID peer,
-            String description) {
+            String description, int colorID) {
         this.transmitter = transmitter;
         this.peer = peer;
         this.description = description;
+        this.colorID = colorID;
 
         this.tmode = TransferMode.JINGLE;
 

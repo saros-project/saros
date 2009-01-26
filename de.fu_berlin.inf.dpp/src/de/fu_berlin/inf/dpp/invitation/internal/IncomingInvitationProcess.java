@@ -73,15 +73,12 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
     protected String projectName;
 
-    private int myColorID;
-
     public IncomingInvitationProcess(ITransmitter transmitter, JID from,
             String projectName, String description, int colorID) {
 
-        super(transmitter, from, description);
+        super(transmitter, from, description, colorID);
 
         this.projectName = projectName;
-        this.myColorID = colorID;
         setState(State.INVITATION_SENT);
 
     }
@@ -461,7 +458,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.joinSession(
-                this.localProject, host, driver, users, myColorID);
+                this.localProject, host, driver, users, colorID);
 
         this.transmitter.sendJoinMessage(sharedProject);
         this.transmitter.removeInvitationProcess(this); // HACK
