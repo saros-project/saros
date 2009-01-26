@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
@@ -136,7 +136,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private int timestamp = ActivitySequencer.UNDEFINED_TIME;
 
-    private ConcurrentManager concurrentManager;
+    private IConcurrentManager concurrentManager;
 
     /** outgoing queue for direct client sync messages for all driver. */
     private final List<Request> outgoingSyncActivities = new Vector<Request>();
@@ -544,7 +544,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     public void initConcurrentManager(
-            de.fu_berlin.inf.dpp.concurrent.ConcurrentManager.Side side,
+            de.fu_berlin.inf.dpp.concurrent.IConcurrentManager.Side side,
             de.fu_berlin.inf.dpp.User host, JID myJID,
             ISharedProject sharedProject) {
         this.concurrentManager = new ConcurrentDocumentManager(side, host,
@@ -555,7 +555,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         this.concurrentManager.setActivitySequencer(this);
     }
 
-    public ConcurrentManager getConcurrentManager() {
+    public IConcurrentManager getConcurrentManager() {
         return this.concurrentManager;
     }
 

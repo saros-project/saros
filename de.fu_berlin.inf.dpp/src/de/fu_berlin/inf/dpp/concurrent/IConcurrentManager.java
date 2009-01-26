@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * @author orieger
  * 
  */
-public interface ConcurrentManager extends IRequestManager,
+public interface IConcurrentManager extends IRequestManager,
         ISharedProjectListener {
 
     public static enum Side {

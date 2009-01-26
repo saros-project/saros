@@ -124,10 +124,6 @@ public class EditorAPI implements IEditorAPI {
 
         private ITextSelection lastSelection = new TextSelection(-1, -1);
 
-        private int lastViewportTop = -1;
-
-        private int lastViewportBottom = -1;
-
         public EditorListener(ITextViewer viewer) {
             this.viewer = viewer;
 
@@ -144,7 +140,13 @@ public class EditorAPI implements IEditorAPI {
          */
         public void viewportChanged(int verticalOffset) {
             // TODO why doesnt this react to window resizes?
-            checkViewport();
+
+            int top = this.viewer.getTopIndex();
+            int bottom = this.viewer.getBottomIndex();
+            IPath editor = EditorAPI.this.editorManager
+                    .getPathOfDocument(this.viewer.getDocument());
+
+            EditorAPI.this.editorManager.viewportChanged(top, bottom, editor);
         }
 
         /*
@@ -208,21 +210,6 @@ public class EditorAPI implements IEditorAPI {
             if (!this.lastSelection.equals(selection)) {
                 EditorAPI.this.editorManager.selectionChanged(selection, sp);
                 this.lastSelection = selection;
-            }
-        }
-
-        private void checkViewport() {
-            int top = this.viewer.getTopIndex();
-            int bottom = this.viewer.getBottomIndex();
-            IPath editor = EditorAPI.this.editorManager
-                    .getPathOfDocument(this.viewer.getDocument());
-
-            if ((top != this.lastViewportTop)
-                    || (bottom != this.lastViewportBottom)) {
-                this.lastViewportTop = top;
-                this.lastViewportBottom = bottom;
-
-                EditorAPI.this.editorManager.viewportChanged(top, bottom, editor);
             }
         }
     }
@@ -308,9 +295,8 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    @SuppressWarnings("restriction")
     public IDocumentProvider getDocumentProvider(IEditorInput input) {
-        
+
         Object adapter = input.getAdapter(IFile.class);
         if (adapter != null) {
             IFile file = (IFile) adapter;
@@ -602,7 +588,7 @@ public class EditorAPI implements IEditorAPI {
                 model.removeAnnotation(ann);
             }
         }
-        
+
         try {
             int start = document.getLineOffset(top);
             int end = document.getLineOffset(bottom);

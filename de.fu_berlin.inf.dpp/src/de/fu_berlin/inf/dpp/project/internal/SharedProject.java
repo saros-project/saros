@@ -55,7 +55,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
@@ -121,7 +121,7 @@ public class SharedProject implements ISharedProject {
 
         /* add host to driver list. */
         this.activitySequencer.initConcurrentManager(
-                ConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
+                IConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
 
         /* init driver manager */
         this.driverManager = DriverDocumentManager.getInstance();
@@ -152,7 +152,7 @@ public class SharedProject implements ISharedProject {
         myself.setColorID(myColorID);
 
         this.activitySequencer.initConcurrentManager(
-                ConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
+                IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
 
         this.project = project;
     }
