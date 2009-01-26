@@ -24,12 +24,12 @@
             icon="icons/comment.png"
             id="de.fu_berlin.inf.dpp.ui.ChatView"
             name="Chat"/>
-	 <view
+	 <!--<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.NetworkView"
             icon="icons/connect.png"
             id="de.fu_berlin.inf.dpp.ui.NetworkViewView"
-            name="Network Monitor"/>
+            name="Network Monitor"/>-->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">

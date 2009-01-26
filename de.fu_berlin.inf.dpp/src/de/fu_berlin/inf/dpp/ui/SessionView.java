@@ -66,7 +66,6 @@ import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
@@ -353,7 +352,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.followModeAction = new FollowModeAction();
         toolBar.add(new ConsistencyAction());
         toolBar.add(new OpenInviteInterface());
-        toolBar.add(new RemoveAllDriverRoleAction());
+        // toolBar.add(new RemoveAllDriverRoleAction());
         toolBar.add(followModeAction);
         toolBar.add(new LeaveSessionAction());
     }
