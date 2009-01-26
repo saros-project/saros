@@ -23,12 +23,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -96,7 +93,7 @@ public class SharedProject implements ISharedProject {
     private final ActivitySequencer activitySequencer = new ActivitySequencer();
 
     private static final int MAX_USERCOLORS = 5;
-    private Queue<Integer> freeColors = null;
+    private FreeColors freeColors = null;
 
     /**
      * Constructor called for SharedProject of the host
@@ -106,10 +103,7 @@ public class SharedProject implements ISharedProject {
 
         this.transmitter = transmitter;
 
-        this.freeColors = new ConcurrentLinkedQueue<Integer>();
-        for (int i = 1; i < SharedProject.MAX_USERCOLORS; i++) {
-            freeColors.add(i);
-        }
+        this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
         this.myID = myID;
         User user = new User(myID, 0);
@@ -315,22 +309,12 @@ public class SharedProject implements ISharedProject {
             log.warn("User " + user.getJID() + " added twice to SharedProject");
         }
 
-        if (this.participants.containsKey(user.getJID())) {
-            this.participants.remove(user.getJID());
-        }
-        this.participants.put(user.getJID(), user);
-
         for (ISharedProjectListener listener : this.listeners) {
             listener.userJoined(user.getJID());
         }
         SharedProject.log.info("User " + user.getJID() + " joined session");
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public void removeUser(User user) {
         this.participants.remove(user);
 
@@ -668,11 +652,7 @@ public class SharedProject implements ISharedProject {
     }
 
     public int getFreeColor() {
-        try {
-            return freeColors.remove();
-        } catch (NoSuchElementException e) {
-            return MAX_USERCOLORS - 1;
-        }
+        return freeColors.get();
     }
 
     public void returnColor(int colorID) {
