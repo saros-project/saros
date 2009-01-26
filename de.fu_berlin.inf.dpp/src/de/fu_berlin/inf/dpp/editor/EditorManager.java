@@ -73,7 +73,6 @@ import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
-import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -448,7 +447,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void viewportChanged(int top, int bottom, IPath editor) {
-        if (!this.sharedProject.isHost()) {
+        if (!this.sharedProject.isDriver()) {
             return;
         }
 
@@ -541,6 +540,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         activateOpenEditors();
 
         removeAllAnnotations(null, ContributionAnnotation.TYPE);
+
+        if (Saros.getDefault().getMyJID().equals(driver) && isDriver)
+            removeAllAnnotations(null, ViewportAnnotation.TYPE);
+
     }
 
     /*
@@ -1021,7 +1024,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private void sharedEditorActivated(IEditorPart editorPart) {
-        if (!this.sharedProject.isHost()) {
+        if (!this.sharedProject.isDriver()) {
             return;
         }
 
@@ -1045,7 +1048,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Removes all contribution and viewport annotations.
+     * Removes all contribution and viewport annotations of given user and type.
+     * 
+     * @param forUserID
+     *            the id of the user whos annotations will be removed, if null
+     *            annotations of given type for all users are removed
+     * @param typeAnnotation
+     *            the type of the annotations to remove
      */
 
     private void removeAllAnnotations(String forUserID, String typeAnnotation) {
@@ -1065,15 +1074,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 Annotation annotation = (Annotation) it.next();
                 String type = annotation.getType();
 
-                boolean isContribution = type
-                        .equals(ContributionAnnotation.TYPE);
-                boolean isViewport = type.equals(ViewportAnnotation.TYPE);
-                boolean isTextSelection = type
-                        .startsWith(SelectionAnnotation.TYPE);
-
-                if (((typeAnnotation == null) && !isContribution && !isViewport && !isTextSelection)
-                        || ((typeAnnotation != null) && (typeAnnotation
-                                .equals(type) == false))) {
+                if ((typeAnnotation == null) || (!typeAnnotation.equals(type))) {
                     continue;
                 }
 
