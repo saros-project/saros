@@ -124,12 +124,11 @@ public interface ISharedProject {
      *            makes the decision to accept or decline the invitation.
      * @param inviteUI
      *            user interface of the invitation for feedback calls.
-     * @param colorID
-     *            the color of the new participant
+     * 
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI, int colorID);
+            boolean inactive, IInvitationUI inviteUI);
 
     /**
      * Adds the given shared project listener. This call is ignored if the

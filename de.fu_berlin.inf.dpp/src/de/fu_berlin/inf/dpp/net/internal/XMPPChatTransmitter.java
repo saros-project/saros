@@ -339,7 +339,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                     JID myJID = Saros.getDefault().getMyJID();
 
                     for (User participant : sharedProject.getParticipants()) {
-                        JID jid = participant.getJid();
+                        JID jid = participant.getJID();
                         if (jid.equals(myJID)) {
                             continue;
                         }
@@ -882,7 +882,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         XMPPChatTransmitter.log.debug("Sending checksum error message of file "
                 + path.lastSegment() + " to all");
         for (User user : participants) {
-            sendMessage(user.getJid(), PacketExtensions
+            sendMessage(user.getJID(), PacketExtensions
                     .createChecksumErrorExtension(path, resolved));
         }
     }
@@ -903,9 +903,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             if (participants != null) {
                 for (User participant : participants) {
                     if (!Saros.getDefault().getSessionManager()
-                            .getSharedProject().getHost().getJid().equals(
-                                    participant.getJid())) {
-                        JID jid = participant.getJid();
+                            .getSharedProject().getHost().getJID().equals(
+                                    participant.getJID())) {
+                        JID jid = participant.getJID();
                         XMPPChatTransmitter.log.debug("Sending checksums to "
                                 + jid);
                         Message m = new Message();
@@ -1176,9 +1176,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
             }
             if (project != null) {
-                User user = new User(fromJID);
-                user.setColorID(colorID);
-                project.addUser(user); // a new user joined this session
+                project.addUser(new User(fromJID, colorID)); // a new user
+                                                             // joined this
+                                                             // session
             }
         }
 
@@ -1268,7 +1268,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 } catch (NumberFormatException nfe) {
                     XMPPChatTransmitter.log
                             .warn("Exception during convert user color form userlist for user : "
-                                    + user.getJid());
+                                    + user.getJID());
                 }
 
                 if (project.getParticipant(jid) == null) {
@@ -1478,24 +1478,24 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         JID myJID = Saros.getDefault().getMyJID();
 
         for (User participant : sharedProject.getParticipants()) {
-            if (participant.getJid().equals(myJID)) {
+            if (participant.getJID().equals(myJID)) {
                 continue;
             }
 
             // if user is known to be offline, dont send but queue
             if (sharedProject != null) {
 
-                User user = sharedProject.getParticipant(participant.getJid());
+                User user = sharedProject.getParticipant(participant.getJID());
                 if ((user != null)
                         && (user.getPresence() == User.UserConnectionState.OFFLINE)) {
 
                     // offline for too long
-                    if (user.getOfflineSecs() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
+                    if (user.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
                         XMPPChatTransmitter.log
                                 .info("Removing offline user from session...");
                         sharedProject.removeUser(user);
                     } else {
-                        queueMessage(participant.getJid(), extension);
+                        queueMessage(participant.getJID(), extension);
                         XMPPChatTransmitter.log
                                 .info("User known as offline - Message queued!");
                     }
@@ -1504,7 +1504,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
             }
 
-            sendMessage(participant.getJid(), extension);
+            sendMessage(participant.getJID(), extension);
         }
     }
 

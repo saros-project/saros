@@ -215,9 +215,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     public void joinReceived(JID from) {
         assertState(State.SYNCHRONIZING_DONE);
 
-        User user = new User(from);
-        user.setColorID(this.colorID);
-        this.sharedProject.addUser(user);
+        this.sharedProject.addUser(new User(from, colorID));
         setState(State.DONE);
 
         sendDriverEditors();

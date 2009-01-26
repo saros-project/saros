@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp;
 
+import java.util.Date;
+
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class User {
@@ -36,16 +38,25 @@ public class User {
 
     public static final int UNKNOWN_COLOR = -1;
 
-    private int colorid = UNKNOWN_COLOR;
+    private int colorID = UNKNOWN_COLOR;
 
+    /**
+     * Time stamp when User became offline the last time. In seconds.
+     */
     private long offlineTime = 0;
+
     private UserRole role = UserRole.OBSERVER;
 
     public User(JID jid) {
         this.jid = jid;
     }
 
-    public JID getJid() {
+    public User(JID jid, int colorID) {
+        this(jid);
+        setColorID(colorID);
+    }
+
+    public JID getJID() {
         return this.jid;
     }
 
@@ -84,26 +95,25 @@ public class User {
     }
 
     public int getColorID() {
-        return this.colorid;
+        return this.colorID;
     }
 
-    public void setColorID(int c) {
-        this.colorid = c;
+    public void setColorID(int colorID) {
+        this.colorID = colorID;
     }
 
     public UserConnectionState getPresence() {
         return this.presence;
     }
 
-    public void setPresence(UserConnectionState p) {
-        this.presence = p;
+    public void setPresence(UserConnectionState presence) {
+        this.presence = presence;
         if (this.presence == User.UserConnectionState.OFFLINE) {
-            this.offlineTime = (new java.util.Date().getTime());
+            this.offlineTime = new Date().getTime();
         }
     }
 
-    public int getOfflineSecs() {
-        return (int) (((new java.util.Date().getTime()) - this.offlineTime) / 1000);
+    public int getOfflineSeconds() {
+        return (int) (((new Date().getTime()) - this.offlineTime) / 1000);
     }
-
 }

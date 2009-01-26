@@ -122,7 +122,7 @@ public class SessionView extends ViewPart implements ISessionListener,
                     .getParticipant(driver);
 
             // if the local host become driver leave follow mode
-            if (participant.getJid().equals(Saros.getDefault().getMyJID())) {
+            if (participant.getJID().equals(Saros.getDefault().getMyJID())) {
                 if (SessionView.this.sharedProject.isDriver(participant))
                     followModeAction.setFollowMode(false);
             }
@@ -160,7 +160,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         public String getColumnText(Object obj, int index) {
             User participant = (User) obj;
 
-            StringBuffer sb = new StringBuffer(participant.getJid().getName());
+            StringBuffer sb = new StringBuffer(participant.getJID().getName());
             if (SessionView.this.sharedProject.isDriver(participant)) {
                 sb.append(" (Driver)");
             }
@@ -186,7 +186,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         public Color getBackground(Object element) {
             User user = (User) element;
 
-            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
                 return null;
             } else {
                 return getUserColor(user);
@@ -195,7 +195,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
         public Color getForeground(Object element) {
             User user = (User) element;
-            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
                 return getUserColor(user);
             }
             return null;
@@ -244,7 +244,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             }
 
             User user = (User) element;
-            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
                 return this.boldFont;
             }
             return null;

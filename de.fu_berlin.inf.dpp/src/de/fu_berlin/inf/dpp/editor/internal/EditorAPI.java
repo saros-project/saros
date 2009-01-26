@@ -314,12 +314,11 @@ public class EditorAPI implements IEditorAPI {
                         return facade.getDocumentProvider();
                     }
 
-                } else if ((fileExtension != null)
-                        && (fileExtension.equals("c")
-                                || fileExtension.equals("h")
-                                || fileExtension.equals("cpp")
-                                || fileExtension.equals("cxx") || fileExtension
-                                .equals("hxx"))) {
+                } else if (fileExtension.equals("c")
+                        || fileExtension.equals("h")
+                        || fileExtension.equals("cpp")
+                        || fileExtension.equals("cxx")
+                        || fileExtension.equals("hxx")) {
 
                     // TODO: Rather this dependency should be injected when the
                     // EditorAPI is created itself.

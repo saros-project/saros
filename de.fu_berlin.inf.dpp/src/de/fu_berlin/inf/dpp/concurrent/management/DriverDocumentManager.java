@@ -270,7 +270,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         // other
         if (activeDriver.size() > 1) {
             for (JID participant : activeDriver) {
-                if (!participant.equals(session.getHost().getJid())) {
+                if (!participant.equals(session.getHost().getJID())) {
                     activeDriver.remove(participant);
                 }
             }

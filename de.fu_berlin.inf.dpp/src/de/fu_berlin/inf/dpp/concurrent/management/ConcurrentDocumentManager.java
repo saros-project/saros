@@ -231,7 +231,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
         this.clientDocs = new HashMap<IPath, JupiterClient>();
         this.driverManager = DriverDocumentManager.getInstance();
         this.side = side;
-        this.host = host.getJid();
+        this.host = host.getJID();
         this.myJID = myJID;
 
         if (side == Side.HOST_SIDE) {

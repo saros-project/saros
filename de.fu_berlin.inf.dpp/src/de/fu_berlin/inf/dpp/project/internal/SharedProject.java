@@ -112,12 +112,11 @@ public class SharedProject implements ISharedProject {
         }
 
         this.myID = myID;
-        User u = new User(myID);
-        u.setUserRole(UserRole.DRIVER);
-        u.setColorID(0);
-        this.host = u;
+        User user = new User(myID, 0);
+        user.setUserRole(UserRole.DRIVER);
+        this.host = user;
 
-        this.participants.put(this.host.getJid(), this.host);
+        this.participants.put(this.host.getJID(), this.host);
 
         /* add host to driver list. */
         this.activitySequencer.initConcurrentManager(
@@ -126,7 +125,7 @@ public class SharedProject implements ISharedProject {
         /* init driver manager */
         this.driverManager = DriverDocumentManager.getInstance();
         addListener(this.driverManager);
-        this.driverManager.addDriver(this.host.getJid());
+        this.driverManager.addDriver(this.host.getJID());
 
         // activitySequencer.getConcurrentManager().addDriver(host.getJid());
 
@@ -135,7 +134,7 @@ public class SharedProject implements ISharedProject {
     }
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
-            JID host, JID driver, List<JID> allParticipants, int myColorID) {
+            JID host, List<JID> allParticipants, int myColorID) {
 
         this.transmitter = transmitter;
 
@@ -222,7 +221,7 @@ public class SharedProject implements ISharedProject {
         }
 
         /* inform observer. */
-        JID jid = driver.getJid();
+        JID jid = driver.getJID();
         for (ISharedProjectListener listener : this.listeners) {
             listener.driverChanged(jid, replicated);
         }
@@ -230,12 +229,12 @@ public class SharedProject implements ISharedProject {
 
     public void removeDriver(User driver, boolean replicated) {
         /* set new observer status in participant list of sharedProject. */
-        getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
+        getParticipant(driver.getJID()).setUserRole(UserRole.OBSERVER);
 
         /**
          * communicate driver role change to listener.
          */
-        JID jid = driver.getJid();
+        JID jid = driver.getJID();
         for (ISharedProjectListener listener : this.listeners) {
             listener.driverChanged(jid, replicated);
         }
@@ -274,10 +273,10 @@ public class SharedProject implements ISharedProject {
     public boolean isDriver(User user) {
         // HOST
         if (this.driverManager != null) {
-            return this.driverManager.isDriver(user.getJid());
+            return this.driverManager.isDriver(user.getJID());
         }
         // CLIENT
-        if (getParticipant(user.getJid()).getUserRole() == UserRole.DRIVER) {
+        if (getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER) {
             return true;
         }
         return false;
@@ -298,7 +297,7 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public boolean isHost() {
-        return this.host.getJid().equals(this.myID);
+        return this.host.getJID().equals(this.myID);
     }
 
     /*
@@ -312,19 +311,19 @@ public class SharedProject implements ISharedProject {
 
     public void addUser(User user) {
 
-        if (this.participants.containsKey(user.getJid())) {
-            log.warn("User " + user.getJid() + " added twice to SharedProject");
+        if (this.participants.containsKey(user.getJID())) {
+            log.warn("User " + user.getJID() + " added twice to SharedProject");
         }
 
-        if (this.participants.containsKey(user.getJid())) {
-            this.participants.remove(user.getJid());
+        if (this.participants.containsKey(user.getJID())) {
+            this.participants.remove(user.getJID());
         }
-        this.participants.put(user.getJid(), user);
+        this.participants.put(user.getJID(), user);
 
         for (ISharedProjectListener listener : this.listeners) {
-            listener.userJoined(user.getJid());
+            listener.userJoined(user.getJID());
         }
-        SharedProject.log.info("User " + user.getJid() + " joined session");
+        SharedProject.log.info("User " + user.getJID() + " joined session");
     }
 
     /*
@@ -338,10 +337,10 @@ public class SharedProject implements ISharedProject {
         // TODO what is to do here if no driver exists anymore?
 
         for (ISharedProjectListener listener : this.listeners) {
-            listener.userLeft(user.getJid());
+            listener.userLeft(user.getJID());
         }
 
-        SharedProject.log.info("User " + user.getJid() + " left session");
+        SharedProject.log.info("User " + user.getJID() + " left session");
     }
 
     /*
@@ -350,9 +349,9 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI, int colorID) {
+            boolean inactive, IInvitationUI inviteUI) {
         return new OutgoingInvitationProcess(this.transmitter, jid, this,
-                description, inactive, inviteUI, colorID);
+                description, inactive, inviteUI, getFreeColor());
     }
 
     /*
@@ -637,7 +636,7 @@ public class SharedProject implements ISharedProject {
                  * if jupiter server request to has to execute locally on host
                  * side.
                  */
-                if (request.getJID().equals(this.host.getJid())) {
+                if (request.getJID().equals(this.host.getJID())) {
                     SharedProject.log
                             .debug("Send host request back for local execution: "
                                     + request);
@@ -652,7 +651,7 @@ public class SharedProject implements ISharedProject {
             } else {
                 SharedProject.log.debug("Send request to host : " + request);
                 this.transmitter.sendJupiterRequest(this, request, this.host
-                        .getJid());
+                        .getJID());
             }
             // connection.sendOperation(new
             // NetworkRequest(this.jid,request.getJID(),request), 0);

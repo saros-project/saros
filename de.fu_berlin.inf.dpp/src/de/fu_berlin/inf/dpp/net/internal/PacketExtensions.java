@@ -240,7 +240,7 @@ public class PacketExtensions {
 
         int count = 0;
         for (User participant : list) {
-            JID jid = participant.getJid();
+            JID jid = participant.getJID();
             String id = "User" + count;
             String role = "UserRole" + count;
             String color = "UserColor" + count;

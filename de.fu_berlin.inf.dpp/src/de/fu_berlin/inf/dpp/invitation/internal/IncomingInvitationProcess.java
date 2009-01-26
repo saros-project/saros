@@ -445,11 +445,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     /**
-     * Ends the incoming invitiation process.
+     * Ends the incoming invitation process.
      */
     private void done() {
         JID host = this.peer;
-        JID driver = this.peer;
 
         // TODO: HACK
         List<JID> users = new ArrayList<JID>();
@@ -458,7 +457,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.joinSession(
-                this.localProject, host, driver, users, colorID);
+                this.localProject, host, users, colorID);
 
         this.transmitter.sendJoinMessage(sharedProject);
         this.transmitter.removeInvitationProcess(this); // HACK

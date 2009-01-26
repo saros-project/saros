@@ -46,7 +46,7 @@ public interface ISessionManager {
      * @return the shared project.
      */
     public abstract ISharedProject joinSession(IProject project, JID host,
-            JID driver, List<JID> users, int myColorID);
+            List<JID> users, int myColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this

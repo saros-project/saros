@@ -99,11 +99,11 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return sessionID;
     }
 
-    public ISharedProject joinSession(IProject project, JID host, JID driver,
+    public ISharedProject joinSession(IProject project, JID host,
             List<JID> users, int colorID) {
 
         this.sharedProject = new SharedProject(this.transmitter, project, Saros
-                .getDefault().getMyJID(), host, driver, users, colorID);
+                .getDefault().getMyJID(), host, users, colorID);
         this.sharedProject.start();
 
         for (ISessionListener listener : this.listeners) {
