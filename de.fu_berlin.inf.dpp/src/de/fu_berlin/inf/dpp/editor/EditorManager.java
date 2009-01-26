@@ -65,6 +65,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -648,6 +649,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IFile file = EditorManager.this.sharedProject.getProject()
                 .getFile(path);
 
+        User user = Saros.getDefault().getSessionManager().getSharedProject()
+                .getParticipant(new JID(textEdit.getSource()));
+
         /* set current execute activity to avoid cirle executions. */
         EditorManager.this.currentExecuteActivity = textEdit;
 
@@ -659,7 +663,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         for (IEditorPart editorPart : editors) {
             EditorManager.this.editorAPI.setSelection(editorPart,
                     new TextSelection(textEdit.offset + textEdit.text.length(),
-                            0), textEdit.getSource());
+                            0), textEdit.getSource(), shouldIFollow(user));
         }
     }
 
@@ -668,7 +672,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         TextSelection textSelection = new TextSelection(cursor.getOffset(),
                 cursor.getLength());
 
-        setDriverTextSelection(textSelection);
+        User user = Saros.getDefault().getSessionManager().getSharedProject()
+                .getParticipant(new JID(cursor.getSource()));
+
+        if (Saros.getDefault().getSessionManager().getSharedProject().isDriver(
+                user)) {
+            setDriverTextSelection(textSelection);
+        }
 
         if (path == null) {
             EditorManager.log
@@ -680,11 +690,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 .getEditors(path);
         for (IEditorPart editorPart : editors) {
             EditorManager.this.editorAPI.setSelection(editorPart,
-                    textSelection, cursor.getSource());
+                    textSelection, cursor.getSource(), shouldIFollow(user));
         }
     }
 
+    // TODO selectable driver to follow
+    protected boolean shouldIFollow(User user) {
+        return isFollowing
+                && Saros.getDefault().getSessionManager().getSharedProject()
+                        .isDriver(user);
+    }
+
     private void execViewport(ViewportActivity viewport) {
+        if (isDriver)
+            return;
 
         int top = viewport.getTopIndex();
         int bottom = viewport.getBottomIndex();
@@ -694,8 +713,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Set<IEditorPart> editors = EditorManager.this.editorPool
                 .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            EditorManager.this.editorAPI.setViewport(editorPart,
-                    EditorManager.this.isFollowing, top, bottom, source);
+            EditorManager.this.editorAPI.setViewport(editorPart, top, bottom,
+                    source);
         }
     }
 
@@ -1070,7 +1089,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             for (@SuppressWarnings("unchecked")
-            Iterator it = model.getAnnotationIterator(); it.hasNext();) {
+            Iterator<Annotation> it = model.getAnnotationIterator(); it
+                    .hasNext();) {
                 Annotation annotation = (Annotation) it.next();
                 String type = annotation.getType();
 

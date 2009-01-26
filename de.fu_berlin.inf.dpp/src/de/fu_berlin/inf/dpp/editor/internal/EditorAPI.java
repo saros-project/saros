@@ -412,7 +412,7 @@ public class EditorAPI implements IEditorAPI {
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
-            String source) {
+            String source, boolean following) {
 
         if (!(editorPart instanceof ITextEditor)) {
             return;
@@ -427,6 +427,12 @@ public class EditorAPI implements IEditorAPI {
                     .getEditorInput());
 
             if (model != null) {
+
+                if (following) {
+                    ITextViewer viewer = EditorAPI.getViewer(editorPart);
+                    viewer.revealRange(selection.getOffset(), selection
+                            .getLength());
+                }
 
                 for (@SuppressWarnings("unchecked")
                 Iterator it = model.getAnnotationIterator(); it.hasNext();) {
@@ -549,15 +555,11 @@ public class EditorAPI implements IEditorAPI {
      * 
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
-    public void setViewport(IEditorPart editorPart, boolean jumpTo, int top,
-            int bottom, String source) {
+    public void setViewport(IEditorPart editorPart, int top, int bottom,
+            String source) {
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         updateViewportAnnotation(viewer, top, bottom, source);
-
-        if (jumpTo) {
-            viewer.setTopIndex(top);
-        }
     }
 
     public ILineRange getViewport(IEditorPart editorPart) {
