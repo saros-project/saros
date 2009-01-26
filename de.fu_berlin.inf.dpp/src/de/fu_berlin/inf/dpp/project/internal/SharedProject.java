@@ -22,12 +22,12 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
@@ -81,7 +81,7 @@ public class SharedProject implements ISharedProject {
 
     protected JID myID;
 
-    protected LinkedHashMap<JID, User> participants = new LinkedHashMap<JID, User>();
+    protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
     private final IProject project;
 
