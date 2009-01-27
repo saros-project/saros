@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/de.fu_berlin.inf.dpp.feature_9.1.16.jar" id="de.fu_berlin.inf.dpp.feature" version="9.1.16"/>
+   <feature url="features/de.fu_berlin.inf.dpp.feature_9.1.27.jar" id="de.fu_berlin.inf.dpp.feature" version="9.1.27"/>
 </site>
