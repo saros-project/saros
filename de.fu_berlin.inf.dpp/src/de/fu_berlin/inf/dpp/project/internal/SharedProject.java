@@ -128,21 +128,16 @@ public class SharedProject implements ISharedProject {
     }
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
-            JID host, List<JID> allParticipants, int myColorID) {
+            JID host, int myColorID) {
 
         this.transmitter = transmitter;
 
         this.myID = myID;
 
-        // Create users for all participants
-        for (JID jid : allParticipants) {
-            this.participants.put(jid, new User(jid));
-        }
+        this.participants.put(host, new User(host, 0));
+        this.participants.put(myID, new User(myID, myColorID));
 
         this.host = getParticipant(host);
-
-        User myself = getParticipant(myID);
-        myself.setColorID(myColorID);
 
         this.activitySequencer.initConcurrentManager(
                 IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
@@ -308,7 +303,7 @@ public class SharedProject implements ISharedProject {
         if (this.participants.containsKey(user.getJID())) {
             log.warn("User " + user.getJID() + " added twice to SharedProject");
         }
-
+        participants.putIfAbsent(user.getJID(), user);
         for (ISharedProjectListener listener : this.listeners) {
             listener.userJoined(user.getJID());
         }

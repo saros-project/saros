@@ -22,8 +22,6 @@ package de.fu_berlin.inf.dpp.invitation.internal;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -450,14 +448,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     private void done() {
         JID host = this.peer;
 
-        // TODO: HACK
-        List<JID> users = new ArrayList<JID>();
-        users.add(host);
-        users.add(Saros.getDefault().getMyJID());
-
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.joinSession(
-                this.localProject, host, users, colorID);
+                this.localProject, host, colorID);
 
         this.transmitter.sendJoinMessage(sharedProject);
         this.transmitter.removeInvitationProcess(this); // HACK

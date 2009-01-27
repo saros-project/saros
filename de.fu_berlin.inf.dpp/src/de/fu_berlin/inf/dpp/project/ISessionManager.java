@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IProject;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -31,22 +29,22 @@ public interface ISessionManager {
     public String getSessionID();
 
     /**
-     * Joins an remotly already running shared project.
+     * Joins an remotely already running shared project.
      * 
      * @param project
      *            the local Eclipse project which should be used to replicate
      *            the remote shared project.
      * @param host
-     *            the host of the remotly shared project.
+     *            the host of the remotely shared project.
      * @param driver
      *            the driver of the shared project.
-     * @param users
-     *            the participants of the shared project.
      * @param myColorID
+     *            Color ID of the user.
+     * 
      * @return the shared project.
      */
     public abstract ISharedProject joinSession(IProject project, JID host,
-            List<JID> users, int myColorID);
+            int myColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
