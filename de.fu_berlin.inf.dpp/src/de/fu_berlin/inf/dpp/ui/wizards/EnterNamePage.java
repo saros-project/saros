@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 
+import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -251,7 +252,7 @@ class EnterNamePage extends WizardPage {
         dialog.open();
         Object[] result = dialog.getResult();
 
-        if ((result == null) && (result.length == 0)) {
+        if (result == null) {
             return null;
         }
 
