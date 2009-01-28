@@ -584,9 +584,9 @@ public class EditorAPI implements IEditorAPI {
         IDocument document = viewer.getDocument();
         for (@SuppressWarnings("unchecked")
         Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-            Annotation ann = (Annotation) it.next();
-            if (ann.getType().equals(ViewportAnnotation.TYPE)) {
-                model.removeAnnotation(ann);
+            Annotation annotation = (Annotation) it.next();
+            if (annotation.getType().startsWith(ViewportAnnotation.TYPE)) {
+                model.removeAnnotation(annotation);
             }
         }
 

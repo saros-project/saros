@@ -47,12 +47,8 @@ public class User {
 
     private UserRole role = UserRole.OBSERVER;
 
-    public User(JID jid) {
-        this.jid = jid;
-    }
-
     public User(JID jid, int colorID) {
-        this(jid);
+        this.jid = jid;
         setColorID(colorID);
     }
 

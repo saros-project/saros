@@ -294,7 +294,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             XMPPChatTransmitter.log.error(e);
         }
         sendMessageToAll(sharedProject, PacketExtensions
-                .createJoinExtension(Saros.getDefault().getLocalUser().getColorID()));
+                .createJoinExtension(Saros.getDefault().getLocalUser()
+                        .getColorID()));
     }
 
     /*
@@ -1177,8 +1178,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             }
             if (project != null) {
                 project.addUser(new User(fromJID, colorID)); // a new user
-                                                             // joined this
-                                                             // session
+                // joined this
+                // session
             }
         }
 
@@ -1245,31 +1246,27 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 if (jidS == null) {
                     break;
                 }
-                XMPPChatTransmitter.log.debug("   *:" + jidS);
-
                 JID jid = new JID(jidS);
+                XMPPChatTransmitter.log.debug("   *:" + jidS);
+                int color = Integer.parseInt(userlistExtension
+                        .getValue("UserColor" + count));
+                XMPPChatTransmitter.log.debug("   color: " + color);
 
                 User user = project.getParticipant(jid);
 
                 if (user == null) {
                     // This user is new, we have to send him a message later
                     // and add him to the project
-                    user = new User(jid);
+                    user = new User(jid, color);
+                } else {
+                    // TODO [MR] The User constructor takes a color argument, so
+                    // this should be unnecessary.
+                    user.setColorID(color);
                 }
 
                 String userRole = userlistExtension
                         .getValue("UserRole" + count);
                 user.setUserRole(UserRole.valueOf(userRole));
-
-                String color = userlistExtension.getValue("UserColor" + count);
-                XMPPChatTransmitter.log.debug("   color: " + color);
-                try {
-                    user.setColorID(Integer.parseInt(color));
-                } catch (NumberFormatException nfe) {
-                    XMPPChatTransmitter.log
-                            .warn("Exception during convert user color form userlist for user : "
-                                    + user.getJID());
-                }
 
                 if (project.getParticipant(jid) == null) {
                     project.addUser(user);

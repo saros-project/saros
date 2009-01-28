@@ -540,10 +540,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.isDriver = this.sharedProject.isDriver();
         activateOpenEditors();
 
-        removeAllAnnotations(null, ContributionAnnotation.TYPE);
+        removeAllAnnotations(ContributionAnnotation.TYPE);
 
         if (Saros.getDefault().getMyJID().equals(driver) && isDriver)
-            removeAllAnnotations(null, ViewportAnnotation.TYPE);
+            removeAllAnnotations(ViewportAnnotation.TYPE);
 
     }
 
@@ -1067,7 +1067,33 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Removes all contribution and viewport annotations of given user and type.
+     * Removes all annotations of a given type and for all users.
+     * 
+     * @param annotationType
+     *            the annotation type that will be removed.
+     */
+    @SuppressWarnings("unchecked")
+    private void removeAllAnnotations(String annotationType) {
+        for (IEditorPart editor : this.editorPool.getAllEditors()) {
+            IEditorInput input = editor.getEditorInput();
+            IDocumentProvider provider = this.editorAPI
+                    .getDocumentProvider(input);
+            IAnnotationModel model = provider.getAnnotationModel(input);
+
+            if (model != null) {
+                for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+                        .hasNext();) {
+                    Annotation annotation = it.next();
+                    if (annotation.getType().startsWith(annotationType)) {
+                        model.removeAnnotation(annotation);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes all annotations of given user and type.
      * 
      * @param forUserID
      *            the id of the user whos annotations will be removed, if null
@@ -1075,7 +1101,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @param typeAnnotation
      *            the type of the annotations to remove
      */
-
     private void removeAllAnnotations(String forUserID, String typeAnnotation) {
 
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
@@ -1091,7 +1116,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             for (@SuppressWarnings("unchecked")
             Iterator<Annotation> it = model.getAnnotationIterator(); it
                     .hasNext();) {
-                Annotation annotation = (Annotation) it.next();
+                Annotation annotation = it.next();
                 String type = annotation.getType();
 
                 if ((typeAnnotation == null) || (!typeAnnotation.equals(type))) {
