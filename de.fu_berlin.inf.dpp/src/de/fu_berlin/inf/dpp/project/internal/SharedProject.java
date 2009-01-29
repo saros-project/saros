@@ -556,49 +556,38 @@ public class SharedProject implements ISharedProject {
                 try {
                     dialog.run(true, false, new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) {
-
-                            FileList flist;
                             try {
-                                flist = new FileList(SharedProject.this.project);
+                                Collection<IPath> paths = new FileList(
+                                        SharedProject.this.project).getPaths();
 
                                 monitor.beginTask("Project settings ... ",
-                                        flist.getPaths().size());
+                                        paths.size());
 
                                 ResourceAttributes attributes = new ResourceAttributes();
                                 attributes.setReadOnly(readonly);
                                 attributes.setArchive(readonly);
 
-                                for (int i = 0; i < flist.getPaths().size(); i++) {
-                                    IPath path = flist.getPaths().get(i);
-                                    path = path.makeAbsolute();
-                                    IFile file = getProject().getFile(path);
+                                for (IPath path : paths) {
+                                    IFile file = getProject().getFile(
+                                            path.makeAbsolute());
                                     if ((file != null) && file.exists()) {
                                         file.setResourceAttributes(attributes);
                                     }
-
                                     monitor.worked(1);
                                 }
                             } catch (CoreException e) {
-                                // log.log(Level.WARNING, "",e);
                                 SharedProject.log.warn("", e);
-                                monitor.done();
                             }
-
                             monitor.done();
-
                         }
-
                     });
                 } catch (InvocationTargetException e) {
-                    // log.log(Level.WARNING, "",e);
                     SharedProject.log.warn("", e);
                     e.printStackTrace();
                 } catch (InterruptedException e) {
-                    // log.log(Level.WARNING, "",e);
                     SharedProject.log.warn("", e);
                     e.printStackTrace();
                 }
-
             }
         });
 
