@@ -128,16 +128,18 @@ public class SharedProject implements ISharedProject {
     }
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
-            JID host, int myColorID) {
+            JID hostID, int myColorID) {
 
         this.transmitter = transmitter;
 
         this.myID = myID;
 
-        this.participants.put(host, new User(host, 0));
+        User host = new User(hostID, 0);
+        host.setUserRole(UserRole.DRIVER);
+        this.participants.put(hostID, host);
         this.participants.put(myID, new User(myID, myColorID));
 
-        this.host = getParticipant(host);
+        this.host = getParticipant(hostID);
 
         this.activitySequencer.initConcurrentManager(
                 IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
@@ -311,7 +313,10 @@ public class SharedProject implements ISharedProject {
     }
 
     public void removeUser(User user) {
-        this.participants.remove(user);
+        this.participants.remove(user.getJID());
+        if (isHost()) {
+            returnColor(user.getColorID());
+        }
 
         // TODO what is to do here if no driver exists anymore?
 
