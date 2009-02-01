@@ -12,8 +12,6 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class FollowModeAction extends Action implements ISessionListener {
 
-    private boolean isFollowMode = false;
-
     public FollowModeAction() {
         super();
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
@@ -29,11 +27,10 @@ public class FollowModeAction extends Action implements ISessionListener {
     }
 
     public boolean getFollowMode() {
-        return this.isFollowMode;
+        return EditorManager.getDefault().isFollowing();
     }
 
     public void setFollowMode(boolean isFollowMode) {
-        this.isFollowMode = isFollowMode;
         EditorManager.getDefault().setEnableFollowing(isFollowMode);
         updateEnablement();
     }
@@ -56,7 +53,7 @@ public class FollowModeAction extends Action implements ISessionListener {
         // ignore
     }
 
-    private void updateEnablement() {
+    public void updateEnablement() {
         setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
         setChecked(getFollowMode());
     }

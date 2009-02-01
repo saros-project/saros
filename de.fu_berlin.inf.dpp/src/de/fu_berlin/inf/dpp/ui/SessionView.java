@@ -385,4 +385,8 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.viewer.refresh();
 
     }
+
+    public void updateFollowingMode() {
+        followModeAction.updateEnablement();
+    }
 }

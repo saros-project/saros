@@ -57,6 +57,8 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -84,6 +86,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -303,6 +306,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final DocumentListener documentListener = new DocumentListener();
 
+    // TODO save only the editor of the followed driver
     private IPath activeDriverEditor;
 
     private final Set<IPath> driverEditors = new HashSet<IPath>();
@@ -592,7 +596,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             editorListener.followModeChanged(enable);
         }
 
-        openDriverEditor();
+        if (enable)
+            openDriverEditor();
     }
 
     /*
@@ -720,6 +725,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     // TODO unify partActivated and partOpened
     public void partOpened(IEditorPart editorPart) {
+
+        // if in follow mode and the opened editor is not the followed one,
+        // exit Follow Mode
+        checkFollowMode(editorPart);
+
         if (!isSharedEditor(editorPart)) {
             return;
         }
@@ -729,6 +739,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     public void partActivated(IEditorPart editorPart) {
+
+        // if in follow mode and the activated editor is not the followed one,
+        // leave Follow Mode
+        checkFollowMode(editorPart);
+
         if (!isSharedEditor(editorPart)) {
             return;
         }
@@ -736,13 +751,44 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         sharedEditorActivated(editorPart);
     }
 
+    protected void checkFollowMode(IEditorPart editorPart) {
+        // if the opened editor is not the followed one, leave following mode
+        IResource resource = this.editorAPI.getEditorResource(editorPart);
+        IPath path = resource.getProjectRelativePath();
+        if (isFollowing) {
+            if (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart)) {
+                setEnableFollowing(false);
+                updateFollowModeUI();
+            }
+        }
+    }
+
+    protected void updateFollowModeUI() {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                IViewPart sessionView = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage().findView(
+                                "de.fu_berlin.inf.dpp.ui.SessionView");
+                if (sessionView != null)
+                    ((SessionView) sessionView).updateFollowingMode();
+            }
+        });
+    }
+
     public void partClosed(IEditorPart editorPart) {
+        IResource resource = this.editorAPI.getEditorResource(editorPart);
+        IPath path = resource.getProjectRelativePath();
+
+        // if closing the following editor, leave follow mode
+        if (isFollowing && activeDriverEditor.equals(path)
+                && isSharedEditor(editorPart)) {
+            setEnableFollowing(false);
+            updateFollowModeUI();
+        }
+
         if (!isSharedEditor(editorPart)) {
             return;
         }
-
-        IResource resource = this.editorAPI.getEditorResource(editorPart);
-        IPath path = resource.getProjectRelativePath();
 
         this.editorPool.remove(editorPart);
 
@@ -1259,6 +1305,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public long getLastRemoteEditTime(IPath path) {
         return this.lastRemoteEditTimes.get(path);
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean isFollowing() {
+        return isFollowing;
     }
 
 }
