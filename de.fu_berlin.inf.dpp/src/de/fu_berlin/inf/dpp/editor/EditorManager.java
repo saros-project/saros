@@ -1307,8 +1307,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
+     * to get the information whether the user is in following mode or not
      * 
-     * @return
+     * @return <code>true</code> when in following mode, otherwise
+     *         <code>false</code>
      */
     public boolean isFollowing() {
         return isFollowing;
