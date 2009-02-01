@@ -764,7 +764,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     protected void updateFollowModeUI() {
-        Display.getDefault().syncExec(new Runnable() {
+        Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 IViewPart sessionView = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow().getActivePage().findView(
