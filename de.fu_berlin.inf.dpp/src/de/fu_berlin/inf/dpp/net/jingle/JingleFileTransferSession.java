@@ -1,9 +1,7 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.ByteArrayInputStream;
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -34,6 +32,7 @@ import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class implements a file transfer session with jingle.
@@ -166,7 +165,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         if (this.getLocal().getSymmetric() != null) {
 
             localIp = this.getLocal().getLocalIp();
-            localPort = getFreePort();
+            localPort = Util.getFreePort();
 
             remoteIp = this.getLocal().getIp();
             remotePort = this.getLocal().getSymmetric().getPort();
@@ -216,39 +215,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     }
 
-    public static <T> Callable<T> retryEvery500ms(final Callable<T> callable) {
-        return new Callable<T>() {
-            public T call() {
-                T t = null;
-                while (t == null && !Thread.currentThread().isInterrupted()) {
-                    try {
-                        t = callable.call();
-                    } catch (InterruptedIOException e) {
-                        // Workaround for bug in Limewire RUDP
-                        // https://www.limewire.org/jira/browse/LWC-2838
-                        return null;
-                    } catch (Exception e) {
-                        // Log here for connection problems.
-                        t = null;
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e2) {
-                            return null;
-                        }
-                    }
-                }
-                return t;
-            }
-        };
-    }
-
     private void initializeAsClient() {
 
         ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
                 Executors.newFixedThreadPool(2));
 
         Future<Socket> tcpConnect = completionService
-                .submit(retryEvery500ms(new Callable<Socket>() {
+                .submit(Util.retryEvery500ms(new Callable<Socket>() {
                     public Socket call() throws Exception {
                         Thread.sleep(20000);
 
@@ -257,7 +230,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 }));
 
         Future<Socket> udpConnect = completionService
-                .submit(retryEvery500ms(new Callable<Socket>() {
+                .submit(Util.retryEvery500ms(new Callable<Socket>() {
                     public Socket call() throws Exception {
 
                         Socket usock = udpSelectorProvider.openSocketChannel()
@@ -409,7 +382,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void startReceive() {
 
-        logger.debug("start receiving");
+        logger.debug("Start receiving");
 
         if (objectInputStream != null) {
             this.receiveThread = new ReceiverThread(objectInputStream);
@@ -462,36 +435,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
     }
 
     public void close() {
-        close(objectInputStream);
-        close(objectOutputStream);
-        close(socket);
+        Util.close(objectInputStream);
+        Util.close(objectOutputStream);
+        Util.close(socket);
 
         objectInputStream = null;
         objectOutputStream = null;
         socket = null;
 
         connectionType = null;
-    }
-
-    public static void close(Socket socketToClose) {
-        if (socketToClose == null)
-            return;
-
-        try {
-            socketToClose.close();
-        } catch (IOException e) {
-            // ignore
-        }
-    }
-
-    public static void close(Closeable closeable) {
-        if (closeable == null)
-            return;
-        try {
-            closeable.close();
-        } catch (IOException e) {
-            // ignore
-        }
     }
 
     @Override
@@ -502,36 +454,5 @@ public class JingleFileTransferSession extends JingleMediaSession {
     @Override
     public void setTrasmit(boolean active) {
         logger.error("Unexpected call to setTrasmit(active ==" + active + ")");
-    }
-
-    /**
-     * Obtain a free port we can use.
-     * 
-     * @return A free port number.
-     */
-    public static int getFreePort() {
-        ServerSocket ss;
-        int freePort = 0;
-
-        for (int i = 0; i < 10; i++) {
-            freePort = (int) (10000 + Math.round(Math.random() * 10000));
-            freePort = freePort % 2 == 0 ? freePort : freePort + 1;
-            try {
-                ss = new ServerSocket(freePort);
-                freePort = ss.getLocalPort();
-                ss.close();
-                return freePort;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            ss = new ServerSocket(0);
-            freePort = ss.getLocalPort();
-            ss.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return freePort;
     }
 }
