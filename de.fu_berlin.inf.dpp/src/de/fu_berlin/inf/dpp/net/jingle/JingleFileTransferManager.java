@@ -55,9 +55,8 @@ public class JingleFileTransferManager {
      */
     private class FileMediaManager extends JingleMediaManager {
 
-        private JingleFileTransferData[] transferData = new JingleFileTransferData[0];
+        private JingleFileTransferData transferData = null;
         private HashMap<JID, JingleFileTransferSession> sessions;
-        private JingleFileTransferSession session;
 
         public FileMediaManager(JingleTransportManager transportManager) {
             super(transportManager);
@@ -89,16 +88,16 @@ public class JingleFileTransferManager {
             return result;
         }
 
-        public void setTransferFile(JingleFileTransferData[] transferData) {
+        public void setTransferFile(JingleFileTransferData transferData) {
             this.transferData = transferData;
         }
 
-        public void transferFiles(JingleFileTransferData[] transferData, JID jid)
+        public void transferFiles(JingleFileTransferData transferData, JID jid)
                 throws JingleSessionException {
             JingleFileTransferSession session = sessions.get(jid);
             if (session != null) {
                 session.sendFiles(transferData);
-                transferData = null;
+                this.transferData = null;
             }
         }
 
@@ -229,7 +228,7 @@ public class JingleFileTransferManager {
                         if (session.getInitiator().equals(
                                 session.getConnection().getUser())) {
                             listener.failedToSendFileListWithJingle(jid,
-                                    mediaManager.transferData[0]);
+                                    mediaManager.transferData);
                         }
                     }
 
@@ -303,7 +302,7 @@ public class JingleFileTransferManager {
      * @throws XMPPException
      */
     public void createOutgoingJingleFileTransfer(JID jid,
-            JingleFileTransferData[] transferData)
+            JingleFileTransferData transferData)
             throws JingleSessionException {
 
         JingleSession outgoing = outgoingSessions.get(jid);

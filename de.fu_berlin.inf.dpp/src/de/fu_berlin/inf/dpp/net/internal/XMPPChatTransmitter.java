@@ -412,7 +412,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                     && jingleManager.getState(recipient) != JingleConnectionState.CLOSED) {
                 try {
                     jingleManager.createOutgoingJingleFileTransfer(recipient,
-                            new JingleFileTransferData[] { data });
+                            data);
                     return;
                 } catch (JingleSessionException e) {
                     log
@@ -814,11 +814,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     private void sendNextFile() {
         if ((this.fileTransferQueue.size() == 0)
-                || (this.runningFileTransfers > XMPPChatTransmitter.MAX_PARALLEL_SENDS)
-        // || Saros.getDefault().getConnectionState() !=
-        // Saros.ConnectionState.CONNECTED
-        ) {
-            XMPPChatTransmitter.log.debug("non file to send in queue.");
+                || (this.runningFileTransfers > XMPPChatTransmitter.MAX_PARALLEL_SENDS)) {
+            XMPPChatTransmitter.log.debug("No file to send in queue.");
             return;
         }
 
@@ -1658,7 +1655,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 try {
                     // transfer files with jingle
                     jingleManager.createOutgoingJingleFileTransfer(recipient,
-                            new JingleFileTransferData[] { data });
+                            data );
 
                     /* inform callback. */
                     if (transferData.callback != null)

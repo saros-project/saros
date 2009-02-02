@@ -1,15 +1,22 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.ByteArrayInputStream;
+import java.io.Closeable;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.jingle.JingleSession;
@@ -27,7 +34,6 @@ import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
 
 /**
  * This class implements a file transfer session with jingle.
@@ -47,55 +53,48 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
  */
 public class JingleFileTransferSession extends JingleMediaSession {
 
-    private class Receive extends Thread {
+    public static final int TIMEOUTSECONDS = 15;
+
+    private class ReceiverThread extends Thread {
 
         private ObjectInputStream input;
 
-        public Receive(ObjectInputStream ii) {
+        public ReceiverThread(ObjectInputStream ii) {
             this.input = ii;
         }
 
         public void run() {
-            try {
 
-                while (true) {
-                    logger.debug("waiting on port " + localPort);
-
-                    /* get number of file to be transfer. */
-                    int fileNumber;
-
-                    fileNumber = input.readInt();
-                    logger.debug("incoming file number: " + fileNumber);
-
-                    for (int i = 0; i < fileNumber; i++) {
-
-                        /* receive file data */
-                        JingleFileTransferData data = (JingleFileTransferData) input
-                                .readObject();
-
-                        if (data.type == FileTransferType.FILELIST_TRANSFER) {
-                            logger.debug("received file List");
-                            logger.debug(data.file_list_content);
-                            /* inform listener. */
-                            for (IJingleFileTransferListener listener : listeners) {
-                                listener.incomingFileList(
-                                        data.file_list_content, data.sender);
-                            }
-
-                        } else if (data.type == FileTransferType.RESOURCE_TRANSFER) {
-                            logger.debug("received resource "
+            while (!isInterrupted()) {
+                JingleFileTransferData data;
+                try {
+                    data = (JingleFileTransferData) input.readObject();
+                } catch (IOException e) {
+                    return;
+                } catch (ClassNotFoundException e) {
+                    logger.error("Received unexpected object in ReceiveThread",
+                            e);
+                    continue;
+                }
+                switch (data.type) {
+                case FILELIST_TRANSFER:
+                    logger
+                            .debug("Received FileList: "
+                                    + data.file_list_content);
+                    for (IJingleFileTransferListener listener : listeners) {
+                        listener.incomingFileList(data.file_list_content,
+                                data.sender);
+                    }
+                    break;
+                case RESOURCE_TRANSFER:
+                    logger
+                            .debug("Received Resource: "
                                     + data.file_project_path);
-                            for (IJingleFileTransferListener listener : listeners) {
-                                listener.incomingResourceFile(data,
-                                        new ByteArrayInputStream(data.content));
-                            }
-                        }
+                    for (IJingleFileTransferListener listener : listeners) {
+                        listener.incomingResourceFile(data,
+                                new ByteArrayInputStream(data.content));
                     }
                 }
-            } catch (IOException e) {
-                logger.info("receive-thread interrupted");
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
             }
 
         }
@@ -104,47 +103,55 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private static Logger logger = Logger
             .getLogger(JingleFileTransferSession.class);
 
-    private Receive tcpReceiveThread;
-    private Receive udpReceiveThread;
-    private JingleFileTransferData[] transferList;
+    private ReceiverThread receiveThread;
+    private JingleFileTransferData transferData;
     private Set<IJingleFileTransferListener> listeners;
     private UDPSelectorProvider udpSelectorProvider;
-    private Socket udpSocket;
-    private Socket tcpSocket;
-    private ObjectOutputStream tcpObjectOutputStream;
-    private ObjectOutputStream udpObjectOutputStream;
-    private ObjectInputStream tcpObjectInputStream;
-    private ObjectInputStream udpObjectInputStream;
+
+    private String connectionType = null;
+    private Socket socket;
+    private ObjectOutputStream objectOutputStream;
+    private ObjectInputStream objectInputStream;
+
     private JID remoteJid;
-    private String ip;
+    private String remoteIp;
     private String localIp;
     private int localPort;
     private int remotePort;
 
     /**
-     * TODO CJ: write javadoc
+     * Create AND initialize a new JingleFileTransferSession. This includes
+     * connecting to given remote side (if initiator).
      * 
      * @param payloadType
+     *            Our PayloadType, which identifies which packets we handle.
+     *            Smack takes care of this.
      * @param remote
+     *            The remote IP and port suggested by Jingle to us.
      * @param local
+     *            Our own IP and port suggested by Jingle to us.
      * @param mediaLocator
+     *            MediaLocator to pass to super()
      * @param jingleSession
+     *            maybenull, the existing JingleSession.
      * @param transferData
+     *            The data to transfer once the setTransmit method is called.
      * @param listeners
+     *            We will notify these listeners if we receive files from the
+     *            remote side.
      */
     public JingleFileTransferSession(PayloadType payloadType,
             TransportCandidate remote, TransportCandidate local,
             String mediaLocator, JingleSession jingleSession,
-            JingleFileTransferData[] transferData, JID remoteJid,
+            JingleFileTransferData transferData, JID remoteJid,
             Set<IJingleFileTransferListener> listeners) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
 
         this.remoteJid = remoteJid;
-        this.transferList = transferData;
+        this.transferData = transferData;
         this.listeners = listeners;
-        logger.debug("JingleFileTransferSesseion created " + local.getIp()
-                + ":" + local.getPort() + " <-> " + remote.getIp() + ":"
-                + remote.getPort());
+        logger.info("Created local: " + local.getIp() + ":" + local.getPort()
+                + " <-> remote: " + remote.getIp() + ":" + remote.getPort());
         initialize();
     }
 
@@ -157,18 +164,21 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public void initialize() {
 
         if (this.getLocal().getSymmetric() != null) {
-            ip = this.getLocal().getIp();
+
             localIp = this.getLocal().getLocalIp();
             localPort = getFreePort();
+
+            remoteIp = this.getLocal().getIp();
             remotePort = this.getLocal().getSymmetric().getPort();
 
-            logger.debug(this.getLocal().getConnection() + " " + ip + ": "
-                    + localPort + "->" + remotePort);
+            logger.debug(this.getLocal().getConnection() + " " + remoteIp
+                    + ": " + localPort + "->" + remotePort);
 
         } else {
-            ip = this.getRemote().getIp();
             localIp = this.getLocal().getLocalIp();
             localPort = this.getLocal().getPort();
+
+            remoteIp = this.getRemote().getIp();
             remotePort = this.getRemote().getPort();
         }
 
@@ -189,108 +199,179 @@ public class JingleFileTransferSession extends JingleMediaSession {
             logger.debug("Failed to create RUDP service");
         }
 
-        // server side
         if (getJingleSession().getInitiator().equals(
                 getJingleSession().getConnection().getUser())) {
 
-            // create TCP Socket and listen
-            Thread createTcpSocket = new Thread(new Runnable() {
-                public void run() {
+            initializeAsServer();
+        } else {
+            initializeAsClient();
+        }
+
+        if (connectionType != null) {
+            logger.debug("Jingle Connection established using "
+                    + connectionType);
+        } else {
+            logger.debug("Could not establish connection using Jingle");
+        }
+
+    }
+
+    public static <T> Callable<T> retryEvery500ms(final Callable<T> callable) {
+        return new Callable<T>() {
+            public T call() {
+                T t = null;
+                while (t == null && !Thread.currentThread().isInterrupted()) {
                     try {
-                        ServerSocket serverSocket = new ServerSocket(localPort);
-                        serverSocket.setSoTimeout(0);
-                        JingleFileTransferSession.this.tcpSocket = serverSocket
-                                .accept();
-                        JingleFileTransferSession.this.tcpObjectOutputStream = new ObjectOutputStream(
-                                tcpSocket.getOutputStream());
-                        JingleFileTransferSession.this.tcpObjectInputStream = new ObjectInputStream(
-                                tcpSocket.getInputStream());
-                        informListenersAboutConnection("TCP");
-                    } catch (IOException e) {
-                        logger.debug("Failed to listen with TCP");
+                        t = callable.call();
+                    } catch (InterruptedIOException e) {
+                        // Workaround for bug in Limewire RUDP
+                        // https://www.limewire.org/jira/browse/LWC-2838
+                        return null;
+                    } catch (Exception e) {
+                        // Log here for connection problems.
+                        t = null;
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e2) {
+                            return null;
+                        }
                     }
                 }
-            });
-            createTcpSocket.start();
+                return t;
+            }
+        };
+    }
 
-            Thread createUdpSocket = new Thread(new Runnable() {
-                public void run() {
-                    try {
+    private void initializeAsClient() {
+
+        ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
+                Executors.newFixedThreadPool(2));
+
+        Future<Socket> tcpConnect = completionService
+                .submit(retryEvery500ms(new Callable<Socket>() {
+                    public Socket call() throws Exception {
+                        Thread.sleep(20000);
+
+                        return new Socket(remoteIp, remotePort);
+                    }
+                }));
+
+        Future<Socket> udpConnect = completionService
+                .submit(retryEvery500ms(new Callable<Socket>() {
+                    public Socket call() throws Exception {
+
+                        Socket usock = udpSelectorProvider.openSocketChannel()
+                                .socket();
+                        usock.setSoTimeout(0);
+                        usock.setKeepAlive(true);
+                        usock.connect(new InetSocketAddress(InetAddress
+                                .getByName(remoteIp), remotePort));
+                        return usock;
+                    }
+                }));
+
+        connect(completionService, tcpConnect, udpConnect);
+    }
+
+    protected void initializeAsServer() {
+
+        ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
+                Executors.newFixedThreadPool(2));
+
+        // create TCP Socket and listen
+        Future<Socket> tcpAccept = completionService
+                .submit(new Callable<Socket>() {
+
+                    public Socket call() throws Exception {
+
+                        ServerSocket serverSocket = new ServerSocket(localPort,
+                                0, InetAddress.getByName(localIp));
+                        serverSocket.setSoTimeout(0);
+
+                        return serverSocket.accept();
+                    }
+                });
+
+        Future<Socket> udpAccept = completionService
+                .submit(new Callable<Socket>() {
+
+                    public Socket call() throws Exception {
                         Socket usock = udpSelectorProvider
                                 .openAcceptorSocketChannel().socket();
                         usock.setSoTimeout(0);
                         usock.connect(new InetSocketAddress(InetAddress
-                                .getByName(ip), remotePort));
+                                .getByName(remoteIp), remotePort));
                         usock.setKeepAlive(true);
-                        JingleFileTransferSession.this.udpSocket = usock;
-                        JingleFileTransferSession.this.udpObjectOutputStream = new ObjectOutputStream(
-                                udpSocket.getOutputStream());
-                        JingleFileTransferSession.this.udpObjectInputStream = new ObjectInputStream(
-                                udpSocket.getInputStream());
-                        informListenersAboutConnection("UDP");
-                    } catch (IOException e) {
-                        logger.debug("Failed to listen with UDP");
+
+                        return usock;
                     }
-                }
-            });
-            createUdpSocket.start();
+                });
 
-            try { // give client a little time to connect
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // do nothing
-            }
-
-        } else { // client side
-            try { // give server a little time to come up
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                // do nothing
-            }
-            try { // to create a tcp socket
-                this.tcpSocket = new Socket(ip, remotePort);
-                this.tcpObjectOutputStream = new ObjectOutputStream(tcpSocket
-                        .getOutputStream());
-                this.tcpObjectInputStream = new ObjectInputStream(tcpSocket
-                        .getInputStream());
-                logger.debug("successfully connected with TCP");
-                informListenersAboutConnection("TCP");
-                logger.debug("JingleFileTransferSesseion initialized");
-                return;
-
-            } catch (UnknownHostException e) {
-                logger.debug("Invalid IP-address of jingle remote (TCP)");
-            } catch (IOException e) {
-                logger.debug("Failed to connect with TCP");
-            }
-
-            try { // to create a udp socket
-
-                Socket usock = udpSelectorProvider.openSocketChannel().socket();
-                usock.setSoTimeout(0);
-                usock.setKeepAlive(true);
-                usock.connect(new InetSocketAddress(InetAddress.getByName(ip),
-                        remotePort));
-                this.udpSocket = usock;
-                this.udpObjectOutputStream = new ObjectOutputStream(udpSocket
-                        .getOutputStream());
-                this.udpObjectInputStream = new ObjectInputStream(udpSocket
-                        .getInputStream());
-                logger.debug("successfully connected with UDP");
-                informListenersAboutConnection("UDP");
-                logger.debug("JingleFileTransferSesseion initialized");
-            } catch (UnknownHostException e1) {
-                logger.debug("Invalid IP-address of jingle remote (UDP)");
-            } catch (IOException e1) {
-                logger.debug("Failed to connect with UDP");
-            }
-        }
+        connect(completionService, tcpAccept, udpAccept);
     }
 
-    private void informListenersAboutConnection(String protocol) {
-        for (IJingleFileTransferListener listener : listeners) {
-            listener.connected(protocol, ip);
+    private void connect(ExecutorCompletionService<Socket> completionService,
+            Future<Socket> tcpConnect, Future<Socket> udpConnect) {
+
+        for (int i = 0; i < 2; i++) {
+
+            Future<Socket> socketFuture = null;
+            try {
+                socketFuture = completionService.poll(TIMEOUTSECONDS,
+                        TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                JingleFileTransferSession.logger.error(
+                        "Unexpected interrupted exception in startTrasmit", e);
+            }
+
+            if (socketFuture == null) {
+                JingleFileTransferSession.logger
+                        .debug("Could not connect with either TCP or UDP.");
+                break;
+            }
+
+            try {
+                this.socket = socketFuture.get();
+            } catch (InterruptedException e) {
+                JingleFileTransferSession.logger.error(
+                        "Unexpected interrupted exception in startTrasmit", e);
+            } catch (ExecutionException e) {
+                JingleFileTransferSession.logger
+                        .debug("Failed to listen with either TCP or UDP.");
+                continue;
+            }
+
+            try {
+                this.objectOutputStream = new ObjectOutputStream(socket
+                        .getOutputStream());
+                this.objectInputStream = new ObjectInputStream(socket
+                        .getInputStream());
+
+                this.connectionType = socketFuture == tcpConnect ? "TCP"
+                        : "UDP";
+
+                for (IJingleFileTransferListener listener : listeners) {
+                    listener.connected(this.connectionType, remoteIp);
+                }
+
+                // Make sure the other connect-future is canceled
+                tcpConnect.cancel(true);
+                udpConnect.cancel(true);
+
+                return;
+            } catch (IOException e) {
+                JingleFileTransferSession.logger
+                        .debug("Failed to listen with either TCP or UDP.");
+
+                close();
+            }
         }
+
+        // Timeout, so cancel both
+        tcpConnect.cancel(true);
+        udpConnect.cancel(true);
+
+        assert objectOutputStream == null && objectInputStream == null;
     }
 
     /**
@@ -300,31 +381,23 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * 
      * @throws JingleSessionException
      */
-    public void sendFiles(JingleFileTransferData[] transferData)
+    public void sendFiles(JingleFileTransferData transferData)
             throws JingleSessionException {
 
-        this.transferList = transferData;
+        this.transferData = transferData;
 
-        if (tcpSocket != null) {
-            logger.debug("sending with TCP to " + ip + ":" + remotePort);
+        if (transferData == null)
+            return;
+
+        if (objectOutputStream != null) {
             try {
-                logger.debug("sending with TCP..");
-                transmit(tcpObjectOutputStream);
+                transmit(objectOutputStream);
                 return;
             } catch (IOException e) {
-                logger.debug("sending with TCP failed, use UDP instead..", e);
+                logger.debug("Failed to send files with Jingle", e);
             }
         }
-        if (udpSocket != null) {
-            logger.debug("sending with UDP to " + ip + ":" + remotePort);
-            try {
-                logger.debug("sending with UDP..");
-                transmit(udpObjectOutputStream);
-                return;
-            } catch (IOException e) {
-                logger.debug("sending with UDP failed, use IBB instead..", e);
-            }
-        }
+
         throw new JingleSessionException("Failed to send files with Jingle");
     }
 
@@ -338,106 +411,97 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         logger.debug("start receiving");
 
-        if (tcpSocket != null && tcpObjectInputStream != null) {
-            this.tcpReceiveThread = new Receive(tcpObjectInputStream);
-            this.tcpReceiveThread.start();
+        if (objectInputStream != null) {
+            this.receiveThread = new ReceiverThread(objectInputStream);
+            this.receiveThread.start();
         }
 
-        if (udpSocket != null && udpObjectInputStream != null) {
-            this.udpReceiveThread = new Receive(udpObjectInputStream);
-            this.udpReceiveThread.start();
-        }
     }
 
     /**
-     * This method is called from Jingle when a jingle session is established.
-     * This method tries to transmit the files with TCP. When this fails it
-     * tries to send the files with UDP/RUDP.
+     * This method is called from Jingle after a jingle session is established.
      */
     @Override
     public void startTrasmit() {
-        logger.debug("JingleFileTransferSesseion: start transmitting");
 
-        if (transferList == null)
+        // Only on the outgoing side
+        if (transferData == null)
             return;
 
-        if (tcpSocket != null) {
+        if (objectOutputStream != null) {
             try {
-                logger.debug("sending with TCP..");
-                transmit(tcpObjectOutputStream);
+                transmit(objectOutputStream);
                 return;
             } catch (IOException e) {
-                logger.debug("sending with TCP failed, use UDP instead..", e);
+                logger.debug("Sending with Jingle failed.", e);
             }
         }
-        if (udpSocket != null) {
-            try {
-                logger.debug("sending with UDP..");
-                transmit(udpObjectOutputStream);
-                return;
-            } catch (IOException e) {
-                logger.warn("sending with UDP failed, use UDP instead..", e);
-            }
-        }
-        if (transferList.length > 0) {
-            for (IJingleFileTransferListener listener : listeners) {
-                listener.failedToSendFileListWithJingle(remoteJid,
-                        transferList[0]);
-            }
+
+        for (IJingleFileTransferListener listener : listeners) {
+            listener.failedToSendFileListWithJingle(remoteJid, transferData);
         }
     }
 
     private synchronized void transmit(ObjectOutputStream oo)
             throws IOException {
-        assert (oo != null);
 
-        oo.writeInt(transferList.length);
+        assert oo != null;
+
+        oo.writeObject(transferData);
         oo.flush();
-        logger.debug("sent transfer number : " + transferList.length);
+        logger.debug("Sent data for : " + transferData.file_project_path);
 
-        for (JingleFileTransferData data : transferList) {
-
-            /* send data */
-            oo.writeObject(data);
-            oo.flush();
-            logger.debug("sent data for : " + data.file_project_path);
-
-        }
-        transferList = null;
+        transferData = null;
     }
 
     @Override
     public void stopReceive() {
-        logger.debug("JingleFileTransferSesseion: stop receiving");
-        if (tcpReceiveThread != null)
-            tcpReceiveThread.interrupt();
-        if (udpReceiveThread != null)
-            udpReceiveThread.interrupt();
+        logger.debug("Stop receiving");
+        if (receiveThread != null)
+            receiveThread.interrupt();
     }
 
-    @Override
-    public void stopTrasmit() {
-        logger.debug("JingleFileTransferSesseion: stop transmitting");
+    public void close() {
+        close(objectInputStream);
+        close(objectOutputStream);
+        close(socket);
+
+        objectInputStream = null;
+        objectOutputStream = null;
+        socket = null;
+
+        connectionType = null;
+    }
+
+    public static void close(Socket socketToClose) {
+        if (socketToClose == null)
+            return;
+
         try {
-            if (tcpSocket != null) {
-                tcpObjectOutputStream.close();
-                tcpObjectInputStream.close();
-                tcpSocket.close();
-            }
-            if (udpSocket != null) {
-                udpObjectOutputStream.close();
-                udpObjectInputStream.close();
-                udpSocket.close();
-            }
+            socketToClose.close();
         } catch (IOException e) {
-            logger.debug("Failed to close all sockets");
+            // ignore
+        }
+    }
+
+    public static void close(Closeable closeable) {
+        if (closeable == null)
+            return;
+        try {
+            closeable.close();
+        } catch (IOException e) {
+            // ignore
         }
     }
 
     @Override
+    public void stopTrasmit() {
+        logger.debug("Stop transmitting");
+    }
+
+    @Override
     public void setTrasmit(boolean active) {
-        logger.debug("JingleFileTransferSesseion: set transmit to " + active);
-        // TODO CJ: What have to do here?
+        logger.error("Unexpected call to setTrasmit(active ==" + active + ")");
     }
 
     /**
@@ -445,7 +509,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * 
      * @return A free port number.
      */
-    protected int getFreePort() {
+    public static int getFreePort() {
         ServerSocket ss;
         int freePort = 0;
 
