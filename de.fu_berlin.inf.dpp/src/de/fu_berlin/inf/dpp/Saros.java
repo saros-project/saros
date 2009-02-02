@@ -97,7 +97,7 @@ public class Saros extends AbstractUIPlugin {
         PacketExtensions.hookExtensionProviders();
         Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
     }
-
+    
     /**
      * Create the shared instance.
      */
@@ -112,7 +112,10 @@ public class Saros extends AbstractUIPlugin {
                 CDTFacade.class).addComponent(JDTFacade.class).addComponent(
                 MessagingManager.class).addComponent(SessionManager.class)
                 .addComponent(SarosUI.class);
-
+        
+        // Code snippet for reinjection:
+        // Reinjector injection = new Reinjector(this.container);
+        // injection.reinject(A.class, new AnnotatedFieldInjection());
     }
 
     /**
@@ -131,6 +134,8 @@ public class Saros extends AbstractUIPlugin {
 
         // Make sure that all components in the container are instantiated
         container.getComponents(Object.class);
+        
+        
 
         boolean hasUserName = getPreferenceStore().getString(
                 PreferenceConstants.USERNAME).length() > 0;
