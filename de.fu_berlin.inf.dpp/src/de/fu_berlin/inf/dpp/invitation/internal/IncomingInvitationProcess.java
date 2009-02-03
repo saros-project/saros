@@ -276,6 +276,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
+                return false;
             }
         }
 
@@ -475,29 +476,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      */
     public TransferMode getTransferMode() {
         return this.tmode;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#jingleFallback()
-     */
-    public void jingleFallback() {
-        IncomingInvitationProcess.logger.warn("jingle fallback");
-        this.tmode = TransferMode.IBB;
-        /* if send file list failed. */
-        if (getState() == State.SYNCHRONIZING) {
-            IncomingInvitationProcess.logger
-                    .debug("send file list another one.");
-            try {
-                this.transmitter.sendFileList(this.peer, new FileList(
-                        this.localProject));
-            } catch (Exception e) {
-                ErrorMessageDialog.showErrorMessage(new Exception(
-                        "Exception during create project."));
-                failed(e);
-            }
-        }
     }
 
     public void fileSent(IPath path) {
