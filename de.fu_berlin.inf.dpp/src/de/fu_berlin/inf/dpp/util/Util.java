@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 
 public class Util {
@@ -99,6 +100,31 @@ public class Util {
                     }
                 }
                 return t;
+            }
+        };
+    }
+
+    /**
+     * Returns an iterable which will return the given iterator ONCE. 
+     * 
+     * Subsequent calls to iterator() will throw an IllegalStateException.
+     * 
+     * @param <T> 
+     * @param it an Iterator to wrap
+     * @return an Iterable which returns the given iterator ONCE.
+     */
+    public static <T> Iterable<T> asIterable(final Iterator<T> it) {
+        return new Iterable<T>(){
+
+            boolean returned = false;
+            
+            public Iterator<T> iterator() {
+                if (returned)
+                    throw new IllegalStateException("Can only call iterator() once.");
+                
+                returned = true;
+                
+                return it;
             }
         };
     }
