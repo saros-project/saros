@@ -449,6 +449,7 @@ public class SharedProject implements ISharedProject {
      */
     public void stop() {
         this.flushTimer.cancel();
+        // TODO CO Not properly stopped
         this.requestTransmitter = null;
     }
 
