@@ -756,7 +756,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IResource resource = this.editorAPI.getEditorResource(editorPart);
         IPath path = resource.getProjectRelativePath();
         if (isFollowing) {
-            if (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart)) {
+            if (activeDriverEditor != null
+                    && (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart))) {
                 setEnableFollowing(false);
                 updateFollowModeUI();
             }
@@ -784,7 +785,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IPath path = resource.getProjectRelativePath();
 
         // if closing the following editor, leave follow mode
-        if (isFollowing && activeDriverEditor.equals(path)) {
+        if (isFollowing && activeDriverEditor != null
+                && activeDriverEditor.equals(path)) {
             setEnableFollowing(false);
             updateFollowModeUI();
         }
