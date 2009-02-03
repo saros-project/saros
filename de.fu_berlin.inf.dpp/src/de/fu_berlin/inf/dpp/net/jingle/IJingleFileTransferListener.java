@@ -17,10 +17,5 @@ public interface IJingleFileTransferListener {
     public void incomingResourceFile(JingleFileTransferData data,
             InputStream input);
 
-    public void exceptionOccured(JingleSessionException exception);
-
-    public void failedToSendFileListWithJingle(JID jid,
-            JingleFileTransferData transferList);
-
     public void connected(String protocol, String remote);
 }

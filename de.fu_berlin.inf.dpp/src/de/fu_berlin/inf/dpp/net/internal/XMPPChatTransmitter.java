@@ -400,15 +400,16 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 getJingleManager().send(recipient, data);
 
             } catch (Exception e) {
-                log
-                        .info(
-                                "Failed to send file list with jingle, fall back to IBB",
-                                e);
+                log.info("Failed to send file list with jingle, fall back to IBB", e);
                 sendFileListWithIBB(xml, recipient);
             }
         }
     }
 
+    /**
+     * TODO CO should use sendFileWithIBB(...), because this just creates a stream.
+     * 
+     */
     private void sendFileListWithIBB(String xml, JID recipient)
             throws XMPPException {
         try {
@@ -437,6 +438,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             XMPPChatTransmitter.log.info("Sending file list");
             FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
                     transfer);
+            // TODO CO Use sendStream instead
             transfer.sendFile(newfile,
                     XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION);
 
@@ -1638,6 +1640,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         }
     }
 
+    /**
+     * TODO CO merge with sendFileList
+     */
     private void transferFile(FileTransferData transferData)
             throws CoreException, XMPPException, IOException {
 
@@ -1692,25 +1697,11 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
                     return;
 
-                } catch (JingleSessionException e) {
-                    log
-                            .info("Failed to send file with jingle, fall back to IBB");
-                }
-            }
-            // failed to send file with jingle (otherwise had returned)
-            // TODO CO Clean this up
-            int attempt = 0;
-            while (attempt < 5) {
-                try {
+                } catch (Exception e) {
+                    log.info("Failed to send file with jingle, fall back to IBB");
                     sendSingleFileWithIBB(transferData);
-                    return;
-                } catch (XMPPException ee) {
-                    log.error("Failed to send file with IBB");
-                    attempt++;
                 }
             }
-            ErrorMessageDialog.showErrorMessage("Failed to send file "
-                    + transferData.path + ".");
         }
     }
 
@@ -1877,11 +1868,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     }
 
-    public void exceptionOccured(JingleSessionException exception) {
-        // TODO Auto-generated method stub
-
-    }
-
     /**
      * File received with jingle.
      */
@@ -1931,21 +1917,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 process.fileListReceived(recipient, fileList);
         }
 
-    }
-
-    public void failedToSendFileListWithJingle(JID jid,
-            JingleFileTransferData transferList) {
-        int attempt = 0;
-        while (attempt < 5) {
-            try {
-                sendFileListWithIBB(transferList.file_list_content, jid);
-                return;
-            } catch (XMPPException e) {
-                log.error("Failed to send file list with IBB");
-                attempt++;
-            }
-        }
-        ErrorMessageDialog.showErrorMessage("Failed to send file list");
     }
 
     public void connected(String protocol, String remote) {
