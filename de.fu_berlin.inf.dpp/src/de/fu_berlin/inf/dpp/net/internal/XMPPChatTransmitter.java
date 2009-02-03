@@ -215,7 +215,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 log.debug("Jingle Manager started");
             }
         });
-        startingJingleThread.start();
+        this.startingJingleThread.start();
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
@@ -243,12 +243,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
      */
     public void sendRequestForFileListMessage(JID user) {
 
-        // wait of jingle manager
-        try {
-            startingJingleThread.join();
-        } catch (InterruptedException e) {
-            log.debug("Interrupted while waiting of jingleManager");
-        }
+        // Make sure JingleManager has started
+        getJingleManager();
 
         sendMessage(user, PacketExtensions.createRequestForFileListExtension());
 
@@ -387,41 +383,29 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         String xml = fileList.toXML();
 
         if (getFileTransferModeViaChat()) {
-
-            /* send file with IBB File Transfer */
+            // send file with IBB File Transfer
             sendFileListWithIBB(xml, recipient);
 
-        } else { // transfer file list with jingle
-
-            // wait of jingle manager
+        } else {
+            // transfer file list with jingle
             try {
-                startingJingleThread.join();
-            } catch (InterruptedException e) {
-                log.debug("Interrupted while waiting of jingleManager");
-            }
+                JingleFileTransferData data = new JingleFileTransferData();
+                data.file_list_content = xml;
+                data.type = FileTransferType.FILELIST_TRANSFER;
+                data.recipient = recipient;
+                data.sender = new JID(connection.getUser());
+                data.file_project_path = FileTransferType.FILELIST_TRANSFER
+                        .toString();
 
-            JingleFileTransferData data = new JingleFileTransferData();
-            data.file_list_content = xml;
-            data.type = FileTransferType.FILELIST_TRANSFER;
-            data.recipient = recipient;
-            data.sender = new JID(connection.getUser());
-            data.file_project_path = FileTransferType.FILELIST_TRANSFER
-                    .toString();
+                getJingleManager().send(recipient, data);
 
-            if (jingleManager.getState(recipient) != JingleConnectionState.ERROR
-                    && jingleManager.getState(recipient) != JingleConnectionState.CLOSED) {
-                try {
-                    jingleManager.createOutgoingJingleFileTransfer(recipient,
-                            data);
-                    return;
-                } catch (JingleSessionException e) {
-                    log
-                            .info("Failed to send file list with jingle, fall back to IBB");
-                }
+            } catch (Exception e) {
+                log
+                        .info(
+                                "Failed to send file list with jingle, fall back to IBB",
+                                e);
+                sendFileListWithIBB(xml, recipient);
             }
-            // failed to send with jingle (otherwise had returned)
-            // failedToSendFileListWithJingle(recipient, data);
-            sendFileListWithIBB(xml, recipient);
         }
     }
 
@@ -1052,34 +1036,19 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
     }
 
-    // TODO replace dependencies by more generic listener interfaces
     /*
-     * (non-Javadoc)
+     * All Smack Packets are dispatched here
      * 
-     * @see org.jivesoftware.smack.PacketListener
+     * TODO replace dependencies by more generic listener interfaces
      */
-    public void processPacket(Packet packet) {
-        final Message message = (Message) packet;
+    public void processPacket(final Packet packet) {
+
+        Message message = (Message) packet;
 
         JID fromJID = new JID(message.getFrom());
 
         if (PacketExtensions.getInviteExtension(message) != null) {
-            DefaultPacketExtension inviteExtension = PacketExtensions
-                    .getInviteExtension(message);
-            String desc = inviteExtension
-                    .getValue(PacketExtensions.DESCRIPTION);
-            String pName = inviteExtension
-                    .getValue(PacketExtensions.PROJECTNAME);
-            String sessionID = inviteExtension
-                    .getValue(PacketExtensions.SESSION_ID);
-            int colorID = Integer.parseInt(inviteExtension
-                    .getValue(PacketExtensions.COLOR_ID));
-
-            ISessionManager sm = Saros.getDefault().getSessionManager();
-            log.debug("Received invitation with session id " + sessionID);
-            log.debug("and ColorID: " + colorID + ", i'm "
-                    + Saros.getDefault().getMyJID());
-            sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
+            processInviteExtension(message, fromJID);
             return;
         }
 
@@ -1090,288 +1059,349 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             return;
         }
 
-        // Change the input method to get the right chats
-        putIncomingChat(fromJID, message.getThread());
         final ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
 
+        // Change the input method to get the right chats
+        putIncomingChat(fromJID, message.getThread());
+
+        if (PacketExtensions.getActvitiesExtension(message) != null) {
+            processActivitiesExtension(message, fromJID, project);
+        }
+
+        if (PacketExtensions.getChecksumExtension(message) != null) {
+            processChecksumExtension(message, project);
+        }
+
+        if (PacketExtensions.getJoinExtension(message) != null) {
+            processJoinExtension(message, fromJID, project);
+        }
+
+        // TODO CJ: Leave Project Message must be handled better
+        if (PacketExtensions.getLeaveExtension(message) != null) {
+            processLeaveExtension(fromJID, project);
+        }
+
+        if (PacketExtensions.getRequestActivityExtension(message) != null) {
+            processActivityRequestExtension(message, project, fromJID);
+        }
+
+        if (PacketExtensions.getDataTransferExtension(message) != null) {
+            receiveChatTransfer(message);
+        }
+
+        if (PacketExtensions.getRequestExtension(message) != null) {
+            processRequestExtension(fromJID);
+        }
+
+        if (PacketExtensions.getUserlistExtension(message) != null) {
+            processUserListExtension(message, fromJID, project);
+        }
+
+        if (PacketExtensions.getCancelInviteExtension(message) != null) {
+            processCancelInviteExtension(message, fromJID);
+        }
+
+        if (PacketExtensions.getChecksumErrorExtension(message) != null) {
+            processChecksumErrorExtension(message);
+        }
+
+    }
+
+    private void processActivitiesExtension(final Message message, JID fromJID,
+            final ISharedProject project) {
         ActivitiesPacketExtension activitiesPacket = PacketExtensions
                 .getActvitiesExtension(message);
+
+        List<TimedActivity> timedActivities = activitiesPacket.getActivities();
 
         boolean isProjectParticipant = false;
         if (project != null) {
             isProjectParticipant = (project.getParticipant(fromJID) != null);
         }
 
-        if (activitiesPacket != null) {
-            List<TimedActivity> timedActivities = activitiesPacket
-                    .getActivities();
+        XMPPChatTransmitter.log.debug("Received activities from "
+                + fromJID.toString() + ": " + timedActivities);
 
-            XMPPChatTransmitter.log.debug("Received activities from "
-                    + fromJID.toString() + ": " + timedActivities);
-
-            if (!isProjectParticipant) {
-                XMPPChatTransmitter.log.info("user not member!");
-                return;
-            }
-
-            for (TimedActivity timedActivity : timedActivities) {
-
-                IActivity activity = timedActivity.getActivity();
-                activity.setSource(fromJID.toString());
-
-                /*
-                 * incoming fileActivities that add files are only used as
-                 * placeholder to bump the timestamp. the real fileActivity will
-                 * be processed by using a file transfer.
-                 */
-                if (!(activity instanceof FileActivity)
-                        || !((FileActivity) activity).getType().equals(
-                                FileActivity.Type.Created)) {
-
-                    project.getSequencer().exec(timedActivity);
-
-                }
-            }
+        if (!isProjectParticipant) {
+            XMPPChatTransmitter.log.info("user not member!");
+            return;
         }
 
-        if (PacketExtensions.getChecksumExtension(message) != null) {
-            final DefaultPacketExtension ext = PacketExtensions
-                    .getChecksumExtension(message);
-            log.debug("Received checksums");
+        for (TimedActivity timedActivity : timedActivities) {
+
+            IActivity activity = timedActivity.getActivity();
+            activity.setSource(fromJID.toString());
+
+            /*
+             * incoming fileActivities that add files are only used as
+             * placeholder to bump the timestamp. the real fileActivity will be
+             * processed by using a file transfer.
+             */
+            if (!(activity instanceof FileActivity)
+                    || !((FileActivity) activity).getType().equals(
+                            FileActivity.Type.Created)) {
+
+                project.getSequencer().exec(timedActivity);
+
+            }
+        }
+    }
+
+    private void processChecksumErrorExtension(final Message message) {
+        DefaultPacketExtension checksumErrorExtension = PacketExtensions
+                .getChecksumErrorExtension(message);
+
+        final String path = checksumErrorExtension
+                .getValue(PacketExtensions.FILE_PATH);
+
+        final boolean resolved = Boolean.parseBoolean(checksumErrorExtension
+                .getValue("resolved"));
+
+        if (resolved) {
+            log.debug("synchronisation completed, inconsistency resolved");
+            ErrorMessageDialog.closeChecksumErrorMessage();
+            return;
+        }
+
+        ErrorMessageDialog.showChecksumErrorMessage(path);
+
+        // Host
+        if (Saros.getDefault().getSessionManager().getSharedProject().isHost()) {
+            log.warn("Checksum Error for " + path);
+
+            IEditorPart editor = (IEditorPart) EditorManager.getDefault()
+                    .getEditors(new Path(path)).toArray()[0];
 
             new Thread() {
-                public void run() {
-                    int count = Integer.parseInt(ext.getValue("quantity"));
-                    DocumentChecksum[] checksums = new DocumentChecksum[count];
 
-                    for (int i = 1; i <= count; i++) {
-                        IPath path = Path.fromPortableString(ext
-                                .getValue("path" + i));
-                        int length = Integer.parseInt(ext
-                                .getValue("length" + i));
-                        int hash = Integer.parseInt(ext.getValue("hash" + i));
-                        checksums[i - 1] = new DocumentChecksum(path, length,
-                                hash);
+                public void run() {
+                    // wait until no more activities are received
+                    while (System.currentTimeMillis()
+                            - XMPPChatTransmitter.this.lastReceivedActivityTime < 1500) {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
-                    project.getConcurrentDocumentManager().checkConsistency(
-                            checksums);
+
+                    EditorManager.getDefault().saveText(new Path(path), true);
+
+                    // IPath fullPath =
+                    // Saros.getDefault().getSessionManager()
+                    // .getSharedProject().getProject().findMember(
+                    // path).getFullPath();
+                    // ITextFileBuffer fileBuff = FileBuffers
+                    // .getTextFileBufferManager().getTextFileBuffer(
+                    // fullPath, LocationKind.IFILE);
+                    //
+                    // if (fileBuff == null) {
+                    // log.error("Can't get File Buffer");
+                    // }
+                    // if (fileBuff.isDirty())
+                    // try {
+                    // fileBuff
+                    // .commit(new NullProgressMonitor(), true);
+                    // } catch (CoreException e) {
+                    // // TODO Auto-generated catch block
+                    // e.printStackTrace();
+                    // }
+
+                    // TODO CJ: thinking about a better solution with
+                    // activity sequencer and jupiter
+
+                    // Saros.getDefault().getSessionManager()
+                    // .getSharedProject()
+                    // .getConcurrentDocumentManager()
+                    // .resetJupiterDocument(new Path(path));
+
+                    log.debug("Sending file to clients");
+                    sendFile(new JID(message.getFrom()), Saros.getDefault()
+                            .getSessionManager().getSharedProject()
+                            .getProject(), new Path(path), null);
                 }
             }.start();
         }
+    }
 
-        if (PacketExtensions.getJoinExtension(message) != null) {
+    private void processCancelInviteExtension(final Message message, JID fromJID) {
+        DefaultPacketExtension cancelInviteExtension = PacketExtensions
+                .getCancelInviteExtension(message);
 
-            int colorID = Integer.parseInt(PacketExtensions.getJoinExtension(
-                    message).getValue("ColorID"));
+        String errorMsg = cancelInviteExtension
+                .getValue(PacketExtensions.ERROR);
 
-            log.debug("Join: ColorID: " + colorID);
-
-            for (IInvitationProcess process : this.processes) {
-                if (process.getPeer().equals(fromJID)) {
-                    process.joinReceived(fromJID);
-                    return;
-                }
-            }
-            if (project != null) {
-                project.addUser(new User(fromJID, colorID)); // a new user
-                // joined this
-                // session
+        for (IInvitationProcess process : this.processes) {
+            if (process.getPeer().equals(fromJID)) {
+                process.cancel(errorMsg, true);
             }
         }
+    }
 
-        // TODO CJ: Leave Project Message must be handled better
-        else if (PacketExtensions.getLeaveExtension(message) != null) {
-            if (project != null) {
-                project.removeUser(project.getParticipant(fromJID)); // HACK
+    private void processUserListExtension(final Message message, JID fromJID,
+            final ISharedProject project) {
+        DefaultPacketExtension userlistExtension = PacketExtensions
+                .getUserlistExtension(message);
+
+        // My inviter sent a list of all session participants
+        // I need to adapt the order for later case of driver leaving the
+        // session
+        XMPPChatTransmitter.log.debug("Received user list from " + fromJID);
+
+        int count = 0;
+        while (true) {
+            String jidS = userlistExtension.getValue("User" + count);
+            if (jidS == null) {
+                break;
             }
-        }
+            JID jid = new JID(jidS);
+            XMPPChatTransmitter.log.debug("   *:" + jidS);
+            int color = Integer.parseInt(userlistExtension.getValue("UserColor"
+                    + count));
+            XMPPChatTransmitter.log.debug("   color: " + color);
 
-        else if ((PacketExtensions.getRequestActivityExtension(message) != null)
-                && isProjectParticipant) {
-            DefaultPacketExtension rae = PacketExtensions
-                    .getRequestActivityExtension(message);
-            String sID = rae.getValue("ID");
-            String sIDandup = rae.getValue("ANDUP");
+            User user = project.getParticipant(jid);
 
-            int ts = -1;
-            if (sID != null) {
-                ts = (new Integer(sID)).intValue();
-                // get that activity from history (if it was mine) and send it
-                boolean sent = resendActivity(fromJID, ts, (sIDandup != null));
-
-                String info = "Received Activity request for timestamp=" + ts
-                        + ".";
-                if (sIDandup != null) {
-                    info += " (andup) ";
-                }
-                if (sent) {
-                    info += " I sent response.";
-                } else {
-                    info += " (not for me)";
-                }
-
-                XMPPChatTransmitter.log.info(info);
-            }
-        }
-
-        else if (PacketExtensions.getDataTransferExtension(message) != null) {
-            receiveChatTransfer(message);
-        }
-
-        /* invitee request for project file list (state.INVITATION_SEND */
-        else if (PacketExtensions.getRequestExtension(message) != null) {
-            for (IInvitationProcess process : this.processes) {
-                if (process.getPeer().equals(fromJID)) {
-                    process.invitationAccepted(fromJID);
-                }
-            }
-        }
-
-        else if (PacketExtensions.getUserlistExtension(message) != null) {
-            DefaultPacketExtension userlistExtension = PacketExtensions
-                    .getUserlistExtension(message);
-
-            // My inviter sent a list of all session participants
-            // I need to adapt the order for later case of driver leaving the
-            // session
-            XMPPChatTransmitter.log.debug("Received user list from " + fromJID);
-
-            int count = 0;
-            while (true) {
-                String jidS = userlistExtension.getValue("User" + count);
-                if (jidS == null) {
-                    break;
-                }
-                JID jid = new JID(jidS);
-                XMPPChatTransmitter.log.debug("   *:" + jidS);
-                int color = Integer.parseInt(userlistExtension
-                        .getValue("UserColor" + count));
-                XMPPChatTransmitter.log.debug("   color: " + color);
-
-                User user = project.getParticipant(jid);
-
-                if (user == null) {
-                    // This user is new, we have to send him a message later
-                    // and add him to the project
-                    user = new User(jid, color);
-                } else {
-                    // TODO [MR] The User constructor takes a color argument, so
-                    // this should be unnecessary.
-                    user.setColorID(color);
-                }
-
-                String userRole = userlistExtension
-                        .getValue("UserRole" + count);
-                user.setUserRole(UserRole.valueOf(userRole));
-
-                if (project.getParticipant(jid) == null) {
-                    project.addUser(user);
-
-                    sendMessage(jid, PacketExtensions.createJoinExtension(Saros
-                            .getDefault().getLocalUser().getColorID()));
-                }
-
-                count++;
-            }
-        }
-
-        else if (PacketExtensions.getCancelInviteExtension(message) != null) {
-            DefaultPacketExtension cancelInviteExtension = PacketExtensions
-                    .getCancelInviteExtension(message);
-
-            String errorMsg = cancelInviteExtension
-                    .getValue(PacketExtensions.ERROR);
-
-            for (IInvitationProcess process : this.processes) {
-                if (process.getPeer().equals(fromJID)) {
-                    process.cancel(errorMsg, true);
-                }
+            if (user == null) {
+                // This user is new, we have to send him a message later
+                // and add him to the project
+                user = new User(jid, color);
+            } else {
+                // TODO [MR] The User constructor takes a color argument, so
+                // this should be unnecessary.
+                user.setColorID(color);
             }
 
+            String userRole = userlistExtension.getValue("UserRole" + count);
+            user.setUserRole(UserRole.valueOf(userRole));
+
+            if (project.getParticipant(jid) == null) {
+                project.addUser(user);
+
+                sendMessage(jid, PacketExtensions.createJoinExtension(Saros
+                        .getDefault().getLocalUser().getColorID()));
+            }
+
+            count++;
         }
-        /**
-         * Checksum Error Message
-         */
-        else if (PacketExtensions.getChecksumErrorExtension(message) != null) {
-            DefaultPacketExtension checksumErrorExtension = PacketExtensions
-                    .getChecksumErrorExtension(message);
+    }
 
-            final String path = checksumErrorExtension
-                    .getValue(PacketExtensions.FILE_PATH);
+    /**
+     *  invitee request for project file list (state.INVITATION_SEND 
+     */
+    private void processRequestExtension(final JID fromJID) {
+        new Thread(new Runnable() {
+            public void run() {
+                for (IInvitationProcess process : processes) {
+                    if (process.getPeer().equals(fromJID)) {
+                        process.invitationAccepted(fromJID);
+                    }
+                }
+            }
+        }).start();
+    }
 
-            final boolean resolved = Boolean
-                    .parseBoolean(checksumErrorExtension.getValue("resolved"));
+    private void processActivityRequestExtension(final Message message,
+            ISharedProject project, JID fromJID) {
 
-            if (resolved) {
-                log.debug("synchronisation completed, inconsistency resolved");
-                ErrorMessageDialog.closeChecksumErrorMessage();
+        if (project == null || project.getParticipant(fromJID) == null) {
+            return;
+        }
+
+        DefaultPacketExtension rae = PacketExtensions
+                .getRequestActivityExtension(message);
+
+        String sID = rae.getValue("ID");
+        String sIDandup = rae.getValue("ANDUP");
+
+        int ts = -1;
+        if (sID != null) {
+            ts = (new Integer(sID)).intValue();
+            // get that activity from history (if it was mine) and send it
+            boolean sent = resendActivity(fromJID, ts, (sIDandup != null));
+
+            String info = "Received Activity request for timestamp=" + ts + ".";
+            if (sIDandup != null) {
+                info += " (andup) ";
+            }
+            if (sent) {
+                info += " I sent response.";
+            } else {
+                info += " (not for me)";
+            }
+
+            XMPPChatTransmitter.log.info(info);
+        }
+    }
+
+    private void processLeaveExtension(JID fromJID, final ISharedProject project) {
+        if (project != null) {
+            project.removeUser(project.getParticipant(fromJID)); // HACK
+        }
+    }
+
+    private void processJoinExtension(final Message message, JID fromJID,
+            final ISharedProject project) {
+        int colorID = Integer.parseInt(PacketExtensions.getJoinExtension(
+                message).getValue("ColorID"));
+
+        log.debug("Join: ColorID: " + colorID);
+
+        for (IInvitationProcess process : this.processes) {
+            if (process.getPeer().equals(fromJID)) {
+                process.joinReceived(fromJID);
                 return;
             }
-
-            ErrorMessageDialog.showChecksumErrorMessage(path);
-
-            // Host
-            if (Saros.getDefault().getSessionManager().getSharedProject()
-                    .isHost()) {
-                log.warn("Checksum Error for " + path);
-
-                IEditorPart editor = (IEditorPart) EditorManager.getDefault()
-                        .getEditors(new Path(path)).toArray()[0];
-
-                new Thread() {
-
-                    public void run() {
-                        // wait until no more activities are received
-                        while (System.currentTimeMillis()
-                                - XMPPChatTransmitter.this.lastReceivedActivityTime < 1500) {
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        EditorManager.getDefault().saveText(new Path(path),
-                                true);
-
-                        // IPath fullPath =
-                        // Saros.getDefault().getSessionManager()
-                        // .getSharedProject().getProject().findMember(
-                        // path).getFullPath();
-                        // ITextFileBuffer fileBuff = FileBuffers
-                        // .getTextFileBufferManager().getTextFileBuffer(
-                        // fullPath, LocationKind.IFILE);
-                        //
-                        // if (fileBuff == null) {
-                        // log.error("Can't get File Buffer");
-                        // }
-                        // if (fileBuff.isDirty())
-                        // try {
-                        // fileBuff
-                        // .commit(new NullProgressMonitor(), true);
-                        // } catch (CoreException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-
-                        // TODO CJ: thinking about a better solution with
-                        // activity sequencer and jupiter
-
-                        // Saros.getDefault().getSessionManager()
-                        // .getSharedProject()
-                        // .getConcurrentDocumentManager()
-                        // .resetJupiterDocument(new Path(path));
-
-                        log.debug("Sending file to clients");
-                        sendFile(new JID(message.getFrom()), Saros.getDefault()
-                                .getSessionManager().getSharedProject()
-                                .getProject(), new Path(path), null);
-                    }
-                }.start();
-            }
         }
+        if (project != null) {
+            project.addUser(new User(fromJID, colorID));
+            // a new user
+            // joined this
+            // session
+        }
+    }
 
+    private void processChecksumExtension(final Message message,
+            final ISharedProject project) {
+        final DefaultPacketExtension ext = PacketExtensions
+                .getChecksumExtension(message);
+        log.debug("Received checksums");
+
+        new Thread() {
+            public void run() {
+                int count = Integer.parseInt(ext.getValue("quantity"));
+                DocumentChecksum[] checksums = new DocumentChecksum[count];
+
+                for (int i = 1; i <= count; i++) {
+                    IPath path = Path.fromPortableString(ext.getValue("path"
+                            + i));
+                    int length = Integer.parseInt(ext.getValue("length" + i));
+                    int hash = Integer.parseInt(ext.getValue("hash" + i));
+                    checksums[i - 1] = new DocumentChecksum(path, length, hash);
+                }
+                project.getConcurrentDocumentManager().checkConsistency(
+                        checksums);
+            }
+        }.start();
+    }
+
+    private void processInviteExtension(final Message message, JID fromJID) {
+        DefaultPacketExtension inviteExtension = PacketExtensions
+                .getInviteExtension(message);
+        String desc = inviteExtension.getValue(PacketExtensions.DESCRIPTION);
+        String pName = inviteExtension.getValue(PacketExtensions.PROJECTNAME);
+        String sessionID = inviteExtension
+                .getValue(PacketExtensions.SESSION_ID);
+        int colorID = Integer.parseInt(inviteExtension
+                .getValue(PacketExtensions.COLOR_ID));
+
+        ISessionManager sm = Saros.getDefault().getSessionManager();
+        log.debug("Received invitation with session id " + sessionID);
+        log.debug("and ColorID: " + colorID + ", i'm "
+                + Saros.getDefault().getMyJID());
+        sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
+        return;
     }
 
     /*
@@ -1624,7 +1654,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
             sendSingleFileWithIBB(transferData);
         } else {
 
-            if (jingleManager.getState(recipient) != JingleConnectionState.ERROR) {
+            if (getJingleManager().getState(recipient) != JingleConnectionState.ERROR) {
                 log.info("Send file " + transferData.path + " (with Jingle)");
 
                 /* create file transfer. */
@@ -1654,8 +1684,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
                 try {
                     // transfer files with jingle
-                    jingleManager.createOutgoingJingleFileTransfer(recipient,
-                            data );
+                    getJingleManager().send(recipient, data);
 
                     /* inform callback. */
                     if (transferData.callback != null)
@@ -1669,6 +1698,7 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 }
             }
             // failed to send file with jingle (otherwise had returned)
+            // TODO CO Clean this up
             int attempt = 0;
             while (attempt < 5) {
                 try {

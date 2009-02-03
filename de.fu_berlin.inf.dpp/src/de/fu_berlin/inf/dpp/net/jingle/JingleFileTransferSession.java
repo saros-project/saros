@@ -8,6 +8,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +35,6 @@ import org.limewire.rudp.UDPSelectorProvider;
 import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -48,7 +51,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * http://wiki.limewire.org/index.php?title=Javadocs .
  * 
  * @author chjacob
- * 
+ * @author oezbek
  */
 public class JingleFileTransferSession extends JingleMediaSession {
 
@@ -103,7 +106,6 @@ public class JingleFileTransferSession extends JingleMediaSession {
             .getLogger(JingleFileTransferSession.class);
 
     private ReceiverThread receiveThread;
-    private JingleFileTransferData transferData;
     private Set<IJingleFileTransferListener> listeners;
     private UDPSelectorProvider udpSelectorProvider;
 
@@ -112,7 +114,6 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
 
-    private JID remoteJid;
     private String remoteIp;
     private String localIp;
     private int localPort;
@@ -142,15 +143,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public JingleFileTransferSession(PayloadType payloadType,
             TransportCandidate remote, TransportCandidate local,
             String mediaLocator, JingleSession jingleSession,
-            JingleFileTransferData transferData, JID remoteJid,
             Set<IJingleFileTransferListener> listeners) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
 
-        this.remoteJid = remoteJid;
-        this.transferData = transferData;
         this.listeners = listeners;
-        logger.info("Created local: " + local.getIp() + ":" + local.getPort()
-                + " <-> remote: " + remote.getIp() + ":" + remote.getPort());
+
         initialize();
     }
 
@@ -170,8 +167,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
             remoteIp = this.getLocal().getIp();
             remotePort = this.getLocal().getSymmetric().getPort();
 
-            logger.debug(this.getLocal().getConnection() + " " + remoteIp
-                    + ": " + localPort + "->" + remotePort);
+            // TODO what does symmetric mean
+            logger.info("Created symmetric - local: " + localIp + ":"
+                    + localPort + " -> remote: " + remoteIp + ":" + remotePort);
 
         } else {
             localIp = this.getLocal().getLocalIp();
@@ -179,6 +177,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
             remoteIp = this.getRemote().getIp();
             remotePort = this.getRemote().getPort();
+
+            logger
+                    .info("Created asymmetric - local: " + localIp + ":"
+                            + localPort + " <-> remote: " + remoteIp + ":"
+                            + remotePort);
         }
 
         // create RUDP service
@@ -217,20 +220,18 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     private void initializeAsClient() {
 
-        ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
-                Executors.newFixedThreadPool(2));
+        ArrayList<SocketCreator> creators = new ArrayList<SocketCreator>(2);
 
-        Future<Socket> tcpConnect = completionService
-                .submit(Util.retryEvery500ms(new Callable<Socket>() {
+        creators.add(SocketCreator.getWrapped("TCP", 
+                Util.retryEvery500ms(new Callable<Socket>() {
                     public Socket call() throws Exception {
-                        Thread.sleep(20000);
-
                         return new Socket(remoteIp, remotePort);
                     }
-                }));
+                })));
 
-        Future<Socket> udpConnect = completionService
-                .submit(Util.retryEvery500ms(new Callable<Socket>() {
+        creators.add(SocketCreator.getWrapped("UDP", 
+                Util.delay(7500,               
+                Util.retryEvery500ms(new Callable<Socket>() {
                     public Socket call() throws Exception {
 
                         Socket usock = udpSelectorProvider.openSocketChannel()
@@ -241,52 +242,77 @@ public class JingleFileTransferSession extends JingleMediaSession {
                                 .getByName(remoteIp), remotePort));
                         return usock;
                     }
-                }));
+                }))));
 
-        connect(completionService, tcpConnect, udpConnect);
+        connect(creators);
     }
 
     protected void initializeAsServer() {
 
-        ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
-                Executors.newFixedThreadPool(2));
+        ArrayList<SocketCreator> creators = new ArrayList<SocketCreator>(2);
 
-        // create TCP Socket and listen
-        Future<Socket> tcpAccept = completionService
-                .submit(new Callable<Socket>() {
+        creators.add(new SocketCreator("TCP") {
 
-                    public Socket call() throws Exception {
+            public Socket call() throws Exception {
 
-                        ServerSocket serverSocket = new ServerSocket(localPort,
-                                0, InetAddress.getByName(localIp));
-                        serverSocket.setSoTimeout(0);
+                ServerSocket serverSocket = new ServerSocket(localPort);
+                serverSocket.setSoTimeout(0);
 
-                        return serverSocket.accept();
-                    }
-                });
+                return serverSocket.accept();
+            }
+        });
 
-        Future<Socket> udpAccept = completionService
-                .submit(new Callable<Socket>() {
+        creators.add(new SocketCreator("UDP") {
 
-                    public Socket call() throws Exception {
-                        Socket usock = udpSelectorProvider
-                                .openAcceptorSocketChannel().socket();
-                        usock.setSoTimeout(0);
-                        usock.connect(new InetSocketAddress(InetAddress
-                                .getByName(remoteIp), remotePort));
-                        usock.setKeepAlive(true);
+            public Socket call() throws Exception {
+                Socket usock = udpSelectorProvider.openAcceptorSocketChannel()
+                        .socket();
+                usock.setSoTimeout(0);
+                usock.connect(new InetSocketAddress(InetAddress
+                        .getByName(remoteIp), remotePort));
+                usock.setKeepAlive(true);
 
-                        return usock;
-                    }
-                });
+                return usock;
+            }
+        });
 
-        connect(completionService, tcpAccept, udpAccept);
+        connect(creators);
     }
 
-    private void connect(ExecutorCompletionService<Socket> completionService,
-            Future<Socket> tcpConnect, Future<Socket> udpConnect) {
+    abstract static class SocketCreator implements Callable<Socket> {
 
-        for (int i = 0; i < 2; i++) {
+        SocketCreator(String type) {
+            this.type = type;
+        }
+
+        String type;
+
+        public String getType() {
+            return this.type;
+        }
+
+        public static SocketCreator getWrapped(String type,
+                final Callable<Socket> callable) {
+            return new SocketCreator(type) {
+                public Socket call() throws Exception {
+                    return callable.call();
+                }
+            };
+        }
+    }
+
+    private void connect(Collection<SocketCreator> connects) {
+
+        ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
+                Executors.newFixedThreadPool(connects.size()));
+
+        Map<Future<Socket>, SocketCreator> futures = new HashMap<Future<Socket>, SocketCreator>();
+
+        for (SocketCreator creator : connects) {
+            futures.put(completionService.submit(creator), creator);
+        }
+
+        for (int i = 0; i < connects.size(); i++) {
 
             Future<Socket> socketFuture = null;
             try {
@@ -320,16 +346,19 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 this.objectInputStream = new ObjectInputStream(socket
                         .getInputStream());
 
-                this.connectionType = socketFuture == tcpConnect ? "TCP"
-                        : "UDP";
+                this.receiveThread = new ReceiverThread(objectInputStream);
+                this.receiveThread.start();
+
+                this.connectionType = futures.get(socketFuture).getType();
 
                 for (IJingleFileTransferListener listener : listeners) {
                     listener.connected(this.connectionType, remoteIp);
                 }
 
-                // Make sure the other connect-future is canceled
-                tcpConnect.cancel(true);
-                udpConnect.cancel(true);
+                // Make sure the other connect-futures are canceled
+                for (Future<Socket> future : futures.keySet()) {
+                    future.cancel(true);
+                }
 
                 return;
             } catch (IOException e) {
@@ -340,34 +369,33 @@ public class JingleFileTransferSession extends JingleMediaSession {
             }
         }
 
-        // Timeout, so cancel both
-        tcpConnect.cancel(true);
-        udpConnect.cancel(true);
+        // Timeout, so cancel all
+        for (Future<Socket> future : futures.keySet()) {
+            future.cancel(true);
+        }
 
         assert objectOutputStream == null && objectInputStream == null;
     }
 
     /**
      * This method is called from the JingleFileTransferManager to send files
-     * with this session. This method tries to transmit the files with TCP. When
-     * this fails it tries to send the files with UDP/RUDP.
+     * with this session.
      * 
      * @throws JingleSessionException
+     *             if sending failed.
      */
-    public void sendFiles(JingleFileTransferData transferData)
+    public synchronized void send(JingleFileTransferData transferData)
             throws JingleSessionException {
-
-        this.transferData = transferData;
-
-        if (transferData == null)
-            return;
 
         if (objectOutputStream != null) {
             try {
-                transmit(objectOutputStream);
+                objectOutputStream.writeObject(transferData);
+                objectOutputStream.flush();
+                logger.debug("Sent: " + transferData);
                 return;
             } catch (IOException e) {
-                logger.debug("Failed to send files with Jingle", e);
+                throw new JingleSessionException(
+                        "Failed to send files with Jingle");
             }
         }
 
@@ -375,66 +403,45 @@ public class JingleFileTransferSession extends JingleMediaSession {
     }
 
     /**
-     * This method is called from Jingle when a jingle session is established.
-     * Two threads are started, one for receiving with TCP, the other for
-     * receiving with UDP/RUDP.
-     */
-    @Override
-    public void startReceive() {
-
-        logger.debug("Start receiving");
-
-        if (objectInputStream != null) {
-            this.receiveThread = new ReceiverThread(objectInputStream);
-            this.receiveThread.start();
-        }
-
-    }
-
-    /**
-     * This method is called from Jingle after a jingle session is established.
+     * This method is called from Jingle AFTER a jingle session is established.
+     * We thus could start sending here, but we want that others call us using
+     * send.
      */
     @Override
     public void startTrasmit() {
-
-        // Only on the outgoing side
-        if (transferData == null)
-            return;
-
-        if (objectOutputStream != null) {
-            try {
-                transmit(objectOutputStream);
-                return;
-            } catch (IOException e) {
-                logger.debug("Sending with Jingle failed.", e);
-            }
-        }
-
-        for (IJingleFileTransferListener listener : listeners) {
-            listener.failedToSendFileListWithJingle(remoteJid, transferData);
-        }
+        // Do nothing -> Users should call send(...) directly
     }
 
-    private synchronized void transmit(ObjectOutputStream oo)
-            throws IOException {
+    @Override
+    public void stopTrasmit() {
+        // Do nothing -> Users should call send(...) directly
+    }
 
-        assert oo != null;
+    @Override
+    public void setTrasmit(boolean active) {
+        logger.error("Unexpected call to setTrasmit(active ==" + active + ")");
+    }
 
-        oo.writeObject(transferData);
-        oo.flush();
-        logger.debug("Sent data for : " + transferData.file_project_path);
-
-        transferData = null;
+    /**
+     * This method is called from Jingle AFTER a jingle session is established.
+     * Since we want others to call us, we need to be ready for transmitting
+     * before this
+     */
+    @Override
+    public void startReceive() {
+        // do nothing.
     }
 
     @Override
     public void stopReceive() {
-        logger.debug("Stop receiving");
-        if (receiveThread != null)
-            receiveThread.interrupt();
+        close();
     }
 
     public void close() {
+
+        if (receiveThread != null)
+            receiveThread.interrupt();
+
         Util.close(objectInputStream);
         Util.close(objectOutputStream);
         Util.close(socket);
@@ -444,15 +451,5 @@ public class JingleFileTransferSession extends JingleMediaSession {
         socket = null;
 
         connectionType = null;
-    }
-
-    @Override
-    public void stopTrasmit() {
-        logger.debug("Stop transmitting");
-    }
-
-    @Override
-    public void setTrasmit(boolean active) {
-        logger.error("Unexpected call to setTrasmit(active ==" + active + ")");
     }
 }
