@@ -61,6 +61,22 @@ public class Util {
         }
     }
 
+    public static <T> Callable<T> delay(final int milliseconds, final Callable<T> callable) {
+        return new Callable<T>() {
+            public T call() throws Exception {
+                
+                try {
+                    Thread.sleep(milliseconds);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return null;
+                }
+                
+                return callable.call();
+            }
+        };
+    }
+    
     public static <T> Callable<T> retryEvery500ms(final Callable<T> callable) {
         return new Callable<T>() {
             public T call() {
