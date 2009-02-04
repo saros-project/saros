@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.net.internal;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -10,8 +10,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
-import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class JupiterReceiver {
 
@@ -46,8 +45,7 @@ public class JupiterReceiver {
         
         connection.addPacketListener(listener, new AndFilter(
                 new MessageTypeFilter(Message.Type.chat),
-                new PacketExtensionFilter(RequestPacketExtension.ELEMENT,
-                        PacketExtensions.NAMESPACE)));
+                RequestPacketExtension.getFilter()));
 
     }
 

@@ -22,6 +22,8 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.text.MessageFormat;
 import java.util.List;
 
+import org.jivesoftware.smack.filter.PacketExtensionFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -29,6 +31,11 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesPacketExtension implements PacketExtension {
+    
+    public static PacketFilter getFilter(){
+        return new PacketExtensionFilter(ELEMENT, NAMESPACE);
+    }
+    
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
     public static final String SESSION_ID = "sessionID";
