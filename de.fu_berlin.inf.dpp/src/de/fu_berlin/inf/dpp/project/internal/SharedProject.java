@@ -394,9 +394,9 @@ public class SharedProject implements ISharedProject {
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                
                 if (SharedProject.this.participants.size() <= 1) {
                     SharedProject.this.activitySequencer.flush();
-
                 } else {
                     List<TimedActivity> activities = SharedProject.this.activitySequencer
                             .flushTimed();
