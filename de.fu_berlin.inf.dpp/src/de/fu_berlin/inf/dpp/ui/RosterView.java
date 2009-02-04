@@ -394,6 +394,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         this.connection.getRoster().addRosterListener(new RosterListener() {
             public void entriesAdded(Collection<String> addresses) {
+                // TODO Why do nothing?
             }
 
             public void entriesUpdated(Collection<String> addresses) {
