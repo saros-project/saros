@@ -102,18 +102,23 @@ public class EditorAPI implements IEditorAPI {
         }
 
         public void partBroughtToTop(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         public void partDeactivated(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         public void partHidden(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         public void partVisible(IWorkbenchPartReference partRef) {
+            // do nothing
         }
 
         public void partInputChanged(IWorkbenchPartReference partRef) {
+            // do nothing
         }
     }
 
@@ -219,8 +224,8 @@ public class EditorAPI implements IEditorAPI {
     private final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         public void verifyKey(VerifyEvent event) {
 
-            log.debug(((int) event.character) + " - " + event.keyCode + " - "
-                    + event.stateMask);
+            // log.debug(((int) event.character) + " - " + event.keyCode + " - "
+            // + event.stateMask);
 
             if (event.character > 0) {
                 event.doit = false;
@@ -591,6 +596,9 @@ public class EditorAPI implements IEditorAPI {
         }
 
         try {
+            top = Math.max(0, Math.min(document.getLength() - 1, top));
+            bottom = Math.max(0, Math.min(document.getLength() - 1, bottom));
+            
             int start = document.getLineOffset(top);
             int end = document.getLineOffset(bottom);
 
