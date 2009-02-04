@@ -5,7 +5,6 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -31,8 +30,7 @@ public class JupiterReceiver {
             // lastReceivedActivityTime = System.currentTimeMillis();
             ISharedProject project = Saros.getDefault().getSessionManager()
                     .getSharedProject();
-            log.info("Received request : "
-                    + packetExtension.getRequest().toString());
+            log.debug("Received request : " + packetExtension.getRequest().toString());
             project.getSequencer().receiveRequest(packetExtension.getRequest());
         }
     };
@@ -43,6 +41,7 @@ public class JupiterReceiver {
 
         this.connection = connection;
         
+        // TODO filter for correct session
         connection.addPacketListener(listener, new AndFilter(
                 new MessageTypeFilter(Message.Type.chat),
                 RequestPacketExtension.getFilter()));
