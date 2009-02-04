@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.LocationKind;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -43,15 +44,13 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 
-public class ConcurrentDocumentManager implements IConcurrentManager,
-        ISessionListener {
+public class ConcurrentDocumentManager implements IConcurrentManager {
 
     private static Logger logger = Logger
             .getLogger(ConcurrentDocumentManager.class);
@@ -60,7 +59,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
     private HashMap<IPath, JupiterDocumentServer> concurrentDocuments;
 
     /** current open editor at client side. */
-    private final HashMap<IPath, JupiterClient> clientDocs;
+    private final HashMap<IPath, JupiterClient> clientDocs = new HashMap<IPath, JupiterClient>();
 
     // private List<JID> drivers;
 
@@ -76,22 +75,47 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
 
     private final IDriverDocumentManager driverManager;
 
-    private final ISharedProject sharedProject;
-
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
             "ConsistencyWatchdog");
 
     private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
             false);
 
-    private Set<IPath> pathesWithWrongChecksums;
+    private Set<IPath> pathesWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+
+    private ISharedProject sharedProject;
 
     /**
-     * This class consists of two parts. The first is a run-method which runs as
-     * an eclipse job on the host side. Once started with schedule() the job is
-     * scheduled to rerun every 5 seconds. The second part is a check method
-     * which checks the documents on this client side against the given
-     * checksums.
+     * Returns the TextFileBuffer associated with this project relative path OR
+     * null if the path could not be traced to a Buffer
+     */
+    public ITextFileBuffer getTextFileBuffer(IPath docPath) {
+
+        if (sharedProject == null)
+            return null;
+
+        IResource resource = sharedProject.getProject().findMember(docPath);
+        if (resource == null)
+            return null;
+
+        IPath fullPath = resource.getFullPath();
+
+        ITextFileBuffer fileBuff = FileBuffers.getTextFileBufferManager()
+                .getTextFileBuffer(fullPath, LocationKind.IFILE);
+        return fileBuff;
+    }
+
+    /**
+     * This class is an eclipse job run on the host side ONLY.
+     * 
+     * The job computes checksums for all files currently managed by Jupiter
+     * (the ConcurrentDocumentManager) and sends them to all guests.
+     * 
+     * These will call their ConcurrentDocumentManager.check(...) method, to
+     * verify that their version is correct.
+     * 
+     * Once started with schedule() the job is scheduled to rerun every 5
+     * seconds.
      * 
      * @author chjacob
      */
@@ -122,14 +146,9 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
             for (IPath docPath : docs) {
 
                 // get document
-                IPath fullPath = Saros.getDefault().getSessionManager()
-                        .getSharedProject().getProject().findMember(docPath)
-                        .getFullPath();
-                ITextFileBuffer fileBuff = FileBuffers
-                        .getTextFileBufferManager().getTextFileBuffer(fullPath,
-                                LocationKind.IFILE);
+                ITextFileBuffer fileBuff = getTextFileBuffer(docPath);
 
-                // HACK
+                // TODO CO Handle missing files correctly
                 if (fileBuff == null) {
                     logger.error("Can't get File Buffer");
                     docsChecksums.remove(docPath);
@@ -161,88 +180,44 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
             schedule(3000);
             return Status.OK_STATUS;
         }
-
-        /**
-         * Checks the local documents against the given checksums. When an
-         * inconsistency occurs all at the concurrent document manager
-         * registered consistency listener are informed about the issue. When a
-         * previous consistency issue have resolved the listeners are also
-         * notified.
-         * 
-         * @param checksums
-         *            the checksums to check the documents against
-         */
-        private void check(DocumentChecksum[] checksums) {
-
-            for (DocumentChecksum checksum : checksums) {
-
-                IPath path = checksum.getPath();
-
-                IDocument doc = EditorManager.getDefault().getDocument(path);
-
-                // if doc == null there is no editor with this resource open
-                if (doc == null)
-                    continue;
-
-                if ((doc.getLength() != checksum.getLength())
-                        || (doc.get().hashCode() != checksum.getHash())) {
-
-                    logger.debug(path.toString() + ": " + doc.getLength() + "/"
-                            + checksum.getLength() + " ; "
-                            + doc.get().hashCode() + "/" + checksum.getHash());
-
-                    long lastEdited = (EditorManager.getDefault()
-                            .getLastEditTime(path));
-
-                    long lastRemoteEdited = (EditorManager.getDefault()
-                            .getLastRemoteEditTime(path));
-
-                    if ((System.currentTimeMillis() - lastEdited) > 2000
-                            && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
-                        logger.debug("Inconsistency detected in document "
-                                + path.toOSString());
-                        ConcurrentDocumentManager.this.pathesWithWrongChecksums
-                                .add(path);
-                        if (!inconsistencyToResolve.getVariable()) {
-                            ConcurrentDocumentManager.this.inconsistencyToResolve
-                                    .setVariable(true);
-                        }
-                    }
-                    return;
-                }
-                logger.debug("All Inconsistencies are resolved");
-                logger.debug(path.toString() + ": " + doc.getLength() + "/"
-                        + checksum.getLength() + " ; " + doc.get().hashCode()
-                        + "/" + checksum.getHash());
-
-                ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
-
-                if (inconsistencyToResolve.getVariable()) {
-                    ConcurrentDocumentManager.this.inconsistencyToResolve
-                            .setVariable(false);
-                }
-            }
-        }
     }
 
-    public ConcurrentDocumentManager(Side side, User host, JID myJID,
+    public ConcurrentDocumentManager(final Side side, User host, JID myJID,
             ISharedProject sharedProject) {
-        this.sharedProject = sharedProject;
-        this.clientDocs = new HashMap<IPath, JupiterClient>();
+
         this.driverManager = DriverDocumentManager.getInstance();
         this.side = side;
         this.host = host.getJID();
         this.myJID = myJID;
+        this.sharedProject = sharedProject;
 
         if (side == Side.HOST_SIDE) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
-            logger.debug("starting consistency watchdog");
+            // logger.debug("starting consistency watchdog");
             // consistencyWatchdog.setSystem(true);
             // consistencyWatchdog.setPriority(Job.SHORT);
             // consistencyWatchdog.schedule();
         }
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+                new AbstractSessionListener() {
+
+                    public void sessionEnded(ISharedProject endedProject) {
+
+                        assert endedProject == ConcurrentDocumentManager.this.sharedProject;
+
+                        Saros.getDefault().getSessionManager()
+                                .removeSessionListener(this);
+
+                        if (side == Side.HOST_SIDE) {
+                            consistencyWatchdog.cancel();
+                        }
+
+                        // TODO we should not need this
+                        pathesWithWrongChecksums.clear();
+                    }
+                });
+
     }
 
     public void setActivitySequencer(IActivitySequencer sequencer) {
@@ -301,7 +276,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
             FileActivity file = (FileActivity) activity;
             if (file.getType() == FileActivity.Type.Created) {
                 if (isHostSide()) {
-
+                    // TODO CO What to do here!!
                 }
             }
             if (file.getType() == FileActivity.Type.Removed) {
@@ -503,17 +478,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
     }
 
     public boolean isHostSide() {
-        if (this.side == Side.HOST_SIDE) {
-            return true;
-        }
-        return false;
+        return this.side == Side.HOST_SIDE;
     }
 
     public boolean isHost(JID jid) {
-        if (jid != null && jid.equals(this.host)) {
-            return true;
-        }
-        return false;
+        return jid != null && jid.equals(this.host);
     }
 
     public void setHost(JID host) {
@@ -709,15 +678,14 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
     }
 
     public void driverChanged(JID driver, boolean replicated) {
+
         if (isHost(driver))
             return;
         /*
          * 1. check if driver exists. 2. add new driver or remove driver. 3.
          */
-        // HOST
         if (isHostSide()) {
             /* if driver changed to observer */
-            // if (drivers.contains(driver)) {
             if (this.driverManager.isDriver(driver)) {
                 userLeft(driver);
             }
@@ -726,9 +694,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
             // drivers.add(driver);
             // //TODO: add driver to current open document proxy ?
             // }
-        }
-        // CLIENT
-        else {
+        } else {
+            // ClientSide
             if (driver.equals(this.myJID)) {
                 this.clientDocs.clear();
             }
@@ -800,20 +767,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
 
     }
 
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void sessionEnded(ISharedProject session) {
-        this.consistencyWatchdog.cancel();
-        pathesWithWrongChecksums.clear();
-    }
-
-    public void sessionStarted(ISharedProject session) {
-        this.pathesWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
-    }
-
     /**
      * Checks the local documents against the given checksums. When an
      * inconsistency occurs all at the concurrent document manager registered
@@ -824,7 +777,53 @@ public class ConcurrentDocumentManager implements IConcurrentManager,
      *            the checksums to check the documents against
      */
     public void checkConsistency(DocumentChecksum[] checksums) {
-        consistencyWatchdog.check(checksums);
+
+        for (DocumentChecksum checksum : checksums) {
+
+            IPath path = checksum.getPath();
+
+            IDocument doc = EditorManager.getDefault().getDocument(path);
+
+            // if doc == null there is no editor with this resource open
+            if (doc == null)
+                continue;
+
+            if ((doc.getLength() != checksum.getLength())
+                    || (doc.get().hashCode() != checksum.getHash())) {
+
+                logger.debug(path.toString() + ": " + doc.getLength() + "/"
+                        + checksum.getLength() + " ; " + doc.get().hashCode()
+                        + "/" + checksum.getHash());
+
+                long lastEdited = (EditorManager.getDefault()
+                        .getLastEditTime(path));
+
+                long lastRemoteEdited = (EditorManager.getDefault()
+                        .getLastRemoteEditTime(path));
+
+                if ((System.currentTimeMillis() - lastEdited) > 2000
+                        && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
+                    logger.debug("Inconsistency detected in document "
+                            + path.toOSString());
+                    ConcurrentDocumentManager.this.pathesWithWrongChecksums
+                            .add(path);
+                    if (!inconsistencyToResolve.getVariable()) {
+                        inconsistencyToResolve.setVariable(true);
+                    }
+                }
+                return;
+            }
+            logger.debug("All Inconsistencies are resolved");
+            logger.debug(path.toString() + ": " + doc.getLength() + "/"
+                    + checksum.getLength() + " ; " + doc.get().hashCode() + "/"
+                    + checksum.getHash());
+
+            ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
+
+            if (inconsistencyToResolve.getVariable() == true) {
+                inconsistencyToResolve.setVariable(false);
+            }
+        }
     }
 
     /**
