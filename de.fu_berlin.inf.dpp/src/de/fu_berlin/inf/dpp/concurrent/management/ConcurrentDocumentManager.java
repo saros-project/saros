@@ -87,7 +87,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * Returns the TextFileBuffer associated with this project relative path OR
-     * null if the path could not be traced to a Buffer
+     * null if the path could not be traced to a Buffer.
      */
     public ITextFileBuffer getTextFileBuffer(IPath docPath) {
 
@@ -133,17 +133,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
 
-            // if not on host side cancel the job
-            if (!isHostSide()) {
-                logger.error("This job is intended to be run on host side!");
-                return Status.CANCEL_STATUS;
-            }
-
-            // get the documents which are controlled by jupiter
-            Set<IPath> docs = clientDocs.keySet();
-
-            // for all documents
-            for (IPath docPath : docs) {
+            assert isHostSide() : "This job is intended to be run on host side!";
+            
+            // Update Checksums for all documents controlled by jupiter
+            for (IPath docPath : clientDocs.keySet()) {
 
                 // get document
                 ITextFileBuffer fileBuff = getTextFileBuffer(docPath);
@@ -161,22 +154,21 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                     DocumentChecksum c = new DocumentChecksum(docPath, doc
                             .getLength(), doc.get().hashCode());
                     docsChecksums.put(docPath, c);
-                    logger.debug(c.getHash());
                 } else {
                     DocumentChecksum c = docsChecksums.get(docPath);
                     if (c.getLength() != doc.getLength()) {
                         // length has changed, compute the hash new
                         c.setLength(doc.getLength());
                         c.setHash(doc.get().hashCode());
-                        docsChecksums.put(docPath, c);
                     }
                 }
             }
 
+            // Send to all Clients
             Saros.getDefault().getSessionManager().getTransmitter()
                     .sendDocChecksumsToClients(docsChecksums.values());
 
-            // schedule the next run in 3 seconds
+            // Reschedule the next run in 3 seconds
             schedule(3000);
             return Status.OK_STATUS;
         }
@@ -191,7 +183,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         this.myJID = myJID;
         this.sharedProject = sharedProject;
 
-        if (side == Side.HOST_SIDE) {
+        if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
             // logger.debug("starting consistency watchdog");
             // consistencyWatchdog.setSystem(true);
