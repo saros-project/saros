@@ -185,7 +185,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         public Color getBackground(Object element) {
             User user = (User) element;
 
-            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
+            if (user.equals(Saros.getDefault().getLocalUser())) {
                 return null;
             } else {
                 return getUserColor(user);
@@ -194,7 +194,8 @@ public class SessionView extends ViewPart implements ISessionListener,
 
         public Color getForeground(Object element) {
             User user = (User) element;
-            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
+
+            if (user.equals(Saros.getDefault().getLocalUser())) {
                 return getUserColor(user);
             }
             return null;
@@ -203,10 +204,6 @@ public class SessionView extends ViewPart implements ISessionListener,
         private Color getUserColor(User user) {
 
             int colorID = user.getColorID();
-
-            if (colorID == User.UNKNOWN_COLOR) {
-                return null;
-            }
 
             String annotationType = SelectionAnnotation.TYPE + "."
                     + new Integer(colorID + 1).toString();

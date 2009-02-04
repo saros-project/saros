@@ -199,7 +199,7 @@ public class XMPPChatTransmitter implements ITransmitter {
     }
 
     private class IBBTransferListener implements FileTransferListener {
-        
+
         /*
          * (non-Javadoc)
          * 
@@ -805,20 +805,20 @@ public class XMPPChatTransmitter implements ITransmitter {
                 }
                 JID jid = new JID(jidS);
                 XMPPChatTransmitter.log.debug("   *:" + jidS);
-                int color = Integer.parseInt(userlistExtension
+                int colorID = Integer.parseInt(userlistExtension
                         .getValue("UserColor" + count));
-                XMPPChatTransmitter.log.debug("   color: " + color);
+                XMPPChatTransmitter.log.debug("   color: " + colorID);
 
                 User user = project.getParticipant(jid);
 
                 if (user == null) {
                     // This user is new, we have to send him a message later
                     // and add him to the project
-                    user = new User(jid, color);
-                } else {
-                    // TODO [MR] The User constructor takes a color argument, so
-                    // this should be unnecessary.
-                    user.setColorID(color);
+                    user = new User(jid, colorID);
+                }
+
+                if (user.getColorID() != colorID) {
+                    log.warn("Received color id doesn't match known color id");
                 }
 
                 String userRole = userlistExtension
@@ -835,12 +835,12 @@ public class XMPPChatTransmitter implements ITransmitter {
                 count++;
             }
         }
-        
+
         /**
-         * Receives a data buffer sent by a chat message. The data will be decoded
-         * from base64 encoding. Splitted transfer will be buffered until all chunks
-         * are received. Then the file will be reconstructed and processed as a
-         * whole.
+         * Receives a data buffer sent by a chat message. The data will be
+         * decoded from base64 encoding. Splitted transfer will be buffered
+         * until all chunks are received. Then the file will be reconstructed
+         * and processed as a whole.
          * 
          * @param message
          *            Message containing the data as extension.
@@ -862,13 +862,14 @@ public class XMPPChatTransmitter implements ITransmitter {
                     int cur = Integer.parseInt(sSplit.substring(0, i));
                     int max = Integer.parseInt(sSplit.substring(i + 1));
 
-                    XMPPChatTransmitter.log.debug("Received chunk " + cur + " of "
-                            + max + " of file " + sName);
+                    XMPPChatTransmitter.log.debug("Received chunk " + cur
+                            + " of " + max + " of file " + sName);
 
                     // check for previous chunks
                     IncomingFile ifile = incomingFiles.get(sName);
                     if (ifile == null) {
-                        // this is the first received chunk->create incoming file
+                        // this is the first received chunk->create incoming
+                        // file
                         // object
                         ifile = new IncomingFile();
                         ifile.receivedChunks++;
@@ -943,7 +944,8 @@ public class XMPPChatTransmitter implements ITransmitter {
                     ByteArrayInputStream in = new ByteArrayInputStream(dataOrg);
 
                     XMPPChatTransmitter.log.debug("Receiving resource from "
-                            + from.toString() + ": " + sName + " (ChatTransfer)");
+                            + from.toString() + ": " + sName
+                            + " (ChatTransfer)");
 
                     boolean handledByInvitation = false;
                     for (IInvitationProcess process : processes) {
@@ -966,7 +968,8 @@ public class XMPPChatTransmitter implements ITransmitter {
                                 FileActivity.Type.Created, path, in);
 
                         int time;
-                        String description = dt.getValue(PacketExtensions.DT_DESC);
+                        String description = dt
+                                .getValue(PacketExtensions.DT_DESC);
                         try {
                             time = Integer
                                     .parseInt(description
@@ -978,17 +981,20 @@ public class XMPPChatTransmitter implements ITransmitter {
                             time = 0; // HACK
                         }
 
-                        TimedActivity timedActivity = new TimedActivity(activity,
-                                time);
+                        TimedActivity timedActivity = new TimedActivity(
+                                activity, time);
 
-                        ISessionManager sm = Saros.getDefault().getSessionManager();
-                        sm.getSharedProject().getSequencer().exec(timedActivity);
+                        ISessionManager sm = Saros.getDefault()
+                                .getSessionManager();
+                        sm.getSharedProject().getSequencer()
+                                .exec(timedActivity);
                     }
 
                     XMPPChatTransmitter.log.info("Received resource " + sName);
 
                 } catch (Exception e) {
-                    XMPPChatTransmitter.log.warn("Failed to receive " + sName, e);
+                    XMPPChatTransmitter.log.warn("Failed to receive " + sName,
+                            e);
                 }
             }
 
@@ -1365,7 +1371,7 @@ public class XMPPChatTransmitter implements ITransmitter {
 
         sendData(toTransferData(recipient, fileList.toXML()));
     }
-    
+
     public void sendFile(JID to, IProject project, IPath path, int timestamp)
             throws IOException {
 

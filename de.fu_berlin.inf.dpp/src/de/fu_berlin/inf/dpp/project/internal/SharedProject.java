@@ -313,7 +313,11 @@ public class SharedProject implements ISharedProject {
     }
 
     public void removeUser(User user) {
-        this.participants.remove(user.getJID());
+        if (this.participants.remove(user.getJID()) == null) {
+            log.warn("Tried to remove user who was not in participants: "
+                    + user.getJID());
+            return;
+        }
         if (isHost()) {
             returnColor(user.getColorID());
         }
@@ -583,8 +587,9 @@ public class SharedProject implements ISharedProject {
                                 }
                             } catch (CoreException e) {
                                 SharedProject.log.warn("", e);
+                            } finally {
+                                monitor.done();
                             }
-                            monitor.done();
                         }
                     });
                 } catch (InvocationTargetException e) {

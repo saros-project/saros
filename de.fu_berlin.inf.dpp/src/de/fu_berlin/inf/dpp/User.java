@@ -36,9 +36,7 @@ public class User {
 
     private final JID jid;
 
-    public static final int UNKNOWN_COLOR = -1;
-
-    private int colorID = UNKNOWN_COLOR;
+    private int colorID;
 
     /**
      * Time stamp when User became offline the last time. In seconds.
@@ -49,7 +47,7 @@ public class User {
 
     public User(JID jid, int colorID) {
         this.jid = jid;
-        setColorID(colorID);
+        this.colorID = colorID;
     }
 
     public JID getJID() {
@@ -92,10 +90,6 @@ public class User {
 
     public int getColorID() {
         return this.colorID;
-    }
-
-    public void setColorID(int colorID) {
-        this.colorID = colorID;
     }
 
     public UserConnectionState getPresence() {

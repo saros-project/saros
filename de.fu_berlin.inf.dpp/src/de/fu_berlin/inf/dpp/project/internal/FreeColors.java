@@ -6,8 +6,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * A pool of free colors.
- * 
- * @TODO For now only color IDs. Should be replaced by Color objects later.
  */
 public class FreeColors {
     protected final int maxColorID;
@@ -49,7 +47,8 @@ public class FreeColors {
      *            Color ID to return.
      */
     public void add(int colorID) {
-        if (colorID != maxColorID) {
+        if ((colorID > 0) && (colorID < maxColorID)
+                && (!freeColors.contains(colorID))) {
             freeColors.add(colorID);
         }
     }
