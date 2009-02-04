@@ -46,8 +46,10 @@ import org.eclipse.ui.IEditorPart;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
@@ -72,14 +74,12 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
-import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
@@ -91,7 +91,7 @@ import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
  * 
  * @author rdjemili
  */
-public class XMPPChatTransmitter implements ITransmitter, IReceiver,
+public class XMPPChatTransmitter implements ITransmitter, PacketListener,
         MessageListener, FileTransferListener, IJingleFileTransferListener {
     private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
             .getName());
@@ -119,8 +119,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
     private ChatManager chatmanager;
 
     private MultiUserChatManager mucmanager;
-
-    private PrivateChatManager privatechatmanager;
 
     private final Map<JID, Chat> chats = new HashMap<JID, Chat>();
 
@@ -204,9 +202,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
         this.chats.clear();
 
-        this.privatechatmanager = new PrivateChatManager();
-        this.privatechatmanager.setConnection(connection, this);
-
+        // Register as PacketListener
+        this.connection.addPacketListener(this, new MessageTypeFilter(Message.Type.chat));
+        
         // Start Jingle Manager asynchronous
         this.startingJingleThread = new Thread(new Runnable() {
             public void run() {
@@ -1017,27 +1015,6 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
                 .getSessionManager().getSessionID(), request));
     }
 
-    public void processRequest(Packet packet) {
-        Message message = (Message) packet;
-
-        RequestPacketExtension packetExtension = PacketExtensions
-                .getJupiterRequestExtension(message);
-
-        if (packetExtension != null) {
-            this.lastReceivedActivityTime = System.currentTimeMillis();
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
-            XMPPChatTransmitter.log.info("Received request : "
-                    + packetExtension.getRequest().toString());
-            project.getSequencer().receiveRequest(packetExtension.getRequest());
-
-        } else {
-            XMPPChatTransmitter.log
-                    .error("Failure in request packet extension.");
-        }
-
-    }
-
     /*
      * All Smack Packets are dispatched here
      * 
@@ -1107,9 +1084,8 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
         if (PacketExtensions.getChecksumErrorExtension(message) != null) {
             processChecksumErrorExtension(message);
         }
-
     }
-
+    
     private void processActivitiesExtension(final Message message, JID fromJID,
             final ISharedProject project) {
         ActivitiesPacketExtension activitiesPacket = PacketExtensions
@@ -1179,6 +1155,9 @@ public class XMPPChatTransmitter implements ITransmitter, IReceiver,
 
                 public void run() {
                     // wait until no more activities are received
+
+                    // TODO lastReceivedActivity is not set at the moment
+                    
                     while (System.currentTimeMillis()
                             - XMPPChatTransmitter.this.lastReceivedActivityTime < 1500) {
                         try {

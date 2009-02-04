@@ -59,6 +59,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
     private ITransmitter transmitter;
+    
+    protected JupiterReceiver jupiterReceiver;
 
     private String sessionID;
 
@@ -171,19 +173,20 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             ConnectionState newState) {
 
         if (newState == Saros.ConnectionState.CONNECTED) {
-            if (this.transmitter == null) {
-                this.transmitter = new XMPPChatTransmitter(connection);
-                attachRosterListener();
-            } else {
-                // TODO: Does this ever happen?
-                this.transmitter.setXMPPConnection(connection);
-            }
-
+            
+            assert this.transmitter == null;
+            
+            this.transmitter = new XMPPChatTransmitter(connection);
+            attachRosterListener();
+            
+            jupiterReceiver = new JupiterReceiver(connection);
+        
         } else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
-            if (this.sharedProject != null) {
-                leaveSession();
-            }
 
+            leaveSession();
+
+            jupiterReceiver.stop();
+            
             this.transmitter = null;
         }
     }

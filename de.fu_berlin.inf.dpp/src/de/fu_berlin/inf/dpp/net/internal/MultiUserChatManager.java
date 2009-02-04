@@ -6,22 +6,19 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 
-public class MultiUserChatManager implements PacketListener {
+public class MultiUserChatManager {
 
     private static Logger log = Logger.getLogger(MultiUserChatManager.class
             .getName());
@@ -149,14 +146,6 @@ public class MultiUserChatManager implements PacketListener {
                     new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
                             "Could not send message, message queued", e));
         }
-
-    }
-
-    public void processPacket(Packet packet) {
-        // TODO should processing here instead of MessagingManager?
-    }
-
-    public void setReceiver(IReceiver receiver) {
 
     }
 
