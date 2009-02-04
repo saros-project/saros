@@ -22,8 +22,13 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.util.Collection;
 
 import org.eclipse.core.runtime.IPath;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.MessageTypeFilter;
+import org.jivesoftware.smack.filter.PacketExtensionFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 
@@ -58,8 +63,6 @@ public class PacketExtensions {
     private static final String USER_LIST = "userList";
 
     private static final String DATATRANSFER = "DataTransfer";
-
-    private static final String JINGLEERROR = "JingleError";
 
     private static final String FILE_CHECKSUM_ERROR = "FileChecksumError";
 
@@ -119,6 +122,10 @@ public class PacketExtensions {
         extension.setValue(PacketExtensions.COLOR_ID, "" + colorID);
 
         return extension;
+    }
+    
+    public static PacketFilter getInviteExtensionFilter(){
+        return new PacketExtensionFilter(INVITATION, NAMESPACE);
     }
 
     /**
@@ -364,4 +371,23 @@ public class PacketExtensions {
         extension = message.getExtension(PacketExtensions.NAMESPACE);
         return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
     }
+    
+    /**
+     * @return PacketFilter that only accepts Messages (!) which belong to the current session  
+     */
+    public static PacketFilter getSessionIDPacketFilter(){
+        
+        return new AndFilter(
+                new MessageTypeFilter(Message.Type.chat),
+                new PacketFilter(){
+                    public boolean accept(Packet arg0) {
+                        Message message = (Message)arg0;
+
+                        return Saros.getDefault().getSessionManager().getSessionID().equals(
+                                PacketExtensions.getSessionID(message));
+                    }
+                });
+    }
+    
+    
 }
