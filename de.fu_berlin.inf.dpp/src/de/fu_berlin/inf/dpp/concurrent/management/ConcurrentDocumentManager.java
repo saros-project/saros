@@ -50,6 +50,10 @@ import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 
+/**
+ * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
+ * etc.
+ */
 public class ConcurrentDocumentManager implements IConcurrentManager {
 
     private static Logger logger = Logger
@@ -134,7 +138,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         protected IStatus run(IProgressMonitor monitor) {
 
             assert isHostSide() : "This job is intended to be run on host side!";
-            
+
             // Update Checksums for all documents controlled by jupiter
             for (IPath docPath : clientDocs.keySet()) {
 
@@ -168,8 +172,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             Saros.getDefault().getSessionManager().getTransmitter()
                     .sendDocChecksumsToClients(docsChecksums.values());
 
-            // Reschedule the next run in 3 seconds
-            schedule(3000);
+            // Reschedule the next run in 10 seconds
+            schedule(10000);
             return Status.OK_STATUS;
         }
     }
@@ -185,10 +189,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
-            // logger.debug("starting consistency watchdog");
-            // consistencyWatchdog.setSystem(true);
-            // consistencyWatchdog.setPriority(Job.SHORT);
-            // consistencyWatchdog.schedule();
+            logger.debug("Starting consistency watchdog");
+            consistencyWatchdog.setSystem(true);
+            consistencyWatchdog.setPriority(Job.SHORT);
+            consistencyWatchdog.schedule();
         }
 
         Saros.getDefault().getSessionManager().addSessionListener(
@@ -267,9 +271,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
             FileActivity file = (FileActivity) activity;
             if (file.getType() == FileActivity.Type.Created) {
-                if (isHostSide()) {
-                    // TODO CO What to do here!!
-                }
+                resetJupiterDocument(file.getPath());
             }
             if (file.getType() == FileActivity.Type.Removed) {
                 if (isHostSide()) {
@@ -719,7 +721,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     /**
      * reset jupiter document server component.
      */
-    public void resetJupiterDocument(IPath path) {
+    protected void resetJupiterDocument(IPath path) {
         // host side
         if (isHostSide()) {
             if (this.concurrentDocuments.containsKey(path)) {
@@ -760,10 +762,9 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     }
 
     /**
-     * Checks the local documents against the given checksums. When an
-     * inconsistency occurs all at the concurrent document manager registered
-     * consistency listener are informed about the issue. When a previous
-     * consistency issue have resolved the listeners are also notified.
+     * Checks the local documents against the given checksums. 
+     * 
+     * Use the VariableProxy getConsistenciesToResolve() to be notified if inconsistencies are found or resolved.
      * 
      * @param checksums
      *            the checksums to check the documents against
@@ -783,10 +784,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             if ((doc.getLength() != checksum.getLength())
                     || (doc.get().hashCode() != checksum.getHash())) {
 
-                logger.debug(path.toString() + ": " + doc.getLength() + "/"
-                        + checksum.getLength() + " ; " + doc.get().hashCode()
-                        + "/" + checksum.getHash());
-
                 long lastEdited = (EditorManager.getDefault()
                         .getLastEditTime(path));
 
@@ -795,8 +792,16 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
                 if ((System.currentTimeMillis() - lastEdited) > 2000
                         && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
-                    logger.debug("Inconsistency detected in document "
-                            + path.toOSString());
+                    logger.debug(String.format(
+                            "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
+                            path.toString(), 
+                            doc.getLength(), 
+                            doc.getLength() == checksum.getLength() ? "==" : "!=",
+                            checksum.getLength(),
+                            doc.get().hashCode(), 
+                            doc.get().hashCode() == checksum.getHash() ? "==" : "!=",
+                            checksum.getHash()));
+                    
                     ConcurrentDocumentManager.this.pathesWithWrongChecksums
                             .add(path);
                     if (!inconsistencyToResolve.getVariable()) {
@@ -806,9 +811,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 return;
             }
             logger.debug("All Inconsistencies are resolved");
-            logger.debug(path.toString() + ": " + doc.getLength() + "/"
-                    + checksum.getLength() + " ; " + doc.get().hashCode() + "/"
-                    + checksum.getHash());
 
             ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
 

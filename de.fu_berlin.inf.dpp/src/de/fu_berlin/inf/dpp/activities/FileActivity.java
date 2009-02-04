@@ -8,8 +8,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class FileActivity implements IActivity {
     public static enum Type {
-        Created, Removed, Error
-    };
+        Created, Removed
+    }
 
     private String source;
 

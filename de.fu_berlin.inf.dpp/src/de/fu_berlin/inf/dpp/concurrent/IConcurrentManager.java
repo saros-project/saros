@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
@@ -37,11 +35,4 @@ public interface IConcurrentManager extends IRequestManager,
 
     public IActivity exec(IActivity activity);
 
-    /**
-     * reset jupter state vector an init with [0,0]
-     * 
-     * @param path
-     *            of document under jupiter control.
-     */
-    public void resetJupiterDocument(IPath path);
 }

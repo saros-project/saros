@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -74,13 +74,14 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.internal.PacketExtensions.ChecksumErrorExtension;
+import de.fu_berlin.inf.dpp.net.internal.PacketExtensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
@@ -88,13 +89,13 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
  * 
  */
-public class XMPPChatTransmitter implements ITransmitter {
+public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListener {
 
     private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
             .getName());
@@ -535,13 +536,7 @@ public class XMPPChatTransmitter implements ITransmitter {
                 processCancelInviteExtension(message, fromJID);
             }
 
-            if (PacketExtensions.getChecksumExtension(message) != null) {
-                processChecksumExtension(message, project);
-            }
-            
-            if (PacketExtensions.getChecksumErrorExtension(message) != null) {
-                processChecksumErrorExtension(message);
-            }
+
         }
 
         private void processActivitiesExtension(final Message message,
@@ -634,121 +629,7 @@ public class XMPPChatTransmitter implements ITransmitter {
             }
         }
 
-        private void processChecksumErrorExtension(final Message message) {
-            DefaultPacketExtension checksumErrorExtension = PacketExtensions
-                    .getChecksumErrorExtension(message);
-
-            final String path = checksumErrorExtension
-                    .getValue(PacketExtensions.FILE_PATH);
-
-            final boolean resolved = Boolean
-                    .parseBoolean(checksumErrorExtension.getValue("resolved"));
-
-            if (resolved) {
-                log.debug("synchronisation completed, inconsistency resolved");
-                ErrorMessageDialog.closeChecksumErrorMessage();
-                return;
-            }
-
-            ErrorMessageDialog.showChecksumErrorMessage(path);
-
-            // Host
-            if (Saros.getDefault().getSessionManager().getSharedProject()
-                    .isHost()) {
-                log.warn("Checksum Error for " + path);
-
-                // IEditorPart editor = (IEditorPart) EditorManager.getDefault()
-                // .getEditors(new Path(path)).toArray()[0];
-
-                new Thread() {
-
-                    public void run() {
-                        // wait until no more activities are received
-
-                        // TODO lastReceivedActivity is not set at the moment
-
-                        while (System.currentTimeMillis()
-                                - XMPPChatTransmitter.this.lastReceivedActivityTime < 1500) {
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        EditorManager.getDefault().saveText(new Path(path),
-                                true);
-
-                        // IPath fullPath =
-                        // Saros.getDefault().getSessionManager()
-                        // .getSharedProject().getProject().findMember(
-                        // path).getFullPath();
-                        // ITextFileBuffer fileBuff = FileBuffers
-                        // .getTextFileBufferManager().getTextFileBuffer(
-                        // fullPath, LocationKind.IFILE);
-                        //
-                        // if (fileBuff == null) {
-                        // log.error("Can't get File Buffer");
-                        // }
-                        // if (fileBuff.isDirty())
-                        // try {
-                        // fileBuff
-                        // .commit(new NullProgressMonitor(), true);
-                        // } catch (CoreException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-
-                        // TODO CJ: thinking about a better solution with
-                        // activity sequencer and jupiter
-
-                        // Saros.getDefault().getSessionManager()
-                        // .getSharedProject()
-                        // .getConcurrentDocumentManager()
-                        // .resetJupiterDocument(new Path(path));
-
-                        log.debug("Sending file to clients");
-                        try {
-                            sendFile(new JID(message.getFrom()), Saros
-                                    .getDefault().getSessionManager()
-                                    .getSharedProject().getProject(), new Path(
-                                    path), -1);
-                        } catch (IOException e) {
-                            log.error("File could not be send:", e);
-                            // TODO This means we were really unable to send
-                            // this
-                            // file. No more falling back.
-                        }
-                    }
-                }.start();
-            }
-        }
-
-        private void processChecksumExtension(final Message message,
-                final ISharedProject project) {
-            final DefaultPacketExtension ext = PacketExtensions
-                    .getChecksumExtension(message);
-            log.debug("Received checksums");
-
-            new Thread() {
-                public void run() {
-                    int count = Integer.parseInt(ext.getValue("quantity"));
-                    DocumentChecksum[] checksums = new DocumentChecksum[count];
-
-                    for (int i = 1; i <= count; i++) {
-                        IPath path = Path.fromPortableString(ext
-                                .getValue("path" + i));
-                        int length = Integer.parseInt(ext
-                                .getValue("length" + i));
-                        int hash = Integer.parseInt(ext.getValue("hash" + i));
-                        checksums[i - 1] = new DocumentChecksum(path, length,
-                                hash);
-                    }
-                    project.getConcurrentDocumentManager().checkConsistency(
-                            checksums);
-                }
-            }.start();
-        }
+        
 
         private void processJoinExtension(final Message message, JID fromJID,
                 final ISharedProject project) {
@@ -1048,10 +929,6 @@ public class XMPPChatTransmitter implements ITransmitter {
         public PacketExtension packetextension;
     }
 
-    public XMPPChatTransmitter(XMPPConnection connection) {
-        setXMPPConnection(connection);
-    }
-
     public void setXMPPConnection(final XMPPConnection connection) {
 
         this.connection = connection;
@@ -1072,7 +949,7 @@ public class XMPPChatTransmitter implements ITransmitter {
         this.connection.addPacketListener(
                 new GodPacketListener(), 
                 PacketExtensions.getSessionIDPacketFilter());
-
+        
         // Start Jingle Manager asynchronous
         this.startingJingleThread = new Thread(new Runnable() {
             public void run() {
@@ -1177,27 +1054,12 @@ public class XMPPChatTransmitter implements ITransmitter {
     public void sendActivities(ISharedProject sharedProject,
             List<TimedActivity> timedActivities) {
 
-        // timer that calls sendActivities is called before setting chat
-
         for (TimedActivity timedActivity : timedActivities) {
             IActivity activity = timedActivity.getActivity();
 
             if (activity instanceof FileActivity) {
                 FileActivity fileAdd = (FileActivity) activity;
 
-                // /* send file checksum error message to exclusive recipient */
-                // if (fileAdd.getType().equals(FileActivity.Type.Error)) {
-                // sendFileChecksumErrorMessage(fileAdd.getPath(), false);
-                // }
-                /* send file to solve checksum error to single recipient */
-                // if (fileAdd.getType().equals(FileActivity.Type.Created)
-                // && (fileAdd.getRecipient() != null)) {
-                // int time = timedActivity.getTimestamp();
-                // sendFile(fileAdd.getRecipient(),
-                // sharedProject.getProject(), fileAdd.getPath(),
-                // time, null);
-                // return;
-                // }
                 if (fileAdd.getType().equals(FileActivity.Type.Created)) {
                     JID myJID = Saros.getDefault().getMyJID();
 
@@ -1209,22 +1071,22 @@ public class XMPPChatTransmitter implements ITransmitter {
 
                         // TODO use callback
                         int time = timedActivity.getTimestamp();
-                        /* send file with other send method. */
                         try {
+                            IFileTransferCallback callback = new AbstractFileTransferCallback(){
+                                @Override
+                                public void fileTransferFailed(IPath path,
+                                        Exception e) {
+                                    log.error("File could not be send:", e);
+                                }
+                            };
                             sendFileAsync(jid, sharedProject.getProject(),
-                                    fileAdd.getPath(), time, null);
+                                    fileAdd.getPath(), time, callback);
                         } catch (IOException e) {
                             log.error("File could not be send:", e);
                             // TODO This means we were really unable to send
                             // this file. No more falling back.
                         }
                     }
-
-                    // TODO remove activity and let this be handled by
-                    // ActivitiesProvider instead
-
-                    // don't remove file activity so that it still bumps the
-                    // time stamp when being received
                 }
             } else {
                 sharedProject.getSequencer().getActivityHistory().add(
@@ -1496,8 +1358,7 @@ public class XMPPChatTransmitter implements ITransmitter {
         XMPPChatTransmitter.log.debug("Sending checksum error message of file "
                 + path.lastSegment() + " to all");
         for (User user : participants) {
-            sendMessage(user.getJID(), PacketExtensions
-                    .createChecksumErrorExtension(path, resolved));
+            sendMessage(user.getJID(), ChecksumErrorExtension.getDefault().create(path, resolved));
         }
     }
 
@@ -1530,8 +1391,7 @@ public class XMPPChatTransmitter implements ITransmitter {
             XMPPChatTransmitter.log.debug("Sending checksums to " + jid);
 
             try {
-                sendMessageWithoutQueueing(jid, PacketExtensions
-                        .createChecksumsExtension(checksums));
+                sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault().create(checksums));
             } catch (IOException e) {
                 // If checksums are failed to be sent, this is not a big problem
                 log.warn("Sending Checksum to " + jid + " failed: ", e);
@@ -1876,11 +1736,14 @@ public class XMPPChatTransmitter implements ITransmitter {
 
     }
 
-    Executor executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
+    ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
 
     public void sendFileAsync(JID recipient, IProject project, IPath path,
             int timestamp, final IFileTransferCallback callback)
             throws IOException {
+        
+        if (callback == null)
+            throw new IllegalArgumentException();
 
         final FileTransferData transfer = new FileTransferData();
         transfer.recipient = recipient;
@@ -1902,5 +1765,21 @@ public class XMPPChatTransmitter implements ITransmitter {
                 }
             }
         });
+    }
+
+    public void dispose() {
+        executor.shutdownNow();
+    }
+
+    public void prepare(XMPPConnection connection) {
+        setXMPPConnection(connection);
+    }
+
+    public void start() {
+        // TODO start sending only now, queue otherwise
+    }
+
+    public void stop() {
+        // TODO stop sending, but queue rather
     }
 }

@@ -127,8 +127,7 @@ public interface ITransmitter {
      * @param timestamp
      *            the time that will be associated with this activity.
      * @param callback
-     *            an callback for the file transfer state. Can be
-     *            <code>null</code>.
+     *            an callback for the file transfer state. CANNOT be null.
      * @throws IOException If we file could not be read, other errors are reported to the callback.
      */
     public void sendFileAsync(JID recipient, IProject project, IPath path,

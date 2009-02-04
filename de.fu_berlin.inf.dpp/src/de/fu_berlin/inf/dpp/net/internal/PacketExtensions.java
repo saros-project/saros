@@ -31,6 +31,12 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.picocontainer.MutablePicoContainer;
+import org.picocontainer.PicoBuilder;
+import org.picocontainer.PicoContainer;
+import org.picocontainer.injectors.AnnotatedFieldInjection;
+import org.picocontainer.injectors.CompositeInjection;
+import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -42,8 +48,46 @@ import de.fu_berlin.inf.dpp.net.JID;
  * extensions.
  * 
  * @author rdjemili
+ * 
+ *         TODO This class should be converted to many small classes
+ *         implementing the SarosPacketExtension and subclasses.
  */
 public class PacketExtensions {
+
+    public static class SarosPacketExtension {
+
+        public SarosPacketExtension(String element) {
+            this.element = element;
+        }
+
+        String element;
+
+        public PacketFilter getFilter() {
+            return new PacketExtensionFilter(element, NAMESPACE);
+        }
+
+        public boolean hasExtension(Message m) {
+            return m.getExtension(element, NAMESPACE) != null;
+        }
+    }
+
+    public static class SarosDefaultPacketExtension extends
+            SarosPacketExtension {
+
+        public SarosDefaultPacketExtension(String element) {
+            super(element);
+        }
+
+        public DefaultPacketExtension create() {
+            return new DefaultPacketExtension(element, NAMESPACE);
+        }
+
+        public DefaultPacketExtension getExtension(Message message) {
+            return (DefaultPacketExtension) message.getExtension(element,
+                    NAMESPACE);
+        }
+    }
+
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
     // elements
@@ -63,8 +107,6 @@ public class PacketExtensions {
     private static final String USER_LIST = "userList";
 
     private static final String DATATRANSFER = "DataTransfer";
-
-    private static final String FILE_CHECKSUM_ERROR = "FileChecksumError";
 
     private static final String JUPITER_TRANSFORMATION_ERROR = "JupiterTransformationError";
 
@@ -86,8 +128,6 @@ public class PacketExtensions {
     public static final String DT_DATA = "DATA_BASE64";
 
     public static final String FILE_PATH = "filename";
-
-    private static final String DOC_CHECKSUM = "DocChecksum";
 
     public static final String COLOR_ID = "ColorID";
 
@@ -123,8 +163,8 @@ public class PacketExtensions {
 
         return extension;
     }
-    
-    public static PacketFilter getInviteExtensionFilter(){
+
+    public static PacketFilter getInviteExtensionFilter() {
         return new PacketExtensionFilter(INVITATION, NAMESPACE);
     }
 
@@ -196,40 +236,6 @@ public class PacketExtensions {
         return PacketExtensions.createExtension(PacketExtensions.LEAVE);
     }
 
-    public static PacketExtension createChecksumErrorExtension(IPath path,
-            boolean resolved) {
-        DefaultPacketExtension extension = new DefaultPacketExtension(
-                PacketExtensions.FILE_CHECKSUM_ERROR,
-                PacketExtensions.NAMESPACE);
-        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
-        extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
-        extension.setValue("resolved", resolved ? "true" : "false");
-
-        return extension;
-    }
-
-    public static PacketExtension createChecksumsExtension(
-            Collection<DocumentChecksum> checksums) {
-        DefaultPacketExtension extension = new DefaultPacketExtension(
-                PacketExtensions.DOC_CHECKSUM, PacketExtensions.NAMESPACE);
-
-        extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
-        extension.setValue("quantity", Integer.toString(checksums.size()));
-
-        int i = 1;
-        for (DocumentChecksum checksum : checksums) {
-            extension.setValue("path" + Integer.toString(i), checksum.getPath()
-                    .toPortableString());
-            extension.setValue("length" + Integer.toString(i), Integer
-                    .toString(checksum.getLength()));
-            extension.setValue("hash" + Integer.toString(i), Integer
-                    .toString(checksum.getHash()));
-            i++;
-        }
-
-        return extension;
-    }
-
     public static PacketExtension createJupiterErrorExtension(IPath path) {
         DefaultPacketExtension extension = new DefaultPacketExtension(
                 PacketExtensions.JUPITER_TRANSFORMATION_ERROR,
@@ -291,17 +297,6 @@ public class PacketExtensions {
             Message message) {
         return PacketExtensions.getExtension(
                 PacketExtensions.JUPITER_TRANSFORMATION_ERROR, message);
-    }
-
-    public static DefaultPacketExtension getChecksumErrorExtension(
-            Message message) {
-        return PacketExtensions.getExtension(
-                PacketExtensions.FILE_CHECKSUM_ERROR, message);
-    }
-
-    public static DefaultPacketExtension getChecksumExtension(Message message) {
-        return PacketExtensions.getExtension(PacketExtensions.DOC_CHECKSUM,
-                message);
     }
 
     public static DefaultPacketExtension getUserlistExtension(Message message) {
@@ -371,23 +366,90 @@ public class PacketExtensions {
         extension = message.getExtension(PacketExtensions.NAMESPACE);
         return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
     }
-    
-    /**
-     * @return PacketFilter that only accepts Messages (!) which belong to the current session  
-     */
-    public static PacketFilter getSessionIDPacketFilter(){
-        
-        return new AndFilter(
-                new MessageTypeFilter(Message.Type.chat),
-                new PacketFilter(){
-                    public boolean accept(Packet arg0) {
-                        Message message = (Message)arg0;
 
-                        return Saros.getDefault().getSessionManager().getSessionID().equals(
-                                PacketExtensions.getSessionID(message));
+    /**
+     * @return PacketFilter that only accepts Messages (!) which belong to the
+     *         current session
+     */
+    public static PacketFilter getSessionIDPacketFilter() {
+
+        return new AndFilter(new MessageTypeFilter(Message.Type.chat),
+                new PacketFilter() {
+                    public boolean accept(Packet arg0) {
+                        Message message = (Message) arg0;
+
+                        return Saros.getDefault().getSessionManager()
+                                .getSessionID().equals(
+                                        PacketExtensions.getSessionID(message));
                     }
                 });
     }
-    
-    
+
+    public static MutablePicoContainer container;
+
+    public static synchronized PicoContainer getContainer() {
+
+        if (container == null) {
+
+            container = new PicoBuilder(new CompositeInjection(
+                    new ConstructorInjection(), new AnnotatedFieldInjection()))
+                    .withCaching().build();
+
+            container.addComponent(ChecksumErrorExtension.class).addComponent(
+                    ChecksumExtension.class);
+        }
+        return container;
+    }
+
+    public static class ChecksumErrorExtension extends
+            SarosDefaultPacketExtension {
+
+        public ChecksumErrorExtension() {
+            super("FileChecksumError");
+        }
+
+        public PacketExtension create(IPath path, boolean resolved) {
+            DefaultPacketExtension extension = create();
+            extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
+            extension.setValue(PacketExtensions.FILE_PATH, path.toOSString());
+            extension.setValue("resolved", resolved ? "true" : "false");
+
+            return extension;
+        }
+
+        public static ChecksumErrorExtension getDefault() {
+            return getContainer().getComponent(ChecksumErrorExtension.class);
+        }
+    }
+
+    public static class ChecksumExtension extends SarosDefaultPacketExtension {
+
+        public ChecksumExtension() {
+            super("DocChecksum");
+        }
+
+        public PacketExtension create(Collection<DocumentChecksum> checksums) {
+            DefaultPacketExtension extension = create();
+            extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
+            extension.setValue("quantity", Integer.toString(checksums.size()));
+
+            int i = 1;
+            for (DocumentChecksum checksum : checksums) {
+                extension.setValue("path" + Integer.toString(i), checksum
+                        .getPath().toPortableString());
+                extension.setValue("length" + Integer.toString(i), Integer
+                        .toString(checksum.getLength()));
+                extension.setValue("hash" + Integer.toString(i), Integer
+                        .toString(checksum.getHash()));
+                i++;
+            }
+
+            return extension;
+
+        }
+
+        public static ChecksumExtension getDefault() {
+            return getContainer().getComponent(ChecksumExtension.class);
+        }
+    }
 }

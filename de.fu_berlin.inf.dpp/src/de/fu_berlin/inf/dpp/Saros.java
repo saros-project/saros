@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
+import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -69,7 +70,7 @@ public class Saros extends AbstractUIPlugin {
 
     public static enum ConnectionState {
         NOT_CONNECTED, CONNECTING, CONNECTED, DISCONNECTING, ERROR
-    };
+    }
 
     // The shared instance.
     private static Saros plugin;
@@ -97,7 +98,7 @@ public class Saros extends AbstractUIPlugin {
         PacketExtensions.hookExtensionProviders();
         Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
     }
-    
+
     /**
      * Create the shared instance.
      */
@@ -111,8 +112,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(Saros.class, this).addComponent(
                 CDTFacade.class).addComponent(JDTFacade.class).addComponent(
                 MessagingManager.class).addComponent(SessionManager.class)
-                .addComponent(SarosUI.class);
-        
+                .addComponent(SarosUI.class).addComponent(CurrentProjectProxy.class);
+
         // Code snippet for reinjection:
         // Reinjector injection = new Reinjector(this.container);
         // injection.reinject(A.class, new AnnotatedFieldInjection());
@@ -134,8 +135,6 @@ public class Saros extends AbstractUIPlugin {
 
         // Make sure that all components in the container are instantiated
         container.getComponents(Object.class);
-        
-        
 
         boolean hasUserName = getPreferenceStore().getString(
                 PreferenceConstants.USERNAME).length() > 0;
@@ -153,8 +152,7 @@ public class Saros extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
         super.stop(context);
 
-        getSessionManager().leaveSession();
-        disconnect(null);
+        disconnect();
 
         Saros.plugin = null;
     }
@@ -249,7 +247,7 @@ public class Saros extends AbstractUIPlugin {
 
             ConnectionConfiguration conConfig = new ConnectionConfiguration(
                     server);
-            conConfig.setReconnectionAllowed(true);
+            conConfig.setReconnectionAllowed(false);
 
             this.connection = new XMPPConnection(conConfig);
             this.connection.connect();
@@ -294,25 +292,19 @@ public class Saros extends AbstractUIPlugin {
      *            the error why the connection was closed. If the connection was
      *            not closed due to an error <code>null</code> should be passed.
      */
-    public void disconnect(String error) {
-        setConnectionState(ConnectionState.DISCONNECTING, error);
+    public void disconnect() {
+        setConnectionState(ConnectionState.DISCONNECTING, null);
 
         if (this.connection != null) {
-            // leave running session before disconnecting
-            getSessionManager().leaveSession();
-
             this.connection
                     .removeConnectionListener(this.smackConnectionListener);
-
             this.connection.disconnect();
             this.connection = null;
         }
 
-        setConnectionState(error == null ? ConnectionState.NOT_CONNECTED
-                : ConnectionState.ERROR, error);
+        setConnectionState(ConnectionState.NOT_CONNECTED, null);
 
         this.myjid = null;
-
     }
 
     /**
@@ -501,9 +493,10 @@ public class Saros extends AbstractUIPlugin {
             Toolkit.getDefaultToolkit().beep();
             logger.error("XMPP Connection Error: " + e.toString());
 
-            disconnect("XMPP Connection Error");
-
             if (e.toString().equals("stream:error (conflict)")) {
+
+                disconnect();
+
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {
                         MessageDialog
@@ -517,13 +510,23 @@ public class Saros extends AbstractUIPlugin {
                 });
 
             } else {
+
+                setConnectionState(ConnectionState.ERROR, null);
+
+                if (connection != null) {
+                    connection
+                            .removeConnectionListener(smackConnectionListener);
+                    connection.disconnect();
+                    connection = null;
+                }
+
                 new Thread(new Runnable() {
 
                     public void run() {
 
-                        int offlineAtTS = 0;
+                        int inErrorSince = 0;
                         if (getSessionManager().getSharedProject() != null) {
-                            offlineAtTS = getSessionManager()
+                            inErrorSince = getSessionManager()
                                     .getSharedProject().getSequencer()
                                     .getTimestamp();
                         }
@@ -538,7 +541,7 @@ public class Saros extends AbstractUIPlugin {
 
                             } while (!Saros.this.connection.isConnected());
 
-                            getSessionManager().OnReconnect(offlineAtTS);
+                            getSessionManager().OnReconnect(inErrorSince);
                             setConnectionState(ConnectionState.CONNECTED, null);
                             logger.debug("XMPP reconnected");
 
@@ -551,18 +554,24 @@ public class Saros extends AbstractUIPlugin {
         }
 
         public void reconnectingIn(int seconds) {
-            logger.debug("saros reconnecting");
-            setConnectionState(ConnectionState.CONNECTING, null);
+            // TODO maybe using Smack reconnect is better
+            assert false : "Reconnecting is disabled";
+            // logger.debug("saros reconnecting");
+            // setConnectionState(ConnectionState.CONNECTING, null);
         }
 
         public void reconnectionFailed(Exception e) {
-            logger.debug("saros reconnection failed");
-            setConnectionState(ConnectionState.ERROR, e.getMessage());
+            // TODO maybe using Smack reconnect is better
+            assert false : "Reconnecting is disabled";
+            // logger.debug("saros reconnection failed");
+            // setConnectionState(ConnectionState.ERROR, e.getMessage());
         }
 
         public void reconnectionSuccessful() {
-            logger.debug("saros reconnection successful");
-            setConnectionState(ConnectionState.CONNECTED, null);
+            // TODO maybe using Smack reconnect is better
+            assert false : "Reconnecting is disabled";
+            // logger.debug("saros reconnection successful");
+            // setConnectionState(ConnectionState.CONNECTED, null);
         }
     }
 

@@ -122,7 +122,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         }
     }
 
-    private static final int UNDEFINED_TIME = -1;
+    public static final int UNDEFINED_TIME = -1;
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
 

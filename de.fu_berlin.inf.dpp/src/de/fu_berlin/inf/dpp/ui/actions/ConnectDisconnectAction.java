@@ -60,7 +60,7 @@ public class ConnectDisconnectAction extends Action implements
             public void run() {
                 Saros saros = Saros.getDefault();
                 if (saros.isConnected()) {
-                    saros.disconnect(null);
+                    saros.disconnect();
                 } else {
 
                     // display task progress information (begin) in status line

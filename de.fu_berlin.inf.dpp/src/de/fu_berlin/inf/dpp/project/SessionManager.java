@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,9 +41,11 @@ import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.ConsistencyWatchdogReceiver;
 import de.fu_berlin.inf.dpp.net.internal.JupiterReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -54,14 +57,15 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     private static Logger log = Logger
             .getLogger(SessionManager.class.getName());
 
-    private SharedProject sharedProject;
+    private CurrentProjectProxy currentlySharedProject;
 
-    // TODO use ListenerList instead
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
-    private ITransmitter transmitter;
+    private XMPPChatTransmitter transmitter;
     
     protected JupiterReceiver jupiterReceiver;
+    
+    protected ConsistencyWatchdogReceiver consistencyWatchdogReceiver;
 
     private String sessionID = "NONE";
 
@@ -69,7 +73,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return transmitter;
     }
 
-    public SessionManager() {
+    public SessionManager(CurrentProjectProxy projectProxy) {
+        this.currentlySharedProject = projectProxy;
         Saros.getDefault().addListener(this);
     }
 
@@ -81,14 +86,18 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         JID myJID = Saros.getDefault().getMyJID();
         this.sessionID = String.valueOf(new Random(System.currentTimeMillis())
                 .nextInt());
-        this.sharedProject = new SharedProject(this.transmitter, project, myJID);
-        this.sharedProject.start();
+        
+        SharedProject sharedProject = new SharedProject(this.transmitter, project, myJID);
+        
+        this.currentlySharedProject.setVariable(sharedProject);
+        
+        sharedProject.start();
 
         for (ISessionListener listener : this.listeners) {
-            listener.sessionStarted(this.sharedProject);
+            listener.sessionStarted(sharedProject);
         }
 
-        this.sharedProject.startInvitation(null);
+        sharedProject.startInvitation(null);
 
         SessionManager.log.info("Session started");
     }
@@ -104,43 +113,47 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
-        this.sharedProject = new SharedProject(this.transmitter, project, Saros
+        SharedProject sharedProject = new SharedProject(this.transmitter, project, Saros
                 .getDefault().getMyJID(), host, colorID);
-        this.sharedProject.start();
+        this.currentlySharedProject.setVariable(sharedProject);
+        
+        sharedProject.start();
 
         for (ISessionListener listener : this.listeners) {
-            listener.sessionStarted(this.sharedProject);
+            listener.sessionStarted(sharedProject);
         }
 
         SessionManager.log.info("Session joined");
 
-        return this.sharedProject;
+        return sharedProject;
     }
 
-    public void leaveSession() {
-        if (this.sharedProject == null) {
+    public void stopSharedProject() {
+        
+        SharedProject project = currentlySharedProject.getVariable();
+        
+        if (project == null) {
             return;
         }
 
-        this.transmitter.sendLeaveMessage(this.sharedProject);
+        this.transmitter.sendLeaveMessage(project);
         
-        // set ressources writeable again
-        this.sharedProject.setProjectReadonly(false); 
+        // set resources writable again
+        project.setProjectReadonly(false); 
 
-        this.sharedProject.stop();
+        project.stop();
 
-        ISharedProject closedProject = this.sharedProject;
-        this.sharedProject = null;
+        this.currentlySharedProject.setVariable(null);
 
         for (ISessionListener listener : this.listeners) {
-            listener.sessionEnded(closedProject);
+            listener.sessionEnded(project);
         }
 
         SessionManager.log.info("Session left");
     }
 
     public ISharedProject getSharedProject() {
-        return this.sharedProject;
+        return this.currentlySharedProject.getVariable();
     }
 
     public void addSessionListener(ISessionListener listener) {
@@ -170,32 +183,84 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         return process;
     }
-
+    
+    public interface ConnectionSessionListener {
+        
+        public void prepare(XMPPConnection connection);
+            
+        public void start();
+                    
+        public void stop();
+            
+        public void dispose();
+        
+    }
+    
+    List<ConnectionSessionListener> connectionSessionListener = new LinkedList<ConnectionSessionListener>();
+    
+    /**
+     * Implements the lifecycle management of ConnectionSessionListeners
+     */
     public void connectionStateChanged(XMPPConnection connection,
             ConnectionState newState) {
 
-        if (newState == Saros.ConnectionState.CONNECTED) {
-            
-            assert this.transmitter == null;
-            
-            this.transmitter = new XMPPChatTransmitter(connection);
-            attachRosterListener();
-            
-            jupiterReceiver = new JupiterReceiver(connection);
+        switch(newState){
+            case CONNECTED:
+
+                if (connectionSessionListener.isEmpty()){
+                    transmitter = new XMPPChatTransmitter();
+                    connectionSessionListener.add(transmitter);
+                    connectionSessionListener.add(new JupiterReceiver());
+                    connectionSessionListener.add(new ConsistencyWatchdogReceiver(transmitter, currentlySharedProject));
+                    connectionSessionListener.add(new PresenceListener());
+                }
+                
+                for (ConnectionSessionListener listener : connectionSessionListener){
+                    listener.prepare(connection);
+                }
+                
+                for (ConnectionSessionListener listener : connectionSessionListener){
+                    listener.start();
+                }
+                
+                break;
+            case CONNECTING:
+                
+                // Cannot do anything until the Connection is up
+                
+                break;
+                
+            case DISCONNECTING:
+                
+                stopSharedProject();
+                break;
+                
+            case ERROR:
+                
+                for (ConnectionSessionListener listener : Util.reverse(connectionSessionListener)){
+                    listener.stop();
+                }
+                break;
+                
+            case NOT_CONNECTED:
+                
+                for (ConnectionSessionListener listener : Util.reverse(connectionSessionListener)){
+                    listener.stop();
+                }
+                
+                for (ConnectionSessionListener listener : Util.reverse(connectionSessionListener)){
+                    listener.dispose();
+                }
+                connectionSessionListener.clear();
+                transmitter = null;
+                break;
         
-        } else if (newState == Saros.ConnectionState.NOT_CONNECTED) {
-
-            leaveSession();
-
-            jupiterReceiver.stop();
-            
-            this.transmitter = null;
         }
     }
 
-    private void attachRosterListener() {
-        Roster roster = Saros.getDefault().getRoster();
-        roster.addRosterListener(new RosterListener() {
+    public class PresenceListener implements ConnectionSessionListener {
+
+        RosterListener listener = new RosterListener() {
             public void entriesAdded(Collection<String> addresses) {
                 // ignore
             }
@@ -212,7 +277,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 
                 String XMPPAddress = newPresence.getFrom();
                 
-                if (SessionManager.this.sharedProject == null) {
+                SharedProject project = currentlySharedProject.getVariable();
+                
+                if (project == null) {
                     return;
                 }
 
@@ -222,8 +289,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 Presence presence = roster.getPresence(XMPPAddress);
 
                 JID jid = new JID(XMPPAddress);
-                User user = SessionManager.this.sharedProject
-                        .getParticipant(jid);
+                User user = project.getParticipant(jid);
                 if (user != null) {
                     if (presence == null) {
                         user.setPresence(User.UserConnectionState.OFFLINE);
@@ -234,13 +300,38 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 }
                 
             }
+        };
+        
+        public void dispose() {
+            connection = null;
+        }
 
-        });
+        public void prepare(XMPPConnection connection) {
+            this.connection = connection;
+        }
+
+        XMPPConnection connection;
+        
+        public void start() {
+            if (connection != null){
+                this.connection.getRoster().addRosterListener(listener);
+            }
+        }
+
+        public void stop() {
+            if (connection != null){
+                connection.getRoster().removeRosterListener(listener);
+            }
+            connection = null;
+        }
+        
     }
 
     public void OnReconnect(int oldtimestamp) {
 
-        if (this.sharedProject == null) {
+        SharedProject project = currentlySharedProject.getVariable();
+        
+        if (project == null) {
             return;
         }
 
@@ -249,7 +340,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         // ask for next expected timestamp activities (in case I missed
         // something while being not available)
-        this.transmitter.sendRequestForActivity(this.sharedProject,
+        this.transmitter.sendRequestForActivity(project,
                 oldtimestamp, true);
     }
 }

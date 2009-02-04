@@ -52,7 +52,7 @@ public interface ISessionManager {
      * 
      * Has no effect if there is no currently shared project.
      */
-    public abstract void leaveSession();
+    public abstract void stopSharedProject();
 
     /**
      * @return the active SharedProject object or <code>null</code> if there is

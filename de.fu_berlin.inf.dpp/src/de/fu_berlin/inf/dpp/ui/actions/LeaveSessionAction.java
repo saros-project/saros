@@ -47,7 +47,7 @@ public class LeaveSessionAction extends Action implements ISessionListener {
     @Override
     public void run() {
         try {
-            LeaveSessionAction.getSessionManager().leaveSession();
+            LeaveSessionAction.getSessionManager().stopSharedProject();
         } catch (Exception e) {
             e.printStackTrace();
         }
