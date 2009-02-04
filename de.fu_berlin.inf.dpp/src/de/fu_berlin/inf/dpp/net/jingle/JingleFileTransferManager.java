@@ -291,7 +291,7 @@ public class JingleFileTransferManager {
      * 
      * @param toJID
      * @param transferData
-     * @throws XMPPException
+     * @throws JingleSessionException
      */
     public void send(JID toJID, final JingleFileTransferData transferData)
             throws JingleSessionException {
