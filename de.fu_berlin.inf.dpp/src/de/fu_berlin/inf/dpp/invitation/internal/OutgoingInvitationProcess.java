@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.invitation.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -287,8 +288,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         this.invitationUI.updateInvitationProgress(this.peer);
 
-        this.transmitter.sendFile(this.peer, this.sharedProject.getProject(),
-                path, this);
+        try {
+            this.transmitter.sendFileAsync(this.peer, this.sharedProject.getProject(),
+                    path, -1, this);
+        } catch (IOException e) {
+            this.fileTransferFailed(path, e);
+        }
     }
 
     /**
@@ -345,6 +350,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -368,6 +374,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
         this.progress_info = "";

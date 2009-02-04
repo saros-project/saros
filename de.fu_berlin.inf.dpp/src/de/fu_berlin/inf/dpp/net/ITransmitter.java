@@ -19,6 +19,7 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -102,8 +103,9 @@ public interface ITransmitter {
      * @throws XMPPException
      *             is thrown if there is some problem with the XMPP file
      *             transfer.
+     * @throws IOException 
      */
-    public void sendFileList(JID jid, FileList fileList) throws XMPPException;
+    public void sendFileList(JID jid, FileList fileList) throws IOException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -114,28 +116,12 @@ public interface ITransmitter {
     public void sendRequestForFileListMessage(JID recipient);
 
     /**
-     * Sends given file to given recipient.
-     * 
-     * @param recipient
-     *            the Jabber ID of the recipient.
-     * @param project
-     *            TODO
-     * @param path
-     *            the project-relative path of the resource that is to be sent.
-     * @param callback
-     *            an callback for the file transfer state. Can be
-     *            <code>null</code>.
-     */
-    public void sendFile(JID recipient, IProject project, IPath path,
-            IFileTransferCallback callback);
-
-    /**
      * Sends given file to given recipient with given timestamp.
      * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
-     *            TODO
+     *            the project of which the given path contains the file to be sent.
      * @param path
      *            the project-relative path of the resource that is to be sent.
      * @param timestamp
@@ -143,9 +129,27 @@ public interface ITransmitter {
      * @param callback
      *            an callback for the file transfer state. Can be
      *            <code>null</code>.
+     * @throws IOException If we file could not be read, other errors are reported to the callback.
      */
-    public void sendFile(JID recipient, IProject project, IPath path,
-            int timestamp, IFileTransferCallback callback);
+    public void sendFileAsync(JID recipient, IProject project, IPath path,
+            int timestamp, IFileTransferCallback callback) throws IOException;
+
+    /**
+     * Sends given file to given recipient with given timestamp SYNCHRONOUSLY.
+     * 
+     * This methods thus block until the file has been sent or it failed.
+     * 
+     * @param recipient
+     *            the Jabber ID of the recipient.
+     * @param project
+     *            the project of which the given path contains the file to be sent.
+     * @param path
+     *            the project-relative path of the resource that is to be sent.
+     * @param timestamp
+     *            the time that will be associated with this activity.
+     * @throws IOException If we file could not be read or an error occurred while sending
+     */
+    public void sendFile(JID to, IProject project, IPath path, int timestamp) throws IOException;
 
     /**
      * Sends given archive file to given recipient. (Fallback of jingle file
@@ -154,7 +158,7 @@ public interface ITransmitter {
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
-     *            TODO
+     *            the project of which the given path contains the file to be sent.
      * @param archive
      *            the project-relative path of the resource that is to be sent.
      * @param callback
