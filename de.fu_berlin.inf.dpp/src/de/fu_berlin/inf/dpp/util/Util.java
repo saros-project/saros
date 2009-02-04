@@ -5,8 +5,14 @@ import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.Callable;
+
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Packet;
 
 public class Util {
 
@@ -125,6 +131,29 @@ public class Util {
                 returned = true;
                 
                 return it;
+            }
+        };
+    }
+
+    public static <T> List<T> reverse(
+            List<T> original) {
+        List<T> reversed = new ArrayList<T>(original);
+        Collections.reverse(reversed);
+        return reversed;
+    }
+
+    public static PacketFilter orFilter(final PacketFilter...filters){
+        
+        return new PacketFilter(){
+    
+            public boolean accept(Packet packet) {
+                
+                for (PacketFilter filter : filters){
+                    if (filter.accept(packet)){
+                        return true;
+                    }
+                }
+                return false;
             }
         };
     }
