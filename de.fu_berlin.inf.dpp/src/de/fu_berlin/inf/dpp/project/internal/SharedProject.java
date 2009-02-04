@@ -432,20 +432,22 @@ public class SharedProject implements ISharedProject {
             }
         }, 0, SharedProject.MILLIS_UPDATE);
 
+        stopped = false;
+        
         /* 2. start thread for sending jupiter requests. */
         this.requestTransmitter = new Thread(new Runnable() {
-
             public void run() {
-                while (true) {
+                while (!stopped && !Thread.interrupted()) {
                     sendRequest();
                 }
-
             }
-
         });
         this.requestTransmitter.start();
     }
 
+    // TODO Review sendRequest for InterruptedException and remove this flag.
+    boolean stopped;
+    
     /*
      * (non-Javadoc)
      * 
@@ -453,8 +455,8 @@ public class SharedProject implements ISharedProject {
      */
     public void stop() {
         this.flushTimer.cancel();
-        // TODO CO Not properly stopped
-        this.requestTransmitter = null;
+        this.requestTransmitter.interrupt();
+        stopped = true;
     }
 
     /*
@@ -605,39 +607,40 @@ public class SharedProject implements ISharedProject {
     }
 
     public void sendRequest() {
+
+        Request request;
         try {
-            // Request request = outgoing.getNextOutgoingRequest();
-            Request request = this.activitySequencer.getNextOutgoingRequest();
+            request = this.activitySequencer.getNextOutgoingRequest();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
+        }
 
-            if (isHost()) {
+        if (isHost()) {
 
-                /*
-                 * if jupiter server request to has to execute locally on host
-                 * side.
-                 */
-                if (request.getJID().equals(this.host.getJID())) {
-                    SharedProject.log
-                            .debug("Send host request back for local execution: "
-                                    + request);
-                    this.activitySequencer.receiveRequest(request);
-                } else {
-                    /* send operation to client. */
-                    SharedProject.log.debug("Send request to client: "
-                            + request + request.getJID());
-                    this.transmitter.sendJupiterRequest(this, request, request
-                            .getJID());
-                }
+            /*
+             * if jupiter server request to has to execute locally on host side.
+             */
+            if (request.getJID().equals(this.host.getJID())) {
+                SharedProject.log
+                        .debug("Send host request back for local execution: "
+                                + request);
+                this.activitySequencer.receiveRequest(request);
             } else {
-                SharedProject.log.debug("Send request to host : " + request);
-                this.transmitter.sendJupiterRequest(this, request, this.host
+                /* send operation to client. */
+                SharedProject.log.debug("Send request to client: " + request
+                        + request.getJID());
+                this.transmitter.sendJupiterRequest(this, request, request
                         .getJID());
             }
-            // connection.sendOperation(new
-            // NetworkRequest(this.jid,request.getJID(),request), 0);
-        } catch (InterruptedException e) {
-
-            e.printStackTrace();
+        } else {
+            SharedProject.log.debug("Send request to host : " + request);
+            this.transmitter.sendJupiterRequest(this, request, this.host
+                    .getJID());
         }
+        // connection.sendOperation(new
+        // NetworkRequest(this.jid,request.getJID(),request), 0);
+
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
