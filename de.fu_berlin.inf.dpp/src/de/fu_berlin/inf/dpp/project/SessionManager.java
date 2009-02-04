@@ -63,7 +63,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     
     protected JupiterReceiver jupiterReceiver;
 
-    private String sessionID;
+    private String sessionID = "NONE";
 
     public ITransmitter getTransmitter() {
         return transmitter;
@@ -197,21 +197,28 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         Roster roster = Saros.getDefault().getRoster();
         roster.addRosterListener(new RosterListener() {
             public void entriesAdded(Collection<String> addresses) {
+                // ignore
             }
 
             public void entriesUpdated(Collection<String> addresses) {
+                // TODO Check if it affects one of our participants in a session
             }
 
             public void entriesDeleted(Collection<String> addresses) {
+                // TODO Check if it affects one of our participants in a session 
             }
 
-            public void presenceChanged(String XMPPAddress) {
-
+            public void presenceChanged(Presence newPresence) {
+                
+                String XMPPAddress = newPresence.getFrom();
+                
                 if (SessionManager.this.sharedProject == null) {
                     return;
                 }
 
                 Roster roster = Saros.getDefault().getRoster();
+
+                // TODO Review if this is necessary                
                 Presence presence = roster.getPresence(XMPPAddress);
 
                 JID jid = new JID(XMPPAddress);
@@ -225,12 +232,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                         user.setPresence(User.UserConnectionState.ONLINE);
                     }
                 }
-            }
-
-            public void presenceChanged(Presence presence) {
-                // TODO: new Method for Smack 3
-                presenceChanged(presence.getFrom());
-
+                
             }
 
         });
