@@ -123,8 +123,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
 
         this.transmitter.sendLeaveMessage(this.sharedProject);
-        this.sharedProject.setProjectReadonly(false); // set ressources
-        // writeable again
+        
+        // set ressources writeable again
+        this.sharedProject.setProjectReadonly(false); 
 
         this.sharedProject.stop();
 
