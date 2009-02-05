@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -39,7 +39,7 @@ public class DeleteContactAction extends SelectionProviderAction {
         super(provider, "Delete");
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Set the nickname of this contact.");
+        setToolTipText("Delete this contact.");
 
         IWorkbench workbench = Saros.getDefault().getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
@@ -78,7 +78,5 @@ public class DeleteContactAction extends SelectionProviderAction {
             this.rosterEntry = null;
             setEnabled(false);
         }
-
-        // TODO disable if user == self
     }
 }
