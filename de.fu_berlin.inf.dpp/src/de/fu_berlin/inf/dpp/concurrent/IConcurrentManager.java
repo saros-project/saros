@@ -9,6 +9,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 /**
  * Interface for management controller class of all jupiter document server.
  * 
+ * TODO [CO] IConcurrentManager should not implement ISharedProjectListener and IRequestManager.
+ * 
  * @author orieger
  * 
  */

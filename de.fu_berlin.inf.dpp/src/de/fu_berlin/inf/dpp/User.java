@@ -26,11 +26,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class User {
     public enum UserConnectionState {
         UNKNOWN, ONLINE, OFFLINE
-    };
+    }
 
     public enum UserRole {
         DRIVER, OBSERVER
-    };
+    }
 
     private UserConnectionState presence = UserConnectionState.UNKNOWN;
 

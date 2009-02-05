@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.IPath;
 public class EditorActivity implements IActivity {
     public static enum Type {
         Activated, Closed, Saved
-    };
+    }
 
     private final Type type;
 
