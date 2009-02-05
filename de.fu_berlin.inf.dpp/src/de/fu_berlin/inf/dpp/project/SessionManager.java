@@ -314,16 +314,27 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         XMPPConnection connection;
 
+        Roster roster;
+
+        public void registerListener(Roster roster){
+
+            if (this.roster != null){
+                this.roster.removeRosterListener(listener);
+            }
+            this.roster = roster;
+            if (this.roster != null){
+                this.roster.addRosterListener(listener);
+            }
+        }
+
         public void start() {
             if (connection != null){
-                this.connection.getRoster().addRosterListener(listener);
+                registerListener(connection.getRoster());
             }
         }
 
         public void stop() {
-            if (connection != null){
-                connection.getRoster().removeRosterListener(listener);
-            }
+            registerListener(null);
             connection = null;
         }
 
