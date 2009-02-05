@@ -43,11 +43,12 @@ public class DeleteOperation implements Operation {
      * Class constructor.
      */
     public DeleteOperation() {
+        // Empty Default constructor
     }
 
     /**
      * Class constructor.
-     * 
+     *
      * @param position
      *            the position into the document
      * @param text
@@ -60,7 +61,7 @@ public class DeleteOperation implements Operation {
 
     /**
      * Class constructor.
-     * 
+     *
      * @param position
      *            the position into the document
      * @param text
@@ -75,7 +76,7 @@ public class DeleteOperation implements Operation {
 
     /**
      * Returns the position.
-     * 
+     *
      * @return the position
      */
     public int getPosition() {
@@ -84,7 +85,7 @@ public class DeleteOperation implements Operation {
 
     /**
      * Sets the position of this operation.
-     * 
+     *
      * @param position
      *            the position to set
      */
@@ -97,7 +98,7 @@ public class DeleteOperation implements Operation {
 
     /**
      * Returns the text length.
-     * 
+     *
      * @return the length of the text
      */
     public int getTextLength() {
@@ -106,7 +107,7 @@ public class DeleteOperation implements Operation {
 
     /**
      * Returns the text to be deleted.
-     * 
+     *
      * @return the text to be deleted
      */
     public String getText() {
@@ -115,7 +116,7 @@ public class DeleteOperation implements Operation {
 
     /**
      * Sets the text to be deleted.
-     * 
+     *
      * @param text
      *            the text to be deleted
      */
