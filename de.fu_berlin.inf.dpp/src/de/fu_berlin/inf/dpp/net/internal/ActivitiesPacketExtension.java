@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -31,11 +31,11 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesPacketExtension implements PacketExtension {
-    
+
     public static PacketFilter getFilter(){
         return new PacketExtensionFilter(ELEMENT, NAMESPACE);
     }
-    
+
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
     public static final String SESSION_ID = "sessionID";
@@ -51,11 +51,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     private String sessionID;
 
-    // into
-
-    // consts
-
     public ActivitiesPacketExtension() {
+        // Default constructor, creating an empty Extension
     }
 
     public ActivitiesPacketExtension(String sessionID,
@@ -66,7 +63,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.jivesoftware.smack.packet.PacketExtension#getElementName()
      */
     public String getElementName() {
@@ -75,7 +72,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.jivesoftware.smack.packet.PacketExtension#getNamespace()
      */
     public String getNamespace() {
@@ -92,7 +89,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
      */
     public String toXML() {
@@ -126,7 +123,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
