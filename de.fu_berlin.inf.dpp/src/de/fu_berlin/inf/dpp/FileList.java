@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 /**
  * A FileList is a list of resources - files and folders - which can be compared
  * to other file lists. Folders are denoted by a trailing separator.
- * 
+ *
  * @author rdjemili
  */
 public class FileList {
@@ -64,7 +64,7 @@ public class FileList {
     private class PathLengthComprarator implements Comparator<IPath> {
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see java.util.Comparator
          */
         public int compare(IPath p1, IPath p2) {
@@ -85,11 +85,12 @@ public class FileList {
      * Creates an empty file list.
      */
     public FileList() {
+        // do nothing
     }
 
     /**
      * Creates a new file list from the file tree in given container.
-     * 
+     *
      * @param container
      *            the resource container that should be represented by the new
      *            file list.
@@ -105,7 +106,7 @@ public class FileList {
 
     /**
      * Creates a new file list from the file tree in given container.
-     * 
+     *
      * @param container
      *            the resource container that should be represented by the new
      *            file list.
@@ -125,7 +126,7 @@ public class FileList {
 
     /**
      * Creates a new file list from given resources.
-     * 
+     *
      * @param resources
      *            the resources that should be added to this file list.
      * @throws CoreException
@@ -138,7 +139,7 @@ public class FileList {
 
     /**
      * Build the FileList from its XML representation.
-     * 
+     *
      * @throws XmlPullParserException
      * @throws IOException
      */
@@ -199,10 +200,10 @@ public class FileList {
     // TODO invert diff direction
     /**
      * Returns a new FileList which contains the diff from the two FileLists.
-     * 
+     *
      * @param other
      *            the other FileList with which this FileList is compared with.
-     * 
+     *
      * @return a new FileList which contains the diff information from the two
      *         FileLists. The diff contains the operations which are needed to
      *         get from this FileList to the other FileList.
