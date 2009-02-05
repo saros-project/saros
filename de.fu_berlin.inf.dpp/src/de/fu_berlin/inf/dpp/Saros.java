@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -51,7 +51,7 @@ import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
@@ -62,7 +62,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * The main plug-in of Saros.
- * 
+ *
  * @author rdjemili
  * @author coezbek
  */
@@ -159,7 +159,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Returns the shared instance.
-     * 
+     *
      * @return the shared instance.
      */
     public static Saros getDefault() {
@@ -170,7 +170,7 @@ public class Saros extends AbstractUIPlugin {
      * Return the PicoContainer that can be asked for all Singleton objects
      * relative to this Saros instance (see the constructor for a complete liste
      * of components in this container):
-     * 
+     *
      * @return The PicoContainer containing all Singleton objects of this Saros
      *         plug-in instance.
      */
@@ -225,7 +225,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Connects according to the preferences. This is a blocking method.
-     * 
+     *
      * If there is already a established connection when calling this method, it
      * disconnects before connecting.
      */
@@ -287,7 +287,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Disconnects. This is a blocking method.
-     * 
+     *
      * @param reason
      *            the error why the connection was closed. If the connection was
      *            not closed due to an error <code>null</code> should be passed.
@@ -310,7 +310,7 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Creates the given account on the given Jabber server. This is a blocking
      * method.
-     * 
+     *
      * @param server
      *            the server on which to create the account.
      * @param username
@@ -342,7 +342,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Adds given contact to the roster. This is a blocking method.
-     * 
+     *
      * @param jid
      *            the Jabber ID of the contact.
      * @param nickname
@@ -385,7 +385,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Removes given contact from the roster. This is a blocking method.
-     * 
+     *
      * @param rosterEntry
      *            the contact that is to be removed
      * @throws XMPPException
@@ -468,7 +468,7 @@ public class Saros extends AbstractUIPlugin {
      * Log a message to the Eclipse ErrorLog. This method should be used to log
      * all errors that occur in the plugin that cannot be corrected by the user
      * and seem to be errors within the plug-in or the used libraries.
-     * 
+     *
      * @param message
      *            A meaningful description of during which operation the error
      *            occurred

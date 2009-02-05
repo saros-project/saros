@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -80,8 +80,18 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.PacketExtensions.ChecksumErrorExtension;
-import de.fu_berlin.inf.dpp.net.internal.PacketExtensions.ChecksumExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.DataTransferExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.JupiterErrorExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
@@ -93,9 +103,10 @@ import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
- * 
+ *
  */
-public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListener {
+public class XMPPChatTransmitter implements ITransmitter,
+        ConnectionSessionListener {
 
     private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
             .getName());
@@ -154,15 +165,15 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
             JID fromJID = new JID(message.getFrom());
 
-            if (PacketExtensions.getInviteExtension(message) != null) {
+            if (InviteExtension.getDefault().hasExtension(message)) {
                 processInviteExtension(message, fromJID);
                 return;
-            }                
+            }
         }
 
         private void processInviteExtension(final Message message, JID fromJID) {
-            DefaultPacketExtension inviteExtension = PacketExtensions
-                    .getInviteExtension(message);
+            DefaultPacketExtension inviteExtension = InviteExtension
+                    .getDefault().getExtension(message);
             String desc = inviteExtension
                     .getValue(PacketExtensions.DESCRIPTION);
             String pName = inviteExtension
@@ -173,11 +184,15 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
                     .getValue(PacketExtensions.COLOR_ID));
 
             ISessionManager sm = Saros.getDefault().getSessionManager();
-            log.debug("Received invitation with session id " + sessionID);
-            log.debug("and ColorID: " + colorID + ", i'm "
+            if (sm.getSessionID().equals(ISessionManager.NOT_IN_SESSION)){
+                log.debug("Received invitation with session id " + sessionID);
+                log.debug("and ColorID: " + colorID + ", i'm "
                     + Saros.getDefault().getMyJID());
-            sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
-            return;
+                sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
+            } else {
+                sendMessage(fromJID,
+                        CancelInviteExtension.getDefault().create(sessionID, "I am already in a Saros-Session, try to contact me by chat first"));
+            }
         }
     }
 
@@ -243,7 +258,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.jivesoftware.smackx.filetransfer.FileTransferListener
          */
         public void fileTransferRequest(FileTransferRequest incommingRequest) {
@@ -307,7 +322,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         /**
          * Receive file and save temporary.
-         * 
+         *
          * @param request
          *            transfer request of incoming file.
          * @return File object of received file
@@ -358,7 +373,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         /**
          * read incoming file and open inputstream to IInvitationProcess.
-         * 
+         *
          * @param request
          * @throws Exception
          */
@@ -390,7 +405,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         /**
          * receive resource with file transfer.
-         * 
+         *
          * @param request
          */
         private void receiveResource(FileTransferRequest request) {
@@ -493,50 +508,55 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
     private final class GodPacketListener implements PacketListener {
         public void processPacket(Packet packet) {
 
-            Message message = (Message) packet;
+            try {
+                Message message = (Message) packet;
 
-            JID fromJID = new JID(message.getFrom());
-            
-            final ISharedProject project = Saros.getDefault()
-                    .getSessionManager().getSharedProject();
+                JID fromJID = new JID(message.getFrom());
 
-            // Change the input method to get the right chats
-            putIncomingChat(fromJID, message.getThread());
+                final ISharedProject project = Saros.getDefault()
+                        .getSessionManager().getSharedProject();
 
-            if (PacketExtensions.getActvitiesExtension(message) != null) {
-                processActivitiesExtension(message, fromJID, project);
+                // Change the input method to get the right chats
+                putIncomingChat(fromJID, message.getThread());
+
+                if (PacketExtensions.getActvitiesExtension(message) != null) {
+                    processActivitiesExtension(message, fromJID, project);
+                }
+
+                if (JoinExtension.getDefault().hasExtension(message)) {
+                    processJoinExtension(message, fromJID, project);
+                }
+
+                // TODO CJ: Leave Project Message must be handled better
+                if (LeaveExtension.getDefault().hasExtension(message)) {
+                    processLeaveExtension(fromJID, project);
+                }
+
+                if (RequestActivityExtension.getDefault().hasExtension(message)) {
+                    processRequestActivityExtension(message, project, fromJID);
+                }
+
+                if (DataTransferExtension.getDefault().hasExtension(message)) {
+                    receiveChatTransfer(message);
+                }
+
+                if (RequestForFileListExtension.getDefault().hasExtension(
+                        message)) {
+                    processRequestForFileListExtension(fromJID);
+                }
+
+                if (UserListExtension.getDefault().hasExtension(message)) {
+                    processUserListExtension(message, fromJID, project);
+                }
+
+                if (CancelInviteExtension.getDefault().hasExtension(message)) {
+                    processCancelInviteExtension(message, fromJID);
+                }
+            } catch (Exception e) {
+                XMPPChatTransmitter.log.error(
+                        "An internal error occurred while processing packets",
+                        e);
             }
-
-            if (PacketExtensions.getJoinExtension(message) != null) {
-                processJoinExtension(message, fromJID, project);
-            }
-
-            // TODO CJ: Leave Project Message must be handled better
-            if (PacketExtensions.getLeaveExtension(message) != null) {
-                processLeaveExtension(fromJID, project);
-            }
-
-            if (PacketExtensions.getRequestActivityExtension(message) != null) {
-                processActivityRequestExtension(message, project, fromJID);
-            }
-
-            if (PacketExtensions.getDataTransferExtension(message) != null) {
-                receiveChatTransfer(message);
-            }
-
-            if (PacketExtensions.getRequestExtension(message) != null) {
-                processRequestExtension(fromJID);
-            }
-
-            if (PacketExtensions.getUserlistExtension(message) != null) {
-                processUserListExtension(message, fromJID, project);
-            }
-
-            if (PacketExtensions.getCancelInviteExtension(message) != null) {
-                processCancelInviteExtension(message, fromJID);
-            }
-
-
         }
 
         private void processActivitiesExtension(final Message message,
@@ -580,15 +600,15 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
             }
         }
 
-        private void processActivityRequestExtension(final Message message,
+        private void processRequestActivityExtension(final Message message,
                 ISharedProject project, JID fromJID) {
 
             if (project == null || project.getParticipant(fromJID) == null) {
                 return;
             }
 
-            DefaultPacketExtension rae = PacketExtensions
-                    .getRequestActivityExtension(message);
+            DefaultPacketExtension rae = RequestActivityExtension.getDefault()
+                    .getExtension(message);
 
             String sID = rae.getValue("ID");
             String sIDandup = rae.getValue("ANDUP");
@@ -616,8 +636,8 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         private void processCancelInviteExtension(final Message message,
                 JID fromJID) {
-            DefaultPacketExtension cancelInviteExtension = PacketExtensions
-                    .getCancelInviteExtension(message);
+            DefaultPacketExtension cancelInviteExtension = CancelInviteExtension
+                    .getDefault().getExtension(message);
 
             String errorMsg = cancelInviteExtension
                     .getValue(PacketExtensions.ERROR);
@@ -629,12 +649,13 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
             }
         }
 
-        
-
         private void processJoinExtension(final Message message, JID fromJID,
                 final ISharedProject project) {
-            int colorID = Integer.parseInt(PacketExtensions.getJoinExtension(
-                    message).getValue("ColorID"));
+
+            DefaultPacketExtension extension = JoinExtension.getDefault()
+                    .getExtension(message);
+
+            int colorID = Integer.parseInt(extension.getValue("ColorID"));
 
             log.debug("Join: ColorID: " + colorID);
 
@@ -660,9 +681,13 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
         }
 
         /**
-         * invitee request for project file list (state.INVITATION_SEND
+         * Invitee request for project file list (state.INVITATION_SEND)
          */
-        private void processRequestExtension(final JID fromJID) {
+        private void processRequestForFileListExtension(final JID fromJID) {
+
+            XMPPChatTransmitter.log
+                    .debug("Received Request for FileList from from " + fromJID);
+
             new Thread(new Runnable() {
                 public void run() {
                     for (IInvitationProcess process : processes) {
@@ -676,8 +701,8 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         private void processUserListExtension(final Message message,
                 JID fromJID, final ISharedProject project) {
-            DefaultPacketExtension userlistExtension = PacketExtensions
-                    .getUserlistExtension(message);
+            DefaultPacketExtension userlistExtension = UserListExtension
+                    .getDefault().getExtension(message);
 
             // My inviter sent a list of all session participants
             // I need to adapt the order for later case of driver leaving the
@@ -715,8 +740,8 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
                 if (project.getParticipant(jid) == null) {
                     project.addUser(user);
 
-                    sendMessage(jid, PacketExtensions.createJoinExtension(Saros
-                            .getDefault().getLocalUser().getColorID()));
+                    sendMessage(jid, JoinExtension.getDefault().create(
+                            Saros.getDefault().getLocalUser().getColorID()));
                 }
 
                 count++;
@@ -728,15 +753,15 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
          * decoded from base64 encoding. Splitted transfer will be buffered
          * until all chunks are received. Then the file will be reconstructed
          * and processed as a whole.
-         * 
+         *
          * @param message
          *            Message containing the data as extension.
-         * 
+         *
          * @return <code>true</code> if the message was handled successfully.
          */
         boolean receiveChatTransfer(Message message) {
-            DefaultPacketExtension dt = PacketExtensions
-                    .getDataTransferExtension(message);
+            DefaultPacketExtension dt = DataTransferExtension.getDefault()
+                    .getExtension(message);
             String sName = dt.getValue(PacketExtensions.DT_NAME);
             String sData = dt.getValue(PacketExtensions.DT_DATA);
 
@@ -942,14 +967,12 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         // Register PacketListeners
         this.connection.addPacketListener(new InvitePacketListener(),
-                new AndFilter(
-                        new MessageTypeFilter(Message.Type.chat),
-                        PacketExtensions.getInviteExtensionFilter()));
-        
-        this.connection.addPacketListener(
-                new GodPacketListener(), 
+                new AndFilter(new MessageTypeFilter(Message.Type.chat),
+                        InviteExtension.getDefault().getFilter()));
+
+        this.connection.addPacketListener(new GodPacketListener(),
                 PacketExtensions.getSessionIDPacketFilter());
-        
+
         // Start Jingle Manager asynchronous
         this.startingJingleThread = new Thread(new Runnable() {
             public void run() {
@@ -971,31 +994,34 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.net.ITransmitter
      */
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        sendMessage(user, PacketExtensions
-                .createCancelInviteExtension(errorMsg));
+        sendMessage(user, CancelInviteExtension.getDefault().create(
+                Saros.getDefault().getSessionManager().getSessionID(),
+                errorMsg));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
-    public void sendRequestForFileListMessage(JID user) {
+    public void sendRequestForFileListMessage(JID toJID) {
+
+        XMPPChatTransmitter.log.debug("Send request for FileList to " + toJID);
 
         // Make sure JingleManager has started
         getJingleManager();
 
-        sendMessage(user, PacketExtensions.createRequestForFileListExtension());
+        sendMessage(toJID, RequestForFileListExtension.getDefault().create());
 
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
@@ -1011,18 +1037,18 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
             String description, int colorID) {
-        sendMessage(guest, PacketExtensions.createInviteExtension(sharedProject
-                .getProject().getName(), description, colorID));
+        sendMessage(guest, InviteExtension.getDefault().create(
+                sharedProject.getProject().getName(), description, colorID));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendJoinMessage(ISharedProject sharedProject) {
@@ -1030,25 +1056,25 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
             /* sleep process for 500 millis to ensure invitation state process. */
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            XMPPChatTransmitter.log.error(e);
+            Thread.currentThread().interrupt();
+            return;
         }
-        sendMessageToAll(sharedProject, PacketExtensions
-                .createJoinExtension(Saros.getDefault().getLocalUser()
-                        .getColorID()));
+        sendMessageToAll(sharedProject, JoinExtension.getDefault().create(
+                Saros.getDefault().getLocalUser().getColorID()));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendLeaveMessage(ISharedProject sharedProject) {
-        sendMessageToAll(sharedProject, PacketExtensions.createLeaveExtension());
+        sendMessageToAll(sharedProject, LeaveExtension.getDefault().create());
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendActivities(ISharedProject sharedProject,
@@ -1072,7 +1098,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
                         // TODO use callback
                         int time = timedActivity.getTimestamp();
                         try {
-                            IFileTransferCallback callback = new AbstractFileTransferCallback(){
+                            IFileTransferCallback callback = new AbstractFileTransferCallback() {
                                 @Override
                                 public void fileTransferFailed(IPath path,
                                         Exception e) {
@@ -1138,10 +1164,10 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
         /**
          * Send the given data as a blocking operation.
-         * 
+         *
          * If this call returns the data has been send successfully, otherwise
          * an IOException is thrown with the reason why the transfer failed.
-         * 
+         *
          * @param data
          *            The data to be sent.
          * @throws IOException
@@ -1154,9 +1180,9 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
     /**
      * Sends a data buffer to a recipient using chat messages. The buffer is
      * transmitted Base64 encoded and split into blocks of size MAX_MSG_LENGTH.
-     * 
+     *
      * This is not IBB (XEP-96)!!
-     * 
+     *
      */
     Transmitter handmade = new Transmitter() {
 
@@ -1189,10 +1215,10 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
                     int psize = Math.min(tosend, maxMsgLen);
                     int end = start + psize;
 
-                    PacketExtension extension = PacketExtensions
-                            .createDataTransferExtension(ibbData.filename,
-                                    ibbData.description, i, pcount, data64
-                                            .substring(start, end));
+                    PacketExtension extension = DataTransferExtension
+                            .getDefault().create(ibbData.filename,
+                                    ibbData.description, i, pcount,
+                                    data64.substring(start, end));
 
                     sendMessage(data.getRecipient(), extension);
 
@@ -1340,12 +1366,12 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
     public void sendUserListTo(JID to, Collection<User> participants) {
         XMPPChatTransmitter.log.debug("Sending user list to " + to.toString());
 
-        sendMessage(to, PacketExtensions.createUserListExtension(participants));
+        sendMessage(to, UserListExtension.getDefault().create(participants));
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * de.fu_berlin.inf.dpp.net.ITransmitter#sendFileChecksumErrorMessage(org
      * .eclipse .core.runtime.IPath)
@@ -1358,12 +1384,13 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
         XMPPChatTransmitter.log.debug("Sending checksum error message of file "
                 + path.lastSegment() + " to all");
         for (User user : participants) {
-            sendMessage(user.getJID(), ChecksumErrorExtension.getDefault().create(path, resolved));
+            sendMessage(user.getJID(), ChecksumErrorExtension.getDefault()
+                    .create(path, resolved));
         }
     }
 
     /**
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.net.ITransmitter
      */
     public void sendDocChecksumsToClients(Collection<DocumentChecksum> checksums) {
@@ -1381,7 +1408,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
         if (participants == null) {
             return;
         }
-        
+
         for (User participant : participants) {
             if (project.getHost().getJID().equals(participant.getJID())) {
                 continue;
@@ -1391,7 +1418,8 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
             XMPPChatTransmitter.log.debug("Sending checksums to " + jid);
 
             try {
-                sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault().create(checksums));
+                sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault()
+                        .create(checksums));
             } catch (IOException e) {
                 // If checksums are failed to be sent, this is not a big problem
                 log.warn("Sending Checksum to " + jid + " failed: ", e);
@@ -1399,18 +1427,11 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.net.ITransmitter#sendJupiterTransformationError(
-     * de.fu_berlin.inf.dpp.net.JID, org.eclipse.core.runtime.IPath)
-     */
     public void sendJupiterTransformationError(JID to, IPath path) {
         XMPPChatTransmitter.log
                 .debug("Sending jupiter transformation error message to " + to
                         + " of file " + path.lastSegment());
-        sendMessage(to, PacketExtensions.createJupiterErrorExtension(path));
+        sendMessage(to, JupiterErrorExtension.getDefault().create(path));
     }
 
     public void sendRemainingFiles() {
@@ -1485,7 +1506,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
     /**
      * TODO use sendMessage
-     * 
+     *
      * @param sharedProject
      * @param extension
      */
@@ -1552,10 +1573,10 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
     /**
      * Send the given packet to the given user.
-     * 
+     *
      * If no connection is set or sending fails, this method fails by throwing
      * an IOException
-     * 
+     *
      * @param jid
      * @param extension
      */
@@ -1621,10 +1642,10 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
 
     /**
      * Will return a TransferData object ready to pass to sendData(...).
-     * 
+     *
      * This method will read all data from the given file into memory and fail
      * immediately if an error occurs.
-     * 
+     *
      * If this method returns, then the data has been cached from the file.
      */
     public TransferData toTransferData(final FileTransferData transferData)
@@ -1741,7 +1762,7 @@ public class XMPPChatTransmitter implements ITransmitter, ConnectionSessionListe
     public void sendFileAsync(JID recipient, IProject project, IPath path,
             int timestamp, final IFileTransferCallback callback)
             throws IOException {
-        
+
         if (callback == null)
             throw new IllegalArgumentException();
 
