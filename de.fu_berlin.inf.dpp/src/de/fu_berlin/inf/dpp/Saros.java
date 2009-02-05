@@ -41,6 +41,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.packet.Jingle;
 import org.osgi.framework.BundleContext;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
@@ -251,6 +252,16 @@ public class Saros extends AbstractUIPlugin {
 
             this.connection = new XMPPConnection(conConfig);
             this.connection.connect();
+
+            ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
+
+            // add Jingle feature to the supported extensions
+            if (!prefStore
+                    .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
+
+                // add Jingle Support for the current connection
+                sdm.addFeature(Jingle.NAMESPACE);
+            }
 
             // have to put this line to use new smack 3.1
             // without this line a NullPointerException happens but after a

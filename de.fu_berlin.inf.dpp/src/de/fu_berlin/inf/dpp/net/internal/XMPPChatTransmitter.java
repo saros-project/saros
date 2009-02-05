@@ -59,11 +59,13 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.packet.Jingle;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -146,6 +148,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public JingleFileTransferManager getJingleManager() {
         try {
+            if (startingJingleThread == null)
+                return null;
+
             startingJingleThread.join();
         } catch (InterruptedException e) {
             // do nothing
@@ -987,7 +992,9 @@ public class XMPPChatTransmitter implements ITransmitter,
                 }
             }
         });
-        this.startingJingleThread.start();
+        if (!getFileTransferModeViaChat()) {
+            this.startingJingleThread.start();
+        }
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
@@ -1158,7 +1165,17 @@ public class XMPPChatTransmitter implements ITransmitter,
         } else {
 
             try {
-                jingle.send(data);
+                ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+                .getInstanceFor(connection);
+
+                if (sdm.discoverInfo(data.getForJingle().recipient.toString())
+                        .containsFeature(Jingle.NAMESPACE)) {
+
+                    jingle.send(data);
+
+                } else {
+                    ibb.send(data);
+                }
             } catch (Exception e) {
                 log
                         .info(
@@ -1279,8 +1296,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         public void send(TransferData data) throws IOException {
             try {
-                getJingleManager().send(data.getRecipient(),
-                        data.getForJingle());
+                JingleFileTransferManager jftm = getJingleManager();
+                if (jftm == null)
+                    throw new IOException();
+                jftm.send(data.getRecipient(), data.getForJingle());
             } catch (JingleSessionException e) {
                 throw new IOException(e);
             }

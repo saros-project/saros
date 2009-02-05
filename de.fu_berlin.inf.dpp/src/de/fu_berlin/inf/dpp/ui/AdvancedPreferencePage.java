@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.Saros;
 /**
  * Contains the advanced preferences - consisting of preferences that are geared
  * towards developers and power users and that are not necessary for normal use.
- * 
+ *
  * @author rdjemili
  */
 public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
@@ -39,7 +39,8 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
         addField(new BooleanFieldEditor(
                 PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
-                "Avoid direct file transfer connection", getFieldEditorParent()));
+                "Avoid direct file transfer connection (needs restart)",
+                getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(
                 PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
@@ -55,7 +56,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.ui.IWorkbenchPreferencePage
      */
     public void init(IWorkbench workbench) {
