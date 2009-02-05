@@ -73,8 +73,8 @@ public interface ISharedProject {
     public void removeDriver(User driver, boolean replicated);
 
     /**
-     * @return <code>true</code> if the local client is the current driver of
-     *         this shared project. <code>false</code> otherwise.
+     * @return <code>true</code> if the local client is a current driver of this
+     *         shared project. <code>false</code> otherwise.
      */
     public boolean isDriver();
 
