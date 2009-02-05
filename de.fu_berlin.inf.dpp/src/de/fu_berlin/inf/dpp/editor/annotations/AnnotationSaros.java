@@ -15,16 +15,13 @@ public class AnnotationSaros extends Annotation {
         super(type, isPersistent, text);
         this.source = source;
 
-        if (
-        // type.equals(ContributionAnnotation.TYPE)
-        // ||
-        type.equals(SelectionAnnotation.TYPE)) {
+        if (// type.equals(ContributionAnnotation.TYPE)
+            // ||
+            type.equals(SelectionAnnotation.TYPE)) {
 
-            // TODO: improve color assingment and dynamic handling
+            // TODO: Improve color assignment and dynamic handling.
             int colorid = getColorIdForUser(source) + 1;
-            String mytype = type + "." + colorid;
-
-            setType(mytype);
+            setType(type + "." + colorid);
         }
     }
 

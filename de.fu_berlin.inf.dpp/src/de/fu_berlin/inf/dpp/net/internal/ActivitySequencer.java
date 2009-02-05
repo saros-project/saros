@@ -501,10 +501,9 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                             + lastTextEdit.text.length())) {
                 result.remove(lastTextEdit);
                 textEdit = new TextEditActivity(lastTextEdit.offset,
-                        lastTextEdit.text + textEdit.text, lastTextEdit.replace
-                                + textEdit.replace);
+                        lastTextEdit.text + textEdit.text, lastTextEdit.length
+                                + textEdit.length, lastTextEdit.getEditor());
                 textEdit.setSource(lastTextEdit.getSource());
-                textEdit.setEditor(lastTextEdit.getEditor());
             }
         }
 
@@ -601,14 +600,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         logger.debug("Receive request : " + request + " from "
                 + request.getJID());
         this.concurrentManager.receiveRequest(request);
-
-        // return null;
-        // IActivity activity = concurrentManager.receiveRequest(request);
-        // if (activity != null) {
-        // /* execute transformed activity */
-        // execTransformedActivity(activity);
-        // }
-        // return activity;
     }
 
     private boolean isHostSide() {

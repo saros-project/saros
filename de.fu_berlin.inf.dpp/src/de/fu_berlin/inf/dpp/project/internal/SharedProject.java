@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -149,7 +149,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public Collection<User> getParticipants() {
@@ -158,7 +158,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public IActivitySequencer getSequencer() {
@@ -167,7 +167,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IActivityManager getActivityManager() {
@@ -176,7 +176,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public void toggleDriverRole(User driver, boolean replicated) {
@@ -234,7 +234,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public boolean isDriver() {
@@ -256,7 +256,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * de.fu_berlin.inf.dpp.project.ISharedProject#isDriver(de.fu_berlin.inf
      * .dpp.User)
@@ -275,7 +275,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public User getHost() {
@@ -284,7 +284,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public boolean isHost() {
@@ -293,7 +293,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
      */
     public boolean exclusiveDriver() {
@@ -333,7 +333,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
@@ -344,7 +344,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void addListener(ISharedProjectListener listener) {
@@ -355,7 +355,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void removeListener(ISharedProjectListener listener) {
@@ -364,7 +364,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IProject getProject() {
@@ -373,7 +373,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public FileList getFileList() throws CoreException {
@@ -386,7 +386,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void start() {
@@ -394,7 +394,7 @@ public class SharedProject implements ISharedProject {
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                
+
                 if (SharedProject.this.participants.size() <= 1) {
                     SharedProject.this.activitySequencer.flush();
                 } else {
@@ -433,7 +433,7 @@ public class SharedProject implements ISharedProject {
         }, 0, SharedProject.MILLIS_UPDATE);
 
         stopped = false;
-        
+
         /* 2. start thread for sending jupiter requests. */
         this.requestTransmitter = new Thread(new Runnable() {
             public void run() {
@@ -447,10 +447,10 @@ public class SharedProject implements ISharedProject {
 
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped;
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void stop() {
@@ -461,7 +461,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public User getParticipant(JID jid) {
@@ -628,8 +628,7 @@ public class SharedProject implements ISharedProject {
                 this.activitySequencer.receiveRequest(request);
             } else {
                 /* send operation to client. */
-                SharedProject.log.debug("Send request to client: " + request
-                        + request.getJID());
+                SharedProject.log.debug("Send request to client: " + request);
                 this.transmitter.sendJupiterRequest(this, request, request
                         .getJID());
             }
@@ -638,9 +637,6 @@ public class SharedProject implements ISharedProject {
             this.transmitter.sendJupiterRequest(this, request, this.host
                     .getJID());
         }
-        // connection.sendOperation(new
-        // NetworkRequest(this.jid,request.getJID(),request), 0);
-
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {

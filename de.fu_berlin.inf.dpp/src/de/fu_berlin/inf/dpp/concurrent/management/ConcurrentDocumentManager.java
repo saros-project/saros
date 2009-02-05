@@ -111,16 +111,16 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * This class is an eclipse job run on the host side ONLY.
-     * 
+     *
      * The job computes checksums for all files currently managed by Jupiter
      * (the ConcurrentDocumentManager) and sends them to all guests.
-     * 
+     *
      * These will call their ConcurrentDocumentManager.check(...) method, to
      * verify that their version is correct.
-     * 
+     *
      * Once started with schedule() the job is scheduled to rerun every 5
      * seconds.
-     * 
+     *
      * @author chjacob
      */
     private class ConsistencyWatchdog extends Job {
@@ -198,6 +198,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         Saros.getDefault().getSessionManager().addSessionListener(
                 new AbstractSessionListener() {
 
+                    @Override
                     public void sessionEnded(ISharedProject endedProject) {
 
                         assert endedProject == ConcurrentDocumentManager.this.sharedProject;
@@ -229,7 +230,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     }
 
     /**
-	 * 
+	 *
 	 */
     public IActivity activityCreated(IActivity activity) {
 
@@ -244,7 +245,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * handled closed editor activity to remove the local jupiter clients.
-     * 
+     *
      * @param activity
      */
     private void editorActivitiy(IActivity activity) {
@@ -291,7 +292,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * handles text edit activities with jupiter.
-     * 
+     *
      * @param activity
      * @return true if activity is transformed with jupiter.
      */
@@ -485,7 +486,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * convert TextEditActivity to Operation op
-     * 
+     *
      * @param text
      * @return
      */
@@ -493,23 +494,23 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         Operation op = null;
         // delete activity
-        if ((text.replace > 0) && (text.text.length() == 0)) {
+        if ((text.length > 0) && (text.text.length() == 0)) {
             /* string placeholder in length of delete area. */
             String placeholder = "";
-            for (int i = 0; i < text.replace; i++) {
+            for (int i = 0; i < text.length; i++) {
                 placeholder += 1;
             }
             op = new DeleteOperation(text.offset, placeholder);
         }
         // insert activity
-        if ((text.replace == 0) && (text.text.length() > 0)) {
+        if ((text.length == 0) && (text.text.length() > 0)) {
             op = new InsertOperation(text.offset, text.text);
         }
         // replace operation has to split into delete and insert operation
-        if ((text.replace > 0) && (text.text.length() > 0)) {
+        if ((text.length > 0) && (text.text.length() > 0)) {
             /* string placeholder in length of delete area. */
             String placeholder = "";
-            for (int i = 0; i < text.replace; i++) {
+            for (int i = 0; i < text.length; i++) {
                 placeholder += 1;
             }
             op = new SplitOperation(new DeleteOperation(text.offset,
@@ -519,8 +520,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     }
 
     /**
-     * Convert Operation op to text edit activity. NoOperation will ignore.
-     * 
+     * Convert Operation to text edit activity. NoOperation will be ignored.
+     *
      * @param op
      *            incoming transformed operation.
      * @return List with executable text edit activities.
@@ -549,10 +550,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
              * if operation one is delete operation the offset of second
              * operation has to modified.
              */
-            if ((op1.replace > 0) && (op1.text.length() == 0)
-                    && (op2.replace > 0) && (op2.text.length() == 0)) {
-                op2 = new TextEditActivity(op2.offset - op1.replace, "",
-                        op2.replace);
+            if ((op1.length > 0) && (op1.text.length() == 0)
+                    && (op2.length > 0) && (op2.text.length() == 0)) {
+                op2 = new TextEditActivity(op2.offset - op1.length, "",
+                        op2.length);
             }
             result.add(op1);
             result.add(op2);
@@ -575,7 +576,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     /**
      * sync received request with right jupiter server document and local
      * client.
-     * 
+     *
      */
     public void receiveRequest(Request request) {
 
@@ -584,8 +585,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
             /* if host side and server jupiter side of request */
             if (isHost(request.getJID()) && (request.getSiteId() == 0)) {
-                /* request already has transformed and have to be execute. */
-                // return execTextEditActivity(request);
+                /* Request already has been transformed and has to be executed. */
                 execTextEditActivity(request);
                 return;
             }
@@ -595,17 +595,9 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
              * if no jupiter document server exists.
              */
             if (!this.concurrentDocuments.containsKey(request.getEditorPath())) {
-                // /* create new document server. */
-                // docServer = new JupiterDocumentServer(forwarder);
-                // // docServer = new JupiterDocumentServer();
-                // docServer.setEditor(request.getEditorPath());
-                // /* create new local host document client. */
-                // docServer.addProxyClient(host);
-
                 docServer = initDocumentServer(request.getEditorPath());
 
                 if (!isHost(request.getJID())) {
-                    //
                     this.driverManager.addDriverToDocument(request
                             .getEditorPath(), request.getJID());
                     docServer.addProxyClient(request.getJID());
@@ -660,13 +652,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
                 }
             } else {
-
                 /*
-                 * 2. receive request in local client component and return the
+                 * 2. receive request in local client component and execute the
                  * transformed operation as IActivity.
                  */
                 execTextEditActivity(request);
-                // return execTextEditActivity(request);
             }
         }
     }
@@ -762,10 +752,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     }
 
     /**
-     * Checks the local documents against the given checksums. 
-     * 
-     * Use the VariableProxy getConsistenciesToResolve() to be notified if inconsistencies are found or resolved.
-     * 
+     * Checks the local documents against the given checksums.
+     *
+     * Use the VariableProxy getConsistenciesToResolve() to be notified if
+     * inconsistencies are found or resolved.
+     *
      * @param checksums
      *            the checksums to check the documents against
      */
@@ -792,16 +783,19 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
                 if ((System.currentTimeMillis() - lastEdited) > 2000
                         && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
-                    logger.debug(String.format(
-                            "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
-                            path.toString(), 
-                            doc.getLength(), 
-                            doc.getLength() == checksum.getLength() ? "==" : "!=",
-                            checksum.getLength(),
-                            doc.get().hashCode(), 
-                            doc.get().hashCode() == checksum.getHash() ? "==" : "!=",
-                            checksum.getHash()));
-                    
+                    logger
+                            .debug(String
+                                    .format(
+                                            "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
+                                            path.toString(), doc.getLength(),
+                                            doc.getLength() == checksum
+                                                    .getLength() ? "==" : "!=",
+                                            checksum.getLength(), doc.get()
+                                                    .hashCode(), doc.get()
+                                                    .hashCode() == checksum
+                                                    .getHash() ? "==" : "!=",
+                                            checksum.getHash()));
+
                     ConcurrentDocumentManager.this.pathesWithWrongChecksums
                             .add(path);
                     if (!inconsistencyToResolve.getVariable()) {
@@ -822,7 +816,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * Returns the variable proxy which stores the current inconsistency state
-     * 
+     *
      */
     public VariableProxy<Boolean> getConsistencyToResolve() {
         return this.inconsistencyToResolve;
@@ -830,7 +824,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /**
      * TODO CJ: write javadoc
-     * 
+     *
      */
     public boolean getExecutingChecksumErrorHandling() {
         return consistencyWatchdog.executingChecksumErrorHandling;

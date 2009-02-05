@@ -654,21 +654,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IFile file = EditorManager.this.sharedProject.getProject()
                 .getFile(path);
 
+        String source = textEdit.getOriginalSource();
         User user = Saros.getDefault().getSessionManager().getSharedProject()
-                .getParticipant(new JID(textEdit.getSource()));
+                .getParticipant(new JID(source));
 
-        /* set current execute activity to avoid cirle executions. */
+        /* set current execute activity to avoid circular executions. */
         EditorManager.this.currentExecuteActivity = textEdit;
 
-        replaceText(file, textEdit.offset, textEdit.replace, textEdit.text,
-                textEdit.getSource());
+        replaceText(file, textEdit.offset, textEdit.length, textEdit.text,
+                source);
 
         Set<IEditorPart> editors = EditorManager.this.editorPool
                 .getEditors(path);
         for (IEditorPart editorPart : editors) {
             EditorManager.this.editorAPI.setSelection(editorPart,
                     new TextSelection(textEdit.offset + textEdit.text.length(),
-                            0), textEdit.getSource(), shouldIFollow(user));
+                            0), source, shouldIFollow(user));
         }
     }
 
@@ -870,7 +871,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             TextEditActivity textEditActivity = (TextEditActivity) activity;
             return "<edit " + "path=\"" + textEditActivity.getEditor() + "\" "
                     + "offset=\"" + textEditActivity.offset + "\" "
-                    + "replace=\"" + textEditActivity.replace + "\">"
+                    + "replace=\"" + textEditActivity.length + "\">"
                     + "<![CDATA[" + textEditActivity.text + "]]>" + "</edit>";
 
         } else if (activity instanceof TextSelectionActivity) {
@@ -901,6 +902,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Path path = pathString.equals("null") ? null : new Path(pathString);
 
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
+        // TODO This value is the length of the old text, so "replace" should be
+        // renamed.
         int replace = Integer.parseInt(parser
                 .getAttributeValue(null, "replace"));
 

@@ -49,7 +49,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
- * reacting to invitiations. The user can be only part of one session at most.
+ * reacting to invitations. The user can be only part of one session at most.
  *
  * @author rdjemili
  */
@@ -87,7 +87,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.sessionID = String.valueOf(new Random(System.currentTimeMillis())
                 .nextInt());
 
-        SharedProject sharedProject = new SharedProject(this.transmitter, project, myJID);
+        SharedProject sharedProject = new SharedProject(this.transmitter,
+                project, myJID);
 
         this.currentlySharedProject.setVariable(sharedProject);
 
@@ -113,8 +114,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
-        SharedProject sharedProject = new SharedProject(this.transmitter, project, Saros
-                .getDefault().getMyJID(), host, colorID);
+        SharedProject sharedProject = new SharedProject(this.transmitter,
+                project, Saros.getDefault().getMyJID(), host, colorID);
         this.currentlySharedProject.setVariable(sharedProject);
 
         sharedProject.start();
@@ -206,56 +207,60 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public void connectionStateChanged(XMPPConnection connection,
             ConnectionState newState) {
 
-        switch(newState){
-            case CONNECTED:
+        switch (newState) {
+        case CONNECTED:
 
-                if (connectionSessionListener.isEmpty()){
-                    transmitter = new XMPPChatTransmitter();
-                    connectionSessionListener.add(transmitter);
-                    connectionSessionListener.add(new JupiterReceiver());
-                    connectionSessionListener.add(new ConsistencyWatchdogReceiver(transmitter, currentlySharedProject));
-                    connectionSessionListener.add(new PresenceListener());
-                }
+            if (connectionSessionListener.isEmpty()) {
+                transmitter = new XMPPChatTransmitter();
+                connectionSessionListener.add(transmitter);
+                connectionSessionListener.add(new JupiterReceiver());
+                connectionSessionListener.add(new ConsistencyWatchdogReceiver(
+                        transmitter, currentlySharedProject));
+                connectionSessionListener.add(new PresenceListener());
+            }
 
-                for (ConnectionSessionListener listener : connectionSessionListener){
-                    listener.prepare(connection);
-                }
+            for (ConnectionSessionListener listener : connectionSessionListener) {
+                listener.prepare(connection);
+            }
 
-                for (ConnectionSessionListener listener : connectionSessionListener){
-                    listener.start();
-                }
+            for (ConnectionSessionListener listener : connectionSessionListener) {
+                listener.start();
+            }
 
-                break;
-            case CONNECTING:
+            break;
+        case CONNECTING:
 
-                // Cannot do anything until the Connection is up
+            // Cannot do anything until the Connection is up
 
-                break;
+            break;
 
-            case DISCONNECTING:
+        case DISCONNECTING:
 
-                stopSharedProject();
-                break;
+            stopSharedProject();
+            break;
 
-            case ERROR:
+        case ERROR:
 
-                for (ConnectionSessionListener listener : Util.reverse(connectionSessionListener)){
-                    listener.stop();
-                }
-                break;
+            for (ConnectionSessionListener listener : Util
+                    .reverse(connectionSessionListener)) {
+                listener.stop();
+            }
+            break;
 
-            case NOT_CONNECTED:
+        case NOT_CONNECTED:
 
-                for (ConnectionSessionListener listener : Util.reverse(connectionSessionListener)){
-                    listener.stop();
-                }
+            for (ConnectionSessionListener listener : Util
+                    .reverse(connectionSessionListener)) {
+                listener.stop();
+            }
 
-                for (ConnectionSessionListener listener : Util.reverse(connectionSessionListener)){
-                    listener.dispose();
-                }
-                connectionSessionListener.clear();
-                transmitter = null;
-                break;
+            for (ConnectionSessionListener listener : Util
+                    .reverse(connectionSessionListener)) {
+                listener.dispose();
+            }
+            connectionSessionListener.clear();
+            transmitter = null;
+            break;
 
         }
     }
@@ -353,7 +358,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         // ask for next expected timestamp activities (in case I missed
         // something while being not available)
-        this.transmitter.sendRequestForActivity(project,
-                oldtimestamp, true);
+        this.transmitter.sendRequestForActivity(project, oldtimestamp, true);
     }
 }

@@ -72,6 +72,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
@@ -184,14 +185,18 @@ public class XMPPChatTransmitter implements ITransmitter,
                     .getValue(PacketExtensions.COLOR_ID));
 
             ISessionManager sm = Saros.getDefault().getSessionManager();
-            if (sm.getSessionID().equals(ISessionManager.NOT_IN_SESSION)){
+            if (sm.getSessionID().equals(ISessionManager.NOT_IN_SESSION)) {
                 log.debug("Received invitation with session id " + sessionID);
                 log.debug("and ColorID: " + colorID + ", i'm "
-                    + Saros.getDefault().getMyJID());
+                        + Saros.getDefault().getMyJID());
                 sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
             } else {
-                sendMessage(fromJID,
-                        CancelInviteExtension.getDefault().create(sessionID, "I am already in a Saros-Session, try to contact me by chat first"));
+                sendMessage(
+                        fromJID,
+                        CancelInviteExtension
+                                .getDefault()
+                                .create(sessionID,
+                                        "I am already in a Saros-Session, try to contact me by chat first"));
             }
         }
     }
@@ -567,15 +572,11 @@ public class XMPPChatTransmitter implements ITransmitter,
             List<TimedActivity> timedActivities = activitiesPacket
                     .getActivities();
 
-            boolean isProjectParticipant = false;
-            if (project != null) {
-                isProjectParticipant = (project.getParticipant(fromJID) != null);
-            }
+            String source = fromJID.toString();
+            XMPPChatTransmitter.log.debug("Received activities from " + source
+                    + ": " + timedActivities);
 
-            XMPPChatTransmitter.log.debug("Received activities from "
-                    + fromJID.toString() + ": " + timedActivities);
-
-            if (!isProjectParticipant) {
+            if ((project == null) || (project.getParticipant(fromJID) == null)) {
                 XMPPChatTransmitter.log.info("user not member!");
                 return;
             }
@@ -583,7 +584,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             for (TimedActivity timedActivity : timedActivities) {
 
                 IActivity activity = timedActivity.getActivity();
-                activity.setSource(fromJID.toString());
+                activity.setSource(source);
 
                 /*
                  * incoming fileActivities that add files are only used as
@@ -998,9 +999,9 @@ public class XMPPChatTransmitter implements ITransmitter,
      * @see de.fu_berlin.inf.dpp.net.ITransmitter
      */
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        sendMessage(user, CancelInviteExtension.getDefault().create(
-                Saros.getDefault().getSessionManager().getSessionID(),
-                errorMsg));
+        sendMessage(user, CancelInviteExtension.getDefault()
+                .create(Saros.getDefault().getSessionManager().getSessionID(),
+                        errorMsg));
     }
 
     /*
@@ -1082,6 +1083,13 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         for (TimedActivity timedActivity : timedActivities) {
             IActivity activity = timedActivity.getActivity();
+
+            if (activity instanceof TextEditActivity) {
+                log.debug("sendActivities: " + activity);
+                TextEditActivity textEditActivity = (TextEditActivity) activity;
+                textEditActivity.setOriginalSource(Saros.getDefault()
+                        .getMyJID().toString());
+            }
 
             if (activity instanceof FileActivity) {
                 FileActivity fileAdd = (FileActivity) activity;

@@ -33,13 +33,13 @@ public class RequestImpl implements Request {
     private JID jid;
 
     /**
-     * Path of the appropriate edior.
+     * Path of the appropriate editor.
      */
     private IPath editor;
 
     /**
      * Creates a new instance of the RequestImpl class.
-     * 
+     *
      * @param siteId
      *            the site id
      * @param timestamp
@@ -56,7 +56,7 @@ public class RequestImpl implements Request {
 
     /**
      * Creates a new instance of the RequestImpl class.
-     * 
+     *
      * @param siteId
      *            the site id
      * @param timestamp
@@ -74,7 +74,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getSiteId()
      */
     public int getSiteId() {
@@ -83,7 +83,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getOperation()
      */
     public Operation getOperation() {
@@ -92,7 +92,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getTimestamp()
      */
     public Timestamp getTimestamp() {
@@ -101,7 +101,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -130,7 +130,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -145,7 +145,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see java.lang.Object#toString()
      */
     @Override
@@ -157,13 +157,15 @@ public class RequestImpl implements Request {
         buffer.append(this.timestamp);
         buffer.append(",");
         buffer.append(this.operation);
+        buffer.append(",");
+        buffer.append(this.jid);
         buffer.append(")");
         return buffer.toString();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getJID()
      */
     public JID getJID() {
