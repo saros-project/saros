@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -37,6 +37,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class AddContactWizard extends Wizard {
 
+    public static final boolean allowToEnterNick = false;
+
     private class AddContactPage extends WizardPage {
         private Text idText;
 
@@ -61,13 +63,15 @@ public class AddContactWizard extends Wizard {
             this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
                     false));
 
+            if (allowToEnterNick){
+
             Label nicknameLabel = new Label(composite, SWT.NONE);
             nicknameLabel.setText("Nickname");
 
             this.nicknameText = new Text(composite, SWT.BORDER);
             this.nicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
                     true, false));
-
+            }
             hookListeners();
             updateNextEnablement();
 
@@ -79,6 +83,9 @@ public class AddContactWizard extends Wizard {
         }
 
         public String getNickname() {
+            if (!allowToEnterNick){
+                throw new IllegalStateException();
+            }
             return this.nicknameText.getText();
         }
 
@@ -90,12 +97,17 @@ public class AddContactWizard extends Wizard {
             };
 
             this.idText.addModifyListener(listener);
-            this.nicknameText.addModifyListener(listener);
+            if (allowToEnterNick){
+                this.nicknameText.addModifyListener(listener);
+            }
         }
 
         private void updateNextEnablement() {
-            boolean done = (this.idText.getText().length() > 0)
-                    && (this.nicknameText.getText().length() > 0);
+            boolean done = (this.idText.getText().length() > 0);
+
+            if (allowToEnterNick){
+                done &= (this.nicknameText.getText().length() > 0);
+            }
 
             setPageComplete(done);
         }
@@ -116,8 +128,13 @@ public class AddContactWizard extends Wizard {
     @Override
     public boolean performFinish() {
         try {
-            Saros.getDefault().addContact(this.page.getJID(),
-                    this.page.getNickname(), null);
+            if (allowToEnterNick){
+                Saros.getDefault().addContact(this.page.getJID(),
+                        this.page.getNickname(), null);
+            } else {
+                Saros.getDefault().addContact(this.page.getJID(),
+                    this.page.getJID().toString(), null);
+            }
             return true;
 
         } catch (XMPPException e) {
