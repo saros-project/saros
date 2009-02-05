@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
@@ -35,9 +37,13 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * Wizard for adding a new contact to the
+ * roster of the currently connected user.
+ */
 public class AddContactWizard extends Wizard {
 
-    public static final boolean allowToEnterNick = false;
+    public static final boolean allowToEnterNick = true;
 
     private class AddContactPage extends WizardPage {
         private Text idText;
@@ -79,14 +85,14 @@ public class AddContactWizard extends Wizard {
         }
 
         public JID getJID() {
-            return new JID(this.idText.getText());
+            return new JID(this.idText.getText().trim());
         }
 
         public String getNickname() {
             if (!allowToEnterNick){
                 throw new IllegalStateException();
             }
-            return this.nicknameText.getText();
+            return this.nicknameText.getText().trim();
         }
 
         private void hookListeners() {
@@ -102,14 +108,36 @@ public class AddContactWizard extends Wizard {
             }
         }
 
+        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
+
         private void updateNextEnablement() {
+
             boolean done = (this.idText.getText().length() > 0);
 
-            if (allowToEnterNick){
-                done &= (this.nicknameText.getText().length() > 0);
+            if (!done){
+                this.setErrorMessage(null);
+                this.setMessage("Please enter a Jabber-ID");
+                this.setPageComplete(false);
+                return;
             }
 
-            setPageComplete(done);
+            if (!emailPattern.matcher(this.idText.getText().trim()).matches()){
+                this.setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
+                this.setMessage(null);
+                this.setPageComplete(false);
+                return;
+            }
+
+            if (allowToEnterNick){
+                if (getNickname().length() == 0){
+                    this.setMessage("Enter a Nickname for the Contact (optional)", WizardPage.INFORMATION);
+                } else {
+                    this.setMessage(null);
+                }
+            }
+
+            this.setErrorMessage(null);
+            setPageComplete(true);
         }
     }
 
@@ -128,7 +156,7 @@ public class AddContactWizard extends Wizard {
     @Override
     public boolean performFinish() {
         try {
-            if (allowToEnterNick){
+            if (allowToEnterNick && !(page.getNickname().length() == 0)){
                 Saros.getDefault().addContact(this.page.getJID(),
                         this.page.getNickname(), null);
             } else {
