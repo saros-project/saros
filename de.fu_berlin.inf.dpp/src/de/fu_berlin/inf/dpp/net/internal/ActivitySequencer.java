@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -53,7 +53,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * Implements {@link IActivitySequencer} and {@link IActivityManager}.
- * 
+ *
  * @author rdjemili
  */
 public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
@@ -78,7 +78,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         /**
          * check status of created activity. After execution in
          * ActivitySequencer activity has created new call of activityCreated.
-         * 
+         *
          * @param activity
          */
         public synchronized boolean checkCreatedActivity(IActivity activity) {
@@ -153,7 +153,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.IActivityManager
      */
     public void exec(final IActivity activity) {
@@ -166,7 +166,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 this.concurrentManager.exec(activity);
             }
             if (activity instanceof FolderActivity) {
-
+                // TODO
             }
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
@@ -213,7 +213,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /**
      * this class check the match of local and remote file checksum.
-     * 
+     *
      * @param editor
      *            incoming editor activity with type saved
      */
@@ -265,7 +265,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public void exec(TimedActivity timedActivity) {
@@ -275,7 +275,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivitySequencer
      */
     public void exec(List<TimedActivity> activities) {
@@ -285,7 +285,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public List<IActivity> flush() {
@@ -298,7 +298,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public List<TimedActivity> flushTimed() {
@@ -322,7 +322,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public void addProvider(IActivityProvider provider) {
@@ -332,7 +332,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public void removeProvider(IActivityProvider provider) {
@@ -342,7 +342,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivitySequencer
      */
     public List<IActivity> getLog() {
@@ -351,7 +351,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityListener
      */
     public void activityCreated(IActivity activity) {
@@ -394,7 +394,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public int getTimestamp() {
@@ -617,7 +617,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /**
      * Execute activity after jupiter transforming process.
-     * 
+     *
      * @param activity
      */
     public void execTransformedActivity(IActivity activity) {
