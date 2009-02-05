@@ -977,9 +977,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         // Start Jingle Manager asynchronous
         this.startingJingleThread = new Thread(new Runnable() {
             public void run() {
-                XMPPChatTransmitter.this.jingleManager = new JingleFileTransferManager(
+                try {
+                    jingleManager = new JingleFileTransferManager(
                         connection, new JingleTransferListener());
-                log.debug("Jingle Manager started");
+                    log.debug("Jingle Manager started");
+                } catch (Exception e){
+                    log.error("Jingle Manager could not be started", e);
+                    jingleManager = null;
+                }
             }
         });
         this.startingJingleThread.start();
