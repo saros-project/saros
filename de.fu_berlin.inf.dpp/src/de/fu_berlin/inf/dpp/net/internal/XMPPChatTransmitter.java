@@ -59,13 +59,11 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
-import org.jivesoftware.smackx.packet.Jingle;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -162,6 +160,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     private Thread startingJingleThread;
 
     protected long lastReceivedActivityTime;
+
+    protected JingleDiscoveryManager jingleDiscovery;
 
     /**
      * TODO What to do if already in a Session?
@@ -982,6 +982,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         this.chats.clear();
 
+        // Create JingleDiscoveryManager
+        jingleDiscovery = new JingleDiscoveryManager(connection);
+
         // Register PacketListeners
         this.connection.addPacketListener(new InvitePacketListener(),
                 new AndFilter(new MessageTypeFilter(Message.Type.chat),
@@ -990,20 +993,20 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.connection.addPacketListener(new GodPacketListener(),
                 PacketExtensions.getSessionIDPacketFilter());
 
-        // Start Jingle Manager asynchronous
-        this.startingJingleThread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    jingleManager = new JingleFileTransferManager(connection,
-                            new JingleTransferListener());
-                    log.debug("Jingle Manager started");
-                } catch (Exception e) {
-                    log.error("Jingle Manager could not be started", e);
-                    jingleManager = null;
-                }
-            }
-        });
         if (!getFileTransferModeViaChat()) {
+            // Start Jingle Manager asynchronous
+            this.startingJingleThread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        jingleManager = new JingleFileTransferManager(
+                            connection, new JingleTransferListener());
+                        log.debug("Jingle Manager started");
+                    } catch (Exception e){
+                        log.error("Jingle Manager could not be started", e);
+                        jingleManager = null;
+                    }
+                }
+            });
             this.startingJingleThread.start();
         }
     }
@@ -1169,34 +1172,31 @@ public class XMPPChatTransmitter implements ITransmitter,
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
 
-        if (getFileTransferModeViaChat()) {
+        /*
+         * TODO This is not a safe way to determine whether the user
+         * really supports Jingle at this point in time - He might have
+         * left and reconnected and changed his Jingle settings in
+         * between
+         */
+        if (getFileTransferModeViaChat() || !jingleDiscovery
+            .getCachedJingleSupport(data.getRecipient())) {
 
             ibb.send(data);
 
         } else {
 
             try {
-                ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-                        .getInstanceFor(connection);
-
-                if (sdm.discoverInfo(data.getForJingle().recipient.toString())
-                        .containsFeature(Jingle.NAMESPACE)) {
-
-                    jingle.send(data);
-
-                } else {
-                    ibb.send(data);
-                }
+                jingle.send(data);
             } catch (Exception e) {
+                // TODO Catch only IOException and RuntimeException
                 log
-                        .info(
-                                "Failed to send file list with jingle, fall back to IBB",
-                                e);
+                    .info(
+                        "Failed to send file with jingle, fall back to IBB",
+                        e);
                 ibb.send(data);
 
                 // Fall back to ChatTransfer:
                 // handmade.send(data)
-
             }
         }
     }
@@ -1309,14 +1309,14 @@ public class XMPPChatTransmitter implements ITransmitter,
             try {
                 JingleFileTransferManager jftm = getJingleManager();
                 if (jftm == null)
-                    throw new IOException();
+                    throw new IOException("Jingle is disabled");
+
                 jftm.send(data.getRecipient(), data.getForJingle());
             } catch (JingleSessionException e) {
                 throw new IOException(e);
             }
         }
-
-    };
+   };
 
     public void sendFileList(JID recipient, FileList fileList)
             throws IOException {
