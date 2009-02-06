@@ -45,7 +45,7 @@ public class OpenInviteInterface extends Action implements
     private void updateEnablement() {
         ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
-        setEnabled((project != null) && project.isDriver());
+        setEnabled((project != null) && project.isHost());
     }
 
     public void driverChanged(JID driver, boolean replicated) {
