@@ -20,6 +20,7 @@ import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
  * @author oezbek
  * 
  */
+@SuppressWarnings("restriction")
 public class JDTSupport implements IJDTSupport {
 
     public void installSharedDocumentProvider() {
@@ -36,7 +37,6 @@ public class JDTSupport implements IJDTSupport {
         cuProvider.setParentDocumentProvider(parentProvider);
     }
 
-    @SuppressWarnings("restriction")
     public IDocumentProvider getDocumentProvider() {
         // TODO RESTRICTED ACCESS
         return JavaPlugin.getDefault().getCompilationUnitDocumentProvider();

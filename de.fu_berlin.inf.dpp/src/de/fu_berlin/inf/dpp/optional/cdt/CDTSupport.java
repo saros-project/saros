@@ -20,8 +20,10 @@ import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
  * @author oezbek
  * 
  */
+@SuppressWarnings("restriction")
 public class CDTSupport implements ICDTSupport {
 
+    @SuppressWarnings( {})
     public void installSharedDocumentProvider() {
         // TODO RESTRICTED ACCESS
         TextFileDocumentProvider docProvider = CUIPlugin.getDefault()
