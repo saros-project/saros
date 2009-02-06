@@ -53,7 +53,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
     }
 
     public void selectionChanged(IAction action, ISelection selection) {
-
+        // We don't need to update on a selectionChanged
     }
 
     public void dispose() {

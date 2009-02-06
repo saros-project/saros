@@ -49,6 +49,7 @@ public class NewSessionAction implements IObjectActionDelegate {
      * (non-Javadoc) Defined in IActionDelegate
      */
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+        // We deal with everything in selectionChanged
     }
 
     /*

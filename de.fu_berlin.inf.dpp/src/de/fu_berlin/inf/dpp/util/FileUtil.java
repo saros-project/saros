@@ -35,6 +35,7 @@ public class FileUtil {
 
             byte[] tempBuf = new byte[128];
             while (cis.read(tempBuf) >= 0) {
+                // continue until buffer empty
             }
             long checksum = cis.getChecksum().getValue();
             return new Long(checksum);

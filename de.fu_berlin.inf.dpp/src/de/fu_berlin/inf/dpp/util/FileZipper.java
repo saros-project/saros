@@ -175,6 +175,8 @@ public class FileZipper {
     public static void readInputStreamsProjectArchive(File file)
         throws Exception {
         ZipFile zip = new ZipFile(file);
+
+        @SuppressWarnings("unchecked")
         Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();

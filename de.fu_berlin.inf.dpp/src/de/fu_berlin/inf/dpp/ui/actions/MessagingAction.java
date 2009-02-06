@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
-import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
@@ -29,8 +28,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class MessagingAction extends SelectionProviderAction {
-
-    private static Logger logger = Logger.getLogger(MessagingAction.class);
 
     public MessagingAction(ISelectionProvider provider) {
         super(provider, "Send instant message..");

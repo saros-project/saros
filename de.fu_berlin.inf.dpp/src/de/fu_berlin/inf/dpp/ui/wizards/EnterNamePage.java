@@ -260,7 +260,7 @@ class EnterNamePage extends WizardPage {
     }
 
     protected void createScanStatusProject(Composite workArea) {
-
+        // TODO?
     }
 
     protected void requestRemoteFileList() {

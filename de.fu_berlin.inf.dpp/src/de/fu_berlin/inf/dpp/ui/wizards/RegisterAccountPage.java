@@ -121,6 +121,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             createAccountButton.setText("Create Account");
             createAccountButton.addSelectionListener(new SelectionListener() {
                 public void widgetDefaultSelected(SelectionEvent e) {
+                    // Do nothing -> Use widget Selected
                 }
 
                 public void widgetSelected(SelectionEvent e) {
