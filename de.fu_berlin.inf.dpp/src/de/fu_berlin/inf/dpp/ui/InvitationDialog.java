@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -274,6 +274,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     // Triggers the update of the table in a GUI thread.
     public void updateInvitationProgress(final JID jid) {
+        // TODO Widget might be disposed
         this.display.asyncExec(new Runnable() {
             public void run() {
                 updateInvitationProgressRunASyn(jid);
@@ -403,7 +404,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
      */
@@ -418,7 +419,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
