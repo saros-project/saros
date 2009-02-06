@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -120,6 +121,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 Thread.sleep(500);
                 monitor.worked(1);
             } catch (InterruptedException e) {
+                cancel(null, false);
             }
         }
 
@@ -219,14 +221,19 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         try {
             IFile file = this.localProject.getFile(path);
             if (file.exists()) {
-                file.setReadOnly(false);
+                ResourceAttributes attributes = new ResourceAttributes();
+                attributes.setReadOnly(false);
+                file.setResourceAttributes(attributes);
                 file
                     .setContents(in, IResource.FORCE, new NullProgressMonitor());
+
+                // TODO Set ReadOnly again?
             } else {
                 file.create(in, true, new NullProgressMonitor());
                 IncomingInvitationProcess.logger.debug("New File created: "
                     + file.getName());
             }
+
         } catch (Exception e) {
             failed(e);
         }
