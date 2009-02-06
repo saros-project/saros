@@ -295,7 +295,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             Object o = ti.getData();
             invdat = (InviterData) o;
 
-            if ((invdat.outginvatationProc != null)
+            if (invdat.outginvatationProc == null)
+                alldone = false;
+            else if ((invdat.outginvatationProc != null)
                 && (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE)
                 && (invdat.outginvatationProc.getState() != IInvitationProcess.State.CANCELED)) {
                 alldone = false;
@@ -320,6 +322,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             this.inviteStep = InvState.DONE;
             getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
             setInviteable(false);
+            this.close();
 
         }
         this.cancelButton.setEnabled(isSelectionCancelable()
