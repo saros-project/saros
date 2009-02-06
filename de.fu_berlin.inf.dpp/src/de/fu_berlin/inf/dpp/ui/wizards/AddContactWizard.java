@@ -38,12 +38,12 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * Wizard for adding a new contact to the
- * roster of the currently connected user.
+ * Wizard for adding a new contact to the roster of the currently connected
+ * user.
  */
 public class AddContactWizard extends Wizard {
 
-    public static final boolean allowToEnterNick = true;
+    public static final boolean allowToEnterNick = false;
 
     private class AddContactPage extends WizardPage {
         private Text idText;
@@ -69,14 +69,14 @@ public class AddContactWizard extends Wizard {
             this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
                     false));
 
-            if (allowToEnterNick){
+            if (allowToEnterNick) {
 
-            Label nicknameLabel = new Label(composite, SWT.NONE);
-            nicknameLabel.setText("Nickname");
+                Label nicknameLabel = new Label(composite, SWT.NONE);
+                nicknameLabel.setText("Nickname");
 
-            this.nicknameText = new Text(composite, SWT.BORDER);
-            this.nicknameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                    true, false));
+                this.nicknameText = new Text(composite, SWT.BORDER);
+                this.nicknameText.setLayoutData(new GridData(SWT.FILL,
+                        SWT.CENTER, true, false));
             }
             hookListeners();
             updateNextEnablement();
@@ -89,7 +89,7 @@ public class AddContactWizard extends Wizard {
         }
 
         public String getNickname() {
-            if (!allowToEnterNick){
+            if (!allowToEnterNick) {
                 throw new IllegalStateException();
             }
             return this.nicknameText.getText().trim();
@@ -103,34 +103,39 @@ public class AddContactWizard extends Wizard {
             };
 
             this.idText.addModifyListener(listener);
-            if (allowToEnterNick){
+            if (allowToEnterNick) {
                 this.nicknameText.addModifyListener(listener);
             }
         }
 
-        Pattern emailPattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$", Pattern.CASE_INSENSITIVE);
+        Pattern emailPattern = Pattern.compile(
+                "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$",
+                Pattern.CASE_INSENSITIVE);
 
         private void updateNextEnablement() {
 
             boolean done = (this.idText.getText().length() > 0);
 
-            if (!done){
+            if (!done) {
                 this.setErrorMessage(null);
                 this.setMessage("Please enter a Jabber-ID");
                 this.setPageComplete(false);
                 return;
             }
 
-            if (!emailPattern.matcher(this.idText.getText().trim()).matches()){
-                this.setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
+            if (!emailPattern.matcher(this.idText.getText().trim()).matches()) {
+                this
+                        .setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
                 this.setMessage(null);
                 this.setPageComplete(false);
                 return;
             }
 
-            if (allowToEnterNick){
-                if (getNickname().length() == 0){
-                    this.setMessage("Enter a Nickname for the Contact (optional)", WizardPage.INFORMATION);
+            if (allowToEnterNick) {
+                if (getNickname().length() == 0) {
+                    this.setMessage(
+                            "Enter a Nickname for the Contact (optional)",
+                            WizardPage.INFORMATION);
                 } else {
                     this.setMessage(null);
                 }
@@ -156,12 +161,12 @@ public class AddContactWizard extends Wizard {
     @Override
     public boolean performFinish() {
         try {
-            if (allowToEnterNick && !(page.getNickname().length() == 0)){
+            if (allowToEnterNick && !(page.getNickname().length() == 0)) {
                 Saros.getDefault().addContact(this.page.getJID(),
                         this.page.getNickname(), null);
             } else {
                 Saros.getDefault().addContact(this.page.getJID(),
-                    this.page.getJID().toString(), null);
+                        this.page.getJID().toString(), null);
             }
             return true;
 
