@@ -8,5 +8,5 @@ import java.io.Serializable;
  * specific methods at all.
  */
 public interface Operation extends Serializable {
-
+    // This interface is a marker interface and left intentionally empty
 }

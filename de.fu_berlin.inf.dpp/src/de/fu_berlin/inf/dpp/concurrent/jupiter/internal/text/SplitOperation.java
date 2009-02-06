@@ -44,6 +44,7 @@ public class SplitOperation implements Operation {
      * Class constructor.
      */
     public SplitOperation() {
+        // Empty default constructor
     }
 
     /**

@@ -51,13 +51,6 @@ public class InsertOperation implements Operation {
     /**
      * Class constructor.
      * 
-     */
-    public InsertOperation() {
-    }
-
-    /**
-     * Class constructor.
-     * 
      * @param position
      *            the position in the document
      * @param text

@@ -7,12 +7,11 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.OperationSerializer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class Serializer extends Thread implements OperationSerializer {
+public class Serializer extends Thread {
 
     private static Logger logger = Logger.getLogger(Serializer.class);
 

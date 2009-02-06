@@ -29,12 +29,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 public class NoOperation implements Operation {
 
     /**
-     * Class constructor.
-     */
-    public NoOperation() {
-    }
-
-    /**
      * Returns the position.
      * 
      * @return the position
