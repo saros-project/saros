@@ -77,8 +77,8 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator,
             return;
         }
 
-        IFile file = (IFile) element; // enablement ensures that we only get
-        // IFile's
+        // Enablement ensures that we only get IFile's
+        IFile file = (IFile) element;
         if (!this.sharedProject.getProject().equals(file.getProject())) {
             return;
         }
@@ -112,6 +112,10 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator,
      * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
      */
     public void dispose() {
+        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+        sessionManager.removeSessionListener(this);
+
+        this.sharedProject = null;
     }
 
     /*
