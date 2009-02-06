@@ -66,5 +66,6 @@ public class PreferencePage extends FieldEditorPreferencePage implements
      * @see org.eclipse.ui.IWorkbenchPreferencePage
      */
     public void init(IWorkbench workbench) {
+        // nothing to initialize
     }
 }

@@ -160,12 +160,14 @@ public class RosterView extends ViewPart implements IConnectionListener,
          * @see org.eclipse.jface.viewers.IContentProvider
          */
         public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+            // do nothing
         }
 
         /*
          * @see org.eclipse.jface.viewers.IContentProvider
          */
         public void dispose() {
+            // do nothing
         }
 
         /*
@@ -301,12 +303,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
             // otherwise use default order
             return super.compare(viewer, elem1, elem2);
         }
-    }
-
-    /**
-     * Creates an roster view..
-     */
-    public RosterView() {
     }
 
     /**

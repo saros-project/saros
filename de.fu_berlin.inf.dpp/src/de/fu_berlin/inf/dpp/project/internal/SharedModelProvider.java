@@ -39,10 +39,6 @@ public class SharedModelProvider extends ModelProvider implements
     /** the currently running shared project */
     private ISharedProject sharedProject;
 
-    public SharedModelProvider() {
-
-    }
-
     /**
      * Check each resource delta whether it is in a shared project. If we are
      * not the exclusive driver set the appropriate flag.

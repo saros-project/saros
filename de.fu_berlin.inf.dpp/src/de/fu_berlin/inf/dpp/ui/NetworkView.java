@@ -99,6 +99,7 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
                 .addJingleFileTransferListener(this);
 
         } else if (newState == ConnectionState.NOT_CONNECTED) {
+            // TODO remove as listener?
         }
 
     }

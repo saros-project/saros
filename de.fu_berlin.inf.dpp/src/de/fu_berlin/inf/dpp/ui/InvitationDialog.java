@@ -178,18 +178,22 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.cancelButton.addSelectionListener(new SelectionListener() {
 
             public void widgetDefaultSelected(SelectionEvent e) {
+                // Everything done in widgetSelected
             }
 
             public void widgetSelected(SelectionEvent e) {
                 cancelInvite();
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {
+                        // Block until all SWT events have been processed
                     }
                 });
             }
         });
 
         this.table.addSelectionListener(new SelectionAdapter() {
+            // TODO Use SelectionAdapter instead of SelectionListener everywhere
+
             @Override
             public void widgetSelected(SelectionEvent event) {
                 InvitationDialog.this.cancelButton
@@ -200,10 +204,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
                 setInviteable(InvitationDialog.this.table.getSelectionCount() > 0
                     && data.outginvatationProc == null);
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent event) {
             }
         });
 
