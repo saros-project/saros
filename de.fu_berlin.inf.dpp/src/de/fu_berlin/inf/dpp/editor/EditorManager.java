@@ -37,6 +37,7 @@ import org.eclipse.core.filebuffers.manipulation.FileBufferOperationRunner;
 import org.eclipse.core.filebuffers.manipulation.TextFileBufferOperation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -116,7 +117,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             IPath path = file.getProjectRelativePath();
-            saveText(path, false);
+            sendEditorActivitySaved(path);
         }
 
         public void elementContentAboutToBeReplaced(Object element) {
@@ -260,11 +261,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private class DocumentListener implements IDocumentListener {
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.text.IDocumentListener
-         */
         public void documentAboutToBeChanged(final DocumentEvent event) {
             // boolean checksumErrorHandling = Saros.getDefault()
             // .getSessionManager().getSharedProject()
@@ -277,12 +273,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 event.getDocument());
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.text.IDocumentListener
-         */
         public void documentChanged(final DocumentEvent event) {
+            // do nothing. We handeled everything in documentAboutToBeChanged
         }
     }
 
@@ -635,7 +627,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 removeDriverEditor(editorActivity.getPath(), true);
 
             } else if (editorActivity.getType().equals(Type.Saved)) {
-                saveText(editorActivity.getPath(), true);
+                saveText(editorActivity.getPath());
             }
         }
 
@@ -1020,54 +1012,67 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * Saves the driver editor.
      * 
      * @param path
-     *            the path to the resource that the driver was editing.
-     * @param replicated
-     *            <code>false</code> if this action originates on this client.
-     *            <code>true</code> if it is an replication of an action from
-     *            another participant of the shared project.
+     *            the project relative path to the resource that the driver was
+     *            editing.
      */
-    public void saveText(IPath path, boolean replicated) {
+    public void saveText(IPath path) {
         for (ISharedEditorListener listener : this.editorListeners) {
-            listener.driverEditorSaved(path, replicated);
+            listener.driverEditorSaved(path, true);
         }
 
-        if (replicated) {
-            IFile file = this.sharedProject.getProject().getFile(path);
-            FileEditorInput input = new FileEditorInput(file);
+        IFile file = this.sharedProject.getProject().getFile(path);
+        FileEditorInput input = new FileEditorInput(file);
 
-            try {
-                file.setReadOnly(false);
-                IDocumentProvider provider = this.editorAPI
-                    .getDocumentProvider(input);
+        try {
+            ResourceAttributes attributes = new ResourceAttributes();
+            attributes.setReadOnly(false);
+            file.setResourceAttributes(attributes);
 
-                // save not necessary, if we have no modified document
-                if (!this.connectedFiles.contains(file)) {
-                    return;
-                }
+            IDocumentProvider provider = this.editorAPI
+                .getDocumentProvider(input);
 
-                IDocument doc = provider.getDocument(input);
-
-                IAnnotationModel model = provider.getAnnotationModel(input);
-                model.connect(doc);
-
-                provider.saveDocument(new NullProgressMonitor(), input, doc,
-                    true);
-                EditorManager.log.debug("Saved document " + path);
-
-                model.disconnect(doc);
-
-                provider.disconnect(input);
-                this.connectedFiles.remove(file);
-
-            } catch (CoreException e) {
-                EditorManager.log.error("Failed to save document.", e);
+            // save not necessary, if we have no modified document
+            if (!this.connectedFiles.contains(file)) {
+                return;
             }
 
-        } else {
-            IActivity activity = new EditorActivity(Type.Saved, path);
-            for (IActivityListener listener : this.activityListeners) {
-                listener.activityCreated(activity);
-            }
+            IDocument doc = provider.getDocument(input);
+
+            IAnnotationModel model = provider.getAnnotationModel(input);
+            model.connect(doc);
+
+            provider.saveDocument(new NullProgressMonitor(), input, doc, true);
+            EditorManager.log.debug("Saved document " + path);
+
+            model.disconnect(doc);
+
+            // TODO Set file readonly again?
+
+            provider.disconnect(input);
+            this.connectedFiles.remove(file);
+
+        } catch (CoreException e) {
+            EditorManager.log.error("Failed to save document.", e);
+        }
+
+    }
+
+    /**
+     * Sends an activity for clients to save the editor of given path.
+     * 
+     * @param path
+     *            the project relative path to the resource that the driver was
+     *            editing.
+     */
+    protected void sendEditorActivitySaved(IPath path) {
+
+        for (ISharedEditorListener listener : this.editorListeners) {
+            listener.driverEditorSaved(path, false);
+        }
+
+        IActivity activity = new EditorActivity(Type.Saved, path);
+        for (IActivityListener listener : this.activityListeners) {
+            listener.activityCreated(activity);
         }
     }
 

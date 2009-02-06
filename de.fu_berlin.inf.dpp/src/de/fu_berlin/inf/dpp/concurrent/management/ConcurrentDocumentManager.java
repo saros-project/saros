@@ -274,7 +274,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
             FileActivity file = (FileActivity) activity;
             if (file.getType() == FileActivity.Type.Created) {
-                resetJupiterDocument(file.getPath());
+                // Do nothing
             }
             if (file.getType() == FileActivity.Type.Removed) {
                 if (isHostSide()) {
@@ -712,29 +712,31 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     /**
      * reset jupiter document server component.
      */
-    protected void resetJupiterDocument(IPath path) {
+    public void resetJupiterDocument(IPath path) {
+
         // host side
-        if (isHostSide()) {
-            if (this.concurrentDocuments.containsKey(path)) {
-                /* remove document server. */
-                this.concurrentDocuments.remove(path);
-                /* init new server. */
-                JupiterDocumentServer doc = initDocumentServer(path);
-                ConcurrentDocumentManager.logger
-                    .debug("Reset jupiter server : ");
-                /* add proxy documents for active driver. */
-                for (JID jid : this.driverManager.getDriversForDocument(path)) {
-                    doc.addProxyClient(jid);
-                    ConcurrentDocumentManager.logger
-                        .debug("add driver proxy : " + jid);
-                }
+        if (!isHostSide()) {
+            return;
+        }
 
-                this.concurrentDocuments.put(path, doc);
-
-            } else {
-                ConcurrentDocumentManager.logger
-                    .error("No jupter document exists for " + path.toOSString());
+        if (this.concurrentDocuments.containsKey(path)) {
+            /* remove document server. */
+            this.concurrentDocuments.remove(path);
+            /* init new server. */
+            JupiterDocumentServer doc = initDocumentServer(path);
+            ConcurrentDocumentManager.logger.debug("Reset jupiter server : ");
+            /* add proxy documents for active driver. */
+            for (JID jid : this.driverManager.getDriversForDocument(path)) {
+                doc.addProxyClient(jid);
+                ConcurrentDocumentManager.logger.debug("add driver proxy : "
+                    + jid);
             }
+
+            this.concurrentDocuments.put(path, doc);
+
+        } else {
+            ConcurrentDocumentManager.logger
+                .error("No jupter document exists for " + path.toOSString());
         }
 
         // reset client documents
@@ -762,6 +764,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      */
     public void checkConsistency(DocumentChecksum[] checksums) {
 
+        logger.debug(String.format(
+            "Received %d checksums for %d inconsistencies", checksums.length,
+            pathesWithWrongChecksums.size()));
+
         for (DocumentChecksum checksum : checksums) {
 
             IPath path = checksum.getPath();
@@ -769,8 +775,9 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             IDocument doc = EditorManager.getDefault().getDocument(path);
 
             // if doc == null there is no editor with this resource open
-            if (doc == null)
+            if (doc == null) {
                 continue;
+            }
 
             if ((doc.getLength() != checksum.getLength())
                 || (doc.get().hashCode() != checksum.getHash())) {
@@ -799,11 +806,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 }
                 return;
             }
-            logger.debug("All Inconsistencies are resolved");
 
             ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
 
-            if (inconsistencyToResolve.getVariable() == true) {
+            if (inconsistencyToResolve.getVariable()) {
+                logger.debug("All Inconsistencies are resolved");
                 inconsistencyToResolve.setVariable(false);
             }
         }

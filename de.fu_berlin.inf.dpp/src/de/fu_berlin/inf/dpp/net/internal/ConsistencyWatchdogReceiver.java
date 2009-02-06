@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.util.Collections;
+import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -19,11 +19,10 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
@@ -121,7 +120,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
             return;
         }
 
-        ErrorMessageDialog.showChecksumErrorMessage(path);
+        // ErrorMessageDialog.showChecksumErrorMessage(path);
 
         // Host
         if (Saros.getDefault().getSessionManager().getSharedProject().isHost()) {
@@ -131,43 +130,55 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
                 @Override
                 public void run() {
+                    try {
 
-                    // wait until no more activities are received
-                    while (System.currentTimeMillis()
-                        - lastReceivedActivityTime < 1500) {
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        // wait until no more activities are received
+                        while (System.currentTimeMillis()
+                            - lastReceivedActivityTime < 1500) {
+                            try {
+                                Thread.sleep(200);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
+
+                        // Set<IEditorPart> editors = EditorManager.getDefault()
+                        // .getEditors(new Path(path));
+                        // if (editors != null && editors.size() > 0) {
+                        // IEditorInput input = editors.iterator().next()
+                        // .getEditorInput();
+                        // input.
+                        // }
+                        EditorManager.getDefault().saveText(new Path(path));
+
+                        Saros.getDefault().getSessionManager()
+                            .getSharedProject().getConcurrentDocumentManager()
+                            .resetJupiterDocument(new Path(path));
+
+                        try {
+                            transmitter.sendFile(new JID(message.getFrom()),
+                                Saros.getDefault().getSessionManager()
+                                    .getSharedProject().getProject(), new Path(
+                                    path), -1);
+                        } catch (IOException e) {
+                            log
+                                .error("Could not sent file for consistency resolution");
+                            // TODO This means we were really unable to send
+                            // this file. No more falling back.
+                        }
+
+                        // TODO Should we not rather send an Activity?
+                        // transmitter.sendActivities(project.getVariable(),
+                        // Collections.singletonList(new TimedActivity(
+                        // new FileActivity(FileActivity.Type.Created,
+                        // new Path(path)),
+                        // ActivitySequencer.UNDEFINED_TIME)));
+                    } catch (RuntimeException e) {
+                        log
+                            .error(
+                                "Internal Error while processing an checksum error",
+                                e);
                     }
-
-                    EditorManager.getDefault().saveText(new Path(path), true);
-
-                    transmitter.sendActivities(project.getVariable(),
-                        Collections.singletonList(new TimedActivity(
-                            new FileActivity(FileActivity.Type.Created,
-                                new Path(path)),
-                            ActivitySequencer.UNDEFINED_TIME)));
-
-                    // // TODO CJ: thinking about a better solution with
-                    // // activity sequencer and jupiter
-                    //
-                    // Saros.getDefault().getSessionManager().getSharedProject()
-                    // .getConcurrentDocumentManager()
-                    // .resetJupiterDocument(new Path(path));
-                    //
-                    // log.debug("Sending file to clients");
-                    // try {
-                    // transmitter.sendFile(new JID(message.getFrom()), Saros
-                    // .getDefault().getSessionManager()
-                    // .getSharedProject().getProject(),
-                    // new Path(path), -1);
-                    // } catch (IOException e) {
-                    // log.error("File could not be send:", e);
-                    // // TODO This means we were really unable to send
-                    // // this file. No more falling back.
-                    // }
                 }
             }.start();
         }
@@ -185,8 +196,6 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
             executor.submit(new Runnable() {
                 public void run() {
                     try {
-                        log.debug("Processing Checksum");
-
                         int count = Integer.parseInt(ext.getValue("quantity"));
                         DocumentChecksum[] checksums = new DocumentChecksum[count];
 

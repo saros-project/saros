@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar" sourcepath="dppsrc.zip"/>
 	<classpathentry kind="lib" path="lib/smack.jar" sourcepath="/smack-3_1/source"/>
-	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-jingle.jar" sourcepath="/smack-3_1/jingle/extension/source"/>
-	<classpathentry kind="lib" path="lib/smackx.jar" sourcepath="/smack-3_1/source"/>
-	<classpathentry kind="lib" path="lib/lw-rudp.jar" sourcepath="/limewire/components/rudp/src"/>
-	<classpathentry kind="lib" path="lib/lw-nio.jar" sourcepath="/limewire/components/nio/src/main/java"/>
-	<classpathentry kind="lib" path="lib/lw-common.jar"/>
-	<classpathentry kind="lib" path="lib/lw-io.jar"/>
-	<classpathentry kind="lib" path="lib/lw-collection.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="lib/smackx.jar" sourcepath="lib/smack_src_3_1_0.zip"/>
+	<classpathentry kind="lib" path="lib/smackx-debug.jar" sourcepath="dppsrc.zip"/>
+	<classpathentry kind="lib" path="lib/smackx-jingle.jar" sourcepath="lib/smack_src_3_1_0.zip"/>
+	<classpathentry kind="lib" path="lib/lw-rudp.jar" sourcepath="C:/Documents and Settings/oezbek/Desktop/Temp/2008/2008-12/limewire"/>
+	<classpathentry kind="lib" path="lib/lw-nio.jar" sourcepath="C:/Documents and Settings/oezbek/Desktop/Temp/2008/2008-12/limewire/components/nio"/>
+	<classpathentry kind="lib" path="lib/lw-io.jar" sourcepath="dppsrc.zip"/>
+	<classpathentry kind="lib" path="lib/lw-common.jar" sourcepath="dppsrc.zip"/>
+	<classpathentry kind="lib" path="lib/lw-collection.jar" sourcepath="dppsrc.zip"/>
+	<classpathentry kind="lib" path="lib/commons-logging.jar" sourcepath="dppsrc.zip"/>
 	<classpathentry kind="lib" path="lib/picocontainer-2.7.jar" sourcepath="lib/picocontainer-2.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-io-1.4.jar" sourcepath="lib/commons-io-1.4-sources.jar"/>
+	<classpathentry kind="lib" path="lib/commons-codec-1.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

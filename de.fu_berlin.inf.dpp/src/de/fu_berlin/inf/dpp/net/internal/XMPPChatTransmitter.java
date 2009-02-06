@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +40,8 @@ import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -831,13 +832,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
             }
 
-            byte[] dataOrg = null;
-            try {
-                dataOrg = new sun.misc.BASE64Decoder().decodeBuffer(sData);
-            } catch (IOException e) {
-                e.printStackTrace();
+            byte[] dataOrg = Base64.decodeBase64(sData.getBytes());
+            if (dataOrg == null)
                 return false;
-            }
 
             // File list received
             if (sName.equals(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION)) {
@@ -1228,16 +1225,15 @@ public class XMPPChatTransmitter implements ITransmitter,
             final int maxMsgLen = Saros.getDefault().getPreferenceStore()
                 .getInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE);
 
-            ByteArrayOutputStream os = new ByteArrayOutputStream();
-
             // Convert byte array to base64 string
-            new sun.misc.BASE64Encoder().encode(ibbData.data, os);
+            byte[] bytes64 = Base64.encodeBase64(IOUtils
+                .toByteArray(ibbData.data));
 
             String data64;
             try {
-                data64 = new String(os.toByteArray(), "UTF-8");
+                data64 = new String(bytes64, "UTF-8");
             } catch (UnsupportedCharsetException e1) {
-                data64 = new String(os.toByteArray());
+                data64 = new String(bytes64);
             }
 
             // send large data sets in several messages
