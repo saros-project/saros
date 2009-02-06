@@ -122,10 +122,20 @@ public class SessionView extends ViewPart implements ISessionListener,
 
             // if the local host become driver leave follow mode
             if (participant.getJID().equals(Saros.getDefault().getMyJID())) {
-                if (SessionView.this.sharedProject.isDriver(participant))
+                if (SessionView.this.sharedProject.isDriver(participant)) {
                     followModeAction.setFollowMode(false);
+                    BalloonNotification.showNotification(
+                        tableViewer.getTable(), "Role changed",
+                        "You are now a driver of this session.", 5000);
+                } else {
+                    BalloonNotification.showNotification(
+                        tableViewer.getTable(), "Role changed",
+                        "You are now an observer of this session.", 5000);
+                }
+
             }
             refreshTable();
+
         }
 
         public void userJoined(JID user) {
@@ -386,4 +396,5 @@ public class SessionView extends ViewPart implements ISessionListener,
     public void updateFollowingMode() {
         followModeAction.updateEnablement();
     }
+
 }
