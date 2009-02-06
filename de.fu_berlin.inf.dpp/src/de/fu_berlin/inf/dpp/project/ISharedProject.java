@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * Shared projects are the central concept of this plugin. They are associated
  * with usual Eclipse projects and make them available for synchronous/real-time
  * collaboration.
- * 
+ *
  * @author rdjemili
  */
 public interface ISharedProject {
@@ -50,7 +50,7 @@ public interface ISharedProject {
     /**
      * Sets the new driver. If given driver is already driver the call is
      * ignored.
-     * 
+     *
      * @param driver
      *            the new driver.
      * @param replicated
@@ -62,7 +62,7 @@ public interface ISharedProject {
 
     /**
      * Remove driver role for given User.
-     * 
+     *
      * @param driver
      *            one current driver.
      * @param replicated
@@ -87,7 +87,7 @@ public interface ISharedProject {
     /**
      * The host is the person that initiated this SharedProject and holds all
      * original files.
-     * 
+     *
      * @return the host.
      */
     public User getHost();
@@ -100,7 +100,7 @@ public interface ISharedProject {
 
     /**
      * Adds the user.
-     * 
+     *
      * @param user
      *            the user that is to be added.
      */
@@ -108,7 +108,7 @@ public interface ISharedProject {
 
     /**
      * Removes the user.
-     * 
+     *
      * @param user
      *            the user that is to be removed.
      */
@@ -116,7 +116,7 @@ public interface ISharedProject {
 
     /**
      * Invites a user to the shared project.
-     * 
+     *
      * @param jid
      *            the JID of the user that is to be invited.
      * @param description
@@ -124,7 +124,7 @@ public interface ISharedProject {
      *            makes the decision to accept or decline the invitation.
      * @param inviteUI
      *            user interface of the invitation for feedback calls.
-     * 
+     *
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
@@ -133,7 +133,7 @@ public interface ISharedProject {
     /**
      * Adds the given shared project listener. This call is ignored if the
      * listener is all a listener of this shared project.
-     * 
+     *
      * @param listener
      *            The listener that is to be added.
      */
@@ -142,7 +142,7 @@ public interface ISharedProject {
     /**
      * Removes the given shared project listener. This call is ignored if the
      * listener doesn't belongs to the current listeners of this shared project.
-     * 
+     *
      * @param listener
      *            the listener that is to be removed.
      */
@@ -179,7 +179,7 @@ public interface ISharedProject {
 
     /**
      * Starts the invitation wizard to invite users.
-     * 
+     *
      * @param jid
      *            the JID of a user to invite without manual selection
      */
@@ -201,7 +201,7 @@ public interface ISharedProject {
     /**
      * Sets all resources of the project to a readonly state on the local file
      * system.
-     * 
+     *
      * @param readonly
      *            The readonly state to set the file to.
      */
@@ -209,31 +209,40 @@ public interface ISharedProject {
 
     /**
      * true, if single driver is active, false otherwise.
-     * 
+     *
      * @return
      */
-    public boolean exclusiveDriver();
+    public boolean isExclusiveDriver();
 
     /**
      * the concurrent document manager is responsible for all jupiter controlled
      * documents
-     * 
+     *
      * @return the concurrent document manager
      */
     public ConcurrentDocumentManager getConcurrentDocumentManager();
 
     /**
      * Get a free color from the pool.
-     * 
+     *
      * @return an unused color ID or a default ID if all color IDs are in use.
      */
     public int getFreeColor();
 
     /**
      * Returns a color to the pool of available colors.
-     * 
+     *
      * @param colorID
      *            the color id that should be returned to the pool.
      */
     public void returnColor(int colorID);
+
+    /**
+     * Gets a driver. If there is more than one, there is no guarantee which one
+     * of them is returned.
+     *
+     * @return a {@link User} with the driver role, or <code>null</code> if
+     *         there is no driver at all.
+     */
+    public User getADriver();
 }

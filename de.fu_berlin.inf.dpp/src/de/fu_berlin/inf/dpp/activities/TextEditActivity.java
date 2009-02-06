@@ -77,15 +77,6 @@ public class TextEditActivity implements IActivity {
 
     public void setSource(String source) {
         this.source = source;
-        setOriginalSource(source);      // TODO [MR] Remove this line.
-    }
-
-    public void setOriginalSource(String originalSource) {
-        this.originalSource = originalSource;
-    }
-
-    public String getOriginalSource() {
-        return originalSource;
     }
 
     @Override

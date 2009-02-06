@@ -16,11 +16,11 @@ public interface IDriverDocumentManager extends IDriverManager,
     public void addDriverToDocument(IPath path, JID jid);
 
     /**
-     * get driver for the appropriate document.
-     * 
+     * Gets drivers for the document.
+     *
      * @param path
      *            to document
-     * @return list of active driver on document.
+     * @return active drivers for the document.
      */
-    public List<JID> getDriverForDocument(IPath path);
+    public List<JID> getDriversForDocument(IPath path);
 }

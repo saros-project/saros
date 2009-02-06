@@ -15,13 +15,9 @@ public class AnnotationSaros extends Annotation {
         super(type, isPersistent, text);
         this.source = source;
 
-        if (// type.equals(ContributionAnnotation.TYPE)
-            // ||
-            type.equals(SelectionAnnotation.TYPE)) {
-
-            // TODO: Improve color assignment and dynamic handling.
-            int colorid = getColorIdForUser(source) + 1;
-            setType(type + "." + colorid);
+        if (type.equals(ContributionAnnotation.TYPE)
+                || type.equals(SelectionAnnotation.TYPE)) {
+            setType(type + "." + (getColorIdForUser(source) + 1));
         }
     }
 

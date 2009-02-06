@@ -1110,8 +1110,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             if (activity instanceof TextEditActivity) {
                 log.debug("sendActivities: " + activity);
                 TextEditActivity textEditActivity = (TextEditActivity) activity;
-                textEditActivity.setOriginalSource(Saros.getDefault()
-                        .getMyJID().toString());
+                textEditActivity.setSource(Saros.getDefault().getMyJID()
+                        .toString());
             }
 
             if (activity instanceof FileActivity) {

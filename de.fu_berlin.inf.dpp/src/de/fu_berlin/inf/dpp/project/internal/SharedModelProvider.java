@@ -78,7 +78,7 @@ public class SharedModelProvider extends ModelProvider implements
                 // TODO Hard-coded Host 
                 /* check driver status */
                 if (!SharedModelProvider.this.sharedProject.isHost() || 
-                    !SharedModelProvider.this.sharedProject.exclusiveDriver()) {
+                    !SharedModelProvider.this.sharedProject.isExclusiveDriver()) {
                     this.isExclusive = false;
                 }
                 return false;

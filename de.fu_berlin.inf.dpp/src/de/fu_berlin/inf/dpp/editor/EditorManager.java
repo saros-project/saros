@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -92,10 +92,10 @@ import de.fu_berlin.inf.dpp.ui.SessionView;
  * The EditorManager is responsible for handling all editors in a DPP-session.
  * This includes the functionality of listening for user inputs in an editor,
  * locking the editors of the observer.
- * 
+ *
  * The EditorManager contains the testable logic. All untestable logic should
  * only appear in an class of the {@link IEditorAPI} type.
- * 
+ *
  * @author rdjemili
  */
 public class EditorManager implements IActivityProvider, ISharedProjectListener {
@@ -138,7 +138,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * @author rdjemili
-     * 
+     *
      */
     private class EditorPool {
         private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
@@ -262,7 +262,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.eclipse.jface.text.IDocumentListener
          */
         public void documentAboutToBeChanged(final DocumentEvent event) {
@@ -279,7 +279,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         /*
          * (non-Javadoc)
-         * 
+         *
          * @see org.eclipse.jface.text.IDocumentListener
          */
         public void documentChanged(final DocumentEvent event) {
@@ -339,7 +339,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
@@ -354,7 +354,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
@@ -371,7 +371,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess invitation) {
@@ -398,7 +398,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Returns the resource paths of editors that the driver is currently using.
-     * 
+     *
      * @return all paths (in project-relative format) of files that the driver
      *         is currently editing by using an editor. Never returns
      *         <code>null</code>. A empty set is returned if there are no
@@ -410,7 +410,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Return the document of the given path.
-     * 
+     *
      * @param path
      *            the path of the wanted document
      * @return the document or null if no document exists with given path or no
@@ -448,7 +448,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void viewportChanged(int top, int bottom, IPath editor) {
@@ -461,7 +461,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void selectionChanged(ITextSelection selection, ISelectionProvider sp) {
@@ -480,7 +480,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void textAboutToBeChanged(int offset, String text, int replace,
@@ -537,7 +537,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void driverChanged(JID driver, boolean replicated) {
@@ -553,7 +553,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void userJoined(JID user) {
@@ -562,7 +562,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void userLeft(JID user) {
@@ -602,7 +602,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void addActivityListener(IActivityListener listener) {
@@ -611,7 +611,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void removeActivityListener(IActivityListener listener) {
@@ -620,7 +620,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(final IActivity activity) {
@@ -650,26 +650,33 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private void execTextEdit(TextEditActivity textEdit) {
 
-        IPath path = textEdit.getEditor();
-        IFile file = EditorManager.this.sharedProject.getProject()
-                .getFile(path);
-
-        String source = textEdit.getOriginalSource();
+        String source = textEdit.getSource();
         User user = Saros.getDefault().getSessionManager().getSharedProject()
                 .getParticipant(new JID(source));
 
         /* set current execute activity to avoid circular executions. */
-        EditorManager.this.currentExecuteActivity = textEdit;
+        currentExecuteActivity = textEdit;
+        /*
+         * Really ugly hack. Because there is just one driver allowed at the
+         * moment we can use this information to set the color for contribution
+         * annotations, regardless of the real origin of contributions.
+         */
+        JID driverJID = Saros.getDefault().getSessionManager()
+                .getSharedProject().getADriver().getJID();
+        if (driverJID == null) {
+            log.warn("There is no driver at all.");
+        }
 
+        IPath path = textEdit.getEditor();
+        IFile file = sharedProject.getProject().getFile(path);
         replaceText(file, textEdit.offset, textEdit.length, textEdit.text,
-                source);
+                (driverJID != null) ? driverJID.toString() : "");
 
-        Set<IEditorPart> editors = EditorManager.this.editorPool
-                .getEditors(path);
+        Set<IEditorPart> editors = editorPool.getEditors(path);
         for (IEditorPart editorPart : editors) {
-            EditorManager.this.editorAPI.setSelection(editorPart,
-                    new TextSelection(textEdit.offset + textEdit.text.length(),
-                            0), source, shouldIFollow(user));
+            editorAPI.setSelection(editorPart, new TextSelection(
+                    textEdit.offset + textEdit.text.length(), 0), source,
+                    shouldIFollow(user));
         }
     }
 
@@ -801,7 +808,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Checks wether given resource is currently opened.
-     * 
+     *
      * @param path
      *            the project-relative path to the resource.
      * @return <code>true</code> if the given resource is opened accoring to the
@@ -813,7 +820,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Gives the editors of given path.
-     * 
+     *
      * @param path
      *            the project-relative path to the resource.
      * @return the set of editors
@@ -824,7 +831,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public IActivity fromXML(XmlPullParser parser) {
@@ -854,7 +861,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public String toXML(IActivity activity) {
@@ -1012,7 +1019,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Saves the driver editor.
-     * 
+     *
      * @param path
      *            the path to the resource that the driver was editing.
      * @param replicated
@@ -1118,7 +1125,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Removes all annotations of a given type and for all users.
-     * 
+     *
      * @param annotationType
      *            the annotation type that will be removed.
      */
@@ -1144,7 +1151,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Removes all annotations of given user and type.
-     * 
+     *
      * @param forUserID
      *            the id of the user whos annotations will be removed, if null
      *            annotations of given type for all users are removed
@@ -1197,7 +1204,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Sets the currently active driver editor.
-     * 
+     *
      * @param path
      *            the project-relative path to the resource that the editor is
      *            currently editting.
@@ -1235,7 +1242,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /**
      * Removes the given editor from the list of editors that the driver is
      * currently using.
-     * 
+     *
      * @param path
      *            the path to the resource that the driver was editting.
      * @param replicated
@@ -1291,7 +1298,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * To get the java system time of the last local edit operation.
-     * 
+     *
      * @param path
      *            the project relative path of the resource
      * @return java system time of last local edit
@@ -1302,7 +1309,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * To get the java system time of the last remote edit operation.
-     * 
+     *
      * @param path
      *            the project relative path of the resource
      * @return java system time of last remote edit
@@ -1313,7 +1320,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * to get the information whether the user is in following mode or not
-     * 
+     *
      * @return <code>true</code> when in following mode, otherwise
      *         <code>false</code>
      */

@@ -722,7 +722,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 ConcurrentDocumentManager.logger
                         .debug("Reset jupiter server : ");
                 /* add proxy documents for active driver. */
-                for (JID jid : this.driverManager.getDriverForDocument(path)) {
+                for (JID jid : this.driverManager.getDriversForDocument(path)) {
                     doc.addProxyClient(jid);
                     ConcurrentDocumentManager.logger
                             .debug("add driver proxy : " + jid);

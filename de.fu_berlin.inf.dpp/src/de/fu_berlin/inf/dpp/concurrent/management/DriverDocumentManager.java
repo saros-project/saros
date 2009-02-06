@@ -16,7 +16,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -24,9 +23,9 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
- * 
+ *
  * @author orieger
- * 
+ *
  */
 public class DriverDocumentManager implements IDriverDocumentManager,
         ISessionListener {
@@ -34,8 +33,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
     private static Logger logger = Logger
             .getLogger(DriverDocumentManager.class);
 
-    /* list of all active driver. */
-    private final List<JID> activeDriver;
+    /** All drivers. Only used on host side. */
+    private final List<JID> drivers;
 
     /* list of documents with appropriate drivers. */
     private final HashMap<IPath, DriverDocument> documents;
@@ -46,14 +45,14 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      * private constructor for singleton pattern.
      */
     private DriverDocumentManager() {
-        this.activeDriver = new Vector<JID>();
+        this.drivers = new Vector<JID>();
         this.documents = new HashMap<IPath, DriverDocument>();
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
     /**
      * get instance of this singleton object
-     * 
+     *
      * @return instance of DriverDocumentManager
      */
     public static DriverDocumentManager getInstance() {
@@ -71,35 +70,27 @@ public class DriverDocumentManager implements IDriverDocumentManager,
      */
     public boolean isDriver(JID jid) {
         if (jid != null) {
-            return this.activeDriver.contains(jid);
+            return this.drivers.contains(jid);
         } else {
-            System.out.println("jid null");
+            logger.warn("jid null");
+            return false;
         }
-        return false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager#getDriverForDocument
-     * (org.eclipse.core.runtime.IPath)
-     */
-    public List<JID> getDriverForDocument(IPath path) {
+    public List<JID> getDriversForDocument(IPath path) {
         if (this.documents.containsKey(path)) {
-            List<JID> drivers = this.documents.get(path).getActiveDriver();
-            return drivers;
+            return this.documents.get(path).getDrivers();
         }
         return new Vector<JID>();
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
      */
-    public List<JID> getActiveDriver() {
-        return this.activeDriver;
+    public List<JID> getDrivers() {
+        return this.drivers;
     }
 
     public void addDriver(JID jid) {
@@ -107,8 +98,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         assert jid != null;
 
         DriverDocumentManager.logger.debug("add driver for jid: " + jid);
-        if (!this.activeDriver.contains(jid)) {
-            this.activeDriver.add(jid);
+        if (!this.drivers.contains(jid)) {
+            this.drivers.add(jid);
         }
     }
 
@@ -139,13 +130,13 @@ public class DriverDocumentManager implements IDriverDocumentManager,
             removeDriverFromDocument(path, jid);
         }
 
-        this.activeDriver.remove(jid);
+        this.drivers.remove(jid);
 
     }
 
     /**
      * remove driver from document and delete empty documents.
-     * 
+     *
      * @param path
      *            of the document
      * @param jid
@@ -168,7 +159,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     /**
      * new driver activity received and has to be managed.
-     * 
+     *
      * @param activity
      */
     public void receiveActivity(IActivity activity) {
@@ -204,10 +195,6 @@ public class DriverDocumentManager implements IDriverDocumentManager,
                     }
                 }
             }
-            if (activity instanceof RoleActivity) {
-
-            }
-
             if (activity instanceof FileActivity) {
                 FileActivity file = (FileActivity) activity;
                 /* if file has been removed, delete appropriate driver document. */
@@ -243,17 +230,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#exclusiveDriver()
-     */
-    public boolean exclusiveDriver() {
-        boolean result = true;
-        if (this.activeDriver.size() > 1) {
-            result = false;
-        }
-        return result;
+    public boolean isExclusiveDriver() {
+        return drivers.size() == 1;
     }
 
     public void invitationReceived(IIncomingInvitationProcess invitation) {
@@ -261,17 +239,17 @@ public class DriverDocumentManager implements IDriverDocumentManager,
     }
 
     public void sessionEnded(ISharedProject session) {
-        activeDriver.clear();
+        drivers.clear();
     }
 
     public void sessionStarted(ISharedProject session) {
 
         // when this is called the host is already active Driver, remove all
         // other
-        if (activeDriver.size() > 1) {
-            for (JID participant : activeDriver) {
+        if (drivers.size() > 1) {
+            for (JID participant : drivers) {
                 if (!participant.equals(session.getHost().getJID())) {
-                    activeDriver.remove(participant);
+                    drivers.remove(participant);
                 }
             }
         }

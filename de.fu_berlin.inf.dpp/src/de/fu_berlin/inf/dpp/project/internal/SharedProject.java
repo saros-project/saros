@@ -254,23 +254,15 @@ public class SharedProject implements ISharedProject {
 
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISharedProject#isDriver(de.fu_berlin.inf
-     * .dpp.User)
-     */
     public boolean isDriver(User user) {
+        /* TODO Is the distinction host vs. client really necessary here? */
         // HOST
         if (this.driverManager != null) {
             return this.driverManager.isDriver(user.getJID());
+        } else {
+            // CLIENT
+            return getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER;
         }
-        // CLIENT
-        if (getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER) {
-            return true;
-        }
-        return false;
     }
 
     /*
@@ -296,8 +288,8 @@ public class SharedProject implements ISharedProject {
      *
      * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
      */
-    public boolean exclusiveDriver() {
-        return this.driverManager.exclusiveDriver();
+    public boolean isExclusiveDriver() {
+        return this.driverManager.isExclusiveDriver();
     }
 
     public void addUser(User user) {
@@ -466,6 +458,15 @@ public class SharedProject implements ISharedProject {
      */
     public User getParticipant(JID jid) {
         return this.participants.get(jid);
+    }
+
+    public User getADriver() {
+        for (User user : getParticipants()) {
+            if (isDriver(user)) {
+                return user;
+            }
+        }
+        return null;
     }
 
     public void startInvitation(final JID jid) {

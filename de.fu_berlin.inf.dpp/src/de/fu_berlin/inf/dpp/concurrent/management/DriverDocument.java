@@ -15,11 +15,11 @@ public class DriverDocument implements IDriverManager {
 
     private final IPath editor;
 
-    private final List<JID> currentDriver;
+    private final List<JID> currentDrivers;
 
     public DriverDocument(IPath editor) {
         this.editor = editor;
-        this.currentDriver = new Vector<JID>();
+        this.currentDrivers = new Vector<JID>();
     }
 
     public IPath getEditor() {
@@ -29,7 +29,7 @@ public class DriverDocument implements IDriverManager {
     public void addDriver(JID jid) {
         /* if driver not exists in list. */
         if (!isDriver(jid)) {
-            this.currentDriver.add(jid);
+            this.currentDrivers.add(jid);
         } else {
             DriverDocument.logger.debug("Driver " + jid
                     + " is already Driver for "
@@ -38,16 +38,16 @@ public class DriverDocument implements IDriverManager {
     }
 
     public boolean isDriver(JID jid) {
-        return this.currentDriver.contains(jid);
+        return this.currentDrivers.contains(jid);
     }
 
     public boolean noDriver() {
-        return this.currentDriver.isEmpty();
+        return this.currentDrivers.isEmpty();
     }
 
     public void removeDriver(JID jid) {
         if (isDriver(jid)) {
-            this.currentDriver.remove(jid);
+            this.currentDrivers.remove(jid);
         } else {
             DriverDocument.logger.warn("JID " + jid
                     + " is not driver for this document "
@@ -56,24 +56,16 @@ public class DriverDocument implements IDriverManager {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#exclusiveDriver()
-     */
-    public boolean exclusiveDriver() {
-        if (this.currentDriver.size() > 1) {
-            return false;
-        }
-        return true;
+    public boolean isExclusiveDriver() {
+        return currentDrivers.size() == 1;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
      */
-    public List<JID> getActiveDriver() {
-        return this.currentDriver;
+    public List<JID> getDrivers() {
+        return this.currentDrivers;
     }
 }
