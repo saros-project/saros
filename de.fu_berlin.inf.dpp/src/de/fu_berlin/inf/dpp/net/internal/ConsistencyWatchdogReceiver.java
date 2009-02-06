@@ -129,6 +129,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
             new Thread() {
 
+                @Override
                 public void run() {
 
                     // wait until no more activities are received
@@ -201,7 +202,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
                         }
                         project.getConcurrentDocumentManager()
                                 .checkConsistency(checksums);
-                    } catch (Exception e) {
+                    } catch (RuntimeException e) {
                         log.error("Failed to check consistency", e);
                     }
                 }
