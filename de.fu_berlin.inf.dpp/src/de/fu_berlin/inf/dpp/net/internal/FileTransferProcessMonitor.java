@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
