@@ -141,11 +141,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     /** outgoing queue for direct client sync messages for all driver. */
     private final List<Request> outgoingSyncActivities = new Vector<Request>();
 
-    private IActivity executedJupiterActivity;
-
     private final ExecuterQueue executer;
-
-    private ISharedProject sharedProject;
 
     public ActivitySequencer() {
         this.executer = new ExecuterQueue();
@@ -547,7 +543,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         de.fu_berlin.inf.dpp.User host, JID myJID, ISharedProject sharedProject) {
         this.concurrentManager = new ConcurrentDocumentManager(side, host,
             myJID, sharedProject);
-        this.sharedProject = sharedProject;
         sharedProject.addListener(this.concurrentManager);
         this.concurrentManager.setRequestForwarder(this);
         this.concurrentManager.setActivitySequencer(this);
@@ -601,10 +596,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         this.concurrentManager.receiveRequest(request);
     }
 
-    private boolean isHostSide() {
-        return this.concurrentManager.isHostSide();
-    }
-
     /**
      * Execute activity after jupiter transforming process.
      * 
@@ -627,7 +618,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             // mark current execute activity
             // executedJupiterActivity = activity;
             // this.executedJupiterActivity = queueActivity;
-            this.executedJupiterActivity = activity;
+
+            // this.executedJupiterActivity = activity;
 
             for (IActivityProvider exec : this.providers) {
                 exec.exec(activity);
