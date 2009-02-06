@@ -103,6 +103,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
+import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -682,7 +683,17 @@ public class XMPPChatTransmitter implements ITransmitter,
         private void processLeaveExtension(JID fromJID,
                 final ISharedProject project) {
             if (project != null) {
-                project.removeUser(project.getParticipant(fromJID)); // HACK
+                if (project.getHost().getJID().equals(fromJID)) {
+                    // Host
+                    Saros.getDefault().getSessionManager().stopSharedProject();
+
+                    WarningMessageDialog.showWarningMessage(
+                            "Closing the Session",
+                            "Closing the session because the host left.");
+                }
+                else  {// Client
+                project.removeUser(project.getParticipant(fromJID));
+                }
             }
         }
 
@@ -983,10 +994,10 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.startingJingleThread = new Thread(new Runnable() {
             public void run() {
                 try {
-                    jingleManager = new JingleFileTransferManager(
-                        connection, new JingleTransferListener());
+                    jingleManager = new JingleFileTransferManager(connection,
+                            new JingleTransferListener());
                     log.debug("Jingle Manager started");
-                } catch (Exception e){
+                } catch (Exception e) {
                     log.error("Jingle Manager could not be started", e);
                     jingleManager = null;
                 }
@@ -1166,7 +1177,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
             try {
                 ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-                .getInstanceFor(connection);
+                        .getInstanceFor(connection);
 
                 if (sdm.discoverInfo(data.getForJingle().recipient.toString())
                         .containsFeature(Jingle.NAMESPACE)) {
