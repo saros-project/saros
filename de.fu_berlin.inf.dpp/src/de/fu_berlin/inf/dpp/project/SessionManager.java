@@ -357,6 +357,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         // ask for next expected timestamp activities (in case I missed
         // something while being not available)
+
+        // TODO this is currently disabled
         this.transmitter.sendRequestForActivity(project, oldtimestamp, true);
     }
 }

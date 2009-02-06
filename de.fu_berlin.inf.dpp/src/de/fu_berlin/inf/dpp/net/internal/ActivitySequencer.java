@@ -633,4 +633,35 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             logger.error("Error while executing activity.", e);
         }
     }
+
+    /**
+     * Given a List of TimedActivities it will either return the Activity for
+     * the given timestamp (andup == false) or all activities that have a
+     * timestamp < than the given (andup == true).
+     * 
+     * If not Activities can be found an empty list is returned.
+     */
+    public static List<TimedActivity> filterActivityHistory(
+        List<TimedActivity> toFilter, int timestamp, boolean andup) {
+
+        List<TimedActivity> result = new LinkedList<TimedActivity>();
+
+        if (andup) {
+            for (TimedActivity tact : toFilter) {
+                if (tact.getTimestamp() >= timestamp) {
+                    result.add(tact);
+                }
+            }
+        } else {
+            for (TimedActivity tact : toFilter) {
+                if (tact.getTimestamp() == timestamp) {
+                    result.add(tact);
+                    // Found the one we were looking for
+                    return result;
+                }
+            }
+        }
+
+        return result;
+    }
 }

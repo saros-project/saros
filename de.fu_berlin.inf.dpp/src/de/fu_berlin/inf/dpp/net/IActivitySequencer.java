@@ -53,6 +53,4 @@ public interface IActivitySequencer extends IActivityListener, IRequestManager,
     public List<TimedActivity> getActivityHistory();
 
     public int getQueuedActivities();
-
-    // public IActivity receiveRequest(Request request);
 }

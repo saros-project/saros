@@ -459,8 +459,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         ISharedProject sharedProject = sessionManager.joinSession(
             this.localProject, host, colorID);
 
+        // TODO Will block 1000 ms to ensure something...
         this.transmitter.sendJoinMessage(sharedProject);
-        this.transmitter.removeInvitationProcess(this); // HACK
+        this.transmitter.removeInvitationProcess(this);
 
         sharedProject.setProjectReadonly(true);
 

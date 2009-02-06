@@ -9,11 +9,11 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * By contract calls to this invitiation process that are not expected, will
- * throw a IllegalStateException. Use {@link #getPeer()} to decide wether a
+ * By contract calls to this invitation process that are not expected, will
+ * throw a IllegalStateException. Use {@link #getPeer()} to decide whether a
  * incoming message is destined for this process.
  * 
- * TODO add special invitation process ID which can be used to specificly
+ * TODO add special invitation process ID which can be used to specifically
  * address certain invitations
  * 
  * @author rdjemili
@@ -54,7 +54,7 @@ public interface IInvitationProcess extends IFileTransferCallback {
     }
 
     /**
-     * @return the exception that occured while executing the process or
+     * @return the exception that occurred while executing the process or
      *         <code>null</code> if no exception was thrown.
      */
     public Exception getException();

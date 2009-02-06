@@ -107,6 +107,9 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
  * 
+ * The instance of this class to use will change when the XMPP Connection is
+ * disconnected.
+ * 
  */
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener {
@@ -618,27 +621,39 @@ public class XMPPChatTransmitter implements ITransmitter,
                 .getExtension(message);
 
             String sID = rae.getValue("ID");
-            String sIDandup = rae.getValue("ANDUP");
+            boolean andUp = rae.getValue("ANDUP") != null;
 
-            int ts = -1;
-            if (sID != null) {
-                ts = (new Integer(sID)).intValue();
-                // get that activity from history (if it was mine) and send it
-                boolean sent = resendActivity(fromJID, ts, (sIDandup != null));
+            if (sID == null)
+                return;
 
-                String info = "Received Activity request for timestamp=" + ts
-                    + ".";
-                if (sIDandup != null) {
-                    info += " (andup) ";
-                }
-                if (sent) {
-                    info += " I sent response.";
-                } else {
-                    info += " (not for me)";
-                }
+            int timeStamp = (new Integer(sID)).intValue();
 
-                XMPPChatTransmitter.log.info(info);
+            List<TimedActivity> tempActivities = ActivitySequencer
+                .filterActivityHistory(Saros.getDefault().getSessionManager()
+                    .getSharedProject().getSequencer().getActivityHistory(),
+                    timeStamp, andUp);
+
+            if (tempActivities.size() > 0) {
+                PacketExtension extension = new ActivitiesPacketExtension(Saros
+                    .getDefault().getSessionManager().getSessionID(),
+                    tempActivities);
+
+                sendMessage(fromJID, extension);
             }
+
+            String info = String.format(
+                "Received request for resending of timestamp%s %d%s.",
+                andUp ? "s" : "", timeStamp, andUp ? " (andup)" : "");
+
+            if (tempActivities.size() > 0) {
+                info += String.format(" I sent back %s activities.",
+                    tempActivities.size());
+            } else {
+                info += String
+                    .format(" I did not find any matching activities.");
+            }
+
+            XMPPChatTransmitter.log.info(info);
         }
 
         private void processCancelInviteExtension(final Message message,
@@ -1013,21 +1028,11 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.processes.remove(process);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.ITransmitter
-     */
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
         sendMessage(user, CancelInviteExtension.getDefault().create(
             Saros.getDefault().getSessionManager().getSessionID(), errorMsg));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
     public void sendRequestForFileListMessage(JID toJID) {
 
         XMPPChatTransmitter.log.debug("Send request for FileList to " + toJID);
@@ -1039,38 +1044,31 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
     public void sendRequestForActivity(ISharedProject sharedProject,
         int timestamp, boolean andup) {
 
-        // log.info("Requesting old activity (timestamp=" + timestamp + ", "
-        // + andup + ") from all...");
-        //
-        // sendMessageToAll(sharedProject, PacketExtensions
-        // .createRequestForActivityExtension(timestamp, andup));
+        log.info("Requesting old activity (timestamp=" + timestamp + ", "
+            + andup + ") from all...");
+
+        // TODO this method is currently not used. Probably they interfere with
+        // Jupiter
+        if (true) {
+            log
+                .error("Unexpected Call to Request for Activity, which is currently disabled");
+            return;
+        }
+
+        sendMessageToAll(sharedProject, RequestActivityExtension.getDefault()
+            .create(timestamp, andup));
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
         String description, int colorID) {
         sendMessage(guest, InviteExtension.getDefault().create(
             sharedProject.getProject().getName(), description, colorID));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
     public void sendJoinMessage(ISharedProject sharedProject) {
         try {
             /* sleep process for 500 millis to ensure invitation state process. */
@@ -1486,47 +1484,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         for (MessageTransfer pex : toTransfer) {
             sendMessage(pex.receipient, pex.packetextension);
         }
-    }
-
-    public boolean resendActivity(JID jid, int timestamp, boolean andup) {
-
-        boolean sent = false;
-
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
-
-        try {
-            List<TimedActivity> tempActivities = new LinkedList<TimedActivity>();
-            for (TimedActivity tact : project.getSequencer()
-                .getActivityHistory()) {
-
-                if (((andup == false) && (tact.getTimestamp() != timestamp))
-                    || ((andup == true) && (tact.getTimestamp() < timestamp))) {
-                    continue;
-                }
-
-                tempActivities.add(tact);
-                sent = true;
-
-                if (andup == false) {
-                    break;
-                }
-            }
-
-            if (sent) {
-                PacketExtension extension = new ActivitiesPacketExtension(Saros
-                    .getDefault().getSessionManager().getSessionID(),
-                    tempActivities);
-                sendMessage(jid, extension);
-            }
-
-        } catch (Exception e) {
-            Saros.getDefault().getLog().log(
-                new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                    "Could not resend message", e));
-        }
-
-        return sent;
     }
 
     public void sendJupiterRequest(ISharedProject sharedProject,

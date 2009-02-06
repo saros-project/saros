@@ -399,15 +399,16 @@ public class SharedProject implements ISharedProject {
                     }
                 }
 
-                // missing activities? (cant execute all)
+                // missing activities? (can not execute all)
                 if (SharedProject.this.activitySequencer.getQueuedActivities() > 0) {
                     SharedProject.queuedsince++;
 
                     // if i am missing activities for REQUEST_ACTIVITY_ON_AGE
-                    // seconds, ask all (because I dont know the origin)
+                    // seconds, ask all (because I do not know the origin)
                     // to send it to me again.
                     if (SharedProject.queuedsince >= SharedProject.REQUEST_ACTIVITY_ON_AGE) {
 
+                        // TODO CO 2009-02-06 this is disabled internally. Why?
                         SharedProject.this.transmitter
                             .sendRequestForActivity(SharedProject.this,
                                 SharedProject.this.activitySequencer
