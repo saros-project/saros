@@ -24,17 +24,17 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * @author rdjemili
  */
 public class SharedModelProvider extends ModelProvider implements
-        ISessionListener {
+    ISessionListener {
 
     private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
     private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
 
     private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
-            "de.fu_berlin.inf.dpp", 2, SharedModelProvider.ERROR_TEXT, null);
+        "de.fu_berlin.inf.dpp", 2, SharedModelProvider.ERROR_TEXT, null);
 
     private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(
-            IStatus.ERROR, "de.fu_berlin.inf.dpp", 2,
-            SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
+        IStatus.ERROR, "de.fu_berlin.inf.dpp", 2,
+        SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
 
     /** the currently running shared project */
     private ISharedProject sharedProject;
@@ -44,8 +44,8 @@ public class SharedModelProvider extends ModelProvider implements
     }
 
     /**
-     * Check each resource delta whether it is in a shared project. If we are not the exclusive driver set 
-     * the appropriate flag.
+     * Check each resource delta whether it is in a shared project. If we are
+     * not the exclusive driver set the appropriate flag.
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
         private boolean isAllowed = true;
@@ -57,28 +57,29 @@ public class SharedModelProvider extends ModelProvider implements
          * @see org.eclipse.core.resources.IResourceDeltaVisitor
          */
         public boolean visit(IResourceDelta delta) throws CoreException {
-            
-            // We already check this in validateChange 
+
+            // We already check this in validateChange
             assert SharedModelProvider.this.sharedProject != null;
 
             IResource resource = delta.getResource();
-            
+
             // If workspace root continue
             if (resource.getProject() == null) {
                 return true;
             }
-            
+
             if (resource.getProject() != SharedModelProvider.this.sharedProject
-                    .getProject()) {
+                .getProject()) {
                 return false;
             }
-            
+
             if (SharedModelProvider.this.sharedProject.isDriver()) {
 
-                // TODO Hard-coded Host 
+                // TODO Hard-coded Host
                 /* check driver status */
-                if (!SharedModelProvider.this.sharedProject.isHost() || 
-                    !SharedModelProvider.this.sharedProject.isExclusiveDriver()) {
+                if (!SharedModelProvider.this.sharedProject.isHost()
+                    || !SharedModelProvider.this.sharedProject
+                        .isExclusiveDriver()) {
                     this.isExclusive = false;
                 }
                 return false;
@@ -103,11 +104,12 @@ public class SharedModelProvider extends ModelProvider implements
 
     @Override
     public IStatus validateChange(IResourceDelta delta, IProgressMonitor pm) {
-        
-        // If we are currently not sharing a project, we don't have to prevent any file operations
+
+        // If we are currently not sharing a project, we don't have to prevent
+        // any file operations
         if (this.sharedProject == null)
             return Status.OK_STATUS;
-        
+
         ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
 
         try {

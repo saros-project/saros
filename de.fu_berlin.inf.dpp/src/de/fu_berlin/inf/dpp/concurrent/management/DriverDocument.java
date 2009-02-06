@@ -32,8 +32,8 @@ public class DriverDocument implements IDriverManager {
             this.currentDrivers.add(jid);
         } else {
             DriverDocument.logger.debug("Driver " + jid
-                    + " is already Driver for "
-                    + this.editor.lastSegment().toString());
+                + " is already Driver for "
+                + this.editor.lastSegment().toString());
         }
     }
 
@@ -50,8 +50,8 @@ public class DriverDocument implements IDriverManager {
             this.currentDrivers.remove(jid);
         } else {
             DriverDocument.logger.warn("JID " + jid
-                    + " is not driver for this document "
-                    + this.editor.lastSegment().toString());
+                + " is not driver for this document "
+                + this.editor.lastSegment().toString());
         }
 
     }
@@ -62,7 +62,7 @@ public class DriverDocument implements IDriverManager {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
      */
     public List<JID> getDrivers() {

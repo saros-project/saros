@@ -43,7 +43,7 @@ public class DeleteContactAction extends SelectionProviderAction {
 
         IWorkbench workbench = Saros.getDefault().getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
-                ISharedImages.IMG_TOOL_DELETE));
+            ISharedImages.IMG_TOOL_DELETE));
     }
 
     @Override
@@ -55,9 +55,9 @@ public class DeleteContactAction extends SelectionProviderAction {
         }
 
         if (MessageDialog.openQuestion(shell, "Confirm Delete",
-                "Are you sure you want to delete contact '"
-                        + this.rosterEntry.getName() + "' ('"
-                        + this.rosterEntry.getUser() + "')?")) {
+            "Are you sure you want to delete contact '"
+                + this.rosterEntry.getName() + "' ('"
+                + this.rosterEntry.getUser() + "')?")) {
 
             try {
                 Saros.getDefault().removeContact(this.rosterEntry);

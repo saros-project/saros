@@ -19,6 +19,7 @@ public class LeaveExtension extends SessionDefaultPacketExtension {
     }
 
     public static LeaveExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(LeaveExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            LeaveExtension.class);
     }
 }

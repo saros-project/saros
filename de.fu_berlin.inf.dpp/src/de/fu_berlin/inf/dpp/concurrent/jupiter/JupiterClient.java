@@ -23,5 +23,5 @@ public interface JupiterClient extends JupiterEditor {
     public Timestamp getTimestamp();
 
     public void updateVectorTime(Timestamp timestamp)
-            throws TransformationException;
+        throws TransformationException;
 }

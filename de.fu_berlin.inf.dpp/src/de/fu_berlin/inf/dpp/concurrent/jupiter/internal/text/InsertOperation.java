@@ -194,11 +194,11 @@ public class InsertOperation implements Operation {
     @Override
     public String toString() {
         return "Insert("
-                + this.position
-                + ",'"
-                + (this.text != null ? ((this.text.length() > 20) ? this.text
-                        .substring(0, 20)
-                        + "..." : this.text) : "") + "'," + this.origin + ")";
+            + this.position
+            + ",'"
+            + (this.text != null ? ((this.text.length() > 20) ? this.text
+                .substring(0, 20)
+                + "..." : this.text) : "") + "'," + this.origin + ")";
     }
 
     /**
@@ -213,7 +213,7 @@ public class InsertOperation implements Operation {
         } else if (obj.getClass().equals(getClass())) {
             InsertOperation op = (InsertOperation) obj;
             return (op.position == this.position) && op.text.equals(this.text)
-                    && (op.origin == this.origin);
+                && (op.origin == this.origin);
         } else {
             return false;
         }

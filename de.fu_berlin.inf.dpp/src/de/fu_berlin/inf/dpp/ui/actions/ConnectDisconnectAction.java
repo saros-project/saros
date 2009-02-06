@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class ConnectDisconnectAction extends Action implements
-        IConnectionListener {
+    IConnectionListener {
 
     private final IPropertyChangeListener propertyListener;
 
@@ -51,7 +51,7 @@ public class ConnectDisconnectAction extends Action implements
             }
         };
         Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
-                this.propertyListener);
+            this.propertyListener);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class ConnectDisconnectAction extends Action implements
                             IStatusLineManager slm = getStatusmanager();
                             IProgressMonitor monitor = slm.getProgressMonitor();
                             monitor.beginTask("Connecting...",
-                                    IProgressMonitor.UNKNOWN);
+                                IProgressMonitor.UNKNOWN);
                         }
                     });
 
@@ -90,8 +90,8 @@ public class ConnectDisconnectAction extends Action implements
 
             private IStatusLineManager getStatusmanager() {
                 return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().getViewReferences()[0].getView(false)
-                        .getViewSite().getActionBars().getStatusLineManager();
+                    .getActivePage().getViewReferences()[0].getView(false)
+                    .getViewSite().getActionBars().getStatusLineManager();
             }
         }).start();
     }
@@ -102,7 +102,7 @@ public class ConnectDisconnectAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         updateStatus();
     }
 
@@ -119,16 +119,16 @@ public class ConnectDisconnectAction extends Action implements
         case NOT_CONNECTED:
         case DISCONNECTING:
             setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/disconnect.png"));
+                .getImageDescriptor("/icons/disconnect.png"));
             break;
         }
 
         String username = Saros.getDefault().getPreferenceStore().getString(
-                PreferenceConstants.USERNAME);
+            PreferenceConstants.USERNAME);
 
         setEnabled((state == ConnectionState.CONNECTED)
-                || (((state == ConnectionState.NOT_CONNECTED) || (state == ConnectionState.ERROR)) && ((username != null) && (username
-                        .length() > 0))));
+            || (((state == ConnectionState.NOT_CONNECTED) || (state == ConnectionState.ERROR)) && ((username != null) && (username
+                .length() > 0))));
         updateText();
     }
 

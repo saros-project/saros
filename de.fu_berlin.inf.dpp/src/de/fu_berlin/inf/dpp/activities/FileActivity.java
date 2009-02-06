@@ -75,7 +75,7 @@ public class FileActivity implements IActivity {
             FileActivity activity = (FileActivity) obj;
 
             return (getPath().equals(activity.getPath()) && getType().equals(
-                    activity.getType()));
+                activity.getType()));
         }
 
         return false;

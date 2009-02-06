@@ -6,9 +6,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This interface handles the driver event and the appropriate documents.
- *
+ * 
  * @author orieger
- *
+ * 
  */
 public interface IDriverManager {
 
@@ -20,14 +20,14 @@ public interface IDriverManager {
 
     /**
      * only one active driver exists in the system.
-     *
+     * 
      * @return
      */
     public boolean isExclusiveDriver();
 
     /**
      * get all active driver
-     *
+     * 
      * @return list of active driver.
      */
     public List<JID> getDrivers();

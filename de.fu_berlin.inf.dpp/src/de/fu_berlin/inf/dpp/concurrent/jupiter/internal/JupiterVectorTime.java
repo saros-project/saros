@@ -28,11 +28,11 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
     public JupiterVectorTime(int localCnt, int remoteCnt) {
         if (localCnt < 0) {
             throw new IllegalArgumentException(
-                    "local operation count cannot be negative");
+                "local operation count cannot be negative");
         }
         if (remoteCnt < 0) {
             throw new IllegalArgumentException(
-                    "remote operation count cannot be negative");
+                "remote operation count cannot be negative");
         }
         this.localOperationCnt = localCnt;
         this.remoteOperationCnt = remoteCnt;
@@ -123,7 +123,7 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
         } else if (obj.getClass().equals(getClass())) {
             JupiterVectorTime vector = (JupiterVectorTime) obj;
             return (vector.localOperationCnt == this.localOperationCnt)
-                    && (vector.remoteOperationCnt == this.remoteOperationCnt);
+                && (vector.remoteOperationCnt == this.remoteOperationCnt);
         } else {
             return false;
         }

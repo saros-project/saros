@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 public class GiveExclusiveDriverRoleAction extends GiveDriverRoleAction {
 
     public GiveExclusiveDriverRoleAction(ISelectionProvider provider,
-            String text) {
+        String text) {
         super(provider, text);
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the driver role exclusive to this user");
@@ -21,12 +21,12 @@ public class GiveExclusiveDriverRoleAction extends GiveDriverRoleAction {
     public void run() {
         super.run();
         ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            .getSharedProject();
 
         for (User user : project.getParticipants()) {
 
             if ((user.getUserRole() == UserRole.DRIVER)
-                    && !this.selectedUser.equals(user)) {
+                && !this.selectedUser.equals(user)) {
                 project.removeDriver(user, false);
             }
         }

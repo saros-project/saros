@@ -24,7 +24,7 @@ public class Util {
     public static int getFreePort() {
         ServerSocket ss;
         int freePort = 0;
-    
+
         for (int i = 0; i < 10; i++) {
             freePort = (int) (10000 + Math.round(Math.random() * 10000));
             freePort = freePort % 2 == 0 ? freePort : freePort + 1;
@@ -50,7 +50,7 @@ public class Util {
     public static void close(Socket socketToClose) {
         if (socketToClose == null)
             return;
-    
+
         try {
             socketToClose.close();
         } catch (IOException e) {
@@ -68,22 +68,23 @@ public class Util {
         }
     }
 
-    public static <T> Callable<T> delay(final int milliseconds, final Callable<T> callable) {
+    public static <T> Callable<T> delay(final int milliseconds,
+        final Callable<T> callable) {
         return new Callable<T>() {
             public T call() throws Exception {
-                
+
                 try {
                     Thread.sleep(milliseconds);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     return null;
                 }
-                
+
                 return callable.call();
             }
         };
     }
-    
+
     public static <T> Callable<T> retryEvery500ms(final Callable<T> callable) {
         return new Callable<T>() {
             public T call() {
@@ -111,45 +112,46 @@ public class Util {
     }
 
     /**
-     * Returns an iterable which will return the given iterator ONCE. 
+     * Returns an iterable which will return the given iterator ONCE.
      * 
      * Subsequent calls to iterator() will throw an IllegalStateException.
      * 
-     * @param <T> 
-     * @param it an Iterator to wrap
+     * @param <T>
+     * @param it
+     *            an Iterator to wrap
      * @return an Iterable which returns the given iterator ONCE.
      */
     public static <T> Iterable<T> asIterable(final Iterator<T> it) {
-        return new Iterable<T>(){
+        return new Iterable<T>() {
 
             boolean returned = false;
-            
+
             public Iterator<T> iterator() {
                 if (returned)
-                    throw new IllegalStateException("Can only call iterator() once.");
-                
+                    throw new IllegalStateException(
+                        "Can only call iterator() once.");
+
                 returned = true;
-                
+
                 return it;
             }
         };
     }
 
-    public static <T> List<T> reverse(
-            List<T> original) {
+    public static <T> List<T> reverse(List<T> original) {
         List<T> reversed = new ArrayList<T>(original);
         Collections.reverse(reversed);
         return reversed;
     }
 
-    public static PacketFilter orFilter(final PacketFilter...filters){
-        
-        return new PacketFilter(){
-    
+    public static PacketFilter orFilter(final PacketFilter... filters) {
+
+        return new PacketFilter() {
+
             public boolean accept(Packet packet) {
-                
-                for (PacketFilter filter : filters){
-                    if (filter.accept(packet)){
+
+                for (PacketFilter filter : filters) {
+                    if (filter.accept(packet)) {
                         return true;
                     }
                 }

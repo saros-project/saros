@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class DeferredVariableProxyListener<T> implements
-        VariableProxyListener<T> {
+    VariableProxyListener<T> {
 
     VariableProxyListener<T> wrapped;
 
@@ -19,7 +19,7 @@ public class DeferredVariableProxyListener<T> implements
     TimeUnit timeUnit;
 
     public static <S> VariableProxyListener<S> defer(
-            VariableProxyListener<S> wrap, long time, TimeUnit timeUnit) {
+        VariableProxyListener<S> wrap, long time, TimeUnit timeUnit) {
         return new DeferredVariableProxyListener<S>(wrap, time, timeUnit);
     }
 
@@ -28,7 +28,7 @@ public class DeferredVariableProxyListener<T> implements
     }
 
     public DeferredVariableProxyListener(VariableProxyListener<T> wrapped,
-            long time, TimeUnit timeUnit) {
+        long time, TimeUnit timeUnit) {
         this.wrapped = wrapped;
         this.time = time;
         this.timeUnit = timeUnit;

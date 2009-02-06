@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * 
  */
 public class RemoveAllDriverRoleAction extends Action implements
-        ISharedProjectListener, ISessionListener {
+    ISharedProjectListener, ISessionListener {
 
     public RemoveAllDriverRoleAction() {
         super("Take remote user driver roles");
@@ -54,11 +54,11 @@ public class RemoveAllDriverRoleAction extends Action implements
     public void run() {
         // getSharedProject().setDriver(getSharedProject().getHost(), false);
         ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            .getSharedProject();
         for (User user : project.getParticipants()) {
 
             if ((user.getUserRole() == UserRole.DRIVER)
-                    && !project.getHost().equals(user)) {
+                && !project.getHost().equals(user)) {
                 project.removeDriver(user, false);
             }
         }

@@ -20,7 +20,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 public class CDTFacade implements ICDTSupport {
 
     public static final Logger log = Logger
-            .getLogger(CDTFacade.class.getName());
+        .getLogger(CDTFacade.class.getName());
 
     public ICDTSupport cdtSupport;
 
@@ -32,17 +32,17 @@ public class CDTFacade implements ICDTSupport {
 
         // Check for CDT Bundle
         if (Platform.getBundle("org.eclipse.cdt.ui") != null
-                && Platform.getBundle("org.eclipse.cdt.core") != null) {
+            && Platform.getBundle("org.eclipse.cdt.core") != null) {
             // We cannot just create a new instance, because this instance
             // cannot be created if CDT is missing.
             try {
                 cdtSupport = (ICDTSupport) Class.forName(
-                        "de.fu_berlin.inf.dpp.optional.cdt.CDTSupport")
-                        .newInstance();
+                    "de.fu_berlin.inf.dpp.optional.cdt.CDTSupport")
+                    .newInstance();
             } catch (Exception e) {
                 // We were unable to enable the CDT-Support
                 log
-                        .warn("ICDTSupport could not be instantiated, despite CDT Plugin being installed");
+                    .warn("ICDTSupport could not be instantiated, despite CDT Plugin being installed");
             }
         }
     }

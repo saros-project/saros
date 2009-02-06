@@ -9,8 +9,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
-public class JupiterErrorExtension extends
-        SessionDefaultPacketExtension {
+public class JupiterErrorExtension extends SessionDefaultPacketExtension {
 
     public JupiterErrorExtension() {
         super("JupiterTransformationError");
@@ -25,6 +24,7 @@ public class JupiterErrorExtension extends
     }
 
     public static JupiterErrorExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(JupiterErrorExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            JupiterErrorExtension.class);
     }
 }

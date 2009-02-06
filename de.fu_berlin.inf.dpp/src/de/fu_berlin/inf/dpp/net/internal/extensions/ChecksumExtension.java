@@ -24,12 +24,12 @@ public class ChecksumExtension extends SessionDefaultPacketExtension {
 
         int i = 1;
         for (DocumentChecksum checksum : checksums) {
-            extension.setValue("path" + Integer.toString(i), checksum
-                    .getPath().toPortableString());
+            extension.setValue("path" + Integer.toString(i), checksum.getPath()
+                .toPortableString());
             extension.setValue("length" + Integer.toString(i), Integer
-                    .toString(checksum.getLength()));
+                .toString(checksum.getLength()));
             extension.setValue("hash" + Integer.toString(i), Integer
-                    .toString(checksum.getHash()));
+                .toString(checksum.getHash()));
             i++;
         }
 
@@ -38,6 +38,7 @@ public class ChecksumExtension extends SessionDefaultPacketExtension {
     }
 
     public static ChecksumExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(ChecksumExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            ChecksumExtension.class);
     }
 }

@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 public class MultiUserChatManager {
 
     private static Logger log = Logger.getLogger(MultiUserChatManager.class
-            .getName());
+        .getName());
 
     // TODO: Room name should be configured by settings.
     /* name of multi user chat room */
@@ -45,13 +45,13 @@ public class MultiUserChatManager {
     }
 
     public void initMUC(XMPPConnection connection, String user, String room)
-            throws XMPPException {
+        throws XMPPException {
         this.room = room;
         initMUC(connection, user);
     }
 
     public void initMUC(XMPPConnection connection, String user)
-            throws XMPPException {
+        throws XMPPException {
 
         /* create room domain of current connection. */
         // JID(connection.getUser()).getDomain();
@@ -81,10 +81,10 @@ public class MultiUserChatManager {
 
                     // Add default answers to the form to submit
                     for (Iterator<FormField> fields = form.getFields(); fields
-                            .hasNext();) {
+                        .hasNext();) {
                         FormField field = fields.next();
                         if (!FormField.TYPE_HIDDEN.equals(field.getType())
-                                && (field.getVariable() != null)) {
+                            && (field.getVariable() != null)) {
                             // Sets the default value as the answer
                             submitForm.setDefaultAnswer(field.getVariable());
                         }
@@ -94,7 +94,7 @@ public class MultiUserChatManager {
                     submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
                     submitForm.setAnswer("muc#roomconfig_allowinvites", true);
                     submitForm
-                            .setAnswer("muc#roomconfig_persistentroom", false);
+                        .setAnswer("muc#roomconfig_persistentroom", false);
 
                     // Send the completed form (with default values) to the
                     // server to configure the room
@@ -122,7 +122,7 @@ public class MultiUserChatManager {
     }
 
     public void sendActivities(ISharedProject sharedProject,
-            List<TimedActivity> activities) {
+        List<TimedActivity> activities) {
 
         // log.info("Sent muc activities: " + activities);
         try {
@@ -130,11 +130,10 @@ public class MultiUserChatManager {
             Message newMessage = this.muc.createMessage();
             /* add packet extension. */
             newMessage.addExtension(new ActivitiesPacketExtension(Saros
-                    .getDefault().getSessionManager().getSessionID(),
-                    activities));
+                .getDefault().getSessionManager().getSessionID(), activities));
             /* add jid property */
             newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, Saros
-                    .getDefault().getMyJID().toString());
+                .getDefault().getMyJID().toString());
 
             // newMessage.setBody("test");
             this.muc.sendMessage(newMessage);
@@ -143,8 +142,8 @@ public class MultiUserChatManager {
         } catch (XMPPException e) {
 
             Saros.getDefault().getLog().log(
-                    new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                            "Could not send message, message queued", e));
+                new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                    "Could not send message, message queued", e));
         }
 
     }

@@ -39,13 +39,13 @@ public class ProxyJupiterDocument implements JupiterClient {
     public Request generateRequest(Operation op) {
         Request req = null;
         ProxyJupiterDocument.logger.debug(this.jid.toString()
-                + " proxy client generate request for " + op);
+            + " proxy client generate request for " + op);
         req = this.jupiter.generateRequest(op);
         req.setJID(this.jid);
         req.setEditorPath(this.editor);
         /* send request */
         ProxyJupiterDocument.logger.debug(this.jid.toString()
-                + " proxy client forward request:  " + req);
+            + " proxy client forward request:  " + req);
         this.forwarder.forwardOutgoingRequest(req);
 
         return req;
@@ -54,11 +54,11 @@ public class ProxyJupiterDocument implements JupiterClient {
     public Operation receiveRequest(Request req) throws TransformationException {
         Operation op = null;
         ProxyJupiterDocument.logger.debug(this.jid.toString()
-                + " proxy client receive request " + req.getOperation());
+            + " proxy client receive request " + req.getOperation());
         /* receive request action */
         op = this.jupiter.receiveRequest(req);
         ProxyJupiterDocument.logger.debug(this.jid.toString()
-                + " proxy client operation of IT: " + op);
+            + " proxy client operation of IT: " + op);
         return op;
     }
 
@@ -82,7 +82,7 @@ public class ProxyJupiterDocument implements JupiterClient {
     }
 
     public void updateVectorTime(Timestamp timestamp)
-            throws TransformationException {
+        throws TransformationException {
         this.jupiter.updateVectorTime(timestamp);
     }
 

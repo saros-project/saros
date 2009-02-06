@@ -22,6 +22,7 @@ public class JoinExtension extends SessionDefaultPacketExtension {
     }
 
     public static JoinExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(JoinExtension.class);
+        return PacketExtensions.getContainer()
+            .getComponent(JoinExtension.class);
     }
 }

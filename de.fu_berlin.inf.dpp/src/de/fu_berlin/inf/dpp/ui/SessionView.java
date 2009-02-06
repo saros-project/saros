@@ -69,7 +69,7 @@ import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
-        IPropertyChangeListener {
+    IPropertyChangeListener {
 
     private TableViewer viewer;
 
@@ -86,7 +86,7 @@ public class SessionView extends ViewPart implements ISessionListener,
     private FollowModeAction followModeAction;
 
     private class SessionContentProvider implements IStructuredContentProvider,
-            ISharedProjectListener {
+        ISharedProjectListener {
 
         private TableViewer tableViewer;
 
@@ -110,7 +110,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         public Object[] getElements(Object parent) {
             if (SessionView.this.sharedProject != null) {
                 return SessionView.this.sharedProject.getParticipants()
-                        .toArray();
+                    .toArray();
             }
 
             return new Object[] {};
@@ -118,7 +118,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
         public void driverChanged(JID driver, boolean replicated) {
             User participant = SessionView.this.sharedProject
-                    .getParticipant(driver);
+                .getParticipant(driver);
 
             // if the local host become driver leave follow mode
             if (participant.getJID().equals(Saros.getDefault().getMyJID())) {
@@ -149,11 +149,11 @@ public class SessionView extends ViewPart implements ISessionListener,
     }
 
     private class SessionLabelProvider extends LabelProvider implements
-            ITableLabelProvider, IColorProvider, ITableFontProvider {
+        ITableLabelProvider, IColorProvider, ITableFontProvider {
 
         private final Image userImage = SarosUI.getImage("icons/user.png");
         private final Image driverImage = SarosUI
-                .getImage("icons/user_edit.png");
+            .getImage("icons/user_edit.png");
         private Font boldFont = null;
 
         public String getColumnText(Object obj, int index) {
@@ -206,12 +206,12 @@ public class SessionView extends ViewPart implements ISessionListener,
             int colorID = user.getColorID();
 
             String annotationType = SelectionAnnotation.TYPE + "."
-                    + new Integer(colorID + 1).toString();
+                + new Integer(colorID + 1).toString();
 
             AnnotationPreferenceLookup lookup = EditorsUI
-                    .getAnnotationPreferenceLookup();
+                .getAnnotationPreferenceLookup();
             AnnotationPreference ap = lookup
-                    .getAnnotationPreference(annotationType);
+                .getAnnotationPreference(annotationType);
             if (ap == null) {
                 return null;
             }
@@ -220,7 +220,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             try {
                 IPreferenceStore store = EditorsUI.getPreferenceStore();
                 rgb = PreferenceConverter.getColor(store, ap
-                        .getColorPreferenceKey());
+                    .getColorPreferenceKey());
             } catch (RuntimeException e) {
                 return null;
             }
@@ -231,7 +231,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         public Font getFont(Object element, int columnIndex) {
             if (this.boldFont == null) {
                 Display disp = SessionView.this.viewer.getControl()
-                        .getDisplay();
+                    .getDisplay();
                 FontData[] data = disp.getSystemFont().getFontData();
                 for (FontData fontData : data) {
                     fontData.setStyle(SWT.BOLD);
@@ -299,15 +299,15 @@ public class SessionView extends ViewPart implements ISessionListener,
     @Override
     public void createPartControl(Composite parent) {
         this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-                | SWT.V_SCROLL);
+            | SWT.V_SCROLL);
         this.viewer.setContentProvider(new SessionContentProvider());
         this.viewer.setLabelProvider(new SessionLabelProvider());
         this.viewer.setInput(null);
 
         this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
-                "Give driver role");
+            "Give driver role");
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
-                this.viewer, "Give exclusive driver role");
+            this.viewer, "Give exclusive driver role");
         this.removeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
 
         contributeToActionBars();

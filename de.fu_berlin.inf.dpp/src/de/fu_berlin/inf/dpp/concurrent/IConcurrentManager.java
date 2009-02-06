@@ -9,13 +9,14 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 /**
  * Interface for management controller class of all jupiter document server.
  * 
- * TODO [CO] IConcurrentManager should not implement ISharedProjectListener and IRequestManager.
+ * TODO [CO] IConcurrentManager should not implement ISharedProjectListener and
+ * IRequestManager.
  * 
  * @author orieger
  * 
  */
 public interface IConcurrentManager extends IRequestManager,
-        ISharedProjectListener {
+    ISharedProjectListener {
 
     public static enum Side {
         CLIENT_SIDE, HOST_SIDE

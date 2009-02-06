@@ -52,6 +52,6 @@ public class TimedActivity {
 
         TimedActivity other = (TimedActivity) obj;
         return other.activity.equals(this.activity)
-                && (other.timestamp == this.timestamp);
+            && (other.timestamp == this.timestamp);
     }
 }

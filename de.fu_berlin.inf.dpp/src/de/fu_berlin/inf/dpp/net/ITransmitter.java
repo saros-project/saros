@@ -39,7 +39,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * An humble interface that is responsible for network functionality. The idea
  * behind this interface is to only capsulates the least possible amount of
  * functionality - the one that can't be easily tested.
- *
+ * 
  * @author rdjemili
  */
 public interface ITransmitter {
@@ -49,7 +49,7 @@ public interface ITransmitter {
     // TODO move aggregation of pending invitation to sessionManager
     /**
      * Adds given invitation to the list of pending invitations.
-     *
+     * 
      * @param invitation
      *            the invitation that to be added.
      */
@@ -57,7 +57,7 @@ public interface ITransmitter {
 
     /**
      * Removes given invitation from the list of pending invitations.
-     *
+     * 
      * @param invitation
      *            the invitation that is to be removed.
      */
@@ -65,7 +65,7 @@ public interface ITransmitter {
 
     /**
      * Sends an invitation message for given shared project to given user.
-     *
+     * 
      * @param sharedProject
      *            the shared project to which the user should be invitited to.
      * @param jid
@@ -75,12 +75,12 @@ public interface ITransmitter {
      *            invitation. Can not be <code>null</code>.
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-            String description, int colorID);
+        String description, int colorID);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
      * is canceled.
-     *
+     * 
      * @param jid
      *            the Jabber ID of the receipient.
      * @param errorMsg
@@ -94,7 +94,7 @@ public interface ITransmitter {
     /**
      * Sends given file list to given Jabber user. This methods blocks until the
      * file transfer is done or failed.
-     *
+     * 
      * @param jid
      *            the Jabber ID of the user to which the file list is to be
      *            sent.
@@ -109,7 +109,7 @@ public interface ITransmitter {
 
     /**
      * Sends a request-for-file-list-message to given user.
-     *
+     * 
      * @param recipient
      *            the Jabber ID of the recipient.
      */
@@ -117,7 +117,7 @@ public interface ITransmitter {
 
     /**
      * Sends given file to given recipient with given timestamp.
-     *
+     * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
@@ -134,13 +134,13 @@ public interface ITransmitter {
      *             the callback.
      */
     public void sendFileAsync(JID recipient, IProject project, IPath path,
-            int timestamp, IFileTransferCallback callback) throws IOException;
+        int timestamp, IFileTransferCallback callback) throws IOException;
 
     /**
      * Sends given file to given recipient with given timestamp SYNCHRONOUSLY.
-     *
+     * 
      * This methods thus block until the file has been sent or it failed.
-     *
+     * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
@@ -155,12 +155,12 @@ public interface ITransmitter {
      *             sending
      */
     public void sendFile(JID to, IProject project, IPath path, int timestamp)
-            throws IOException;
+        throws IOException;
 
     /**
      * Sends given archive file to given recipient. (Fallback of jingle file
      * transfer to achieve better transfer with IBB.)
-     *
+     * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
@@ -173,7 +173,7 @@ public interface ITransmitter {
      *            <code>null</code>.
      */
     public void sendProjectArchive(JID recipient, IProject project,
-            File archive, IFileTransferCallback callback);
+        File archive, IFileTransferCallback callback);
 
     /**
      * Sends queued file transfers.
@@ -187,7 +187,7 @@ public interface ITransmitter {
 
     /**
      * Sends a list of users to given recipient
-     *
+     * 
      * @param to
      *            Receipient of this list
      * @param participants
@@ -198,7 +198,7 @@ public interface ITransmitter {
     /**
      * Sets my XMPP connection to the given connection - for changing the
      * current connection (like after reconnect).
-     *
+     * 
      * @param connection
      *            the new XMPPConnection
      */
@@ -206,7 +206,7 @@ public interface ITransmitter {
 
     /**
      * Sends a request for activities to all users.
-     *
+     * 
      * @param sharedProject
      *            the shared project
      * @param timestamp
@@ -216,7 +216,7 @@ public interface ITransmitter {
      *            requested too
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
-            int timestamp, boolean andup);
+        int timestamp, boolean andup);
 
     /* ---------- etc --------- */
 
@@ -224,7 +224,7 @@ public interface ITransmitter {
      * Sends a join message to the participants of given shared project. See
      * {@link IInvitationProcess} for more information when this is supposed be
      * sent.
-     *
+     * 
      * @param sharedProject
      *            the shared project that this join message refers to.
      */
@@ -234,7 +234,7 @@ public interface ITransmitter {
      * Sends a leave message to the participants of given shared project. See
      * {@link IInvitationProcess} for more information when this is supposed be
      * sent.
-     *
+     * 
      * @param sharedProject
      *            the shared project that this join message refers to.
      */
@@ -243,18 +243,18 @@ public interface ITransmitter {
     /**
      * Sends given list of activities with given timestamp to the participants
      * of given shared project.
-     *
+     * 
      * @param sharedProject
      *            the shared project the activities refer to.
      * @param activities
      *            a list of timed activities.
      */
     public void sendActivities(ISharedProject sharedProject,
-            List<TimedActivity> activities);
+        List<TimedActivity> activities);
 
     /**
      * Sends given request to given participant of given shared project.
-     *
+     * 
      * @param sharedProject
      *            the shared project the activities refer to.
      * @param request
@@ -264,11 +264,11 @@ public interface ITransmitter {
      */
     // TODO Is "Jupiter" in the name really necessary?
     public void sendJupiterRequest(ISharedProject sharedProject,
-            Request request, JID jid);
+        Request request, JID jid);
 
     /**
      * Sends error message of checksum error to all clients.
-     *
+     * 
      * @param path
      *            appropriate file for checksum error
      * @param resolved
@@ -278,18 +278,18 @@ public interface ITransmitter {
 
     /**
      * Sends the checksum of all concurrent documents to all clients.
-     *
+     * 
      * @param to
      *            the recipient
      * @param collection
      *            the checksums
      */
     public void sendDocChecksumsToClients(
-            Collection<DocumentChecksum> collection);
+        Collection<DocumentChecksum> collection);
 
     /**
      * Sends error messge of transformation error.
-     *
+     * 
      * @param to
      *            the recipient
      * @param path

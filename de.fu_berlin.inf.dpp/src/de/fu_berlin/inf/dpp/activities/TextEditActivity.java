@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * A simple immutable text activity.
- *
+ * 
  * @author rdjemili
  */
 public class TextEditActivity implements IActivity {
@@ -84,9 +84,9 @@ public class TextEditActivity implements IActivity {
         if (obj instanceof TextEditActivity) {
             TextEditActivity other = (TextEditActivity) obj;
             return (this.offset == other.offset)
-                    && this.text.equals(other.text)
-                    && (this.length == other.length)
-                    && (this.source == other.source);
+                && this.text.equals(other.text)
+                && (this.length == other.length)
+                && (this.source == other.source);
         }
 
         return false;
@@ -95,13 +95,13 @@ public class TextEditActivity implements IActivity {
     @Override
     public String toString() {
         return "TextEditActivity(offset:" + this.offset + ",text:" + this.text
-                + ",length:" + this.length + ",path:" + this.editor.toString()
-                + ",src:" + this.source + ",oSrc:" + this.originalSource + ")";
+            + ",length:" + this.length + ",path:" + this.editor.toString()
+            + ",src:" + this.source + ",oSrc:" + this.originalSource + ")";
     }
 
     /**
      * Compare text edit information without source settings.
-     *
+     * 
      * @param obj
      *            TextEditActivity Object
      * @return true if edit information equals. false otherwise.
@@ -110,10 +110,9 @@ public class TextEditActivity implements IActivity {
         if (obj instanceof TextEditActivity) {
             TextEditActivity other = (TextEditActivity) obj;
             return (this.offset == other.offset) && (this.editor != null)
-                    && (other.editor != null)
-                    && this.editor.equals(other.editor)
-                    && this.text.equals(other.text)
-                    && (this.length == other.length);
+                && (other.editor != null) && this.editor.equals(other.editor)
+                && this.text.equals(other.text)
+                && (this.length == other.length);
         }
         return false;
     }

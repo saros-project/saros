@@ -11,12 +11,12 @@ public class AnnotationSaros extends Annotation {
     private String source;
 
     AnnotationSaros(String type, boolean isPersistent, String text,
-            String source) {
+        String source) {
         super(type, isPersistent, text);
         this.source = source;
 
         if (type.equals(ContributionAnnotation.TYPE)
-                || type.equals(SelectionAnnotation.TYPE)) {
+            || type.equals(SelectionAnnotation.TYPE)) {
             setType(type + "." + (getColorIdForUser(source) + 1));
         }
     }
@@ -36,7 +36,7 @@ public class AnnotationSaros extends Annotation {
 
     protected int getColorIdForUser(String username) {
         User user = Saros.getDefault().getSessionManager().getSharedProject()
-                .getParticipant(new JID(username));
+            .getParticipant(new JID(username));
 
         int colorid = 0;
         if (user != null) {

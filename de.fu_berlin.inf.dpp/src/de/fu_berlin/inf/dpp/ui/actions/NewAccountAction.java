@@ -36,7 +36,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
         try {
             Shell shell = this.window.getShell();
             new WizardDialog(shell, new CreateAccountWizard(true, true, true))
-                    .open();
+                .open();
         } catch (Exception e) {
             // TODO Use consistent way of dealing with Exceptions
             Saros.log("Could not create new Account.", e);
@@ -45,7 +45,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
      */
     public void init(IWorkbenchWindow window) {

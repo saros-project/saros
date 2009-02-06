@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesPacketExtension implements PacketExtension {
 
-    public static PacketFilter getFilter(){
+    public static PacketFilter getFilter() {
         return new PacketExtensionFilter(ELEMENT, NAMESPACE);
     }
 
@@ -47,7 +47,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
     private List<TimedActivity> activities;
 
     MessageFormat textChangeFormat = new MessageFormat(
-            "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
+        "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
 
     private String sessionID;
 
@@ -56,14 +56,14 @@ public class ActivitiesPacketExtension implements PacketExtension {
     }
 
     public ActivitiesPacketExtension(String sessionID,
-            List<TimedActivity> activities) {
+        List<TimedActivity> activities) {
         this.sessionID = sessionID;
         setActivities(activities);
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.jivesoftware.smack.packet.PacketExtension#getElementName()
      */
     public String getElementName() {
@@ -72,7 +72,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.jivesoftware.smack.packet.PacketExtension#getNamespace()
      */
     public String getNamespace() {
@@ -89,7 +89,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
      */
     public String toXML() {
@@ -118,12 +118,12 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     private String sessionIdToXML() {
         return "<" + ActivitiesPacketExtension.SESSION_ID + ">" + sessionID
-                + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
+            + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

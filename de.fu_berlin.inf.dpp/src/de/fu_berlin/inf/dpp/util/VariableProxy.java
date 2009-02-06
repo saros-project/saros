@@ -45,7 +45,7 @@ public class VariableProxy<T> {
     }
 
     public boolean setVariable(T variable,
-            VariableProxyListener<? super T> exclude) {
+        VariableProxyListener<? super T> exclude) {
         this.variable = variable;
         for (VariableProxyListener<? super T> vpl : nonVetoables) {
             if (vpl == exclude)

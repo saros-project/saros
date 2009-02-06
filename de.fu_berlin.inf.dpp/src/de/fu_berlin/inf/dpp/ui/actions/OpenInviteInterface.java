@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class OpenInviteInterface extends Action implements
-        ISharedProjectListener, ISessionListener {
+    ISharedProjectListener, ISessionListener {
 
     public OpenInviteInterface() {
         super();
@@ -25,7 +25,7 @@ public class OpenInviteInterface extends Action implements
     @Override
     public void run() {
         Saros.getDefault().getSessionManager().getSharedProject()
-                .startInvitation(null);
+            .startInvitation(null);
     }
 
     public void sessionStarted(ISharedProject session) {
@@ -44,7 +44,7 @@ public class OpenInviteInterface extends Action implements
 
     private void updateEnablement() {
         ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            .getSharedProject();
         setEnabled((project != null) && project.isHost());
     }
 

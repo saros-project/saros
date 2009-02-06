@@ -26,7 +26,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
     public ConsistencyAction() {
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-                .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
+            .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setEnabled(false);
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
@@ -47,7 +47,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 if (executingChecksumErrorHandling) {
                     for (IPath path : pathes) {
                         Saros.getDefault().getSessionManager().getTransmitter()
-                                .sendFileChecksumErrorMessage(path, true);
+                            .sendFileChecksumErrorMessage(path, true);
                     }
                     pathes.clear();
                     executingChecksumErrorHandling = false;
@@ -64,12 +64,12 @@ public class ConsistencyAction extends Action implements ISessionListener {
         executingChecksumErrorHandling = true;
 
         pathes = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
-                .getSessionManager().getSharedProject()
-                .getConcurrentDocumentManager().getPathesWithWrongChecksums());
+            .getSessionManager().getSharedProject()
+            .getConcurrentDocumentManager().getPathesWithWrongChecksums());
 
         for (IPath path : pathes) {
             Saros.getDefault().getSessionManager().getTransmitter()
-                    .sendFileChecksumErrorMessage(path, false);
+                .sendFileChecksumErrorMessage(path, false);
         }
 
     }
@@ -82,7 +82,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
         }
 
         proxy = Saros.getDefault().getSessionManager().getSharedProject()
-                .getConcurrentDocumentManager().getConsistencyToResolve();
+            .getConcurrentDocumentManager().getConsistencyToResolve();
 
         proxy.add(listener);
     }

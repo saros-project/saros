@@ -42,7 +42,7 @@ public class CreateAccountWizard extends Wizard {
     private final RegisterAccountPage page;
 
     public CreateAccountWizard(boolean createAccount,
-            boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
+        boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
 
         if (createAccount) {
             setWindowTitle("Create New User Account");
@@ -50,7 +50,7 @@ public class CreateAccountWizard extends Wizard {
             setWindowTitle("Enter User Account");
         }
         this.page = new RegisterAccountPage(createAccount,
-                showStoreInPrefsButton, storeInPrefsDefault);
+            showStoreInPrefsButton, storeInPrefsDefault);
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
     }
@@ -86,12 +86,12 @@ public class CreateAccountWizard extends Wizard {
                 IWorkbench workbench = PlatformUI.getWorkbench();
                 IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
                 window.getActivePage().showView(
-                        "de.fu_berlin.inf.dpp.ui.RosterView", null,
-                        IWorkbenchPage.VIEW_ACTIVATE);
+                    "de.fu_berlin.inf.dpp.ui.RosterView", null,
+                    IWorkbenchPage.VIEW_ACTIVATE);
             } catch (PartInitException e) {
                 Saros.getDefault().getLog().log(
-                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                                "Could not activate Roster View", e));
+                    new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                        "Could not activate Roster View", e));
             }
             return true;
         } else {

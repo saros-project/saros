@@ -37,6 +37,7 @@ public class UserListExtension extends SessionDefaultPacketExtension {
     }
 
     public static UserListExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(UserListExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            UserListExtension.class);
     }
 }

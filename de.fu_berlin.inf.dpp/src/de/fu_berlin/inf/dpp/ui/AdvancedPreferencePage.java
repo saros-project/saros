@@ -13,11 +13,11 @@ import de.fu_berlin.inf.dpp.Saros;
 /**
  * Contains the advanced preferences - consisting of preferences that are geared
  * towards developers and power users and that are not necessary for normal use.
- *
+ * 
  * @author rdjemili
  */
 public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
-        IWorkbenchPreferencePage {
+    IWorkbenchPreferencePage {
 
     public AdvancedPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -28,35 +28,34 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     @Override
     protected void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.SKYPE_USERNAME,
-                "Skype name:", getFieldEditorParent()));
+            "Skype name:", getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
-                "File transfer port (needs reconnect):", getFieldEditorParent()));
+            "File transfer port (needs reconnect):", getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
-                "Show Jabber debug window (needs restart).",
-                getFieldEditorParent()));
+            "Show Jabber debug window (needs restart).", getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(
-                PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
-                "Avoid direct file transfer connection (needs restart)",
-                getFieldEditorParent()));
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT,
+            "Avoid direct file transfer connection (needs restart)",
+            getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(
-                PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
-                "Chunk size for chat data transfer", getFieldEditorParent()));
+            PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE,
+            "Chunk size for chat data transfer", getFieldEditorParent()));
 
         addField(new StringFieldEditor(PreferenceConstants.STUN,
-                "STUN Server (example: stunserver.org, needs restart)",
-                getFieldEditorParent()));
+            "STUN Server (example: stunserver.org, needs restart)",
+            getFieldEditorParent()));
 
         addField(new IntegerFieldEditor(PreferenceConstants.STUN_PORT,
-                "STUN server port (needs restart)", getFieldEditorParent()));
+            "STUN server port (needs restart)", getFieldEditorParent()));
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see org.eclipse.ui.IWorkbenchPreferencePage
      */
     public void init(IWorkbench workbench) {

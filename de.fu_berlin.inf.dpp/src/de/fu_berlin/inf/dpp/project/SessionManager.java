@@ -50,12 +50,12 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
  * reacting to invitations. The user can be only part of one session at most.
- *
+ * 
  * @author rdjemili
  */
 public class SessionManager implements IConnectionListener, ISessionManager {
     private static Logger log = Logger
-            .getLogger(SessionManager.class.getName());
+        .getLogger(SessionManager.class.getName());
 
     private CurrentProjectProxy currentlySharedProject;
 
@@ -85,10 +85,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         JID myJID = Saros.getDefault().getMyJID();
         this.sessionID = String.valueOf(new Random(System.currentTimeMillis())
-                .nextInt());
+            .nextInt());
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
-                project, myJID);
+            project, myJID);
 
         this.currentlySharedProject.setVariable(sharedProject);
 
@@ -105,7 +105,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     /**
      * Every Session is identified by an int as identifier.
-     *
+     * 
      * @return the session id of this session
      */
     public String getSessionID() {
@@ -115,7 +115,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
-                project, Saros.getDefault().getMyJID(), host, colorID);
+            project, Saros.getDefault().getMyJID(), host, colorID);
         this.currentlySharedProject.setVariable(sharedProject);
 
         sharedProject.start();
@@ -170,13 +170,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     public IIncomingInvitationProcess invitationReceived(JID from,
-            String sessionID, String projectName, String description,
-            int colorID) {
+        String sessionID, String projectName, String description, int colorID) {
 
         this.sessionID = sessionID;
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
-                this.transmitter, from, projectName, description, colorID);
+            this.transmitter, from, projectName, description, colorID);
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);
@@ -205,7 +204,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * Implements the lifecycle management of ConnectionSessionListeners
      */
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
 
         switch (newState) {
         case CONNECTED:
@@ -215,7 +214,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 connectionSessionListener.add(transmitter);
                 connectionSessionListener.add(new JupiterReceiver());
                 connectionSessionListener.add(new ConsistencyWatchdogReceiver(
-                        transmitter, currentlySharedProject));
+                    transmitter, currentlySharedProject));
                 connectionSessionListener.add(new PresenceListener());
             }
 
@@ -242,7 +241,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         case ERROR:
 
             for (ConnectionSessionListener listener : Util
-                    .reverse(connectionSessionListener)) {
+                .reverse(connectionSessionListener)) {
                 listener.stop();
             }
             break;
@@ -250,12 +249,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         case NOT_CONNECTED:
 
             for (ConnectionSessionListener listener : Util
-                    .reverse(connectionSessionListener)) {
+                .reverse(connectionSessionListener)) {
                 listener.stop();
             }
 
             for (ConnectionSessionListener listener : Util
-                    .reverse(connectionSessionListener)) {
+                .reverse(connectionSessionListener)) {
                 listener.dispose();
             }
             connectionSessionListener.clear();
@@ -321,19 +320,19 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         Roster roster;
 
-        public void registerListener(Roster roster){
+        public void registerListener(Roster roster) {
 
-            if (this.roster != null){
+            if (this.roster != null) {
                 this.roster.removeRosterListener(listener);
             }
             this.roster = roster;
-            if (this.roster != null){
+            if (this.roster != null) {
                 this.roster.addRosterListener(listener);
             }
         }
 
         public void start() {
-            if (connection != null){
+            if (connection != null) {
                 registerListener(connection.getRoster());
             }
         }

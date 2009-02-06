@@ -51,7 +51,7 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      *             -
      */
     public void accept(IProject baseProject, String newProjectName,
-            IProgressMonitor monitor);
+        IProgressMonitor monitor);
 
     public void setInvitationUI(IInvitationUI inviteUI);
 

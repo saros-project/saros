@@ -25,14 +25,13 @@ public class JDTSupport implements IJDTSupport {
     public void installSharedDocumentProvider() {
         // TODO RESTRICTED ACCESS
         CompilationUnitDocumentProvider cuProvider = (CompilationUnitDocumentProvider) JavaPlugin
-                .getDefault().getCompilationUnitDocumentProvider();
+            .getDefault().getCompilationUnitDocumentProvider();
 
         SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
 
         IDocumentSetupParticipant setupParticipant = new JavaDocumentSetupParticipant();
         ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
-                IJavaPartitions.JAVA_PARTITIONING, setupParticipant,
-                sharedProvider);
+            IJavaPartitions.JAVA_PARTITIONING, setupParticipant, sharedProvider);
 
         cuProvider.setParentDocumentProvider(parentProvider);
     }

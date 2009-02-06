@@ -15,7 +15,7 @@ public interface ISessionManager {
 
     /**
      * Starts a new shared project with the local user as only participant.
-     *
+     * 
      * @param project
      *            the local Eclipse project which should become shared.
      * @throws XMPPException
@@ -25,14 +25,14 @@ public interface ISessionManager {
 
     /**
      * Every Session is identified by an int as identifier.
-     *
+     * 
      * @return the session id of this session
      */
     public String getSessionID();
 
     /**
      * Joins an remotely already running shared project.
-     *
+     * 
      * @param project
      *            the local Eclipse project which should be used to replicate
      *            the remote shared project.
@@ -42,16 +42,16 @@ public interface ISessionManager {
      *            the driver of the shared project.
      * @param myColorID
      *            Color ID of the user.
-     *
+     * 
      * @return the shared project.
      */
     public abstract ISharedProject joinSession(IProject project, JID host,
-            int myColorID);
+        int myColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
      * will close the session for everybody.
-     *
+     * 
      * Has no effect if there is no currently shared project.
      */
     public abstract void stopSharedProject();
@@ -65,7 +65,7 @@ public interface ISessionManager {
     /**
      * Add the given session listener. Is ignored if the listener is already
      * listening.
-     *
+     * 
      * @param listener
      *            the listener that is to be added.
      */
@@ -74,7 +74,7 @@ public interface ISessionManager {
     /**
      * Removes the given session listener. Is ignored if the given listener
      * wasn't listening.
-     *
+     * 
      * @param listener
      *            the listener that is to be removed.
      */
@@ -82,7 +82,7 @@ public interface ISessionManager {
 
     /**
      * Is fired when an incoming invitation is received.
-     *
+     * 
      * @param from
      *            the sender of this invitation.
      * @param description
@@ -96,22 +96,21 @@ public interface ISessionManager {
      *         further interaction with the invitation.
      */
     public abstract IIncomingInvitationProcess invitationReceived(JID from,
-            String sessionID, String projectName, String description,
-            int colorID);
+        String sessionID, String projectName, String description, int colorID);
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public abstract void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState);
+        ConnectionState newState);
 
     public abstract void OnReconnect(int oldtimestamp);
 
     /**
      * Get the transmitter of the session.
-     *
+     * 
      * @return the transmitter of the session
      */
     public abstract ITransmitter getTransmitter();

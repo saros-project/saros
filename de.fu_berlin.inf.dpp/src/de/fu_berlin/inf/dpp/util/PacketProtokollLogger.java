@@ -36,8 +36,8 @@ public class PacketProtokollLogger {
             // "ConnectionDatei"+Saros.getDefault().getMyJID().getName()+".log",
             // "'.'yyyy-MM-dd_HH-mm" );
             FileAppender fileAppender = new FileAppender(layout,
-                    "ConnectionDatei" + Saros.getDefault().getMyJID().getName()
-                            + ".log", false);
+                "ConnectionDatei" + Saros.getDefault().getMyJID().getName()
+                    + ".log", false);
             PacketProtokollLogger.logger.addAppender(fileAppender);
             PacketProtokollLogger.logger.setLevel(Level.ALL);
         } catch (Exception ex) {
@@ -53,8 +53,10 @@ public class PacketProtokollLogger {
      */
     public void sendPacket(Message msg) {
         // Date send = Calendar.getInstance().getTime();
-        // logger.info(msg.getFrom()+" "+msg.getThread()+" send : "+DateFormat.getDateTimeInstance().format(send));
-        // logger.info(Saros.getDefault().getMyJID().getName()+" send : "+msg.getPacketID());
+        // logger.info(msg.getFrom()+" "+msg.getThread()+" send : "+DateFormat.
+        // getDateTimeInstance().format(send));
+        // logger.info(Saros.getDefault().getMyJID().getName()+" send : "+msg.
+        // getPacketID());
     }
 
     /**
@@ -65,6 +67,7 @@ public class PacketProtokollLogger {
      */
     public void receivePacket(Message msg) {
 
-        // logger.info(Saros.getDefault().getMyJID().getName()+" receive : "+msg.getPacketID());
+        //logger.info(Saros.getDefault().getMyJID().getName()+" receive : "+msg.
+        // getPacketID());
     }
 }

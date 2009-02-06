@@ -20,7 +20,7 @@ public class ErrorMessageDialog {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 MessageDialog.openError(Display.getDefault().getActiveShell(),
-                        exception.toString(), exception.getMessage());
+                    exception.toString(), exception.getMessage());
             }
         });
     }
@@ -35,10 +35,10 @@ public class ErrorMessageDialog {
             public void run() {
                 if ((exceptionMessage == null) || exceptionMessage.equals("")) {
                     MessageDialog.openError(Display.getDefault()
-                            .getActiveShell(), "Exception", "Error occured.");
+                        .getActiveShell(), "Exception", "Error occured.");
                 } else {
                     MessageDialog.openError(Display.getDefault()
-                            .getActiveShell(), "Exception", exceptionMessage);
+                        .getActiveShell(), "Exception", exceptionMessage);
                 }
             }
 
@@ -56,11 +56,10 @@ public class ErrorMessageDialog {
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 actualChecksumerrorDialog = new MessageDialog(Display
-                        .getDefault().getActiveShell(), "Consistency Problem!",
-                        null, "Inconsitent file state has detected. File "
-                                + fileName
-                                + " has to synchronized with project host",
-                        MessageDialog.WARNING, new String[0], 0);
+                    .getDefault().getActiveShell(), "Consistency Problem!",
+                    null, "Inconsitent file state has detected. File "
+                        + fileName + " has to synchronized with project host",
+                    MessageDialog.WARNING, new String[0], 0);
                 actualChecksumerrorDialog.open();
             }
         });

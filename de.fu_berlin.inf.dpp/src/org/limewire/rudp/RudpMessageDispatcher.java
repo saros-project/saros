@@ -14,10 +14,10 @@ import org.limewire.rudp.messages.RUDPMessage;
 public class RudpMessageDispatcher implements MessageDispatcher {
 
     private static final Log LOG = LogFactory
-            .getLog(DefaultMessageDispatcher.class);
+        .getLog(DefaultMessageDispatcher.class);
 
     private final Executor executor = ExecutorsHelper
-            .newProcessingQueue("RUDPDispatch");
+        .newProcessingQueue("RUDPDispatch");
     private volatile UDPMultiplexor multiplexor;
 
     public void setUDPMultiplexor(UDPMultiplexor plexor) {

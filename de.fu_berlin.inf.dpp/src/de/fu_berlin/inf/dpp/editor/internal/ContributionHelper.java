@@ -31,7 +31,7 @@ public class ContributionHelper {
      *            of the annotation.
      */
     public static void insertAnnotation(IAnnotationModel model, int offset,
-            int length, String source) {
+        int length, String source) {
 
         if (length > 0) {
             /* Return early if there already is an annotation at that offset */
@@ -40,13 +40,13 @@ public class ContributionHelper {
                 Annotation annotation = (Annotation) it.next();
 
                 if ((annotation.getType().equals(ContributionAnnotation.TYPE))
-                        && (model.getPosition(annotation).includes(offset))) {
+                    && (model.getPosition(annotation).includes(offset))) {
                     return;
                 }
             }
 
             model.addAnnotation(new ContributionAnnotation(source),
-                    new Position(offset, length));
+                new Position(offset, length));
         }
     }
 
@@ -71,17 +71,17 @@ public class ContributionHelper {
 
                 if ((offset > pos.offset) && (offset < pos.offset + pos.length)) {
                     Position beforeOffset = new Position(pos.offset, offset
-                            - pos.offset);
+                        - pos.offset);
                     Position afterOffset = new Position(offset, pos.length
-                            - (offset - pos.offset));
+                        - (offset - pos.offset));
 
                     model.removeAnnotation(annotation);
 
                     String source = ((AnnotationSaros) annotation).getSource();
                     model.addAnnotation(new ContributionAnnotation(source),
-                            beforeOffset);
+                        beforeOffset);
                     model.addAnnotation(new ContributionAnnotation(source),
-                            afterOffset);
+                        afterOffset);
                 }
             }
         }

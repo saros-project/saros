@@ -19,7 +19,8 @@ public class RequestForFileListExtension extends SessionDefaultPacketExtension {
     }
 
     public static RequestForFileListExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(RequestForFileListExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            RequestForFileListExtension.class);
     }
 
 }

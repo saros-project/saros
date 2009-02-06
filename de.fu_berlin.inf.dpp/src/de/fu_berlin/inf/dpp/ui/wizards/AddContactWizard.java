@@ -67,7 +67,7 @@ public class AddContactWizard extends Wizard {
 
             this.idText = new Text(composite, SWT.BORDER);
             this.idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                    false));
+                false));
 
             if (allowToEnterNick) {
 
@@ -76,7 +76,7 @@ public class AddContactWizard extends Wizard {
 
                 this.nicknameText = new Text(composite, SWT.BORDER);
                 this.nicknameText.setLayoutData(new GridData(SWT.FILL,
-                        SWT.CENTER, true, false));
+                    SWT.CENTER, true, false));
             }
             hookListeners();
             updateNextEnablement();
@@ -109,8 +109,8 @@ public class AddContactWizard extends Wizard {
         }
 
         Pattern emailPattern = Pattern.compile(
-                "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$",
-                Pattern.CASE_INSENSITIVE);
+            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$",
+            Pattern.CASE_INSENSITIVE);
 
         private void updateNextEnablement() {
 
@@ -125,7 +125,7 @@ public class AddContactWizard extends Wizard {
 
             if (!emailPattern.matcher(this.idText.getText().trim()).matches()) {
                 this
-                        .setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
+                    .setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
                 this.setMessage(null);
                 this.setPageComplete(false);
                 return;
@@ -134,8 +134,8 @@ public class AddContactWizard extends Wizard {
             if (allowToEnterNick) {
                 if (getNickname().length() == 0) {
                     this.setMessage(
-                            "Enter a Nickname for the Contact (optional)",
-                            WizardPage.INFORMATION);
+                        "Enter a Nickname for the Contact (optional)",
+                        WizardPage.INFORMATION);
                 } else {
                     this.setMessage(null);
                 }
@@ -163,10 +163,10 @@ public class AddContactWizard extends Wizard {
         try {
             if (allowToEnterNick && !(page.getNickname().length() == 0)) {
                 Saros.getDefault().addContact(this.page.getJID(),
-                        this.page.getNickname(), null);
+                    this.page.getNickname(), null);
             } else {
                 Saros.getDefault().addContact(this.page.getJID(),
-                        this.page.getJID().toString(), null);
+                    this.page.getJID().toString(), null);
             }
             return true;
 
@@ -174,7 +174,7 @@ public class AddContactWizard extends Wizard {
             // contact not found
             if (e.getMessage().contains("item-not-found"))
                 this.page.setMessage("Contact not found!",
-                        IMessageProvider.ERROR);
+                    IMessageProvider.ERROR);
             else
                 this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
         }

@@ -62,7 +62,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class InvitationDialog extends Dialog implements IInvitationUI,
-        IConnectionListener {
+    IConnectionListener {
 
     private TableViewer tableviewer;
     private Table table;
@@ -87,7 +87,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     // Class for providing labels of my Tableview
     private class MyLabelProvider extends LabelProvider implements
-            ITableLabelProvider {
+        ITableLabelProvider {
 
         public Image getColumnImage(Object element, int columnIndex) {
             return null;
@@ -109,11 +109,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 if (item.outginvatationProc != null) {
                     if (item.outginvatationProc.getState() == IInvitationProcess.State.SYNCHRONIZING) {
                         return "Transfering file "
-                                + (item.outginvatationProc.getProgressCurrent())
-                                + " of "
-                                + item.outginvatationProc.getProgressMax()
-                                + ": "
-                                + item.outginvatationProc.getProgressInfo();
+                            + (item.outginvatationProc.getProgressCurrent())
+                            + " of " + item.outginvatationProc.getProgressMax()
+                            + ": " + item.outginvatationProc.getProgressInfo();
                     } else {
                         return "";
                     }
@@ -195,13 +193,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             @Override
             public void widgetSelected(SelectionEvent event) {
                 InvitationDialog.this.cancelButton
-                        .setEnabled(isSelectionCancelable());
+                    .setEnabled(isSelectionCancelable());
 
                 InviterData data = (InviterData) InvitationDialog.this.table
-                        .getSelection()[0].getData();
+                    .getSelection()[0].getData();
 
                 setInviteable(InvitationDialog.this.table.getSelectionCount() > 0
-                        && data.outginvatationProc == null);
+                    && data.outginvatationProc == null);
             }
 
             @Override
@@ -251,7 +249,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             TableItem[] cursel = this.table.getSelection();
 
             ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
+                .getSharedProject();
             String name = project.getProject().getName();
 
             for (TableItem ti : cursel) {
@@ -259,7 +257,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
                 InviterData invdat = (InviterData) o;
                 invdat.outginvatationProc = project.invite(invdat.jid, name,
-                        true, this);
+                    true, this);
             }
 
             return false; // we wanna wait (and block) until all invites are
@@ -298,8 +296,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             invdat = (InviterData) o;
 
             if ((invdat.outginvatationProc != null)
-                    && (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE)
-                    && (invdat.outginvatationProc.getState() != IInvitationProcess.State.CANCELED)) {
+                && (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE)
+                && (invdat.outginvatationProc.getState() != IInvitationProcess.State.CANCELED)) {
                 alldone = false;
             }
 
@@ -325,7 +323,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
         }
         this.cancelButton.setEnabled(isSelectionCancelable()
-                && (this.inviteStep != InvState.DONE));
+            && (this.inviteStep != InvState.DONE));
 
     }
 
@@ -340,10 +338,10 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             Object o = ti.getData();
             InviterData invdat = (InviterData) o;
             if ((invdat.outginvatationProc == null)
-                    || ((invdat.outginvatationProc.getState() == State.INITIALIZED)
-                            || (invdat.outginvatationProc.getState() == State.SYNCHRONIZING_DONE)
-                            || (invdat.outginvatationProc.getState() == State.CANCELED) || (invdat.outginvatationProc
-                            .getState() == State.DONE))) {
+                || ((invdat.outginvatationProc.getState() == State.INITIALIZED)
+                    || (invdat.outginvatationProc.getState() == State.SYNCHRONIZING_DONE)
+                    || (invdat.outginvatationProc.getState() == State.CANCELED) || (invdat.outginvatationProc
+                    .getState() == State.DONE))) {
                 return false;
             }
         }
@@ -383,12 +381,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     }
 
     static final String[] StateNames = { "Initialized",
-            "Invitation sent. Waiting for acknowledgement...",
-            "Filelist of inviter requested", "Filelist of inviter sent",
-            "Filelist of invitee sent",
-            "Synchornizing project files. Transfering files...",
-            "Files sent. Waiting for invitee...", "Invitiation completed",
-            "Invitation canceled" };
+        "Invitation sent. Waiting for acknowledgement...",
+        "Filelist of inviter requested", "Filelist of inviter sent",
+        "Filelist of invitee sent",
+        "Synchornizing project files. Transfering files...",
+        "Files sent. Waiting for invitee...", "Invitiation completed",
+        "Invitation canceled" };
 
     private String getStateDesc(IInvitationProcess.State state) {
         return InvitationDialog.StateNames[state.ordinal()];
@@ -404,7 +402,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see
      * de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
      */
@@ -419,11 +417,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-            final ConnectionState newState) {
+        final ConnectionState newState) {
 
         if (newState == ConnectionState.CONNECTED) {
             this.roster = Saros.getDefault().getRoster();
@@ -506,12 +504,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             Presence presence = this.roster.getPresence(username);
 
             User user = Saros.getDefault().getSessionManager()
-                    .getSharedProject()
-                    .getParticipant(new JID(entry.getUser()));
+                .getSharedProject().getParticipant(new JID(entry.getUser()));
 
             if ((presence != null)
-                    && presence.getType().equals(Presence.Type.available)
-                    && (user == null)) {
+                && presence.getType().equals(Presence.Type.available)
+                && (user == null)) {
                 InviterData invdat = new InviterData();
                 invdat.jid = new JID(entry.getUser());
                 String name = entry.getName();
@@ -522,13 +519,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 index++;
 
                 if (((this.autoinviteJID != null) && invdat.jid
-                        .equals(this.autoinviteJID))
-                        || ((this.autoinviteJID == null) && isJIDinList(
-                                curselA, invdat.jid))) {
+                    .equals(this.autoinviteJID))
+                    || ((this.autoinviteJID == null) && isJIDinList(curselA,
+                        invdat.jid))) {
                     int curselOld[] = this.table.getSelectionIndices();
                     curselNew = new int[curselOld.length + 1];
                     System.arraycopy(curselOld, 0, curselNew, 0,
-                            curselOld.length);
+                        curselOld.length);
                     curselNew[curselNew.length - 1] = index;
                 }
             }

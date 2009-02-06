@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
 public class NetworkView extends ViewPart implements JingleTransportListener,
-        IJingleFileTransferListener, IConnectionListener {
+    IJingleFileTransferListener, IConnectionListener {
 
     private Text log;
 
@@ -56,9 +56,9 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     }
 
     public void transportEstablished(TransportCandidate local,
-            TransportCandidate remote) {
+        TransportCandidate remote) {
         log.append("Jingle transport estabblished: " + local.getLocalIp()
-                + " <-> " + remote.getLocalIp());
+            + " <-> " + remote.getLocalIp());
 
     }
 
@@ -66,7 +66,7 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 log.append("P2P Connected with " + protocol + " to " + remote
-                        + "\n");
+                    + "\n");
             }
         });
     }
@@ -77,7 +77,7 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     }
 
     public void failedToSendFileListWithJingle(JID jid,
-            JingleFileTransferData transferList) {
+        JingleFileTransferData transferList) {
         log.append("Failed to send File with Jingle to " + jid);
     }
 
@@ -86,17 +86,17 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     }
 
     public void incomingResourceFile(JingleFileTransferData data,
-            InputStream input) {
+        InputStream input) {
         // TODO Auto-generated method stub
 
     }
 
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
             ((XMPPChatTransmitter) Saros.getDefault().getSessionManager()
-                    .getTransmitter()).getJingleManager()
-                    .addJingleFileTransferListener(this);
+                .getTransmitter()).getJingleManager()
+                .addJingleFileTransferListener(this);
 
         } else if (newState == ConnectionState.NOT_CONNECTED) {
         }

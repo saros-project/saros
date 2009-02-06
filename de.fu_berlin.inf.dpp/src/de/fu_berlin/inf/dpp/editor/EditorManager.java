@@ -92,10 +92,10 @@ import de.fu_berlin.inf.dpp.ui.SessionView;
  * The EditorManager is responsible for handling all editors in a DPP-session.
  * This includes the functionality of listening for user inputs in an editor,
  * locking the editors of the observer.
- *
+ * 
  * The EditorManager contains the testable logic. All untestable logic should
  * only appear in an class of the {@link IEditorAPI} type.
- *
+ * 
  * @author rdjemili
  */
 public class EditorManager implements IActivityProvider, ISharedProjectListener {
@@ -103,7 +103,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private class ElementStateListener implements IElementStateListener {
         public void elementDirtyStateChanged(Object element, boolean isDirty) {
             if (!EditorManager.this.isDriver || isDirty
-                    || !(element instanceof FileEditorInput)) {
+                || !(element instanceof FileEditorInput)) {
                 return;
             }
 
@@ -111,7 +111,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IFile file = fileEditorInput.getFile();
 
             if (file.getProject() != EditorManager.this.sharedProject
-                    .getProject()) {
+                .getProject()) {
                 return;
             }
 
@@ -138,14 +138,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * @author rdjemili
-     *
+     * 
      */
     private class EditorPool {
         private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
         public void add(IEditorPart editorPart) {
             IResource resource = EditorManager.this.editorAPI
-                    .getEditorResource(editorPart);
+                .getEditorResource(editorPart);
             IPath path = resource.getProjectRelativePath();
 
             if (path == null) {
@@ -156,16 +156,16 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             EditorManager.this.editorAPI.addSharedEditorListener(editorPart);
             EditorManager.this.editorAPI.setEditable(editorPart,
-                    EditorManager.this.isDriver);
+                EditorManager.this.isDriver);
 
             IDocumentProvider documentProvider = EditorManager.this.editorAPI
-                    .getDocumentProvider(editorPart.getEditorInput());
+                .getDocumentProvider(editorPart.getEditorInput());
 
             documentProvider
-                    .addElementStateListener(EditorManager.this.elementStateListener);
+                .addElementStateListener(EditorManager.this.elementStateListener);
 
             IDocument document = EditorManager.this.editorAPI
-                    .getDocument(editorPart);
+                .getDocument(editorPart);
 
             if (editors == null) {
                 editors = new HashSet<IEditorPart>();
@@ -175,13 +175,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             // if line delimiters are not in unix style convert them
             if (document instanceof IDocumentExtension4) {
                 if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
-                        .equals("\n")) {
+                    .equals("\n")) {
                     convertLineDelimiters(editorPart);
                 }
                 ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
             } else {
                 EditorManager.log
-                        .error("Can't discover line delimiter of document");
+                    .error("Can't discover line delimiter of document");
             }
             document.addDocumentListener(EditorManager.this.documentListener);
             editors.add(editorPart);
@@ -195,37 +195,37 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             // get path of file
             IFile file = ((FileEditorInput) editorPart.getEditorInput())
-                    .getFile();
+                .getFile();
             IPath[] paths = new IPath[1];
             paths[0] = file.getFullPath();
 
             ITextFileBufferManager buffManager = FileBuffers
-                    .getTextFileBufferManager();
+                .getTextFileBufferManager();
 
             // convert operation to change line delimiters
             TextFileBufferOperation convertOperation = new ConvertLineDelimitersOperation(
-                    "\n");
+                "\n");
 
             // operation runner for the convert operation
             FileBufferOperationRunner runner = new FileBufferOperationRunner(
-                    buffManager, null);
+                buffManager, null);
 
             // execute convert operation in runner
             try {
                 runner.execute(paths, convertOperation,
-                        new NullProgressMonitor());
+                    new NullProgressMonitor());
             } catch (OperationCanceledException e) {
                 EditorManager.log.error("Can't convert line delimiters! "
-                        + e.getMessage());
+                    + e.getMessage());
             } catch (CoreException e) {
                 EditorManager.log.error("Can't convert line delimiters!"
-                        + e.getMessage());
+                    + e.getMessage());
             }
         }
 
         public void remove(IEditorPart editorPart) {
             IResource resource = EditorManager.this.editorAPI
-                    .getEditorResource(editorPart);
+                .getEditorResource(editorPart);
             IPath path = resource.getProjectRelativePath();
 
             if (path == null) {
@@ -262,7 +262,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see org.eclipse.jface.text.IDocumentListener
          */
         public void documentAboutToBeChanged(final DocumentEvent event) {
@@ -274,12 +274,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             // return;
             String text = event.getText() == null ? "" : event.getText();
             textAboutToBeChanged(event.getOffset(), text, event.getLength(),
-                    event.getDocument());
+                event.getDocument());
         }
 
         /*
          * (non-Javadoc)
-         *
+         * 
          * @see org.eclipse.jface.text.IDocumentListener
          */
         public void documentChanged(final DocumentEvent event) {
@@ -339,7 +339,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
@@ -354,7 +354,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
@@ -371,7 +371,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess invitation) {
@@ -398,7 +398,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Returns the resource paths of editors that the driver is currently using.
-     *
+     * 
      * @return all paths (in project-relative format) of files that the driver
      *         is currently editing by using an editor. Never returns
      *         <code>null</code>. A empty set is returned if there are no
@@ -410,7 +410,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Return the document of the given path.
-     *
+     * 
      * @param path
      *            the path of the wanted document
      * @return the document or null if no document exists with given path or no
@@ -432,7 +432,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         for (IEditorPart editor : editors) {
             if (editorAPI.getDocument(editor) == doc) {
                 path = editorAPI.getEditorResource(editor)
-                        .getProjectRelativePath();
+                    .getProjectRelativePath();
                 break;
             }
         }
@@ -448,7 +448,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void viewportChanged(int top, int bottom, IPath editor) {
@@ -461,7 +461,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void selectionChanged(ITextSelection selection, ISelectionProvider sp) {
@@ -480,11 +480,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void textAboutToBeChanged(int offset, String text, int replace,
-            IDocument document) {
+        IDocument document) {
         if (!this.isDriver) {
             this.currentExecuteActivity = null;
             return;
@@ -503,11 +503,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         path = editorAPI.getEditorResource(changedEditor)
-                .getProjectRelativePath();
+            .getProjectRelativePath();
 
         if (path != null) {
             TextEditActivity activity = new TextEditActivity(offset, text,
-                    replace, path);
+                replace, path);
             /*
              * check if text edit activity is executed by other driver activity
              * recently.
@@ -518,13 +518,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             EditorManager.this.lastEditTimes.put(path, System
-                    .currentTimeMillis());
+                .currentTimeMillis());
 
             fireActivity(activity);
 
             IEditorInput input = changedEditor.getEditorInput();
             IDocumentProvider provider = this.editorAPI
-                    .getDocumentProvider(input);
+                .getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
             ContributionHelper.splitAnnotation(model, offset);
@@ -537,7 +537,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void driverChanged(JID driver, boolean replicated) {
@@ -553,7 +553,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void userJoined(JID user) {
@@ -562,7 +562,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
     public void userLeft(JID user) {
@@ -586,7 +586,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         this.editorAPI
-                .openEditor(this.sharedProject.getProject().getFile(path));
+            .openEditor(this.sharedProject.getProject().getFile(path));
     }
 
     public void setEnableFollowing(boolean enable) {
@@ -602,7 +602,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void addActivityListener(IActivityListener listener) {
@@ -611,7 +611,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void removeActivityListener(IActivityListener listener) {
@@ -620,7 +620,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(final IActivity activity) {
@@ -652,7 +652,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         String source = textEdit.getSource();
         User user = Saros.getDefault().getSessionManager().getSharedProject()
-                .getParticipant(new JID(source));
+            .getParticipant(new JID(source));
 
         /* set current execute activity to avoid circular executions. */
         currentExecuteActivity = textEdit;
@@ -662,7 +662,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
          * annotations, regardless of the real origin of contributions.
          */
         JID driverJID = Saros.getDefault().getSessionManager()
-                .getSharedProject().getADriver().getJID();
+            .getSharedProject().getADriver().getJID();
         if (driverJID == null) {
             log.warn("There is no driver at all.");
         }
@@ -670,48 +670,48 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);
         replaceText(file, textEdit.offset, textEdit.length, textEdit.text,
-                (driverJID != null) ? driverJID.toString() : "");
+            (driverJID != null) ? driverJID.toString() : "");
 
         Set<IEditorPart> editors = editorPool.getEditors(path);
         for (IEditorPart editorPart : editors) {
             editorAPI.setSelection(editorPart, new TextSelection(
-                    textEdit.offset + textEdit.text.length(), 0), source,
-                    shouldIFollow(user));
+                textEdit.offset + textEdit.text.length(), 0), source,
+                shouldIFollow(user));
         }
     }
 
     private void execTextSelection(TextSelectionActivity cursor) {
         IPath path = cursor.getEditor();
         TextSelection textSelection = new TextSelection(cursor.getOffset(),
-                cursor.getLength());
+            cursor.getLength());
 
         User user = Saros.getDefault().getSessionManager().getSharedProject()
-                .getParticipant(new JID(cursor.getSource()));
+            .getParticipant(new JID(cursor.getSource()));
 
         if (Saros.getDefault().getSessionManager().getSharedProject().isDriver(
-                user)) {
+            user)) {
             setDriverTextSelection(textSelection);
         }
 
         if (path == null) {
             EditorManager.log
-                    .error("Received text selection but have no driver editor");
+                .error("Received text selection but have no driver editor");
             return;
         }
 
         Set<IEditorPart> editors = EditorManager.this.editorPool
-                .getEditors(path);
+            .getEditors(path);
         for (IEditorPart editorPart : editors) {
             EditorManager.this.editorAPI.setSelection(editorPart,
-                    textSelection, cursor.getSource(), shouldIFollow(user));
+                textSelection, cursor.getSource(), shouldIFollow(user));
         }
     }
 
     // TODO selectable driver to follow
     protected boolean shouldIFollow(User user) {
         return isFollowing
-                && Saros.getDefault().getSessionManager().getSharedProject()
-                        .isDriver(user);
+            && Saros.getDefault().getSessionManager().getSharedProject()
+                .isDriver(user);
     }
 
     private void execViewport(ViewportActivity viewport) {
@@ -724,10 +724,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         String source = viewport.getSource();
 
         Set<IEditorPart> editors = EditorManager.this.editorPool
-                .getEditors(path);
+            .getEditors(path);
         for (IEditorPart editorPart : editors) {
             EditorManager.this.editorAPI.setViewport(editorPart, top, bottom,
-                    source);
+                source);
         }
     }
 
@@ -765,7 +765,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IPath path = resource.getProjectRelativePath();
         if (isFollowing) {
             if (activeDriverEditor != null
-                    && (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart))) {
+                && (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart))) {
                 setEnableFollowing(false);
                 updateFollowModeUI();
             }
@@ -776,8 +776,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 IViewPart sessionView = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getActivePage().findView(
-                                "de.fu_berlin.inf.dpp.ui.SessionView");
+                    .getActiveWorkbenchWindow().getActivePage().findView(
+                        "de.fu_berlin.inf.dpp.ui.SessionView");
                 if (sessionView != null)
                     ((SessionView) sessionView).updateFollowingMode();
             }
@@ -794,7 +794,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // if closing the following editor, leave follow mode
         if (isFollowing && activeDriverEditor != null
-                && activeDriverEditor.equals(path)) {
+            && activeDriverEditor.equals(path)) {
             setEnableFollowing(false);
             updateFollowModeUI();
         }
@@ -808,7 +808,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Checks wether given resource is currently opened.
-     *
+     * 
      * @param path
      *            the project-relative path to the resource.
      * @return <code>true</code> if the given resource is opened accoring to the
@@ -820,7 +820,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Gives the editors of given path.
-     *
+     * 
      * @param path
      *            the project-relative path to the resource.
      * @return the set of editors
@@ -831,7 +831,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public IActivity fromXML(XmlPullParser parser) {
@@ -861,7 +861,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public String toXML(IActivity activity) {
@@ -871,38 +871,38 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             // + "type=\""
             // + editorActivity.getType() + "\" />";
             return "<editor " + "path=\"" + editorActivity.getPath() + "\" "
-                    + "type=\"" + editorActivity.getType() + "\" "
-                    + "checksum=\"" + editorActivity.getChecksum() + "\"  />";
+                + "type=\"" + editorActivity.getType() + "\" " + "checksum=\""
+                + editorActivity.getChecksum() + "\"  />";
 
         } else if (activity instanceof TextEditActivity) {
             TextEditActivity textEditActivity = (TextEditActivity) activity;
             return "<edit " + "path=\"" + textEditActivity.getEditor() + "\" "
-                    + "offset=\"" + textEditActivity.offset + "\" "
-                    + "replace=\"" + textEditActivity.length + "\">"
-                    + "<![CDATA[" + textEditActivity.text + "]]>" + "</edit>";
+                + "offset=\"" + textEditActivity.offset + "\" " + "replace=\""
+                + textEditActivity.length + "\">" + "<![CDATA["
+                + textEditActivity.text + "]]>" + "</edit>";
 
         } else if (activity instanceof TextSelectionActivity) {
             TextSelectionActivity textSelection = (TextSelectionActivity) activity;
             assert textSelection.getEditor() != null;
             return "<textSelection " + "offset=\"" + textSelection.getOffset()
-                    + "\" " + "length=\"" + textSelection.getLength() + "\" "
-                    + "editor=\""
-                    + textSelection.getEditor().toPortableString() + "\" />";
+                + "\" " + "length=\"" + textSelection.getLength() + "\" "
+                + "editor=\"" + textSelection.getEditor().toPortableString()
+                + "\" />";
 
         } else if (activity instanceof ViewportActivity) {
             ViewportActivity viewportActvity = (ViewportActivity) activity;
             assert viewportActvity.getEditor() != null;
             return "<viewport " + "top=\"" + viewportActvity.getTopIndex()
-                    + "\" " + "bottom=\"" + viewportActvity.getBottomIndex()
-                    + "\" " + "editor=\""
-                    + viewportActvity.getEditor().toPortableString() + "\" />";
+                + "\" " + "bottom=\"" + viewportActvity.getBottomIndex()
+                + "\" " + "editor=\""
+                + viewportActvity.getEditor().toPortableString() + "\" />";
         }
 
         return null;
     }
 
     private IActivity parseTextEditActivity(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
 
         // extract current editor for text edit.
         String pathString = parser.getAttributeValue(null, "path");
@@ -912,7 +912,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         // TODO This value is the length of the old text, so "replace" should be
         // renamed.
         int replace = Integer.parseInt(parser
-                .getAttributeValue(null, "replace"));
+            .getAttributeValue(null, "replace"));
 
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
@@ -930,7 +930,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Path path = pathString.equals("null") ? null : new Path(pathString);
 
         Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null,
-                "type"));
+            "type"));
         EditorActivity edit = new EditorActivity(type, path);
         try {
             long checksum = Long.parseLong(checksumString);
@@ -948,7 +948,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         int length = Integer.parseInt(parser.getAttributeValue(null, "length"));
         String path = parser.getAttributeValue(null, "editor");
         return new TextSelectionActivity(offset, length, Path
-                .fromPortableString(path));
+            .fromPortableString(path));
     }
 
     private ViewportActivity parseViewport(XmlPullParser parser) {
@@ -961,11 +961,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private boolean isSharedEditor(IEditorPart editorPart) {
         IResource resource = this.editorAPI.getEditorResource(editorPart);
         return ((this.sharedProject != null) && (resource.getProject() == this.sharedProject
-                .getProject()));
+            .getProject()));
     }
 
     private void replaceText(IFile file, int offset, int replace, String text,
-            String source) {
+        String source) {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
 
@@ -978,11 +978,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IDocument doc = provider.getDocument(input);
             doc.replace(offset, replace, text);
             EditorManager.this.lastRemoteEditTimes.put(file
-                    .getProjectRelativePath(), System.currentTimeMillis());
+                .getProjectRelativePath(), System.currentTimeMillis());
 
             IAnnotationModel model = provider.getAnnotationModel(input);
             ContributionHelper.insertAnnotation(model, offset, text.length(),
-                    source);
+                source);
 
             // Don't disconnect from provider yet, because otherwise the text
             // changes would be lost. We only disconnect when the document is
@@ -992,9 +992,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             // TODO If this happens a resend of the original text should be
             // initiated.
             log
-                    .error(
-                            "Couldn't insert driver text because of bad location.",
-                            e);
+                .error("Couldn't insert driver text because of bad location.",
+                    e);
         } catch (CoreException e) {
             log.error("Couldn't insert driver text.", e);
         }
@@ -1019,7 +1018,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Saves the driver editor.
-     *
+     * 
      * @param path
      *            the path to the resource that the driver was editing.
      * @param replicated
@@ -1039,7 +1038,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             try {
                 file.setReadOnly(false);
                 IDocumentProvider provider = this.editorAPI
-                        .getDocumentProvider(input);
+                    .getDocumentProvider(input);
 
                 // save not necessary, if we have no modified document
                 if (!this.connectedFiles.contains(file)) {
@@ -1052,7 +1051,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 model.connect(doc);
 
                 provider.saveDocument(new NullProgressMonitor(), input, doc,
-                        true);
+                    true);
                 EditorManager.log.debug("Saved document " + path);
 
                 model.disconnect(doc);
@@ -1086,12 +1085,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 for (IEditorPart editorPart : EditorManager.this.editorAPI
-                        .getOpenEditors()) {
+                    .getOpenEditors()) {
                     partOpened(editorPart);
                 }
 
                 IEditorPart activeEditor = EditorManager.this.editorAPI
-                        .getActiveEditor();
+                    .getActiveEditor();
                 if (activeEditor != null) {
                     sharedEditorActivated(activeEditor);
                 }
@@ -1114,7 +1113,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         ILineRange viewport = this.editorAPI.getViewport(editorPart);
         int startLine = viewport.getStartLine();
         viewportChanged(startLine, startLine + viewport.getNumberOfLines(),
-                editorPath);
+            editorPath);
     }
 
     private void setAllEditorsToEditable() {
@@ -1125,7 +1124,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Removes all annotations of a given type and for all users.
-     *
+     * 
      * @param annotationType
      *            the annotation type that will be removed.
      */
@@ -1134,12 +1133,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
             IDocumentProvider provider = this.editorAPI
-                    .getDocumentProvider(input);
+                .getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
             if (model != null) {
                 for (Iterator<Annotation> it = model.getAnnotationIterator(); it
-                        .hasNext();) {
+                    .hasNext();) {
                     Annotation annotation = it.next();
                     if (annotation.getType().startsWith(annotationType)) {
                         model.removeAnnotation(annotation);
@@ -1151,7 +1150,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Removes all annotations of given user and type.
-     *
+     * 
      * @param forUserID
      *            the id of the user whos annotations will be removed, if null
      *            annotations of given type for all users are removed
@@ -1163,7 +1162,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
             IDocumentProvider provider = this.editorAPI
-                    .getDocumentProvider(input);
+                .getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
             if (model == null) {
@@ -1172,7 +1171,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             for (@SuppressWarnings("unchecked")
             Iterator<Annotation> it = model.getAnnotationIterator(); it
-                    .hasNext();) {
+                .hasNext();) {
                 Annotation annotation = it.next();
                 String type = annotation.getType();
 
@@ -1182,8 +1181,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
                 AnnotationSaros anns = (AnnotationSaros) annotation;
                 boolean isfromuser = (forUserID == null)
-                        || ((forUserID != null) && anns.getSource().equals(
-                                forUserID));
+                    || ((forUserID != null) && anns.getSource().equals(
+                        forUserID));
 
                 if (isfromuser) {
                     model.removeAnnotation(annotation);
@@ -1195,7 +1194,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private EditorManager() {
         setEditorAPI(new EditorAPI());
         if ((Saros.getDefault() != null)
-                && (Saros.getDefault().getSessionManager() != null)) {
+            && (Saros.getDefault().getSessionManager() != null)) {
             Saros.getDefault().getSessionManager().addSessionListener(this);
             this.lastEditTimes = new HashMap<IPath, Long>();
             this.lastRemoteEditTimes = new HashMap<IPath, Long>();
@@ -1204,7 +1203,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * Sets the currently active driver editor.
-     *
+     * 
      * @param path
      *            the project-relative path to the resource that the editor is
      *            currently editting.
@@ -1219,7 +1218,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         for (ISharedEditorListener listener : this.editorListeners) {
             listener.activeDriverEditorChanged(this.activeDriverEditor,
-                    replicated);
+                replicated);
         }
 
         if (replicated) {
@@ -1242,7 +1241,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /**
      * Removes the given editor from the list of editors that the driver is
      * currently using.
-     *
+     * 
      * @param path
      *            the path to the resource that the driver was editting.
      * @param replicated
@@ -1265,7 +1264,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
                     IFile file = EditorManager.this.sharedProject.getProject()
-                            .getFile(path);
+                        .getFile(path);
                     resetText(file);
 
                     if (!EditorManager.this.isFollowing) {
@@ -1273,7 +1272,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     }
 
                     Set<IEditorPart> editors = EditorManager.this.editorPool
-                            .getEditors(path);
+                        .getEditors(path);
                     for (IEditorPart part : editors) {
                         EditorManager.this.editorAPI.closeEditor(part);
                     }
@@ -1298,7 +1297,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * To get the java system time of the last local edit operation.
-     *
+     * 
      * @param path
      *            the project relative path of the resource
      * @return java system time of last local edit
@@ -1309,7 +1308,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * To get the java system time of the last remote edit operation.
-     *
+     * 
      * @param path
      *            the project relative path of the resource
      * @return java system time of last remote edit
@@ -1320,7 +1319,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     /**
      * to get the information whether the user is in following mode or not
-     *
+     * 
      * @return <code>true</code> when in following mode, otherwise
      *         <code>false</code>
      */

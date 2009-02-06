@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
 public class JupiterReceiver implements ConnectionSessionListener {
 
     public static final Logger log = Logger.getLogger(JupiterReceiver.class
-            .getName());
+        .getName());
 
     PacketListener listener = new PacketListener() {
 
@@ -24,14 +24,14 @@ public class JupiterReceiver implements ConnectionSessionListener {
             Message message = (Message) packet;
 
             RequestPacketExtension packetExtension = PacketExtensions
-                    .getJupiterRequestExtension(message);
+                .getJupiterRequestExtension(message);
 
             assert packetExtension != null;
 
             ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
+                .getSharedProject();
             log.debug("Received request : "
-                    + packetExtension.getRequest().toString());
+                + packetExtension.getRequest().toString());
             project.getSequencer().receiveRequest(packetExtension.getRequest());
         }
     };
@@ -50,8 +50,8 @@ public class JupiterReceiver implements ConnectionSessionListener {
         if (this.connection != null) {
             // TODO filter for correct session
             connection.addPacketListener(listener, new AndFilter(
-                    new MessageTypeFilter(Message.Type.chat),
-                    RequestPacketExtension.getFilter()));
+                new MessageTypeFilter(Message.Type.chat),
+                RequestPacketExtension.getFilter()));
         }
     }
 

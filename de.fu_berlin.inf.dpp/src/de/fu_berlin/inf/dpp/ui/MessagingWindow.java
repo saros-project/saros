@@ -69,7 +69,7 @@ public class MessagingWindow extends ApplicationWindow {
         SashForm form = new SashForm(composite, SWT.VERTICAL);
 
         this.historyViewer = new TextViewer(form, SWT.READ_ONLY | SWT.V_SCROLL
-                | SWT.BORDER);
+            | SWT.BORDER);
         this.historyViewer.setDocument(new Document());
 
         this.textInput = new StyledText(form, SWT.MULTI | SWT.BORDER);

@@ -50,7 +50,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
     protected final int colorID;
 
     public InvitationProcess(ITransmitter transmitter, JID peer,
-            String description, int colorID) {
+        String description, int colorID) {
         this.transmitter = transmitter;
         this.peer = peer;
         this.description = description;
@@ -131,7 +131,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
     @Override
     public String toString() {
         return "InvitationProcess(peer:" + this.peer + ", state:" + this.state
-                + ")";
+            + ")";
     }
 
     /**
@@ -159,7 +159,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
     protected void failState() {
         throw new IllegalStateException("Bad input while in state "
-                + this.state);
+            + this.state);
     }
 
     public void setInvitationUI(IInvitationUI inviteUI) {

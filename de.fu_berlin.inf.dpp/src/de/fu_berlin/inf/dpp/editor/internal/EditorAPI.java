@@ -123,7 +123,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     private class EditorListener implements IViewportListener, MouseListener,
-            KeyListener, ISelectionChangedListener {
+        KeyListener, ISelectionChangedListener {
 
         private final ITextViewer viewer;
 
@@ -149,7 +149,7 @@ public class EditorAPI implements IEditorAPI {
             int top = this.viewer.getTopIndex();
             int bottom = this.viewer.getBottomIndex();
             IPath editor = EditorAPI.this.editorManager
-                    .getPathOfDocument(this.viewer.getDocument());
+                .getPathOfDocument(this.viewer.getDocument());
 
             EditorAPI.this.editorManager.viewportChanged(top, bottom, editor);
         }
@@ -231,14 +231,14 @@ public class EditorAPI implements IEditorAPI {
                 event.doit = false;
 
                 Object adapter = getActiveEditor().getAdapter(
-                        IEditorStatusLine.class);
+                    IEditorStatusLine.class);
                 if (adapter != null) {
                     IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
                     statusLine
-                            .setMessage(
-                                    false,
-                                    "You're not allowed to perform modifications while not being the driver of the session.",
-                                    null);
+                        .setMessage(
+                            false,
+                            "You're not allowed to perform modifications while not being the driver of the session.",
+                            null);
                     Toolkit.getDefaultToolkit().beep();
                 }
             }
@@ -262,7 +262,7 @@ public class EditorAPI implements IEditorAPI {
             public void run() {
                 IWorkbenchWindow window = EditorAPI.getActiveWindow();
                 window.getPartService().addPartListener(
-                        new SharedProjectPartListener());
+                    new SharedProjectPartListener());
             }
         });
     }
@@ -313,22 +313,21 @@ public class EditorAPI implements IEditorAPI {
                     // TODO: Rather this dependency should be injected when the
                     // EditorAPI is created itself.
                     JDTFacade facade = Saros.getDefault().getContainer()
-                            .getComponent(JDTFacade.class);
+                        .getComponent(JDTFacade.class);
 
                     if (facade.isJDTAvailable()) {
                         return facade.getDocumentProvider();
                     }
 
                 } else if (fileExtension.equals("c")
-                        || fileExtension.equals("h")
-                        || fileExtension.equals("cpp")
-                        || fileExtension.equals("cxx")
-                        || fileExtension.equals("hxx")) {
+                    || fileExtension.equals("h") || fileExtension.equals("cpp")
+                    || fileExtension.equals("cxx")
+                    || fileExtension.equals("hxx")) {
 
                     // TODO: Rather this dependency should be injected when the
                     // EditorAPI is created itself.
                     CDTFacade facade = Saros.getDefault().getContainer()
-                            .getComponent(CDTFacade.class);
+                        .getComponent(CDTFacade.class);
 
                     if (facade.isCDTAvailable()) {
                         return facade.getDocumentProvider();
@@ -338,7 +337,7 @@ public class EditorAPI implements IEditorAPI {
         }
 
         DocumentProviderRegistry registry = DocumentProviderRegistry
-                .getDefault();
+            .getDefault();
         return registry.getDocumentProvider(input);
     }
 
@@ -417,7 +416,7 @@ public class EditorAPI implements IEditorAPI {
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
-            String source, boolean following) {
+        String source, boolean following) {
 
         if (!(editorPart instanceof ITextEditor)) {
             return;
@@ -429,14 +428,14 @@ public class EditorAPI implements IEditorAPI {
 
         if (docProvider != null) {
             IAnnotationModel model = docProvider.getAnnotationModel(textEditor
-                    .getEditorInput());
+                .getEditorInput());
 
             if (model != null) {
 
                 if (following) {
                     ITextViewer viewer = EditorAPI.getViewer(editorPart);
                     viewer.revealRange(selection.getOffset(), selection
-                            .getLength());
+                        .getLength());
                 }
 
                 for (@SuppressWarnings("unchecked")
@@ -444,7 +443,7 @@ public class EditorAPI implements IEditorAPI {
                     Annotation annotation = (Annotation) it.next();
 
                     if (annotation.getType().startsWith(
-                            SelectionAnnotation.TYPE) == false) {
+                        SelectionAnnotation.TYPE) == false) {
                         continue;
                     }
 
@@ -458,9 +457,9 @@ public class EditorAPI implements IEditorAPI {
                 String label = "Selection of " + sourceJid.getName();
 
                 Position position = new Position(selection.getOffset(),
-                        selection.getLength());
+                    selection.getLength());
                 AnnotationSaros annotation = new SelectionAnnotation(label,
-                        source); // BG:was
+                    source); // BG:was
                 // source
                 model.addAnnotation(annotation, position);
             }
@@ -479,7 +478,7 @@ public class EditorAPI implements IEditorAPI {
 
         ITextEditor textEditor = (ITextEditor) editorPart;
         ISelectionProvider selectionProvider = textEditor
-                .getSelectionProvider();
+            .getSelectionProvider();
         if (selectionProvider != null) {
             return (ITextSelection) selectionProvider.getSelection();
         }
@@ -500,17 +499,17 @@ public class EditorAPI implements IEditorAPI {
                 updateStatusLine(editorPart, editable);
 
                 ITextViewerExtension textViewer = (ITextViewerExtension) EditorAPI
-                        .getViewer(editorPart);
+                    .getViewer(editorPart);
 
                 if (textViewer == null) {
                     return;
                 }
 
                 if (editable
-                        && EditorAPI.this.lockedEditors.contains(editorPart)) {
+                    && EditorAPI.this.lockedEditors.contains(editorPart)) {
                     EditorAPI.this.lockedEditors.remove(editorPart);
                     textViewer
-                            .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
+                        .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
 
                     // enable editing and undo-manager
                     SourceViewer sourceViewer = (SourceViewer) textViewer;
@@ -520,10 +519,10 @@ public class EditorAPI implements IEditorAPI {
                     sourceViewer.getUndoManager().setMaximalUndoLevel(200);
 
                 } else if (!editable
-                        && !EditorAPI.this.lockedEditors.contains(editorPart)) {
+                    && !EditorAPI.this.lockedEditors.contains(editorPart)) {
                     EditorAPI.this.lockedEditors.add(editorPart);
                     textViewer
-                            .appendVerifyKeyListener(EditorAPI.this.keyVerifier);
+                        .appendVerifyKeyListener(EditorAPI.this.keyVerifier);
 
                     // disable editing and undo-manager
                     SourceViewer sourceViewer = (SourceViewer) textViewer;
@@ -561,7 +560,7 @@ public class EditorAPI implements IEditorAPI {
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
     public void setViewport(IEditorPart editorPart, int top, int bottom,
-            String source) {
+        String source) {
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         updateViewportAnnotation(viewer, top, bottom, source);
@@ -577,7 +576,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     private void updateViewportAnnotation(ITextViewer viewer, int top,
-            int bottom, String source) {
+        int bottom, String source) {
 
         if (!(viewer instanceof ISourceViewer)) {
             return;
@@ -598,7 +597,7 @@ public class EditorAPI implements IEditorAPI {
         try {
             top = Math.max(0, Math.min(document.getLength() - 1, top));
             bottom = Math.max(0, Math.min(document.getLength() - 1, bottom));
-            
+
             int start = document.getLineOffset(top);
             int end = document.getLineOffset(bottom);
 

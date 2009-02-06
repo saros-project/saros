@@ -12,7 +12,7 @@ public interface IJDTSupport {
 
     /**
      * Will return the IDocumentProvider from the JDT Plugin by calling
-     *  JavaPlugin.getDefault().getCompilationUnitDocumentProvider();
+     * JavaPlugin.getDefault().getCompilationUnitDocumentProvider();
      */
     public IDocumentProvider getDocumentProvider();
 

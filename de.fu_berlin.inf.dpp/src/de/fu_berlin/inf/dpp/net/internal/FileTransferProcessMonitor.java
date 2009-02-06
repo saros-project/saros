@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 public class FileTransferProcessMonitor extends Thread {
 
     private static Logger logger = Logger
-            .getLogger(FileTransferProcessMonitor.class);
+        .getLogger(FileTransferProcessMonitor.class);
 
     FileTransfer transfer;
     private final int TIMEOUT = 10000;
@@ -32,7 +32,7 @@ public class FileTransferProcessMonitor extends Thread {
     }
 
     public FileTransferProcessMonitor(FileTransfer transfer,
-            IFileTransferCallback callback) {
+        IFileTransferCallback callback) {
         this.transfer = transfer;
         this.callback = callback;
         start();
@@ -57,15 +57,15 @@ public class FileTransferProcessMonitor extends Thread {
         while (!this.closeMonitor) {
             try {
                 while (!this.transfer.isDone()
-                        && (this.transfer.getProgress() < 1.0)) {
+                    && (this.transfer.getProgress() < 1.0)) {
 
                     /* check negotiator process */
                     FileTransferProcessMonitor.logger.debug("Status: "
-                            + this.transfer.getStatus() + " Progress : "
-                            + this.transfer.getProgress());
+                        + this.transfer.getStatus() + " Progress : "
+                        + this.transfer.getProgress());
                     if (this.callback != null) {
                         this.callback.transferProgress((int) (this.transfer
-                                .getProgress() * 100));
+                            .getProgress() * 100));
                     }
                     if (this.closeMonitor) {
                         return;

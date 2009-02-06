@@ -14,15 +14,15 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class JingleDiscoveryManager {
     HashMap<JID, Boolean> jingleSupport = new HashMap<JID, Boolean>();
-    
+
     protected XMPPConnection connection;
-    
-    public JingleDiscoveryManager(XMPPConnection connection){
+
+    public JingleDiscoveryManager(XMPPConnection connection) {
         this.connection = connection;
     }
-    
-    public boolean getCachedJingleSupport(JID recipient){
-        if (jingleSupport.containsKey(recipient)){
+
+    public boolean getCachedJingleSupport(JID recipient) {
+        if (jingleSupport.containsKey(recipient)) {
             return jingleSupport.get(recipient);
         } else {
             boolean hasJingleSupport = queryJingleSupport(recipient);
@@ -36,10 +36,10 @@ public class JingleDiscoveryManager {
             .getInstanceFor(connection);
 
         try {
-            return sdm.discoverInfo(recipient.toString())
-                    .containsFeature(Jingle.NAMESPACE);
+            return sdm.discoverInfo(recipient.toString()).containsFeature(
+                Jingle.NAMESPACE);
         } catch (XMPPException e) {
-           return false;
+            return false;
         }
     }
 }

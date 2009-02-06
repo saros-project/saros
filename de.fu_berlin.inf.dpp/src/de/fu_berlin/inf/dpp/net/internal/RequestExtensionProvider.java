@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class RequestExtensionProvider implements PacketExtensionProvider {
 
     public PacketExtension parseExtension(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
 
         Request request = null;
         String sessionID = null;
@@ -40,7 +40,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
                     }
 
                     if (parser.getName().equals(
-                            RequestPacketExtension.SESSION_ID)) {
+                        RequestPacketExtension.SESSION_ID)) {
                         sessionID = parseSessionId(parser);
                         parser.next();
                     }
@@ -76,7 +76,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private String parseSessionId(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         parser.next(); // read text
         String sessionID = parser.getText();
         parser.next(); // read end tag
@@ -85,7 +85,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private String parsePath(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         parser.next(); // read text
         String path = parser.getText();
         parser.next(); // read end tag
@@ -94,7 +94,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private String parseJID(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         parser.next(); // read text
         String jid = parser.getText();
         parser.next(); // read end tag
@@ -103,7 +103,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private int parseSideID(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         parser.next(); // read text
         int id = Integer.parseInt(parser.getText());
         parser.next(); // read end tag
@@ -112,7 +112,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private Request parseRequest(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         // // extract current editor for text edit.
         int id = 0;
         Timestamp timestamp = null;
@@ -124,9 +124,9 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
 
         if (parser.getName().equals(RequestPacketExtension.VECTOR_TIME)) {
             int local = Integer.parseInt(parser
-                    .getAttributeValue(null, "local"));
+                .getAttributeValue(null, "local"));
             int remote = Integer.parseInt(parser.getAttributeValue(null,
-                    "remote"));
+                "remote"));
             timestamp = new JupiterVectorTime(local, remote);
             parser.next();
             parser.next();
@@ -163,7 +163,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private Operation parseSingleOperation(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         Operation op = null;
         if (parser.getName().equals(RequestPacketExtension.INSERT_OP)) {
             return parseInsertOperation(parser);
@@ -182,12 +182,12 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private Operation parseInsertOperation(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         Operation op = null;
         int pos = Integer.parseInt(parser.getAttributeValue(null,
-                RequestPacketExtension.POSITION));
+            RequestPacketExtension.POSITION));
         int origin = Integer.parseInt(parser.getAttributeValue(null,
-                RequestPacketExtension.ORIGIN));
+            RequestPacketExtension.ORIGIN));
 
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
@@ -198,10 +198,10 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
     }
 
     private Operation parseDeleteOperation(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         Operation op = null;
         int pos = Integer.parseInt(parser.getAttributeValue(null,
-                RequestPacketExtension.POSITION));
+            RequestPacketExtension.POSITION));
 
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {

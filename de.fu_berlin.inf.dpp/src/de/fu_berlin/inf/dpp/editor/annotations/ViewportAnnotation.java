@@ -23,7 +23,7 @@ import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
  * @author rdjemili
  */
 public class ViewportAnnotation extends AnnotationSaros implements
-        IAnnotationPresentation, IPropertyChangeListener {
+    IAnnotationPresentation, IPropertyChangeListener {
 
     public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
 
@@ -43,14 +43,14 @@ public class ViewportAnnotation extends AnnotationSaros implements
         super(ViewportAnnotation.TYPE, false, label, source);
 
         String annotationType = ViewportAnnotation.TYPE + "."
-                + (getColorIdForUser(source) + 1);
+            + (getColorIdForUser(source) + 1);
         setType(annotationType);
         AnnotationPreferenceLookup lookup = EditorsUI
-                .getAnnotationPreferenceLookup();
+            .getAnnotationPreferenceLookup();
         AnnotationPreference annotationPreference = lookup
-                .getAnnotationPreference(annotationType);
+            .getAnnotationPreference(annotationType);
         RGB rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
-                annotationPreference.getColorPreferenceKey());
+            annotationPreference.getColorPreferenceKey());
         Display display = Display.getDefault();
         strokeColor = new Color(display, scaleColor(rgb, STROKE_SCALE));
         fillColor = new Color(display, scaleColor(rgb, FILL_SCALE));
@@ -92,7 +92,7 @@ public class ViewportAnnotation extends AnnotationSaros implements
          */
         assert false;
         if (event.getProperty().equals(
-                ViewportAnnotation.getColorPreferenceKey())) {
+            ViewportAnnotation.getColorPreferenceKey())) {
             if (ViewportAnnotation.strokeColor != null) {
                 ViewportAnnotation.strokeColor.dispose();
                 ViewportAnnotation.strokeColor = null;
@@ -105,10 +105,10 @@ public class ViewportAnnotation extends AnnotationSaros implements
 
     public static String getColorPreferenceKey() {
         AnnotationPreferenceLookup lookup = EditorsUI
-                .getAnnotationPreferenceLookup();
+            .getAnnotationPreferenceLookup();
 
         AnnotationPreference preference = lookup
-                .getAnnotationPreference(ViewportAnnotation.TYPE);
+            .getAnnotationPreference(ViewportAnnotation.TYPE);
 
         return preference.getColorPreferenceKey();
     }

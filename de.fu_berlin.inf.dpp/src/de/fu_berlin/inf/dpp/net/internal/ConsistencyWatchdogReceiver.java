@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
     private static Logger log = Logger
-            .getLogger(ConsistencyWatchdogReceiver.class.getName());
+        .getLogger(ConsistencyWatchdogReceiver.class.getName());
 
     protected long lastReceivedActivityTime;
 
@@ -69,7 +69,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
     CurrentProjectProxy project;
 
     public ConsistencyWatchdogReceiver(ITransmitter transmitter,
-            CurrentProjectProxy project) {
+        CurrentProjectProxy project) {
         this.project = project;
         this.transmitter = transmitter;
     }
@@ -87,9 +87,9 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
             // TODO filter for correct session
             connection.addPacketListener(listener, new AndFilter(
-                    new MessageTypeFilter(Message.Type.chat), Util.orFilter(
-                            checksum.getFilter(), checksumError.getFilter(),
-                            RequestPacketExtension.getFilter())));
+                new MessageTypeFilter(Message.Type.chat), Util.orFilter(
+                    checksum.getFilter(), checksumError.getFilter(),
+                    RequestPacketExtension.getFilter())));
         }
     }
 
@@ -107,13 +107,13 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
         log.debug("ChecksumError received");
 
         DefaultPacketExtension checksumErrorExtension = checksumError
-                .getExtension(message);
+            .getExtension(message);
 
         final String path = checksumErrorExtension
-                .getValue(PacketExtensions.FILE_PATH);
+            .getValue(PacketExtensions.FILE_PATH);
 
         final boolean resolved = Boolean.parseBoolean(checksumErrorExtension
-                .getValue("resolved"));
+            .getValue("resolved"));
 
         if (resolved) {
             log.debug("synchronisation completed, inconsistency resolved");
@@ -134,7 +134,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
                     // wait until no more activities are received
                     while (System.currentTimeMillis()
-                            - lastReceivedActivityTime < 1500) {
+                        - lastReceivedActivityTime < 1500) {
                         try {
                             Thread.sleep(200);
                         } catch (InterruptedException e) {
@@ -145,10 +145,10 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
                     EditorManager.getDefault().saveText(new Path(path), true);
 
                     transmitter.sendActivities(project.getVariable(),
-                            Collections.singletonList(new TimedActivity(
-                                    new FileActivity(FileActivity.Type.Created,
-                                            new Path(path)),
-                                    ActivitySequencer.UNDEFINED_TIME)));
+                        Collections.singletonList(new TimedActivity(
+                            new FileActivity(FileActivity.Type.Created,
+                                new Path(path)),
+                            ActivitySequencer.UNDEFINED_TIME)));
 
                     // // TODO CJ: thinking about a better solution with
                     // // activity sequencer and jupiter
@@ -174,10 +174,10 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
     }
 
     ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
-            TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1));
+        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1));
 
     private void processChecksumExtension(final Message message,
-            final ISharedProject project) {
+        final ISharedProject project) {
 
         final DefaultPacketExtension ext = checksum.getExtension(message);
 
@@ -192,16 +192,16 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
                         for (int i = 1; i <= count; i++) {
                             IPath path = Path.fromPortableString(ext
-                                    .getValue("path" + i));
+                                .getValue("path" + i));
                             int length = Integer.parseInt(ext.getValue("length"
-                                    + i));
+                                + i));
                             int hash = Integer.parseInt(ext
-                                    .getValue("hash" + i));
+                                .getValue("hash" + i));
                             checksums[i - 1] = new DocumentChecksum(path,
-                                    length, hash);
+                                length, hash);
                         }
                         project.getConcurrentDocumentManager()
-                                .checkConsistency(checksums);
+                            .checkConsistency(checksums);
                     } catch (RuntimeException e) {
                         log.error("Failed to check consistency", e);
                     }
@@ -211,7 +211,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
             // Ignore Checksums that arrive before we are done processing the
             // last set of Checksums.
             log
-                    .warn("Received Checksums before processing of previous checksums finished");
+                .warn("Received Checksums before processing of previous checksums finished");
         }
     }
 

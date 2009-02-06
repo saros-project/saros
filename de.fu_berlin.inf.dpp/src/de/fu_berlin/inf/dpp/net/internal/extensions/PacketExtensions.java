@@ -44,9 +44,9 @@ import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 /**
  * Holds various simple helper methods to create and parse simple Smack packet
  * extensions.
- *
+ * 
  * @author rdjemili
- *
+ * 
  *         TODO This class should be converted to many small classes
  *         implementing the SarosPacketExtension and subclasses.
  */
@@ -70,7 +70,7 @@ public class PacketExtensions {
     }
 
     public static abstract class SarosDefaultPackageExtension extends
-            SarosPacketExtension {
+        SarosPacketExtension {
 
         public SarosDefaultPackageExtension(String element) {
             super(element);
@@ -78,13 +78,13 @@ public class PacketExtensions {
 
         public DefaultPacketExtension create() {
             DefaultPacketExtension extension = new DefaultPacketExtension(
-                    element, NAMESPACE);
+                element, NAMESPACE);
             return extension;
         }
 
         public DefaultPacketExtension getExtension(Message message) {
             return (DefaultPacketExtension) message.getExtension(element,
-                    NAMESPACE);
+                NAMESPACE);
         }
     }
 
@@ -93,7 +93,7 @@ public class PacketExtensions {
      * the current SessionID
      */
     public static abstract class SessionDefaultPacketExtension extends
-            SarosPacketExtension {
+        SarosPacketExtension {
 
         public SessionDefaultPacketExtension(String element) {
             super(element);
@@ -101,7 +101,7 @@ public class PacketExtensions {
 
         public DefaultPacketExtension create() {
             DefaultPacketExtension extension = new DefaultPacketExtension(
-                    element, NAMESPACE);
+                element, NAMESPACE);
 
             extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
 
@@ -110,7 +110,7 @@ public class PacketExtensions {
 
         public DefaultPacketExtension getExtension(Message message) {
             return (DefaultPacketExtension) message.getExtension(element,
-                    NAMESPACE);
+                NAMESPACE);
         }
     }
 
@@ -141,10 +141,9 @@ public class PacketExtensions {
 
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-                PacketExtensions.NAMESPACE, new ActivitiesProvider());
+            PacketExtensions.NAMESPACE, new ActivitiesProvider());
         providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
-                RequestPacketExtension.NAMESPACE,
-                new RequestExtensionProvider());
+            RequestPacketExtension.NAMESPACE, new RequestExtensionProvider());
     }
 
     public static String getSessionID() {
@@ -152,31 +151,31 @@ public class PacketExtensions {
     }
 
     public static ActivitiesPacketExtension getActvitiesExtension(
-            Message message) {
+        Message message) {
         return (ActivitiesPacketExtension) message.getExtension(
-                ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
     }
 
     public static RequestPacketExtension getJupiterRequestExtension(
-            Message message) {
+        Message message) {
         return (RequestPacketExtension) message.getExtension(
-                RequestPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            RequestPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
     }
 
     /**
      * TODO CJ: write javadoc
-     *
+     * 
      * @param message
      * @return
      */
     public static String getSessionID(Message message) {
         PacketExtension extension = message.getExtension(
-                ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
         if (extension != null) {
             return ((ActivitiesPacketExtension) extension).getSessionID();
         }
         extension = message.getExtension(RequestPacketExtension.ELEMENT,
-                PacketExtensions.NAMESPACE);
+            PacketExtensions.NAMESPACE);
         if (extension != null) {
             return ((RequestPacketExtension) extension).getSessionID();
         }
@@ -191,15 +190,15 @@ public class PacketExtensions {
     public static PacketFilter getSessionIDPacketFilter() {
 
         return new AndFilter(new MessageTypeFilter(Message.Type.chat),
-                new PacketFilter() {
-                    public boolean accept(Packet arg0) {
-                        Message message = (Message) arg0;
+            new PacketFilter() {
+                public boolean accept(Packet arg0) {
+                    Message message = (Message) arg0;
 
-                        return Saros.getDefault().getSessionManager()
-                                .getSessionID().equals(
-                                        PacketExtensions.getSessionID(message));
-                    }
-                });
+                    return Saros.getDefault().getSessionManager()
+                        .getSessionID().equals(
+                            PacketExtensions.getSessionID(message));
+                }
+            });
     }
 
     public static MutablePicoContainer container;
@@ -209,19 +208,20 @@ public class PacketExtensions {
         if (container == null) {
 
             container = new PicoBuilder(new CompositeInjection(
-                    new ConstructorInjection(), new AnnotatedFieldInjection()))
-                    .withCaching().build();
+                new ConstructorInjection(), new AnnotatedFieldInjection()))
+                .withCaching().build();
 
             container.addComponent(CancelInviteExtension.class).addComponent(
-                    ChecksumErrorExtension.class).addComponent(
-                    ChecksumExtension.class).addComponent(
-                    DataTransferExtension.class).addComponent(
-                    InviteExtension.class).addComponent(JoinExtension.class)
-                    .addComponent(JupiterErrorExtension.class).addComponent(
-                            LeaveExtension.class).addComponent(
-                            RequestActivityExtension.class).addComponent(
-                            RequestForFileListExtension.class).addComponent(
-                            UserListExtension.class);
+                ChecksumErrorExtension.class).addComponent(
+                ChecksumExtension.class).addComponent(
+                DataTransferExtension.class)
+                .addComponent(InviteExtension.class).addComponent(
+                    JoinExtension.class).addComponent(
+                    JupiterErrorExtension.class).addComponent(
+                    LeaveExtension.class).addComponent(
+                    RequestActivityExtension.class).addComponent(
+                    RequestForFileListExtension.class).addComponent(
+                    UserListExtension.class);
         }
         return container;
     }
@@ -230,7 +230,7 @@ public class PacketExtensions {
         return new PacketFilter() {
             public boolean accept(Packet arg0) {
                 return Saros.getDefault().getSessionManager()
-                        .getSharedProject() != null;
+                    .getSharedProject() != null;
             }
         };
     }

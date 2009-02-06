@@ -31,7 +31,7 @@ public class FileUtil {
             // Adler-32 checksum
             contents = file.getContents();
             CheckedInputStream cis = new CheckedInputStream(contents,
-                    new Adler32());
+                new Adler32());
 
             byte[] tempBuf = new byte[128];
             while (cis.read(tempBuf) >= 0) {

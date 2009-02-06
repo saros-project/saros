@@ -20,7 +20,7 @@ public class JupiterDocumentClient implements JupiterClient {
      */
 
     private static Logger logger = Logger.getLogger(JupiterDocumentClient.class
-            .toString());
+        .toString());
 
     /** jid of remote client */
     private final JID jid;
@@ -33,7 +33,7 @@ public class JupiterDocumentClient implements JupiterClient {
     private final RequestForwarder forwarder;
 
     public JupiterDocumentClient(JID jid, RequestForwarder forwarder,
-            IPath editor) {
+        IPath editor) {
         this.jid = jid;
         this.jupiter = new Jupiter(true);
         this.forwarder = forwarder;
@@ -43,7 +43,7 @@ public class JupiterDocumentClient implements JupiterClient {
     public Request generateRequest(Operation op) {
         Request req = null;
         JupiterDocumentClient.logger.debug(this.jid.toString()
-                + " client generate request for " + op);
+            + " client generate request for " + op);
         req = this.jupiter.generateRequest(op);
         req.setJID(this.jid);
         req.setEditorPath(this.editor);
@@ -56,11 +56,11 @@ public class JupiterDocumentClient implements JupiterClient {
     public Operation receiveRequest(Request req) throws TransformationException {
         Operation op = null;
         JupiterDocumentClient.logger.debug(this.jid.toString()
-                + " client receive request " + req.getOperation());
+            + " client receive request " + req.getOperation());
         /* receive request action */
         op = this.jupiter.receiveRequest(req);
         JupiterDocumentClient.logger.debug(this.jid.toString()
-                + " client operation of IT: " + op);
+            + " client operation of IT: " + op);
         return op;
     }
 
@@ -82,7 +82,7 @@ public class JupiterDocumentClient implements JupiterClient {
     }
 
     public void updateVectorTime(Timestamp timestamp)
-            throws TransformationException {
+        throws TransformationException {
         this.jupiter.updateVectorTime(timestamp);
     }
 

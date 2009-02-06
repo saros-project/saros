@@ -51,10 +51,10 @@ import de.fu_berlin.inf.dpp.ui.MessagingWindow;
  * @author rdjemili
  */
 public class MessagingManager implements PacketListener, MessageListener,
-        IConnectionListener, InvitationListener {
+    IConnectionListener, InvitationListener {
 
     private static Logger log = Logger.getLogger(MessagingManager.class
-            .getName());
+        .getName());
 
     MessageEventManager messageEventManager;
 
@@ -97,9 +97,9 @@ public class MessagingManager implements PacketListener, MessageListener,
      * fallback if muc fails?
      */
     public class ChatSession implements SessionProvider, PacketListener,
-            MessageListener {
+        MessageListener {
         private final Logger logCH = Logger.getLogger(ChatSession.class
-                .getName());
+            .getName());
 
         private final String name;
 
@@ -215,9 +215,9 @@ public class MessagingManager implements PacketListener, MessageListener,
     }
 
     public class MultiChatSession implements SessionProvider, PacketListener,
-            MessageListener {
+        MessageListener {
         private final Logger logCH = Logger.getLogger(ChatSession.class
-                .getName());
+            .getName());
 
         private final String name;
 
@@ -232,7 +232,7 @@ public class MessagingManager implements PacketListener, MessageListener,
         public MultiChatSession(MultiUserChat muc) {
             this.muc = muc;
             this.name = "Multi User Chat ("
-                    + Saros.getDefault().getMyJID().getName() + ")";
+                + Saros.getDefault().getMyJID().getName() + ")";
             muc.addMessageListener(this);
         }
 
@@ -335,7 +335,7 @@ public class MessagingManager implements PacketListener, MessageListener,
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         if ((connection != null) && (newState == ConnectionState.NOT_CONNECTED)) {
             // TODO CJ Review: connection.removePacketListener(this);
             log.debug("unconnect");
@@ -343,7 +343,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
         if (newState == ConnectionState.CONNECTED) {
             connection.addPacketListener(this, new MessageTypeFilter(
-                    Message.Type.chat));
+                Message.Type.chat));
             initMultiChatListener();
         }
     }
@@ -370,7 +370,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
             if (this.multiSession == null) {
                 this.multiSession = new MultiChatSession(this.multitrans
-                        .getMUC());
+                    .getMUC());
                 this.multiSession.processPacket(message);
             }
         } else {
@@ -399,7 +399,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
     // TODO CJ Rework needed
     public void invitationReceived(XMPPConnection conn, String room,
-            String inviter, String reason, String password, Message message) {
+        String inviter, String reason, String password, Message message) {
         try {
             // System.out.println(conn.getUser());
             if (this.multitrans.getMUC() == null) {
@@ -410,10 +410,10 @@ public class MessagingManager implements PacketListener, MessageListener,
             // muc.addMessageListener(mucl);
             // TODO: check if still connected
             if ((this.multiSession == null)
-                    && (this.multitrans.getMUC() != null)) {
+                && (this.multitrans.getMUC() != null)) {
                 // muc.removeMessageListener(mucl);
                 MultiChatSession session = new MultiChatSession(this.multitrans
-                        .getMUC());
+                    .getMUC());
                 this.multiSession = session;
             }
         } catch (XMPPException e) {
@@ -428,7 +428,7 @@ public class MessagingManager implements PacketListener, MessageListener,
     public void initMultiChatListener() {
         // listens for MUC invitations
         MultiUserChat.addInvitationListener(Saros.getDefault().getConnection(),
-                this);
+            this);
     }
 
     public MultiChatSession getSession() {
@@ -444,7 +444,7 @@ public class MessagingManager implements PacketListener, MessageListener,
             MultiUserChat muc = this.multitrans.getMUC();
             if (muc == null) {
                 this.multitrans.initMUC(Saros.getDefault().getConnection(),
-                        user);
+                    user);
                 muc = this.multitrans.getMUC();
             }
             MessagingManager.log.debug("Creating MUC session..");

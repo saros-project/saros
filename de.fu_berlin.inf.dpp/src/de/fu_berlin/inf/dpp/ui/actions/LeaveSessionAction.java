@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 /**
  * Leaves the current Saros session. Is deactivated if there is no running
  * session.
- *
+ * 
  * @author rdjemili
  * @author oezbek
  */
@@ -65,14 +65,14 @@ public class LeaveSessionAction extends Action implements ISessionListener {
 
         if (sessionManager.getSharedProject().isHost()) {
             reallyLeave = MessageDialog
-                    .openQuestion(
-                            shell,
-                            "Confirm Closing Session",
-                            "Are you sure that you want to close this Saros session? Since you are the host of this session, it will be closed for all participants.");
+                .openQuestion(
+                    shell,
+                    "Confirm Closing Session",
+                    "Are you sure that you want to close this Saros session? Since you are the host of this session, it will be closed for all participants.");
         } else {
             reallyLeave = MessageDialog.openQuestion(shell,
-                    "Confirm Leaving Session",
-                    "Are you sure that you want to leave this Saros session?");
+                "Confirm Leaving Session",
+                "Are you sure that you want to leave this Saros session?");
         }
 
         if (!reallyLeave)
@@ -81,16 +81,15 @@ public class LeaveSessionAction extends Action implements ISessionListener {
             sessionManager.stopSharedProject();
         } catch (Exception e) {
             ErrorDialog.openError(Display.getDefault().getActiveShell(),
-                    "Internal Error Leaving Session",
-                    "Session could not be left", new Status(IStatus.ERROR,
-                            "de.fu_berlin.inf.dpp", IStatus.ERROR, e
-                                    .getMessage(), e));
+                "Internal Error Leaving Session", "Session could not be left",
+                new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                    IStatus.ERROR, e.getMessage(), e));
         }
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
@@ -99,7 +98,7 @@ public class LeaveSessionAction extends Action implements ISessionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
@@ -108,7 +107,7 @@ public class LeaveSessionAction extends Action implements ISessionListener {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess process) {

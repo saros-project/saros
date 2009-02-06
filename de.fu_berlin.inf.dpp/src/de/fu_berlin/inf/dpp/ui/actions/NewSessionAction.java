@@ -62,11 +62,11 @@ public class NewSessionAction implements IObjectActionDelegate {
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
                     ErrorDialog.openError(
-                            Display.getDefault().getActiveShell(),
-                            "Error Starting Session",
-                            "Session could not be started", new Status(
-                                    IStatus.ERROR, "de.fu_berlin.inf.dpp",
-                                    IStatus.ERROR, e.getMessage(), e));
+                        Display.getDefault().getActiveShell(),
+                        "Error Starting Session",
+                        "Session could not be started", new Status(
+                            IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                            IStatus.ERROR, e.getMessage(), e));
                 }
             });
         }
@@ -86,8 +86,8 @@ public class NewSessionAction implements IObjectActionDelegate {
         // instead of being disabled.
 
         action.setEnabled(connected && !running
-                && (this.selectedProject != null)
-                && this.selectedProject.isAccessible());
+            && (this.selectedProject != null)
+            && this.selectedProject.isAccessible());
     }
 
     private IProject getProject(ISelection selection) {

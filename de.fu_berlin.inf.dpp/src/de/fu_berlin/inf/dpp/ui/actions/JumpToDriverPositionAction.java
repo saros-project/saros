@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class JumpToDriverPositionAction extends Action implements
-        ISessionListener {
+    ISessionListener {
 
     public JumpToDriverPositionAction() {
         setToolTipText("Jump to position of driver.");

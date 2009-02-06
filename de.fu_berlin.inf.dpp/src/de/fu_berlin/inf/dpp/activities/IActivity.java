@@ -23,14 +23,14 @@ package de.fu_berlin.inf.dpp.activities;
  * A generic interface for activities that happen in sessions. All activities
  * should be implemented by the value patter, i.e. created activities are
  * immutable.
- *
+ * 
  * @author rdjemili
  */
 public interface IActivity {
 
     /**
      * set source jabber_id of producer of this IActivity.
-     *
+     * 
      * @param source
      *            jabber_id string
      */
@@ -38,7 +38,7 @@ public interface IActivity {
 
     /**
      * get jabber_id of remote producer
-     *
+     * 
      * @return jabber_id
      */
     public String getSource();

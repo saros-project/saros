@@ -58,14 +58,14 @@ public class RenameContactAction extends SelectionProviderAction {
         }
 
         InputDialog dialog = new InputDialog(shell, "Set new nickname",
-                "Enter the new nickname of this contact '"
-                        + this.rosterEntry.getName() + "' ('"
-                        + this.rosterEntry.getUser() + "'):", this.rosterEntry
-                        .getName(), new InputValidator());
+            "Enter the new nickname of this contact '"
+                + this.rosterEntry.getName() + "' ('"
+                + this.rosterEntry.getUser() + "'):", this.rosterEntry
+                .getName(), new InputValidator());
 
         if (dialog.open() == Window.OK) {
             String name = (dialog.getValue().length() == 0) ? "" : dialog
-                    .getValue();
+                .getValue();
             this.rosterEntry.setName(name);
         }
     }

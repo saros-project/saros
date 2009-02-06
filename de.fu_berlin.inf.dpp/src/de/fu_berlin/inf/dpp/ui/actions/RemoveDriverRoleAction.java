@@ -39,21 +39,21 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         setToolTipText("Take the driver role from this user.");
 
         Saros.getDefault().getSessionManager().addSessionListener(
-                new ISessionListener() {
+            new ISessionListener() {
 
-                    public void invitationReceived(
-                            IIncomingInvitationProcess invitation) {
-                        // ignore
-                    }
+                public void invitationReceived(
+                    IIncomingInvitationProcess invitation) {
+                    // ignore
+                }
 
-                    public void sessionEnded(ISharedProject session) {
-                        session.removeListener(projectListener);
-                    }
+                public void sessionEnded(ISharedProject session) {
+                    session.removeListener(projectListener);
+                }
 
-                    public void sessionStarted(ISharedProject session) {
-                        session.addListener(projectListener);
-                    }
-                });
+                public void sessionStarted(ISharedProject session) {
+                    session.addListener(projectListener);
+                }
+            });
 
         updateEnablemnet();
     }
@@ -61,7 +61,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     @Override
     public void run() {
         ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            .getSharedProject();
         project.removeDriver(this.selectedUser, false);
         updateEnablemnet();
     }
@@ -69,17 +69,17 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     @Override
     public void selectionChanged(IStructuredSelection selection) {
         this.selectedUser = (selection.size() == 1) ? (User) selection
-                .getFirstElement() : null;
+            .getFirstElement() : null;
 
         updateEnablemnet();
     }
 
     private void updateEnablemnet() {
         ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            .getSharedProject();
 
         boolean enabled = ((project != null) && (this.selectedUser != null)
-                && project.isHost() && project.isDriver(this.selectedUser));
+            && project.isHost() && project.isDriver(this.selectedUser));
         setEnabled(enabled);
     }
 }

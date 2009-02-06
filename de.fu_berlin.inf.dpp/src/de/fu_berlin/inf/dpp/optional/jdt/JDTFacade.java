@@ -20,7 +20,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 public class JDTFacade implements IJDTSupport {
 
     public static final Logger log = Logger
-            .getLogger(JDTFacade.class.getName());
+        .getLogger(JDTFacade.class.getName());
 
     public IJDTSupport jdtSupport;
 
@@ -32,17 +32,17 @@ public class JDTFacade implements IJDTSupport {
 
         // Check for JDT Bundle
         if (Platform.getBundle("org.eclipse.jdt.ui") != null
-                && Platform.getBundle("org.eclipse.jdt.core") != null) {
+            && Platform.getBundle("org.eclipse.jdt.core") != null) {
             // We cannot just create a new instance, because this instance
             // cannot be created if JDT is missing.
             try {
                 jdtSupport = (IJDTSupport) Class.forName(
-                        "de.fu_berlin.inf.dpp.optional.jdt.JDTSupport")
-                        .newInstance();
+                    "de.fu_berlin.inf.dpp.optional.jdt.JDTSupport")
+                    .newInstance();
             } catch (Exception e) {
                 // We were unable to enable the JDT-Support
                 log
-                        .warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");
+                    .warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");
             }
         }
     }

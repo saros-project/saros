@@ -25,13 +25,13 @@ public class CDTSupport implements ICDTSupport {
     public void installSharedDocumentProvider() {
         // TODO RESTRICTED ACCESS
         TextFileDocumentProvider docProvider = CUIPlugin.getDefault()
-                .getDocumentProvider();
+            .getDocumentProvider();
 
         SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
 
         IDocumentSetupParticipant setupParticipant = new CDocumentSetupParticipant();
         ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(
-                ICPartitions.C_PARTITIONING, setupParticipant, sharedProvider);
+            ICPartitions.C_PARTITIONING, setupParticipant, sharedProvider);
         docProvider.setParentDocumentProvider(parentProvider);
     }
 

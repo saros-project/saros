@@ -39,7 +39,7 @@ public class RequestImpl implements Request {
 
     /**
      * Creates a new instance of the RequestImpl class.
-     *
+     * 
      * @param siteId
      *            the site id
      * @param timestamp
@@ -56,7 +56,7 @@ public class RequestImpl implements Request {
 
     /**
      * Creates a new instance of the RequestImpl class.
-     *
+     * 
      * @param siteId
      *            the site id
      * @param timestamp
@@ -65,7 +65,7 @@ public class RequestImpl implements Request {
      *            the operation
      */
     public RequestImpl(int siteId, Timestamp timestamp, Operation operation,
-            JID jid) {
+        JID jid) {
         this.siteId = siteId;
         this.timestamp = timestamp;
         this.operation = operation;
@@ -74,7 +74,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getSiteId()
      */
     public int getSiteId() {
@@ -83,7 +83,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getOperation()
      */
     public Operation getOperation() {
@@ -92,7 +92,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getTimestamp()
      */
     public Timestamp getTimestamp() {
@@ -101,7 +101,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -111,8 +111,8 @@ public class RequestImpl implements Request {
         } else if (obj instanceof Request) {
             Request request = (Request) obj;
             return (this.siteId == request.getSiteId())
-                    && nullSafeEquals(this.timestamp, request.getTimestamp())
-                    && nullSafeEquals(this.operation, request.getOperation());
+                && nullSafeEquals(this.timestamp, request.getTimestamp())
+                && nullSafeEquals(this.operation, request.getOperation());
         } else {
             return false;
         }
@@ -130,22 +130,22 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         int hashCode = 13 * this.siteId;
         hashCode += (this.timestamp != null) ? 17 * this.timestamp.hashCode()
-                : 0;
+            : 0;
         hashCode += (this.operation != null) ? 29 * this.operation.hashCode()
-                : 0;
+            : 0;
         return hashCode;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
@@ -165,7 +165,7 @@ public class RequestImpl implements Request {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.jupiter.Request#getJID()
      */
     public JID getJID() {

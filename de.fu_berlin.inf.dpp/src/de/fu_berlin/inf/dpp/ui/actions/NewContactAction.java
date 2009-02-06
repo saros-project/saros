@@ -48,7 +48,7 @@ public class NewContactAction extends Action implements IConnectionListener {
     }
 
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         updateEnablement();
     }
 

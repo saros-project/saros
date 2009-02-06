@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.project;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 
 /**
- * Abstract ISessionListener that does nothing in all the methods. 
+ * Abstract ISessionListener that does nothing in all the methods.
  * 
  * Clients can override just the methods they want to act upon.
  */

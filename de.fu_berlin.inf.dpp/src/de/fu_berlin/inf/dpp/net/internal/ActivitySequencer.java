@@ -53,13 +53,13 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * Implements {@link IActivitySequencer} and {@link IActivityManager}.
- *
+ * 
  * @author rdjemili
  */
 public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private static Logger logger = Logger.getLogger(ActivitySequencer.class
-            .getName());
+        .getName());
 
     /**/
     public class ExecuterQueue {
@@ -78,15 +78,15 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         /**
          * check status of created activity. After execution in
          * ActivitySequencer activity has created new call of activityCreated.
-         *
+         * 
          * @param activity
          */
         public synchronized boolean checkCreatedActivity(IActivity activity) {
             if (this.currentExecutedActivity != null) {
                 if ((activity instanceof TextEditActivity)
-                        && this.currentExecutedActivity.sameLike(activity)) {
+                    && this.currentExecutedActivity.sameLike(activity)) {
                     logger.debug("TextEditActivity " + activity
-                            + " is executed.");
+                        + " is executed.");
                     this.executed = true;
                     notify();
                 }
@@ -97,7 +97,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         public synchronized void addActivity(IActivity activity) {
             if (activity instanceof TextEditActivity) {
                 logger.debug("Add new Activity " + activity
-                        + " to executer queue.");
+                    + " to executer queue.");
                 this.executerQueue.add((TextEditActivity) activity);
                 notify();
             }
@@ -111,7 +111,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 this.currentExecutedActivity = this.executerQueue.remove(0);
                 this.executed = false;
                 logger.debug("Remove " + this.currentExecutedActivity
-                        + " form executer queue.");
+                    + " form executer queue.");
                 /* get next activity in queue. */
                 return this.currentExecutedActivity;
             } catch (InterruptedException e) {
@@ -153,7 +153,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.IActivityManager
      */
     public void exec(final IActivity activity) {
@@ -177,13 +177,13 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                          * mechanism.
                          */
                         if (!ActivitySequencer.this.concurrentManager
-                                .isHostSide()
-                                && (ActivitySequencer.this.concurrentManager
-                                        .exec(activity) != null)) {
+                            .isHostSide()
+                            && (ActivitySequencer.this.concurrentManager
+                                .exec(activity) != null)) {
                             // CLIENT SIDE
                             logger
-                                    .debug("Execute received activity (without jupiter): "
-                                            + activity);
+                                .debug("Execute received activity (without jupiter): "
+                                    + activity);
                             for (IActivityProvider executor : ActivitySequencer.this.providers) {
                                 executor.exec(activity);
                             }
@@ -198,7 +198,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                         // Check for file checksum after incoming save file
                         // activity.
                         if ((activity instanceof EditorActivity)
-                                && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
+                            && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
                             checkSavedFile((EditorActivity) activity);
                         }
 
@@ -213,7 +213,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /**
      * this class check the match of local and remote file checksum.
-     *
+     * 
      * @param editor
      *            incoming editor activity with type saved
      */
@@ -265,7 +265,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public void exec(TimedActivity timedActivity) {
@@ -275,7 +275,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivitySequencer
      */
     public void exec(List<TimedActivity> activities) {
@@ -285,7 +285,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public List<IActivity> flush() {
@@ -298,7 +298,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public List<TimedActivity> flushTimed() {
@@ -322,7 +322,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public void addProvider(IActivityProvider provider) {
@@ -332,7 +332,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityManager
      */
     public void removeProvider(IActivityProvider provider) {
@@ -342,7 +342,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivitySequencer
      */
     public List<IActivity> getLog() {
@@ -351,13 +351,13 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.IActivityListener
      */
     public void activityCreated(IActivity activity) {
 
         if ((activity instanceof EditorActivity)
-                || (activity instanceof FileActivity)) {
+            || (activity instanceof FileActivity)) {
             /*
              * Host: start and stop jupiter server process depending on editor
              * activities of remote clients. Client: start and stop local
@@ -377,7 +377,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
              * logic.
              */
             IActivity resultAC = this.concurrentManager
-                    .activityCreated(activity);
+                .activityCreated(activity);
             /**
              * host activity: put into outgoing queue and send to all if
              * activity is generated by host. otherwise: send request to host.
@@ -394,7 +394,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
      */
     public int getTimestamp() {
@@ -455,7 +455,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 textEdit = joinTextEdits(result, textEdit);
 
                 selection = new TextSelection(textEdit.offset
-                        + textEdit.text.length(), 0);
+                    + textEdit.text.length(), 0);
                 source = textEdit.getSource();
                 path = textEdit.getEditor();
                 result.add(textEdit);
@@ -464,7 +464,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 TextSelectionActivity textSelection = (TextSelectionActivity) activity;
 
                 selection = new TextSelection(textSelection.getOffset(),
-                        textSelection.getLength());
+                    textSelection.getLength());
                 source = textSelection.getSource();
                 path = textSelection.getEditor();
 
@@ -486,7 +486,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     private TextEditActivity joinTextEdits(List<IActivity> result,
-            TextEditActivity textEdit) {
+        TextEditActivity textEdit) {
         if (result.size() == 0) {
             return textEdit;
         }
@@ -496,13 +496,13 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
 
             if (((lastTextEdit.getSource() == null) || lastTextEdit.getSource()
-                    .equals(textEdit.getSource()))
-                    && (textEdit.offset == lastTextEdit.offset
-                            + lastTextEdit.text.length())) {
+                .equals(textEdit.getSource()))
+                && (textEdit.offset == lastTextEdit.offset
+                    + lastTextEdit.text.length())) {
                 result.remove(lastTextEdit);
                 textEdit = new TextEditActivity(lastTextEdit.offset,
-                        lastTextEdit.text + textEdit.text, lastTextEdit.length
-                                + textEdit.length, lastTextEdit.getEditor());
+                    lastTextEdit.text + textEdit.text, lastTextEdit.length
+                        + textEdit.length, lastTextEdit.getEditor());
                 textEdit.setSource(lastTextEdit.getSource());
             }
         }
@@ -511,7 +511,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     private ITextSelection addSelection(List<IActivity> result,
-            ITextSelection selection, String source, IPath path) {
+        ITextSelection selection, String source, IPath path) {
         if (selection == null) {
             return null;
         }
@@ -522,8 +522,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
 
                 if ((selection.getOffset() == lastTextEdit.offset
-                        + lastTextEdit.text.length())
-                        && (selection.getLength() == 0)) {
+                    + lastTextEdit.text.length())
+                    && (selection.getLength() == 0)) {
 
                     return selection;
                 }
@@ -533,7 +533,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         // HACK TODO CJ: review
         if (path != null) {
             TextSelectionActivity newSel = new TextSelectionActivity(selection
-                    .getOffset(), selection.getLength(), path);
+                .getOffset(), selection.getLength(), path);
             newSel.setSource(source);
             result.add(newSel);
         }
@@ -543,11 +543,10 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     public void initConcurrentManager(
-            de.fu_berlin.inf.dpp.concurrent.IConcurrentManager.Side side,
-            de.fu_berlin.inf.dpp.User host, JID myJID,
-            ISharedProject sharedProject) {
+        de.fu_berlin.inf.dpp.concurrent.IConcurrentManager.Side side,
+        de.fu_berlin.inf.dpp.User host, JID myJID, ISharedProject sharedProject) {
         this.concurrentManager = new ConcurrentDocumentManager(side, host,
-                myJID, sharedProject);
+            myJID, sharedProject);
         this.sharedProject = sharedProject;
         sharedProject.addListener(this.concurrentManager);
         this.concurrentManager.setRequestForwarder(this);
@@ -564,7 +563,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         if (req instanceof RequestError) {
             /* create save activity. */
             IActivity activity = new EditorActivity(Type.Saved, req
-                    .getEditorPath());
+                .getEditorPath());
             /* execute save activity and start consistency check. */
             exec(activity);
             return;
@@ -577,7 +576,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     public synchronized Request getNextOutgoingRequest()
-            throws InterruptedException {
+        throws InterruptedException {
         Request request = null;
         /* get next message and transfer to client. */
         while (!(this.outgoingSyncActivities.size() > 0)) {
@@ -598,7 +597,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
          * jupiter client side.
          */
         logger.debug("Receive request : " + request + " from "
-                + request.getJID());
+            + request.getJID());
         this.concurrentManager.receiveRequest(request);
     }
 
@@ -608,7 +607,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     /**
      * Execute activity after jupiter transforming process.
-     *
+     * 
      * @param activity
      */
     public void execTransformedActivity(IActivity activity) {

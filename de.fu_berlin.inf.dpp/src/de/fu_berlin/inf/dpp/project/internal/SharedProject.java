@@ -114,7 +114,7 @@ public class SharedProject implements ISharedProject {
 
         /* add host to driver list. */
         this.activitySequencer.initConcurrentManager(
-                IConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
+            IConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
 
         /* init driver manager */
         this.driverManager = DriverDocumentManager.getInstance();
@@ -128,7 +128,7 @@ public class SharedProject implements ISharedProject {
     }
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
-            JID hostID, int myColorID) {
+        JID hostID, int myColorID) {
 
         this.transmitter = transmitter;
 
@@ -142,14 +142,14 @@ public class SharedProject implements ISharedProject {
         this.host = getParticipant(hostID);
 
         this.activitySequencer.initConcurrentManager(
-                IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
+            IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
 
         this.project = project;
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public Collection<User> getParticipants() {
@@ -158,7 +158,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public IActivitySequencer getSequencer() {
@@ -167,7 +167,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IActivityManager getActivityManager() {
@@ -176,7 +176,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public void toggleDriverRole(User driver, boolean replicated) {
@@ -234,7 +234,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public boolean isDriver() {
@@ -267,7 +267,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public User getHost() {
@@ -276,7 +276,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public boolean isHost() {
@@ -285,7 +285,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
      */
     public boolean isExclusiveDriver() {
@@ -307,7 +307,7 @@ public class SharedProject implements ISharedProject {
     public void removeUser(User user) {
         if (this.participants.remove(user.getJID()) == null) {
             log.warn("Tried to remove user who was not in participants: "
-                    + user.getJID());
+                + user.getJID());
             return;
         }
         if (isHost()) {
@@ -325,18 +325,18 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI) {
+        boolean inactive, IInvitationUI inviteUI) {
         return new OutgoingInvitationProcess(this.transmitter, jid, this,
-                description, inactive, inviteUI, getFreeColor());
+            description, inactive, inviteUI, getFreeColor());
     }
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void addListener(ISharedProjectListener listener) {
@@ -347,7 +347,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void removeListener(ISharedProjectListener listener) {
@@ -356,7 +356,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IProject getProject() {
@@ -365,7 +365,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public FileList getFileList() throws CoreException {
@@ -378,7 +378,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void start() {
@@ -391,11 +391,11 @@ public class SharedProject implements ISharedProject {
                     SharedProject.this.activitySequencer.flush();
                 } else {
                     List<TimedActivity> activities = SharedProject.this.activitySequencer
-                            .flushTimed();
+                        .flushTimed();
 
                     if (activities != null) {
                         SharedProject.this.transmitter.sendActivities(
-                                SharedProject.this, activities);
+                            SharedProject.this, activities);
                     }
                 }
 
@@ -408,10 +408,10 @@ public class SharedProject implements ISharedProject {
                     // to send it to me again.
                     if (SharedProject.queuedsince >= SharedProject.REQUEST_ACTIVITY_ON_AGE) {
 
-                        SharedProject.this.transmitter.sendRequestForActivity(
-                                SharedProject.this,
+                        SharedProject.this.transmitter
+                            .sendRequestForActivity(SharedProject.this,
                                 SharedProject.this.activitySequencer
-                                        .getTimestamp(), false);
+                                    .getTimestamp(), false);
 
                         SharedProject.queuedsince = 0;
 
@@ -442,7 +442,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public void stop() {
@@ -453,7 +453,7 @@ public class SharedProject implements ISharedProject {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public User getParticipant(JID jid) {
@@ -475,12 +475,12 @@ public class SharedProject implements ISharedProject {
 
         if (searchUnsavedChangesInProject(false)) {
             if (MessageDialog
-                    .openQuestion(
-                            shell,
-                            "Unsaved file modifications",
-                            "Before inviting users and therefore synchronizing files, "
-                                    + "this project needs to be saved to disk. "
-                                    + "Do you want to save all unsaved files of this project now?")) {
+                .openQuestion(
+                    shell,
+                    "Unsaved file modifications",
+                    "Before inviting users and therefore synchronizing files, "
+                        + "this project needs to be saved to disk. "
+                        + "Do you want to save all unsaved files of this project now?")) {
 
                 // save
                 // PlatformUI.getWorkbench().saveAllEditors(false); // saves all
@@ -499,16 +499,9 @@ public class SharedProject implements ISharedProject {
                     Window iw = new InvitationDialog(shell, jid);
                     iw.open();
                 } catch (Exception e) {
-                    Saros
-                            .getDefault()
-                            .getLog()
-                            .log(
-                                    new Status(
-                                            IStatus.ERROR,
-                                            Saros.SAROS,
-                                            IStatus.ERROR,
-                                            "Error while running invitation helper",
-                                            e));
+                    Saros.getDefault().getLog().log(
+                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                            "Error while running invitation helper", e));
                 }
             }
         });
@@ -528,18 +521,18 @@ public class SharedProject implements ISharedProject {
 
         try {
             IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench()
-                    .getWorkbenchWindows();
+                .getWorkbenchWindows();
             for (IWorkbenchWindow window : wbWindows) {
                 IWorkbenchPage activePage = window.getActivePage();
                 IEditorReference[] editorRefs = activePage
-                        .getEditorReferences();
+                    .getEditorReferences();
                 for (IEditorReference editorRef : editorRefs) {
                     if (editorRef.isDirty()
-                            && (editorRef.getEditorInput() instanceof IFileEditorInput)) {
+                        && (editorRef.getEditorInput() instanceof IFileEditorInput)) {
 
                         IPath fp = ((IFileEditorInput) editorRef
-                                .getEditorInput()).getFile()
-                                .getProjectRelativePath();
+                            .getEditorInput()).getFile()
+                            .getProjectRelativePath();
 
                         // is that dirty file in my project?
                         if (flist.getPaths().contains(fp)) {
@@ -565,16 +558,16 @@ public class SharedProject implements ISharedProject {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                        Display.getDefault().getActiveShell());
+                    Display.getDefault().getActiveShell());
                 try {
                     dialog.run(true, false, new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) {
                             try {
                                 Collection<IPath> paths = new FileList(
-                                        SharedProject.this.project).getPaths();
+                                    SharedProject.this.project).getPaths();
 
                                 monitor.beginTask("Project settings ... ",
-                                        paths.size());
+                                    paths.size());
 
                                 ResourceAttributes attributes = new ResourceAttributes();
                                 attributes.setReadOnly(readonly);
@@ -582,7 +575,7 @@ public class SharedProject implements ISharedProject {
 
                                 for (IPath path : paths) {
                                     IFile file = getProject().getFile(
-                                            path.makeAbsolute());
+                                        path.makeAbsolute());
                                     if ((file != null) && file.exists()) {
                                         file.setResourceAttributes(attributes);
                                     }
@@ -624,25 +617,25 @@ public class SharedProject implements ISharedProject {
              */
             if (request.getJID().equals(this.host.getJID())) {
                 SharedProject.log
-                        .debug("Send host request back for local execution: "
-                                + request);
+                    .debug("Send host request back for local execution: "
+                        + request);
                 this.activitySequencer.receiveRequest(request);
             } else {
                 /* send operation to client. */
                 SharedProject.log.debug("Send request to client: " + request);
                 this.transmitter.sendJupiterRequest(this, request, request
-                        .getJID());
+                    .getJID());
             }
         } else {
             SharedProject.log.debug("Send request to host : " + request);
             this.transmitter.sendJupiterRequest(this, request, this.host
-                    .getJID());
+                .getJID());
         }
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
         return (ConcurrentDocumentManager) this.activitySequencer
-                .getConcurrentManager();
+            .getConcurrentManager();
 
     }
 

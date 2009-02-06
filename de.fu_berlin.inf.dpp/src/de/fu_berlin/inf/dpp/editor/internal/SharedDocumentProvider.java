@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
 public class SharedDocumentProvider extends TextFileDocumentProvider implements
-        ISessionListener, ISharedProjectListener {
+    ISessionListener, ISharedProjectListener {
 
     private ISharedProject sharedProject;
 

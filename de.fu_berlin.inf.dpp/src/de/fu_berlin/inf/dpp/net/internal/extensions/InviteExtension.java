@@ -16,13 +16,13 @@ public class InviteExtension extends SessionDefaultPacketExtension {
 
     /**
      * Creates the packet extension for new invitations.
-     *
+     * 
      * @param description
      *            an informal text that will be shown with the invitation.
      * @return the packet extension.
      */
-    public PacketExtension create(String projectName,
-            String description, int colorID) {
+    public PacketExtension create(String projectName, String description,
+        int colorID) {
         DefaultPacketExtension extension = create();
 
         extension.setValue(PacketExtensions.PROJECTNAME, projectName);
@@ -33,6 +33,7 @@ public class InviteExtension extends SessionDefaultPacketExtension {
     }
 
     public static InviteExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(InviteExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            InviteExtension.class);
     }
 }

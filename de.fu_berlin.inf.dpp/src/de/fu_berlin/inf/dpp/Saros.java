@@ -63,7 +63,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * The main plug-in of Saros.
- *
+ * 
  * @author rdjemili
  * @author coezbek
  */
@@ -107,13 +107,14 @@ public class Saros extends AbstractUIPlugin {
         Saros.plugin = this;
 
         this.container = new PicoBuilder(new CompositeInjection(
-                new ConstructorInjection(), new AnnotatedFieldInjection()))
-                .withCaching().build();
+            new ConstructorInjection(), new AnnotatedFieldInjection()))
+            .withCaching().build();
 
         this.container.addComponent(Saros.class, this).addComponent(
-                CDTFacade.class).addComponent(JDTFacade.class).addComponent(
-                MessagingManager.class).addComponent(SessionManager.class)
-                .addComponent(SarosUI.class).addComponent(CurrentProjectProxy.class);
+            CDTFacade.class).addComponent(JDTFacade.class).addComponent(
+            MessagingManager.class).addComponent(SessionManager.class)
+            .addComponent(SarosUI.class)
+            .addComponent(CurrentProjectProxy.class);
 
         // Code snippet for reinjection:
         // Reinjector injection = new Reinjector(this.container);
@@ -127,7 +128,7 @@ public class Saros extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
-                PreferenceConstants.DEBUG);
+            PreferenceConstants.DEBUG);
 
         setupLoggers();
 
@@ -138,10 +139,10 @@ public class Saros extends AbstractUIPlugin {
         container.getComponents(Object.class);
 
         boolean hasUserName = getPreferenceStore().getString(
-                PreferenceConstants.USERNAME).length() > 0;
+            PreferenceConstants.USERNAME).length() > 0;
 
         if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
-                && hasUserName) {
+            && hasUserName) {
             asyncConnect();
         }
     }
@@ -160,7 +161,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Returns the shared instance.
-     *
+     * 
      * @return the shared instance.
      */
     public static Saros getDefault() {
@@ -171,7 +172,7 @@ public class Saros extends AbstractUIPlugin {
      * Return the PicoContainer that can be asked for all Singleton objects
      * relative to this Saros instance (see the constructor for a complete liste
      * of components in this container):
-     *
+     * 
      * @return The PicoContainer containing all Singleton objects of this Saros
      *         plug-in instance.
      */
@@ -226,7 +227,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Connects according to the preferences. This is a blocking method.
-     *
+     * 
      * If there is already a established connection when calling this method, it
      * disconnects before connecting.
      */
@@ -235,7 +236,7 @@ public class Saros extends AbstractUIPlugin {
         IPreferenceStore prefStore = getPreferenceStore();
         final String server = prefStore.getString(PreferenceConstants.SERVER);
         final String username = prefStore
-                .getString(PreferenceConstants.USERNAME);
+            .getString(PreferenceConstants.USERNAME);
         String password = prefStore.getString(PreferenceConstants.PASSWORD);
 
         try {
@@ -243,21 +244,22 @@ public class Saros extends AbstractUIPlugin {
 
                 this.connection.disconnect();
                 this.connection
-                        .removeConnectionListener(this.smackConnectionListener);
+                    .removeConnectionListener(this.smackConnectionListener);
             }
 
             ConnectionConfiguration conConfig = new ConnectionConfiguration(
-                    server);
+                server);
             conConfig.setReconnectionAllowed(false);
 
             this.connection = new XMPPConnection(conConfig);
             this.connection.connect();
 
-            ServiceDiscoveryManager sdm = ServiceDiscoveryManager.getInstanceFor(connection);
+            ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+                .getInstanceFor(connection);
 
             // add Jingle feature to the supported extensions
             if (!prefStore
-                    .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
+                .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
 
                 // add Jingle Support for the current connection
                 sdm.addFeature(Jingle.NAMESPACE);
@@ -272,7 +274,7 @@ public class Saros extends AbstractUIPlugin {
             this.connection.login(username, password);
 
             this.connection.getRoster().setSubscriptionMode(
-                    SubscriptionMode.manual);
+                SubscriptionMode.manual);
 
             this.connection.addConnectionListener(this.smackConnectionListener);
             setConnectionState(ConnectionState.CONNECTED, null);
@@ -284,13 +286,11 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, e.getMessage());
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
-                    MessageDialog
-                            .openError(Display.getDefault().getActiveShell(),
-                                    "Error Connecting",
-                                    "Could not connect to server '" + server
-                                            + "' as user '" + username
-                                            + "'.\nErrorMessage was: "
-                                            + e.getMessage());
+                    MessageDialog.openError(Display.getDefault()
+                        .getActiveShell(), "Error Connecting",
+                        "Could not connect to server '" + server
+                            + "' as user '" + username
+                            + "'.\nErrorMessage was: " + e.getMessage());
                 }
             });
         }
@@ -298,7 +298,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Disconnects. This is a blocking method.
-     *
+     * 
      * @param reason
      *            the error why the connection was closed. If the connection was
      *            not closed due to an error <code>null</code> should be passed.
@@ -308,7 +308,7 @@ public class Saros extends AbstractUIPlugin {
 
         if (this.connection != null) {
             this.connection
-                    .removeConnectionListener(this.smackConnectionListener);
+                .removeConnectionListener(this.smackConnectionListener);
             this.connection.disconnect();
             this.connection = null;
         }
@@ -321,7 +321,7 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Creates the given account on the given Jabber server. This is a blocking
      * method.
-     *
+     * 
      * @param server
      *            the server on which to create the account.
      * @param username
@@ -334,7 +334,7 @@ public class Saros extends AbstractUIPlugin {
      *             exception that occcurs while registering.
      */
     public void createAccount(String server, String username, String password,
-            IProgressMonitor monitor) throws XMPPException {
+        IProgressMonitor monitor) throws XMPPException {
 
         monitor.beginTask("Registering account", 3);
 
@@ -353,7 +353,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Adds given contact to the roster. This is a blocking method.
-     *
+     * 
      * @param jid
      *            the Jabber ID of the contact.
      * @param nickname
@@ -367,7 +367,7 @@ public class Saros extends AbstractUIPlugin {
      *             doesn't exist
      */
     public void addContact(JID jid, String nickname, String[] groups)
-            throws XMPPException {
+        throws XMPPException {
         assertConnection();
 
         // if roster already contains user with this jid do nothing
@@ -381,14 +381,14 @@ public class Saros extends AbstractUIPlugin {
         try {
             if (sdm.discoverInfo(jid.toString()).getIdentities().hasNext()) {
                 connection.getRoster().createEntry(jid.toString(), nickname,
-                        groups);
+                    groups);
             }
         } catch (XMPPException e) {
             // if server doesn't support to get information add contact
             // anyway (if entry would't exist it should be an error 404)
             if (e.getMessage().contains("501"))/* feature-not-implemented */{
                 connection.getRoster().createEntry(jid.toString(), nickname,
-                        groups);
+                    groups);
             } else
                 throw e;
         }
@@ -396,7 +396,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Removes given contact from the roster. This is a blocking method.
-     *
+     * 
      * @param rosterEntry
      *            the contact that is to be removed
      * @throws XMPPException
@@ -467,7 +467,7 @@ public class Saros extends AbstractUIPlugin {
         try {
 
             PropertyConfigurator.configureAndWatch("log4j.properties",
-                    60 * 1000);
+                60 * 1000);
             logger = Logger.getLogger("de.fu_berlin.inf.dpp");
 
         } catch (SecurityException e) {
@@ -479,7 +479,7 @@ public class Saros extends AbstractUIPlugin {
      * Log a message to the Eclipse ErrorLog. This method should be used to log
      * all errors that occur in the plugin that cannot be corrected by the user
      * and seem to be errors within the plug-in or the used libraries.
-     *
+     * 
      * @param message
      *            A meaningful description of during which operation the error
      *            occurred
@@ -488,8 +488,7 @@ public class Saros extends AbstractUIPlugin {
      */
     public static void log(String message, Exception e) {
         Saros.getDefault().getLog().log(
-                new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message,
-                        e));
+            new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message, e));
     }
 
     private class XMPPConnectionListener implements ConnectionListener {
@@ -511,12 +510,12 @@ public class Saros extends AbstractUIPlugin {
                 Display.getDefault().syncExec(new Runnable() {
                     public void run() {
                         MessageDialog
-                                .openError(
-                                        Display.getDefault().getActiveShell(),
-                                        "Connection error",
-                                        "There is a conflict with the jabber connection."
-                                                + "The reason for this is mostly that another saros "
-                                                + "instance have connected with the same login.");
+                            .openError(
+                                Display.getDefault().getActiveShell(),
+                                "Connection error",
+                                "There is a conflict with the jabber connection."
+                                    + "The reason for this is mostly that another saros "
+                                    + "instance have connected with the same login.");
                     }
                 });
 
@@ -526,7 +525,7 @@ public class Saros extends AbstractUIPlugin {
 
                 if (connection != null) {
                     connection
-                            .removeConnectionListener(smackConnectionListener);
+                        .removeConnectionListener(smackConnectionListener);
                     connection.disconnect();
                     connection = null;
                 }
@@ -538,8 +537,8 @@ public class Saros extends AbstractUIPlugin {
                         int inErrorSince = 0;
                         if (getSessionManager().getSharedProject() != null) {
                             inErrorSince = getSessionManager()
-                                    .getSharedProject().getSequencer()
-                                    .getTimestamp();
+                                .getSharedProject().getSequencer()
+                                .getTimestamp();
                         }
 
                         try {
@@ -595,7 +594,7 @@ public class Saros extends AbstractUIPlugin {
             return null;
 
         return getSessionManager().getSharedProject().getParticipant(
-                Saros.getDefault().getMyJID());
+            Saros.getDefault().getMyJID());
     }
 
 }

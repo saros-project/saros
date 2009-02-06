@@ -117,7 +117,7 @@ public class SplitOperation implements Operation {
         } else if (obj.getClass().equals(getClass())) {
             SplitOperation op = (SplitOperation) obj;
             return op.getFirst().equals(this.op1)
-                    && op.getSecond().equals(this.op2);
+                && op.getSecond().equals(this.op2);
         } else {
             return false;
         }

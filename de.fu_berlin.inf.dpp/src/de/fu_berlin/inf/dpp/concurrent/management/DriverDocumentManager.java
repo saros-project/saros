@@ -23,15 +23,15 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
- *
+ * 
  * @author orieger
- *
+ * 
  */
 public class DriverDocumentManager implements IDriverDocumentManager,
-        ISessionListener {
+    ISessionListener {
 
     private static Logger logger = Logger
-            .getLogger(DriverDocumentManager.class);
+        .getLogger(DriverDocumentManager.class);
 
     /** All drivers. Only used on host side. */
     private final List<JID> drivers;
@@ -52,7 +52,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     /**
      * get instance of this singleton object
-     *
+     * 
      * @return instance of DriverDocumentManager
      */
     public static DriverDocumentManager getInstance() {
@@ -86,7 +86,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
      */
     public List<JID> getDrivers() {
@@ -107,12 +107,12 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         addDriver(jid);
 
         DriverDocumentManager.logger.debug("add activer driver " + jid
-                + " to document " + path.lastSegment().toString());
+            + " to document " + path.lastSegment().toString());
         /* add driver to new document. */
         DriverDocument doc = this.documents.get(path);
         if ((doc == null) || !this.documents.containsKey(path)) {
             DriverDocumentManager.logger.debug("New document creates for "
-                    + path.lastSegment().toString());
+                + path.lastSegment().toString());
             /* create new instance of this documents. */
             doc = new DriverDocument(path);
             this.documents.put(path, doc);
@@ -136,7 +136,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     /**
      * remove driver from document and delete empty documents.
-     *
+     * 
      * @param path
      *            of the document
      * @param jid
@@ -150,8 +150,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         /* check for other driver or delete if no other driver exists. */
         if (doc.noDriver()) {
             DriverDocumentManager.logger.debug("no driver exists for document "
-                    + path.lastSegment().toString()
-                    + ". Document delete from driver manager.");
+                + path.lastSegment().toString()
+                + ". Document delete from driver manager.");
             /* delete driver document. */
             this.documents.remove(doc.getEditor());
         }
@@ -159,7 +159,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     /**
      * new driver activity received and has to be managed.
-     *
+     * 
      * @param activity
      */
     public void receiveActivity(IActivity activity) {
@@ -173,8 +173,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
                 EditorActivity edit = (EditorActivity) activity;
 
                 DriverDocumentManager.logger.debug("receive activity of " + jid
-                        + " for editor " + edit.getPath().lastSegment()
-                        + " and action " + edit.getType());
+                    + " for editor " + edit.getPath().lastSegment()
+                    + " and action " + edit.getType());
 
                 /* editor has activated. */
                 if (edit.getType() == EditorActivity.Type.Activated) {
@@ -190,8 +190,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
                     } else {
                         DriverDocumentManager.logger
-                                .warn("No driver document exists for "
-                                        + edit.getPath());
+                            .warn("No driver document exists for "
+                                + edit.getPath());
                     }
                 }
             }
@@ -204,7 +204,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
             }
         } else {
             DriverDocumentManager.logger.debug("JID " + jid
-                    + " isn't an active driver.");
+                + " isn't an active driver.");
         }
     }
 

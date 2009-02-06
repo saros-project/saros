@@ -58,10 +58,10 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
  * @author rdjemili
  */
 public class SharedResourcesManager implements IResourceChangeListener,
-        IActivityProvider {
+    IActivityProvider {
 
     private static Logger log = Logger.getLogger(SharedResourcesManager.class
-            .getName());
+        .getName());
 
     /**
      * Should be set to <code>true</code> while executing resource changes to
@@ -89,7 +89,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             assert SharedResourcesManager.this.sharedProject != null;
 
             if (SharedResourcesManager.this.replicationInProgess
-                    || !SharedResourcesManager.this.sharedProject.isDriver()) {
+                || !SharedResourcesManager.this.sharedProject.isDriver()) {
                 return false;
             }
 
@@ -99,7 +99,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
 
             if (resource.getProject() != SharedResourcesManager.this.sharedProject
-                    .getProject()) {
+                .getProject()) {
                 return false;
             }
 
@@ -235,7 +235,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             event.getDelta().accept(this.visitor);
         } catch (CoreException e) {
             SharedResourcesManager.log.log(Level.SEVERE,
-                    "Couldn't handle resource change.", e);
+                "Couldn't handle resource change.", e);
         }
     }
 
@@ -256,7 +256,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         } catch (CoreException e) {
             SharedResourcesManager.log.log(Level.SEVERE,
-                    "Failed to execute resource activity.", e);
+                "Failed to execute resource activity.", e);
 
         } finally {
             this.replicationInProgess = false;
@@ -295,12 +295,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (activity instanceof FileActivity) {
             FileActivity fileActivity = (FileActivity) activity;
             return "<file " + "path=\"" + fileActivity.getPath() + "\" "
-                    + "type=\"" + fileActivity.getType() + "\" />";
+                + "type=\"" + fileActivity.getType() + "\" />";
 
         } else if (activity instanceof FolderActivity) {
             FolderActivity folderActivity = (FolderActivity) activity;
             return "<folder " + "path=\"" + folderActivity.getPath() + "\" "
-                    + "type=\"" + folderActivity.getType() + "\" />";
+                + "type=\"" + folderActivity.getType() + "\" />";
         }
 
         return null;
@@ -337,18 +337,18 @@ public class SharedResourcesManager implements IResourceChangeListener,
     }
 
     private FileActivity parseFile(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
 
         IPath path = new Path(parser.getAttributeValue(null, "path"));
         return new FileActivity(FileActivity.Type.valueOf(parser
-                .getAttributeValue(null, "type")), path);
+            .getAttributeValue(null, "type")), path);
     }
 
     private FolderActivity parseFolder(XmlPullParser parser) {
         Path path = new Path(parser.getAttributeValue(null, "path"));
 
         return new FolderActivity(FolderActivity.Type.valueOf(parser
-                .getAttributeValue(null, "type")), path);
+            .getAttributeValue(null, "type")), path);
     }
 
     private void closeRemovedEditors() {

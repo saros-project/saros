@@ -46,13 +46,13 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * @see ILightweightLabelDecorator
  */
 public class SharedProjectDecorator implements ILightweightLabelDecorator,
-        ISessionListener, ISharedEditorListener {
+    ISessionListener, ISharedEditorListener {
 
     private final ImageDescriptor activeDescriptor = SarosUI
-            .getImageDescriptor("icons/bullet_green.png"); // NON-NLS-1
+        .getImageDescriptor("icons/bullet_green.png"); // NON-NLS-1
 
     private final ImageDescriptor passiveDescriptor = SarosUI
-            .getImageDescriptor("icons/bullet_yellow.png"); // NON-NLS-1
+        .getImageDescriptor("icons/bullet_yellow.png"); // NON-NLS-1
 
     private ISharedProject sharedProject;
 
@@ -88,10 +88,10 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator,
             EditorManager editorManager = EditorManager.getDefault();
             if (path.equals(editorManager.getActiveDriverEditor())) {
                 decoration.addOverlay(this.activeDescriptor,
-                        IDecoration.TOP_LEFT);
+                    IDecoration.TOP_LEFT);
             } else if (editorManager.getDriverEditors().contains(path)) {
                 decoration.addOverlay(this.passiveDescriptor,
-                        IDecoration.TOP_LEFT);
+                    IDecoration.TOP_LEFT);
             }
         }
 
@@ -225,7 +225,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator,
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 LabelProviderChangedEvent event = new LabelProviderChangedEvent(
-                        SharedProjectDecorator.this, updateElements);
+                    SharedProjectDecorator.this, updateElements);
 
                 for (ILabelProviderListener listener : SharedProjectDecorator.this.listeners) {
                     listener.labelProviderChanged(event);

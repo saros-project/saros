@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
 public interface IDriverDocumentManager extends IDriverManager,
-        ISharedProjectListener {
+    ISharedProjectListener {
 
     public void receiveActivity(IActivity activity);
 
@@ -17,7 +17,7 @@ public interface IDriverDocumentManager extends IDriverManager,
 
     /**
      * Gets drivers for the document.
-     *
+     * 
      * @param path
      *            to document
      * @return active drivers for the document.

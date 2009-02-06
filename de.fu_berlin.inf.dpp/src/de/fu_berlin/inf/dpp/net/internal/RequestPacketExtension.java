@@ -17,11 +17,11 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 
 public class RequestPacketExtension implements PacketExtension {
-    
-    public static PacketFilter getFilter(){
+
+    public static PacketFilter getFilter() {
         return new PacketExtensionFilter(ELEMENT, NAMESPACE);
     }
-    
+
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
     public static final String ELEMENT = "request";
@@ -112,32 +112,32 @@ public class RequestPacketExtension implements PacketExtension {
 
     private String sessionIdToXML() {
         return "<" + RequestPacketExtension.SESSION_ID + ">" + sessionID + "</"
-                + RequestPacketExtension.SESSION_ID + ">";
+            + RequestPacketExtension.SESSION_ID + ">";
     }
 
     private String pathToXML() {
         return "<" + RequestPacketExtension.PATH + ">"
-                + this.request.getEditorPath() + "</"
-                + RequestPacketExtension.PATH + ">";
+            + this.request.getEditorPath() + "</" + RequestPacketExtension.PATH
+            + ">";
     }
 
     private String jidToXML() {
         return "<" + RequestPacketExtension.JID + ">" + this.request.getJID()
-                + "</" + RequestPacketExtension.JID + ">";
+            + "</" + RequestPacketExtension.JID + ">";
     }
 
     private String sideIDToXML() {
         return "<" + RequestPacketExtension.SIDE_ID + ">"
-                + this.request.getSiteId() + "</"
-                + RequestPacketExtension.SIDE_ID + ">";
+            + this.request.getSiteId() + "</" + RequestPacketExtension.SIDE_ID
+            + ">";
     }
 
     private String vectorTimeToXML() {
         String xml = "";
         Timestamp timestamp = this.request.getTimestamp();
         xml += "<" + RequestPacketExtension.VECTOR_TIME + " local=\""
-                + timestamp.getComponents()[0] + "\" remote=\""
-                + timestamp.getComponents()[1] + "\"" + "/>";
+            + timestamp.getComponents()[0] + "\" remote=\""
+            + timestamp.getComponents()[1] + "\"" + "/>";
         return xml;
     }
 
@@ -185,9 +185,9 @@ public class RequestPacketExtension implements PacketExtension {
         String xml = "";
         InsertOperation ins = (InsertOperation) op;
         xml += "<" + RequestPacketExtension.INSERT_OP + " "
-                + RequestPacketExtension.POSITION + "=\"" + ins.getPosition()
-                + "\"" + " " + RequestPacketExtension.ORIGIN + "=\""
-                + ins.getOrigin() + "\"" + ">";
+            + RequestPacketExtension.POSITION + "=\"" + ins.getPosition()
+            + "\"" + " " + RequestPacketExtension.ORIGIN + "=\""
+            + ins.getOrigin() + "\"" + ">";
         xml += "<![CDATA[" + ins.getText() + "]]>";
         xml += "</" + RequestPacketExtension.INSERT_OP + ">";
         return xml;
@@ -197,8 +197,8 @@ public class RequestPacketExtension implements PacketExtension {
         String xml = "";
         DeleteOperation del = (DeleteOperation) op;
         xml += "<" + RequestPacketExtension.DELETE_OP + " "
-                + RequestPacketExtension.POSITION + "=\"" + del.getPosition()
-                + "\"" + ">";
+            + RequestPacketExtension.POSITION + "=\"" + del.getPosition()
+            + "\"" + ">";
         xml += "<![CDATA[" + del.getText() + "]]>";
         xml += "</" + RequestPacketExtension.DELETE_OP + ">";
         return xml;

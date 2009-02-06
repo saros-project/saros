@@ -48,7 +48,7 @@ public class FreeColors {
      */
     public void add(int colorID) {
         if ((colorID > 0) && (colorID < maxColorID)
-                && (!freeColors.contains(colorID))) {
+            && (!freeColors.contains(colorID))) {
             freeColors.add(colorID);
         }
     }

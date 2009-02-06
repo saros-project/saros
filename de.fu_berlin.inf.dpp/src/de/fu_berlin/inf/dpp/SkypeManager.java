@@ -34,7 +34,7 @@ public class SkypeManager implements IConnectionListener {
         Saros.getDefault().addListener(this);
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager
-                .addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
+            .addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
     }
 
     public static SkypeManager getDefault() {
@@ -73,7 +73,7 @@ public class SkypeManager implements IConnectionListener {
      * @see de.fu_berlin.inf.dpp.net.IConnectionListener
      */
     public void connectionStateChanged(final XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
 
         if (newState == ConnectionState.CONNECTED) {
             connection.addPacketListener(new PacketListener() {
@@ -131,7 +131,7 @@ public class SkypeManager implements IConnectionListener {
 
         // Create a packet collector to listen for a response.
         PacketCollector collector = connection
-                .createPacketCollector(new PacketIDFilter(request.getPacketID()));
+            .createPacketCollector(new PacketIDFilter(request.getPacketID()));
 
         connection.sendPacket(request);
 
@@ -141,7 +141,7 @@ public class SkypeManager implements IConnectionListener {
             SkypeIQ skypeResult = (SkypeIQ) result;
 
             return skypeResult.getName().length() == 0 ? null : skypeResult
-                    .getName();
+                .getName();
         }
 
         return null;

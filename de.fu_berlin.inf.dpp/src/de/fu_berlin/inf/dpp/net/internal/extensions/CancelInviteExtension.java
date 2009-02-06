@@ -25,6 +25,7 @@ public class CancelInviteExtension extends SarosDefaultPackageExtension {
     }
 
     public static CancelInviteExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(CancelInviteExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            CancelInviteExtension.class);
     }
 }

@@ -8,15 +8,14 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
-public class DataTransferExtension extends
-        SessionDefaultPacketExtension {
+public class DataTransferExtension extends SessionDefaultPacketExtension {
 
     public DataTransferExtension() {
         super("DataTransfer");
     }
 
     public PacketExtension create(String name, String desc, int index,
-            int count, String data) {
+        int count, String data) {
         DefaultPacketExtension extension = create();
 
         extension.setValue(PacketExtensions.DT_NAME, name);
@@ -31,6 +30,7 @@ public class DataTransferExtension extends
     }
 
     public static DataTransferExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(DataTransferExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            DataTransferExtension.class);
     }
 }

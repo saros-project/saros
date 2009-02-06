@@ -27,6 +27,7 @@ public class RequestActivityExtension extends SessionDefaultPacketExtension {
     }
 
     public static RequestActivityExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(RequestActivityExtension.class);
+        return PacketExtensions.getContainer().getComponent(
+            RequestActivityExtension.class);
     }
 }

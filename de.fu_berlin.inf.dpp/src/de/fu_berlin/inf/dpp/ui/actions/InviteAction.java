@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * @author rdjemili
  */
 public class InviteAction extends SelectionProviderAction implements
-        ISessionListener {
+    ISessionListener {
 
     private RosterEntry selectedEntry;
 
@@ -46,7 +46,7 @@ public class InviteAction extends SelectionProviderAction implements
 
         setToolTipText("Start a IM messaging session with this user");
         setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/transmit_blue.png"));
+            .getImageDescriptor("icons/transmit_blue.png"));
 
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
@@ -63,7 +63,7 @@ public class InviteAction extends SelectionProviderAction implements
     @Override
     public void selectionChanged(IStructuredSelection selection) {
         if ((selection.size() == 1)
-                && (selection.getFirstElement() instanceof RosterEntry)) {
+            && (selection.getFirstElement() instanceof RosterEntry)) {
             this.selectedEntry = (RosterEntry) selection.getFirstElement();
         } else {
             this.selectedEntry = null;
@@ -101,13 +101,11 @@ public class InviteAction extends SelectionProviderAction implements
 
     private void updateEnablement() {
         JID jid = (this.selectedEntry == null) ? null : new JID(
-                this.selectedEntry.getUser());
+            this.selectedEntry.getUser());
 
-        setEnabled((getSharedProject() != null)
-                && (this.selectedEntry != null)
-                && (getSharedProject().getParticipant(jid) == null)
-                && (getSharedProject().isHost() || getSharedProject()
-                        .isDriver()));
+        setEnabled((getSharedProject() != null) && (this.selectedEntry != null)
+            && (getSharedProject().getParticipant(jid) == null)
+            && (getSharedProject().isHost() || getSharedProject().isDriver()));
     }
 
     private ISharedProject getSharedProject() {

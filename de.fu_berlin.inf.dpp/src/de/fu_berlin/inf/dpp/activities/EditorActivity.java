@@ -48,7 +48,7 @@ public class EditorActivity implements IActivity {
     public EditorActivity(Type type, IPath path) {
         if ((type != Type.Activated) && (path == null)) {
             throw new IllegalArgumentException(
-                    "Null path for non-activation type editor activity given.");
+                "Null path for non-activation type editor activity given.");
         }
 
         this.type = type;
@@ -75,8 +75,8 @@ public class EditorActivity implements IActivity {
 
         EditorActivity other = (EditorActivity) obj;
         return (((this.path == null) && (other.path == null)) || this.path
-                .equals(other.path))
-                && this.type.equals(other.type);
+            .equals(other.path))
+            && this.type.equals(other.type);
     }
 
     @Override

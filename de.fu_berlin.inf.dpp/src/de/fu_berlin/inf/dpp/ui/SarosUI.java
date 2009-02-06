@@ -53,18 +53,20 @@ public class SarosUI implements ISessionListener {
 
     private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
-    public SarosUI(ISessionManager sessionManager, JDTFacade jdtFacade, CDTFacade cdtFacade) {
-        
+    public SarosUI(ISessionManager sessionManager, JDTFacade jdtFacade,
+        CDTFacade cdtFacade) {
+
         // TODO: [CO] We don't know what this actually is for.
-        // It would be nice to eliminiate these, because they cause dependencies to the JDT and CDT
-        if (jdtFacade.isJDTAvailable()){
+        // It would be nice to eliminiate these, because they cause dependencies
+        // to the JDT and CDT
+        if (jdtFacade.isJDTAvailable()) {
             jdtFacade.installSharedDocumentProvider();
         }
-        
-        if (cdtFacade.isCDTAvailable()){
+
+        if (cdtFacade.isCDTAvailable()) {
             cdtFacade.installSharedDocumentProvider();
         }
-        
+
         sessionManager.addSessionListener(this);
     }
 
@@ -89,15 +91,14 @@ public class SarosUI implements ISessionListener {
                     Shell shell = Display.getDefault().getActiveShell();
                     JoinSessionWizard jsw = new JoinSessionWizard(process);
                     WizardDialogAccessable wd = new WizardDialogAccessable(
-                            shell, jsw);
+                        shell, jsw);
                     jsw.setWizardDlg(wd);
                     process.setInvitationUI(jsw.getInvitationUI());
                     wd.open();
                 } catch (Exception e) {
                     Saros.getDefault().getLog().log(
-                            new Status(IStatus.ERROR, Saros.SAROS,
-                                    IStatus.ERROR,
-                                    "Error while joining a session", e));
+                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                            "Error while joining a session", e));
                 }
             }
         });
@@ -115,28 +116,26 @@ public class SarosUI implements ISessionListener {
                     // Create Session View
                     IWorkbench workbench = PlatformUI.getWorkbench();
                     IWorkbenchWindow window = workbench
-                            .getActiveWorkbenchWindow();
+                        .getActiveWorkbenchWindow();
                     window.getActivePage().showView(SarosUI.SESSION_VIEW, null,
-                            IWorkbenchPage.VIEW_CREATE);
+                        IWorkbenchPage.VIEW_CREATE);
                 } catch (PartInitException e) {
                     Saros.getDefault().getLog().log(
-                            new Status(IStatus.ERROR, Saros.SAROS,
-                                    IStatus.ERROR,
-                                    "Could not create Session View", e));
+                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                            "Could not create Session View", e));
                 }
 
                 try {
                     // Open Roster so that a participant can be invited
                     IWorkbench workbench = PlatformUI.getWorkbench();
                     IWorkbenchWindow window = workbench
-                            .getActiveWorkbenchWindow();
+                        .getActiveWorkbenchWindow();
                     window.getActivePage().showView(SarosUI.ROSTER_VIEW, null,
-                            IWorkbenchPage.VIEW_ACTIVATE);
+                        IWorkbenchPage.VIEW_ACTIVATE);
                 } catch (PartInitException e) {
                     Saros.getDefault().getLog().log(
-                            new Status(IStatus.ERROR, Saros.SAROS,
-                                    IStatus.ERROR,
-                                    "Could not activate Roster View", e));
+                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                            "Could not activate Roster View", e));
                 }
 
             }
@@ -156,7 +155,7 @@ public class SarosUI implements ISessionListener {
             return "Connecting...";
         case CONNECTED:
             return "Connected (as "
-                    + Saros.getDefault().getConnection().getUser() + ")";
+                + Saros.getDefault().getConnection().getUser() + ")";
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:
@@ -181,7 +180,7 @@ public class SarosUI implements ISessionListener {
 
     public static Image getImage(String path) {
         return new Image(Display.getDefault(), SarosUI.getImageDescriptor(path)
-                .getImageData());
+            .getImageData());
     }
 
     /**
@@ -194,6 +193,6 @@ public class SarosUI implements ISessionListener {
      */
     public static ImageDescriptor getImageDescriptor(String path) {
         return AbstractUIPlugin.imageDescriptorFromPlugin(
-                "de.fu_berlin.inf.dpp", path);
+            "de.fu_berlin.inf.dpp", path);
     }
 }

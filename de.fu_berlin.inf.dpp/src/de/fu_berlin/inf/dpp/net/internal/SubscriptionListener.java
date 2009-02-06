@@ -50,23 +50,23 @@ public class SubscriptionListener implements PacketListener {
                 // subscribed
                 if (p.getType() == Presence.Type.subscribed) {
                     SubscriptionListener.logger.debug("subcribed from "
-                            + p.getFrom());
+                        + p.getFrom());
                 }
 
                 // unsubscribed
                 if (p.getType() == Presence.Type.unsubscribed) {
                     SubscriptionListener.logger.debug("unsubcribed from "
-                            + p.getFrom());
+                        + p.getFrom());
                 }
 
                 // Request of removal of subscription
                 else if (p.getType() == Presence.Type.unsubscribe) {
                     SubscriptionListener.logger.debug("unsubcribe from "
-                            + p.getFrom());
+                        + p.getFrom());
 
                     // if appropriate entry exists remove that
                     RosterEntry e = connection.getRoster().getEntry(
-                            packet.getFrom());
+                        packet.getFrom());
                     if (e != null) {
                         try {
                             connection.getRoster().removeEntry(e);
@@ -91,12 +91,11 @@ public class SubscriptionListener implements PacketListener {
                         // if no appropriate entry for request exists
                         // create one
                         RosterEntry e = connection.getRoster().getEntry(
-                                packet.getFrom());
+                            packet.getFrom());
                         if (e == null) {
                             try {
                                 connection.getRoster().createEntry(
-                                        packet.getFrom(), packet.getFrom(),
-                                        null);
+                                    packet.getFrom(), packet.getFrom(), null);
                             } catch (XMPPException e1) {
                                 logger.error(e1);
                             }
@@ -104,7 +103,7 @@ public class SubscriptionListener implements PacketListener {
                     } else {
                         // user has rejected request
                         sendPresence(Presence.Type.unsubscribe, packet
-                                .getFrom());
+                            .getFrom());
                     }
                 }
             }
@@ -125,8 +124,8 @@ public class SubscriptionListener implements PacketListener {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 result.set(MessageDialog.openConfirm(Display.getDefault()
-                        .getActiveShell(), "Request of subscription received",
-                        "The User " + from + " has requested subscription."));
+                    .getActiveShell(), "Request of subscription received",
+                    "The User " + from + " has requested subscription."));
             }
         });
         return result.get();
@@ -136,12 +135,12 @@ public class SubscriptionListener implements PacketListener {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 MessageDialog
-                        .openInformation(
-                                Display.getDefault().getActiveShell(),
-                                "Removal of subscription",
-                                "User "
-                                        + from
-                                        + " has rejected your request of subsription or has removed you from his roster.");
+                    .openInformation(
+                        Display.getDefault().getActiveShell(),
+                        "Removal of subscription",
+                        "User "
+                            + from
+                            + " has rejected your request of subsription or has removed you from his roster.");
             }
         });
     }

@@ -68,18 +68,18 @@ class EnterNamePage extends WizardPage {
         if (project == null) {
 
             this.updateProjectStatusResult
-                    .setText("No matching project found. Project download will start from scratch.");
+                .setText("No matching project found. Project download will start from scratch.");
 
         } else {
 
             this.updateProjectStatusResult.setText("Your project "
-                    + project.getName()
-                    + " matches with "
-                    + JoinSessionWizardUtils.getMatch(
-                            this.joinSessionWizard.process.getRemoteFileList(),
-                            project) + "% accuracy.\n"
-                    + "This fact will used to shorten the process of "
-                    + "downloading the remote project.");
+                + project.getName()
+                + " matches with "
+                + JoinSessionWizardUtils
+                    .getMatch(this.joinSessionWizard.process
+                        .getRemoteFileList(), project) + "% accuracy.\n"
+                + "This fact will used to shorten the process of "
+                + "downloading the remote project.");
 
             this.updateProjectText.setText(this.similarProject.getName());
 
@@ -93,14 +93,14 @@ class EnterNamePage extends WizardPage {
     private void setConnectionStatus() {
         if (this.joinSessionWizard.process.getTransferMode() == TransferMode.IBB) {
             setDescription("Attention: No direct connection avialable!"
-                    + '\n'
-                    + "Suggestion: Update an existing project or copy resources from another project.");
+                + '\n'
+                + "Suggestion: Update an existing project or copy resources from another project.");
             setImageDescriptor(SarosUI
-                    .getImageDescriptor("icons/ibb_connection.png"));
+                .getImageDescriptor("icons/ibb_connection.png"));
         } else {
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(SarosUI
-                    .getImageDescriptor("icons/jingle_connection.png"));
+                .getImageDescriptor("icons/jingle_connection.png"));
         }
     }
 
@@ -128,11 +128,11 @@ class EnterNamePage extends WizardPage {
 
         this.newProjectNameText = new Text(projectGroup, SWT.BORDER);
         this.newProjectNameText.setLayoutData(new GridData(
-                GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+            GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         this.newProjectNameText.setFocus();
         this.newProjectNameText.setText(JoinSessionWizardUtils
-                .findProjectNameProposal(this.joinSessionWizard.process
-                        .getProjectName()));
+            .findProjectNameProposal(this.joinSessionWizard.process
+                .getProjectName()));
     }
 
     /**
@@ -161,7 +161,7 @@ class EnterNamePage extends WizardPage {
 
         this.updateProjectText = new Text(projectGroup, SWT.BORDER);
         this.updateProjectText.setLayoutData(new GridData(
-                GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+            GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         this.updateProjectText.setFocus();
         this.updateProjectText.setEnabled(false);
         this.updateProjectText.setText("");
@@ -170,16 +170,16 @@ class EnterNamePage extends WizardPage {
         this.browseUpdateProjectButton.setText("Browse");
         setButtonLayoutData(this.browseUpdateProjectButton);
         this.browseUpdateProjectButton
-                .addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        IProject project = getProjectDialog("Select project for update.");
-                        if (project != null) {
-                            EnterNamePage.this.updateProjectText
-                                    .setText(project.getName());
-                        }
+            .addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    IProject project = getProjectDialog("Select project for update.");
+                    if (project != null) {
+                        EnterNamePage.this.updateProjectText.setText(project
+                            .getName());
                     }
-                });
+                }
+            });
 
         Composite optionsGroup = new Composite(workArea, SWT.NONE);
         layout = new GridLayout();
@@ -193,7 +193,7 @@ class EnterNamePage extends WizardPage {
 
         this.copyCheckbox = new Button(optionsGroup, SWT.CHECK);
         this.copyCheckbox
-                .setText("Create copy for working distributed. New project name:");
+            .setText("Create copy for working distributed. New project name:");
         this.copyCheckbox.setSelection(false);
         this.copyCheckbox.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -204,11 +204,11 @@ class EnterNamePage extends WizardPage {
 
         this.copyToBeforeUpdateText = new Text(optionsGroup, SWT.BORDER);
         this.copyToBeforeUpdateText.setLayoutData(new GridData(
-                GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+            GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         this.copyToBeforeUpdateText.setFocus();
         this.copyToBeforeUpdateText.setText(JoinSessionWizardUtils
-                .findProjectNameProposal(this.joinSessionWizard.process
-                        .getProjectName()));
+            .findProjectNameProposal(this.joinSessionWizard.process
+                .getProjectName()));
 
         Composite scanGroup = new Composite(workArea, SWT.NONE);
         layout = new GridLayout();
@@ -224,22 +224,22 @@ class EnterNamePage extends WizardPage {
         this.scanWorkspaceProjectsButton = new Button(scanGroup, SWT.PUSH);
         this.scanWorkspaceProjectsButton.setText("Scan workspace");
         this.scanWorkspaceProjectsButton
-                .setToolTipText("Scan workspace for similar projects.");
+            .setToolTipText("Scan workspace for similar projects.");
         setButtonLayoutData(this.scanWorkspaceProjectsButton);
 
         this.scanWorkspaceProjectsButton
-                .addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        setUpdateProject(JoinSessionWizardUtils
-                                .getBestScanMatch(EnterNamePage.this.joinSessionWizard.process));
-                    }
-                });
+            .addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    setUpdateProject(JoinSessionWizardUtils
+                        .getBestScanMatch(EnterNamePage.this.joinSessionWizard.process));
+                }
+            });
 
         this.updateProjectStatusResult = new Label(scanGroup, SWT.NONE);
         this.updateProjectStatusResult.setText("No scan results.");
         this.updateProjectStatusResult.setLayoutData(new GridData(
-                GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL));
+            GridData.FILL_HORIZONTAL | GridData.GRAB_VERTICAL));
     }
 
     /**
@@ -247,7 +247,7 @@ class EnterNamePage extends WizardPage {
      */
     public IProject getProjectDialog(String title) {
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(
-                getShell(), null, false, title);
+            getShell(), null, false, title);
 
         dialog.open();
         Object[] result = dialog.getResult();
@@ -268,15 +268,15 @@ class EnterNamePage extends WizardPage {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) {
                     EnterNamePage.this.joinSessionWizard.process
-                            .requestRemoteFileList(monitor);
+                        .requestRemoteFileList(monitor);
                 }
             });
         } catch (InvocationTargetException e) {
             JoinSessionWizard.log.log(Level.WARNING,
-                    "Exception while requesting remote file list", e);
+                "Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
             JoinSessionWizard.log.log(Level.FINE,
-                    "Request of remote file list canceled/interrupted", e);
+                "Request of remote file list canceled/interrupted", e);
         }
     }
 
@@ -401,7 +401,7 @@ class EnterNamePage extends WizardPage {
 
                     if (this.copyCheckbox.getSelection()) {
                         setPageCompleteTargetProject(this.copyToBeforeUpdateText
-                                .getText());
+                            .getText());
                     } else {
                         setMessage(null);
                         setErrorMessage(null);
@@ -435,10 +435,10 @@ class EnterNamePage extends WizardPage {
         if (isUpdateSelected()) {
             if (this.copyCheckbox.getSelection()) {
                 return ResourcesPlugin.getWorkspace().getRoot().getProject(
-                        this.copyToBeforeUpdateText.getText());
+                    this.copyToBeforeUpdateText.getText());
             } else {
                 return ResourcesPlugin.getWorkspace().getRoot().getProject(
-                        this.updateProjectText.getText());
+                    this.updateProjectText.getText());
             }
         } else {
             return null;

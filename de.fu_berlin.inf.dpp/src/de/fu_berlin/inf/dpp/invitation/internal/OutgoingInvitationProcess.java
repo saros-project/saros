@@ -47,10 +47,10 @@ import de.fu_berlin.inf.dpp.util.FileZipper;
  * @author rdjemili
  */
 public class OutgoingInvitationProcess extends InvitationProcess implements
-        IOutgoingInvitationProcess {
+    IOutgoingInvitationProcess {
 
     private static Logger logger = Logger
-            .getLogger(OutgoingInvitationProcess.class);
+        .getLogger(OutgoingInvitationProcess.class);
 
     private final ISharedProject sharedProject;
 
@@ -107,8 +107,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
-            ISharedProject sharedProject, String description, boolean startNow,
-            IInvitationUI inviteUI, int colorID) {
+        ISharedProject sharedProject, String description, boolean startNow,
+        IInvitationUI inviteUI, int colorID) {
 
         super(transmitter, to, description, colorID);
 
@@ -117,7 +117,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         if (startNow) {
             transmitter.sendInviteMessage(sharedProject, to, description,
-                    colorID);
+                colorID);
             setState(State.INVITATION_SENT);
         } else {
             setState(State.INITIALIZED);
@@ -135,8 +135,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         setState(State.SYNCHRONIZING);
 
         if ((this.tmode == TransferMode.JINGLE)
-                || (this.tmode == TransferMode.DEFAULT)
-                || (this.tmode == TransferMode.IBB)) {
+            || (this.tmode == TransferMode.DEFAULT)
+            || (this.tmode == TransferMode.IBB)) {
             try {
                 FileList local = new FileList(this.sharedProject.getProject());
                 FileList diff = this.remoteFileList.diff(local);
@@ -144,7 +144,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 List<IPath> added = diff.getAddedPaths();
                 List<IPath> altered = diff.getAlteredPaths();
                 this.toSend = new ArrayList<IPath>(added.size()
-                        + altered.size());
+                    + altered.size());
                 this.toSend.addAll(added);
                 this.toSend.addAll(altered);
 
@@ -186,7 +186,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         try {
             this.transmitter.sendFileList(this.peer, this.sharedProject
-                    .getFileList());
+                .getFileList());
             setState(State.HOST_FILELIST_SENT);
         } catch (Exception e) {
             failed(e);
@@ -224,7 +224,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.transmitter.removeInvitationProcess(this); // HACK
 
         this.transmitter.sendUserListTo(from, this.sharedProject
-                .getParticipants());
+            .getParticipants());
     }
 
     /*
@@ -289,8 +289,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.invitationUI.updateInvitationProgress(this.peer);
 
         try {
-            this.transmitter.sendFileAsync(this.peer, this.sharedProject.getProject(),
-                    path, -1, this);
+            this.transmitter.sendFileAsync(this.peer, this.sharedProject
+                .getProject(), path, -1, this);
         } catch (IOException e) {
             this.fileTransferFailed(path, e);
         }
@@ -312,16 +312,16 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         this.archive = new File("./" + getPeer().getName() + "_Project.zip");
         OutgoingInvitationProcess.logger
-                .debug("Project archive file has to be send. "
-                        + this.archive.getAbsolutePath() + " length: "
-                        + this.archive.length());
+            .debug("Project archive file has to be send. "
+                + this.archive.getAbsolutePath() + " length: "
+                + this.archive.length());
         try {
             /* create project zip archive. */
             FileZipper.createProjectZipArchive(this.toSend, this.archive
-                    .getAbsolutePath(), this.sharedProject.getProject());
+                .getAbsolutePath(), this.sharedProject.getProject());
             /* send data. */
             this.transmitter.sendProjectArchive(this.peer, this.sharedProject
-                    .getProject(), this.archive, this);
+                .getProject(), this.archive, this);
         } catch (Exception e) {
             failed(e);
         }
@@ -342,7 +342,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      */
     private boolean blockUntilFilesSent() {
         while ((this.state != State.SYNCHRONIZING_DONE)
-                && (this.state != State.DONE)) {
+            && (this.state != State.DONE)) {
             if (getState() == State.CANCELED) {
                 return false;
             }
@@ -400,19 +400,19 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         // HACK
         for (IPath path : driverEditors) {
             if ((filelist != null)
-                    && (filelist.getPaths().contains(path) == false)) {
+                && (filelist.getPaths().contains(path) == false)) {
                 continue;
             }
 
             this.sharedProject.getSequencer().activityCreated(
-                    new EditorActivity(EditorActivity.Type.Activated, path));
+                new EditorActivity(EditorActivity.Type.Activated, path));
         }
 
         if ((filelist != null)
-                && (filelist.getPaths().contains(activeDriverEditor) == true)) {
+            && (filelist.getPaths().contains(activeDriverEditor) == true)) {
             this.sharedProject.getSequencer().activityCreated(
-                    new EditorActivity(EditorActivity.Type.Activated,
-                            activeDriverEditor));
+                new EditorActivity(EditorActivity.Type.Activated,
+                    activeDriverEditor));
         }
     }
 

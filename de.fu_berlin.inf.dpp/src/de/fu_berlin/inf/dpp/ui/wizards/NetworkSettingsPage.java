@@ -46,19 +46,19 @@ public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
         twoColumn.horizontalSpan = 2;
         portDescription.setLayoutData(twoColumn);
         portDescription
-                .setText("Choose your incoming port and configure your firewall to accept incoming connections over this port.");
+            .setText("Choose your incoming port and configure your firewall to accept incoming connections over this port.");
 
         Label serverLabel = new Label(root, SWT.NONE);
         serverLabel.setText("Port:");
 
         this.portText = new Text(root, SWT.BORDER);
         this.portText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false));
+            false));
 
         Label autoConnectDesc = new Label(root, SWT.NONE);
         autoConnectDesc.setLayoutData(twoColumn);
         autoConnectDesc
-                .setText("Should Saros automatically connect on Eclipse startup?");
+            .setText("Should Saros automatically connect on Eclipse startup?");
 
         new Label(root, SWT.NONE);
 
@@ -68,22 +68,22 @@ public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
         Label skypeDesc = new Label(root, SWT.NONE);
         skypeDesc.setLayoutData(twoColumn);
         skypeDesc
-                .setText("Saros can send your Skype username to your peer if you provide it here");
+            .setText("Saros can send your Skype username to your peer if you provide it here");
 
         Label skype = new Label(root, SWT.NONE);
         skype.setText("Skype Username:");
         this.skypeText = new Text(root, SWT.BORDER);
         this.skypeText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false));
+            false));
 
         // Set initial values
         IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
         this.portText.setText(String.valueOf(preferences
-                .getInt(PreferenceConstants.FILE_TRANSFER_PORT)));
+            .getInt(PreferenceConstants.FILE_TRANSFER_PORT)));
         this.autoText.setSelection(preferences
-                .getBoolean(PreferenceConstants.AUTO_CONNECT));
+            .getBoolean(PreferenceConstants.AUTO_CONNECT));
         this.skypeText.setText(preferences
-                .getString(PreferenceConstants.SKYPE_USERNAME));
+            .getString(PreferenceConstants.SKYPE_USERNAME));
 
         ModifyListener m = new ModifyListener() {
             public void modifyText(ModifyEvent e) {
@@ -121,11 +121,11 @@ public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
     public boolean performFinish() {
         IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
         preferences.setValue(PreferenceConstants.FILE_TRANSFER_PORT,
-                this.portText.getText());
+            this.portText.getText());
         preferences.setValue(PreferenceConstants.AUTO_CONNECT, this.autoText
-                .getSelection());
+            .getSelection());
         preferences.setValue(PreferenceConstants.SKYPE_USERNAME, this.skypeText
-                .getText());
+            .getText());
 
         return true;
     }
