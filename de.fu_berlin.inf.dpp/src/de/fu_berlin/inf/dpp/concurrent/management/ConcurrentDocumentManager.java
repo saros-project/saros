@@ -169,8 +169,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             }
 
             // Send to all Clients
-            Saros.getDefault().getSessionManager().getTransmitter()
-                .sendDocChecksumsToClients(docsChecksums.values());
+            if (docsChecksums.values().size() > 0) {
+                Saros.getDefault().getSessionManager().getTransmitter()
+                    .sendDocChecksumsToClients(docsChecksums.values());
+            }
 
             // Reschedule the next run in 10 seconds
             schedule(10000);
