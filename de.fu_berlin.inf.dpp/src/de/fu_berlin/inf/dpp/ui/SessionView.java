@@ -62,11 +62,9 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
     IPropertyChangeListener {
@@ -75,11 +73,11 @@ public class SessionView extends ViewPart implements ISessionListener,
 
     private ISharedProject sharedProject;
 
-    private GiveDriverRoleAction giveDriverRoleAction;
+    // private GiveDriverRoleAction giveDriverRoleAction;
 
     private GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
 
-    private RemoveDriverRoleAction removeDriverRoleAction;
+    // private RemoveDriverRoleAction removeDriverRoleAction;
 
     private IPreferenceStore store = null;
 
@@ -147,6 +145,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
 
         public void dispose() {
+            // Do nothing
         }
 
         private void refreshTable() {
@@ -314,11 +313,16 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.viewer.setLabelProvider(new SessionLabelProvider());
         this.viewer.setInput(null);
 
-        this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
-            "Give driver role");
+        /*
+         * this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
+         * "Give driver role");
+         */
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
             this.viewer, "Give exclusive driver role");
-        this.removeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
+        /*
+         * this.removeDriverRoleAction = new
+         * RemoveDriverRoleAction(this.viewer);
+         */
 
         contributeToActionBars();
         hookContextMenu();
