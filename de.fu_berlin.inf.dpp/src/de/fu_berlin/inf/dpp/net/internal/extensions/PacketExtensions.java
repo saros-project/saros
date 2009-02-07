@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * Holds various simple helper methods to create and parse simple Smack packet
@@ -204,6 +205,22 @@ public class PacketExtensions {
             public boolean accept(Packet arg0) {
                 return Saros.getDefault().getSessionManager()
                     .getSharedProject() != null;
+            }
+        };
+    }
+
+    /**
+     * @return filter that returns true iff currently a shared project exists
+     *         and the message was from the host of this shared project.
+     */
+    public static PacketFilter getFromHostFilter() {
+        return new PacketFilter() {
+            public boolean accept(Packet arg0) {
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
+
+                return project != null
+                    && project.getHost().getJID().equals(arg0.getFrom());
             }
         };
     }
