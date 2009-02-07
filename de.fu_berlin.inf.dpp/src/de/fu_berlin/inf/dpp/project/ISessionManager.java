@@ -21,7 +21,7 @@ public interface ISessionManager {
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public abstract void startSession(IProject project) throws XMPPException;
+    public void startSession(IProject project) throws XMPPException;
 
     /**
      * Every Session is identified by an int as identifier.
@@ -45,8 +45,7 @@ public interface ISessionManager {
      * 
      * @return the shared project.
      */
-    public abstract ISharedProject joinSession(IProject project, JID host,
-        int myColorID);
+    public ISharedProject joinSession(IProject project, JID host, int myColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -54,13 +53,13 @@ public interface ISessionManager {
      * 
      * Has no effect if there is no currently shared project.
      */
-    public abstract void stopSharedProject();
+    public void stopSharedProject();
 
     /**
      * @return the active SharedProject object or <code>null</code> if there is
      *         no active project.
      */
-    public abstract ISharedProject getSharedProject();
+    public ISharedProject getSharedProject();
 
     /**
      * Add the given session listener. Is ignored if the listener is already
@@ -69,7 +68,7 @@ public interface ISessionManager {
      * @param listener
      *            the listener that is to be added.
      */
-    public abstract void addSessionListener(ISessionListener listener);
+    public void addSessionListener(ISessionListener listener);
 
     /**
      * Removes the given session listener. Is ignored if the given listener
@@ -78,7 +77,7 @@ public interface ISessionManager {
      * @param listener
      *            the listener that is to be removed.
      */
-    public abstract void removeSessionListener(ISessionListener listener);
+    public void removeSessionListener(ISessionListener listener);
 
     /**
      * Is fired when an incoming invitation is received.
@@ -88,31 +87,26 @@ public interface ISessionManager {
      * @param description
      *            the informal description text that can be given with
      *            invitations.
-     * @param sessionID
-     *            the id of the session
      * @param colorID
      *            the assigned color id for the invited participant.
      * @return the process that represents the invitation and which handles the
      *         further interaction with the invitation.
      */
-    public abstract IIncomingInvitationProcess invitationReceived(JID from,
+    public IIncomingInvitationProcess invitationReceived(JID from,
         String sessionID, String projectName, String description, int colorID);
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+     * @see IConnectionListener
      */
-    public abstract void connectionStateChanged(XMPPConnection connection,
+    public void connectionStateChanged(XMPPConnection connection,
         ConnectionState newState);
 
-    public abstract void OnReconnect(int oldtimestamp);
+    public void OnReconnect(int oldtimestamp);
 
     /**
      * Get the transmitter of the session.
      * 
      * @return the transmitter of the session
      */
-    public abstract ITransmitter getTransmitter();
-
+    public ITransmitter getTransmitter();
 }
