@@ -56,7 +56,6 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -70,7 +69,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -88,7 +86,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.DataTransferExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.JupiterErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
@@ -167,47 +164,35 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     protected JingleDiscoveryManager jingleDiscovery;
 
-    /**
-     * TODO What to do if already in a Session?
-     */
-    private final class InvitePacketListener implements PacketListener {
+    protected class InvitePacketListener implements PacketListener {
+
+        InviteExtension extension = new InviteExtension() {
+
+            @Override
+            public void invitationReceived(JID sender, String sessionID,
+                String projectName, String description, int colorID) {
+                ISessionManager sm = Saros.getDefault().getSessionManager();
+                if (sm.getSessionID().equals(ISessionManager.NOT_IN_SESSION)) {
+                    log.debug("Received invitation with session id "
+                        + sessionID);
+                    log.debug("and ColorID: " + colorID + ", i'm "
+                        + Saros.getDefault().getMyJID());
+                    sm.invitationReceived(sender, sessionID, projectName,
+                        description, colorID);
+                } else {
+                    sendMessage(
+                        sender,
+                        CancelInviteExtension
+                            .getDefault()
+                            .create(sessionID,
+                                "I am already in a Saros-Session, try to contact me by chat first"));
+                }
+            }
+
+        };
+
         public void processPacket(Packet packet) {
-            Message message = (Message) packet;
-
-            JID fromJID = new JID(message.getFrom());
-
-            if (InviteExtension.getDefault().hasExtension(message)) {
-                processInviteExtension(message, fromJID);
-                return;
-            }
-        }
-
-        private void processInviteExtension(final Message message, JID fromJID) {
-            DefaultPacketExtension inviteExtension = InviteExtension
-                .getDefault().getExtension(message);
-            String desc = inviteExtension
-                .getValue(PacketExtensions.DESCRIPTION);
-            String pName = inviteExtension
-                .getValue(PacketExtensions.PROJECTNAME);
-            String sessionID = inviteExtension
-                .getValue(PacketExtensions.SESSION_ID);
-            int colorID = Integer.parseInt(inviteExtension
-                .getValue(PacketExtensions.COLOR_ID));
-
-            ISessionManager sm = Saros.getDefault().getSessionManager();
-            if (sm.getSessionID().equals(ISessionManager.NOT_IN_SESSION)) {
-                log.debug("Received invitation with session id " + sessionID);
-                log.debug("and ColorID: " + colorID + ", i'm "
-                    + Saros.getDefault().getMyJID());
-                sm.invitationReceived(fromJID, sessionID, pName, desc, colorID);
-            } else {
-                sendMessage(
-                    fromJID,
-                    CancelInviteExtension
-                        .getDefault()
-                        .create(sessionID,
-                            "I am already in a Saros-Session, try to contact me by chat first"));
-            }
+            extension.processPacket(packet);
         }
     }
 
@@ -521,6 +506,329 @@ public class XMPPChatTransmitter implements ITransmitter,
      * TODO break this up into many individually registered Listeners
      */
     private final class GodPacketListener implements PacketListener {
+
+        private CancelInviteExtension cancelInvite = new CancelInviteExtension() {
+
+            @Override
+            public void invitationCanceled(JID from, String errorMsg) {
+                for (IInvitationProcess process : processes) {
+                    if (process.getPeer().equals(from)) {
+                        process.cancel(errorMsg, true);
+                    }
+                }
+            }
+        };
+        private RequestForFileListExtension requestForFileList = new RequestForFileListExtension() {
+
+            @Override
+            public void requestForFileListReceived(final JID from) {
+
+                XMPPChatTransmitter.log
+                    .debug("Received Request for FileList from " + from);
+
+                new Thread(new Runnable() {
+                    public void run() {
+                        for (IInvitationProcess process : processes) {
+                            if (process.getPeer().equals(from)) {
+                                process.invitationAccepted(from);
+                            }
+                        }
+                    }
+                }).start();
+            }
+        };
+
+        private JoinExtension join = new JoinExtension() {
+
+            @Override
+            public void joinReceived(JID fromJID, int colorID) {
+                log.debug("Join: ColorID: " + colorID);
+
+                for (IInvitationProcess process : processes) {
+                    if (process.getPeer().equals(fromJID)) {
+                        process.joinReceived(fromJID);
+                        return;
+                    }
+                }
+
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
+
+                if (project != null) {
+                    // a new user joined this session
+                    project.addUser(new User(fromJID, colorID));
+                }
+            }
+
+        };
+        private LeaveExtension leave = new LeaveExtension() {
+
+            @Override
+            public void leaveReceived(JID fromJID) {
+
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
+
+                if (project != null) {
+                    if (project.getHost().getJID().equals(fromJID)) {
+                        // Host
+                        Saros.getDefault().getSessionManager()
+                            .stopSharedProject();
+
+                        WarningMessageDialog.showWarningMessage(
+                            "Closing the Session",
+                            "Closing the session because the host left.");
+                    } else {// Client
+                        project.removeUser(project.getParticipant(fromJID));
+                    }
+                }
+            }
+
+        };
+        private RequestActivityExtension requestActivity = new RequestActivityExtension() {
+
+            @Override
+            public void requestForResendingActivitiesReceived(JID fromJID,
+                int timeStamp, boolean andUp) {
+
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
+
+                if (project == null || project.getParticipant(fromJID) == null) {
+                    return;
+                }
+
+                List<TimedActivity> tempActivities = ActivitySequencer
+                    .filterActivityHistory(Saros.getDefault()
+                        .getSessionManager().getSharedProject().getSequencer()
+                        .getActivityHistory(), timeStamp, andUp);
+
+                if (tempActivities.size() > 0) {
+                    PacketExtension extension = new ActivitiesPacketExtension(
+                        Saros.getDefault().getSessionManager().getSessionID(),
+                        tempActivities);
+
+                    sendMessage(fromJID, extension);
+                }
+
+                String info = String.format(
+                    "Received request for resending of timestamp%s %d%s.",
+                    andUp ? "s" : "", timeStamp, andUp ? " (andup)" : "");
+
+                if (tempActivities.size() > 0) {
+                    info += String.format(" I sent back %s activities.",
+                        tempActivities.size());
+                } else {
+                    info += String
+                        .format(" I did not find any matching activities.");
+                }
+
+                XMPPChatTransmitter.log.info(info);
+            }
+        };
+        private UserListExtension userList = new UserListExtension() {
+
+            @Override
+            public void userListReceived(JID fromJID, List<User> userList) {
+
+                // TODO Put preconditions in Filter: inSession(), from == host
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
+
+                if (project == null) {
+                    return;
+                }
+
+                XMPPChatTransmitter.log.debug("Received user list from "
+                    + fromJID);
+
+                for (User receivedUser : userList) {
+
+                    // Check if we already know this user
+                    User user = project.getParticipant(receivedUser.getJID());
+
+                    if (user == null) {
+                        // This user is not part of our project
+                        user = receivedUser;
+
+                        // Add him and send him a message, and tell him our
+                        // color
+                        project.addUser(user);
+                        sendMessage(user.getJID(), JoinExtension.getDefault()
+                            .create(
+                                Saros.getDefault().getLocalUser().getColorID()));
+                    } else {
+                        // User already exists
+
+                        // Check if the existing user has the color that we
+                        // expect
+                        if (user.getColorID() != receivedUser.getColorID()) {
+                            log
+                                .warn("Received color id doesn't match known color id");
+                        }
+
+                        // Update his role
+                        user.setUserRole(receivedUser.getUserRole());
+                    }
+                }
+            }
+        };
+        private DataTransferExtension dataTransfer = new DataTransferExtension() {
+
+            /**
+             * Receives a data buffer sent by a chat message. The data will be
+             * decoded from base64 encoding. Splitted transfer will be buffered
+             * until all chunks are received. Then the file will be
+             * reconstructed and processed as a whole.
+             * 
+             * @param message
+             *            Message containing the data as extension.
+             * 
+             * @return <code>true</code> if the message was handled
+             *         successfully.
+             */
+            @Override
+            public void chunkReceived(JID fromJID, String sName, String desc,
+                int index, int maxIndex, String sData) {
+
+                // Is this a transfer with multiple parts?
+                if (maxIndex > 1) {
+
+                    XMPPChatTransmitter.log.debug("Received chunk " + index
+                        + " of " + maxIndex + " of file " + sName);
+
+                    // check for previous chunks
+                    IncomingFile ifile = incomingFiles.get(sName);
+                    if (ifile == null) {
+                        /*
+                         * this is the first received chunk->create incoming
+                         * file object
+                         */
+                        ifile = new IncomingFile();
+                        ifile.receivedChunks++;
+                        ifile.chunkCount = maxIndex;
+                        ifile.name = sName;
+                        for (int i = 0; i < maxIndex; i++) {
+                            ifile.messageBuffer.add(null);
+                        }
+                        ifile.messageBuffer.set(index - 1, sData);
+                        incomingFiles.put(sName, ifile);
+                        return;
+                    } else {
+                        // this is a following chunk
+                        ifile.receivedChunks++;
+                        ifile.messageBuffer.set(index - 1, sData);
+
+                        if (ifile.isComplete() == false) {
+                            return;
+                        } else {
+
+                            // join the buffers to restore the file from chunks
+                            sData = "";
+                            for (int i = 0; i < maxIndex; i++) {
+                                sData += ifile.messageBuffer.get(i);
+                            }
+                            incomingFiles.remove(ifile);
+                        }
+                    }
+                }
+
+                byte[] dataOrg = Base64.decodeBase64(sData.getBytes());
+                if (dataOrg == null)
+                    return;
+
+                // File list received
+                if (sName
+                    .equals(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION)) {
+                    FileList fileList = null;
+                    IInvitationProcess myProcess = null;
+                    try {
+                        for (IInvitationProcess process : processes) {
+                            if (process.getPeer().equals(fromJID)) {
+                                myProcess = process;
+                                fileList = new FileList(new String(dataOrg));
+                                process.fileListReceived(fromJID, fileList);
+                            }
+                        }
+                        XMPPChatTransmitter.log
+                            .info("Received file list via ChatTransfer");
+                    } catch (Exception e) {
+                        if (myProcess != null) {
+                            myProcess
+                                .cancel("Error receiving file list", false);
+                        }
+                    }
+
+                } else {
+
+                    // receiving file (resource)
+                    try {
+                        Path path = new Path(sName);
+
+                        ByteArrayInputStream in = new ByteArrayInputStream(
+                            dataOrg);
+
+                        XMPPChatTransmitter.log
+                            .debug("Receiving resource from "
+                                + fromJID.toString() + ": " + sName
+                                + " (ChatTransfer)");
+
+                        boolean handledByInvitation = false;
+                        for (IInvitationProcess process : processes) {
+                            if (process.getPeer().equals(fromJID)) {
+                                process.resourceReceived(fromJID, path, in);
+                                handledByInvitation = true;
+                            }
+                        }
+
+                        if (!handledByInvitation) {
+
+                            if (Saros.getDefault().getSessionManager()
+                                .getSharedProject() == null) {
+                                // receiving resource without a running session?
+                                // not accepted
+                                return;
+                            }
+
+                            FileActivity activity = new FileActivity(
+                                FileActivity.Type.Created, path, in);
+
+                            int time;
+                            String description = desc;
+                            try {
+                                time = Integer
+                                    .parseInt(description
+                                        .substring(XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION
+                                            .length() + 1));
+                            } catch (Exception e) {
+                                Saros.log(
+                                    "Could not parse time from description: "
+                                        + description, e);
+                                time = 0; // HACK
+                            }
+
+                            TimedActivity timedActivity = new TimedActivity(
+                                activity, time);
+
+                            ISessionManager sm = Saros.getDefault()
+                                .getSessionManager();
+                            sm.getSharedProject().getSequencer().exec(
+                                timedActivity);
+                        }
+
+                        XMPPChatTransmitter.log.info("Received resource "
+                            + sName);
+
+                    } catch (Exception e) {
+                        XMPPChatTransmitter.log.warn("Failed to receive "
+                            + sName, e);
+                    }
+                }
+
+                return;
+            }
+        };
+
         public void processPacket(Packet packet) {
 
             try {
@@ -528,45 +836,27 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 JID fromJID = new JID(message.getFrom());
 
-                final ISharedProject project = Saros.getDefault()
-                    .getSessionManager().getSharedProject();
-
                 // Change the input method to get the right chats
                 putIncomingChat(fromJID, message.getThread());
 
                 if (PacketExtensions.getActvitiesExtension(message) != null) {
-                    processActivitiesExtension(message, fromJID, project);
+                    processActivitiesExtension(message, fromJID);
                 }
 
-                if (JoinExtension.getDefault().hasExtension(message)) {
-                    processJoinExtension(message, fromJID, project);
-                }
+                join.processPacket(packet);
 
-                // TODO CJ: Leave Project Message must be handled better
-                if (LeaveExtension.getDefault().hasExtension(message)) {
-                    processLeaveExtension(fromJID, project);
-                }
+                leave.processPacket(packet);
 
-                if (RequestActivityExtension.getDefault().hasExtension(message)) {
-                    processRequestActivityExtension(message, project, fromJID);
-                }
+                requestActivity.processPacket(packet);
 
-                if (DataTransferExtension.getDefault().hasExtension(message)) {
-                    receiveChatTransfer(message);
-                }
+                dataTransfer.processPacket(packet);
 
-                if (RequestForFileListExtension.getDefault().hasExtension(
-                    message)) {
-                    processRequestForFileListExtension(fromJID);
-                }
+                requestForFileList.processPacket(packet);
 
-                if (UserListExtension.getDefault().hasExtension(message)) {
-                    processUserListExtension(message, fromJID, project);
-                }
+                userList.processPacket(packet);
 
-                if (CancelInviteExtension.getDefault().hasExtension(message)) {
-                    processCancelInviteExtension(message, fromJID);
-                }
+                cancelInvite.processPacket(packet);
+
             } catch (Exception e) {
                 XMPPChatTransmitter.log.error(
                     "An internal error occurred while processing packets", e);
@@ -574,7 +864,11 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
 
         private void processActivitiesExtension(final Message message,
-            JID fromJID, final ISharedProject project) {
+            JID fromJID) {
+
+            final ISharedProject project = Saros.getDefault()
+                .getSessionManager().getSharedProject();
+
             ActivitiesPacketExtension activitiesPacket = PacketExtensions
                 .getActvitiesExtension(message);
 
@@ -582,12 +876,14 @@ public class XMPPChatTransmitter implements ITransmitter,
                 .getActivities();
 
             String source = fromJID.toString();
-            XMPPChatTransmitter.log.debug("Received activities from " + source
-                + ": " + timedActivities);
 
             if ((project == null) || (project.getParticipant(fromJID) == null)) {
-                XMPPChatTransmitter.log.info("user not member!");
+                XMPPChatTransmitter.log.info("Recevied activities from "
+                    + source + " but User is no participant!");
                 return;
+            } else {
+                XMPPChatTransmitter.log.debug("Received activities from "
+                    + source + ": " + timedActivities);
             }
 
             for (TimedActivity timedActivity : timedActivities) {
@@ -608,335 +904,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 }
             }
-        }
-
-        private void processRequestActivityExtension(final Message message,
-            ISharedProject project, JID fromJID) {
-
-            if (project == null || project.getParticipant(fromJID) == null) {
-                return;
-            }
-
-            DefaultPacketExtension rae = RequestActivityExtension.getDefault()
-                .getExtension(message);
-
-            String sID = rae.getValue("ID");
-            boolean andUp = rae.getValue("ANDUP") != null;
-
-            if (sID == null)
-                return;
-
-            int timeStamp = (new Integer(sID)).intValue();
-
-            List<TimedActivity> tempActivities = ActivitySequencer
-                .filterActivityHistory(Saros.getDefault().getSessionManager()
-                    .getSharedProject().getSequencer().getActivityHistory(),
-                    timeStamp, andUp);
-
-            if (tempActivities.size() > 0) {
-                PacketExtension extension = new ActivitiesPacketExtension(Saros
-                    .getDefault().getSessionManager().getSessionID(),
-                    tempActivities);
-
-                sendMessage(fromJID, extension);
-            }
-
-            String info = String.format(
-                "Received request for resending of timestamp%s %d%s.",
-                andUp ? "s" : "", timeStamp, andUp ? " (andup)" : "");
-
-            if (tempActivities.size() > 0) {
-                info += String.format(" I sent back %s activities.",
-                    tempActivities.size());
-            } else {
-                info += String
-                    .format(" I did not find any matching activities.");
-            }
-
-            XMPPChatTransmitter.log.info(info);
-        }
-
-        private void processCancelInviteExtension(final Message message,
-            JID fromJID) {
-            DefaultPacketExtension cancelInviteExtension = CancelInviteExtension
-                .getDefault().getExtension(message);
-
-            String errorMsg = cancelInviteExtension
-                .getValue(PacketExtensions.ERROR);
-
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(fromJID)) {
-                    process.cancel(errorMsg, true);
-                }
-            }
-        }
-
-        private void processJoinExtension(final Message message, JID fromJID,
-            final ISharedProject project) {
-
-            DefaultPacketExtension extension = JoinExtension.getDefault()
-                .getExtension(message);
-
-            int colorID = Integer.parseInt(extension.getValue("ColorID"));
-
-            log.debug("Join: ColorID: " + colorID);
-
-            for (IInvitationProcess process : processes) {
-                if (process.getPeer().equals(fromJID)) {
-                    process.joinReceived(fromJID);
-                    return;
-                }
-            }
-            if (project != null) {
-                project.addUser(new User(fromJID, colorID));
-                // a new user
-                // joined this
-                // session
-            }
-        }
-
-        private void processLeaveExtension(JID fromJID,
-            final ISharedProject project) {
-            if (project != null) {
-                if (project.getHost().getJID().equals(fromJID)) {
-                    // Host
-                    Saros.getDefault().getSessionManager().stopSharedProject();
-
-                    WarningMessageDialog.showWarningMessage(
-                        "Closing the Session",
-                        "Closing the session because the host left.");
-                } else {// Client
-                    project.removeUser(project.getParticipant(fromJID));
-                }
-            }
-        }
-
-        /**
-         * Invitee request for project file list (state.INVITATION_SEND)
-         */
-        private void processRequestForFileListExtension(final JID fromJID) {
-
-            XMPPChatTransmitter.log
-                .debug("Received Request for FileList from from " + fromJID);
-
-            new Thread(new Runnable() {
-                public void run() {
-                    for (IInvitationProcess process : processes) {
-                        if (process.getPeer().equals(fromJID)) {
-                            process.invitationAccepted(fromJID);
-                        }
-                    }
-                }
-            }).start();
-        }
-
-        private void processUserListExtension(final Message message,
-            JID fromJID, final ISharedProject project) {
-            DefaultPacketExtension userlistExtension = UserListExtension
-                .getDefault().getExtension(message);
-
-            // My inviter sent a list of all session participants
-            // I need to adapt the order for later case of driver leaving the
-            // session
-            XMPPChatTransmitter.log.debug("Received user list from " + fromJID);
-
-            int count = 0;
-            while (true) {
-                String jidS = userlistExtension.getValue("User" + count);
-                if (jidS == null) {
-                    break;
-                }
-                JID jid = new JID(jidS);
-                XMPPChatTransmitter.log.debug("   *:" + jidS);
-                int colorID = Integer.parseInt(userlistExtension
-                    .getValue("UserColor" + count));
-                XMPPChatTransmitter.log.debug("   color: " + colorID);
-
-                User user = project.getParticipant(jid);
-
-                if (user == null) {
-                    // This user is new, we have to send him a message later
-                    // and add him to the project
-                    user = new User(jid, colorID);
-                }
-
-                if (user.getColorID() != colorID) {
-                    log.warn("Received color id doesn't match known color id");
-                }
-
-                String userRole = userlistExtension
-                    .getValue("UserRole" + count);
-                user.setUserRole(UserRole.valueOf(userRole));
-
-                if (project.getParticipant(jid) == null) {
-                    project.addUser(user);
-
-                    sendMessage(jid, JoinExtension.getDefault().create(
-                        Saros.getDefault().getLocalUser().getColorID()));
-                }
-
-                count++;
-            }
-        }
-
-        /**
-         * Receives a data buffer sent by a chat message. The data will be
-         * decoded from base64 encoding. Splitted transfer will be buffered
-         * until all chunks are received. Then the file will be reconstructed
-         * and processed as a whole.
-         * 
-         * @param message
-         *            Message containing the data as extension.
-         * 
-         * @return <code>true</code> if the message was handled successfully.
-         */
-        boolean receiveChatTransfer(Message message) {
-            DefaultPacketExtension dt = DataTransferExtension.getDefault()
-                .getExtension(message);
-            String sName = dt.getValue(PacketExtensions.DT_NAME);
-            String sData = dt.getValue(PacketExtensions.DT_DATA);
-
-            String sSplit = dt.getValue(PacketExtensions.DT_SPLIT);
-            try {
-                // is this a multipart transfer?
-                if ((sSplit != null) && (sSplit.equals("1/1") == false)) {
-                    // parse split information (index and chunk count)
-                    int i = sSplit.indexOf('/');
-                    int cur = Integer.parseInt(sSplit.substring(0, i));
-                    int max = Integer.parseInt(sSplit.substring(i + 1));
-
-                    XMPPChatTransmitter.log.debug("Received chunk " + cur
-                        + " of " + max + " of file " + sName);
-
-                    // check for previous chunks
-                    IncomingFile ifile = incomingFiles.get(sName);
-                    if (ifile == null) {
-                        // this is the first received chunk->create incoming
-                        // file
-                        // object
-                        ifile = new IncomingFile();
-                        ifile.receivedChunks++;
-                        ifile.chunkCount = max;
-                        ifile.name = sName;
-                        for (i = 0; i < max; i++) {
-                            ifile.messageBuffer.add(null);
-                        }
-                        ifile.messageBuffer.set(cur - 1, sData);
-                        incomingFiles.put(sName, ifile);
-                        return true;
-                    } else {
-                        // this is a following chunk
-                        ifile.receivedChunks++;
-                        ifile.messageBuffer.set(cur - 1, sData);
-
-                        if (ifile.isComplete() == false) {
-                            return true;
-                        }
-
-                        // join the buffers to restore the file from chunks
-                        sData = "";
-                        for (i = 0; i < max; i++) {
-                            sData += ifile.messageBuffer.get(i);
-                        }
-                        incomingFiles.remove(ifile);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false;
-
-            }
-
-            byte[] dataOrg = Base64.decodeBase64(sData.getBytes());
-            if (dataOrg == null)
-                return false;
-
-            // File list received
-            if (sName.equals(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION)) {
-                FileList fileList = null;
-                IInvitationProcess myProcess = null;
-                try {
-                    JID fromJID = new JID(message.getFrom());
-                    for (IInvitationProcess process : processes) {
-                        if (process.getPeer().equals(fromJID)) {
-                            myProcess = process;
-                            fileList = new FileList(new String(dataOrg));
-                            process.fileListReceived(fromJID, fileList);
-                        }
-                    }
-                    XMPPChatTransmitter.log
-                        .info("Received file list via ChatTransfer");
-                } catch (Exception e) {
-                    if (myProcess != null) {
-                        myProcess.cancel("Error receiving file list", false);
-                    }
-                }
-
-            } else {
-                // receiving file (resource)
-
-                try {
-
-                    JID from = new JID(message.getFrom());
-                    Path path = new Path(sName);
-
-                    ByteArrayInputStream in = new ByteArrayInputStream(dataOrg);
-
-                    XMPPChatTransmitter.log.debug("Receiving resource from "
-                        + from.toString() + ": " + sName + " (ChatTransfer)");
-
-                    boolean handledByInvitation = false;
-                    for (IInvitationProcess process : processes) {
-                        if (process.getPeer().equals(from)) {
-                            process.resourceReceived(from, path, in);
-                            handledByInvitation = true;
-                        }
-                    }
-
-                    if (!handledByInvitation) {
-
-                        if (Saros.getDefault().getSessionManager()
-                            .getSharedProject() == null) {
-                            // receiving resource without a running session? not
-                            // accepted
-                            return false;
-                        }
-
-                        FileActivity activity = new FileActivity(
-                            FileActivity.Type.Created, path, in);
-
-                        int time;
-                        String description = dt
-                            .getValue(PacketExtensions.DT_DESC);
-                        try {
-                            time = Integer
-                                .parseInt(description
-                                    .substring(XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION
-                                        .length() + 1));
-                        } catch (Exception e) {
-                            Saros.log("Could not parse time from description: "
-                                + description, e);
-                            time = 0; // HACK
-                        }
-
-                        TimedActivity timedActivity = new TimedActivity(
-                            activity, time);
-
-                        ISessionManager sm = Saros.getDefault()
-                            .getSessionManager();
-                        sm.getSharedProject().getSequencer()
-                            .exec(timedActivity);
-                    }
-
-                    XMPPChatTransmitter.log.info("Received resource " + sName);
-
-                } catch (Exception e) {
-                    XMPPChatTransmitter.log.warn("Failed to receive " + sName,
-                        e);
-                }
-            }
-
-            return true;
         }
     }
 
@@ -1458,13 +1425,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    public void sendJupiterTransformationError(JID to, IPath path) {
-        XMPPChatTransmitter.log
-            .debug("Sending jupiter transformation error message to " + to
-                + " of file " + path.lastSegment());
-        sendMessage(to, JupiterErrorExtension.getDefault().create(path));
-    }
-
     public void sendRemainingFiles() {
 
         if (this.fileTransferQueue.size() > 0) {
@@ -1717,7 +1677,6 @@ public class XMPPChatTransmitter implements ITransmitter,
             Chat chat = this.chatmanager.getThreadChat(thread);
             this.chats.put(jid, chat);
         }
-
     }
 
     private Chat getChat(JID jid) {

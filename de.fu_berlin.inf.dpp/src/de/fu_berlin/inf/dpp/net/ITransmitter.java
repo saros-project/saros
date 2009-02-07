@@ -286,14 +286,4 @@ public interface ITransmitter {
      */
     public void sendDocChecksumsToClients(
         Collection<DocumentChecksum> collection);
-
-    /**
-     * Sends error messge of transformation error.
-     * 
-     * @param to
-     *            the recipient
-     * @param path
-     *            appropriate file for jupiter transformtion error
-     */
-    public void sendJupiterTransformationError(JID to, IPath path);
 }

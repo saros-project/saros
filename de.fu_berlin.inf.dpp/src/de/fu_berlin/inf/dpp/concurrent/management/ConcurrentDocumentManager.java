@@ -762,10 +762,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      * @param checksums
      *            the checksums to check the documents against
      */
-    public void checkConsistency(DocumentChecksum[] checksums) {
+    public void checkConsistency(List<DocumentChecksum> checksums) {
 
         logger.debug(String.format(
-            "Received %d checksums for %d inconsistencies", checksums.length,
+            "Received %d checksums for %d inconsistencies", checksums.size(),
             pathesWithWrongChecksums.size()));
 
         for (DocumentChecksum checksum : checksums) {

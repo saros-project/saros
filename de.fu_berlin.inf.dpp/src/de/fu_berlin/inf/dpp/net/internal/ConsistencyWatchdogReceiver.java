@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -9,12 +10,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -27,7 +26,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -39,21 +37,127 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
 
     protected long lastReceivedActivityTime;
 
-    ChecksumErrorExtension checksumError = new ChecksumErrorExtension();
-    ChecksumExtension checksum = new ChecksumExtension();
+    ChecksumErrorExtension checksumError = new ChecksumErrorExtension() {
+
+        @Override
+        public void checksumErrorReceived(final JID from, final IPath path,
+            boolean resolved) {
+
+            log.debug("ChecksumError received");
+
+            if (resolved) {
+                log.debug("synchronisation completed, inconsistency resolved");
+                ErrorMessageDialog.closeChecksumErrorMessage();
+                return;
+            }
+
+            // ErrorMessageDialog.showChecksumErrorMessage(path);
+
+            // Host
+            if (Saros.getDefault().getSessionManager().getSharedProject()
+                .isHost()) {
+                log.warn("Checksum Error for " + path);
+
+                new Thread() {
+
+                    @Override
+                    public void run() {
+                        try {
+
+                            // wait until no more activities are received
+                            while (System.currentTimeMillis()
+                                - lastReceivedActivityTime < 1500) {
+                                try {
+                                    Thread.sleep(200);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            // Set<IEditorPart> editors =
+                            // EditorManager.getDefault()
+                            // .getEditors(new Path(path));
+                            // if (editors != null && editors.size() > 0) {
+                            // IEditorInput input = editors.iterator().next()
+                            // .getEditorInput();
+                            // input.
+                            // }
+                            EditorManager.getDefault().saveText(path);
+
+                            Saros.getDefault().getSessionManager()
+                                .getSharedProject()
+                                .getConcurrentDocumentManager()
+                                .resetJupiterDocument(path);
+
+                            try {
+                                transmitter.sendFile(from, Saros.getDefault()
+                                    .getSessionManager().getSharedProject()
+                                    .getProject(), path, -1);
+                            } catch (IOException e) {
+                                log
+                                    .error("Could not sent file for consistency resolution");
+                                // TODO This means we were really unable to send
+                                // this file. No more falling back.
+                            }
+
+                            // TODO Should we not rather send an Activity?
+                            // transmitter.sendActivities(project.getVariable(),
+                            // Collections.singletonList(new TimedActivity(
+                            // new FileActivity(FileActivity.Type.Created,
+                            // new Path(path)),
+                            // ActivitySequencer.UNDEFINED_TIME)));
+                        } catch (RuntimeException e) {
+                            log
+                                .error(
+                                    "Internal Error while processing an checksum error",
+                                    e);
+                        }
+                    }
+                }.start();
+            }
+
+        }
+
+    };
+
+    ChecksumExtension checksum = new ChecksumExtension() {
+
+        ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
+            TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1));
+
+        @Override
+        public void checksumsReceived(JID sender,
+            final List<DocumentChecksum> checksums) {
+            try {
+                executor.submit(new Runnable() {
+                    public void run() {
+                        try {
+                            project.getVariable()
+                                .getConcurrentDocumentManager()
+                                .checkConsistency(checksums);
+                        } catch (RuntimeException e) {
+                            log.error("Failed to check consistency", e);
+                        }
+                    }
+                });
+            } catch (RejectedExecutionException e) {
+                // Ignore Checksums that arrive before we are done processing
+                // the
+                // last set of Checksums.
+                log
+                    .warn("Received Checksums before processing of previous checksums finished");
+            }
+        }
+    };
 
     PacketListener listener = new PacketListener() {
 
         public void processPacket(Packet packet) {
             Message message = (Message) packet;
 
-            if (checksum.hasExtension(message)) {
-                processChecksumExtension(message, project.getVariable());
-            }
+            checksum.processPacket(packet);
 
-            if (checksumError.hasExtension(message)) {
-                processChecksumErrorExtension(message);
-            }
+            checksumError.processPacket(packet);
 
             if (PacketExtensions.getJupiterRequestExtension(message) != null) {
                 lastReceivedActivityTime = System.currentTimeMillis();
@@ -93,135 +197,12 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
     }
 
     public void stop() {
-        // TODO Think about queueing or what happens if we don't listen for
+        // TODO Think about queuing or what happens if we don't listen for
         // packets while stopped
         if (this.connection != null) {
             connection.removePacketListener(listener);
         }
         this.connection = null;
-    }
-
-    private void processChecksumErrorExtension(final Message message) {
-
-        log.debug("ChecksumError received");
-
-        DefaultPacketExtension checksumErrorExtension = checksumError
-            .getExtension(message);
-
-        final String path = checksumErrorExtension
-            .getValue(PacketExtensions.FILE_PATH);
-
-        final boolean resolved = Boolean.parseBoolean(checksumErrorExtension
-            .getValue("resolved"));
-
-        if (resolved) {
-            log.debug("synchronisation completed, inconsistency resolved");
-            ErrorMessageDialog.closeChecksumErrorMessage();
-            return;
-        }
-
-        // ErrorMessageDialog.showChecksumErrorMessage(path);
-
-        // Host
-        if (Saros.getDefault().getSessionManager().getSharedProject().isHost()) {
-            log.warn("Checksum Error for " + path);
-
-            new Thread() {
-
-                @Override
-                public void run() {
-                    try {
-
-                        // wait until no more activities are received
-                        while (System.currentTimeMillis()
-                            - lastReceivedActivityTime < 1500) {
-                            try {
-                                Thread.sleep(200);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        // Set<IEditorPart> editors = EditorManager.getDefault()
-                        // .getEditors(new Path(path));
-                        // if (editors != null && editors.size() > 0) {
-                        // IEditorInput input = editors.iterator().next()
-                        // .getEditorInput();
-                        // input.
-                        // }
-                        EditorManager.getDefault().saveText(new Path(path));
-
-                        Saros.getDefault().getSessionManager()
-                            .getSharedProject().getConcurrentDocumentManager()
-                            .resetJupiterDocument(new Path(path));
-
-                        try {
-                            transmitter.sendFile(new JID(message.getFrom()),
-                                Saros.getDefault().getSessionManager()
-                                    .getSharedProject().getProject(), new Path(
-                                    path), -1);
-                        } catch (IOException e) {
-                            log
-                                .error("Could not sent file for consistency resolution");
-                            // TODO This means we were really unable to send
-                            // this file. No more falling back.
-                        }
-
-                        // TODO Should we not rather send an Activity?
-                        // transmitter.sendActivities(project.getVariable(),
-                        // Collections.singletonList(new TimedActivity(
-                        // new FileActivity(FileActivity.Type.Created,
-                        // new Path(path)),
-                        // ActivitySequencer.UNDEFINED_TIME)));
-                    } catch (RuntimeException e) {
-                        log
-                            .error(
-                                "Internal Error while processing an checksum error",
-                                e);
-                    }
-                }
-            }.start();
-        }
-    }
-
-    ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
-        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1));
-
-    private void processChecksumExtension(final Message message,
-        final ISharedProject project) {
-
-        final DefaultPacketExtension ext = checksum.getExtension(message);
-
-        try {
-            executor.submit(new Runnable() {
-                public void run() {
-                    try {
-                        int count = Integer.parseInt(ext.getValue("quantity"));
-                        DocumentChecksum[] checksums = new DocumentChecksum[count];
-
-                        for (int i = 1; i <= count; i++) {
-                            IPath path = Path.fromPortableString(ext
-                                .getValue("path" + i));
-                            int length = Integer.parseInt(ext.getValue("length"
-                                + i));
-                            int hash = Integer.parseInt(ext
-                                .getValue("hash" + i));
-                            checksums[i - 1] = new DocumentChecksum(path,
-                                length, hash);
-                        }
-                        project.getConcurrentDocumentManager()
-                            .checkConsistency(checksums);
-                    } catch (RuntimeException e) {
-                        log.error("Failed to check consistency", e);
-                    }
-                }
-            });
-        } catch (RejectedExecutionException e) {
-            // Ignore Checksums that arrive before we are done processing the
-            // last set of Checksums.
-            log
-                .warn("Received Checksums before processing of previous checksums finished");
-        }
     }
 
 }
