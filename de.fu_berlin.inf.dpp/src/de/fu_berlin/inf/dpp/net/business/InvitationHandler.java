@@ -43,7 +43,7 @@ public class InvitationHandler extends InviteExtension {
                     CancelInviteExtension
                         .getDefault()
                         .create(sessionID,
-                            "I am already in a Saros-Session, try to contact me by chat first"));
+                            "I am already in a Saros-Session, try to contact me by chat first."));
         }
     }
 }
