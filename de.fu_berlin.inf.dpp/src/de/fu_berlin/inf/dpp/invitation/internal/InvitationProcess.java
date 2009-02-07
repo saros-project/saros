@@ -117,7 +117,13 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
         setState(State.CANCELED);
 
-        InvitationProcess.logger.error("Invitation was canceled. " + errorMsg);
+        if (errorMsg != null) {
+            InvitationProcess.logger
+                .error("Invitation was canceled because of an error: "
+                    + errorMsg);
+        } else {
+            InvitationProcess.logger.error("Invitation was canceled.");
+        }
 
         if (!replicated) {
             this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
