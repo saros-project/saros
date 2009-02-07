@@ -279,9 +279,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 // TODO Check if it affects one of our participants in a session
             }
 
-            public void presenceChanged(Presence newPresence) {
-
-                String XMPPAddress = newPresence.getFrom();
+            public void presenceChanged(Presence presence) {
 
                 SharedProject project = currentlySharedProject.getVariable();
 
@@ -289,22 +287,15 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                     return;
                 }
 
-                Roster roster = Saros.getDefault().getRoster();
-
-                // TODO Review if this is necessary
-                Presence presence = roster.getPresence(XMPPAddress);
-
-                JID jid = new JID(XMPPAddress);
-                User user = project.getParticipant(jid);
+                // Update the presence on the User
+                User user = project.getParticipant(new JID(presence.getFrom()));
                 if (user != null) {
-                    if (presence == null) {
-                        user.setPresence(User.UserConnectionState.OFFLINE);
-
-                    } else {
+                    if (presence.isAvailable()) {
                         user.setPresence(User.UserConnectionState.ONLINE);
+                    } else {
+                        user.setPresence(User.UserConnectionState.OFFLINE);
                     }
                 }
-
             }
         };
 
