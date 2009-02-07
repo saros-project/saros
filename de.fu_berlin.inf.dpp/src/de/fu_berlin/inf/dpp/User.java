@@ -104,6 +104,10 @@ public class User {
     }
 
     public int getOfflineSeconds() {
-        return (int) (((new Date().getTime()) - this.offlineTime) / 1000);
+        if (this.presence == UserConnectionState.OFFLINE) {
+            return (int) (((new Date().getTime()) - this.offlineTime) / 1000);
+        } else {
+            return 0;
+        }
     }
 }
