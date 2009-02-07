@@ -45,9 +45,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
@@ -70,6 +68,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -1309,30 +1308,32 @@ public class XMPPChatTransmitter implements ITransmitter,
         JID myJID = Saros.getDefault().getMyJID();
 
         for (User participant : sharedProject.getParticipants()) {
+
             if (participant.getJID().equals(myJID)) {
                 continue;
             }
 
-            // if user is known to be offline, dont send but queue
-            if (sharedProject != null) {
+            if (participant.getPresence() == UserConnectionState.OFFLINE) {
 
-                User user = sharedProject.getParticipant(participant.getJID());
-                if ((user != null)
-                    && (user.getPresence() == User.UserConnectionState.OFFLINE)) {
+                /*
+                 * TODO [CO] 2009-02-07 This probably does not work anymore! See
+                 * Bug #2577390
+                 * https://sourceforge.net/tracker2/?func=detail&aid
+                 * =2577390&group_id=167540&atid=843359
+                 */
 
-                    // offline for too long
-                    if (user.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
-                        XMPPChatTransmitter.log
-                            .info("Removing offline user from session...");
-                        sharedProject.removeUser(user);
-                    } else {
-                        queueMessage(participant.getJID(), extension);
-                        XMPPChatTransmitter.log
-                            .info("User known as offline - Message queued!");
-                    }
-
-                    continue;
+                // Offline for too long
+                if (participant.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
+                    XMPPChatTransmitter.log
+                        .info("Removing offline user from session...");
+                    sharedProject.removeUser(participant);
+                } else {
+                    queueMessage(participant.getJID(), extension);
+                    XMPPChatTransmitter.log
+                        .info("User known as offline - Message queued!");
                 }
+
+                continue;
             }
 
             sendMessage(participant.getJID(), extension);
@@ -1356,11 +1357,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         try {
             sendMessageWithoutQueueing(jid, extension);
         } catch (IOException e) {
+            log.info("Could not send message, thus queuing", e);
             queueMessage(jid, extension);
-
-            Saros.getDefault().getLog().log(
-                new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                    "Could not send message, message queued", e));
         }
     }
 
