@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
-import de.fu_berlin.inf.dpp.net.jingle.TransferDescription;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
 public class NetworkView extends ViewPart implements JingleTransportListener,

@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.InputStream;
 
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+
 /**
  * this class contains method for jingle file transfer action
  * 

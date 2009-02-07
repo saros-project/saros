@@ -1,7 +1,7 @@
 /**
  * 
  */
-package de.fu_berlin.inf.dpp.net.jingle;
+package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

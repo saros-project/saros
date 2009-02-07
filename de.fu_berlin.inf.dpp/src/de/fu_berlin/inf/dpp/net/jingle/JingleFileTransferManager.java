@@ -28,6 +28,7 @@ import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 
 /**
  * This class manages all Jingle Peer to Peer Sessions. Jingle is a

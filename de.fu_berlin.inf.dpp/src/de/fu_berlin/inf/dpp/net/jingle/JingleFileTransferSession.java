@@ -35,6 +35,7 @@ import org.limewire.rudp.UDPSelectorProvider;
 import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**

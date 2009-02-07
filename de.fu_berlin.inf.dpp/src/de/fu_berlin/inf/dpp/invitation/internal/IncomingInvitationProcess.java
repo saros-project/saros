@@ -492,7 +492,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
     public void fileTransferFailed(IPath path, Exception e) {
         failed(e);
-
     }
 
     public void transferProgress(int transfered) {
