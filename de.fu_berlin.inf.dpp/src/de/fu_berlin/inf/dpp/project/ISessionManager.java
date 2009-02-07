@@ -109,4 +109,12 @@ public interface ISessionManager {
      * @return the transmitter of the session
      */
     public ITransmitter getTransmitter();
+
+    /**
+     * Called by the Invitation Process if the invitation did not work out
+     * (joinSession was not called).
+     * 
+     * Set the SessionID to none, so that new Sessions can be begun.
+     */
+    public void cancelIncomingInvitation();
 }

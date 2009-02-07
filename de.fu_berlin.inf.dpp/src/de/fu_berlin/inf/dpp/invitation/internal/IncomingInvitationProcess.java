@@ -503,4 +503,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         this.tmode = mode;
     }
 
+    @Override
+    public void cancel(String errorMsg, boolean replicated) {
+        super.cancel(errorMsg, replicated);
+
+        Saros.getDefault().getSessionManager().cancelIncomingInvitation();
+    }
 }

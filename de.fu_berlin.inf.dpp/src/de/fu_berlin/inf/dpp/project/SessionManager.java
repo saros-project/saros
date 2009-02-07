@@ -352,4 +352,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         // TODO this is currently disabled
         this.transmitter.sendRequestForActivity(project, oldtimestamp, true);
     }
+
+    public void cancelIncomingInvitation() {
+        /**
+         * We never started a session, but still had set a session ID because we
+         * were in an InvitationProcess.
+         */
+        sessionID = NOT_IN_SESSION;
+    }
 }
