@@ -126,8 +126,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     public InvitationDialog(Shell parentShell, JID jid) {
         super(parentShell);
         this.autoinviteJID = jid;
-
-        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -275,7 +273,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         // TODO Widget might be disposed
         this.display.asyncExec(new Runnable() {
             public void run() {
-                updateInvitationProgressRunASyn(jid);
+                updateInvitationProgressRunASync(jid);
             }
         });
     }
@@ -284,10 +282,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
      * Updates the invitation progress for all users in the table by refreshing
      * the table. MyLabelProvider will then poll the current progresses.
      */
-    private void updateInvitationProgressRunASyn(JID jid) {
-        boolean alldone = true;
+    private void updateInvitationProgressRunASync(JID jid) {
+        boolean allSuccessfullyDone = true;
         InviterData invdat = null;
         int index;
+
+        boolean atLeastOneInvitationWasStarted = false;
 
         for (index = 0; index < this.table.getItemCount(); index++) {
 
@@ -295,12 +295,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             Object o = ti.getData();
             invdat = (InviterData) o;
 
-            if (invdat.outginvatationProc == null)
-                alldone = false;
-            else if ((invdat.outginvatationProc != null)
-                && (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE)
-                && (invdat.outginvatationProc.getState() != IInvitationProcess.State.CANCELED)) {
-                alldone = false;
+            if (invdat.outginvatationProc != null) {
+                atLeastOneInvitationWasStarted = true;
+                if (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE) {
+                    allSuccessfullyDone = false;
+                }
             }
 
             if ((jid != null) && invdat.jid.equals(jid)) {
@@ -314,17 +313,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
 
         // are all invites done?
-        if (alldone) {
-            // if(invdat.outginvatationProc.getState() ==
-            // IInvitationProcess.State.DONE){
-            // inviteStep= InvState.SELECTION;
-            // }
+        if (atLeastOneInvitationWasStarted && allSuccessfullyDone) {
             this.inviteStep = InvState.DONE;
+            // TODO does not seem correct
             getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
             setInviteable(false);
             this.close();
-
         }
+
         this.cancelButton.setEnabled(isSelectionCancelable()
             && (this.inviteStep != InvState.DONE));
 
@@ -360,7 +356,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 continue;
             }
 
-            invdat.outginvatationProc.cancel(null, false);
+            invdat.outginvatationProc.cancel("Invitation canceled by host",
+                false);
         }
         updateInvitationProgress(null);
     }
@@ -400,14 +397,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     }
 
     public void cancel(String errorMsg, boolean replicated) {
+
+        // TODO Error Message is not displayed
         updateInvitationProgress(null);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess.IInvitationUI
+    /**
+     * @see IInvitationUI
      */
     public void runGUIAsynch(final Runnable runnable) {
 
@@ -418,10 +414,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         });
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+    /**
+     * @see IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
         final ConnectionState newState) {
