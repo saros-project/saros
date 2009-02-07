@@ -497,6 +497,8 @@ public class SharedProject implements ISharedProject {
             public void run() {
                 try {
                     Shell shell = Display.getDefault().getActiveShell();
+                    // TODO check if anybody is online, empty dialog feels
+                    // strange
                     Window iw = new InvitationDialog(shell, jid);
                     iw.open();
                 } catch (Exception e) {
