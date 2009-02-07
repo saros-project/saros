@@ -67,7 +67,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private TableViewer tableviewer;
     private Table table;
     private ArrayList<InviterData> input;
-    private Button cancelButton;
+    private Button cancelSelectedInvitationButton;
 
     private Roster roster = Saros.getDefault().getRoster();
     private InvState inviteStep = InvState.SELECTION;
@@ -82,7 +82,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private class InviterData {
         JID jid;
         String name;
-        IOutgoingInvitationProcess outginvatationProc;
+        IOutgoingInvitationProcess outgoingProcess;
     }
 
     // Class for providing labels of my Tableview
@@ -100,18 +100,18 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             case 0:
                 return item.name;
             case 1:
-                if (item.outginvatationProc != null) {
-                    return getStateDesc(item.outginvatationProc.getState());
+                if (item.outgoingProcess != null) {
+                    return getStateDesc(item.outgoingProcess.getState());
                 } else {
                     return "";
                 }
             case 2:
-                if (item.outginvatationProc != null) {
-                    if (item.outginvatationProc.getState() == IInvitationProcess.State.SYNCHRONIZING) {
+                if (item.outgoingProcess != null) {
+                    if (item.outgoingProcess.getState() == IInvitationProcess.State.SYNCHRONIZING) {
                         return "Transfering file "
-                            + (item.outginvatationProc.getProgressCurrent())
-                            + " of " + item.outginvatationProc.getProgressMax()
-                            + ": " + item.outginvatationProc.getProgressInfo();
+                            + (item.outgoingProcess.getProgressCurrent()) + " of "
+                            + item.outgoingProcess.getProgressMax() + ": "
+                            + item.outgoingProcess.getProgressInfo();
                     } else {
                         return "";
                     }
@@ -171,41 +171,43 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.input = new ArrayList<InviterData>();
         this.tableviewer.setInput(this.input);
 
-        this.cancelButton = new Button(composite, SWT.NONE);
-        this.cancelButton.setText("Cancel selected invitation");
-        this.cancelButton.addSelectionListener(new SelectionListener() {
+        this.cancelSelectedInvitationButton = new Button(composite, SWT.NONE);
+        this.cancelSelectedInvitationButton
+            .setText("Cancel selected invitation");
+        this.cancelSelectedInvitationButton
+            .addSelectionListener(new SelectionListener() {
 
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // Everything done in widgetSelected
-            }
+                public void widgetDefaultSelected(SelectionEvent e) {
+                    // Everything done in widgetSelected
+                }
 
-            public void widgetSelected(SelectionEvent e) {
-                cancelInvite();
-                Display.getDefault().syncExec(new Runnable() {
-                    public void run() {
-                        // Block until all SWT events have been processed
-                    }
-                });
-            }
-        });
+                public void widgetSelected(SelectionEvent e) {
+                    cancelInvite();
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            // Block until all SWT events have been processed
+                        }
+                    });
+                }
+            });
 
         this.table.addSelectionListener(new SelectionAdapter() {
             // TODO Use SelectionAdapter instead of SelectionListener everywhere
 
             @Override
             public void widgetSelected(SelectionEvent event) {
-                InvitationDialog.this.cancelButton
+                InvitationDialog.this.cancelSelectedInvitationButton
                     .setEnabled(isSelectionCancelable());
 
                 InviterData data = (InviterData) InvitationDialog.this.table
                     .getSelection()[0].getData();
 
                 setInviteable(InvitationDialog.this.table.getSelectionCount() > 0
-                    && data.outginvatationProc == null);
+                    && data.outgoingProcess == null);
             }
         });
 
-        this.cancelButton.setEnabled(false);
+        this.cancelSelectedInvitationButton.setEnabled(false);
 
         // get online users from roster
         if (this.autoinviteJID == null) {
@@ -240,7 +242,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     public boolean performInvitation() {
 
         this.inviteStep = InvState.INVITING;
-        this.cancelButton.setEnabled(true);
+        this.cancelSelectedInvitationButton.setEnabled(true);
         getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
         try {
@@ -254,8 +256,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 Object o = ti.getData();
 
                 InviterData invdat = (InviterData) o;
-                invdat.outginvatationProc = project.invite(invdat.jid, name,
-                    true, this);
+                invdat.outgoingProcess = project
+                    .invite(invdat.jid, name, true, this);
             }
 
             return false; // we wanna wait (and block) until all invites are
@@ -283,7 +285,10 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
      * the table. MyLabelProvider will then poll the current progresses.
      */
     private void updateInvitationProgressRunASync(JID jid) {
+
         boolean allSuccessfullyDone = true;
+        boolean allDoneOrCanceled = true;
+
         InviterData invdat = null;
         int index;
 
@@ -295,10 +300,15 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             Object o = ti.getData();
             invdat = (InviterData) o;
 
-            if (invdat.outginvatationProc != null) {
+            if (invdat.outgoingProcess != null) {
                 atLeastOneInvitationWasStarted = true;
-                if (invdat.outginvatationProc.getState() != IInvitationProcess.State.DONE) {
+                if (invdat.outgoingProcess.getState() != IInvitationProcess.State.DONE) {
                     allSuccessfullyDone = false;
+                }
+
+                if (invdat.outgoingProcess.getState() != IInvitationProcess.State.DONE
+                    && invdat.outgoingProcess.getState() != IInvitationProcess.State.CANCELED) {
+                    allDoneOrCanceled = false;
                 }
             }
 
@@ -316,12 +326,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         if (atLeastOneInvitationWasStarted && allSuccessfullyDone) {
             this.inviteStep = InvState.DONE;
             // TODO does not seem correct
-            getButton(IDialogConstants.CANCEL_ID).setEnabled(true);
             setInviteable(false);
             this.close();
         }
 
-        this.cancelButton.setEnabled(isSelectionCancelable()
+        getButton(IDialogConstants.CANCEL_ID).setEnabled(allDoneOrCanceled);
+
+        this.cancelSelectedInvitationButton.setEnabled(isSelectionCancelable()
             && (this.inviteStep != InvState.DONE));
 
     }
@@ -336,10 +347,10 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         for (TableItem ti : cursel) {
             Object o = ti.getData();
             InviterData invdat = (InviterData) o;
-            if ((invdat.outginvatationProc == null)
-                || ((invdat.outginvatationProc.getState() == State.INITIALIZED)
-                    || (invdat.outginvatationProc.getState() == State.SYNCHRONIZING_DONE)
-                    || (invdat.outginvatationProc.getState() == State.CANCELED) || (invdat.outginvatationProc
+            if ((invdat.outgoingProcess == null)
+                || ((invdat.outgoingProcess.getState() == State.INITIALIZED)
+                    || (invdat.outgoingProcess.getState() == State.SYNCHRONIZING_DONE)
+                    || (invdat.outgoingProcess.getState() == State.CANCELED) || (invdat.outgoingProcess
                     .getState() == State.DONE))) {
                 return false;
             }
@@ -352,12 +363,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         for (TableItem ti : cursel) {
             Object o = ti.getData();
             InviterData invdat = (InviterData) o;
-            if (invdat.outginvatationProc == null) {
+            if (invdat.outgoingProcess == null) {
                 continue;
             }
 
-            invdat.outginvatationProc.cancel("Invitation canceled by host",
-                false);
+            invdat.outgoingProcess.cancel("Invitation canceled by host", false);
         }
         updateInvitationProgress(null);
     }
@@ -465,6 +475,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             return;
         }
 
+        if (display.isDisposed())
+            return;
+
         this.display.asyncExec(new Runnable() {
             public void run() {
                 refreshRosterListRunASync(null);
@@ -510,7 +523,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 invdat.jid = new JID(entry.getUser());
                 String name = entry.getName();
                 invdat.name = (name == null) ? entry.getUser() : name;
-                invdat.outginvatationProc = null;
+                invdat.outgoingProcess = null;
 
                 this.input.add(invdat);
                 index++;
