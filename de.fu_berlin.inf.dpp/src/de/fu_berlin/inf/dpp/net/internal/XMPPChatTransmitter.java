@@ -80,6 +80,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
+import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
@@ -97,7 +98,6 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
-import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -227,16 +227,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         } finally {
             IOUtils.closeQuietly(input);
         }
-
     }
 
     /**
      * TODO break this up into many individually registered Listeners
      */
-    private final class GodPacketListener implements PacketListener {
+    public final class GodPacketListener implements PacketListener {
 
         private CancelInviteExtension cancelInvite = new CancelInviteExtension() {
-
             @Override
             public void invitationCanceledReceived(JID sender, String errorMsg) {
                 for (IInvitationProcess process : processes) {
@@ -246,6 +244,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 }
             }
         };
+
         private RequestForFileListExtension requestForFileList = new RequestForFileListExtension() {
 
             @Override
@@ -287,32 +286,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                     project.addUser(new User(sender, colorID));
                 }
             }
-
         };
-        private LeaveExtension leave = new LeaveExtension() {
 
-            @Override
-            public void leaveReceived(JID fromJID) {
-
-                ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
-
-                if (project != null) {
-                    if (project.getHost().getJID().equals(fromJID)) {
-                        // Host
-                        Saros.getDefault().getSessionManager()
-                            .stopSharedProject();
-
-                        WarningMessageDialog.showWarningMessage(
-                            "Closing the Session",
-                            "Closing the session because the host left.");
-                    } else {// Client
-                        project.removeUser(project.getParticipant(fromJID));
-                    }
-                }
-            }
-
-        };
         private RequestActivityExtension requestActivity = new RequestActivityExtension() {
 
             @Override
@@ -493,8 +468,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 join.processPacket(packet);
 
-                leave.processPacket(packet);
-
                 requestActivity.processPacket(packet);
 
                 dataTransfer.processPacket(packet);
@@ -584,6 +557,9 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.connection.addPacketListener(new InvitationHandler(this),
             new AndFilter(new MessageTypeFilter(Message.Type.chat),
                 InviteExtension.getDefault().getFilter()));
+
+        LeaveHandler handler = new LeaveHandler();
+        this.connection.addPacketListener(handler, handler.getFilter());
 
         this.connection.addPacketListener(new GodPacketListener(),
             PacketExtensions.getSessionIDPacketFilter());

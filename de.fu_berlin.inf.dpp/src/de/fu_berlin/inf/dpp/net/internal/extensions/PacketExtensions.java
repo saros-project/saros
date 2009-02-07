@@ -195,6 +195,10 @@ public class PacketExtensions {
         return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
     }
 
+    /**
+     * @return A PacketFilter that only accepts Packets if there is currently a
+     *         SharedProject
+     */
     public static PacketFilter getInSessionFilter() {
         return new PacketFilter() {
             public boolean accept(Packet arg0) {
