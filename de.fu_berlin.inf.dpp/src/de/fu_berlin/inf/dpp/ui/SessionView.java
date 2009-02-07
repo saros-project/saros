@@ -50,6 +50,9 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -168,7 +171,31 @@ public class SessionView extends ViewPart implements ISessionListener,
         public String getColumnText(Object obj, int index) {
             User participant = (User) obj;
 
-            StringBuffer sb = new StringBuffer(participant.getJID().getName());
+            String name;
+
+            if (participant == Saros.getDefault().getLocalUser()) {
+                name = "Yourself (" + participant.getJID().getBase() + ")";
+            } else {
+                name = participant.getJID().getBase();
+                XMPPConnection connection = Saros.getDefault().getConnection();
+                if (connection != null) {
+                    Roster roster = connection.getRoster();
+                    if (roster != null) {
+                        RosterEntry entry = roster.getEntry(participant
+                            .getJID().getBase());
+                        if (entry != null) {
+                            String nickName = entry.getName();
+                            if (nickName != null
+                                && nickName.trim().length() > 0) {
+                                name = nickName + " ("
+                                    + participant.getJID().getBase() + ")";
+                            }
+                        }
+                    }
+                }
+            }
+
+            StringBuffer sb = new StringBuffer(name);
             if (SessionView.this.sharedProject.isDriver(participant)) {
                 sb.append(" (Driver)");
             }
@@ -190,7 +217,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             return getImage(obj);
         }
 
-        // TODO getting current color doesnt uses when default was changed.
+        // TODO getting current color does not work if default was changed.
         public Color getBackground(Object element) {
             User user = (User) element;
 
