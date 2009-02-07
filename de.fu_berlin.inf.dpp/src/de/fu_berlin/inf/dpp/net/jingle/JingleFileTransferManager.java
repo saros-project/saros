@@ -291,36 +291,40 @@ public class JingleFileTransferManager {
      * Send via jingle. Will create a jingle session on demand.
      * 
      * @param toJID
-     * @param transferData
+     * @param transferDescription
      * @throws JingleSessionException
      */
-    public void send(JID toJID, final JingleFileTransferData transferData)
-        throws JingleSessionException {
+    public void send(final TransferDescription transferDescription,
+        final byte[] content) throws JingleSessionException {
 
         logger.debug("Sending with Jingle");
+
+        JID toJID = transferDescription.getRecipient();
 
         FileTransferConnection connection = connections.get(toJID);
 
         if (connection == null
             || connection.state == JingleConnectionState.CLOSED) {
             connection = startJingleSession(toJID);
+
+            logger.debug("Started Jingle");
         }
 
-        logger.debug("Started Jingle");
-
-        // TODO observe state
-        while (connection.state == JingleConnectionState.INIT) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+        if (connection.state != JingleConnectionState.ESTABLISHED) {
+            // TODO observe state rather than sleep
+            while (connection.state == JingleConnectionState.INIT) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        }
 
-        logger.debug("Init done");
+            logger.debug("Init done");
+        }
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
-            connection.fileTransfer.send(transferData);
+            connection.fileTransfer.send(transferDescription, content);
         } else {
             throw new JingleSessionException(
                 "Could not establish connection when trying to send");

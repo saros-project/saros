@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
+import de.fu_berlin.inf.dpp.net.jingle.TransferDescription;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
 public class NetworkView extends ViewPart implements JingleTransportListener,
@@ -77,18 +77,8 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     }
 
     public void failedToSendFileListWithJingle(JID jid,
-        JingleFileTransferData transferList) {
+        TransferDescription transferList) {
         log.append("Failed to send File with Jingle to " + jid);
-    }
-
-    public void incomingFileList(String fileList_content, JID sender) {
-        // TODO Auto-generated method stub
-    }
-
-    public void incomingResourceFile(JingleFileTransferData data,
-        InputStream input) {
-        // TODO Auto-generated method stub
-
     }
 
     public void connectionStateChanged(XMPPConnection connection,
@@ -101,6 +91,11 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
         } else if (newState == ConnectionState.NOT_CONNECTED) {
             // TODO remove as listener?
         }
+
+    }
+
+    public void incomingData(TransferDescription data, InputStream input) {
+        // TODO Auto-generated method stub
 
     }
 

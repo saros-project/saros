@@ -240,7 +240,7 @@ public class PacketExtensions {
                 new CancelInviteExtension() {
 
                     @Override
-                    public void invitationCanceled(JID sender,
+                    public void invitationCanceledReceived(JID sender,
                         String errorMessage) {
                         // Default implementation does nothing
                     }

@@ -41,11 +41,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
@@ -57,11 +59,9 @@ import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.jivesoftware.smackx.filetransfer.FileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
-import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -92,10 +92,9 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData.FileTransferType;
+import de.fu_berlin.inf.dpp.net.jingle.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
@@ -117,17 +116,6 @@ public class XMPPChatTransmitter implements ITransmitter,
     private static final int MAX_PARALLEL_SENDS = 10;
     private static final int MAX_TRANSFER_RETRIES = 5;
     private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
-
-    /*
-     * the following string descriptions are used to differentiate between
-     * transfers that are for invitations and transfers that are an activity for
-     * the current project.
-     */
-    private static final String RESOURCE_TRANSFER_DESCRIPTION = "resourceAddActivity";
-
-    private static final String FILELIST_TRANSFER_DESCRIPTION = "filelist";
-
-    private static final String PROJECT_ARCHIVE_DESCRIPTION = "projectArchiveFile";
 
     private XMPPConnection connection;
 
@@ -164,18 +152,30 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     protected JingleDiscoveryManager jingleDiscovery;
 
+    /**
+     * A simple struct that is used to manage incoming chunked files via
+     * chat-file transfer
+     */
+    private class IncomingFile {
+        String name;
+        int receivedChunks;
+        int chunkCount;
+        List<String> messageBuffer;
+
+        IncomingFile() {
+            this.messageBuffer = new LinkedList<String>();
+        }
+
+        boolean isComplete() {
+            return (this.receivedChunks == this.chunkCount);
+        }
+    }
+
     private final class JingleTransferListener implements
         IJingleFileTransferListener {
 
-        public void incomingResourceFile(JingleFileTransferData data,
-            InputStream input) {
-
-            resourceReceived(data.sender, new Path(data.file_project_path),
-                input, data.timestamp);
-        }
-
-        public void incomingFileList(String fileList_content, JID recipient) {
-            fileListReceived(recipient, fileList_content);
+        public void incomingData(TransferDescription data, InputStream input) {
+            receiveData(data, input);
         }
 
         public void connected(String protocol, String remote) {
@@ -191,29 +191,17 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 public void run() {
                     try {
-                        String description = request.getDescription();
+                        TransferDescription data = TransferDescription
+                            .fromBase64(request.getDescription());
+
                         XMPPChatTransmitter.log
                             .debug("Incoming file transfer via IBB: "
-                                + request.getFileName());
+                                + data.toString());
 
-                        if (description
-                            .equals(XMPPChatTransmitter.PROJECT_ARCHIVE_DESCRIPTION)) {
-
-                            receiveArchiveFile(request);
-
-                        } else if (description
-                            .equals(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION)) {
-
-                            XMPPChatTransmitter.this.fileListReceived(new JID(
-                                request.getRequestor()), receive(request));
-
-                        } else if (description
-                            .startsWith(XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION)) {
-                            receiveResource(request);
-                        }
+                        receiveData(data, request.accept().recieveFile());
                     } catch (Exception e) {
                         XMPPChatTransmitter.log.error(
-                            "Incoming File Transfer Thread: ", e);
+                            "Incoming File Transfer via IBB failed: ", e);
                         for (IInvitationProcess process : XMPPChatTransmitter.this.processes) {
                             if (process.getPeer().equals(
                                 new JID(request.getRequestor()))) {
@@ -225,164 +213,22 @@ public class XMPPChatTransmitter implements ITransmitter,
                 }
             }).start();
         }
-
-        /**
-         * Receive file and save temporary.
-         * 
-         * @param request
-         *            transfer request of incoming file.
-         * @return File object of received file
-         */
-        private File receiveFile(FileTransferRequest request) {
-            File archiveFile = new File("./incoming_archive.zip");
-            XMPPChatTransmitter.log.debug("Archive file: "
-                + archiveFile.getAbsolutePath());
-            try {
-                final IncomingFileTransfer transfer = request.accept();
-
-                IFileTransferCallback callback = null;
-
-                /* get IInvitationprocess for monitoring. */
-                JID fromJID = new JID(request.getRequestor());
-                for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(fromJID)) {
-                        /* set callback. */
-                        callback = process;
-                    }
-                }
-
-                /* monitoring of transfer process */
-                FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-                    transfer, callback);
-
-                /* receive file. */
-                transfer.recieveFile(archiveFile);
-
-                /* wait for complete transfer. */
-                while (monitor.isAlive() && monitor.isRunning()) {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                monitor.closeMonitor(true);
-
-            } catch (Exception e) {
-                XMPPChatTransmitter.log.error("Error in Incoming File: ", e);
-                return null;
-            }
-
-            return archiveFile;
-        }
-
-        /**
-         * read incoming file and open inputstream to IInvitationProcess.
-         * 
-         * @param request
-         * @throws Exception
-         */
-        private void receiveArchiveFile(FileTransferRequest request)
-            throws Exception {
-
-            XMPPChatTransmitter.log.debug(" incoming project archive file.");
-
-            File archive = receiveFile(request);
-
-            ZipFile zip = new ZipFile(archive);
-            @SuppressWarnings("unchecked")
-            Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip
-                .entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                XMPPChatTransmitter.log.debug(entry.getName());
-                JID fromJID = new JID(request.getRequestor());
-
-                XMPPChatTransmitter.log
-                    .debug("2. inform invitation process...");
-                for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(fromJID)) {
-                        process.resourceReceived(fromJID, new Path(entry
-                            .getName()), zip.getInputStream(entry));
-                    }
-                }
-            }
-            archive.delete();
-        }
-
-        /**
-         * receive resource with file transfer.
-         * 
-         * @param request
-         */
-        private void receiveResource(FileTransferRequest request) {
-
-            JID from = new JID(request.getRequestor());
-
-            Path path = new Path(request.getDescription().substring(
-                XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION.length() + 1));
-
-            int time;
-            try {
-                time = Integer.parseInt(request.getDescription()
-                    .substring(
-                        XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION
-                            .length() + 1));
-            } catch (NumberFormatException e) {
-                time = ActivitySequencer.UNDEFINED_TIME;
-            }
-
-            IncomingFileTransfer transfer = request.accept();
-
-            InputStream in;
-            try {
-                in = transfer.recieveFile();
-            } catch (XMPPException e) {
-                log.error("Failed to receive file from " + from + " (" + path
-                    + ")");
-                return;
-            }
-
-            XMPPChatTransmitter.this.resourceReceived(from, path, in, time);
-        }
-
     }
 
-    public static String receive(FileTransferRequest request) {
+    public static String read(InputStream input) throws IOException {
 
-        InputStream in = null;
         try {
-            in = request.accept().recieveFile();
-            return new String(IOUtils.toByteArray(in), "UTF-8");
-        } catch (Exception e) {
-            log.error("Error while receiving via IBB: ", e);
-        } finally {
-            IOUtils.closeQuietly(in);
-        }
-        return null;
-    }
+            byte[] content = IOUtils.toByteArray(input);
 
-    public void fileListReceived(JID sender, String fileListAsString) {
-
-        FileList fileList = null;
-
-        if (fileListAsString != null) {
             try {
-                fileList = new FileList(fileListAsString);
-            } catch (Exception e) {
-
-                for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(sender))
-                        process.cancel("Could not parse your FileList", false);
-                }
-                log.error("Could not parse FileList", e);
+                return new String(content, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return new String(content);
             }
+        } finally {
+            IOUtils.closeQuietly(input);
         }
-        for (IInvitationProcess process : processes) {
-            if (process.getPeer().equals(sender))
-                process.fileListReceived(sender, fileList);
-        }
+
     }
 
     /**
@@ -393,9 +239,9 @@ public class XMPPChatTransmitter implements ITransmitter,
         private CancelInviteExtension cancelInvite = new CancelInviteExtension() {
 
             @Override
-            public void invitationCanceled(JID from, String errorMsg) {
+            public void invitationCanceledReceived(JID sender, String errorMsg) {
                 for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(from)) {
+                    if (process.getPeer().equals(sender)) {
                         process.cancel(errorMsg, true);
                     }
                 }
@@ -404,16 +250,16 @@ public class XMPPChatTransmitter implements ITransmitter,
         private RequestForFileListExtension requestForFileList = new RequestForFileListExtension() {
 
             @Override
-            public void requestForFileListReceived(final JID from) {
+            public void requestForFileListReceived(final JID sender) {
 
                 XMPPChatTransmitter.log
-                    .debug("Received Request for FileList from " + from);
+                    .debug("Received Request for FileList from " + sender);
 
                 new Thread(new Runnable() {
                     public void run() {
                         for (IInvitationProcess process : processes) {
-                            if (process.getPeer().equals(from)) {
-                                process.invitationAccepted(from);
+                            if (process.getPeer().equals(sender)) {
+                                process.invitationAccepted(sender);
                             }
                         }
                     }
@@ -424,12 +270,12 @@ public class XMPPChatTransmitter implements ITransmitter,
         private JoinExtension join = new JoinExtension() {
 
             @Override
-            public void joinReceived(JID fromJID, int colorID) {
-                log.debug("Join: ColorID: " + colorID);
+            public void joinReceived(JID sender, int colorID) {
+                log.debug("Join: ColorID=" + colorID);
 
                 for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(fromJID)) {
-                        process.joinReceived(fromJID);
+                    if (process.getPeer().equals(sender)) {
+                        process.joinReceived(sender);
                         return;
                     }
                 }
@@ -439,7 +285,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 if (project != null) {
                     // a new user joined this session
-                    project.addUser(new User(fromJID, colorID));
+                    project.addUser(new User(sender, colorID));
                 }
             }
 
@@ -564,25 +410,31 @@ public class XMPPChatTransmitter implements ITransmitter,
              * decoded from base64 encoding. Splitted transfer will be buffered
              * until all chunks are received. Then the file will be
              * reconstructed and processed as a whole.
-             * 
-             * @param message
-             *            Message containing the data as extension.
-             * 
-             * @return <code>true</code> if the message was handled
-             *         successfully.
              */
             @Override
             public void chunkReceived(JID fromJID, String sName, String desc,
                 int index, int maxIndex, String sData) {
 
+                TransferDescription transferDescription;
+                try {
+                    transferDescription = TransferDescription.fromBase64(desc);
+                } catch (IOException e) {
+                    log
+                        .error(
+                            "Error while decoding TransferDescription in ChatTransfer",
+                            e);
+                    return;
+                }
+
                 // Is this a transfer with multiple parts?
                 if (maxIndex > 1) {
 
                     XMPPChatTransmitter.log.debug("Received chunk " + index
-                        + " of " + maxIndex + " of file " + sName);
+                        + " of " + maxIndex + " of "
+                        + transferDescription.toString());
 
                     // check for previous chunks
-                    IncomingFile ifile = incomingFiles.get(sName);
+                    IncomingFile ifile = incomingFiles.get(desc);
                     if (ifile == null) {
                         /*
                          * this is the first received chunk->create incoming
@@ -621,31 +473,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 if (dataOrg == null)
                     return;
 
-                if (sName
-                    .equals(XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION)) {
-
-                    XMPPChatTransmitter.this.fileListReceived(fromJID,
-                        new String(dataOrg));
-
-                } else {
-
-                    Path path = new Path(sName);
-
-                    int time;
-                    try {
-                        time = Integer
-                            .parseInt(desc
-                                .substring(XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION
-                                    .length() + 1));
-                    } catch (NumberFormatException e) {
-                        time = ActivitySequencer.UNDEFINED_TIME;
-                    }
-
-                    resourceReceived(fromJID, path, new ByteArrayInputStream(
-                        dataOrg), time);
-                }
-
-                return;
+                receiveData(transferDescription, new ByteArrayInputStream(
+                    dataOrg));
             }
         };
 
@@ -728,38 +557,6 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     /**
-     * A simple struct that is used to queue file transfers.
-     */
-    public class FileTransferData {
-        public JID recipient;
-        public IPath path;
-        public int timestamp;
-        public int retries = 0;
-        public byte[] content;
-        public long filesize;
-        public IProject project;
-    }
-
-    /**
-     * A simple struct that is used to manage incoming chunked files via
-     * chat-file transfer
-     */
-    private class IncomingFile {
-        String name;
-        int receivedChunks;
-        int chunkCount;
-        List<String> messageBuffer;
-
-        IncomingFile() {
-            this.messageBuffer = new LinkedList<String>();
-        }
-
-        boolean isComplete() {
-            return (this.receivedChunks == this.chunkCount);
-        }
-    }
-
-    /**
      * A simple struct that is used to queue message transfers.
      */
     private class MessageTransfer {
@@ -775,6 +572,9 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager
             .addFileTransferListener(new IBBTransferListener());
+
+        OutgoingFileTransfer
+            .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
 
         this.chats.clear();
 
@@ -807,31 +607,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    public void resourceReceived(JID from, Path path, InputStream input,
-        int time) {
-
-        log.info("Incoming resource from " + from.toString() + ": " + path);
-
-        // TODO CJ: move this to business logic
-        boolean handledByInvitation = false;
-        for (IInvitationProcess process : processes) {
-            if (process.getPeer().equals(from)) {
-                process.resourceReceived(from, path, input);
-                handledByInvitation = true;
-                break;
-            }
-        }
-
-        if (!handledByInvitation) {
-            TimedActivity timedActivity = new TimedActivity(new FileActivity(
-                FileActivity.Type.Created, path, input), time);
-
-            ISessionManager sm = Saros.getDefault().getSessionManager();
-            sm.getSharedProject().getSequencer().exec(timedActivity);
-        }
-
-    }
-
     public void addInvitationProcess(IInvitationProcess process) {
         this.processes.add(process);
     }
@@ -849,8 +624,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         XMPPChatTransmitter.log.debug("Send request for FileList to " + toJID);
 
-        // Make sure JingleManager has started
-        getJingleManager();
+        // If other user supports Jingle, make sure that we are done starting
+        // the JingleManager
+        if (jingleDiscovery.getCachedJingleSupport(toJID)) {
+            getJingleManager();
+        }
 
         sendMessage(toJID, RequestForFileListExtension.getDefault().create());
 
@@ -883,7 +661,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendJoinMessage(ISharedProject sharedProject) {
         try {
-            /* sleep process for 500 millis to ensure invitation state process. */
+            /* sleep process for 1000 millis to ensure invitation state process. */
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -969,7 +747,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     }
 
-    protected void sendData(TransferData data) throws IOException {
+    protected void sendData(TransferDescription jingleFileTransferData,
+        byte[] content) throws IOException {
 
         // TODO Buffer correctly when not connected....
         // this.fileTransferQueue.offer(transfer);
@@ -981,20 +760,21 @@ public class XMPPChatTransmitter implements ITransmitter,
          * reconnected and changed his Jingle settings in between
          */
         if (getFileTransferModeViaChat()
-            || !jingleDiscovery.getCachedJingleSupport(data.getRecipient())) {
+            || !jingleDiscovery
+                .getCachedJingleSupport(jingleFileTransferData.recipient)) {
 
-            ibb.send(data);
+            ibb.send(jingleFileTransferData, content);
 
         } else {
 
             try {
-                jingle.send(data);
+                jingle.send(jingleFileTransferData, content);
             } catch (Exception e) {
                 // TODO Catch only IOException and RuntimeException
                 log
                     .info("Failed to send file with jingle, fall back to IBB",
                         e);
-                ibb.send(data);
+                ibb.send(jingleFileTransferData, content);
 
                 // Fall back to ChatTransfer:
                 // handmade.send(data)
@@ -1015,7 +795,8 @@ public class XMPPChatTransmitter implements ITransmitter,
          * @throws IOException
          *             if the send failed
          */
-        public void send(TransferData data) throws IOException;
+        public void send(TransferDescription data, byte[] content)
+            throws IOException;
 
     }
 
@@ -1028,16 +809,14 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     Transmitter handmade = new Transmitter() {
 
-        public void send(TransferData data) throws IOException {
-
-            IBBData ibbData = data.getForIBB();
+        public void send(TransferDescription data, byte[] content)
+            throws IOException {
 
             final int maxMsgLen = Saros.getDefault().getPreferenceStore()
                 .getInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE);
 
             // Convert byte array to base64 string
-            byte[] bytes64 = Base64.encodeBase64(IOUtils
-                .toByteArray(ibbData.data));
+            byte[] bytes64 = Base64.encodeBase64(content);
 
             String data64;
             try {
@@ -1057,8 +836,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                     int end = start + psize;
 
                     PacketExtension extension = DataTransferExtension
-                        .getDefault().create(ibbData.filename,
-                            ibbData.description, i, pcount,
+                        .getDefault().create("Filename managed by Description",
+                            data.toBase64(), i, pcount,
                             data64.substring(start, end));
 
                     sendMessage(data.getRecipient(), extension);
@@ -1075,7 +854,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     Transmitter ibb = new Transmitter() {
 
-        public void send(TransferData data) throws IOException {
+        public void send(TransferDescription data, byte[] content)
+            throws IOException {
 
             OutgoingFileTransfer
                 .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
@@ -1085,10 +865,10 @@ public class XMPPChatTransmitter implements ITransmitter,
             FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
                 transfer);
 
-            IBBData ibbData = data.getForIBB();
-
-            transfer.sendStream(ibbData.data, ibbData.filename,
-                ibbData.filesize, ibbData.description);
+            // The file path is irrelevant
+            transfer.sendStream(new ByteArrayInputStream(content),
+                "Filename managed by Description", content.length, data
+                    .toBase64());
 
             /* wait for complete transfer. */
             while (monitor.isAlive() && monitor.isRunning()) {
@@ -1105,13 +885,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     Transmitter jingle = new Transmitter() {
 
-        public void send(TransferData data) throws IOException {
+        public void send(TransferDescription data, byte[] content)
+            throws IOException {
             try {
                 JingleFileTransferManager jftm = getJingleManager();
                 if (jftm == null)
                     throw new IOException("Jingle is disabled");
 
-                jftm.send(data.getRecipient(), data.getForJingle());
+                jftm.send(data, content);
             } catch (JingleSessionException e) {
                 throw new IOException(e);
             }
@@ -1121,62 +902,41 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendFileList(JID recipient, FileList fileList)
         throws IOException {
 
-        sendData(toTransferData(recipient, fileList.toXML()));
+        TransferDescription data = TransferDescription
+            .createFileListTransferDescription(recipient, new JID(connection
+                .getUser()));
+
+        sendData(data, fileList.toXML().getBytes());
     }
 
     public void sendFile(JID to, IProject project, IPath path, int timestamp)
         throws IOException {
 
-        FileTransferData transfer = new FileTransferData();
-        transfer.recipient = to;
-        transfer.path = path;
-        transfer.timestamp = timestamp;
-        transfer.project = project;
-        transfer.filesize = project.getFile(path).getLocation().toFile()
-            .length();
+        TransferDescription transfer = TransferDescription
+            .createFileTransferDescription(to, new JID(connection.getUser()),
+                path, timestamp);
 
-        TransferData data = toTransferData(transfer);
+        File f = new File(project.getFile(path).getLocation().toOSString());
 
-        sendData(data);
+        sendData(transfer, FileUtils.readFileToByteArray(f));
     }
 
     public void sendProjectArchive(JID recipient, IProject project,
         File archive, IFileTransferCallback callback) {
-        OutgoingFileTransfer
-            .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
-        OutgoingFileTransfer transfer = this.fileTransferManager
-            .createOutgoingFileTransfer(recipient.toString());
 
+        TransferDescription transfer = TransferDescription
+            .createArchiveTransferDescription(recipient, new JID(connection
+                .getUser()));
+
+        // TODO monitor progress
         try {
-            transfer.sendFile(archive,
-                XMPPChatTransmitter.PROJECT_ARCHIVE_DESCRIPTION);
-
-            FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
-                transfer, callback);
-            /* wait for complete transfer. */
-            while (monitor.isAlive() && monitor.isRunning()) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            monitor.closeMonitor(true);
-
-            if (transfer.getStatus().equals(FileTransfer.Status.complete)) {
-                XMPPChatTransmitter.log.debug("transfer complete");
+            sendData(transfer, FileUtils.readFileToByteArray(archive));
+            if (callback != null)
                 callback.fileSent(new Path(archive.getName()));
-            }
 
-            /* delete temp archive file. */
-            archive.delete();
-
-        } catch (Exception e) {
-
-            XMPPChatTransmitter.log.warn("Failed to send archive file", e);
-            if (callback != null) {
+        } catch (IOException e) {
+            if (callback != null)
                 callback.fileTransferFailed(null, e);
-            }
         }
     }
 
@@ -1388,131 +1148,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    public TransferData toTransferData(final JID recipient, final String xml) {
-
-        return new TransferData() {
-
-            public IBBData getForIBB() {
-
-                IBBData result = new IBBData();
-
-                byte[] content;
-                try {
-                    content = xml.getBytes("UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    content = xml.getBytes();
-                }
-
-                result.data = new ByteArrayInputStream(content);
-                result.description = XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION;
-                result.filesize = content.length;
-                result.filename = XMPPChatTransmitter.FILELIST_TRANSFER_DESCRIPTION
-                    + "." + new JID(connection.getUser()).getName();
-
-                return result;
-            }
-
-            public JingleFileTransferData getForJingle() {
-
-                JingleFileTransferData data = new JingleFileTransferData();
-                data.file_list_content = xml;
-                data.type = FileTransferType.FILELIST_TRANSFER;
-                data.recipient = recipient;
-                data.sender = new JID(connection.getUser());
-                data.file_project_path = FileTransferType.FILELIST_TRANSFER
-                    .toString();
-                return data;
-            }
-
-            public JID getRecipient() {
-                return recipient;
-            }
-
-        };
-    }
-
-    /**
-     * Will return a TransferData object ready to pass to sendData(...).
-     * 
-     * This method will read all data from the given file into memory and fail
-     * immediately if an error occurs.
-     * 
-     * If this method returns, then the data has been cached from the file.
-     */
-    public TransferData toTransferData(final FileTransferData transferData)
-        throws IOException {
-
-        // Read content data
-        File f = new File(transferData.project.getFile(transferData.path)
-            .getLocation().toOSString());
-        final long filesize = f.length();
-        final String filename = f.getName();
-        final byte[] content = new byte[(int) filesize];
-
-        try {
-            InputStream in = transferData.project.getFile(transferData.path)
-                .getContents();
-            in.read(content, 0, (int) filesize);
-        } catch (Exception e) {
-            log.error("Error during read file content for transfer!", e);
-            throw new IOException(e);
-        }
-
-        return new TransferData() {
-
-            public IBBData getForIBB() {
-
-                IBBData result = new IBBData();
-                result.data = new ByteArrayInputStream(content);
-                result.description = XMPPChatTransmitter.RESOURCE_TRANSFER_DESCRIPTION
-                    + ":" + transferData.path.toString();
-                result.filesize = filesize;
-                result.filename = filename;
-
-                return result;
-            }
-
-            public JingleFileTransferData getForJingle() {
-                /* create file transfer. */
-                JingleFileTransferData data = new JingleFileTransferData();
-
-                data.file_project_path = transferData.path.toString();
-                data.project_name = transferData.project.getName();
-                data.type = FileTransferType.RESOURCE_TRANSFER;
-                data.recipient = transferData.recipient;
-                data.sender = new JID(connection.getUser());
-                data.content = content;
-
-                return data;
-            }
-
-            public JID getRecipient() {
-                return transferData.recipient;
-            }
-
-        };
-    }
-
-    public interface TransferData {
-
-        public JID getRecipient();
-
-        public IBBData getForIBB();
-
-        public JingleFileTransferData getForJingle();
-    }
-
-    public static class IBBData {
-
-        String description;
-
-        InputStream data;
-
-        String filename;
-
-        long filesize;
-    }
-
     private void putIncomingChat(JID jid, String thread) {
         if (!this.chats.containsKey(jid)) {
             Chat chat = this.chatmanager.getThreadChat(thread);
@@ -1549,29 +1184,28 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
 
-    public void sendFileAsync(JID recipient, IProject project, IPath path,
-        int timestamp, final IFileTransferCallback callback) throws IOException {
+    public void sendFileAsync(JID recipient, IProject project,
+        final IPath path, int timestamp, final IFileTransferCallback callback)
+        throws IOException {
 
         if (callback == null)
             throw new IllegalArgumentException();
 
-        final FileTransferData transfer = new FileTransferData();
-        transfer.recipient = recipient;
-        transfer.path = path;
-        transfer.timestamp = timestamp;
-        transfer.project = project;
-        transfer.filesize = project.getFile(path).getLocation().toFile()
-            .length();
+        final TransferDescription transfer = TransferDescription
+            .createFileTransferDescription(recipient, new JID(connection
+                .getUser()), path, timestamp);
 
-        final TransferData data = toTransferData(transfer);
+        File f = new File(project.getFile(path).getLocation().toOSString());
+
+        final byte[] content = FileUtils.readFileToByteArray(f);
 
         executor.execute(new Runnable() {
             public void run() {
                 try {
-                    sendData(data);
-                    callback.fileSent(transfer.path);
+                    sendData(transfer, content);
+                    callback.fileSent(path);
                 } catch (Exception e) {
-                    callback.fileTransferFailed(transfer.path, e);
+                    callback.fileTransferFailed(path, e);
                 }
             }
         });
@@ -1591,5 +1225,107 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void stop() {
         // TODO stop sending, but queue rather
+    }
+
+    private void receiveData(TransferDescription data, InputStream input) {
+
+        try {
+            switch (data.type) {
+            case ARCHIVE_TRANSFER:
+                receivedArchive(data, input);
+                break;
+            case FILELIST_TRANSFER:
+                receivedFileList(data, input);
+                break;
+            case RESOURCE_TRANSFER:
+                receivedResource(data.sender, new Path(data.file_project_path),
+                    input, data.timestamp);
+                break;
+            }
+        } finally {
+            IOUtils.closeQuietly(input);
+        }
+    }
+
+    public void receivedResource(JID from, Path path, InputStream input,
+        int time) {
+
+        log.info("Incoming resource from " + from.toString() + ": " + path);
+
+        // TODO CJ: move this to business logic
+        boolean handledByInvitation = false;
+        for (IInvitationProcess process : processes) {
+            if (process.getPeer().equals(from)) {
+                process.resourceReceived(from, path, input);
+                handledByInvitation = true;
+                break;
+            }
+        }
+
+        if (!handledByInvitation) {
+            TimedActivity timedActivity = new TimedActivity(new FileActivity(
+                FileActivity.Type.Created, path, input), time);
+
+            ISessionManager sm = Saros.getDefault().getSessionManager();
+            sm.getSharedProject().getSequencer().exec(timedActivity);
+        }
+
+    }
+
+    private void receivedFileList(TransferDescription data, InputStream input) {
+
+        String fileListAsString;
+        try {
+            fileListAsString = read(input);
+        } catch (IOException e) {
+            log.error("Error receiving FileList", e);
+            return;
+        }
+
+        FileList fileList = null;
+
+        if (fileListAsString != null) {
+            try {
+                fileList = new FileList(fileListAsString);
+            } catch (Exception e) {
+
+                for (IInvitationProcess process : processes) {
+                    if (process.getPeer().equals(data.getSender()))
+                        process.cancel("Could not parse your FileList", false);
+                }
+                log.error("Could not parse FileList", e);
+            }
+        }
+        for (IInvitationProcess process : processes) {
+            if (process.getPeer().equals(data.getSender()))
+                process.fileListReceived(data.getSender(), fileList);
+        }
+    }
+
+    private void receivedArchive(TransferDescription data, InputStream input) {
+
+        File archiveFile = new File("./incoming_archive.zip");
+        XMPPChatTransmitter.log.debug("Archive file: "
+            + archiveFile.getAbsolutePath());
+
+        try {
+            FileUtils.writeByteArrayToFile(archiveFile, IOUtils
+                .toByteArray(input));
+
+            ZipFile zip = new ZipFile(archiveFile);
+            @SuppressWarnings("unchecked")
+            Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip
+                .entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                XMPPChatTransmitter.log.debug(entry.getName());
+
+                receivedResource(data.getSender(), new Path(entry.getName()),
+                    zip.getInputStream(entry), data.timestamp);
+            }
+            archiveFile.delete();
+        } catch (IOException e) {
+            log.error("Failed to receive and unpack archive");
+        }
     }
 }

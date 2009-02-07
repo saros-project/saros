@@ -65,12 +65,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
             this.input = ii;
         }
 
+        @Override
         public void run() {
 
             while (!isInterrupted()) {
-                JingleFileTransferData data;
+                TransferDescription data;
                 try {
-                    data = (JingleFileTransferData) input.readObject();
+                    data = (TransferDescription) input.readObject();
                 } catch (IOException e) {
                     return;
                 } catch (ClassNotFoundException e) {
@@ -78,22 +79,19 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         e);
                     continue;
                 }
-                switch (data.type) {
-                case FILELIST_TRANSFER:
-                    logger
-                        .debug("Received FileList: " + data.file_list_content);
-                    for (IJingleFileTransferListener listener : listeners) {
-                        listener.incomingFileList(data.file_list_content,
-                            data.sender);
-                    }
-                    break;
-                case RESOURCE_TRANSFER:
-                    logger
-                        .debug("Received Resource: " + data.file_project_path);
-                    for (IJingleFileTransferListener listener : listeners) {
-                        listener.incomingResourceFile(data,
-                            new ByteArrayInputStream(data.content));
-                    }
+                byte[] content;
+                try {
+                    content = (byte[]) input.readObject();
+                } catch (IOException e) {
+                    return;
+                } catch (ClassNotFoundException e) {
+                    logger.error("Received unexpected object in ReceiveThread",
+                        e);
+                    continue;
+                }
+                for (IJingleFileTransferListener listener : listeners) {
+                    listener.incomingData(data, new ByteArrayInputStream(
+                        content));
                 }
             }
 
@@ -379,12 +377,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * @throws JingleSessionException
      *             if sending failed.
      */
-    public synchronized void send(JingleFileTransferData transferData)
-        throws JingleSessionException {
+    public synchronized void send(TransferDescription transferData,
+        byte[] content) throws JingleSessionException {
 
         if (objectOutputStream != null) {
             try {
                 objectOutputStream.writeObject(transferData);
+                objectOutputStream.writeObject(content);
                 objectOutputStream.flush();
                 logger.debug("Sent: " + transferData);
                 return;

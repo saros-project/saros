@@ -45,8 +45,8 @@ public abstract class CancelInviteExtension extends SarosDefaultPacketExtension 
 
         String errorMsg = cancelInviteExtension.getValue(ERROR);
 
-        invitationCanceled(sender, errorMsg);
+        invitationCanceledReceived(sender, errorMsg);
     }
 
-    public abstract void invitationCanceled(JID sender, String errorMessage);
+    public abstract void invitationCanceledReceived(JID sender, String errorMessage);
 }
