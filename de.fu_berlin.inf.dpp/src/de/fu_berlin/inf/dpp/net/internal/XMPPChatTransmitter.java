@@ -81,6 +81,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
+import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
+import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
@@ -288,95 +290,6 @@ public class XMPPChatTransmitter implements ITransmitter,
             }
         };
 
-        private RequestActivityExtension requestActivity = new RequestActivityExtension() {
-
-            @Override
-            public void requestForResendingActivitiesReceived(JID fromJID,
-                int timeStamp, boolean andUp) {
-
-                ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
-
-                if (project == null || project.getParticipant(fromJID) == null) {
-                    return;
-                }
-
-                List<TimedActivity> tempActivities = ActivitySequencer
-                    .filterActivityHistory(Saros.getDefault()
-                        .getSessionManager().getSharedProject().getSequencer()
-                        .getActivityHistory(), timeStamp, andUp);
-
-                if (tempActivities.size() > 0) {
-                    PacketExtension extension = new ActivitiesPacketExtension(
-                        Saros.getDefault().getSessionManager().getSessionID(),
-                        tempActivities);
-
-                    sendMessage(fromJID, extension);
-                }
-
-                String info = String.format(
-                    "Received request for resending of timestamp%s %d%s.",
-                    andUp ? "s" : "", timeStamp, andUp ? " (andup)" : "");
-
-                if (tempActivities.size() > 0) {
-                    info += String.format(" I sent back %s activities.",
-                        tempActivities.size());
-                } else {
-                    info += String
-                        .format(" I did not find any matching activities.");
-                }
-
-                XMPPChatTransmitter.log.info(info);
-            }
-        };
-        private UserListExtension userList = new UserListExtension() {
-
-            @Override
-            public void userListReceived(JID fromJID, List<User> userList) {
-
-                // TODO Put preconditions in Filter: inSession(), from == host
-                ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
-
-                if (project == null) {
-                    return;
-                }
-
-                XMPPChatTransmitter.log.debug("Received user list from "
-                    + fromJID);
-
-                for (User receivedUser : userList) {
-
-                    // Check if we already know this user
-                    User user = project.getParticipant(receivedUser.getJID());
-
-                    if (user == null) {
-                        // This user is not part of our project
-                        user = receivedUser;
-
-                        // Add him and send him a message, and tell him our
-                        // color
-                        project.addUser(user);
-                        sendMessage(user.getJID(), JoinExtension.getDefault()
-                            .create(
-                                Saros.getDefault().getLocalUser().getColorID()));
-                    } else {
-                        // User already exists
-
-                        // Check if the existing user has the color that we
-                        // expect
-                        if (user.getColorID() != receivedUser.getColorID()) {
-                            log
-                                .warn("Received color id doesn't match known color id");
-                        }
-
-                        // Update his role
-                        user.setUserRole(receivedUser.getUserRole());
-                    }
-                }
-            }
-        };
-
         private DataTransferExtension dataTransfer = new DataTransferExtension() {
 
             /**
@@ -468,13 +381,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 join.processPacket(packet);
 
-                requestActivity.processPacket(packet);
-
                 dataTransfer.processPacket(packet);
 
                 requestForFileList.processPacket(packet);
-
-                userList.processPacket(packet);
 
                 cancelInvite.processPacket(packet);
 
@@ -560,6 +469,15 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         LeaveHandler handler = new LeaveHandler();
         this.connection.addPacketListener(handler, handler.getFilter());
+
+        RequestForActivityHandler activityHandler = new RequestForActivityHandler(
+            this);
+        this.connection.addPacketListener(activityHandler, activityHandler
+            .getFilter());
+
+        UserListHandler userListHandler = new UserListHandler(this);
+        this.connection.addPacketListener(userListHandler, userListHandler
+            .getFilter());
 
         this.connection.addPacketListener(new GodPacketListener(),
             PacketExtensions.getSessionIDPacketFilter());
