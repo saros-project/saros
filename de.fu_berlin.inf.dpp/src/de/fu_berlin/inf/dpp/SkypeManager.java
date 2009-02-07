@@ -4,14 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.IQTypeFilter;
 import org.jivesoftware.smack.filter.PacketIDFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
@@ -21,9 +25,13 @@ import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype
- * and that allows to initiate Skype VOiP sessions with that entity.
+ * and that allows to initiate Skype VOIP sessions with that entity.
+ * 
+ * TODO CO: Verify that IQ Packets are the best way of doing this. It seems kind
+ * of hackisch. Could we also use ServiceDiscovery?
  * 
  * @author rdjemili
+ * @author oezbek
  */
 public class SkypeManager implements IConnectionListener {
     private static SkypeManager instance;
@@ -35,6 +43,22 @@ public class SkypeManager implements IConnectionListener {
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager
             .addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
+
+        /**
+         * Register for our preference store, so we can be notified if the Skype
+         * Username changes.
+         */
+        IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
+        prefs.addPropertyChangeListener(new IPropertyChangeListener() {
+
+            public void propertyChange(PropertyChangeEvent event) {
+                if (event.getProperty().equals(
+                    PreferenceConstants.SKYPE_USERNAME)) {
+                    publishSkypeIQ(event.getNewValue().toString());
+                }
+            }
+        });
+
     }
 
     public static SkypeManager getDefault() {
@@ -58,45 +82,80 @@ public class SkypeManager implements IConnectionListener {
         String name;
         if (this.skypeNames.containsKey(jid)) {
             name = this.skypeNames.get(jid);
-
         } else {
             name = SkypeManager.requestSkypeName(connection, jid);
-            this.skypeNames.put(jid, name);
+            if (name != null) {
+                // Only cache if we found something
+                this.skypeNames.put(jid, name);
+            }
         }
 
         return name == null ? null : "skype:" + name;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Send the given Username to all our contacts that are currently available.
      * 
-     * @see de.fu_berlin.inf.dpp.net.IConnectionListener
+     * TODO only send to those, that we know use Saros.
+     */
+    public void publishSkypeIQ(String newSkypeName) {
+        XMPPConnection connection = Saros.getDefault().getConnection();
+        if (connection != null) {
+            Roster roster = connection.getRoster();
+            if (roster != null) {
+                for (RosterEntry entry : roster.getEntries()) {
+                    String username = entry.getUser();
+                    Presence presence = roster.getPresence(username);
+
+                    if (presence != null) {
+                        if (presence.isAvailable()) {
+                            SkypeIQ result = new SkypeIQ();
+                            result.setType(IQ.Type.SET);
+                            result.setTo(username + "/Smack");
+                            result.setName(newSkypeName);
+                            connection.sendPacket(result);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Register a new PacketListener for intercepting SkypeIQ packets.
      */
     public void connectionStateChanged(final XMPPConnection connection,
         ConnectionState newState) {
 
         if (newState == ConnectionState.CONNECTED) {
             connection.addPacketListener(new PacketListener() {
-
-                /*
-                 * (non-Javadoc)
-                 * 
-                 * @see org.jivesoftware.smack.PacketListener
-                 */
                 public void processPacket(Packet packet) {
-                    if (packet instanceof SkypeIQ) {
-                        SkypeIQ iq = (SkypeIQ) packet;
+                    SkypeIQ iq = (SkypeIQ) packet;
 
+                    if (iq.getType() == IQ.Type.GET) {
                         SkypeIQ result = new SkypeIQ();
                         result.setType(IQ.Type.RESULT);
                         result.setPacketID(iq.getPacketID());
-                        result.setTo(iq.getFrom()); // HACK
+                        // HACK because we have rigged the JID to evade
+                        // detection by Smack
+                        result.setTo(iq.getFrom());
                         result.setName(getLocalSkypeName());
 
                         connection.sendPacket(result);
                     }
+                    if (iq.getType() == IQ.Type.SET) {
+                        String skypeName = iq.getName();
+                        if (skypeName != null && skypeName.length() > 0) {
+                            skypeNames.put(new JID(iq.getFrom()), skypeName);
+                        } else {
+                            skypeNames.remove(new JID(iq.getFrom()));
+                        }
+                    }
                 }
-            }, new IQTypeFilter(IQ.Type.GET));
+            }, new PacketTypeFilter(SkypeIQ.class));
+        } else {
+            // Otherwise clear or cache
+            skypeNames.clear();
         }
     }
 
@@ -127,21 +186,26 @@ public class SkypeManager implements IConnectionListener {
         SkypeIQ request = new SkypeIQ();
 
         request.setType(IQ.Type.GET);
-        request.setTo(user.toString() + "/Smack"); // HACK
+        // HACK because Smack does not support IQ.Type.SET
+        request.setTo(user.toString() + "/Smack");
 
         // Create a packet collector to listen for a response.
         PacketCollector collector = connection
             .createPacketCollector(new PacketIDFilter(request.getPacketID()));
 
-        connection.sendPacket(request);
+        try {
+            connection.sendPacket(request);
 
-        // Wait up to 5 seconds for a result.
-        IQ result = (IQ) collector.nextResult(5000);
-        if ((result != null) && (result.getType() == IQ.Type.RESULT)) {
-            SkypeIQ skypeResult = (SkypeIQ) result;
+            // Wait up to 5 seconds for a result.
+            IQ result = (IQ) collector.nextResult(5000);
+            if ((result != null) && (result.getType() == IQ.Type.RESULT)) {
+                SkypeIQ skypeResult = (SkypeIQ) result;
 
-            return skypeResult.getName().length() == 0 ? null : skypeResult
-                .getName();
+                return skypeResult.getName().length() == 0 ? null : skypeResult
+                    .getName();
+            }
+        } finally {
+            collector.cancel();
         }
 
         return null;
