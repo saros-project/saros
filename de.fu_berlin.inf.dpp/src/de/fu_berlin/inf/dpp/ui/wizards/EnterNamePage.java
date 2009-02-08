@@ -5,9 +5,9 @@ import java.util.logging.Level;
 
 import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -91,6 +91,7 @@ class EnterNamePage extends WizardPage {
      * get transfer mode and set header information of the wizard.
      */
     private void setConnectionStatus() {
+        // TODO IBB Status is currently not correctly set
         if (this.joinSessionWizard.process.getTransferMode() == TransferMode.IBB) {
             setDescription("Attention: No direct connection avialable!"
                 + '\n'
@@ -173,11 +174,8 @@ class EnterNamePage extends WizardPage {
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    IProject project = getProjectDialog("Select project for update.");
-                    if (project != null) {
-                        EnterNamePage.this.updateProjectText.setText(project
-                            .getName());
-                    }
+                    EnterNamePage.this.updateProjectText
+                        .setText(getProjectDialog("Select project for update."));
                 }
             });
 
@@ -245,22 +243,19 @@ class EnterNamePage extends WizardPage {
     /**
      * browse dialog to select project for copy.
      */
-    public IProject getProjectDialog(String title) {
+    public String getProjectDialog(String title) {
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(
             getShell(), null, false, title);
 
         dialog.open();
         Object[] result = dialog.getResult();
 
-        if (result == null) {
+        if (result == null || result.length == 0) {
             return null;
         }
-
-        return ((IResource) result[0]).getProject();
-    }
-
-    protected void createScanStatusProject(Composite workArea) {
-        // TODO?
+        // TODO More error Checking
+        return ResourcesPlugin.getWorkspace().getRoot().findMember(
+            (Path) result[0]).getProject().getName();
     }
 
     protected void requestRemoteFileList() {
