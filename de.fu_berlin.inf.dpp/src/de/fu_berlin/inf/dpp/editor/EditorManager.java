@@ -1016,13 +1016,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            editing.
      */
     public void saveText(IPath path) {
+
+        IFile file = this.sharedProject.getProject().getFile(path);
+
+        if (!file.exists()) {
+            EditorManager.log.warn("Cannot save file that does not exist:"
+                + path.toString());
+            return;
+        }
+
         for (ISharedEditorListener listener : this.editorListeners) {
             listener.driverEditorSaved(path, true);
         }
 
-        IFile file = this.sharedProject.getProject().getFile(path);
         FileEditorInput input = new FileEditorInput(file);
-
         try {
             ResourceAttributes attributes = new ResourceAttributes();
             attributes.setReadOnly(false);
