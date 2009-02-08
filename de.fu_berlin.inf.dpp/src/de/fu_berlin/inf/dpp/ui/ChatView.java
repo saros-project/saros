@@ -83,7 +83,7 @@ public class ChatView extends ViewPart implements ISessionListener,
                             Saros.getDefault().getMessagingManager()
                                 .getSession().sendMessage(text);
                         }
-                        // append("ID-TODO", text);
+                        /* append("ID-TODO", text); */
                     }
                     break;
                 }
@@ -103,15 +103,16 @@ public class ChatView extends ViewPart implements ISessionListener,
 
         this.connectAction = new Action("Connect/DisConnect") {
 
+            @Override
             public void run() {
                 MessagingManager mm = Saros.getDefault().getMessagingManager();
                 Saros.getDefault().getConnection().getUser();
                 if (ChatView.this.joined) {
                     try {
                         ChatView.this.session
-                            .sendMessage("is leaving the chat..");
+                            .sendMessage("is leaving the chat...");
                         ChatView.this.inputText
-                            .setText("You have left the chat. To renter the chat please use the connect button.");
+                            .setText("You have left the chat. To re-enter the chat please use the connect button.");
                         mm.disconnectMultiUserChat();
                         ChatView.this.session = null;
                         ChatView.this.inputText.setEditable(false);
@@ -168,6 +169,7 @@ public class ChatView extends ViewPart implements ISessionListener,
         Saros.getDefault().addListener(this);
     }
 
+    @Override
     public void setFocus() {
         // TODO Auto-generated method stub
 
@@ -198,15 +200,6 @@ public class ChatView extends ViewPart implements ISessionListener,
         }
     }
 
-    public void displayMessage(String body) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                // 
-            }
-        });
-
-    }
-
     public void chatMessageAdded(final String sender, final String message) {
         ChatView.log.debug("Received Message from " + sender + ": " + message);
         Display.getDefault().asyncExec(new Runnable() {
@@ -219,7 +212,6 @@ public class ChatView extends ViewPart implements ISessionListener,
                         + ": " + m + "\n");
             }
         });
-
     }
 
 }
