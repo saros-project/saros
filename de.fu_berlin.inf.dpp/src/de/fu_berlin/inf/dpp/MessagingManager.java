@@ -92,12 +92,12 @@ public class MessagingManager implements PacketListener, MessageListener,
      * handle their IM chat window and save their history, even when their chat
      * windows are disposed and reopened again.
      * 
-     * TODO CJ: Rework needed, we don't want one-to-one chats anymore wanted:
-     * messages to all developers of programming session use this class as
-     * fallback if muc fails?
+     * TODO CJ: Rework needed, we don't want one-to-one chats anymore
+     * 
+     * wanted: messages to all developers of programming session use this class
+     * as fallback if muc fails?
      */
-    public class ChatSession implements SessionProvider, PacketListener,
-        MessageListener {
+    public class ChatSession implements SessionProvider, MessageListener {
         private final Logger logCH = Logger.getLogger(ChatSession.class
             .getName());
 
@@ -116,8 +116,7 @@ public class MessagingManager implements PacketListener, MessageListener,
             this.name = name;
             this.participant = new JID(chat.getParticipant());
 
-            // TODO: this method is not exists in the new API version.
-            chat.addMessageListener(this); // HACK
+            chat.addMessageListener(this);
             openWindow();
         }
 
@@ -170,13 +169,15 @@ public class MessagingManager implements PacketListener, MessageListener,
             if (this.window == null) {
                 this.window = new MessagingWindow(this);
                 this.window.open();
+                this.window.getShell().addDisposeListener(
+                    new DisposeListener() {
+                        public void widgetDisposed(DisposeEvent e) {
+                            ChatSession.this.window = null;
+                        }
+                    });
             }
-
-            this.window.getShell().addDisposeListener(new DisposeListener() {
-                public void widgetDisposed(DisposeEvent e) {
-                    ChatSession.this.window = null;
-                }
-            });
+            this.window.getShell().forceActive();
+            this.window.getShell().forceFocus();
         }
 
         /*
