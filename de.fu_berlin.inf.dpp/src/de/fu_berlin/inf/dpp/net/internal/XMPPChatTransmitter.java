@@ -63,6 +63,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -771,7 +772,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                     .toBase64());
 
             /* wait for complete transfer. */
-            while (monitor.isAlive() && monitor.isRunning()) {
+            while (monitor.isRunning()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -779,9 +780,21 @@ public class XMPPChatTransmitter implements ITransmitter,
                 }
             }
 
-            monitor.closeMonitor(true);
-        }
+            if (monitor.getMonitoringException() != null) {
+                throw new IOException("RuntimeError in IBB-FileTransfer: ",
+                    monitor.getMonitoringException());
+            }
 
+            if (transfer.getStatus() == Status.error) {
+                throw new IOException("XMPPError in IBB-FileTransfer: "
+                    + transfer.getError());
+            }
+
+            if (transfer.getStatus() != Status.complete) {
+                throw new IOException("Error in IBB-FileTransfer wrong state: "
+                    + transfer.getStatus());
+            }
+        }
     };
 
     Transmitter jingle = new Transmitter() {

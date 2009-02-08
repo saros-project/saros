@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -9,21 +8,18 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
  * for information on monitoring the process of a file tranfer
  * 
  * @author troll
+ * @author oezbek
  * 
  */
 public class FileTransferProgressMonitor extends Thread {
 
-    private static Logger logger = Logger
-        .getLogger(FileTransferProgressMonitor.class);
+    protected FileTransfer transfer;
 
-    FileTransfer transfer;
-    private final int TIMEOUT = 10000;
+    protected RuntimeException exception;
 
-    private boolean running = true;
+    protected boolean running = true;
 
-    private boolean closeMonitor = false;
-
-    private IFileTransferCallback callback;
+    protected IFileTransferCallback callback;
 
     public FileTransferProgressMonitor(FileTransfer transfer) {
         this.transfer = transfer;
@@ -41,49 +37,39 @@ public class FileTransferProgressMonitor extends Thread {
         return this.running;
     }
 
-    public String getException() {
-        return null;
+    /**
+     * Returns an Exception that might have occurred while Monitoring the
+     * progress
+     * 
+     * @return
+     */
+    public RuntimeException getMonitoringException() {
+        return exception;
     }
 
-    public void closeMonitor(boolean close) {
-        this.closeMonitor = close;
+    public void close() {
+        this.running = false;
     }
 
     @Override
     public void run() {
-        int time = 0;
+        try {
+            while (this.running && !this.transfer.isDone()
+                && this.transfer.getProgress() < 1.0) {
 
-        while (!this.closeMonitor) {
-            try {
-                while (!this.transfer.isDone()
-                    && (this.transfer.getProgress() < 1.0)) {
-
-                    /* check negotiator process */
-                    FileTransferProgressMonitor.logger.debug("Status: "
-                        + this.transfer.getStatus() + " Progress : "
-                        + this.transfer.getProgress());
-                    if (this.callback != null) {
-                        this.callback.transferProgress((int) (this.transfer
-                            .getProgress() * 100));
-                    }
-                    if (this.closeMonitor) {
-                        return;
-                    }
-                    Thread.sleep(500);
+                if (this.callback != null) {
+                    this.callback.transferProgress((int) (this.transfer
+                        .getProgress() * 100));
                 }
-                this.running = false;
-                time = time + 500;
 
-                if (time > this.TIMEOUT) {
-                    this.closeMonitor = true;
-                    return;
-                }
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.sleep(100);
             }
+        } catch (RuntimeException e) {
+            this.exception = e;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } finally {
+            this.running = false;
         }
-
     }
-
 }
