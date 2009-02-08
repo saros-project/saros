@@ -5,11 +5,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -67,7 +71,19 @@ public class ConsistencyAction extends Action implements ISessionListener {
             .getSessionManager().getSharedProject()
             .getConcurrentDocumentManager().getPathesWithWrongChecksums());
 
-        for (IPath path : pathes) {
+        for (final IPath path : pathes) {
+            // save document
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    Set<IEditorPart> editors = EditorManager.getDefault()
+                        .getEditors(path);
+                    if (editors != null && editors.size() > 0) {
+                        editors.iterator().next().doSave(
+                            new NullProgressMonitor());
+                    }
+                }
+            });
+
             Saros.getDefault().getSessionManager().getTransmitter()
                 .sendFileChecksumErrorMessage(path, false);
         }

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -10,6 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -51,7 +55,7 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
                 return;
             }
 
-            // ErrorMessageDialog.showChecksumErrorMessage(path);
+            ErrorMessageDialog.showChecksumErrorMessage(path.toOSString());
 
             // Host
             if (Saros.getDefault().getSessionManager().getSharedProject()
@@ -70,25 +74,30 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
                                 try {
                                     Thread.sleep(200);
                                 } catch (InterruptedException e) {
-                                    e.printStackTrace();
+                                    Thread.currentThread().interrupt();
                                 }
                             }
 
-                            // Set<IEditorPart> editors =
-                            // EditorManager.getDefault()
-                            // .getEditors(new Path(path));
-                            // if (editors != null && editors.size() > 0) {
-                            // IEditorInput input = editors.iterator().next()
-                            // .getEditorInput();
-                            // input.
-                            // }
-                            EditorManager.getDefault().saveText(path);
+                            // save document
+                            Display.getDefault().syncExec(new Runnable() {
+                                public void run() {
+                                    Set<IEditorPart> editors = EditorManager
+                                        .getDefault().getEditors(path);
+                                    if (editors != null && editors.size() > 0) {
+                                        editors.iterator().next().doSave(
+                                            new NullProgressMonitor());
+                                    }
 
+                                }
+                            });
+
+                            // reset jupiter
                             Saros.getDefault().getSessionManager()
                                 .getSharedProject()
                                 .getConcurrentDocumentManager()
                                 .resetJupiterDocument(path);
 
+                            // send the file to client
                             try {
                                 transmitter.sendFile(from, Saros.getDefault()
                                     .getSessionManager().getSharedProject()

@@ -800,9 +800,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
                     ConcurrentDocumentManager.this.pathesWithWrongChecksums
                         .add(path);
-                    if (!inconsistencyToResolve.getVariable()) {
-                        inconsistencyToResolve.setVariable(true);
-                    }
+                    inconsistencyToResolve.setVariable(true);
+
                 }
                 return;
             }
