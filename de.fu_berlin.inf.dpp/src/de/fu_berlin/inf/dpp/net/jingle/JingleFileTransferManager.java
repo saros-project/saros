@@ -251,7 +251,7 @@ public class JingleFileTransferManager {
             public void sessionEstablished(PayloadType arg0,
                 TransportCandidate arg1, TransportCandidate arg2,
                 JingleSession arg3) {
-                // Do nothing, this message is useless, because the mediasession
+                // Do nothing, this message is useless, because the MediaSession
                 // does not yet exist
             }
 
@@ -311,7 +311,7 @@ public class JingleFileTransferManager {
             logger.debug("Started Jingle");
         }
 
-        if (connection.state != JingleConnectionState.ESTABLISHED) {
+        if (connection.state == JingleConnectionState.INIT) {
             // TODO observe state rather than sleep
             while (connection.state == JingleConnectionState.INIT) {
                 try {
@@ -320,13 +320,14 @@ public class JingleFileTransferManager {
                     Thread.currentThread().interrupt();
                 }
             }
-
             logger.debug("Init done");
         }
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
             connection.fileTransfer.send(transferDescription, content);
         } else {
+            // If we want to reconnect, then we should not set this to ERROR
+            connection.state = JingleConnectionState.ERROR;
             throw new JingleSessionException(
                 "Could not establish connection when trying to send");
         }
