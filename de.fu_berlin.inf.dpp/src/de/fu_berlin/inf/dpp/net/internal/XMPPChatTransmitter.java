@@ -62,6 +62,7 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
+import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 
@@ -200,7 +201,19 @@ public class XMPPChatTransmitter implements ITransmitter,
                             .debug("Incoming file transfer via IBB: "
                                 + data.toString());
 
-                        receiveData(data, request.accept().recieveFile());
+                        IncomingFileTransfer accept = request.accept();
+
+                        InputStream in = accept.recieveFile();
+
+                        byte[] content;
+                        try {
+                            content = IOUtils.toByteArray(in);
+                        } finally {
+                            IOUtils.closeQuietly(in);
+                        }
+
+                        receiveData(data, new ByteArrayInputStream(content));
+
                     } catch (Exception e) {
                         XMPPChatTransmitter.log.error(
                             "Incoming File Transfer via IBB failed: ", e);
