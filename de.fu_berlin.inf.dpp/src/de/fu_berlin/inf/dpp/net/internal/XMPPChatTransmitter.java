@@ -536,8 +536,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         // TODO this method is currently not used. Probably they interfere with
         // Jupiter
         if (true) {
-            log
-                .error("Unexpected Call to Request for Activity, which is currently disabled");
+            try {
+                throw new RuntimeException("Traceback");
+            } catch (RuntimeException e) {
+                log
+                    .error(
+                        "Unexpected Call to Request for Activity, which is currently disabled:",
+                        e);
+            }
             return;
         }
 
@@ -664,9 +670,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 jingle.send(jingleFileTransferData, content);
             } catch (Exception e) {
                 // TODO Catch only IOException and RuntimeException
-                log
-                    .info("Failed to send file with jingle, fall back to IBB",
-                        e);
+                log.error("Failed to send file with jingle, fall back to IBB",
+                    e);
                 ibb.send(jingleFileTransferData, content);
 
                 // Fall back to ChatTransfer:
@@ -750,12 +755,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         public void send(TransferDescription data, byte[] content)
             throws IOException {
 
+            log.debug("Sending via IBB: " + data.toString());
+
             OutgoingFileTransfer
                 .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
             OutgoingFileTransfer transfer = fileTransferManager
                 .createOutgoingFileTransfer(data.getRecipient().toString());
 
-            FileTransferProcessMonitor monitor = new FileTransferProcessMonitor(
+            FileTransferProgressMonitor monitor = new FileTransferProgressMonitor(
                 transfer);
 
             // The file path is irrelevant
@@ -771,6 +778,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                     break;
                 }
             }
+
             monitor.closeMonitor(true);
         }
 
@@ -908,7 +916,6 @@ public class XMPPChatTransmitter implements ITransmitter,
             }
 
             JID jid = participant.getJID();
-            XMPPChatTransmitter.log.debug("Sending checksums to " + jid);
 
             try {
                 sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault()

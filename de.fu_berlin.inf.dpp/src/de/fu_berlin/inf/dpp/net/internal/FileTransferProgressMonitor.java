@@ -11,10 +11,10 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
  * @author troll
  * 
  */
-public class FileTransferProcessMonitor extends Thread {
+public class FileTransferProgressMonitor extends Thread {
 
     private static Logger logger = Logger
-        .getLogger(FileTransferProcessMonitor.class);
+        .getLogger(FileTransferProgressMonitor.class);
 
     FileTransfer transfer;
     private final int TIMEOUT = 10000;
@@ -25,12 +25,12 @@ public class FileTransferProcessMonitor extends Thread {
 
     private IFileTransferCallback callback;
 
-    public FileTransferProcessMonitor(FileTransfer transfer) {
+    public FileTransferProgressMonitor(FileTransfer transfer) {
         this.transfer = transfer;
         start();
     }
 
-    public FileTransferProcessMonitor(FileTransfer transfer,
+    public FileTransferProgressMonitor(FileTransfer transfer,
         IFileTransferCallback callback) {
         this.transfer = transfer;
         this.callback = callback;
@@ -59,7 +59,7 @@ public class FileTransferProcessMonitor extends Thread {
                     && (this.transfer.getProgress() < 1.0)) {
 
                     /* check negotiator process */
-                    FileTransferProcessMonitor.logger.debug("Status: "
+                    FileTransferProgressMonitor.logger.debug("Status: "
                         + this.transfer.getStatus() + " Progress : "
                         + this.transfer.getProgress());
                     if (this.callback != null) {
