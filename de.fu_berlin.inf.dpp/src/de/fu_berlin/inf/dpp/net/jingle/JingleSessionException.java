@@ -17,7 +17,6 @@ public class JingleSessionException extends Exception {
 
     private String message;
     private JID jid;
-    private String errorName = "Jingle Tranfer Error";
 
     public JingleSessionException(String message) {
         super();
@@ -39,11 +38,8 @@ public class JingleSessionException extends Exception {
         return jid;
     }
 
+    @Override
     public String getMessage() {
         return message;
-    }
-
-    public String toString() {
-        return errorName;
     }
 }
