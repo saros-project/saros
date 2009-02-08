@@ -255,9 +255,11 @@ public class SharedProject implements ISharedProject {
     }
 
     public boolean isDriver(User user) {
-        /* TODO Is the distinction host vs. client really necessary here? */
-        // HOST
+        /*
+         * TODO Is the distinction host vs. client really necessary here?
+         */
         if (this.driverManager != null) {
+            // HOST
             return this.driverManager.isDriver(user.getJID());
         } else {
             // CLIENT
