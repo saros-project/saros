@@ -31,7 +31,7 @@ public class BalloonNotification {
      *            the timeout in milliseconds for automatically hidding the
      *            balloon
      */
-    protected static void showNotification(Control pControl, String pTitle,
+    public static void showNotification(Control pControl, String pTitle,
         String pText, int pTimeout) {
 
         if (pControl.isDisposed()) {

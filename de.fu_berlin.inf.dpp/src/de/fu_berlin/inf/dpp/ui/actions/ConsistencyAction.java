@@ -7,6 +7,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
@@ -17,6 +19,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
@@ -26,9 +29,12 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
     private boolean executingChecksumErrorHandling;
 
+    private IToolBarManager toolBar;
+
     private static Set<IPath> pathes;
 
-    public ConsistencyAction() {
+    public ConsistencyAction(IToolBarManager toolBar) {
+        this.toolBar = toolBar;
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setEnabled(false);
@@ -44,7 +50,25 @@ public class ConsistencyAction extends Action implements ISessionListener {
             ConsistencyAction.this.setEnabled(newValue);
 
             if (newValue) {
-                setToolTipText("Inconsistency Detected!");
+                pathes = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
+                    .getSessionManager().getSharedProject()
+                    .getConcurrentDocumentManager()
+                    .getPathesWithWrongChecksums());
+
+                Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+                        for (IPath path : pathes) {
+                            setToolTipText("Inconsistency Detected in file "
+                                + path.toOSString());
+                            BalloonNotification.showNotification(
+                                ((ToolBarManager) toolBar).getControl(),
+                                "Inconsistency Detected!", "In file "
+                                    + path.toOSString()
+                                    + " exists inconsistencies.", 5000);
+                        }
+                    }
+                });
+
             } else {
                 setToolTipText("");
                 logger.debug("All Inconsistencies are resolved");
@@ -66,10 +90,6 @@ public class ConsistencyAction extends Action implements ISessionListener {
         super.run();
 
         executingChecksumErrorHandling = true;
-
-        pathes = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
-            .getSessionManager().getSharedProject()
-            .getConcurrentDocumentManager().getPathesWithWrongChecksums());
 
         for (final IPath path : pathes) {
             // save document

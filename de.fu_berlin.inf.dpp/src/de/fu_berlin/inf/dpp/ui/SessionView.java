@@ -388,7 +388,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         IToolBarManager toolBar = bars.getToolBarManager();
 
         this.followModeAction = new FollowModeAction();
-        toolBar.add(new ConsistencyAction());
+        toolBar.add(new ConsistencyAction(toolBar));
         toolBar.add(new OpenInviteInterface());
         // toolBar.add(new RemoveAllDriverRoleAction());
         toolBar.add(followModeAction);
