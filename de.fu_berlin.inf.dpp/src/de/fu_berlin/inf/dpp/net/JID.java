@@ -82,11 +82,13 @@ public class JID implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj instanceof String) {
+            obj = new JID((String) obj);
+        }
         if (obj instanceof JID) {
             JID other = (JID) obj;
             return getBase().equals(other.getBase());
         }
-
         return false;
     }
 
@@ -97,8 +99,6 @@ public class JID implements Serializable {
 
     /**
      * @return the complete string that was used to construct this object.
-     * 
-     * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {

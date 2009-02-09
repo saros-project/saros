@@ -220,7 +220,8 @@ public class PacketExtensions {
                     .getSharedProject();
 
                 return project != null
-                    && project.getHost().getJID().equals(arg0.getFrom());
+                    && project.getHost().getJID().equals(
+                        new JID(arg0.getFrom()));
             }
         };
     }
