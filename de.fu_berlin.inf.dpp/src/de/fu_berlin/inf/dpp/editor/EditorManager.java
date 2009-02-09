@@ -78,7 +78,7 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
-import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
+import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -316,6 +316,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     public HashMap<IPath, Long> lastEditTimes;
     public HashMap<IPath, Long> lastRemoteEditTimes;
 
+    private ContributionAnnotationManager contributionAnnotationManager;
+
     public static EditorManager getDefault() {
         if (EditorManager.instance == null) {
             EditorManager.instance = new EditorManager();
@@ -340,7 +342,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.isDriver = this.sharedProject.isDriver();
         this.sharedProject.addListener(this);
         this.sharedProject.getActivityManager().addProvider(this);
-
+        this.contributionAnnotationManager = new ContributionAnnotationManager(session);
         activateOpenEditors();
     }
 
@@ -359,6 +361,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.editorPool.removeAllEditors();
         this.lastEditTimes.clear();
         this.lastRemoteEditTimes.clear();
+        this.contributionAnnotationManager.dispose();
+        this.contributionAnnotationManager = null;
     }
 
     /*
@@ -519,7 +523,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 .getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
-            ContributionHelper.splitAnnotation(model, offset);
+            contributionAnnotationManager.splitAnnotation(model, offset);
         } else {
             log.error("Can't get editor path");
         }
@@ -973,7 +977,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 .getProjectRelativePath(), System.currentTimeMillis());
 
             IAnnotationModel model = provider.getAnnotationModel(input);
-            ContributionHelper.insertAnnotation(model, offset, text.length(),
+            contributionAnnotationManager.insertAnnotation(model, offset, text.length(),
                 source);
 
             // Don't disconnect from provider yet, because otherwise the text
@@ -1191,12 +1195,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     continue;
                 }
 
-                AnnotationSaros anns = (AnnotationSaros) annotation;
-                boolean isfromuser = (forUserID == null)
-                    || ((forUserID != null) && anns.getSource().equals(
-                        forUserID));
+                AnnotationSaros sarosAnnotation = (AnnotationSaros) annotation;
+                if (((forUserID == null) || sarosAnnotation.getSource().equals(
+                    forUserID))) {
 
-                if (isfromuser) {
                     model.removeAnnotation(annotation);
                 }
             }

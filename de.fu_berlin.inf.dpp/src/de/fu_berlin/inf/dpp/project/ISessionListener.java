@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.project;
 
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A listener for SharedProject life-cycle related events.
@@ -50,11 +49,9 @@ public interface ISessionListener {
     public void sessionEnded(ISharedProject session);
 
     /**
-     * Is fired when the local user is invited to a session. Use
-     * {@link SessionManager#acceptSessionInvitation(JID, String, org.eclipse.core.resources.IProject)}
-     * to accept the invitation.
+     * Is fired when the local user is invited to a session.
      * 
-     * @param process
+     * @param invitation
      *            the invitation process which represents the invitation.
      */
     public void invitationReceived(IIncomingInvitationProcess invitation);
