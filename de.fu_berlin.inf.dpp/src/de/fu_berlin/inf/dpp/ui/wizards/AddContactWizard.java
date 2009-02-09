@@ -108,9 +108,15 @@ public class AddContactWizard extends Wizard {
             }
         }
 
-        Pattern emailPattern = Pattern.compile(
-            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$",
-            Pattern.CASE_INSENSITIVE);
+        /**
+         * Email-Pattern was too strict:
+         * 
+         * <code> Pattern emailPattern = Pattern.compile(
+         * "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$\\.[A-Z]{2,4}",
+         * Pattern.CASE_INSENSITIVE); </code>
+         */
+        Pattern userAtHostPattern = Pattern.compile(
+            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+$", Pattern.CASE_INSENSITIVE);
 
         private void updateNextEnablement() {
 
@@ -123,7 +129,8 @@ public class AddContactWizard extends Wizard {
                 return;
             }
 
-            if (!emailPattern.matcher(this.idText.getText().trim()).matches()) {
+            if (!userAtHostPattern.matcher(this.idText.getText().trim())
+                .matches()) {
                 this
                     .setErrorMessage("Not a valid Jabber-ID (should be: id@server.domain)!");
                 this.setMessage(null);
