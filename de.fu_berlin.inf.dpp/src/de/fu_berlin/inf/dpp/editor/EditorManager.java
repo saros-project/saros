@@ -303,7 +303,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final Set<IPath> driverEditors = new HashSet<IPath>();
 
-    private ITextSelection driverTextSelection;
+    private HashMap<User, ITextSelection> driverTextSelections;
 
     /** all files that have connected document providers */
     private final Set<IFile> connectedFiles = new HashSet<IFile>();
@@ -342,7 +342,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.isDriver = this.sharedProject.isDriver();
         this.sharedProject.addListener(this);
         this.sharedProject.getActivityManager().addProvider(this);
-        this.contributionAnnotationManager = new ContributionAnnotationManager(session);
+        this.contributionAnnotationManager = new ContributionAnnotationManager(
+            session);
         activateOpenEditors();
     }
 
@@ -436,10 +437,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * @return the text selection that the driver is currently using.
+     * @param user
+     *            User for who's text selection will be returned.
+     * @return the text selection of given user or <code>null</code> if that
+     *         user is not a driver.
      */
-    public ITextSelection getDriverTextSelection() {
-        return this.driverTextSelection;
+    public ITextSelection getDriverTextSelection(User user) {
+        return this.driverTextSelections.get(user);
     }
 
     /*
@@ -487,7 +491,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         IEditorPart changedEditor = null;
-        IPath path = null;
 
         // search editor which changed
         Set<IEditorPart> editors = editorPool.getAllEditors();
@@ -497,8 +500,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 break;
             }
         }
+        assert changedEditor != null;
 
-        path = editorAPI.getEditorResource(changedEditor)
+        IPath path = editorAPI.getEditorResource(changedEditor)
             .getProjectRelativePath();
 
         if (path != null) {
@@ -563,6 +567,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void userLeft(JID user) {
         removeAllAnnotations(user.toString(), null);
+        driverTextSelections.remove(sharedProject.getParticipant(user));
     }
 
     /* ---------- etc --------- */
@@ -681,12 +686,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         TextSelection textSelection = new TextSelection(cursor.getOffset(),
             cursor.getLength());
 
-        User user = Saros.getDefault().getSessionManager().getSharedProject()
-            .getParticipant(new JID(cursor.getSource()));
+        User user = sharedProject.getParticipant(new JID(cursor.getSource()));
 
-        if (Saros.getDefault().getSessionManager().getSharedProject().isDriver(
-            user)) {
-            setDriverTextSelection(textSelection);
+        if (sharedProject.isDriver(user)) {
+            setDriverTextSelection(user, textSelection);
         }
 
         if (path == null) {
@@ -698,8 +701,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            EditorManager.this.editorAPI.setSelection(editorPart,
-                textSelection, cursor.getSource(), shouldIFollow(user));
+            this.editorAPI.setSelection(editorPart, textSelection, cursor
+                .getSource(), shouldIFollow(user));
         }
     }
 
@@ -719,11 +722,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IPath path = viewport.getEditor();
         String source = viewport.getSource();
 
-        Set<IEditorPart> editors = EditorManager.this.editorPool
-            .getEditors(path);
+        Set<IEditorPart> editors = this.editorPool.getEditors(path);
         for (IEditorPart editorPart : editors) {
-            EditorManager.this.editorAPI.setViewport(editorPart, top, bottom,
-                source);
+            this.editorAPI.setViewport(editorPart, top, bottom, source);
         }
     }
 
@@ -977,8 +978,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 .getProjectRelativePath(), System.currentTimeMillis());
 
             IAnnotationModel model = provider.getAnnotationModel(input);
-            contributionAnnotationManager.insertAnnotation(model, offset, text.length(),
-                source);
+            contributionAnnotationManager.insertAnnotation(model, offset, text
+                .length(), source);
 
             // Don't disconnect from provider yet, because otherwise the text
             // changes would be lost. We only disconnect when the document is
@@ -1124,7 +1125,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         setActiveDriverEditor(editorPath, false);
 
         ITextSelection selection = this.editorAPI.getSelection(editorPart);
-        setDriverTextSelection(selection);
+        setDriverTextSelection(Saros.getDefault().getLocalUser(), selection);
 
         ILineRange viewport = this.editorAPI.getViewport(editorPart);
         int startLine = viewport.getStartLine();
@@ -1212,6 +1213,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             Saros.getDefault().getSessionManager().addSessionListener(this);
             this.lastEditTimes = new HashMap<IPath, Long>();
             this.lastRemoteEditTimes = new HashMap<IPath, Long>();
+            this.driverTextSelections = new HashMap<User, ITextSelection>();
         }
     }
 
@@ -1305,8 +1307,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @param selection
      *            sets the current text selection that is used by the driver.
      */
-    private void setDriverTextSelection(ITextSelection selection) {
-        this.driverTextSelection = selection;
+    private void setDriverTextSelection(User user, ITextSelection selection) {
+        if (user.getUserRole() == User.UserRole.DRIVER) {
+            this.driverTextSelections.put(user, selection);
+        }
     }
 
     /**
