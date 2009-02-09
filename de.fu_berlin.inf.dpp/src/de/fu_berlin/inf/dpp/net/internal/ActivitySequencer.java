@@ -147,14 +147,22 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         this.executer = new ExecuterQueue();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * TODO Refactor like this:
      * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityManager
+     * <code>
+     * concurrentManager.exec(activity); 
+     * editorManager.exec(activity);
+     * roleManager.exec(activity); 
+     * sharedResourceManager.exec(activity);
+     * </code>
+     * 
+     * Is easier to read and debug :-) But watch out for interdependencies
+     * between these.
      */
     public void exec(final IActivity activity) {
-        try {
 
+        try {
             if (activity instanceof EditorActivity) {
                 this.concurrentManager.exec(activity);
             }
@@ -191,6 +199,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                             executor.exec(activity);
                         }
 
+                        // CO Checksums are not used at the moment, aren't they?
                         // Check for file checksum after incoming save file
                         // activity.
                         if ((activity instanceof EditorActivity)
