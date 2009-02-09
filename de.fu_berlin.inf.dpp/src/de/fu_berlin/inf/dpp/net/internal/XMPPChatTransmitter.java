@@ -77,6 +77,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -102,6 +103,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -178,6 +180,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         IJingleFileTransferListener {
 
         public void incomingData(TransferDescription data, InputStream input) {
+            setLastUsedTransferMode(data.getSender(), TransferMode.JINGLE);
             receiveData(data, input);
         }
 
@@ -211,7 +214,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                         } finally {
                             IOUtils.closeQuietly(in);
                         }
-
+                        setLastUsedTransferMode(data.getSender(),
+                            TransferMode.IBB);
                         receiveData(data, new ByteArrayInputStream(content));
 
                     } catch (Exception e) {
@@ -315,6 +319,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             @Override
             public void chunkReceived(JID fromJID, String sName, String desc,
                 int index, int maxIndex, String sData) {
+
+                setLastUsedTransferMode(fromJID, TransferMode.DEFAULT);
 
                 TransferDescription transferDescription;
                 try {
@@ -550,14 +556,10 @@ public class XMPPChatTransmitter implements ITransmitter,
         // TODO this method is currently not used. Probably they interfere with
         // Jupiter
         if (true) {
-            try {
-                throw new RuntimeException("Traceback");
-            } catch (RuntimeException e) {
-                log
-                    .error(
-                        "Unexpected Call to Request for Activity, which is currently disabled:",
-                        e);
-            }
+            log
+                .error(
+                    "Unexpected Call to Request for Activity, which is currently disabled:",
+                    new StackTrace());
             return;
         }
 
@@ -1153,7 +1155,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         // TODO stop sending, but queue rather
     }
 
-    private void receiveData(TransferDescription data, InputStream input) {
+    public void setLastUsedTransferMode(JID from, TransferMode mode) {
+        for (IInvitationProcess process : processes) {
+            if (process.getPeer().equals(from))
+                process.setTransferMode(mode);
+        }
+    }
+
+    protected void receiveData(TransferDescription data, InputStream input) {
 
         try {
             switch (data.type) {
@@ -1173,7 +1182,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    public void receivedResource(JID from, Path path, InputStream input,
+    protected void receivedResource(JID from, Path path, InputStream input,
         int time) {
 
         log.info("Incoming resource from " + from.toString() + ": " + path);
@@ -1198,7 +1207,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     }
 
-    private void receivedFileList(TransferDescription data, InputStream input) {
+    protected void receivedFileList(TransferDescription data, InputStream input) {
 
         String fileListAsString;
         try {
@@ -1228,7 +1237,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    private void receivedArchive(TransferDescription data, InputStream input) {
+    protected void receivedArchive(TransferDescription data, InputStream input) {
 
         File archiveFile = new File("./incoming_archive.zip");
         XMPPChatTransmitter.log.debug("Archive file: "

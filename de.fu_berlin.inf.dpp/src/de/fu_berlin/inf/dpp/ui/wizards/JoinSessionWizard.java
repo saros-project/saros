@@ -54,7 +54,7 @@ public class JoinSessionWizard extends Wizard {
 
     ShowDescriptionPage descriptionPage;
 
-    EnterNamePage namePage;
+    EnterProjectNamePage namePage;
 
     WizardDialogAccessable myWizardDlg;
 
@@ -117,7 +117,7 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public void addPages() {
         this.descriptionPage = new ShowDescriptionPage(this);
-        this.namePage = new EnterNamePage(this);
+        this.namePage = new EnterProjectNamePage(this);
 
         addPage(this.descriptionPage);
         addPage(this.namePage);

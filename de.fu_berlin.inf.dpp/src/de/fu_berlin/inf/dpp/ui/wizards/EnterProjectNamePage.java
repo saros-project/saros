@@ -24,14 +24,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
  * overwrite the project selected by the {@link ProjectSelectionPage}.
  */
-class EnterNamePage extends WizardPage {
+class EnterProjectNamePage extends WizardPage {
 
     private final JoinSessionWizard joinSessionWizard;
 
@@ -52,14 +51,12 @@ class EnterNamePage extends WizardPage {
     /* project for update or base project for copy into new project */
     private IProject similarProject;
 
-    protected EnterNamePage(JoinSessionWizard joinSessionWizard) {
+    protected EnterProjectNamePage(JoinSessionWizard joinSessionWizard) {
         super("namePage");
         this.joinSessionWizard = joinSessionWizard;
         setPageComplete(false);
 
         setTitle("Select local project.");
-
-        setConnectionStatus();
     }
 
     protected void setUpdateProject(IProject project) {
@@ -90,18 +87,28 @@ class EnterNamePage extends WizardPage {
     /**
      * get transfer mode and set header information of the wizard.
      */
-    private void setConnectionStatus() {
-        // TODO IBB Status is currently not correctly set
-        if (this.joinSessionWizard.process.getTransferMode() == TransferMode.IBB) {
-            setDescription("Attention: No direct connection avialable!"
+    private void updateConnectionStatus() {
+
+        switch (this.joinSessionWizard.process.getTransferMode()) {
+        case DEFAULT:
+            setDescription("Attention: No P2P connection with Jingle available! Using Chat instead!"
                 + '\n'
                 + "Suggestion: Update an existing project or copy resources from another project.");
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/ibb_connection.png"));
-        } else {
+            break;
+        case IBB:
+            setDescription("Attention: No P2P connection with Jingle available! Using IBB instead!"
+                + '\n'
+                + "Suggestion: Update an existing project or copy resources from another project.");
+            setImageDescriptor(SarosUI
+                .getImageDescriptor("icons/ibb_connection.png"));
+            break;
+        case JINGLE:
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/jingle_connection.png"));
+            break;
         }
     }
 
@@ -174,7 +181,7 @@ class EnterNamePage extends WizardPage {
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    EnterNamePage.this.updateProjectText
+                    EnterProjectNamePage.this.updateProjectText
                         .setText(getProjectDialog("Select project for update."));
                 }
             });
@@ -230,7 +237,7 @@ class EnterNamePage extends WizardPage {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     setUpdateProject(JoinSessionWizardUtils
-                        .getBestScanMatch(EnterNamePage.this.joinSessionWizard.process));
+                        .getBestScanMatch(EnterProjectNamePage.this.joinSessionWizard.process));
                 }
             });
 
@@ -241,7 +248,7 @@ class EnterNamePage extends WizardPage {
     }
 
     /**
-     * browse dialog to select project for copy.
+     * Browse dialog to select project for copy.
      */
     public String getProjectDialog(String title) {
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(
@@ -262,7 +269,7 @@ class EnterNamePage extends WizardPage {
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) {
-                    EnterNamePage.this.joinSessionWizard.process
+                    EnterProjectNamePage.this.joinSessionWizard.process
                         .requestRemoteFileList(monitor);
                 }
             });
@@ -308,6 +315,7 @@ class EnterNamePage extends WizardPage {
         attachListeners();
         setControl(composite);
 
+        updateConnectionStatus();
         updateEnabled();
     }
 
