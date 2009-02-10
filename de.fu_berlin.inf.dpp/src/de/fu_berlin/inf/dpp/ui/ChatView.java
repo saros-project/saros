@@ -136,7 +136,7 @@ public class ChatView extends ViewPart implements ISessionListener,
                         ChatView.this.session = Saros.getDefault()
                             .getMessagingManager().getSession();
                         ChatView.this.session
-                            .sendMessage("have joined the chat");
+                            .sendMessage("has joined the chat");
                     } catch (XMPPException e) {
                         ChatView.this.viewer.getDocument().set(
                             "Error: Couldn't connect");
