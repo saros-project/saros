@@ -57,15 +57,23 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
+
+                        // concatenate pathes
+                        String pathesOfInconsistencies = "";
                         for (IPath path : pathes) {
-                            setToolTipText("Inconsistency Detected in file "
-                                + path.toOSString());
-                            BalloonNotification.showNotification(
-                                ((ToolBarManager) toolBar).getControl(),
-                                "Inconsistency Detected!", "In file "
-                                    + path.toOSString()
-                                    + " exists inconsistencies.", 5000);
+                            pathesOfInconsistencies += path.toOSString() + " ";
                         }
+
+                        // set tooltip
+                        setToolTipText("Inconsistency Detected in file/s "
+                            + pathesOfInconsistencies);
+
+                        // show balloon notification
+                        BalloonNotification.showNotification(
+                            ((ToolBarManager) toolBar).getControl(),
+                            "Inconsistency Detected!", "In file/s "
+                                + pathesOfInconsistencies
+                                + " exists inconsistencies.", 5000);
                     }
                 });
 
