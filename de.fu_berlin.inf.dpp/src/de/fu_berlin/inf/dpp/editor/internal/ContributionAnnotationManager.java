@@ -11,7 +11,6 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -65,19 +64,21 @@ public class ContributionAnnotationManager {
         if (length > 0) {
             /* Return early if there already is an annotation at that offset */
             for (@SuppressWarnings("unchecked")
-            Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-                Annotation annotation = (Annotation) it.next();
+            Iterator<Annotation> it = model.getAnnotationIterator(); it
+                .hasNext();) {
+                Annotation annotation = it.next();
 
-                if ((annotation.getType().equals(ContributionAnnotation.TYPE))
-                    && model.getPosition(annotation).includes(offset)) {
+                if (annotation.getType().equals(ContributionAnnotation.TYPE)
+                    && model.getPosition(annotation).includes(offset)
+                    && ((ContributionAnnotation) annotation).getSource()
+                        .equals(source)) {
                     return;
                 }
             }
 
             ContributionAnnotation annotation = new ContributionAnnotation(
                 source, model);
-            addToHistory(source, annotation);
-            model.addAnnotation(annotation, new Position(offset, length));
+            addToHistory(annotation, new Position(offset, length));
         }
     }
 
@@ -93,8 +94,8 @@ public class ContributionAnnotationManager {
      */
     public void splitAnnotation(IAnnotationModel model, int offset) {
         for (@SuppressWarnings("unchecked")
-        Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-            Annotation annotation = (Annotation) it.next();
+        Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
+            Annotation annotation = it.next();
 
             if (annotation.getType().equals(ContributionAnnotation.TYPE)) {
 
@@ -106,19 +107,18 @@ public class ContributionAnnotationManager {
                     Position afterOffset = new Position(offset, pos.length
                         - (offset - pos.offset));
 
-                    String source = ((AnnotationSaros) annotation).getSource();
-                    getHistory(source).remove(annotation);
-                    model.removeAnnotation(annotation);
+                    ContributionAnnotation oldAnnotation = (ContributionAnnotation) annotation;
+
+                    removeFromHistory(oldAnnotation);
 
                     ContributionAnnotation newAnnotation;
+                    String source = oldAnnotation.getSource();
 
                     newAnnotation = new ContributionAnnotation(source, model);
-                    model.addAnnotation(newAnnotation, beforeOffset);
-                    addToHistory(source, newAnnotation);
+                    addToHistory(newAnnotation, beforeOffset);
 
                     newAnnotation = new ContributionAnnotation(source, model);
-                    model.addAnnotation(newAnnotation, afterOffset);
-                    addToHistory(source, newAnnotation);
+                    addToHistory(newAnnotation, afterOffset);
                 }
             }
         }
@@ -127,13 +127,14 @@ public class ContributionAnnotationManager {
     public void dispose() {
         Saros.getDefault().getSessionManager().getSharedProject()
             .removeListener(sharedProjectListener);
+        sourceToHistory.clear();
     }
 
     /**
      * Get the history of contribution annotations of the given user.
      * 
      * @param source
-     *            Jabber id of the user who's history we want.
+     *            source of the user who's history we want.
      * @return the history of source.
      */
     protected Queue<ContributionAnnotation> getHistory(String source) {
@@ -154,12 +155,27 @@ public class ContributionAnnotationManager {
      * @param annotation
      *            the annotation to add.
      */
-    protected void addToHistory(String source, ContributionAnnotation annotation) {
-        Queue<ContributionAnnotation> history = getHistory(source);
+    protected void addToHistory(ContributionAnnotation annotation,
+        Position position) {
+
+        annotation.getModel().addAnnotation(annotation, position);
+
+        Queue<ContributionAnnotation> history = getHistory(annotation
+            .getSource());
         history.add(annotation);
         while (history.size() > MAX_HISTORY_LENGTH) {
             ContributionAnnotation oldAnnotation = history.remove();
             oldAnnotation.getModel().removeAnnotation(oldAnnotation);
         }
+    }
+
+    /**
+     * Removes an annotation from the user's history and the annotation model.
+     * 
+     * @param annotation
+     */
+    protected void removeFromHistory(ContributionAnnotation annotation) {
+        getHistory(annotation.getSource()).remove(annotation);
+        annotation.getModel().removeAnnotation(annotation);
     }
 }

@@ -1197,8 +1197,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 }
 
                 AnnotationSaros sarosAnnotation = (AnnotationSaros) annotation;
-                if (((forUserID == null) || sarosAnnotation.getSource().equals(
-                    forUserID))) {
+                if (forUserID == null
+                    || sarosAnnotation.getSource().equals(forUserID)) {
 
                     model.removeAnnotation(annotation);
                 }
