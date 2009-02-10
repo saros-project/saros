@@ -35,8 +35,10 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
     public void run(IAction action) {
         try {
             Shell shell = this.window.getShell();
-            new WizardDialog(shell, new CreateAccountWizard(true, true, true))
-                .open();
+            WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
+                true, true, true));
+            wd.setHelpAvailable(false);
+            wd.open();
         } catch (Exception e) {
             // TODO Use consistent way of dealing with Exceptions
             Saros.log("Could not create new Account.", e);

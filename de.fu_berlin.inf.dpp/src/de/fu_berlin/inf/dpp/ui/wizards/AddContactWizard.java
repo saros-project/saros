@@ -157,7 +157,6 @@ public class AddContactWizard extends Wizard {
 
     public AddContactWizard() {
         setWindowTitle("New Contact");
-        setHelpAvailable(false);
     }
 
     @Override

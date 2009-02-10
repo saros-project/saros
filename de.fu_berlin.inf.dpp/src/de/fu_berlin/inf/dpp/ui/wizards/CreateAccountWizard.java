@@ -51,7 +51,6 @@ public class CreateAccountWizard extends Wizard {
         }
         this.page = new RegisterAccountPage(createAccount,
             showStoreInPrefsButton, storeInPrefsDefault);
-        setHelpAvailable(false);
         setNeedsProgressMonitor(true);
     }
 
