@@ -293,6 +293,7 @@ public class Saros extends AbstractUIPlugin {
                             + "'.\nErrorMessage was: " + e.getMessage());
                 }
             });
+            disconnect();
         }
     }
 
