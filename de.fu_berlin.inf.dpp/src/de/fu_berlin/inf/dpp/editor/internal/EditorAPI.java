@@ -554,16 +554,21 @@ public class EditorAPI implements IEditorAPI {
         return textEditor.getDocumentProvider().getDocument(input);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-     */
     public void setViewport(IEditorPart editorPart, int top, int bottom,
-        String source) {
+        String source, boolean following) {
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         updateViewportAnnotation(viewer, top, bottom, source);
+
+        if (following) {
+            try {
+                // Show the middle of the driver's viewport.
+                viewer.revealRange(viewer.getDocument().getLineOffset(
+                    top + ((bottom - top) / 2)), 0);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public ILineRange getViewport(IEditorPart editorPart) {

@@ -721,10 +721,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         int bottom = viewport.getBottomIndex();
         IPath path = viewport.getEditor();
         String source = viewport.getSource();
+        /*
+         * Check if source is an observed driver and his cursor is outside the
+         * viewport. Taking the last line of the driver's last selection might
+         * be a bit inaccurate.
+         */
+        User user = sharedProject.getParticipant(new JID(source));
+        int driverCursor = getDriverTextSelection(user).getEndLine();
+        boolean following = shouldIFollow(user)
+            && (driverCursor < top || driverCursor > bottom);
 
         Set<IEditorPart> editors = this.editorPool.getEditors(path);
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setViewport(editorPart, top, bottom, source);
+            this.editorAPI.setViewport(editorPart, top, bottom, source,
+                following);
         }
     }
 

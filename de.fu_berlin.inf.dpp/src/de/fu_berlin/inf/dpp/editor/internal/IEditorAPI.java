@@ -78,7 +78,7 @@ public interface IEditorAPI {
     public IResource getEditorResource(IEditorPart editorPart);
 
     public void setViewport(IEditorPart editorPart, int top, int bottom,
-        String source);
+        String source, boolean following);
 
     /**
      * Return the viewport for given editor.
