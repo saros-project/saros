@@ -44,8 +44,8 @@ public class SharedModelProvider extends ModelProvider implements
      * not the exclusive driver set the appropriate flag.
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
+
         private boolean isAllowed = true;
-        private boolean isExclusive = true;
 
         /*
          * (non-Javadoc)
@@ -69,19 +69,12 @@ public class SharedModelProvider extends ModelProvider implements
                 return false;
             }
 
-            if (SharedModelProvider.this.sharedProject.isDriver()) {
-                if (!SharedModelProvider.this.sharedProject.isExclusiveDriver()) {
-                    this.isExclusive = false;
-                }
-                return false;
-            }
-
             if ((resource instanceof IFile) || (resource instanceof IFolder)) {
                 this.isAllowed = false;
                 return false;
             }
 
-            return delta.getKind() != IResourceDelta.NO_CHANGE;
+            return true;
         }
     }
 
@@ -109,14 +102,13 @@ public class SharedModelProvider extends ModelProvider implements
             e.printStackTrace();
         }
 
-        IStatus result = Status.OK_STATUS;
-        if (!visitor.isAllowed) {
-            result = SharedModelProvider.ERROR_STATUS;
+        if (!sharedProject.isDriver() && !visitor.isAllowed) {
+            return SharedModelProvider.ERROR_STATUS;
         }
-        if (!visitor.isExclusive) {
-            result = SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
+        if (!sharedProject.isExclusiveDriver() && !visitor.isAllowed) {
+            return SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
         }
-        return result;
+        return Status.OK_STATUS;
     }
 
     /*
