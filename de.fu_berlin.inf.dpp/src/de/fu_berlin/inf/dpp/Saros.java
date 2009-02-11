@@ -293,7 +293,6 @@ public class Saros extends AbstractUIPlugin {
                             + "'.\nErrorMessage was: " + e.getMessage());
                 }
             });
-            disconnect();
         }
     }
 
@@ -409,7 +408,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     public boolean isConnected() {
-        return (this.connection != null) && this.connection.isConnected();
+        return this.connectionState == ConnectionState.CONNECTED;
     }
 
     /**
