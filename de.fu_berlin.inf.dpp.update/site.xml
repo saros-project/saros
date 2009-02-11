@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/de.fu_berlin.inf.dpp.feature_9.2.8.jar" id="de.fu_berlin.inf.dpp.feature" version="9.2.8"/>
+   <feature url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.feature_9.2.11.jar?use_mirror=dfn" id="de.fu_berlin.inf.dpp.feature" version="9.2.11"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp_9.2.11.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_9.2.11.jar?use_mirror=dfn"/>
 </site>
