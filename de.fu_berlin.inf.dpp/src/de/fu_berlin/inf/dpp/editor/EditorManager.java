@@ -59,6 +59,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.AbstractTextEditor;
@@ -88,6 +90,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -341,6 +344,35 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         assert (this.editorPool.editorParts.isEmpty());
         this.isDriver = this.sharedProject.isDriver();
         this.sharedProject.addListener(this);
+
+        // Add ConsistencyListener
+        Saros.getDefault().getSessionManager().getSharedProject()
+            .getConcurrentDocumentManager().getConsistencyToResolve().add(
+                new VariableProxyListener<Boolean>() {
+                    public void setVariable(Boolean inconsistency) {
+                        if (inconsistency) {
+                            Display.getDefault().syncExec(new Runnable() {
+                                public void run() {
+                                    try {
+                                        // Open Session view
+                                        PlatformUI
+                                            .getWorkbench()
+                                            .getActiveWorkbenchWindow()
+                                            .getActivePage()
+                                            .showView(
+                                                "de.fu_berlin.inf.dpp.ui.SessionView",
+                                                null,
+                                                IWorkbenchPage.VIEW_ACTIVATE);
+                                    } catch (PartInitException e) {
+                                        log
+                                            .error("Could not open session view!");
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+
         this.sharedProject.getActivityManager().addProvider(this);
         this.contributionAnnotationManager = new ContributionAnnotationManager(
             session);

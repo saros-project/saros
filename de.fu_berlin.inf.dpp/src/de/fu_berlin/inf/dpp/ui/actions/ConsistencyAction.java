@@ -37,7 +37,17 @@ public class ConsistencyAction extends Action implements ISessionListener {
         this.toolBar = toolBar;
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
-        setEnabled(false);
+
+        // add ConsistencyListener if already in a session
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+        if (project != null) {
+            this.proxy = project.getConcurrentDocumentManager()
+                .getConsistencyToResolve();
+            proxy.addAndNotify(listener);
+        } else
+            setEnabled(false);
+
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
