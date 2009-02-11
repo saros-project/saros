@@ -730,16 +730,17 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         ITextSelection driverSelection = getDriverTextSelection(user);
         // Check needed when viewport activity came before the first
         // text selection activity.
+        boolean following = false;
         if (driverSelection != null) {
             int driverCursor = driverSelection.getEndLine();
-            boolean following = shouldIFollow(user)
+            following = shouldIFollow(user)
                 && (driverCursor < top || driverCursor > bottom);
+        }
 
-            Set<IEditorPart> editors = this.editorPool.getEditors(path);
-            for (IEditorPart editorPart : editors) {
-                this.editorAPI.setViewport(editorPart, top, bottom, source,
-                    following);
-            }
+        Set<IEditorPart> editors = this.editorPool.getEditors(path);
+        for (IEditorPart editorPart : editors) {
+            this.editorAPI.setViewport(editorPart, top, bottom, source,
+                following);
         }
     }
 
