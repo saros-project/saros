@@ -19,33 +19,26 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
 import org.eclipse.core.resources.IProject;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Presence;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ConsistencyWatchdogReceiver;
-import de.fu_berlin.inf.dpp.net.internal.JupiterReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -57,15 +50,16 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     private static Logger log = Logger
         .getLogger(SessionManager.class.getName());
 
-    private CurrentProjectProxy currentlySharedProject;
+    @Inject
+    protected CurrentProjectProxy currentlySharedProject;
+
+    @Inject
+    protected XMPPReceiver xmppReceiver;
+
+    @Inject
+    protected XMPPChatTransmitter transmitter;
 
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
-
-    private XMPPChatTransmitter transmitter;
-
-    protected JupiterReceiver jupiterReceiver;
-
-    protected ConsistencyWatchdogReceiver consistencyWatchdogReceiver;
 
     private String sessionID = NOT_IN_SESSION;
 
@@ -73,17 +67,19 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return transmitter;
     }
 
-    public SessionManager(CurrentProjectProxy projectProxy) {
-        this.currentlySharedProject = projectProxy;
-        Saros.getDefault().addListener(this);
+    protected Saros saros;
+
+    public SessionManager(Saros saros) {
+        this.saros = saros;
+        saros.addListener(this);
     }
 
     public void startSession(IProject project) throws XMPPException {
-        if (!Saros.getDefault().isConnected()) {
+        if (!saros.isConnected()) {
             throw new XMPPException("No connection");
         }
 
-        JID myJID = Saros.getDefault().getMyJID();
+        JID myJID = saros.getMyJID();
         this.sessionID = String.valueOf(new Random(System.currentTimeMillis())
             .nextInt());
 
@@ -115,7 +111,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
-            project, Saros.getDefault().getMyJID(), host, colorID);
+            project, saros.getMyJID(), host, colorID);
         this.currentlySharedProject.setVariable(sharedProject);
 
         sharedProject.start();
@@ -186,153 +182,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return process;
     }
 
-    public interface ConnectionSessionListener {
-
-        public void prepare(XMPPConnection connection);
-
-        public void start();
-
-        public void stop();
-
-        public void dispose();
-
-    }
-
-    List<ConnectionSessionListener> connectionSessionListener = new LinkedList<ConnectionSessionListener>();
-
-    /**
-     * Implements the lifecycle management of ConnectionSessionListeners
-     */
     public void connectionStateChanged(XMPPConnection connection,
         ConnectionState newState) {
 
-        switch (newState) {
-        case CONNECTED:
-
-            if (connectionSessionListener.isEmpty()) {
-                transmitter = new XMPPChatTransmitter();
-                connectionSessionListener.add(transmitter);
-                connectionSessionListener.add(new JupiterReceiver());
-                connectionSessionListener.add(new ConsistencyWatchdogReceiver(
-                    transmitter, currentlySharedProject));
-                connectionSessionListener.add(new PresenceListener());
-            }
-
-            for (ConnectionSessionListener listener : connectionSessionListener) {
-                listener.prepare(connection);
-            }
-
-            for (ConnectionSessionListener listener : connectionSessionListener) {
-                listener.start();
-            }
-
-            break;
-        case CONNECTING:
-
-            // Cannot do anything until the Connection is up
-
-            break;
-
-        case DISCONNECTING:
-
+        if (newState == ConnectionState.DISCONNECTING) {
             stopSharedProject();
-            break;
-
-        case ERROR:
-
-            for (ConnectionSessionListener listener : Util
-                .reverse(connectionSessionListener)) {
-                listener.stop();
-            }
-            break;
-
-        case NOT_CONNECTED:
-
-            for (ConnectionSessionListener listener : Util
-                .reverse(connectionSessionListener)) {
-                listener.stop();
-            }
-
-            for (ConnectionSessionListener listener : Util
-                .reverse(connectionSessionListener)) {
-                listener.dispose();
-            }
-            connectionSessionListener.clear();
-            transmitter = null;
-            break;
-
         }
-    }
-
-    public class PresenceListener implements ConnectionSessionListener {
-
-        RosterListener listener = new RosterListener() {
-            public void entriesAdded(Collection<String> addresses) {
-                // ignore
-            }
-
-            public void entriesUpdated(Collection<String> addresses) {
-                // TODO Check if it affects one of our participants in a session
-            }
-
-            public void entriesDeleted(Collection<String> addresses) {
-                // TODO Check if it affects one of our participants in a session
-            }
-
-            public void presenceChanged(Presence presence) {
-
-                SharedProject project = currentlySharedProject.getVariable();
-
-                if (project == null) {
-                    return;
-                }
-
-                // Update the presence on the User
-                User user = project.getParticipant(new JID(presence.getFrom()));
-                if (user != null) {
-                    if (presence.isAvailable()) {
-                        user.setPresence(User.UserConnectionState.ONLINE);
-                    } else {
-                        user.setPresence(User.UserConnectionState.OFFLINE);
-                    }
-                }
-            }
-        };
-
-        public void dispose() {
-            connection = null;
-        }
-
-        public void prepare(XMPPConnection connection) {
-            this.connection = connection;
-        }
-
-        XMPPConnection connection;
-
-        Roster roster;
-
-        public void registerListener(Roster roster) {
-
-            if (this.roster != null) {
-                this.roster.removeRosterListener(listener);
-            }
-            this.roster = roster;
-            if (this.roster != null) {
-                this.roster.addRosterListener(listener);
-            }
-        }
-
-        public void start() {
-            if (connection != null) {
-                registerListener(connection.getRoster());
-            }
-        }
-
-        public void stop() {
-            registerListener(null);
-            connection = null;
-        }
-
     }
 
     public void OnReconnect(int oldtimestamp) {

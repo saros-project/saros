@@ -15,11 +15,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
@@ -30,11 +30,14 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
-import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
+/**
+ * @Component The single instance of this class per application is managed by
+ *            PicoContainer
+ */
+public class ConsistencyWatchdogReceiver {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogReceiver.class.getName());
@@ -174,44 +177,19 @@ public class ConsistencyWatchdogReceiver implements ConnectionSessionListener {
         }
     };
 
-    XMPPConnection connection;
-
+    @Inject
     ITransmitter transmitter;
 
+    @Inject
     CurrentProjectProxy project;
 
-    public ConsistencyWatchdogReceiver(ITransmitter transmitter,
-        CurrentProjectProxy project) {
-        this.project = project;
-        this.transmitter = transmitter;
-    }
+    public ConsistencyWatchdogReceiver(XMPPReceiver receiver) {
 
-    public void dispose() {
-        // Nothing to dispose about :-D
-    }
+        receiver.addPacketListener(listener, new AndFilter(
+            new MessageTypeFilter(Message.Type.chat),
 
-    public void prepare(XMPPConnection connection) {
-        this.connection = connection;
-    }
-
-    public void start() {
-        if (this.connection != null) {
-
-            // TODO filter for correct session
-            connection.addPacketListener(listener, new AndFilter(
-                new MessageTypeFilter(Message.Type.chat), Util.orFilter(
-                    checksum.getFilter(), checksumError.getFilter(),
-                    RequestPacketExtension.getFilter())));
-        }
-    }
-
-    public void stop() {
-        // TODO Think about queuing or what happens if we don't listen for
-        // packets while stopped
-        if (this.connection != null) {
-            connection.removePacketListener(listener);
-        }
-        this.connection = null;
+            Util.orFilter(checksum.getFilter(), checksumError.getFilter(),
+                RequestPacketExtension.getFilter())));
     }
 
 }

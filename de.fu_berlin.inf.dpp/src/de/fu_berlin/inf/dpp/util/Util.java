@@ -6,6 +6,7 @@ import java.io.InterruptedIOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -136,6 +137,10 @@ public class Util {
                 return it;
             }
         };
+    }
+
+    public static <T> List<T> reverse(T[] original) {
+        return reverse(Arrays.asList(original));
     }
 
     public static <T> List<T> reverse(List<T> original) {

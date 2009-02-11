@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -16,22 +17,24 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class RequestForActivityHandler extends RequestActivityExtension {
 
+    @Inject
+    protected IXMPPTransmitter transmitter;
+
+    public RequestForActivityHandler(XMPPReceiver receiver) {
+        receiver.addPacketListener(this, this.getFilter());
+    }
+
     @Override
     public PacketFilter getFilter() {
         return new AndFilter(super.getFilter(), PacketExtensions
             .getInSessionFilter());
-    }
-
-    protected IXMPPTransmitter transmitter;
-
-    public RequestForActivityHandler(IXMPPTransmitter transmitter) {
-        this.transmitter = transmitter;
     }
 
     private final Logger log = Logger.getLogger(RequestForActivityHandler.class

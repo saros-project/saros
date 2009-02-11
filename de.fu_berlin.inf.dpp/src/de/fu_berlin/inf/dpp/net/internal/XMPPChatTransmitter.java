@@ -54,8 +54,6 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -82,10 +80,6 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
-import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
-import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
-import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
@@ -100,17 +94,16 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
+import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
  * 
- * The instance of this class to use will change when the XMPP Connection is
- * disconnected.
- * 
+ * @Component The single instance of this class per application is managed by
+ *            PicoContainer
  */
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {
@@ -483,22 +476,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         jingleDiscovery = new JingleDiscoveryManager(connection);
 
         // Register PacketListeners
-        this.connection.addPacketListener(new InvitationHandler(this),
-            new AndFilter(new MessageTypeFilter(Message.Type.chat),
-                InviteExtension.getDefault().getFilter()));
-
-        LeaveHandler handler = new LeaveHandler();
-        this.connection.addPacketListener(handler, handler.getFilter());
-
-        RequestForActivityHandler activityHandler = new RequestForActivityHandler(
-            this);
-        this.connection.addPacketListener(activityHandler, activityHandler
-            .getFilter());
-
-        UserListHandler userListHandler = new UserListHandler(this);
-        this.connection.addPacketListener(userListHandler, userListHandler
-            .getFilter());
-
         this.connection.addPacketListener(new GodPacketListener(),
             PacketExtensions.getSessionIDPacketFilter());
 

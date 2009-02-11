@@ -8,11 +8,13 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
@@ -29,10 +31,11 @@ public class UserListHandler extends UserListExtension {
     private static final Logger log = Logger.getLogger(UserListHandler.class
         .getName());
 
+    @Inject
     protected IXMPPTransmitter transmitter;
 
-    public UserListHandler(IXMPPTransmitter transmitter) {
-        this.transmitter = transmitter;
+    public UserListHandler(XMPPReceiver receiver) {
+        receiver.addPacketListener(this, this.getFilter());
     }
 
     @Override

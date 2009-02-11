@@ -4,10 +4,12 @@
 package de.fu_berlin.inf.dpp.net.business;
 
 import org.apache.log4j.Logger;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
@@ -20,10 +22,11 @@ public class InvitationHandler extends InviteExtension {
     private static final Logger log = Logger.getLogger(InvitationHandler.class
         .getName());
 
+    @Inject
     protected IXMPPTransmitter transmitter;
 
-    public InvitationHandler(IXMPPTransmitter transmitter) {
-        this.transmitter = transmitter;
+    public InvitationHandler(XMPPReceiver receiver) {
+        receiver.addPacketListener(this, this.getFilter());
     }
 
     @Override
