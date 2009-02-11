@@ -58,7 +58,8 @@ public class ErrorMessageDialog {
                 actualChecksumerrorDialog = new MessageDialog(Display
                     .getDefault().getActiveShell(), "Consistency Problem!",
                     null, "Inconsitent file state has detected. File "
-                        + fileName + " has to synchronized with project host",
+                        + fileName
+                        + " has to be synchronized with project host",
                     MessageDialog.WARNING, new String[0], 0);
                 actualChecksumerrorDialog.open();
             }
