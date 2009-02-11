@@ -45,7 +45,7 @@ public class SharedModelProvider extends ModelProvider implements
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
-        private boolean isAffectingSharedProjectFiles = true;
+        private boolean isAffectingSharedProjectFiles = false;
 
         /*
          * (non-Javadoc)
@@ -70,7 +70,7 @@ public class SharedModelProvider extends ModelProvider implements
             }
 
             if ((resource instanceof IFile) || (resource instanceof IFolder)) {
-                this.isAffectingSharedProjectFiles = false;
+                this.isAffectingSharedProjectFiles = true;
                 return false;
             }
 
@@ -105,10 +105,11 @@ public class SharedModelProvider extends ModelProvider implements
             e.printStackTrace();
         }
 
-        if (!sharedProject.isDriver() && !visitor.isAffectingSharedProjectFiles) {
+        if (!sharedProject.isDriver() && visitor.isAffectingSharedProjectFiles) {
             return SharedModelProvider.ERROR_STATUS;
         }
-        if (!sharedProject.isExclusiveDriver() && !visitor.isAffectingSharedProjectFiles) {
+        if (!sharedProject.isExclusiveDriver()
+            && visitor.isAffectingSharedProjectFiles) {
             return SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
         }
         return Status.OK_STATUS;
