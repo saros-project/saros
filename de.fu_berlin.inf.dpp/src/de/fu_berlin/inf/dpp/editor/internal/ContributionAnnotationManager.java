@@ -10,7 +10,6 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -39,7 +38,10 @@ public class ContributionAnnotationManager {
         }
     }
 
+    ISharedProject project;
+
     public ContributionAnnotationManager(ISharedProject project) {
+        this.project = project;
         sharedProjectListener = new SharedProjectListener();
         project.addListener(sharedProjectListener);
     }
@@ -125,8 +127,7 @@ public class ContributionAnnotationManager {
     }
 
     public void dispose() {
-        Saros.getDefault().getSessionManager().getSharedProject()
-            .removeListener(sharedProjectListener);
+        this.project.removeListener(sharedProjectListener);
         sourceToHistory.clear();
     }
 
