@@ -52,9 +52,9 @@ import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogReceiver;
+import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
-import de.fu_berlin.inf.dpp.net.business.JupiterReceiver;
+import de.fu_berlin.inf.dpp.net.business.JupiterHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
@@ -125,10 +125,10 @@ public class Saros extends AbstractUIPlugin {
             MessagingManager.class).addComponent(SessionManager.class)
             .addComponent(SarosUI.class)
             .addComponent(CurrentProjectProxy.class).addComponent(
-                XMPPChatTransmitter.class).addComponent(JupiterReceiver.class)
+                XMPPChatTransmitter.class).addComponent(JupiterHandler.class)
             .addComponent(ConnectionSessionManager.class).addComponent(
                 SarosRosterListener.class).addComponent(
-                ConsistencyWatchdogReceiver.class).addComponent(
+                ConsistencyWatchdogHandler.class).addComponent(
                 XMPPChatReceiver.class).addComponent(InvitationHandler.class)
             .addComponent(LeaveHandler.class).addComponent(
                 RequestForActivityHandler.class).addComponent(

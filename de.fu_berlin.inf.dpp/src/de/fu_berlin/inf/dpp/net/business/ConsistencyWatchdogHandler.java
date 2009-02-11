@@ -39,10 +39,10 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @Component The single instance of this class per application is managed by
  *            PicoContainer
  */
-public class ConsistencyWatchdogReceiver {
+public class ConsistencyWatchdogHandler {
 
     private static Logger log = Logger
-        .getLogger(ConsistencyWatchdogReceiver.class.getName());
+        .getLogger(ConsistencyWatchdogHandler.class.getName());
 
     protected long lastReceivedActivityTime;
 
@@ -185,7 +185,7 @@ public class ConsistencyWatchdogReceiver {
     @Inject
     CurrentProjectProxy project;
 
-    public ConsistencyWatchdogReceiver(XMPPChatReceiver receiver) {
+    public ConsistencyWatchdogHandler(XMPPChatReceiver receiver) {
 
         receiver.addPacketListener(listener, new AndFilter(
             new MessageTypeFilter(Message.Type.chat),

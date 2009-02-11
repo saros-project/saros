@@ -18,15 +18,15 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * @Component The single instance of this class per application is managed by
  *            PicoContainer
  */
-public class JupiterReceiver {
+public class JupiterHandler {
 
-    public static final Logger log = Logger.getLogger(JupiterReceiver.class
+    public static final Logger log = Logger.getLogger(JupiterHandler.class
         .getName());
 
     @Inject
     CurrentProjectProxy currentProject;
 
-    public JupiterReceiver(XMPPChatReceiver receiver) {
+    public JupiterHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(listener, new AndFilter(
             new MessageTypeFilter(Message.Type.chat), RequestPacketExtension
                 .getFilter()));

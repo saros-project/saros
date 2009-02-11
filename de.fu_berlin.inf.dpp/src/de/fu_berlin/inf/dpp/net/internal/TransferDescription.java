@@ -17,6 +17,10 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * A TransferDescription contains all necessary information for dealing with
+ * FileTransfers to a remote user via Jingle, IBB or Chat.
+ */
 public class TransferDescription implements Serializable {
 
     private static final long serialVersionUID = -4063208452619555716L;
