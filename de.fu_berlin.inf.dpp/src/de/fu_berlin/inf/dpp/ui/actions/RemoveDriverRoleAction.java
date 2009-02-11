@@ -36,7 +36,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     public RemoveDriverRoleAction(ISelectionProvider provider) {
         super(provider, "Remove driver role");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user.png"));
-        setToolTipText("Take the driver role from this user.");
+        setToolTipText("Remove the driver role from this user.");
 
         Saros.getDefault().getSessionManager().addSessionListener(
             new ISessionListener() {
@@ -62,7 +62,8 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
-        project.removeDriver(this.selectedUser, false);
+        if (project.isDriver(selectedUser))
+            project.toggleDriverRole(selectedUser, false);
         updateEnablemnet();
     }
 
@@ -70,8 +71,6 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     public void selectionChanged(IStructuredSelection selection) {
         this.selectedUser = (selection.size() == 1) ? (User) selection
             .getFirstElement() : null;
-
-        updateEnablemnet();
     }
 
     private void updateEnablemnet() {

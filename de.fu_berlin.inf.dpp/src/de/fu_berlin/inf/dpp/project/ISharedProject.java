@@ -48,29 +48,17 @@ public interface ISharedProject {
     public Collection<User> getParticipants();
 
     /**
-     * Sets the new driver. If given driver is already driver the call is
-     * ignored.
+     * Toggle the role of the given user. Driver becomes to an observer and vice
+     * versa.
      * 
-     * @param driver
-     *            the new driver.
+     * @param user
+     *            the user which role has to be changed.
      * @param replicated
      *            <code>false</code> if this event was created by this client.
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void toggleDriverRole(User driver, boolean replicated);
-
-    /**
-     * Remove driver role for given User.
-     * 
-     * @param driver
-     *            one current driver.
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    public void removeDriver(User driver, boolean replicated);
+    public void toggleDriverRole(User user, boolean replicated);
 
     /**
      * @return <code>true</code> if the local client is a current driver of this

@@ -218,20 +218,6 @@ public class SharedProject implements ISharedProject {
         }
     }
 
-    public void removeDriver(User driver, boolean replicated) {
-        /* set new observer status in participant list of sharedProject. */
-        getParticipant(driver.getJID()).setUserRole(UserRole.OBSERVER);
-
-        /**
-         * communicate driver role change to listener.
-         */
-        JID jid = driver.getJID();
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.driverChanged(jid, replicated);
-        }
-
-    }
-
     /*
      * (non-Javadoc)
      * 
