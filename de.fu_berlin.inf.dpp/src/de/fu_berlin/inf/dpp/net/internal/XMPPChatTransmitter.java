@@ -102,6 +102,9 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
  * 
+ * Hides the complexity of dealing with changing XMPPConnection objects and
+ * provides convenience functions for sending messages.
+ * 
  * @Component The single instance of this class per application is managed by
  *            PicoContainer
  */

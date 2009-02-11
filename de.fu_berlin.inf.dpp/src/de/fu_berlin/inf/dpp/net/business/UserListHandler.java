@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
@@ -34,7 +34,7 @@ public class UserListHandler extends UserListExtension {
     @Inject
     protected IXMPPTransmitter transmitter;
 
-    public UserListHandler(XMPPReceiver receiver) {
+    public UserListHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
     }
 

@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
 /**
@@ -54,7 +54,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected CurrentProjectProxy currentlySharedProject;
 
     @Inject
-    protected XMPPReceiver xmppReceiver;
+    protected XMPPChatReceiver xmppReceiver;
 
     @Inject
     protected XMPPChatTransmitter transmitter;

@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.business;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +26,8 @@ import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
@@ -183,7 +185,7 @@ public class ConsistencyWatchdogReceiver {
     @Inject
     CurrentProjectProxy project;
 
-    public ConsistencyWatchdogReceiver(XMPPReceiver receiver) {
+    public ConsistencyWatchdogReceiver(XMPPChatReceiver receiver) {
 
         receiver.addPacketListener(listener, new AndFilter(
             new MessageTypeFilter(Message.Type.chat),

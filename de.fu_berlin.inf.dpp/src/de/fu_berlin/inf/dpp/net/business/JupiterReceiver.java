@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.net.internal;
+package de.fu_berlin.inf.dpp.net.business;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
@@ -8,6 +8,8 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -24,7 +26,7 @@ public class JupiterReceiver {
     @Inject
     CurrentProjectProxy currentProject;
 
-    public JupiterReceiver(XMPPReceiver receiver) {
+    public JupiterReceiver(XMPPChatReceiver receiver) {
         receiver.addPacketListener(listener, new AndFilter(
             new MessageTypeFilter(Message.Type.chat), RequestPacketExtension
                 .getFilter()));

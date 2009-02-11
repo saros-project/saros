@@ -52,14 +52,14 @@ import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogReceiver;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
+import de.fu_berlin.inf.dpp.net.business.JupiterReceiver;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
-import de.fu_berlin.inf.dpp.net.internal.ConsistencyWatchdogReceiver;
-import de.fu_berlin.inf.dpp.net.internal.JupiterReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
@@ -129,7 +129,7 @@ public class Saros extends AbstractUIPlugin {
             .addComponent(ConnectionSessionManager.class).addComponent(
                 SarosRosterListener.class).addComponent(
                 ConsistencyWatchdogReceiver.class).addComponent(
-                XMPPReceiver.class).addComponent(InvitationHandler.class)
+                XMPPChatReceiver.class).addComponent(InvitationHandler.class)
             .addComponent(LeaveHandler.class).addComponent(
                 RequestForActivityHandler.class).addComponent(
                 UserListHandler.class);

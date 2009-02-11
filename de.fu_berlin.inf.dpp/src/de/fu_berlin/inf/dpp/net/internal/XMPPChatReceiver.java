@@ -15,15 +15,15 @@ import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
  * 
- * XMPPReceiver implements addPacketListener and removePacketListener just like
+ * XMPPChatReceiver implements addPacketListener and removePacketListener just like
  * a XMPPConnection but hides the complexity of dealing with new connection
  * objects appearing and old one's disappearing. Users can just register with
- * the XMPPReceiver for the whole application lifecycle.
+ * the XMPPChatReceiver for the whole application lifecycle.
  * 
  * @Component The single instance of this class per application is managed by
  *            PicoContainer
  */
-public class XMPPReceiver implements ConnectionSessionListener {
+public class XMPPChatReceiver implements ConnectionSessionListener {
 
     protected Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());

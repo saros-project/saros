@@ -8,7 +8,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
  */
 public class LeaveHandler extends LeaveExtension {
 
-    public LeaveHandler(XMPPReceiver receiver) {
+    public LeaveHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
     }
 

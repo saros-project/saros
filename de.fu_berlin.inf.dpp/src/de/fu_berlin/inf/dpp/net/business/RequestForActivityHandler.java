@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -27,7 +27,7 @@ public class RequestForActivityHandler extends RequestActivityExtension {
     @Inject
     protected IXMPPTransmitter transmitter;
 
-    public RequestForActivityHandler(XMPPReceiver receiver) {
+    public RequestForActivityHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
     }
 
