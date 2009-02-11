@@ -23,7 +23,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -98,6 +97,7 @@ import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -227,21 +227,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 }
             }).start();
-        }
-    }
-
-    public static String read(InputStream input) throws IOException {
-
-        try {
-            byte[] content = IOUtils.toByteArray(input);
-
-            try {
-                return new String(content, "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                return new String(content);
-            }
-        } finally {
-            IOUtils.closeQuietly(input);
         }
     }
 
@@ -1193,7 +1178,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         String fileListAsString;
         try {
-            fileListAsString = read(input);
+            fileListAsString = Util.read(input);
         } catch (IOException e) {
             log.error("Error receiving FileList", e);
             return;

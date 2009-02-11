@@ -2,7 +2,9 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.io.IOUtils;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -163,6 +166,21 @@ public class Util {
                 return false;
             }
         };
+    }
+
+    public static String read(InputStream input) throws IOException {
+    
+        try {
+            byte[] content = IOUtils.toByteArray(input);
+    
+            try {
+                return new String(content, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return new String(content);
+            }
+        } finally {
+            IOUtils.closeQuietly(input);
+        }
     }
 
 }
