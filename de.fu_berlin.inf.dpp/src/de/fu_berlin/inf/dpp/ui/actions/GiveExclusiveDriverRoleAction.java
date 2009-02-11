@@ -67,13 +67,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         for (User user : project.getParticipants()) {
             if ((project.isDriver(user) && !user.getJID().equals(
                 selectedUser.getJID()))) {
-                project.toggleDriverRole(user, false);
+                project.toggleUserRole(user, false);
             }
         }
 
         // if selected user is not already driver give him driver role
         if (!project.isDriver(selectedUser))
-            project.toggleDriverRole(this.selectedUser, false);
+            project.toggleUserRole(this.selectedUser, false);
     }
 
     @Override

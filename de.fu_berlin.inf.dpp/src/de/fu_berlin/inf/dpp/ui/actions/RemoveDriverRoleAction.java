@@ -63,7 +63,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
         if (project.isDriver(selectedUser))
-            project.toggleDriverRole(selectedUser, false);
+            project.toggleUserRole(selectedUser, false);
         updateEnablemnet();
     }
 

@@ -179,7 +179,7 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public void toggleDriverRole(User driver, boolean replicated) {
+    public void toggleUserRole(User driver, boolean replicated) {
 
         assert driver != null;
 

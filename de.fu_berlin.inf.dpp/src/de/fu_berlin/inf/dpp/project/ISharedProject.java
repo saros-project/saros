@@ -58,7 +58,7 @@ public interface ISharedProject {
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void toggleDriverRole(User user, boolean replicated);
+    public void toggleUserRole(User user, boolean replicated);
 
     /**
      * @return <code>true</code> if the local client is a current driver of this

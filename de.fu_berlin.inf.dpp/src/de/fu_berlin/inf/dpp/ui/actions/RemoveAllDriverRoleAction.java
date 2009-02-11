@@ -56,7 +56,7 @@ public class RemoveAllDriverRoleAction extends Action implements
             .getSharedProject();
         for (User user : project.getParticipants()) {
             if (project.isDriver(user)) {
-                project.toggleDriverRole(user, false);
+                project.toggleUserRole(user, false);
             }
         }
     }

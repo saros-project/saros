@@ -89,7 +89,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
             RoleActivity roleActivity = (RoleActivity) activity;
             User user = this.sharedProject.getParticipant(roleActivity
                 .getDriver());
-            this.sharedProject.toggleDriverRole(user, true);
+            this.sharedProject.toggleUserRole(user, true);
         }
     }
 
