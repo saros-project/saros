@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -91,6 +90,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
@@ -581,45 +581,43 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         removeAllAnnotations(ContributionAnnotation.TYPE);
 
         if (Saros.getDefault().getMyJID().equals(driver)) {
+
+            // get the session view
+            IViewPart view = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage().findView(
+                    "de.fu_berlin.inf.dpp.ui.SessionView");
+
             if (isDriver) {
+
                 removeAllAnnotations(ViewportAnnotation.TYPE);
 
-                // if session view is open return
-                IViewReference[] references = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage()
-                    .getViewReferences();
-                for (IViewReference ref : references) {
-                    if (ref.getId().equals(
-                        "de.fu_berlin.inf.dpp.ui.SessionView"))
-                        return;
+                // if session view is not open show the balloon notification in
+                // the control which has the keyboard focus
+                if (view == null) {
+                    ErrorMessageDialog.showErrorMessage("Test1");
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            BalloonNotification.showNotification(Display
+                                .getDefault().getFocusControl(),
+                                "Role changed",
+                                "You are now a driver of this session.", 5000);
+                        }
+                    });
                 }
-                // show notification of role change
-                Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        // show balloon notification
-                        BalloonNotification.showNotification(Display
-                            .getDefault().getFocusControl(), "Role changed",
-                            "You are now a driver of this session.", 5000);
-                    }
-                });
             } else {
-                // if session view is open return
-                IViewReference[] references = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage()
-                    .getViewReferences();
-                for (IViewReference ref : references) {
-                    if (ref.getId().equals(
-                        "de.fu_berlin.inf.dpp.ui.SessionView"))
-                        return;
+                // if session view is not open show the balloon notification in
+                // the control which has the keyboard focus
+                if (view == null) {
+                    Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            BalloonNotification.showNotification(Display
+                                .getDefault().getFocusControl(),
+                                "Role changed",
+                                "You are now an observer of this session.",
+                                5000);
+                        }
+                    });
                 }
-                // show notification of role change
-                Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        BalloonNotification.showNotification(Display
-                            .getDefault().getFocusControl(), "Role changed",
-                            "You are now an observer of this session.", 5000);
-                    }
-                });
             }
         }
 
