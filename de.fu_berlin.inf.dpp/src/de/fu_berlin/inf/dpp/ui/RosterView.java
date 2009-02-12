@@ -322,7 +322,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         RowLayout layout = new RowLayout(SWT.VERTICAL);
         layout.pack = true;
-        layout.fill = true;
         layout.spacing = 5;
         composite.setLayout(layout);
 
@@ -403,6 +402,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
         // .getStatusLineManager();
         // statusLine.setMessage(SarosUI.getDescription(newState));
         label.setText(SarosUI.getDescription(newState));
+        composite.layout();
     }
 
     private void attachRosterListener() {
