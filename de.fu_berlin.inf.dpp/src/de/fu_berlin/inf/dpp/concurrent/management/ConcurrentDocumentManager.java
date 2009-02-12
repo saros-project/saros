@@ -9,11 +9,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filebuffers.LocationKind;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
@@ -104,9 +108,21 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         IPath fullPath = resource.getFullPath();
 
-        ITextFileBuffer fileBuff = FileBuffers.getTextFileBufferManager()
-            .getTextFileBuffer(fullPath, LocationKind.IFILE);
-        return fileBuff;
+        ITextFileBufferManager tfbm = FileBuffers.getTextFileBufferManager();
+
+        ITextFileBuffer fileBuff = tfbm.getTextFileBuffer(fullPath,
+            LocationKind.IFILE);
+        if (fileBuff != null)
+            return fileBuff;
+        else {
+            try {
+                tfbm.connect(fullPath, LocationKind.IFILE,
+                    new NullProgressMonitor());
+            } catch (CoreException e) {
+                return null;
+            }
+            return tfbm.getTextFileBuffer(fullPath, LocationKind.IFILE);
+        }
     }
 
     /**
@@ -772,10 +788,28 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
             IPath path = checksum.getPath();
 
+            IFile file = sharedProject.getProject().getFile(path);
+            if (!file.exists()) {
+                ConcurrentDocumentManager.this.pathesWithWrongChecksums
+                    .add(path);
+                if (!inconsistencyToResolve.getVariable()) {
+                    inconsistencyToResolve.setVariable(true);
+                }
+                continue;
+            }
+
             IDocument doc = EditorManager.getDefault().getDocument(path);
 
             // if doc == null there is no editor with this resource open
             if (doc == null) {
+                // get Document from FileBuffer
+                doc = getTextFileBuffer(path).getDocument();
+            }
+
+            // if doc is still null give up
+            if (doc == null) {
+                logger.warn("Could not check checksum of file "
+                    + path.toOSString());
                 continue;
             }
 
