@@ -58,8 +58,8 @@ import de.fu_berlin.inf.dpp.net.business.JupiterHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
@@ -87,6 +87,8 @@ public class Saros extends AbstractUIPlugin {
     private static Saros plugin;
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
+
+    public String xmppFeatureID;
 
     private MutablePicoContainer container;
 
@@ -145,10 +147,16 @@ public class Saros extends AbstractUIPlugin {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
+        xmppFeatureID = plugin.toString()
+            + "_"
+            + (String) getBundle().getHeaders().get(
+                org.osgi.framework.Constants.BUNDLE_VERSION);
+
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
 
         setupLoggers();
+        logger.debug("Starting Saros with id " + xmppFeatureID);
 
         ActivityRegistry.getDefault();
         SkypeManager.getDefault();
@@ -274,6 +282,8 @@ public class Saros extends AbstractUIPlugin {
 
             ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                 .getInstanceFor(connection);
+
+            sdm.addFeature(xmppFeatureID);
 
             // add Jingle feature to the supported extensions
             if (!prefStore
@@ -613,6 +623,17 @@ public class Saros extends AbstractUIPlugin {
 
         return getSessionManager().getSharedProject().getParticipant(
             Saros.getDefault().getMyJID());
+    }
+
+    public boolean hasSarosSupport(String username) {
+        ServiceDiscoveryManager sdm = ServiceDiscoveryManager
+            .getInstanceFor(getDefault().getConnection());
+        try {
+            return sdm.discoverInfo(username + "/Smack").containsFeature(
+                xmppFeatureID);
+        } catch (XMPPException e) {
+            return false;
+        }
     }
 
 }

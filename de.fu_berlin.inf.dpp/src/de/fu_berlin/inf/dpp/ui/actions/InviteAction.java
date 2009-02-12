@@ -45,7 +45,7 @@ public class InviteAction extends SelectionProviderAction implements
         super(provider, "Invite user to shared project..");
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Start a IM messaging session with this user");
+        setToolTipText("Invite user to shared project..");
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/transmit_blue.png"));
 
@@ -112,7 +112,8 @@ public class InviteAction extends SelectionProviderAction implements
 
         setEnabled(getSharedProject() != null && this.selectedEntry != null
             && getSharedProject().getParticipant(jid) == null
-            && getSharedProject().isHost() && presence.isAvailable());
+            && getSharedProject().isHost() && presence.isAvailable()
+            && Saros.getDefault().hasSarosSupport(jid.toString()));
     }
 
     private ISharedProject getSharedProject() {

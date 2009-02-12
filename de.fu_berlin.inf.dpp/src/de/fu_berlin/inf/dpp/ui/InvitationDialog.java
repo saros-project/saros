@@ -109,9 +109,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 if (item.outgoingProcess != null) {
                     if (item.outgoingProcess.getState() == IInvitationProcess.State.SYNCHRONIZING) {
                         return "Transfering file "
-                            + (item.outgoingProcess.getProgressCurrent()) + " of "
-                            + item.outgoingProcess.getProgressMax() + ": "
-                            + item.outgoingProcess.getProgressInfo();
+                            + (item.outgoingProcess.getProgressCurrent())
+                            + " of " + item.outgoingProcess.getProgressMax()
+                            + ": " + item.outgoingProcess.getProgressInfo();
                     } else {
                         return "";
                     }
@@ -256,8 +256,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 Object o = ti.getData();
 
                 InviterData invdat = (InviterData) o;
-                invdat.outgoingProcess = project
-                    .invite(invdat.jid, name, true, this);
+                invdat.outgoingProcess = project.invite(invdat.jid, name, true,
+                    this);
             }
 
             return false; // we wanna wait (and block) until all invites are
@@ -456,12 +456,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 refreshRosterList();
             }
 
-            public void presenceChanged(String XMPPAddress) {
-                refreshRosterList();
-            }
-
             public void presenceChanged(Presence presence) {
-                presenceChanged(presence.getFrom());
+                refreshRosterList();
 
             }
         });
@@ -511,6 +507,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         for (RosterEntry entry : users) {
 
             String username = entry.getUser();
+
+            if (!Saros.getDefault().hasSarosSupport(username)) {
+                continue;
+            }
+
             Presence presence = this.roster.getPresence(username);
 
             User user = Saros.getDefault().getSessionManager()
@@ -547,5 +548,4 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             this.table.setSelection(curselNew);
         }
     }
-
 }
