@@ -90,7 +90,6 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
-import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
@@ -594,7 +593,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
                 if (view == null) {
-                    ErrorMessageDialog.showErrorMessage("Test1");
                     Display.getDefault().asyncExec(new Runnable() {
                         public void run() {
                             BalloonNotification.showNotification(Display
