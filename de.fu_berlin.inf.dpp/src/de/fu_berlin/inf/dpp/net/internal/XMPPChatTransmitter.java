@@ -135,6 +135,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     private JingleFileTransferManager jingleManager;
 
+    protected ExecutorService executor;
+
     public JingleFileTransferManager getJingleManager() {
         try {
             if (startingJingleThread == null)
@@ -148,8 +150,6 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     private Thread startingJingleThread;
-
-    protected long lastReceivedActivityTime;
 
     protected JingleDiscoveryManager jingleDiscovery;
 
@@ -447,6 +447,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void setXMPPConnection(final XMPPConnection connection) {
+
+        this.executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
 
         this.connection = connection;
         this.chatmanager = connection.getChatManager();
@@ -1077,8 +1079,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     }
 
-    ExecutorService executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
-
     public void sendFileAsync(JID recipient, IProject project,
         final IPath path, int timestamp, final IFileTransferCallback callback)
         throws IOException {
@@ -1108,6 +1108,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void dispose() {
         executor.shutdownNow();
+        chats.clear();
+        processes.clear();
+        incomingFiles.clear();
+        fileTransferQueue.clear();
+        messageTransferQueue.clear();
     }
 
     public void prepare(XMPPConnection connection) {
