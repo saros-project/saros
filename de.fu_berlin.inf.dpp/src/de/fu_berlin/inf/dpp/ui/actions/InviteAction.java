@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -102,10 +103,16 @@ public class InviteAction extends SelectionProviderAction implements
     private void updateEnablement() {
         JID jid = (this.selectedEntry == null) ? null : new JID(
             this.selectedEntry.getUser());
+        if (jid == null) {
+            setEnabled(false);
+            return;
+        }
+        Presence presence = Saros.getDefault().getConnection().getRoster()
+            .getPresence(jid.toString());
 
-        setEnabled((getSharedProject() != null) && (this.selectedEntry != null)
-            && (getSharedProject().getParticipant(jid) == null)
-            && (getSharedProject().isHost() || getSharedProject().isDriver()));
+        setEnabled(getSharedProject() != null && this.selectedEntry != null
+            && getSharedProject().getParticipant(jid) == null
+            && getSharedProject().isHost() && presence.isAvailable());
     }
 
     private ISharedProject getSharedProject() {
