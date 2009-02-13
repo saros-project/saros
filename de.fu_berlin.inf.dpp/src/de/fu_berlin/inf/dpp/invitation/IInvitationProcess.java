@@ -37,8 +37,14 @@ public interface IInvitationProcess extends IFileTransferCallback {
          */
         public void cancel(String errorMsg, boolean replicated);
 
-        public void updateInvitationProgress(final JID jid);
+        /**
+         * Update the status information for the given JID
+         */
+        public void updateInvitationProgress(JID jid);
 
+        /**
+         * Run the given runnable in the GUI Thread
+         */
         public void runGUIAsynch(final Runnable runnable);
     }
 
