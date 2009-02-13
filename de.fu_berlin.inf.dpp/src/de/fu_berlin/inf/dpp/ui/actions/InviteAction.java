@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
@@ -39,6 +40,9 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 public class InviteAction extends SelectionProviderAction implements
     ISessionListener {
 
+    private static final Logger log = Logger.getLogger(InviteAction.class
+        .getName());
+
     private RosterEntry selectedEntry;
 
     public InviteAction(ISelectionProvider provider) {
@@ -50,6 +54,7 @@ public class InviteAction extends SelectionProviderAction implements
             .getImageDescriptor("icons/transmit_blue.png"));
 
         Saros.getDefault().getSessionManager().addSessionListener(this);
+        updateEnablement();
     }
 
     @Override
@@ -73,47 +78,47 @@ public class InviteAction extends SelectionProviderAction implements
         updateEnablement();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
     public void sessionStarted(ISharedProject session) {
         updateEnablement();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
     public void sessionEnded(ISharedProject session) {
         updateEnablement();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
     public void invitationReceived(IIncomingInvitationProcess process) {
         // ignore
     }
 
-    private void updateEnablement() {
-        JID jid = (this.selectedEntry == null) ? null : new JID(
-            this.selectedEntry.getUser());
-        if (jid == null) {
-            setEnabled(false);
-            return;
-        }
-        Presence presence = Saros.getDefault().getConnection().getRoster()
-            .getPresence(jid.toString());
+    protected void updateEnablement() {
 
-        setEnabled(getSharedProject() != null && this.selectedEntry != null
-            && getSharedProject().getParticipant(jid) == null
-            && getSharedProject().isHost() && presence.isAvailable()
-            && Saros.getDefault().hasSarosSupport(jid.toString()));
+        try {
+            JID jid = (this.selectedEntry == null) ? null : new JID(
+                this.selectedEntry.getUser());
+            if (jid == null) {
+                setEnabled(false);
+                return;
+            }
+            Presence presence = Saros.getDefault().getConnection().getRoster()
+                .getPresence(jid.toString());
+
+            log
+                .debug(String
+                    .format(
+                        "InviteAction enabled==(in session %b, user in session %b, host %b, available %b, saros %b)",
+                        getSharedProject() != null, getSharedProject()
+                            .getParticipant(jid) == null, getSharedProject()
+                            .isHost(), presence.isAvailable(), Saros
+                            .getDefault().hasSarosSupport(jid.toString())));
+
+            setEnabled(getSharedProject() != null
+                && getSharedProject().getParticipant(jid) == null
+                && getSharedProject().isHost() && presence.isAvailable()
+                && Saros.getDefault().hasSarosSupport(jid.toString()));
+
+        } catch (RuntimeException e) {
+            log.error("Internal Error while updating InviteAction:", e);
+        }
     }
 
     private ISharedProject getSharedProject() {
