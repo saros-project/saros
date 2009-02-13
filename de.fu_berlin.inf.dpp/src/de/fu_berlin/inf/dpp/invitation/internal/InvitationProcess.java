@@ -37,7 +37,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
     protected State state;
 
     /** mode of file transfer. */
-    protected TransferMode tmode;
+    protected TransferMode transferMode;
 
     private Exception exception;
 
@@ -56,7 +56,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
         this.description = description;
         this.colorID = colorID;
 
-        this.tmode = TransferMode.JINGLE;
+        this.transferMode = TransferMode.JINGLE;
 
         transmitter.addInvitationProcess(this);
     }

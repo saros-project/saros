@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -56,7 +55,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     private int progress_done;
     private int progress_max;
-    private String progress_info;
+    private String progress_info = "";
 
     private FileList remoteFileList;
 
@@ -69,8 +68,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     private long transferedFileSize = 0;
 
     public int getProgressCurrent() {
-        // TODO CJ: Jingle File Transfer progrss information
-        if (this.tmode == TransferMode.IBB) {
+        // TODO CJ: Jingle File Transfer progress information
+        if (this.transferMode == TransferMode.IBB) {
             return (int) (this.transferedFileSize);
         } else {
             return this.progress_done + 1;
@@ -78,32 +77,15 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     public int getProgressMax() {
-        if (this.tmode == TransferMode.IBB) {
+        if (this.transferMode == TransferMode.IBB) {
             return (int) (this.fileSize);
         } else {
             return this.progress_max;
         }
-
     }
 
     public String getProgressInfo() {
         return this.progress_info;
-    }
-
-    /**
-     * A simple runnable that calls
-     * {@link IOutgoingInvitationProcess#startSynchronization(IProgressMonitor)}
-     */
-    private class SynchronizationRunnable implements Runnable {
-        private final OutgoingInvitationProcess process;
-
-        public SynchronizationRunnable(OutgoingInvitationProcess process) {
-            this.process = process;
-        }
-
-        public void run() {
-            this.process.startSynchronization();
-        }
     }
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
@@ -124,49 +106,39 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IOutgoingInvitationProcess
-     */
     public void startSynchronization() {
         assertState(State.GUEST_FILELIST_SENT);
 
         setState(State.SYNCHRONIZING);
 
-        if ((this.tmode == TransferMode.JINGLE)
-            || (this.tmode == TransferMode.DEFAULT)
-            || (this.tmode == TransferMode.IBB)) {
-            try {
-                FileList local = new FileList(this.sharedProject.getProject());
-                FileList diff = this.remoteFileList.diff(local);
+        try {
+            FileList local = new FileList(this.sharedProject.getProject());
+            FileList diff = this.remoteFileList.diff(local);
 
-                List<IPath> added = diff.getAddedPaths();
-                List<IPath> altered = diff.getAlteredPaths();
-                this.toSend = new ArrayList<IPath>(added.size()
-                    + altered.size());
-                this.toSend.addAll(added);
-                this.toSend.addAll(altered);
+            List<IPath> added = diff.getAddedPaths();
+            List<IPath> altered = diff.getAlteredPaths();
+            this.toSend = new ArrayList<IPath>(added.size() + altered.size());
+            this.toSend.addAll(added);
+            this.toSend.addAll(altered);
 
-                this.progress_max = this.toSend.size();
-                this.progress_done = 0;
+            this.progress_max = this.toSend.size();
+            this.progress_done = 0;
 
-                /* transfer all data with archive. */
-                if (tmode == TransferMode.IBB) {
-                    sendArchive();
-                } else {
-                    /* send separate files. */
-                    sendNext();
-                }
-
-                if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
-                    cancel(null, false);
-                }
-
-            } catch (CoreException e) {
-                failed(e);
-
+            /* transfer all data with archive. */
+            if (transferMode == TransferMode.IBB) {
+                sendArchive();
+            } else {
+                /* send separate files. */
+                sendNext();
             }
+
+            if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
+                cancel(null, false);
+            }
+
+        } catch (CoreException e) {
+            failed(e);
+
         }
 
     }
@@ -186,7 +158,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         try {
             this.transmitter.sendFileList(this.peer, this.sharedProject
-                .getFileList());
+                .getFileList(), this);
             setState(State.HOST_FILELIST_SENT);
         } catch (Exception e) {
             failed(e);
@@ -194,9 +166,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
     public void fileListReceived(JID from, FileList fileList) {
@@ -205,12 +175,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.remoteFileList = fileList;
         setState(State.GUEST_FILELIST_SENT);
 
-        this.invitationUI.runGUIAsynch(new SynchronizationRunnable(this));
+        this.invitationUI.runGUIAsynch(new Runnable() {
+            public void run() {
+                startSynchronization();
+            }
+        });
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
     public void joinReceived(JID from) {
@@ -237,38 +209,31 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback
+     * Methods for implementing IFileTransferCallback
      */
     public void fileTransferFailed(IPath path, Exception e) {
         failed(e);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.IFileTrafnsferCallback
-     */
     public void fileSent(IPath path) {
 
-        if (this.tmode == TransferMode.IBB) {
+        if (transferMode == TransferMode.IBB) {
             setState(State.SYNCHRONIZING_DONE);
         } else {
-            this.progress_done++;
+            progress_done++;
             sendNext();
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.IFileTransferCallback#transferProgress(int)
-     */
     public void transferProgress(int transfered) {
-        this.transferedFileSize = transfered;
-        /* update ui */
-        this.invitationUI.updateInvitationProgress(this.peer);
+        transferedFileSize = transfered;
+
+        // Tell the UI to update itself
+        invitationUI.updateInvitationProgress(peer);
+    }
+
+    public void setTransferMode(TransferMode newMode) {
+        transferMode = newMode;
     }
 
     private void sendNext() {
@@ -284,9 +249,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         }
 
         IPath path = this.toSend.remove(0);
-        this.progress_info = path.toFile().getName();
-
-        this.invitationUI.updateInvitationProgress(this.peer);
+        this.setProgressInfo(path.toFile().getName());
 
         try {
             this.transmitter.sendFileAsync(this.peer, this.sharedProject
@@ -315,20 +278,25 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             .debug("Project archive file has to be send. "
                 + this.archive.getAbsolutePath() + " length: "
                 + this.archive.length());
+
         try {
-            /* create project zip archive. */
+
+            this.setProgressInfo("Creating Archive");
+
+            /* Create project archive. */
+            // TODO Track Progress and provide possibility to cancel
             FileZipper.createProjectZipArchive(this.toSend, this.archive
                 .getAbsolutePath(), this.sharedProject.getProject());
-            /* send data. */
+
+            this.setProgressInfo("Sending project archive");
+
+            /* Send data. */
+            // TODO Track Progress and provide possibility to cancel
             this.transmitter.sendProjectArchive(this.peer, this.sharedProject
                 .getProject(), this.archive, this);
         } catch (Exception e) {
             failed(e);
         }
-
-        this.progress_info = "Transfer project tar file";
-
-        // fileSize = archive.length();
     }
 
     /**
@@ -364,7 +332,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      *         <code>false</code> if the user chose to cancel.
      */
     private boolean blockUntilJoinReceived() {
-        this.progress_info = "Waiting for confirmation";
+
+        this.setProgressInfo("Waiting for confirmation");
 
         while (this.state != State.DONE) {
             if (getState() == State.CANCELED) {
@@ -377,7 +346,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 Thread.currentThread().interrupt();
             }
         }
-        this.progress_info = "";
+        this.setProgressInfo("");
 
         return true;
     }
@@ -426,18 +395,18 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
      */
     public TransferMode getTransferMode() {
-        return this.tmode;
-    }
-
-    public void setTransferMode(TransferMode mode) {
-        this.tmode = mode;
-
+        return this.transferMode;
     }
 
     @Override
     public void cancel(String errorMsg, boolean replicated) {
         super.cancel(errorMsg, replicated);
         sharedProject.returnColor(this.colorID);
+    }
+
+    public void setProgressInfo(String progress_info) {
+        this.progress_info = progress_info;
+        this.invitationUI.updateInvitationProgress(this.peer);
     }
 
 }

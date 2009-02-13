@@ -24,6 +24,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
+import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
@@ -106,7 +108,31 @@ public class ConsistencyWatchdogHandler {
                             try {
                                 transmitter.sendFile(from, Saros.getDefault()
                                     .getSessionManager().getSharedProject()
-                                    .getProject(), path, -1);
+                                    .getProject(), path, -1,
+                                    /* TODO CO The Callback should be used to show progress to the user */
+                                    new IFileTransferCallback() {
+
+                                        public void fileSent(IPath path) {
+                                            // do nothing
+                                        }
+
+                                        public void fileTransferFailed(
+                                            IPath path, Exception e) {
+                                            // do nothing
+
+                                        }
+
+                                        public void setTransferMode(
+                                            TransferMode mode) {
+                                            // do nothing
+                                        }
+
+                                        public void transferProgress(
+                                            int transfered) {
+                                            // do nothing
+                                        }
+
+                                    });
                             } catch (IOException e) {
                                 log
                                     .error("Could not sent file for consistency resolution");

@@ -94,7 +94,6 @@ import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -628,44 +627,42 @@ public class XMPPChatTransmitter implements ITransmitter,
                 .getDefault().getSessionManager().getSessionID(),
                 timedActivities));
         }
-
     }
 
-    protected void sendData(TransferDescription jingleFileTransferData,
-        byte[] content) throws IOException {
+    protected void sendData(TransferDescription transferData, byte[] content,
+        IFileTransferCallback callback) throws IOException {
 
         // TODO Buffer correctly when not connected....
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
 
-        /*
-         * TODO This is not a safe way to determine whether the user really
-         * supports Jingle at this point in time - He might have left and
-         * reconnected and changed his Jingle settings in between
-         */
-        if (getFileTransferModeViaChat()
-            || !jingleDiscovery
-                .getCachedJingleSupport(jingleFileTransferData.recipient)) {
+        for (Transmitter transmitter : new Transmitter[] { jingle, ibb,
+            handmade }) {
 
-            ibb.send(jingleFileTransferData, content);
-
-        } else {
-
-            try {
-                jingle.send(jingleFileTransferData, content);
-            } catch (Exception e) {
-                // TODO Catch only IOException and RuntimeException
-                log.error("Failed to send file with jingle, fall back to IBB",
-                    e);
-                ibb.send(jingleFileTransferData, content);
-
-                // Fall back to ChatTransfer:
-                // handmade.send(data)
+            if (transmitter.isSuitable(transferData.recipient)) {
+                try {
+                    transmitter.send(transferData, content, callback);
+                    return;
+                } catch (Exception e) {
+                    log.error("Failed to send file with "
+                        + transmitter.getName() + ":", e);
+                }
             }
         }
+
+        throw new IOException("Exhausted all options to send the given file.");
+
     }
 
     public interface Transmitter {
+
+        public String getName();
+
+        /**
+         * Should return true if this transmitter can send data to the given
+         * JID.
+         */
+        public boolean isSuitable(JID jid);
 
         /**
          * Send the given data as a blocking operation.
@@ -678,8 +675,8 @@ public class XMPPChatTransmitter implements ITransmitter,
          * @throws IOException
          *             if the send failed
          */
-        public void send(TransferDescription data, byte[] content)
-            throws IOException;
+        public void send(TransferDescription data, byte[] content,
+            IFileTransferCallback callback) throws IOException;
 
     }
 
@@ -692,8 +689,8 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     Transmitter handmade = new Transmitter() {
 
-        public void send(TransferDescription data, byte[] content)
-            throws IOException {
+        public void send(TransferDescription data, byte[] content,
+            IFileTransferCallback callback) throws IOException {
 
             final int maxMsgLen = Saros.getDefault().getPreferenceStore()
                 .getInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE);
@@ -733,12 +730,20 @@ public class XMPPChatTransmitter implements ITransmitter,
                 throw new IOException("Sending failed", e);
             }
         }
+
+        public boolean isSuitable(JID jid) {
+            return true;
+        }
+
+        public String getName() {
+            return "ChatTransfer";
+        }
     };
 
     Transmitter ibb = new Transmitter() {
 
-        public void send(TransferDescription data, byte[] content)
-            throws IOException {
+        public void send(TransferDescription data, byte[] content,
+            IFileTransferCallback callback) throws IOException {
 
             log.debug("Sending via IBB: " + data.toString());
 
@@ -748,7 +753,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 .createOutgoingFileTransfer(data.getRecipient().toString());
 
             FileTransferProgressMonitor monitor = new FileTransferProgressMonitor(
-                transfer);
+                transfer, callback, content.length);
 
             // The file path is irrelevant
             transfer.sendStream(new ByteArrayInputStream(content),
@@ -779,12 +784,20 @@ public class XMPPChatTransmitter implements ITransmitter,
                     + transfer.getStatus());
             }
         }
+
+        public boolean isSuitable(JID jid) {
+            return true;
+        }
+
+        public String getName() {
+            return "IBB";
+        }
     };
 
     Transmitter jingle = new Transmitter() {
 
-        public void send(TransferDescription data, byte[] content)
-            throws IOException {
+        public void send(TransferDescription data, byte[] content,
+            IFileTransferCallback callback) throws IOException {
             try {
                 JingleFileTransferManager jftm = getJingleManager();
                 if (jftm == null)
@@ -795,20 +808,37 @@ public class XMPPChatTransmitter implements ITransmitter,
                 throw new IOException(e);
             }
         }
+
+        public boolean isSuitable(JID jid) {
+
+            if (getFileTransferModeViaChat())
+                return false;
+
+            /*
+             * TODO This is not a safe way to determine whether the user really
+             * supports Jingle at this point in time - He might have left and
+             * reconnected and changed his Jingle settings in between
+             */
+            return jingleDiscovery.getCachedJingleSupport(jid);
+        }
+
+        public String getName() {
+            return "Jingle";
+        }
     };
 
-    public void sendFileList(JID recipient, FileList fileList)
-        throws IOException {
+    public void sendFileList(JID recipient, FileList fileList,
+        IFileTransferCallback callback) throws IOException {
 
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(connection
                 .getUser()));
 
-        sendData(data, fileList.toXML().getBytes());
+        sendData(data, fileList.toXML().getBytes(), callback);
     }
 
-    public void sendFile(JID to, IProject project, IPath path, int timestamp)
-        throws IOException {
+    public void sendFile(JID to, IProject project, IPath path, int timestamp,
+        IFileTransferCallback callback) throws IOException {
 
         TransferDescription transfer = TransferDescription
             .createFileTransferDescription(to, new JID(connection.getUser()),
@@ -816,7 +846,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
-        sendData(transfer, FileUtils.readFileToByteArray(f));
+        sendData(transfer, FileUtils.readFileToByteArray(f), callback);
     }
 
     public void sendProjectArchive(JID recipient, IProject project,
@@ -828,7 +858,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         // TODO monitor progress
         try {
-            sendData(transfer, FileUtils.readFileToByteArray(archive));
+            sendData(transfer, FileUtils.readFileToByteArray(archive), callback);
             if (callback != null)
                 callback.fileSent(new Path(archive.getName()));
 
@@ -1097,7 +1127,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         executor.execute(new Runnable() {
             public void run() {
                 try {
-                    sendData(transfer, content);
+                    sendData(transfer, content, callback);
                     callback.fileSent(path);
                 } catch (Exception e) {
                     callback.fileTransferFailed(path, e);
@@ -1173,8 +1203,11 @@ public class XMPPChatTransmitter implements ITransmitter,
             TimedActivity timedActivity = new TimedActivity(new FileActivity(
                 FileActivity.Type.Created, path, input), time);
 
-            ISessionManager sm = Saros.getDefault().getSessionManager();
-            sm.getSharedProject().getSequencer().exec(timedActivity);
+            ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
+
+            if (project != null)
+                project.getSequencer().exec(timedActivity);
         }
 
     }

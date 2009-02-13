@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smackx.filetransfer.FileTransfer;
 
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -13,6 +14,9 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
  */
 public class FileTransferProgressMonitor extends Thread {
 
+    private static final Logger log = Logger
+        .getLogger(FileTransferProgressMonitor.class.getName());
+
     protected FileTransfer transfer;
 
     protected RuntimeException exception;
@@ -21,15 +25,13 @@ public class FileTransferProgressMonitor extends Thread {
 
     protected IFileTransferCallback callback;
 
-    public FileTransferProgressMonitor(FileTransfer transfer) {
-        this.transfer = transfer;
-        start();
-    }
+    protected long filesize;
 
     public FileTransferProgressMonitor(FileTransfer transfer,
-        IFileTransferCallback callback) {
+        IFileTransferCallback callback, long filesize) {
         this.transfer = transfer;
         this.callback = callback;
+        this.filesize = filesize;
         start();
     }
 
@@ -47,21 +49,30 @@ public class FileTransferProgressMonitor extends Thread {
         return exception;
     }
 
-    public void close() {
+    public void cancel() {
+        this.transfer.cancel();
         this.running = false;
+    }
+
+    public double getProgress() {
+        // transfer.getProgress() has a bug, when sending a stream
+        return ((double) this.transfer.getAmountWritten()) / this.filesize;
+    }
+
+    public int getProgressPercent() {
+        return (int) (100 * getProgress());
     }
 
     @Override
     public void run() {
         try {
-            while (this.running && !this.transfer.isDone()
-                && this.transfer.getProgress() < 1.0) {
+            while (this.running && !this.transfer.isDone()) {
+
+                log.trace("Progress " + getProgressPercent() + "%");
 
                 if (this.callback != null) {
-                    this.callback.transferProgress((int) (this.transfer
-                        .getProgress() * 100));
+                    this.callback.transferProgress(getProgressPercent());
                 }
-
                 Thread.sleep(100);
             }
         } catch (RuntimeException e) {

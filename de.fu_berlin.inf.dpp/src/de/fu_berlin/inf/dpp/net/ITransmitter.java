@@ -105,7 +105,8 @@ public interface ITransmitter {
      *             transfer.
      * @throws IOException
      */
-    public void sendFileList(JID jid, FileList fileList) throws IOException;
+    public void sendFileList(JID jid, FileList fileList,
+        IFileTransferCallback callback) throws IOException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -154,12 +155,11 @@ public interface ITransmitter {
      *             If we file could not be read or an error occurred while
      *             sending
      */
-    public void sendFile(JID to, IProject project, IPath path, int timestamp)
-        throws IOException;
+    public void sendFile(JID to, IProject project, IPath path, int timestamp,
+        IFileTransferCallback callback) throws IOException;
 
     /**
-     * Sends given archive file to given recipient. (Fallback of jingle file
-     * transfer to achieve better transfer with IBB.)
+     * Sends given archive file to given recipient.
      * 
      * @param recipient
      *            the Jabber ID of the recipient.

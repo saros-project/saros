@@ -127,9 +127,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         monitor.done();
 
-        // TODO: for testing
-        // tmode = TransferMode.IBB;
-
         return this.remoteFileList;
     }
 
@@ -160,17 +157,18 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 this.remoteFileList);
 
             this.progressMonitor = monitor;
-            if (this.tmode == TransferMode.IBB) {
-                this.progressMonitor
-                    .beginTask("Transfer archive file ...", 100);
+            if (this.transferMode == TransferMode.IBB) {
+                this.progressMonitor.beginTask("Synchronizing",
+                    100 + this.filesLeftToSynchronize);
+                this.progressMonitor.subTask("Receiving Archive...");
             } else {
-                this.progressMonitor.beginTask("Synchronizing...",
+                this.progressMonitor.beginTask("Synchronizing",
                     this.filesLeftToSynchronize);
             }
             setState(State.SYNCHRONIZING);
 
             this.transmitter.sendFileList(this.peer, new FileList(
-                this.localProject));
+                this.localProject), this);
 
             if (blockUntilAllFilesSynchronized(monitor)) {
                 done();
@@ -214,8 +212,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     public void resourceReceived(JID from, IPath path, InputStream in) {
         IncomingInvitationProcess.logger.debug("new file received: " + path);
         if (this.localProject == null) {
-            return; // we dont have started the new project yet, so received
-            // ressources are not welcomed
+            return; // we do not have started the new project yet, so received
+            // resources are not welcomed
         }
 
         try {
@@ -236,15 +234,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         } catch (Exception e) {
             failed(e);
-        }
-
-        /*
-         * archive file for transfering data finished. Unzip separate files.
-         */
-        if (this.tmode == TransferMode.IBB) {
-            this.tmode = TransferMode.DEFAULT;
-            this.progressMonitor.beginTask("Files left: ",
-                this.filesLeftToSynchronize);
         }
 
         this.progressMonitor.worked(1);
@@ -472,22 +461,12 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         return this.projectName;
     }
 
-    public void updateInvitationProgress(JID jid) {
-        // ignored, not needed atm
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
-     */
     public TransferMode getTransferMode() {
-        return this.tmode;
+        return this.transferMode;
     }
 
     public void fileSent(IPath path) {
         // do nothing
-
     }
 
     public void fileTransferFailed(IPath path, Exception e) {
@@ -500,7 +479,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     public void setTransferMode(TransferMode mode) {
-        this.tmode = mode;
+        this.transferMode = mode;
     }
 
     @Override
