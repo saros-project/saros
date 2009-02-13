@@ -408,6 +408,10 @@ public class SharedProject implements ISharedProject {
                     }
                 }
 
+                // TODO CO 2009-02-06 this is disabled internally. Why?
+                if (false)
+                    return;
+
                 // missing activities? (can not execute all)
                 if (SharedProject.this.activitySequencer.getQueuedActivities() > 0) {
                     SharedProject.queuedsince++;
@@ -417,7 +421,6 @@ public class SharedProject implements ISharedProject {
                     // to send it to me again.
                     if (SharedProject.queuedsince >= SharedProject.REQUEST_ACTIVITY_ON_AGE) {
 
-                        // TODO CO 2009-02-06 this is disabled internally. Why?
                         SharedProject.this.transmitter
                             .sendRequestForActivity(SharedProject.this,
                                 SharedProject.this.activitySequencer
