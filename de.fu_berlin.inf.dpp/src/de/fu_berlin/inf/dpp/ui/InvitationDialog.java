@@ -108,8 +108,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             case 2:
                 if (item.outgoingProcess != null) {
                     if (item.outgoingProcess.getState() == IInvitationProcess.State.SYNCHRONIZING) {
-                        return "Transfering file "
-                            + (item.outgoingProcess.getProgressCurrent())
+                        return "" + (item.outgoingProcess.getProgressCurrent())
                             + " of " + item.outgoingProcess.getProgressMax()
                             + ": " + item.outgoingProcess.getProgressInfo();
                     } else {
@@ -163,7 +162,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         column.setText("Status");
         column.setWidth(300);
         column = new TableColumn(this.table, SWT.NONE);
-        column.setText("Action");
+        column.setText("Progress");
         column.setWidth(200);
 
         // table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
