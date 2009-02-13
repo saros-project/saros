@@ -394,7 +394,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         "Invitation sent. Waiting for acknowledgement...",
         "Filelist of inviter requested", "Filelist of inviter sent",
         "Filelist of invitee sent",
-        "Synchornizing project files. Transfering files...",
+        "Synchronizing project files. Transfering files...",
         "Files sent. Waiting for invitee...", "Invitiation completed",
         "Invitation canceled" };
 
