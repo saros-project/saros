@@ -99,7 +99,8 @@ public class JoinSessionWizard extends Wizard {
             }
 
             public void runGUIAsynch(Runnable runnable) {
-                // ignored, not needed atm
+                // TODO this cannot be ignored an InvitationUI like the
+                // JoinSessionWizard need to implement this
             }
 
             public void updateInvitationProgress(JID jid) {
