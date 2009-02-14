@@ -252,10 +252,11 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Connects according to the preferences. This is a blocking method.
+     * Connects using the credentials from the preferences. This is a blocking
+     * method.
      * 
      * If there is already a established connection when calling this method, it
-     * disconnects before connecting.
+     * disconnects before connecting (including state transitions!).
      */
     public void connect() {
 
@@ -267,11 +268,10 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             if (isConnected()) {
-
-                this.connection.disconnect();
-                this.connection
-                    .removeConnectionListener(this.smackConnectionListener);
+                disconnect();
             }
+
+            setConnectionState(ConnectionState.CONNECTING, null);
 
             ConnectionConfiguration conConfig = new ConnectionConfiguration(
                 server);
@@ -326,10 +326,6 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Disconnects. This is a blocking method.
-     * 
-     * @param reason
-     *            the error why the connection was closed. If the connection was
-     *            not closed due to an error <code>null</code> should be passed.
      */
     public void disconnect() {
         setConnectionState(ConnectionState.DISCONNECTING, null);
