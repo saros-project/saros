@@ -138,7 +138,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         } catch (CoreException e) {
             failed(e);
-
         }
 
     }
@@ -175,11 +174,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.remoteFileList = fileList;
         setState(State.GUEST_FILELIST_SENT);
 
-        this.invitationUI.runGUIAsynch(new Runnable() {
+        // Run asynchronously
+        new Thread(new Runnable() {
             public void run() {
                 startSynchronization();
             }
-        });
+        }).start();
     }
 
     /**
