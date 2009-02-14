@@ -76,7 +76,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private Button cancelSelectedInvitationButton;
 
     private Roster roster;
-    private JID autoinviteJID = null;
+    private JID autoinviteJID;
     private Display display;
 
     // assigned to any of the entries of the invite-tableview
@@ -217,7 +217,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
         // get online users from roster
         setRoster(Saros.getDefault().getRoster());
-        refreshRosterList(this.autoinviteJID);
+        refreshRosterList();
 
         Control c = super.createContents(parent);
 
@@ -226,7 +226,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         setInviteable(false);
 
         // auto trigger automatic invite
-        if (this.autoinviteJID != null) {
+        if (autoinviteJID != null) {
+            select(autoinviteJID);
             performInvitation();
         }
 
@@ -302,6 +303,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         boolean atLeastOneInvitationWasStarted = false;
         boolean allSuccessfullyDone = true;
         boolean allDoneOrCanceled = true;
+
+        if (this.table.isDisposed()) {
+            setRoster(null);
+            return;
+        }
 
         for (int index = 0; index < this.table.getItemCount(); index++) {
 
@@ -400,7 +406,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         final ConnectionState newState) {
 
         setRoster(Saros.getDefault().getRoster());
-        refreshRosterList(null);
+        refreshRosterList();
     }
 
     RosterListener rosterListener = new RosterListener() {
@@ -408,7 +414,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         public void refreshRoster() {
             runGUIAsynch(new Runnable() {
                 public void run() {
-                    refreshRosterList(null);
+                    refreshRosterList();
                 }
             });
         }
@@ -444,7 +450,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
      * Clears and re-filles the table with all online users from my roster.
      * Selections are preserved.
      */
-    private void refreshRosterList(JID toselect) {
+    private void refreshRosterList() {
 
         // save selection
         TableItem[] oldSelection = table.getSelection();
@@ -482,19 +488,18 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
 
         this.tableviewer.refresh();
+        this.table.setSelection(oldSelection);
+    }
 
-        // Update Selection
-        if (toselect != null) {
-            int index = 0;
-            for (InviterData invdat : input) {
-                if (invdat.jid.equals(toselect)) {
-                    this.table.setSelection(index);
-                    return;
-                }
-                index++;
+    public void select(JID toSelect) {
+
+        int index = 0;
+        for (InviterData invdat : input) {
+            if (invdat.jid.equals(toSelect)) {
+                this.table.setSelection(index);
+                return;
             }
-        } else {
-            this.table.setSelection(oldSelection);
+            index++;
         }
     }
 }
