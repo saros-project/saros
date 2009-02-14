@@ -102,15 +102,6 @@ public class InviteAction extends SelectionProviderAction implements
             Presence presence = Saros.getDefault().getConnection().getRoster()
                 .getPresence(jid.toString());
 
-            log
-                .debug(String
-                    .format(
-                        "InviteAction enabled==(in session %b, user in session %b, host %b, available %b, saros %b)",
-                        getSharedProject() != null, getSharedProject()
-                            .getParticipant(jid) == null, getSharedProject()
-                            .isHost(), presence.isAvailable(), Saros
-                            .getDefault().hasSarosSupport(jid.toString())));
-
             setEnabled(getSharedProject() != null
                 && getSharedProject().getParticipant(jid) == null
                 && getSharedProject().isHost() && presence.isAvailable()
