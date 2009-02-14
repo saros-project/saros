@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -29,6 +30,8 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -64,19 +67,17 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 public class InvitationDialog extends Dialog implements IInvitationUI,
     IConnectionListener {
 
+    private static final Logger log = Logger.getLogger(InvitationDialog.class
+        .getName());
+
     private TableViewer tableviewer;
     private Table table;
     private ArrayList<InviterData> input;
     private Button cancelSelectedInvitationButton;
 
-    private Roster roster = Saros.getDefault().getRoster();
-    private InvState inviteStep = InvState.SELECTION;
+    private Roster roster;
     private JID autoinviteJID = null;
-    private Display display = null;
-
-    private static enum InvState {
-        SELECTION, INVITING, DONE
-    }
+    private Display display;
 
     // assigned to any of the entries of the invite-tableview
     private class InviterData {
@@ -129,6 +130,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     @Override
     protected Control createContents(Composite parent) {
+
+        getShell().addDisposeListener(new DisposeListener() {
+            public void widgetDisposed(DisposeEvent e) {
+                setRoster(null);
+            }
+        });
 
         getShell().setText("Invitation Helper");
         this.display = getShell().getDisplay();
@@ -209,10 +216,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.cancelSelectedInvitationButton.setEnabled(false);
 
         // get online users from roster
-        if (this.autoinviteJID == null) {
-            attachRosterListener();
-        }
-        refreshRosterListRunASync(this.autoinviteJID);
+        setRoster(Saros.getDefault().getRoster());
+        refreshRosterList(this.autoinviteJID);
 
         Control c = super.createContents(parent);
 
@@ -238,9 +243,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         setInviteable(false);
     }
 
-    public boolean performInvitation() {
+    public void performInvitation() {
 
-        this.inviteStep = InvState.INVITING;
         this.cancelSelectedInvitationButton.setEnabled(true);
         getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
@@ -259,22 +263,32 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                     this);
             }
 
-            return false; // we wanna wait (and block) until all invites are
-            // done
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RuntimeException e) {
+            log.error("Failed to perform invitation:", e);
         }
-
-        return false;
     }
 
     // Triggers the update of the table in a GUI thread.
     public void updateInvitationProgress(final JID jid) {
-        // TODO Widget might be disposed
+        runGUIAsynch(new Runnable() {
+            public void run() {
+                updateInvitationProgressInternal(jid);
+            }
+        });
+    }
+
+    public void runGUIAsynch(final Runnable r) {
+
+        if (this.display == null || this.display.isDisposed())
+            return;
+
         this.display.asyncExec(new Runnable() {
             public void run() {
-                updateInvitationProgressRunASync(jid);
+                try {
+                    r.run();
+                } catch (RuntimeException e) {
+                    log.error("Caught internal error in InvitationDialog:", e);
+                }
             }
         });
     }
@@ -283,21 +297,16 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
      * Updates the invitation progress for all users in the table by refreshing
      * the table. MyLabelProvider will then poll the current progresses.
      */
-    private void updateInvitationProgressRunASync(JID jid) {
+    private void updateInvitationProgressInternal(JID jid) {
 
+        boolean atLeastOneInvitationWasStarted = false;
         boolean allSuccessfullyDone = true;
         boolean allDoneOrCanceled = true;
 
-        InviterData invdat = null;
-        int index;
+        for (int index = 0; index < this.table.getItemCount(); index++) {
 
-        boolean atLeastOneInvitationWasStarted = false;
-
-        for (index = 0; index < this.table.getItemCount(); index++) {
-
-            TableItem ti = this.table.getItem(index);
-            Object o = ti.getData();
-            invdat = (InviterData) o;
+            InviterData invdat = (InviterData) this.table.getItem(index)
+                .getData();
 
             if (invdat.outgoingProcess != null) {
                 atLeastOneInvitationWasStarted = true;
@@ -312,7 +321,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             }
 
             if ((jid != null) && invdat.jid.equals(jid)) {
-                this.tableviewer.refresh(o);
+                this.tableviewer.refresh(invdat);
             }
         }
 
@@ -321,19 +330,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             this.tableviewer.refresh();
         }
 
-        // are all invites done?
+        // Are all invites done?
         if (atLeastOneInvitationWasStarted && allSuccessfullyDone) {
-            this.inviteStep = InvState.DONE;
-            // TODO does not seem correct
-            setInviteable(false);
             this.close();
         }
 
         getButton(IDialogConstants.CANCEL_ID).setEnabled(allDoneOrCanceled);
 
-        this.cancelSelectedInvitationButton.setEnabled(isSelectionCancelable()
-            && (this.inviteStep != InvState.DONE));
-
+        this.cancelSelectedInvitationButton.setEnabled(isSelectionCancelable());
     }
 
     boolean isSelectionCancelable() {
@@ -358,35 +362,17 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     }
 
     void cancelInvite() {
-        TableItem[] cursel = this.table.getSelection();
-        for (TableItem ti : cursel) {
-            Object o = ti.getData();
-            InviterData invdat = (InviterData) o;
-            if (invdat.outgoingProcess == null) {
-                continue;
-            }
+        TableItem[] selection = this.table.getSelection();
 
-            invdat.outgoingProcess.cancel("Invitation canceled by host", false);
+        for (TableItem item : selection) {
+            InviterData invdat = (InviterData) item.getData();
+            if (invdat.outgoingProcess != null) {
+                invdat.outgoingProcess.cancel("Invitation canceled by host",
+                    false);
+            }
         }
+
         updateInvitationProgress(null);
-    }
-
-    boolean isJIDinList(ArrayList<JID> items, JID jid) {
-        for (int i = 0; i < items.size(); i++) {
-
-            try {
-                JID curJID = items.get(i);
-
-                if (curJID.equals(jid)) {
-                    return true;
-                }
-
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-
-        return false;
     }
 
     static final String[] StateNames = { "Initialized",
@@ -401,26 +387,10 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         return InvitationDialog.StateNames[state.ordinal()];
     }
 
-    public void showErrorMessage(String errorMessage) {
-        ErrorMessageDialog.showErrorMessage(errorMessage);
-    }
-
     public void cancel(String errorMsg, boolean replicated) {
 
         // TODO Error Message is not displayed
         updateInvitationProgress(null);
-    }
-
-    /**
-     * @see IInvitationUI
-     */
-    public void runGUIAsynch(final Runnable runnable) {
-
-        this.display.asyncExec(new Runnable() {
-            public void run() {
-                new Thread(runnable).start();
-            }
-        });
     }
 
     /**
@@ -429,70 +399,55 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     public void connectionStateChanged(XMPPConnection connection,
         final ConnectionState newState) {
 
-        if (newState == ConnectionState.CONNECTED) {
-            this.roster = Saros.getDefault().getRoster();
-            attachRosterListener();
-
-        } else if (newState == ConnectionState.NOT_CONNECTED) {
-            this.roster = null;
-        }
-
-        refreshRosterListRunASync(null);
-
+        setRoster(Saros.getDefault().getRoster());
+        refreshRosterList(null);
     }
 
-    private void attachRosterListener() {
-        this.roster.addRosterListener(new RosterListener() {
-            public void entriesAdded(Collection<String> addresses) {
-                refreshRosterList();
-            }
+    RosterListener rosterListener = new RosterListener() {
 
-            public void entriesUpdated(Collection<String> addresses) {
-                refreshRosterList();
-            }
-
-            public void entriesDeleted(Collection<String> addresses) {
-                refreshRosterList();
-            }
-
-            public void presenceChanged(Presence presence) {
-                refreshRosterList();
-
-            }
-        });
-    }
-
-    /*
-     * Triggers the refresh of the roster list in a GUI thread.
-     */
-    private void refreshRosterList() {
-        if (this.inviteStep != InvState.SELECTION) {
-            return;
+        public void refreshRoster() {
+            runGUIAsynch(new Runnable() {
+                public void run() {
+                    refreshRosterList(null);
+                }
+            });
         }
 
-        if (display.isDisposed())
-            return;
+        public void entriesAdded(Collection<String> addresses) {
+            refreshRoster();
+        }
 
-        this.display.asyncExec(new Runnable() {
-            public void run() {
-                refreshRosterListRunASync(null);
-            }
-        });
+        public void entriesUpdated(Collection<String> addresses) {
+            refreshRoster();
+        }
+
+        public void entriesDeleted(Collection<String> addresses) {
+            refreshRoster();
+        }
+
+        public void presenceChanged(Presence presence) {
+            refreshRoster();
+        }
+    };
+
+    public void setRoster(Roster newRoster) {
+        if (this.roster != null) {
+            this.roster.removeRosterListener(rosterListener);
+        }
+        this.roster = newRoster;
+        if (this.roster != null) {
+            this.roster.addRosterListener(rosterListener);
+        }
     }
 
     /*
      * Clears and re-filles the table with all online users from my roster.
      * Selections are preserved.
      */
-    private void refreshRosterListRunASync(JID toselect) {
-        ArrayList<JID> curselA = new ArrayList<JID>();
-        int[] curselNew = null;
+    private void refreshRosterList(JID toselect) {
 
         // save selection
-        TableItem[] curselTIs = this.table.getSelection();
-        for (TableItem curselTI : curselTIs) {
-            curselA.add(((InviterData) curselTI.getData()).jid);
-        }
+        TableItem[] oldSelection = table.getSelection();
 
         this.input.clear();
         this.table.removeAll();
@@ -501,50 +456,45 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             return;
         }
 
-        Collection<RosterEntry> users = this.roster.getEntries();
-        int index = -1;
-        for (RosterEntry entry : users) {
+        for (RosterEntry entry : this.roster.getEntries()) {
 
             String username = entry.getUser();
 
-            if (!Saros.getDefault().hasSarosSupport(username)) {
-                continue;
-            }
-
             Presence presence = this.roster.getPresence(username);
+            if (presence == null || !presence.isAvailable())
+                continue;
+
+            if (!Saros.getDefault().hasSarosSupport(username))
+                continue;
 
             User user = Saros.getDefault().getSessionManager()
                 .getSharedProject().getParticipant(new JID(entry.getUser()));
+            if (user != null)
+                continue;
 
-            if ((presence != null)
-                && presence.getType().equals(Presence.Type.available)
-                && (user == null)) {
-                InviterData invdat = new InviterData();
-                invdat.jid = new JID(entry.getUser());
-                String name = entry.getName();
-                invdat.name = (name == null) ? entry.getUser() : name;
-                invdat.outgoingProcess = null;
+            InviterData invdat = new InviterData();
+            invdat.jid = new JID(entry.getUser());
+            invdat.name = (entry.getName() == null) ? entry.getUser() : entry
+                .getName();
+            invdat.outgoingProcess = null;
 
-                this.input.add(invdat);
-                index++;
-
-                if (((this.autoinviteJID != null) && invdat.jid
-                    .equals(this.autoinviteJID))
-                    || ((this.autoinviteJID == null) && isJIDinList(curselA,
-                        invdat.jid))) {
-                    int curselOld[] = this.table.getSelectionIndices();
-                    curselNew = new int[curselOld.length + 1];
-                    System.arraycopy(curselOld, 0, curselNew, 0,
-                        curselOld.length);
-                    curselNew[curselNew.length - 1] = index;
-                }
-            }
+            this.input.add(invdat);
         }
 
         this.tableviewer.refresh();
 
-        if (curselNew != null) {
-            this.table.setSelection(curselNew);
+        // Update Selection
+        if (toselect != null) {
+            int index = 0;
+            for (InviterData invdat : input) {
+                if (invdat.jid.equals(toselect)) {
+                    this.table.setSelection(index);
+                    return;
+                }
+                index++;
+            }
+        } else {
+            this.table.setSelection(oldSelection);
         }
     }
 }
