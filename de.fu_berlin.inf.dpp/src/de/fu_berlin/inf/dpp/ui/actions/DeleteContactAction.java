@@ -46,6 +46,16 @@ public class DeleteContactAction extends SelectionProviderAction {
             ISharedImages.IMG_TOOL_DELETE));
     }
 
+    public static String toString(RosterEntry entry) {
+        StringBuilder sb = new StringBuilder();
+        String name = entry.getName();
+        if (name != null && name.trim().length() > 0) {
+            sb.append("'").append(name).append("' ");
+        }
+        sb.append(entry.getUser());
+        return sb.toString();
+    }
+
     @Override
     public void run() {
 
@@ -55,9 +65,8 @@ public class DeleteContactAction extends SelectionProviderAction {
         }
 
         if (MessageDialog.openQuestion(shell, "Confirm Delete",
-            "Are you sure you want to delete contact '"
-                + this.rosterEntry.getName() + "' ('"
-                + this.rosterEntry.getUser() + "')?")) {
+            "Are you sure you want to delete " + toString(this.rosterEntry)
+                + " from your roster?")) {
 
             try {
                 Saros.getDefault().removeContact(this.rosterEntry);
