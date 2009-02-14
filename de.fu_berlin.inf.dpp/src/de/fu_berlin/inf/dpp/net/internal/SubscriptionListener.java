@@ -19,8 +19,8 @@ import de.fu_berlin.inf.dpp.ui.IRosterTree;
  * received (when a remote user added the local user) the user is asked about
  * confirmation. If he accepts the request a new entry in the roster will be
  * created and a subscribed-message sent. If a request of removal are received
- * (when a remote user deleted the local user from his roster or rejected a
- * request of subscription) the appropriate entry are removed from the roster.
+ * (when a remote user deleted the local user from his or her roster or rejected
+ * a request of subscription) the appropriate entry are removed from the roster.
  * 
  * @author chjacob
  * 
@@ -140,7 +140,7 @@ public class SubscriptionListener implements PacketListener {
                         "Removal of subscription",
                         "User "
                             + from
-                            + " has rejected your request of subsription or has removed you from his roster.");
+                            + " has rejected your request of subsription or has removed you from her or his roster.");
             }
         });
     }
