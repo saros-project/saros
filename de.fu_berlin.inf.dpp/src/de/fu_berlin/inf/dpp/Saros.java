@@ -632,6 +632,8 @@ public class Saros extends AbstractUIPlugin {
             return sdm.discoverInfo(username + "/Smack").containsFeature(
                 xmppFeatureID);
         } catch (XMPPException e) {
+            logger
+                .error("Could not discoverInfo for user " + username + ":", e);
             return false;
         }
     }
