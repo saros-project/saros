@@ -59,7 +59,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
@@ -600,6 +602,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
+    public static IViewPart findView(String id) {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        if (workbench == null)
+            return null;
+
+        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+        if (window == null)
+            return null;
+
+        IWorkbenchPage page = window.getActivePage();
+        if (page == null)
+            return null;
+
+        return page.findView(id);
+    }
+
     /* ---------- ISharedProjectListener --------- */
 
     /*
@@ -616,9 +634,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (Saros.getDefault().getMyJID().equals(driver)) {
 
             // get the session view
-            IViewPart view = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage().findView(
-                    "de.fu_berlin.inf.dpp.ui.SessionView");
+            IViewPart view = findView("de.fu_berlin.inf.dpp.ui.SessionView");
 
             if (isDriver) {
 
@@ -785,12 +801,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
-    private void execTextSelection(TextSelectionActivity cursor) {
-        IPath path = cursor.getEditor();
-        TextSelection textSelection = new TextSelection(cursor.getOffset(),
-            cursor.getLength());
+    private void execTextSelection(TextSelectionActivity selection) {
+        IPath path = selection.getEditor();
+        TextSelection textSelection = new TextSelection(selection.getOffset(),
+            selection.getLength());
 
-        User user = sharedProject.getParticipant(new JID(cursor.getSource()));
+        User user = sharedProject
+            .getParticipant(new JID(selection.getSource()));
 
         if (sharedProject.isDriver(user)) {
             setDriverTextSelection(user, textSelection);
@@ -805,7 +822,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setSelection(editorPart, textSelection, cursor
+            this.editorAPI.setSelection(editorPart, textSelection, selection
                 .getSource(), shouldIFollow(user));
         }
     }
@@ -892,9 +909,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     protected void updateFollowModeUI() {
         runSafeAsync(new Runnable() {
             public void run() {
-                IViewPart sessionView = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage().findView(
-                        "de.fu_berlin.inf.dpp.ui.SessionView");
+                IViewPart sessionView = findView("de.fu_berlin.inf.dpp.ui.SessionView");
                 if (sessionView != null)
                     ((SessionView) sessionView).updateFollowingMode();
             }
