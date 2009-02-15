@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 
@@ -92,7 +93,17 @@ public class InviteAction extends SelectionProviderAction {
     }
 
     public void updateEnablement() {
-        setEnabled(canInviteSelected());
+
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                try {
+                    setEnabled(canInviteSelected());
+                } catch (RuntimeException e) {
+                    log.error("Caught internal error in InvitationDialog:", e);
+                }
+            }
+        });
+
     }
 
     public List<JID> getSelected() {
@@ -111,36 +122,32 @@ public class InviteAction extends SelectionProviderAction {
 
     public boolean canInviteSelected() {
 
-        try {
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
 
-            List<JID> selected = getSelected();
+        List<JID> selected = getSelected();
 
-            if (project == null || !project.isHost() || selected.isEmpty()) {
-                return false;
-            }
-
-            for (JID jid : selected) {
-
-                // Participant needs to be...
-                // ...available
-                if (!Saros.getDefault().getRoster().getPresence(jid.toString())
-                    .isAvailable())
-                    return false;
-
-                // ...not in a session already
-                if (project.getParticipant(jid) != null)
-                    return false;
-
-                // ...use a Saros enabled client
-                if (!Saros.getDefault().hasSarosSupport(jid.toString()))
-                    return false;
-            }
-        } catch (RuntimeException e) {
-            log.error("Internal Error while updating InviteAction:", e);
+        if (project == null || !project.isHost() || selected.isEmpty()) {
             return false;
         }
+
+        for (JID jid : selected) {
+
+            // Participant needs to be...
+            // ...available
+            if (!Saros.getDefault().getRoster().getPresence(jid.toString())
+                .isAvailable())
+                return false;
+
+            // ...not in a session already
+            if (project.getParticipant(jid) != null)
+                return false;
+
+            // ...use a Saros enabled client
+            if (!Saros.getDefault().hasSarosSupport(jid.toString()))
+                return false;
+        }
+
         return true;
     }
 }
