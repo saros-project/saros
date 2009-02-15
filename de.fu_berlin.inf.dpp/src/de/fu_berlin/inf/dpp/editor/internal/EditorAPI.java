@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.editor.internal;
 
 import java.awt.Toolkit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
@@ -438,30 +440,39 @@ public class EditorAPI implements IEditorAPI {
                         .getLength());
                 }
 
+                // Use Nick instead!
+                String label = "Selection of " + new JID(source).getName();
+                Position position = new Position(selection.getOffset(),
+                    selection.getLength());
+                AnnotationSaros newAnnotation = new SelectionAnnotation(label,
+                    source);
+
                 for (@SuppressWarnings("unchecked")
-                Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-                    Annotation annotation = (Annotation) it.next();
+                Iterator<Annotation> it = model.getAnnotationIterator(); it
+                    .hasNext();) {
+                    Annotation annotation = it.next();
 
                     if (annotation.getType().startsWith(
                         SelectionAnnotation.TYPE) == false) {
                         continue;
                     }
 
-                    AnnotationSaros anns = (AnnotationSaros) annotation;
-                    if (anns.getSource().equals(source)) {
+                    AnnotationSaros oldAnnotation = (AnnotationSaros) annotation;
+                    if (oldAnnotation.getSource().equals(source)) {
+                        // If model supports IAnnotationModelExtension we can
+                        // just update the existing annotation.
+                        if (model instanceof IAnnotationModelExtension) {
+                            IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
+                            extension.replaceAnnotations(
+                                new Annotation[] { oldAnnotation }, Collections
+                                    .singletonMap(newAnnotation, position));
+                            return;
+                        }
                         model.removeAnnotation(annotation);
                     }
                 }
 
-                JID sourceJid = new JID(source);
-                String label = "Selection of " + sourceJid.getName();
-
-                Position position = new Position(selection.getOffset(),
-                    selection.getLength());
-                AnnotationSaros annotation = new SelectionAnnotation(label,
-                    source); // BG:was
-                // source
-                model.addAnnotation(annotation, position);
+                model.addAnnotation(newAnnotation, position);
             }
         }
     }
