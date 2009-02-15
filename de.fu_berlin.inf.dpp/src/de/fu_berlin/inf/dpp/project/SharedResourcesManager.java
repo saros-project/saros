@@ -192,8 +192,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     public void sessionEnded(ISharedProject session) {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        this.sharedProject.getActivityManager().removeProvider(this);
-        this.sharedProject = null;
+        if (this.sharedProject != null) {
+            this.sharedProject.getActivityManager().removeProvider(this);
+            this.sharedProject = null;
+        }
     }
 
     /*
