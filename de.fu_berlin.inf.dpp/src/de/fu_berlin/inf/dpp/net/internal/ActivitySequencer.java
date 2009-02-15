@@ -296,7 +296,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     public List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
-        out = optimize(out);
+        out = optimizeCO(out);
         this.flushedLog.addAll(out);
         return out.size() > 0 ? out : null;
     }
@@ -442,8 +442,51 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     }
 
-    // TODO extract this into the activities themselves
-    // TODO CJ: review needed
+    /**
+     * This method tries to reduce the number of activities transmitted by
+     * removing activities that would overwrite each other and joining
+     * activities that can be send as a single activity.
+     */
+    private List<IActivity> optimizeCO(List<IActivity> activities) {
+
+        List<IActivity> result = new ArrayList<IActivity>(activities.size());
+
+        TextSelectionActivity selection = null;
+        ViewportActivity viewport = null;
+
+        for (IActivity activity : activities) {
+
+            if (activity instanceof TextEditActivity) {
+                TextEditActivity textEdit = (TextEditActivity) activity;
+                textEdit = joinTextEdits(result, textEdit);
+                result.add(textEdit);
+            } else if (activity instanceof TextSelectionActivity) {
+                selection = (TextSelectionActivity) activity;
+            } else if (activity instanceof ViewportActivity) {
+                viewport = (ViewportActivity) activity;
+            } else {
+                result.add(activity);
+            }
+        }
+
+        // only send one selection activity
+        if (selection != null)
+            result.add(selection);
+
+        // and one viewport activity
+        if (viewport != null)
+            result.add(viewport);
+
+        return result;
+    }
+
+    /**
+     * TODO extract this into the activities themselves
+     * 
+     * TODO CJ: review needed
+     * 
+     * TODO CO: I replaced this by a simpler optimizeCO
+     */
     private List<IActivity> optimize(List<IActivity> activities) {
         List<IActivity> result = new ArrayList<IActivity>(activities.size());
 
@@ -543,8 +586,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             result.add(newSel);
         }
 
-        selection = null;
-        return selection;
+        return null;
     }
 
     public void initConcurrentManager(
