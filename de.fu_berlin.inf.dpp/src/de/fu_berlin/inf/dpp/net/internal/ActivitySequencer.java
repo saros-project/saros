@@ -126,6 +126,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
+    // TODO never used!
     private final List<IActivity> flushedLog = new LinkedList<IActivity>();
 
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
