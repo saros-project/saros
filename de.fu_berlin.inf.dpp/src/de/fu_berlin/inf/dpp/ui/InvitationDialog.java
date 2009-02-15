@@ -291,7 +291,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 try {
                     r.run();
                 } catch (RuntimeException e) {
-                    log.error("Caught internal error in InvitationDialog:", e);
+                    log.error("Internal error in InvitationDialog:", e);
                 }
             }
         });
@@ -339,14 +339,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             this.tableviewer.refresh();
         }
 
+        this.getButton(IDialogConstants.CANCEL_ID)
+            .setEnabled(allDoneOrCanceled);
+        this.cancelSelectedInvitationButton.setEnabled(isSelectionCancelable());
+
         // Are all invites done?
         if (atLeastOneInvitationWasStarted && allSuccessfullyDone) {
             this.close();
         }
-
-        getButton(IDialogConstants.CANCEL_ID).setEnabled(allDoneOrCanceled);
-
-        this.cancelSelectedInvitationButton.setEnabled(isSelectionCancelable());
     }
 
     boolean isSelectionCancelable() {
