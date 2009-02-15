@@ -81,7 +81,8 @@ public class EditorActivity implements IActivity {
 
     @Override
     public String toString() {
-        return "EditorActivity(type:" + this.type + ", path:" + this.path + ")";
+        return "EditorActivity(type:" + this.type + ", path:"
+            + (this.path != null ? this.path.lastSegment() : "no path") + ")";
     }
 
     public String getSource() {
