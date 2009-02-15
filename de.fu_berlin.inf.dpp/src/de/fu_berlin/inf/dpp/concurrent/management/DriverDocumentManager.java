@@ -172,9 +172,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
             if (activity instanceof EditorActivity) {
                 EditorActivity edit = (EditorActivity) activity;
 
-                DriverDocumentManager.logger.debug("receive activity of " + jid
-                    + " for editor " + edit.getPath().lastSegment()
-                    + " and action " + edit.getType());
+                DriverDocumentManager.logger.debug("receive activity from "
+                    + jid + ": " + edit);
 
                 /* editor has activated. */
                 if (edit.getType() == EditorActivity.Type.Activated) {
