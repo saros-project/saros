@@ -20,9 +20,11 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -168,10 +170,10 @@ public interface ISharedProject {
     /**
      * Starts the invitation wizard to invite users.
      * 
-     * @param jid
-     *            the JID of a user to invite without manual selection
+     * @param list
+     *            the JIDs of users to invite manual selection
      */
-    public void startInvitation(JID jid);
+    public void startInvitation(@Nullable List<JID> list);
 
     /**
      * Activates sending of activities. The reason that this isn't done

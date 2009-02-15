@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
@@ -52,6 +53,7 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -76,7 +78,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private Button cancelSelectedInvitationButton;
 
     private Roster roster;
-    private JID autoinviteJID;
+    private List<JID> autoinviteJID;
     private Display display;
 
     // assigned to any of the entries of the invite-tableview
@@ -123,9 +125,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
     }
 
-    public InvitationDialog(Shell parentShell, JID jid) {
+    public InvitationDialog(Shell parentShell, List<JID> autoInvite) {
         super(parentShell);
-        this.autoinviteJID = jid;
+        this.autoinviteJID = autoInvite;
     }
 
     @Override
@@ -155,7 +157,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         comTable.setLayoutData(gd);
 
         // avoid multi selection
-        this.tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION);
+        this.tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION
+            | SWT.MULTI);
         this.table = this.tableviewer.getTable();
         this.table.setLinesVisible(true);
         this.tableviewer.setContentProvider(new ArrayContentProvider());
@@ -491,13 +494,21 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.table.setSelection(oldSelection);
     }
 
-    public void select(JID toSelect) {
+    /**
+     * Will select any row in the able that has a JID contained in the given
+     * list.
+     */
+    public void select(@Nullable List<JID> toSelect) {
+
+        table.deselectAll();
+
+        if (toSelect == null)
+            return;
 
         int index = 0;
         for (InviterData invdat : input) {
-            if (invdat.jid.equals(toSelect)) {
-                this.table.setSelection(index);
-                return;
+            if (toSelect.contains(invdat.jid)) {
+                table.select(index);
             }
             index++;
         }

@@ -122,7 +122,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
                 .error("Invitation was canceled because of an error: "
                     + errorMsg);
         } else {
-            InvitationProcess.logger.error("Invitation was canceled.");
+            InvitationProcess.logger.info("Invitation was canceled.");
         }
 
         if (!replicated) {

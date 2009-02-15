@@ -19,100 +19,128 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
+ * Action to start an Invitation for the currently selected RosterEntries.
+ * 
  * @author rdjemili
+ * @author oezbek
  */
-public class InviteAction extends SelectionProviderAction implements
-    ISessionListener {
+public class InviteAction extends SelectionProviderAction {
 
     private static final Logger log = Logger.getLogger(InviteAction.class
         .getName());
 
-    private RosterEntry selectedEntry;
-
     public InviteAction(ISelectionProvider provider) {
         super(provider, "Invite user to shared project..");
-        selectionChanged((IStructuredSelection) provider.getSelection());
-
         setToolTipText("Invite user to shared project..");
+
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/transmit_blue.png"));
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+            new ISessionListener() {
+                public void sessionStarted(ISharedProject session) {
+                    updateEnablement();
+                }
+
+                public void sessionEnded(ISharedProject session) {
+                    updateEnablement();
+                }
+
+                public void invitationReceived(
+                    IIncomingInvitationProcess process) {
+                    // does not affect us (because we are not host if we receive
+                    // an invitation)
+                }
+            });
+
         updateEnablement();
     }
 
     @Override
     public void run() {
-        JID jid = new JID(this.selectedEntry.getUser());
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
-        ISharedProject project = sessionManager.getSharedProject();
+        try {
+            ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
 
-        project.startInvitation(jid);
+            project.startInvitation(getSelected());
+        } catch (RuntimeException e) {
+            log.error("Internal Error in InviteAction:", e);
+        }
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-        if ((selection.size() == 1)
-            && (selection.getFirstElement() instanceof RosterEntry)) {
-            this.selectedEntry = (RosterEntry) selection.getFirstElement();
-        } else {
-            this.selectedEntry = null;
+        updateEnablement();
+    }
+
+    public void updateEnablement() {
+        setEnabled(canInviteSelected());
+    }
+
+    public List<JID> getSelected() {
+        ArrayList<JID> selected = new ArrayList<JID>();
+
+        for (Object o : getStructuredSelection().toList()) {
+            if (!(o instanceof RosterEntry)) {
+                return Collections.emptyList();
+            } else {
+                selected.add(new JID(((RosterEntry) o).getUser()));
+            }
         }
 
-        updateEnablement();
+        return selected;
     }
 
-    public void sessionStarted(ISharedProject session) {
-        updateEnablement();
-    }
-
-    public void sessionEnded(ISharedProject session) {
-        updateEnablement();
-    }
-
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
-
-    protected void updateEnablement() {
+    public boolean canInviteSelected() {
 
         try {
-            JID jid = (this.selectedEntry == null) ? null : new JID(
-                this.selectedEntry.getUser());
-            if (jid == null) {
-                setEnabled(false);
-                return;
+            ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
+
+            List<JID> selected = getSelected();
+
+            if (project == null || !project.isHost() || selected.isEmpty()) {
+                return false;
             }
-            Presence presence = Saros.getDefault().getConnection().getRoster()
-                .getPresence(jid.toString());
 
-            setEnabled(getSharedProject() != null
-                && getSharedProject().getParticipant(jid) == null
-                && getSharedProject().isHost() && presence.isAvailable()
-                && Saros.getDefault().hasSarosSupport(jid.toString()));
+            for (JID jid : selected) {
 
+                // Participant needs to be...
+                // ...available
+                if (!Saros.getDefault().getRoster().getPresence(jid.toString())
+                    .isAvailable())
+                    return false;
+
+                // ...not in a session already
+                if (project.getParticipant(jid) != null)
+                    return false;
+
+                // ...use a Saros enabled client
+                if (!Saros.getDefault().hasSarosSupport(jid.toString()))
+                    return false;
+            }
         } catch (RuntimeException e) {
             log.error("Internal Error while updating InviteAction:", e);
+            return false;
         }
-    }
-
-    private ISharedProject getSharedProject() {
-        return Saros.getDefault().getSessionManager().getSharedProject();
+        return true;
     }
 }

@@ -48,6 +48,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -482,7 +483,7 @@ public class SharedProject implements ISharedProject {
         return null;
     }
 
-    public void startInvitation(final JID jid) {
+    public void startInvitation(final @Nullable List<JID> toInvite) {
 
         Shell shell = Display.getDefault().getActiveShell();
 
@@ -495,9 +496,6 @@ public class SharedProject implements ISharedProject {
                         + "this project needs to be saved to disk. "
                         + "Do you want to save all unsaved files of this project now?")) {
 
-                // save
-                // PlatformUI.getWorkbench().saveAllEditors(false); // saves all
-                // editors
                 searchUnsavedChangesInProject(true);
 
             } else {
@@ -511,7 +509,7 @@ public class SharedProject implements ISharedProject {
                     Shell shell = Display.getDefault().getActiveShell();
                     // TODO check if anybody is online, empty dialog feels
                     // strange
-                    Window iw = new InvitationDialog(shell, jid);
+                    Window iw = new InvitationDialog(shell, toInvite);
                     iw.open();
                 } catch (Exception e) {
                     Saros.getDefault().getLog().log(
@@ -529,7 +527,7 @@ public class SharedProject implements ISharedProject {
         try {
             flist = new FileList(getProject());
         } catch (CoreException e) {
-            // TODO Auto-generated catch block
+            // Show this to user?
             e.printStackTrace();
             return false;
         }
@@ -586,7 +584,7 @@ public class SharedProject implements ISharedProject {
                                     paths.size());
 
                                 // TODO: Use ResourceAttributes
-                                // (something goeswrong when i use these)
+                                // (something goes wrong when i use these)
                                 SharedProject.this.project.findMember(
                                     new Path("src")).setReadOnly(readonly);
 
@@ -611,10 +609,8 @@ public class SharedProject implements ISharedProject {
                     });
                 } catch (InvocationTargetException e) {
                     SharedProject.log.warn("", e);
-                    e.printStackTrace();
                 } catch (InterruptedException e) {
                     SharedProject.log.warn("", e);
-                    e.printStackTrace();
                 }
             }
         });
