@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -169,10 +170,10 @@ public class Util {
     }
 
     public static String read(InputStream input) throws IOException {
-    
+
         try {
             byte[] content = IOUtils.toByteArray(input);
-    
+
             try {
                 return new String(content, "UTF-8");
             } catch (UnsupportedEncodingException e) {
@@ -181,6 +182,18 @@ public class Util {
         } finally {
             IOUtils.closeQuietly(input);
         }
+    }
+
+    public static void runSafeAsync(final Logger logger, final Runnable runnable) {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (RuntimeException e) {
+                    logger.error("Internal Error:", e);
+                }
+            }
+        }).start();
     }
 
 }

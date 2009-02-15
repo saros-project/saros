@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The main plug-in of Saros.
@@ -554,8 +555,7 @@ public class Saros extends AbstractUIPlugin {
                     connection = null;
                 }
 
-                new Thread(new Runnable() {
-
+                Util.runSafeAsync(logger, new Runnable() {
                     public void run() {
 
                         int inErrorSince = 0;
@@ -565,25 +565,23 @@ public class Saros extends AbstractUIPlugin {
                                 .getTimestamp();
                         }
 
-                        try {
-                            do {
-                                connect();
+                        while (!Saros.this.connection.isConnected()) {
+                            connect();
 
-                                if (!Saros.this.connection.isConnected()) {
+                            if (!Saros.this.connection.isConnected()) {
+                                try {
                                     Thread.sleep(5000);
+                                } catch (InterruptedException e) {
+                                    return;
                                 }
-
-                            } while (!Saros.this.connection.isConnected());
-
-                            getSessionManager().OnReconnect(inErrorSince);
-                            setConnectionState(ConnectionState.CONNECTED, null);
-                            logger.debug("XMPP reconnected");
-
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                            }
                         }
+
+                        getSessionManager().OnReconnect(inErrorSince);
+                        setConnectionState(ConnectionState.CONNECTED, null);
+                        logger.debug("XMPP reconnected");
                     }
-                }).start();
+                });
             }
         }
 
