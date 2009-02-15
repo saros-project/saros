@@ -37,6 +37,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
         this.toolBar = toolBar;
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
+        setToolTipText("No inconsistencies");
 
         // add ConsistencyListener if already in a session
         ISharedProject project = Saros.getDefault().getSessionManager()
@@ -88,7 +89,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 });
 
             } else {
-                setToolTipText("");
+                setToolTipText("No inconsistencies");
                 logger.debug("All Inconsistencies are resolved");
                 if (executingChecksumErrorHandling) {
                     for (IPath path : pathes) {
