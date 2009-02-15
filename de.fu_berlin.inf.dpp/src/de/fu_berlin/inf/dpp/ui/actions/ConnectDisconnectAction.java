@@ -115,7 +115,7 @@ public class ConnectDisconnectAction extends Action {
         try {
             ConnectionState state = Saros.getDefault().getConnectionState();
 
-            log.debug("New State: " + state);
+            log.debug("New State == " + state);
 
             switch (state) {
             case CONNECTED:
