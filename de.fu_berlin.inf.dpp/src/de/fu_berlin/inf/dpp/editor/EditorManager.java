@@ -102,6 +102,11 @@ import de.fu_berlin.inf.dpp.util.VariableProxyListener;
  * only appear in an class of the {@link IEditorAPI} type.
  * 
  * @author rdjemili
+ * 
+ *         TODO CO Since it was forgotton to reset the DriverEditors after a
+ *         session closed, it is highly likely that this whole class needs to be
+ *         reviewed for restarting issues
+ * 
  */
 public class EditorManager implements IActivityProvider, ISharedProjectListener {
 
@@ -179,6 +184,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             // if line delimiters are not in unix style convert them
             if (document instanceof IDocumentExtension4) {
+
                 if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
                     .equals("\n")) {
                     convertLineDelimiters(editorPart);
@@ -204,6 +210,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IPath[] paths = new IPath[1];
             paths[0] = file.getFullPath();
 
+            boolean makeReadable = false;
+
+            ResourceAttributes resourceAttributes = file
+                .getResourceAttributes();
+            if (resourceAttributes.isReadOnly()) {
+                resourceAttributes.setReadOnly(false);
+                try {
+                    file.setResourceAttributes(resourceAttributes);
+                    makeReadable = true;
+                } catch (CoreException e) {
+                    log.warn(
+                        "Error making file readable for delimiter conversion:",
+                        e);
+                }
+            }
+
             ITextFileBufferManager buffManager = FileBuffers
                 .getTextFileBufferManager();
 
@@ -220,11 +242,21 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 runner.execute(paths, convertOperation,
                     new NullProgressMonitor());
             } catch (OperationCanceledException e) {
-                EditorManager.log.error("Can't convert line delimiters! "
-                    + e.getMessage());
+                EditorManager.log.error("Can't convert line delimiters:", e);
             } catch (CoreException e) {
-                EditorManager.log.error("Can't convert line delimiters!"
-                    + e.getMessage());
+                EditorManager.log.error("Can't convert line delimiters:", e);
+            }
+
+            if (makeReadable) {
+                resourceAttributes.setReadOnly(true);
+                try {
+                    file.setResourceAttributes(resourceAttributes);
+                } catch (CoreException e) {
+                    EditorManager.log
+                        .error(
+                            "Error restoring readable state to false after delimiter conversion:",
+                            e);
+                }
             }
         }
 
@@ -352,7 +384,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 new VariableProxyListener<Boolean>() {
                     public void setVariable(Boolean inconsistency) {
                         if (inconsistency) {
-                            Display.getDefault().syncExec(new Runnable() {
+                            runSafeSync(new Runnable() {
                                 public void run() {
                                     try {
                                         // Open Session view
@@ -397,6 +429,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.lastRemoteEditTimes.clear();
         this.contributionAnnotationManager.dispose();
         this.contributionAnnotationManager = null;
+        this.activeDriverEditor = null;
+        this.driverEditors.clear();
     }
 
     /*
@@ -593,7 +627,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
                 if (view == null) {
-                    Display.getDefault().asyncExec(new Runnable() {
+                    runSafeAsync(new Runnable() {
                         public void run() {
                             BalloonNotification.showNotification(Display
                                 .getDefault().getFocusControl(),
@@ -606,7 +640,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
                 if (view == null) {
-                    Display.getDefault().asyncExec(new Runnable() {
+                    runSafeAsync(new Runnable() {
                         public void run() {
                             BalloonNotification.showNotification(Display
                                 .getDefault().getFocusControl(),
@@ -856,7 +890,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     protected void updateFollowModeUI() {
-        Display.getDefault().asyncExec(new Runnable() {
+        runSafeAsync(new Runnable() {
             public void run() {
                 IViewPart sessionView = PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage().findView(
@@ -950,9 +984,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     public String toXML(IActivity activity) {
         if (activity instanceof EditorActivity) {
             EditorActivity editorActivity = (EditorActivity) activity;
-            // return "<editor " + "path=\"" + editorActivity.getPath() + "\" "
-            // + "type=\""
-            // + editorActivity.getType() + "\" />";
+
+            // TODO What is that checksum?
             return "<editor " + "path=\"" + editorActivity.getPath() + "\" "
                 + "type=\"" + editorActivity.getType() + "\" " + "checksum=\""
                 + editorActivity.getChecksum() + "\"  />";
@@ -1185,7 +1218,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     // TODO CJ: review needed
     private void activateOpenEditors() {
-        Display.getDefault().syncExec(new Runnable() {
+        runSafeSync(new Runnable() {
             public void run() {
                 for (IEditorPart editorPart : EditorManager.this.editorAPI
                     .getOpenEditors()) {
@@ -1325,7 +1358,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         if (replicated) {
             if (this.isFollowing) {
-                Display.getDefault().syncExec(new Runnable() {
+                runSafeSync(new Runnable() {
                     public void run() {
                         openDriverEditor();
                     }
@@ -1363,7 +1396,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         if (replicated) {
-            Display.getDefault().syncExec(new Runnable() {
+            runSafeSync(new Runnable() {
                 public void run() {
                     IFile file = EditorManager.this.sharedProject.getProject()
                         .getFile(path);
@@ -1431,4 +1464,27 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return isFollowing;
     }
 
+    public void runSafeSync(final Runnable runnable) {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (RuntimeException e) {
+                    log.error("Internal Error in EditorManager:", e);
+                }
+            }
+        });
+    }
+
+    public void runSafeAsync(final Runnable runnable) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (RuntimeException e) {
+                    log.error("Internal Error in EditorManager:", e);
+                }
+            }
+        });
+    }
 }
