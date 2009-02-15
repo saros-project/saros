@@ -78,7 +78,18 @@
             lightweight="true"
             state="true">
          <enablement>
-            <objectClass name="org.eclipse.core.resources.IFile"/>
+            <objectClass name="org.eclipse.core.resources.IProject"/>
+         </enablement>
+      </decorator>
+      <decorator
+            adaptable="true"
+            class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
+            id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
+            label="Shared Project File Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+      	   	<objectClass name="org.eclipse.core.resources.IFile"/>
          </enablement>
       </decorator>
    </extension>
