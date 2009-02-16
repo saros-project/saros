@@ -24,21 +24,26 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileZipper;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * An outgoing invitation process.
@@ -48,7 +53,7 @@ import de.fu_berlin.inf.dpp.util.FileZipper;
 public class OutgoingInvitationProcess extends InvitationProcess implements
     IOutgoingInvitationProcess {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(OutgoingInvitationProcess.class);
 
     private final ISharedProject sharedProject;
@@ -274,7 +279,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         }
 
         this.archive = new File("./" + getPeer().getName() + "_Project.zip");
-        OutgoingInvitationProcess.logger
+        OutgoingInvitationProcess.log
             .debug("Project archive file has to be send. "
                 + this.archive.getAbsolutePath() + " length: "
                 + this.archive.length());
@@ -352,36 +357,47 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     /**
-     * Send activities which set the active editors.
+     * Send activities which set the active editors and their viewports.
      */
     private void sendDriverEditors() {
         EditorManager editorManager = EditorManager.getDefault();
-        Set<IPath> driverEditors = editorManager.getDriverEditors();
+        ArrayList<IPath> driverEditors = new ArrayList<IPath>(editorManager
+            .getDriverEditors());
+
+        // Make sure the active editor is the last in this list.
         IPath activeDriverEditor = editorManager.getActiveDriverEditor();
-        driverEditors.remove(activeDriverEditor);
-
-        FileList filelist;
-        try {
-            filelist = this.sharedProject.getFileList();
-        } catch (CoreException e) {
-            filelist = null;
+        if (activeDriverEditor != null) {
+            driverEditors.remove(activeDriverEditor);
+            driverEditors.add(activeDriverEditor);
         }
-        // HACK
-        for (IPath path : driverEditors) {
-            if ((filelist != null)
-                && (filelist.getPaths().contains(path) == false)) {
-                continue;
+
+        // Create editor activated activities and viewport information for all
+        // the driver's editors.
+        final IActivitySequencer sequencer = this.sharedProject.getSequencer();
+        for (final IPath path : driverEditors) {
+            // HACK Why do we need to check whether the file really belongs to
+            // project? See else branch.
+            if (this.sharedProject.getProject().findMember(path) != null) {
+
+                sequencer.activityCreated(new EditorActivity(
+                    EditorActivity.Type.Activated, path));
+
+                // HACK Get one of possibly more editors for given path.
+                IEditorPart editorPart = editorManager.getEditors(path)
+                    .iterator().next();
+                final ITextViewer viewer = EditorAPI.getViewer(editorPart);
+                if (viewer != null) {
+                    Util.runSafeSWTSync(log, new Runnable() {
+                        public void run() {
+                            sequencer.activityCreated(new ViewportActivity(
+                                viewer.getTopIndex(), viewer.getBottomIndex(),
+                                path));
+                        }
+                    });
+                }
+            } else {
+                log.warn("Editor " + path + " is not a driver's editor!");
             }
-
-            this.sharedProject.getSequencer().activityCreated(
-                new EditorActivity(EditorActivity.Type.Activated, path));
-        }
-
-        if ((filelist != null)
-            && (filelist.getPaths().contains(activeDriverEditor) == true)) {
-            this.sharedProject.getSequencer().activityCreated(
-                new EditorActivity(EditorActivity.Type.Activated,
-                    activeDriverEditor));
         }
     }
 

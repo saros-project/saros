@@ -93,6 +93,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
 /**
@@ -386,7 +387,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 new VariableProxyListener<Boolean>() {
                     public void setVariable(Boolean inconsistency) {
                         if (inconsistency) {
-                            runSafeSync(new Runnable() {
+                            Util.runSafeSWTSync(log, new Runnable() {
                                 public void run() {
                                     try {
                                         // Open Session view
@@ -643,7 +644,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
                 if (view == null) {
-                    runSafeAsync(new Runnable() {
+                    Util.runSafeSWTAsync(log, new Runnable() {
                         public void run() {
                             BalloonNotification.showNotification(Display
                                 .getDefault().getFocusControl(),
@@ -656,7 +657,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
                 if (view == null) {
-                    runSafeAsync(new Runnable() {
+                    Util.runSafeSWTAsync(log, new Runnable() {
                         public void run() {
                             BalloonNotification.showNotification(Display
                                 .getDefault().getFocusControl(),
@@ -904,7 +905,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     protected void updateFollowModeUI() {
-        runSafeAsync(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 IViewPart sessionView = findView("de.fu_berlin.inf.dpp.ui.SessionView");
                 if (sessionView != null)
@@ -1230,7 +1231,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     // TODO CJ: review needed
     private void activateOpenEditors() {
-        runSafeSync(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 for (IEditorPart editorPart : EditorManager.this.editorAPI
                     .getOpenEditors()) {
@@ -1367,7 +1368,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         if (replicated) {
             if (this.isFollowing) {
-                runSafeSync(new Runnable() {
+                Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         openDriverEditor();
                     }
@@ -1405,7 +1406,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         if (replicated) {
-            runSafeSync(new Runnable() {
+            Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     IFile file = EditorManager.this.sharedProject.getProject()
                         .getFile(path);
@@ -1471,29 +1472,5 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public boolean isFollowing() {
         return isFollowing;
-    }
-
-    public void runSafeSync(final Runnable runnable) {
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                try {
-                    runnable.run();
-                } catch (RuntimeException e) {
-                    log.error("Internal Error in EditorManager:", e);
-                }
-            }
-        });
-    }
-
-    public void runSafeAsync(final Runnable runnable) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    runnable.run();
-                } catch (RuntimeException e) {
-                    log.error("Internal Error in EditorManager:", e);
-                }
-            }
-        });
     }
 }

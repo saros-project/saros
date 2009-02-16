@@ -20,8 +20,10 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -448,14 +450,14 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
      * removing activities that would overwrite each other and joining
      * activities that can be send as a single activity.
      */
-    private List<IActivity> optimizeCO(List<IActivity> activities) {
+    private List<IActivity> optimizeCO(List<IActivity> toOptimize) {
 
-        List<IActivity> result = new ArrayList<IActivity>(activities.size());
+        List<IActivity> result = new ArrayList<IActivity>(toOptimize.size());
 
         TextSelectionActivity selection = null;
-        ViewportActivity viewport = null;
+        LinkedHashMap<IPath, ViewportActivity> viewport = new LinkedHashMap<IPath, ViewportActivity>();
 
-        for (IActivity activity : activities) {
+        for (IActivity activity : toOptimize) {
 
             if (activity instanceof TextEditActivity) {
                 TextEditActivity textEdit = (TextEditActivity) activity;
@@ -464,7 +466,9 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             } else if (activity instanceof TextSelectionActivity) {
                 selection = (TextSelectionActivity) activity;
             } else if (activity instanceof ViewportActivity) {
-                viewport = (ViewportActivity) activity;
+                ViewportActivity viewActivity = (ViewportActivity) activity;
+                viewport.remove(viewActivity.getEditor());
+                viewport.put(viewActivity.getEditor(), viewActivity);
             } else {
                 result.add(activity);
             }
@@ -474,9 +478,10 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         if (selection != null)
             result.add(selection);
 
-        // and one viewport activity
-        if (viewport != null)
-            result.add(viewport);
+        // Add only one viewport per editor
+        for (Map.Entry<IPath, ViewportActivity> entry : viewport.entrySet()) {
+            result.add(entry.getValue());
+        }
 
         return result;
     }

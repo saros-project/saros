@@ -25,6 +25,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextUtilities;
+import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
@@ -702,8 +703,8 @@ public class EditorAPI implements IEditorAPI {
 
         IDocument document = viewer.getDocument();
         for (@SuppressWarnings("unchecked")
-        Iterator it = model.getAnnotationIterator(); it.hasNext();) {
-            Annotation annotation = (Annotation) it.next();
+        Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
+            Annotation annotation = it.next();
             if (annotation.getType().startsWith(ViewportAnnotation.TYPE)) {
                 model.removeAnnotation(annotation);
             }
@@ -738,8 +739,21 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    private static ITextViewer getViewer(IEditorPart editorPart) {
-        return (ITextViewer) editorPart.getAdapter(ITextOperationTarget.class);
+    /**
+     * Gets a {@link ITextViewer} instance for the given editor part.
+     * 
+     * @param editorPart
+     *            for which we want a {@link TextViewer}.
+     * @return {@link ITextViewer} or <code>null</code> if there is no
+     *         {@link TextViewer} for the editorPart.
+     */
+    public static ITextViewer getViewer(IEditorPart editorPart) {
+        Object viewer = editorPart.getAdapter(ITextOperationTarget.class);
+        if (viewer instanceof ITextViewer) {
+            return (ITextViewer) viewer;
+        } else {
+            return null;
+        }
     }
 
     /**

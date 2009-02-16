@@ -16,6 +16,7 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
@@ -194,6 +195,30 @@ public class Util {
                 }
             }
         }).start();
+    }
+
+    public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (RuntimeException e) {
+                    log.error("Internal Error:", e);
+                }
+            }
+        });
+    }
+
+    public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
+        Display.getDefault().asyncExec(new Runnable() {
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (RuntimeException e) {
+                    log.error("Internal Error:", e);
+                }
+            }
+        });
     }
 
 }
