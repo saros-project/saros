@@ -822,8 +822,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 long lastRemoteEdited = (EditorManager.getDefault()
                     .getLastRemoteEditTime(path));
 
-                if ((System.currentTimeMillis() - lastEdited) > 2000
-                    && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
+                if ((System.currentTimeMillis() - lastEdited) > 4000
+                    && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
                     logger.debug(String.format(
                         "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
                         path.toString(), doc.getLength(),
