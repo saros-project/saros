@@ -14,13 +14,17 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextOperationTarget;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
+import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
@@ -435,9 +439,7 @@ public class EditorAPI implements IEditorAPI {
             if (model != null) {
 
                 if (following) {
-                    ITextViewer viewer = EditorAPI.getViewer(editorPart);
-                    viewer.revealRange(selection.getOffset(), selection
-                        .getLength());
+                    reveal(editorPart, selection);
                 }
 
                 // Use Nick instead!
@@ -473,6 +475,103 @@ public class EditorAPI implements IEditorAPI {
                 }
 
                 model.addAnnotation(newAnnotation, position);
+            }
+        }
+    }
+
+    public static int getLine(ITextViewerExtension5 viewer, int offset) {
+        return viewer.widgetLineOfWidgetOffset(viewer
+            .modelOffset2WidgetOffset(offset));
+    }
+
+    /**
+     * Given a new ITextSelection this method tries to reveal as much as
+     * possible, but moving only in a conservative manner.
+     * 
+     */
+    public static void reveal(IEditorPart editorPart, ITextSelection selection) {
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        IRegion visible = new Region(viewer.getTopIndexStartOffset(), viewer
+            .getBottomIndexEndOffset()
+            - viewer.getTopIndexStartOffset());
+        IRegion newSelection = new Region(selection.getOffset(), selection
+            .getLength());
+
+        /*
+         * log.debug("Visible: " + visible + " - Selected: " + newSelection);
+         */
+
+        if (!TextUtilities.overlaps(visible, newSelection)) {
+            viewer.revealRange(selection.getOffset(), selection.getLength());
+            return;
+        }
+
+        if (!(viewer instanceof ITextViewerExtension5))
+            return;
+
+        ITextViewerExtension5 viewer5 = (ITextViewerExtension5) viewer;
+
+        // Make sure that we show as much of the selection
+        // as possible with as little moving as possible
+        if (newSelection.getOffset() > visible.getOffset()) {
+            // newSelection is below viewport
+
+            if (newSelection.getOffset() + newSelection.getLength() > visible
+                .getOffset()
+                + visible.getLength()) {
+                // there is space to go down
+
+                int visibleStartLine = getLine(viewer5, visible.getOffset());
+                int selectionStartLine = getLine(viewer5, newSelection
+                    .getOffset());
+                int visibleEndLine = getLine(viewer5, visible.getOffset()
+                    + visible.getLength());
+
+                int targetLine = visibleEndLine
+                    + (selectionStartLine - visibleStartLine);
+
+                targetLine = Math.min(targetLine, getLine(viewer5, viewer
+                    .getDocument().getLength()));
+
+                int targetOffset = visible.getOffset() + visible.getLength();
+                while (getLine(viewer5, targetOffset) < targetLine) {
+                    targetOffset++;
+                }
+
+                viewer.revealRange(newSelection.getOffset(), targetOffset
+                    - newSelection.getOffset());
+            }
+
+        } else {
+            if (newSelection.getOffset() < visible.getOffset()) {
+                // newSelection is above viewport
+
+                if (newSelection.getOffset() + newSelection.getLength() < visible
+                    .getOffset()
+                    + visible.getLength()) {
+                    // there is space to go up
+
+                    int visibleStartLine = getLine(viewer5, visible.getOffset());
+                    int selectionEndLine = getLine(viewer5, newSelection
+                        .getOffset()
+                        + newSelection.getLength());
+                    int visibleEndLine = getLine(viewer5, visible.getOffset()
+                        + visible.getLength());
+
+                    int targetLine = visibleStartLine
+                        + (selectionEndLine - visibleEndLine);
+
+                    targetLine = Math.max(0, targetLine);
+
+                    int targetOffset = visible.getOffset();
+                    while (getLine(viewer5, targetOffset) > targetLine) {
+                        targetOffset--;
+                    }
+
+                    viewer.revealRange(newSelection.getOffset(), targetOffset
+                        - newSelection.getOffset());
+                }
             }
         }
     }
