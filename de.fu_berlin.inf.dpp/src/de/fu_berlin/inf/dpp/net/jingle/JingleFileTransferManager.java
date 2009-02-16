@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -91,7 +92,8 @@ public class JingleFileTransferManager {
 
     private JingleManager jm;
 
-    private HashMap<JID, FileTransferConnection> connections = new HashMap<JID, FileTransferConnection>();
+    private Map<JID, FileTransferConnection> connections = Collections
+        .synchronizedMap(new HashMap<JID, FileTransferConnection>());
 
     private Set<IJingleFileTransferListener> listeners = new HashSet<IJingleFileTransferListener>();
 
@@ -119,9 +121,17 @@ public class JingleFileTransferManager {
                 payload, tc1, tc2, null, jingleSession, listeners);
 
             connections.get(remoteJID).fileTransfer = newSession;
-            logger.debug("Session established : " + remoteJID.toString());
-            connections.get(remoteJID).setState(
-                JingleConnectionState.ESTABLISHED);
+
+            if (newSession.isConnected()) {
+                logger.debug("Session established to " + remoteJID.toString());
+                connections.get(remoteJID).setState(
+                    JingleConnectionState.ESTABLISHED);
+            } else {
+                logger.debug("Session could not be established to "
+                    + remoteJID.toString());
+                connections.get(remoteJID)
+                    .setState(JingleConnectionState.ERROR);
+            }
 
             return newSession;
         }
@@ -298,8 +308,6 @@ public class JingleFileTransferManager {
     public void send(final TransferDescription transferDescription,
         final byte[] content) throws JingleSessionException {
 
-        logger.debug("Sending with Jingle");
-
         JID toJID = transferDescription.getRecipient();
 
         FileTransferConnection connection = connections.get(toJID);
@@ -308,7 +316,7 @@ public class JingleFileTransferManager {
             || connection.state == JingleConnectionState.CLOSED) {
             connection = startJingleSession(toJID);
 
-            logger.debug("Started Jingle");
+            logger.debug("Started Jingle with " + toJID);
         }
 
         if (connection.state == JingleConnectionState.INIT) {
@@ -336,7 +344,7 @@ public class JingleFileTransferManager {
     private FileTransferConnection startJingleSession(JID toJID)
         throws JingleSessionException {
 
-        logger.debug("Starting JingleSession");
+        logger.debug("Starting JingleSession with " + toJID);
 
         FileTransferConnection connection = new FileTransferConnection();
         connections.put(toJID, connection);

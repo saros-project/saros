@@ -447,4 +447,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         connectionType = null;
     }
+
+    public boolean isConnected() {
+        return objectInputStream != null && objectOutputStream != null;
+    }
 }
