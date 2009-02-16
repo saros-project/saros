@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class InsertOperation implements Operation {
 
+    private static final long serialVersionUID = -1285726114177092936L;
+
     /**
      * the text to be inserted.
      */

@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class DeleteOperation implements Operation {
 
+    private static final long serialVersionUID = -8486323536916454961L;
+
     /**
      * the text to be deleted.
      */

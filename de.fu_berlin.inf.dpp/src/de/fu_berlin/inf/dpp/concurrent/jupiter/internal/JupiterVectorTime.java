@@ -7,6 +7,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.VectorTime;
  */
 public class JupiterVectorTime implements VectorTime, Cloneable {
 
+    private static final long serialVersionUID = 7679625564488573511L;
+
     /**
      * Counter for the number of local operations.
      */

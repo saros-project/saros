@@ -29,6 +29,9 @@ import org.jivesoftware.smack.util.StringUtils;
  * @author rdjemili
  */
 public class JID implements Serializable {
+
+    private static final long serialVersionUID = 4830741516870940459L;
+
     private final String jid;
 
     /**
@@ -39,7 +42,6 @@ public class JID implements Serializable {
      *            is optional.
      */
     public JID(String jid) {
-        // TODO check for malformated string
         this.jid = jid;
     }
 

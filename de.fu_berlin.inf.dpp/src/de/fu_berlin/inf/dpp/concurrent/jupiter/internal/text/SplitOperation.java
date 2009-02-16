@@ -30,6 +30,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class SplitOperation implements Operation {
 
+    private static final long serialVersionUID = 3948091155375639761L;
+
     /**
      * The first operation.
      */

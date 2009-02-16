@@ -12,6 +12,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class RequestImpl implements Request {
 
+    private static final long serialVersionUID = 2843724349387550074L;
+
     /**
      * The site id of the request.
      */
