@@ -341,7 +341,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final Set<IPath> driverEditors = new HashSet<IPath>();
 
-    private HashMap<User, ITextSelection> driverTextSelections;
+    private HashMap<User, ITextSelection> driverTextSelections = new HashMap<User, ITextSelection>();
 
     /** all files that have connected document providers */
     private final Set<IFile> connectedFiles = new HashSet<IFile>();
@@ -351,8 +351,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /* this activity has arrived and will be execute now. */
     private IActivity currentExecuteActivity;
 
-    public HashMap<IPath, Long> lastEditTimes;
-    public HashMap<IPath, Long> lastRemoteEditTimes;
+    public HashMap<IPath, Long> lastEditTimes = new HashMap<IPath, Long>();
+    public HashMap<IPath, Long> lastRemoteEditTimes = new HashMap<IPath, Long>();
 
     private ContributionAnnotationManager contributionAnnotationManager;
 
@@ -1342,9 +1342,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if ((Saros.getDefault() != null)
             && (Saros.getDefault().getSessionManager() != null)) {
             Saros.getDefault().getSessionManager().addSessionListener(this);
-            this.lastEditTimes = new HashMap<IPath, Long>();
-            this.lastRemoteEditTimes = new HashMap<IPath, Long>();
-            this.driverTextSelections = new HashMap<User, ITextSelection>();
         }
     }
 
