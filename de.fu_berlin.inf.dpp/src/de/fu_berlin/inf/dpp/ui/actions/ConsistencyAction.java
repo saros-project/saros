@@ -6,8 +6,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -28,6 +26,7 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
@@ -127,29 +126,9 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
             IFile file = project.getProject().getFile(path);
 
-            writeFile(input, file);
+            FileUtil.writeFile(input, file);
 
             return true;
-        }
-
-        // TODO put this into Util
-        private void writeFile(InputStream input, IFile file) {
-            // TODO: Use ResourcesAttributes
-            file.setReadOnly(false);
-
-            try {
-                if (file.exists()) {
-                    file.setContents(input, IResource.FORCE, null);
-                } else {
-                    file.create(input, true, new NullProgressMonitor());
-                }
-            } catch (CoreException e) {
-                log.error("Could not write file", e);
-            }
-
-            // TODO: Use ResourcesAttributes
-            file.setReadOnly(!Saros.getDefault().getSessionManager()
-                .getSharedProject().isDriver());
         }
     };
 

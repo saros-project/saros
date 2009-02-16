@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -580,11 +579,6 @@ public class SharedProject implements ISharedProject {
 
                                 monitor.beginTask("Project settings ... ",
                                     paths.size());
-
-                                // TODO: Use ResourceAttributes
-                                // (something goes wrong when i use these)
-                                SharedProject.this.project.findMember(
-                                    new Path("src")).setReadOnly(readonly);
 
                                 ResourceAttributes attributes = new ResourceAttributes();
                                 attributes.setReadOnly(readonly);

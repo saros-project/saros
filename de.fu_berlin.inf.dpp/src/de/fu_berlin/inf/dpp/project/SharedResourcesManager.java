@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -312,8 +313,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         IProject project = this.sharedProject.getProject();
         IFile file = project.getFile(activity.getPath());
 
-        // TODO: Use ResourcesAttributes
-        file.setReadOnly(false);
+        FileUtil.setReadOnly(file, false);
 
         if (activity.getType() == FileActivity.Type.Created) {
             InputStream in = activity.getContents();
@@ -323,8 +323,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 file.create(in, true, new NullProgressMonitor());
             }
 
-            // TODO: Use ResourcesAttributes
-            file.setReadOnly(!Saros.getDefault().getSessionManager()
+            FileUtil.setReadOnly(file, !Saros.getDefault().getSessionManager()
                 .getSharedProject().isDriver());
 
         } else if (activity.getType() == FileActivity.Type.Removed) {
