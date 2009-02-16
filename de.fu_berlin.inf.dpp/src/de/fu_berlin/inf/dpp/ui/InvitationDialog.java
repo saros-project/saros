@@ -473,9 +473,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             if (presence == null || !presence.isAvailable())
                 continue;
 
-            if (!Saros.getDefault().hasSarosSupport(username))
-                continue;
-
             User user = Saros.getDefault().getSessionManager()
                 .getSharedProject().getParticipant(new JID(entry.getUser()));
             if (user != null)

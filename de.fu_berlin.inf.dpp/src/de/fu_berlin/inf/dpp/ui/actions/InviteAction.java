@@ -142,10 +142,6 @@ public class InviteAction extends SelectionProviderAction {
             // ...not in a session already
             if (project.getParticipant(jid) != null)
                 return false;
-
-            // ...use a Saros enabled client
-            if (!Saros.getDefault().hasSarosSupport(jid.toString()))
-                return false;
         }
 
         return true;

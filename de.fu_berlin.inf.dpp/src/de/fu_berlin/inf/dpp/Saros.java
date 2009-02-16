@@ -619,17 +619,4 @@ public class Saros extends AbstractUIPlugin {
             Saros.getDefault().getMyJID());
     }
 
-    public boolean hasSarosSupport(String username) {
-        ServiceDiscoveryManager sdm = ServiceDiscoveryManager
-            .getInstanceFor(getDefault().getConnection());
-        try {
-            return sdm.discoverInfo(username + "/Smack").containsFeature(
-                xmppFeatureID);
-        } catch (XMPPException e) {
-            logger
-                .error("Could not discoverInfo for user " + username + ":", e);
-            return false;
-        }
-    }
-
 }
