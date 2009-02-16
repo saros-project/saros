@@ -410,8 +410,6 @@ public class SharedProject implements ISharedProject {
                 }
 
                 // TODO CO 2009-02-06 this is disabled internally. Why?
-                if (false)
-                    return;
 
                 // missing activities? (can not execute all)
                 if (SharedProject.this.activitySequencer.getQueuedActivities() > 0) {

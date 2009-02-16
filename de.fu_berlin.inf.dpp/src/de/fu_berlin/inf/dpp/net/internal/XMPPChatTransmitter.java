@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
+import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -135,6 +136,10 @@ public class XMPPChatTransmitter implements ITransmitter,
     private JingleFileTransferManager jingleManager;
 
     protected ExecutorService executor;
+
+    public XMPPChatTransmitter() {
+        this.receivers.add(defaultReceiver);
+    }
 
     public JingleFileTransferManager getJingleManager() {
         try {
@@ -1143,6 +1148,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         incomingFiles.clear();
         fileTransferQueue.clear();
         messageTransferQueue.clear();
+        receivers.clear();
     }
 
     public void prepare(XMPPConnection connection) {
@@ -1164,19 +1170,43 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
+    protected List<IDataReceiver> receivers = new LinkedList<IDataReceiver>();
+
+    public void addDataReceiver(IDataReceiver receiver) {
+        receivers.add(0, receiver);
+    }
+
+    public void removeDataReceiver(IDataReceiver receiver) {
+        receivers.remove(receiver);
+    }
+
     protected void receiveData(TransferDescription data, InputStream input) {
 
         try {
             switch (data.type) {
             case ARCHIVE_TRANSFER:
-                receivedArchive(data, input);
+                for (IDataReceiver receiver : receivers) {
+                    boolean consumed = receiver.receivedArchive(data, input);
+                    if (consumed)
+                        return;
+                }
                 break;
             case FILELIST_TRANSFER:
-                receivedFileList(data, input);
+                for (IDataReceiver receiver : receivers) {
+                    boolean consumed = receiver.receivedFileList(data, input);
+                    if (consumed)
+                        return;
+                }
                 break;
             case RESOURCE_TRANSFER:
-                receivedResource(data.sender, new Path(data.file_project_path),
-                    input, data.timestamp);
+                for (IDataReceiver receiver : receivers) {
+                    boolean consumed = receiver
+                        .receivedResource(data.sender, new Path(
+                            data.file_project_path), input, data.timestamp);
+                    if (consumed)
+                        return;
+                }
+
                 break;
             }
         } finally {
@@ -1184,88 +1214,98 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    protected void receivedResource(JID from, Path path, InputStream input,
-        int time) {
+    public IDataReceiver defaultReceiver = new IDataReceiver() {
 
-        log.info("Incoming resource from " + from.toString() + ": " + path);
+        public boolean receivedResource(JID from, Path path, InputStream input,
+            int time) {
 
-        // TODO CJ: move this to business logic
-        boolean handledByInvitation = false;
-        for (IInvitationProcess process : processes) {
-            if (process.getPeer().equals(from)) {
-                process.resourceReceived(from, path, input);
-                handledByInvitation = true;
-                break;
-            }
-        }
+            log.info("Incoming resource from " + from.toString() + ": " + path);
 
-        if (!handledByInvitation) {
-            TimedActivity timedActivity = new TimedActivity(new FileActivity(
-                FileActivity.Type.Created, path, input), time);
-
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
-
-            if (project != null)
-                project.getSequencer().exec(timedActivity);
-        }
-
-    }
-
-    protected void receivedFileList(TransferDescription data, InputStream input) {
-
-        String fileListAsString;
-        try {
-            fileListAsString = Util.read(input);
-        } catch (IOException e) {
-            log.error("Error receiving FileList", e);
-            return;
-        }
-
-        FileList fileList = null;
-
-        if (fileListAsString != null) {
-            try {
-                fileList = new FileList(fileListAsString);
-            } catch (Exception e) {
-
-                for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(data.getSender()))
-                        process.cancel("Could not parse your FileList", false);
+            // TODO CJ: move this to business logic
+            boolean handledByInvitation = false;
+            for (IInvitationProcess process : processes) {
+                if (process.getPeer().equals(from)) {
+                    process.resourceReceived(from, path, input);
+                    handledByInvitation = true;
+                    break;
                 }
-                log.error("Could not parse FileList", e);
             }
-        }
-        for (IInvitationProcess process : processes) {
-            if (process.getPeer().equals(data.getSender()))
-                process.fileListReceived(data.getSender(), fileList);
-        }
-    }
 
-    protected void receivedArchive(TransferDescription data, InputStream input) {
+            if (!handledByInvitation) {
+                TimedActivity timedActivity = new TimedActivity(
+                    new FileActivity(FileActivity.Type.Created, path, input),
+                    time);
 
-        File archiveFile = new File("./incoming_archive.zip");
-        XMPPChatTransmitter.log.debug("Archive file: "
-            + archiveFile.getAbsolutePath());
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
 
-        try {
-            FileUtils.writeByteArrayToFile(archiveFile, IOUtils
-                .toByteArray(input));
-
-            ZipFile zip = new ZipFile(archiveFile);
-            @SuppressWarnings("unchecked")
-            Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip
-                .entries();
-            while (entries.hasMoreElements()) {
-                ZipEntry entry = entries.nextElement();
-                XMPPChatTransmitter.log.debug(entry.getName());
-
-                receivedResource(data.getSender(), new Path(entry.getName()),
-                    zip.getInputStream(entry), data.timestamp);
+                if (project != null)
+                    project.getSequencer().exec(timedActivity);
             }
-            archiveFile.delete();
-        } catch (IOException e) {
-            log.error("Failed to receive and unpack archive");
+            return true;
         }
-    }
+
+        public boolean receivedFileList(TransferDescription data,
+            InputStream input) {
+
+            String fileListAsString;
+            try {
+                fileListAsString = Util.read(input);
+            } catch (IOException e) {
+                log.error("Error receiving FileList", e);
+                return true;
+            }
+
+            FileList fileList = null;
+
+            if (fileListAsString != null) {
+                try {
+                    fileList = new FileList(fileListAsString);
+                } catch (Exception e) {
+
+                    for (IInvitationProcess process : processes) {
+                        if (process.getPeer().equals(data.getSender()))
+                            process.cancel("Could not parse your FileList",
+                                false);
+                    }
+                    log.error("Could not parse FileList", e);
+                }
+            }
+            for (IInvitationProcess process : processes) {
+                if (process.getPeer().equals(data.getSender()))
+                    process.fileListReceived(data.getSender(), fileList);
+            }
+            return true;
+        }
+
+        public boolean receivedArchive(TransferDescription data,
+            InputStream input) {
+
+            File archiveFile = new File("./incoming_archive.zip");
+            XMPPChatTransmitter.log.debug("Archive file: "
+                + archiveFile.getAbsolutePath());
+
+            try {
+                FileUtils.writeByteArrayToFile(archiveFile, IOUtils
+                    .toByteArray(input));
+
+                ZipFile zip = new ZipFile(archiveFile);
+                @SuppressWarnings("unchecked")
+                Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip
+                    .entries();
+                while (entries.hasMoreElements()) {
+                    ZipEntry entry = entries.nextElement();
+                    XMPPChatTransmitter.log.debug(entry.getName());
+
+                    receivedResource(data.getSender(),
+                        new Path(entry.getName()), zip.getInputStream(entry),
+                        data.timestamp);
+                }
+                archiveFile.delete();
+            } catch (IOException e) {
+                log.error("Failed to receive and unpack archive");
+            }
+            return true;
+        }
+    };
 }

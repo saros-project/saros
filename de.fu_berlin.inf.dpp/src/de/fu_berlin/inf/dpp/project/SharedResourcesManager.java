@@ -313,7 +313,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         IFile file = project.getFile(activity.getPath());
 
         // TODO: Use ResourcesAttributes
-        project.findMember(new Path("src")).setReadOnly(false);
+        file.setReadOnly(false);
 
         if (activity.getType() == FileActivity.Type.Created) {
             InputStream in = activity.getContents();
@@ -324,9 +324,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
 
             // TODO: Use ResourcesAttributes
-            project.findMember(new Path("src")).setReadOnly(
-                !Saros.getDefault().getSessionManager().getSharedProject()
-                    .isDriver());
+            file.setReadOnly(!Saros.getDefault().getSessionManager()
+                .getSharedProject().isDriver());
 
         } else if (activity.getType() == FileActivity.Type.Removed) {
             file.delete(false, new NullProgressMonitor());

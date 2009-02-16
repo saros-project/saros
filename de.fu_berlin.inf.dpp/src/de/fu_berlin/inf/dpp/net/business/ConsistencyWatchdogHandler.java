@@ -109,30 +109,32 @@ public class ConsistencyWatchdogHandler {
                                 transmitter.sendFile(from, Saros.getDefault()
                                     .getSessionManager().getSharedProject()
                                     .getProject(), path, -1,
-                                    /* TODO CO The Callback should be used to show progress to the user */
-                                    new IFileTransferCallback() {
+                                /*
+                                 * TODO CO The Callback should be used to show
+                                 * progress to the user
+                                 */
+                                new IFileTransferCallback() {
 
-                                        public void fileSent(IPath path) {
-                                            // do nothing
-                                        }
+                                    public void fileSent(IPath path) {
+                                        // do nothing
+                                    }
 
-                                        public void fileTransferFailed(
-                                            IPath path, Exception e) {
-                                            // do nothing
+                                    public void fileTransferFailed(IPath path,
+                                        Exception e) {
+                                        // do nothing
 
-                                        }
+                                    }
 
-                                        public void setTransferMode(
-                                            TransferMode mode) {
-                                            // do nothing
-                                        }
+                                    public void setTransferMode(
+                                        TransferMode mode) {
+                                        // do nothing
+                                    }
 
-                                        public void transferProgress(
-                                            int transfered) {
-                                            // do nothing
-                                        }
+                                    public void transferProgress(int transfered) {
+                                        // do nothing
+                                    }
 
-                                    });
+                                });
                             } catch (IOException e) {
                                 log
                                     .error("Could not sent file for consistency resolution");
