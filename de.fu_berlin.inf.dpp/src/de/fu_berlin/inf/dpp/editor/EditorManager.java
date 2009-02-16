@@ -829,9 +829,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     // TODO selectable driver to follow
     protected boolean shouldIFollow(User user) {
-        return isFollowing
-            && Saros.getDefault().getSessionManager().getSharedProject()
-                .isDriver(user);
+        return isFollowing && sharedProject.isDriver(user);
     }
 
     private void execViewport(ViewportActivity viewport) {
@@ -851,11 +849,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         ITextSelection driverSelection = getDriverTextSelection(user);
         // Check needed when viewport activity came before the first
         // text selection activity.
-        boolean following = false;
+        boolean following = shouldIFollow(user);
         if (driverSelection != null) {
             int driverCursor = driverSelection.getEndLine();
-            following = shouldIFollow(user)
-                && (driverCursor < top || driverCursor > bottom);
+            following &= (driverCursor < top || driverCursor > bottom);
         }
 
         Set<IEditorPart> editors = this.editorPool.getEditors(path);
