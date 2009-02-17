@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import org.picocontainer.annotations.Nullable;
 
 public class Util {
 
@@ -101,6 +102,8 @@ public class Util {
                     } catch (InterruptedIOException e) {
                         // Workaround for bug in Limewire RUDP
                         // https://www.limewire.org/jira/browse/LWC-2838
+                        return null;
+                    } catch (InterruptedException e) {
                         return null;
                     } catch (Exception e) {
                         // Log here for connection problems.
@@ -185,8 +188,10 @@ public class Util {
         }
     }
 
-    public static void runSafeAsync(final Logger logger, final Runnable runnable) {
-        new Thread(new Runnable() {
+    public static void runSafeAsync(@Nullable String name, final Logger logger,
+        final Runnable runnable) {
+
+        Thread t = new Thread(new Runnable() {
             public void run() {
                 try {
                     runnable.run();
@@ -194,7 +199,14 @@ public class Util {
                     logger.error("Internal Error:", e);
                 }
             }
-        }).start();
+        });
+        if (name != null)
+            t.setName(name);
+        t.start();
+    }
+
+    public static void runSafeAsync(final Logger logger, final Runnable runnable) {
+        runSafeAsync(null, logger, runnable);
     }
 
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
