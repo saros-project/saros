@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class manages all Jingle Peer to Peer Sessions. Jingle is a
@@ -124,23 +125,28 @@ public class JingleFileTransferManager {
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, tc1, tc2, null, jingleSession, listeners, remoteJID);
 
-            // TODO Make sure we don't need to do this asynchronously
-            newSession.initialize();
+            Util.runSafeAsync(logger, new Runnable() {
 
-            connections.get(remoteJID).fileTransfer = newSession;
+                public void run() {
+                    // TODO Make sure we don't need to do this asynchronously
+                    newSession.initialize();
 
-            if (newSession.isConnected()) {
-                logger.debug("Jingle [" + remoteJID.getName()
-                    + "] Media Session - Success using "
-                    + newSession.getConnectionType());
-                connections.get(remoteJID).setState(
-                    JingleConnectionState.ESTABLISHED);
-            } else {
-                logger.debug("Jingle [" + remoteJID.getName()
-                    + "] Media Session - Failure");
-                connections.get(remoteJID)
-                    .setState(JingleConnectionState.ERROR);
-            }
+                    connections.get(remoteJID).fileTransfer = newSession;
+
+                    if (newSession.isConnected()) {
+                        logger.debug("Jingle [" + remoteJID.getName()
+                            + "] Media Session - Success using "
+                            + newSession.getConnectionType());
+                        connections.get(remoteJID).setState(
+                            JingleConnectionState.ESTABLISHED);
+                    } else {
+                        logger.debug("Jingle [" + remoteJID.getName()
+                            + "] Media Session - Failure");
+                        connections.get(remoteJID).setState(
+                            JingleConnectionState.ERROR);
+                    }
+                }
+            });
 
             return newSession;
         }
