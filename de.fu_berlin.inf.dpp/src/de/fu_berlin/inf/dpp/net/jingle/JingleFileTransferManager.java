@@ -329,11 +329,16 @@ public class JingleFileTransferManager {
             connection = startJingleSession(toJID);
         }
 
+        int i = 0;
+
         if (connection.state == JingleConnectionState.INIT) {
             // TODO observe state rather than sleep
-            while (connection.state == JingleConnectionState.INIT) {
+            while (connection.state == JingleConnectionState.INIT && i < 60) {
                 try {
-                    Thread.sleep(100);
+                    logger.debug("Jingle [" + toJID
+                        + "] Waiting for Init since " + (i * 500) / 1000 + "s");
+                    i++;
+                    Thread.sleep(500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
