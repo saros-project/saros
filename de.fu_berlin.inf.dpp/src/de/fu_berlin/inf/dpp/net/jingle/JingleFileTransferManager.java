@@ -319,25 +319,31 @@ public class JingleFileTransferManager {
 
         JID toJID = transferDescription.getRecipient();
 
-        FileTransferConnection connection = connections.get(toJID);
+        FileTransferConnection connection;
 
-        if (connection == null
-            || connection.state == JingleConnectionState.CLOSED) {
-            connection = startJingleSession(toJID);
-        }
+        synchronized (this) {
 
-        int i = 0;
+            connection = connections.get(toJID);
 
-        if (connection.state == JingleConnectionState.INIT) {
-            // TODO observe state rather than sleep
-            while (connection.state == JingleConnectionState.INIT && i < 60) {
-                try {
-                    logger.debug("Jingle [" + toJID
-                        + "] Waiting for Init since " + (i * 500) / 1000 + "s");
-                    i++;
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
+            if (connection == null
+                || connection.state == JingleConnectionState.CLOSED) {
+                connection = startJingleSession(toJID);
+            }
+
+            int i = 0;
+
+            if (connection.state == JingleConnectionState.INIT) {
+                // TODO observe state rather than sleep
+                while (connection.state == JingleConnectionState.INIT && i < 60) {
+                    try {
+                        logger.debug("Jingle [" + toJID
+                            + "] Waiting for Init since " + (i * 500) / 1000
+                            + "s");
+                        i++;
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }
@@ -352,7 +358,7 @@ public class JingleFileTransferManager {
         }
     }
 
-    private synchronized FileTransferConnection startJingleSession(JID toJID)
+    private FileTransferConnection startJingleSession(JID toJID)
         throws JingleSessionException {
 
         logger.debug("Jingle [" + toJID.getName() + "] Start Session");
