@@ -259,7 +259,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             public Socket call() throws Exception {
                 Socket usock = udpSelectorProvider.openAcceptorSocketChannel()
                     .socket();
-                usock.setSoTimeout(3500);
+                usock.setSoTimeout(0);
                 usock.connect(new InetSocketAddress(InetAddress
                     .getByName(remoteIp), remotePort));
                 usock.setKeepAlive(true);
