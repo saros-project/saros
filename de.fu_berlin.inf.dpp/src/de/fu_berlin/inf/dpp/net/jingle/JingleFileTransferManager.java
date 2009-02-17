@@ -124,10 +124,7 @@ public class JingleFileTransferManager {
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, tc1, tc2, null, jingleSession, listeners, remoteJID);
 
-            // Util.runSafeAsync("Jingle-Initialize-" + remoteJID.getName(),
-            // logger, new Runnable() {
-            //
-            // public void run() {
+            // TODO Make sure we don't need to do this asynchronously
             newSession.initialize();
 
             connections.get(remoteJID).fileTransfer = newSession;
@@ -256,7 +253,7 @@ public class JingleFileTransferManager {
 
             public void sessionClosed(String arg0, JingleSession session) {
                 logger.info("Session closed : " + jid.toString());
-                connection.setState(JingleConnectionState.CLOSED);
+                connection.setState(JingleConnectionState.ERROR);
             }
 
             public void sessionClosedOnError(XMPPException arg0,
@@ -426,11 +423,16 @@ public class JingleFileTransferManager {
      * 
      * @param jid
      *            identify the jingle session
-     * @return JingleConnectionState for given jabber id, or null if non jingle
+     * @return JingleConnectionState for given jabber id, or null if no jingle
      *         session has found.
      */
     public JingleConnectionState getState(JID jid) {
-        return connections.get(jid).state;
+
+        if (connections.containsKey(jid)) {
+            return connections.get(jid).state;
+        } else {
+            return null;
+        }
     }
 
     /**

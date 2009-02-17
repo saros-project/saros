@@ -95,6 +95,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -803,7 +804,21 @@ public class XMPPChatTransmitter implements ITransmitter,
              * supports Jingle at this point in time - He might have left and
              * reconnected and changed his Jingle settings in between
              */
-            return jingleDiscovery.getCachedJingleSupport(jid);
+            if (!jingleDiscovery.getCachedJingleSupport(jid))
+                return false;
+
+            JingleFileTransferManager jftm = getJingleManager();
+            if (jftm == null)
+                return false;
+
+            JingleConnectionState state = jftm.getState(jid);
+
+            // If null, then we have never tried to connect
+            if (state == null)
+                return true;
+
+            // Only use Jingle, if not in ERROR
+            return state != JingleConnectionState.ERROR;
         }
 
         public String getName() {
