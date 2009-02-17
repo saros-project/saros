@@ -314,7 +314,6 @@ public class SharedProject implements ISharedProject {
     }
 
     public void removeUser(User user) {
-        // TODO possible NPE
         if (this.participants.remove(user.getJID()) == null) {
             log.warn("Tried to remove user who was not in participants: "
                 + user.getJID());
