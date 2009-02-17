@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -194,15 +193,6 @@ public interface ITransmitter {
      *            List of Users, of current shared project participants
      */
     public void sendUserListTo(JID to, Collection<User> participants);
-
-    /**
-     * Sets my XMPP connection to the given connection - for changing the
-     * current connection (like after reconnect).
-     * 
-     * @param connection
-     *            the new XMPPConnection
-     */
-    public void setXMPPConnection(XMPPConnection connection);
 
     /**
      * Sends a request for activities to all users.
