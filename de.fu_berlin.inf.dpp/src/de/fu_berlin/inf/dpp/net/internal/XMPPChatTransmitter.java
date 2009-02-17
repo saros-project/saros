@@ -114,32 +114,35 @@ public class XMPPChatTransmitter implements ITransmitter,
     private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
         .getName());
 
-    private static final int MAX_PARALLEL_SENDS = 10;
-    private static final int MAX_TRANSFER_RETRIES = 5;
-    private static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
+    public static final int MAX_PARALLEL_SENDS = 10;
+    public static final int MAX_TRANSFER_RETRIES = 5;
+    public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
 
-    private XMPPConnection connection;
+    protected XMPPConnection connection;
 
-    private ChatManager chatmanager;
+    protected ChatManager chatmanager;
 
-    private final Map<JID, Chat> chats = new HashMap<JID, Chat>();
+    protected Map<JID, Chat> chats;
 
-    private FileTransferManager fileTransferManager;
+    protected FileTransferManager fileTransferManager;
 
-    private final List<IInvitationProcess> processes = new CopyOnWriteArrayList<IInvitationProcess>();
+    protected List<IInvitationProcess> processes;
 
-    private final ConcurrentLinkedQueue<TransferData> fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-    private final List<MessageTransfer> messageTransferQueue = Collections
-        .synchronizedList(new LinkedList<MessageTransfer>());
-    private final Map<String, IncomingFile> incomingFiles = new HashMap<String, IncomingFile>();
+    protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
 
-    private JingleFileTransferManager jingleManager;
+    protected List<MessageTransfer> messageTransferQueue;
+
+    protected Map<String, IncomingFile> incomingFiles;
+
+    protected JingleFileTransferManager jingleManager;
 
     protected ExecutorService executor;
 
-    public XMPPChatTransmitter() {
-        this.receivers.add(defaultReceiver);
-    }
+    protected Thread startingJingleThread;
+
+    protected JingleDiscoveryManager jingleDiscovery;
+
+    protected List<IDataReceiver> receivers;
 
     public JingleFileTransferManager getJingleManager() {
         try {
@@ -152,10 +155,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
         return jingleManager;
     }
-
-    private Thread startingJingleThread;
-
-    protected JingleDiscoveryManager jingleDiscovery;
 
     /**
      * A simple struct that is used to manage incoming chunked files via
@@ -450,47 +449,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         public PacketExtension packetextension;
     }
 
-    public void setXMPPConnection(final XMPPConnection connection) {
-
-        this.executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
-
-        this.connection = connection;
-        this.chatmanager = connection.getChatManager();
-
-        this.fileTransferManager = new FileTransferManager(connection);
-        this.fileTransferManager
-            .addFileTransferListener(new IBBTransferListener());
-
-        OutgoingFileTransfer
-            .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
-
-        this.chats.clear();
-
-        // Create JingleDiscoveryManager
-        jingleDiscovery = new JingleDiscoveryManager(connection);
-
-        // Register PacketListeners
-        this.connection.addPacketListener(new GodPacketListener(),
-            PacketExtensions.getSessionIDPacketFilter());
-
-        if (!getFileTransferModeViaChat()) {
-            // Start Jingle Manager asynchronous
-            this.startingJingleThread = new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        jingleManager = new JingleFileTransferManager(
-                            connection, new JingleTransferListener());
-                        log.debug("Jingle Manager started");
-                    } catch (Exception e) {
-                        log.error("Jingle Manager could not be started", e);
-                        jingleManager = null;
-                    }
-                }
-            });
-            this.startingJingleThread.start();
-        }
-    }
-
     public void addInvitationProcess(IInvitationProcess process) {
         this.processes.add(process);
     }
@@ -641,8 +599,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
 
-        for (Transmitter transmitter : new Transmitter[] { jingle, ibb,
-            handmade }) {
+        for (Transmitter transmitter : new Transmitter[] { jingle, ibb }) {
 
             if (transmitter.isSuitable(transferData.recipient)) {
                 try {
@@ -692,7 +649,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      * This is not IBB (XEP-96)!!
      * 
      */
-    Transmitter handmade = new Transmitter() {
+    protected Transmitter handmade = new Transmitter() {
 
         public void send(TransferDescription data, byte[] content,
             IFileTransferCallback callback) throws IOException {
@@ -745,12 +702,13 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     };
 
-    Transmitter ibb = new Transmitter() {
+    protected Transmitter ibb = new Transmitter() {
 
         public void send(TransferDescription data, byte[] content,
             IFileTransferCallback callback) throws IOException {
 
-            log.debug("Sending via IBB: " + data.toString());
+            log.debug("[IBB] Sending to " + data.getRecipient() + ": "
+                + data.toString());
 
             OutgoingFileTransfer
                 .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
@@ -788,6 +746,9 @@ public class XMPPChatTransmitter implements ITransmitter,
                 throw new IOException("Error in IBB-FileTransfer wrong state: "
                     + transfer.getStatus());
             }
+
+            log.debug("Sent successfully via IBB to " + data.getRecipient()
+                + ": " + data.toString());
         }
 
         public boolean isSuitable(JID jid) {
@@ -799,7 +760,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     };
 
-    Transmitter jingle = new Transmitter() {
+    protected Transmitter jingle = new Transmitter() {
 
         public void send(TransferDescription data, byte[] content,
             IFileTransferCallback callback) throws IOException {
@@ -816,7 +777,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         public boolean isSuitable(JID jid) {
 
-            if (getFileTransferModeViaChat())
+            if (Saros.getFileTransferModeViaChat())
                 return false;
 
             /*
@@ -1108,12 +1069,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         return chat;
     }
 
-    public static boolean getFileTransferModeViaChat() {
-        return Saros.getDefault().getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
-
-    }
-
     public void sendFileAsync(JID recipient, IProject project,
         final IPath path, int timestamp, final IFileTransferCallback callback)
         throws IOException {
@@ -1149,10 +1104,62 @@ public class XMPPChatTransmitter implements ITransmitter,
         fileTransferQueue.clear();
         messageTransferQueue.clear();
         receivers.clear();
+
+        jingleManager = null;
+        chatmanager = null;
+        fileTransferManager = null;
+        jingleDiscovery = null;
+        startingJingleThread = null;
     }
 
-    public void prepare(XMPPConnection connection) {
-        setXMPPConnection(connection);
+    public void prepare(final XMPPConnection connection) {
+
+        // Create Containers
+        this.chats = new HashMap<JID, Chat>();
+        this.processes = new CopyOnWriteArrayList<IInvitationProcess>();
+        this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
+        this.messageTransferQueue = Collections
+            .synchronizedList(new LinkedList<MessageTransfer>());
+        this.incomingFiles = new HashMap<String, IncomingFile>();
+        this.receivers = new LinkedList<IDataReceiver>();
+        this.receivers.add(defaultReceiver);
+
+        this.jingleManager = null;
+        this.executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
+
+        this.connection = connection;
+        this.chatmanager = connection.getChatManager();
+
+        this.fileTransferManager = new FileTransferManager(connection);
+        this.fileTransferManager
+            .addFileTransferListener(new IBBTransferListener());
+
+        OutgoingFileTransfer
+            .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
+
+        // Create JingleDiscoveryManager
+        jingleDiscovery = new JingleDiscoveryManager(connection);
+
+        // Register PacketListeners
+        this.connection.addPacketListener(new GodPacketListener(),
+            PacketExtensions.getSessionIDPacketFilter());
+
+        if (!Saros.getFileTransferModeViaChat()) {
+            // Start Jingle Manager asynchronous
+            this.startingJingleThread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        jingleManager = new JingleFileTransferManager(
+                            connection, new JingleTransferListener());
+                        log.debug("Jingle Manager started");
+                    } catch (Exception e) {
+                        log.error("Jingle Manager could not be started", e);
+                        jingleManager = null;
+                    }
+                }
+            });
+            this.startingJingleThread.start();
+        }
     }
 
     public void start() {
@@ -1169,8 +1176,6 @@ public class XMPPChatTransmitter implements ITransmitter,
                 process.setTransferMode(mode);
         }
     }
-
-    protected List<IDataReceiver> receivers = new LinkedList<IDataReceiver>();
 
     public void addDataReceiver(IDataReceiver receiver) {
         receivers.add(0, receiver);
@@ -1214,7 +1219,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    public IDataReceiver defaultReceiver = new IDataReceiver() {
+    protected IDataReceiver defaultReceiver = new IDataReceiver() {
 
         public boolean receivedResource(JID from, Path path, InputStream input,
             int time) {

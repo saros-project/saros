@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class manages all Jingle Peer to Peer Sessions. Jingle is a
@@ -114,24 +115,35 @@ public class JingleFileTransferManager {
             TransportCandidate tc1, TransportCandidate tc2,
             JingleSession jingleSession) {
 
-            JID remoteJID = isInitiator(jingleSession) ? new JID(jingleSession
-                .getResponder()) : new JID(jingleSession.getInitiator());
+            final JID remoteJID = isInitiator(jingleSession) ? new JID(
+                jingleSession.getResponder()) : new JID(jingleSession
+                .getInitiator());
 
-            JingleFileTransferSession newSession = new JingleFileTransferSession(
-                payload, tc1, tc2, null, jingleSession, listeners);
+            final JingleFileTransferSession newSession = new JingleFileTransferSession(
+                payload, tc1, tc2, null, jingleSession, listeners, remoteJID);
 
-            connections.get(remoteJID).fileTransfer = newSession;
+            Util.runSafeAsync("Jingle-Initialize-" + remoteJID.getName(),
+                logger, new Runnable() {
 
-            if (newSession.isConnected()) {
-                logger.debug("Session established to " + remoteJID.toString());
-                connections.get(remoteJID).setState(
-                    JingleConnectionState.ESTABLISHED);
-            } else {
-                logger.debug("Session could not be established to "
-                    + remoteJID.toString());
-                connections.get(remoteJID)
-                    .setState(JingleConnectionState.ERROR);
-            }
+                    public void run() {
+                        newSession.initialize();
+
+                        connections.get(remoteJID).fileTransfer = newSession;
+
+                        if (newSession.isConnected()) {
+                            logger.debug("Jingle [" + remoteJID.getName()
+                                + "] Session success using "
+                                + newSession.getConnectionType());
+                            connections.get(remoteJID).setState(
+                                JingleConnectionState.ESTABLISHED);
+                        } else {
+                            logger.debug("Jingle [" + remoteJID.getName()
+                                + "] Session failed");
+                            connections.get(remoteJID).setState(
+                                JingleConnectionState.ERROR);
+                        }
+                    }
+                });
 
             return newSession;
         }
@@ -315,8 +327,6 @@ public class JingleFileTransferManager {
         if (connection == null
             || connection.state == JingleConnectionState.CLOSED) {
             connection = startJingleSession(toJID);
-
-            logger.debug("Started Jingle with " + toJID);
         }
 
         if (connection.state == JingleConnectionState.INIT) {
@@ -328,7 +338,6 @@ public class JingleFileTransferManager {
                     Thread.currentThread().interrupt();
                 }
             }
-            logger.debug("Init done");
         }
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
@@ -341,10 +350,10 @@ public class JingleFileTransferManager {
         }
     }
 
-    private FileTransferConnection startJingleSession(JID toJID)
+    private synchronized FileTransferConnection startJingleSession(JID toJID)
         throws JingleSessionException {
 
-        logger.debug("Starting JingleSession with " + toJID);
+        logger.debug("Jingle [" + toJID.getName() + "] Start Session");
 
         FileTransferConnection connection = new FileTransferConnection();
         connections.put(toJID, connection);
@@ -363,7 +372,8 @@ public class JingleFileTransferManager {
             connection.session = null;
             connection.state = JingleConnectionState.ERROR;
 
-            throw new JingleSessionException("Can't connect with Jingle", e);
+            throw new JingleSessionException("Jingle [" + toJID.getName()
+                + "] Error connecting", e);
         }
         return connection;
     }

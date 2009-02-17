@@ -619,4 +619,10 @@ public class Saros extends AbstractUIPlugin {
             Saros.getDefault().getMyJID());
     }
 
+    public static boolean getFileTransferModeViaChat() {
+        return getDefault().getPreferenceStore().getBoolean(
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+    
+    }
+
 }

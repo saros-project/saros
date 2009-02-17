@@ -35,7 +35,9 @@ import org.limewire.rudp.UDPSelectorProvider;
 import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -116,6 +118,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private int localPort;
     private int remotePort;
 
+    private JID connectTo;
+
     /**
      * Create AND initialize a new JingleFileTransferSession. This includes
      * connecting to given remote side (if initiator).
@@ -140,12 +144,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public JingleFileTransferSession(PayloadType payloadType,
         TransportCandidate remote, TransportCandidate local,
         String mediaLocator, JingleSession jingleSession,
-        Set<IJingleFileTransferListener> listeners) {
+        Set<IJingleFileTransferListener> listeners, JID connectTo) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
 
+        this.connectTo = connectTo;
         this.listeners = listeners;
-
-        initialize();
     }
 
     /**
@@ -165,8 +168,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
             remotePort = this.getLocal().getSymmetric().getPort();
 
             // TODO what does symmetric mean
-            logger.info("Created symmetric - local: " + localIp + ":"
-                + localPort + " -> remote: " + remoteIp + ":" + remotePort);
+            logger.info("Jingle [" + connectTo.getName()
+                + "] Symmetric IPs - local: " + localIp + ":" + localPort
+                + " -> remote: " + remoteIp + ":" + remotePort);
 
         } else {
             localIp = this.getLocal().getLocalIp();
@@ -175,8 +179,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
             remoteIp = this.getRemote().getIp();
             remotePort = this.getRemote().getPort();
 
-            logger.info("Created asymmetric - local: " + localIp + ":"
-                + localPort + " <-> remote: " + remoteIp + ":" + remotePort);
+            logger.info("Jingle [" + connectTo.getName()
+                + "] Not Symmetric IPs - local: " + localIp + ":" + localPort
+                + " <-> remote: " + remoteIp + ":" + remotePort);
         }
 
         // create RUDP service
@@ -193,7 +198,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
         try {
             service.start(localPort);
         } catch (IOException e) {
-            logger.debug("Failed to create RUDP service");
+            logger.error("Jingle [" + connectTo.getName()
+                + "] Failed to create RUDP service");
         }
 
         if (getJingleSession().getInitiator().equals(
@@ -203,17 +209,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
         } else {
             initializeAsClient();
         }
-
-        if (connectionType != null) {
-            logger.debug("Jingle Connection established using "
-                + connectionType);
-        } else {
-            logger.debug("Could not establish connection using Jingle");
-        }
-
     }
 
-    private void initializeAsClient() {
+    protected void initializeAsClient() {
 
         ArrayList<SocketCreator> creators = new ArrayList<SocketCreator>(2);
 
@@ -298,7 +296,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private void connect(Collection<SocketCreator> connects) {
 
         ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
-            Executors.newFixedThreadPool(connects.size()));
+            Executors.newFixedThreadPool(connects.size(),
+                new NamedThreadFactory("Jingle-Connect-" + connectTo.getName()
+                    + "-")));
 
         Map<Future<Socket>, SocketCreator> futures = new HashMap<Future<Socket>, SocketCreator>();
 
@@ -318,19 +318,19 @@ public class JingleFileTransferSession extends JingleMediaSession {
             }
 
             if (socketFuture == null) {
-                JingleFileTransferSession.logger
-                    .debug("Could not connect with either TCP or UDP.");
+                logger.debug("Jingle [" + connectTo.getName()
+                    + "] Could not connect with either TCP or UDP.");
                 break;
             }
 
             try {
                 this.socket = socketFuture.get();
             } catch (InterruptedException e) {
-                JingleFileTransferSession.logger.error(
-                    "Unexpected interrupted exception in startTrasmit", e);
+                logger.error("Jingle [" + connectTo.getName() + "] "
+                    + "Unexpected interrupted exception in startTrasmit", e);
             } catch (ExecutionException e) {
-                JingleFileTransferSession.logger
-                    .debug("Failed to listen with either TCP or UDP.");
+                logger.debug("Jingle [" + connectTo.getName()
+                    + "] Could not connect with either TCP or UDP.");
                 continue;
             }
 
@@ -356,8 +356,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
                 return;
             } catch (IOException e) {
-                JingleFileTransferSession.logger
-                    .debug("Failed to listen with either TCP or UDP.");
+                logger.debug("Jingle [" + connectTo.getName() + "] "
+                    + "Failed to listen with either TCP or UDP.", e);
 
                 close();
             }
@@ -389,8 +389,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 logger.debug("Sent: " + transferData);
                 return;
             } catch (IOException e) {
-                throw new JingleSessionException(
-                    "Failed to send files with Jingle");
+                throw new JingleSessionException("Jingle ["
+                    + connectTo.getName() + "] Failed to send files");
             }
         }
 
@@ -450,5 +450,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     public boolean isConnected() {
         return objectInputStream != null && objectOutputStream != null;
+    }
+
+    public String getConnectionType() {
+        return connectionType;
     }
 }
