@@ -248,7 +248,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             public Socket call() throws Exception {
 
                 ServerSocket serverSocket = new ServerSocket(localPort);
-                serverSocket.setSoTimeout(0);
+                serverSocket.setSoTimeout(30000);
 
                 return serverSocket.accept();
             }
@@ -259,7 +259,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             public Socket call() throws Exception {
                 Socket usock = udpSelectorProvider.openAcceptorSocketChannel()
                     .socket();
-                usock.setSoTimeout(0);
+                usock.setSoTimeout(3500);
                 usock.connect(new InetSocketAddress(InetAddress
                     .getByName(remoteIp), remotePort));
                 usock.setKeepAlive(true);
@@ -437,9 +437,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
         if (receiveThread != null)
             receiveThread.interrupt();
 
+        Util.close(socket);
         Util.close(objectInputStream);
         Util.close(objectOutputStream);
-        Util.close(socket);
 
         objectInputStream = null;
         objectOutputStream = null;

@@ -6,24 +6,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
-
-import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
  * 
- * XMPPChatReceiver implements addPacketListener and removePacketListener just like
- * a XMPPConnection but hides the complexity of dealing with new connection
+ * XMPPChatReceiver implements addPacketListener and removePacketListener just
+ * like a XMPPConnection but hides the complexity of dealing with new connection
  * objects appearing and old one's disappearing. Users can just register with
  * the XMPPChatReceiver for the whole application lifecycle.
  * 
  * @Component The single instance of this class per application is managed by
  *            PicoContainer
  */
-public class XMPPChatReceiver implements ConnectionSessionListener {
+public class XMPPChatReceiver {
 
     protected Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());
@@ -49,50 +46,25 @@ public class XMPPChatReceiver implements ConnectionSessionListener {
         listeners.remove(listener);
     }
 
-    protected PacketListener dispatcher = new PacketListener() {
-        /**
-         * This is called from the XMPPConnection for each incoming Packet and
-         * will dispatch these to the registered listeners.
-         */
-        public void processPacket(Packet packet) {
+    /**
+     * This is called from the XMPPConnection for each incoming Packet and will
+     * dispatch these to the registered listeners.
+     */
+    public void processPacket(Packet packet) {
 
-            Map<PacketListener, PacketFilter> copy;
+        Map<PacketListener, PacketFilter> copy;
 
-            synchronized (listeners) {
-                copy = new HashMap<PacketListener, PacketFilter>(listeners);
-            }
+        synchronized (listeners) {
+            copy = new HashMap<PacketListener, PacketFilter>(listeners);
+        }
 
-            for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
-                PacketListener listener = entry.getKey();
-                PacketFilter filter = entry.getValue();
+        for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
+            PacketListener listener = entry.getKey();
+            PacketFilter filter = entry.getValue();
 
-                if (filter == null || filter.accept(packet)) {
-                    listener.processPacket(packet);
-                }
+            if (filter == null || filter.accept(packet)) {
+                listener.processPacket(packet);
             }
         }
-    };
-
-    protected XMPPConnection connection;
-
-    public void dispose() {
-        // Nothing to dispose about :-D
-    }
-
-    public void prepare(XMPPConnection newConnection) {
-        connection = newConnection;
-    }
-
-    public void start() {
-        if (this.connection != null) {
-            connection.addPacketListener(dispatcher, null);
-        }
-    }
-
-    public void stop() {
-        if (this.connection != null) {
-            connection.removePacketListener(dispatcher);
-        }
-        this.connection = null;
     }
 }

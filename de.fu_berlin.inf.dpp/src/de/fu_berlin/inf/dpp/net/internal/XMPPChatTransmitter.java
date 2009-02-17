@@ -53,6 +53,7 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -96,6 +97,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -143,6 +145,12 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected JingleDiscoveryManager jingleDiscovery;
 
     protected List<IDataReceiver> receivers;
+
+    protected XMPPChatReceiver receiver;
+
+    public XMPPChatTransmitter(XMPPChatReceiver receiver) {
+        this.receiver = receiver;
+    }
 
     public JingleFileTransferManager getJingleManager() {
         try {
@@ -254,41 +262,49 @@ public class XMPPChatTransmitter implements ITransmitter,
             @Override
             public void requestForFileListReceived(final JID sender) {
 
-                XMPPChatTransmitter.log
-                    .debug("Received Request for FileList from " + sender);
+                XMPPChatTransmitter.log.debug("[" + sender.getName()
+                    + "] Request for FileList");
 
-                new Thread(new Runnable() {
-                    public void run() {
-                        for (IInvitationProcess process : processes) {
-                            if (process.getPeer().equals(sender)) {
-                                process.invitationAccepted(sender);
+                Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList",
+                    log, new Runnable() {
+                        public void run() {
+                            for (IInvitationProcess process : processes) {
+                                if (process.getPeer().equals(sender)) {
+                                    process.invitationAccepted(sender);
+                                }
                             }
                         }
-                    }
-                }).start();
+                    });
             }
         };
 
         private JoinExtension join = new JoinExtension() {
 
             @Override
-            public void joinReceived(JID sender, int colorID) {
-                log.debug("Join: ColorID=" + colorID);
+            public void joinReceived(final JID sender, final int colorID) {
 
-                for (IInvitationProcess process : processes) {
-                    if (process.getPeer().equals(sender)) {
-                        process.joinReceived(sender);
-                        return;
-                    }
-                }
+                XMPPChatTransmitter.log.debug("[" + sender.getName()
+                    + "] Join: ColorID=" + colorID);
 
-                ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
+                Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList",
+                    log, new Runnable() {
+                        public void run() {
+                            for (IInvitationProcess process : processes) {
+                                if (process.getPeer().equals(sender)) {
+                                    process.joinReceived(sender);
+                                    return;
+                                }
+                            }
 
-                if (project != null) {
-                    // a new user joined this session
-                    project.addUser(new User(sender, colorID));
-                }
+                            ISharedProject project = Saros.getDefault()
+                                .getSessionManager().getSharedProject();
+
+                            if (project != null) {
+                                // a new user joined this session
+                                project.addUser(new User(sender, colorID));
+                            }
+                        }
+                    });
             }
         };
 
@@ -390,6 +406,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 requestForFileList.processPacket(packet);
 
                 cancelInvite.processPacket(packet);
+
+                receiver.processPacket(packet);
 
             } catch (Exception e) {
                 XMPPChatTransmitter.log.error(
@@ -1141,8 +1159,33 @@ public class XMPPChatTransmitter implements ITransmitter,
         jingleDiscovery = new JingleDiscoveryManager(connection);
 
         // Register PacketListeners
-        this.connection.addPacketListener(new GodPacketListener(),
-            PacketExtensions.getSessionIDPacketFilter());
+        this.connection.addPacketListener(new PacketListener() {
+
+            GodPacketListener godListener = new GodPacketListener();
+
+            PacketFilter sessionFilter = PacketExtensions
+                .getSessionIDPacketFilter();
+
+            ExecutorService executor = Executors
+                .newSingleThreadExecutor(new NamedThreadFactory(
+                    "XMPPChatTransmitter-Dispatch"));
+
+            public void processPacket(final Packet packet) {
+                executor.submit(new Runnable() {
+                    public void run() {
+                        try {
+                            if (sessionFilter.accept(packet)) {
+                                godListener.processPacket(packet);
+                            }
+                            receiver.processPacket(packet);
+                        } catch (RuntimeException e) {
+                            log.error("Internal Error:", e);
+                        }
+                    }
+                });
+            }
+
+        }, null);
 
         if (!Saros.getFileTransferModeViaChat()) {
             // Start Jingle Manager asynchronous
