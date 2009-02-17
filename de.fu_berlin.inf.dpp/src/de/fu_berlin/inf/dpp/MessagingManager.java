@@ -358,7 +358,7 @@ public class MessagingManager implements PacketListener, MessageListener,
      * @see org.jivesoftware.smack.PacketListener
      */
     public void processPacket(Packet packet) {
-        MessagingManager.log.debug("messagePacket called");
+        MessagingManager.log.trace("processPacket called");
         final Message message = (Message) packet;
         final JID jid = new JID(message.getFrom());
 
