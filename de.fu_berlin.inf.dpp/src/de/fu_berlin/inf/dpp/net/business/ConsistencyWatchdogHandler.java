@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -48,115 +49,155 @@ public class ConsistencyWatchdogHandler {
 
     protected long lastReceivedActivityTime;
 
+    public class FinishMonitor extends NullProgressMonitor {
+
+        JID from;
+        IPath path;
+        boolean wasReadOnly;
+
+        public FinishMonitor(JID from, IPath path, boolean wasReadOnly) {
+            this.from = from;
+            this.path = path;
+            this.wasReadOnly = wasReadOnly;
+        }
+
+        boolean firstTime = true;
+
+        @Override
+        public void done() {
+
+            synchronized (this) {
+                if (!firstTime) {
+                    return;
+                }
+                firstTime = false;
+            }
+
+            if (isCanceled()) {
+                log.warn("Saving was canceled");
+            }
+
+            Util.runSafeAsync("ConsistencyWatchdog-Finish", log,
+                new Runnable() {
+                    public void run() {
+                        finishConsistencyCheck(from, path, wasReadOnly);
+                    }
+
+                });
+        }
+    }
+
+    private void finishConsistencyCheck(JID from, IPath path,
+        boolean wasReadOnly) {
+
+        // Reset Read Only flag
+        if (wasReadOnly) {
+            FileUtil.setReadOnly(Saros.getDefault().getSessionManager()
+                .getSharedProject().getProject().getFile(path), true);
+        }
+
+        // Reset jupiter
+        Saros.getDefault().getSessionManager().getSharedProject()
+            .getConcurrentDocumentManager().resetJupiterDocument(path);
+
+        // Send the file to client
+        try {
+            transmitter.sendFile(from, Saros.getDefault().getSessionManager()
+                .getSharedProject().getProject(), path, -1,
+            /*
+             * TODO CO The Callback should be used to show progress to the user
+             */
+            new IFileTransferCallback() {
+
+                public void fileSent(IPath path) {
+                    // do nothing
+                }
+
+                public void fileTransferFailed(IPath path, Exception e) {
+                    // do nothing
+
+                }
+
+                public void setTransferMode(TransferMode mode) {
+                    // do nothing
+                }
+
+                public void transferProgress(int transfered) {
+                    // do nothing
+                }
+
+            });
+        } catch (IOException e) {
+            // TODO This means we were really unable to send
+            // this file. No more falling back.
+            log.error("Could not sent file for consistency resolution");
+        }
+
+        // TODO Should we not rather send an Activity?
+        // transmitter.sendActivities(project.getVariable(),
+        // Collections.singletonList(new TimedActivity(
+        // new FileActivity(FileActivity.Type.Created,
+        // new Path(path)),
+        // ActivitySequencer.UNDEFINED_TIME)));
+
+    }
+
     ChecksumErrorExtension checksumError = new ChecksumErrorExtension() {
 
         @Override
         public void checksumErrorReceived(final JID from, final IPath path,
             boolean resolved) {
 
-            log.debug("ChecksumError received");
-
             if (resolved) {
-                log.debug("synchronisation completed, inconsistency resolved");
+                log.info("Synchronisation completed, inconsistency resolved");
                 ErrorMessageDialog.closeChecksumErrorMessage();
                 return;
             }
 
+            log.debug("Checksum Error for " + path);
+
             ErrorMessageDialog.showChecksumErrorMessage(path.toOSString());
 
-            // Host
-            if (Saros.getDefault().getSessionManager().getSharedProject()
+            if (!Saros.getDefault().getSessionManager().getSharedProject()
                 .isHost()) {
-                log.warn("Checksum Error for " + path);
+                // Client only needs to showChecksumErrorMessage
+                return;
+            }
 
-                new Thread() {
+            Util.runSafeAsync("ConsistencyWatchdog-Start", log, new Runnable() {
+                public void run() {
 
-                    @Override
-                    public void run() {
+                    // wait until no more activities are received
+                    while (System.currentTimeMillis()
+                        - lastReceivedActivityTime < 1500) {
                         try {
-
-                            // wait until no more activities are received
-                            while (System.currentTimeMillis()
-                                - lastReceivedActivityTime < 1500) {
-                                try {
-                                    Thread.sleep(200);
-                                } catch (InterruptedException e) {
-                                    Thread.currentThread().interrupt();
-                                }
-                            }
-
-                            // save document
-                            Display.getDefault().syncExec(new Runnable() {
-                                public void run() {
-                                    Set<IEditorPart> editors = EditorManager
-                                        .getDefault().getEditors(path);
-                                    if (editors != null && editors.size() > 0) {
-                                        editors.iterator().next().doSave(
-                                            new NullProgressMonitor());
-                                    }
-
-                                }
-                            });
-
-                            // reset jupiter
-                            Saros.getDefault().getSessionManager()
-                                .getSharedProject()
-                                .getConcurrentDocumentManager()
-                                .resetJupiterDocument(path);
-
-                            // send the file to client
-                            try {
-                                transmitter.sendFile(from, Saros.getDefault()
-                                    .getSessionManager().getSharedProject()
-                                    .getProject(), path, -1,
-                                /*
-                                 * TODO CO The Callback should be used to show
-                                 * progress to the user
-                                 */
-                                new IFileTransferCallback() {
-
-                                    public void fileSent(IPath path) {
-                                        // do nothing
-                                    }
-
-                                    public void fileTransferFailed(IPath path,
-                                        Exception e) {
-                                        // do nothing
-
-                                    }
-
-                                    public void setTransferMode(
-                                        TransferMode mode) {
-                                        // do nothing
-                                    }
-
-                                    public void transferProgress(int transfered) {
-                                        // do nothing
-                                    }
-
-                                });
-                            } catch (IOException e) {
-                                log
-                                    .error("Could not sent file for consistency resolution");
-                                // TODO This means we were really unable to send
-                                // this file. No more falling back.
-                            }
-
-                            // TODO Should we not rather send an Activity?
-                            // transmitter.sendActivities(project.getVariable(),
-                            // Collections.singletonList(new TimedActivity(
-                            // new FileActivity(FileActivity.Type.Created,
-                            // new Path(path)),
-                            // ActivitySequencer.UNDEFINED_TIME)));
-                        } catch (RuntimeException e) {
-                            log
-                                .error(
-                                    "Internal Error while processing an checksum error",
-                                    e);
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
                         }
                     }
-                }.start();
-            }
+
+                    // TODO Handle case, when file does not exist locally any
+                    // more
+                    final boolean wasReadOnly = FileUtil.setReadOnly(Saros
+                        .getDefault().getSessionManager().getSharedProject()
+                        .getProject().getFile(path), false);
+
+                    // save document -> will continue when done in
+                    // finishConsistencyCheck()
+                    Display.getDefault().syncExec(new Runnable() {
+                        public void run() {
+                            Set<IEditorPart> editors = EditorManager
+                                .getDefault().getEditors(path);
+                            if (editors != null && editors.size() > 0) {
+                                editors.iterator().next().doSave(
+                                    new FinishMonitor(from, path, wasReadOnly));
+                            }
+
+                        }
+                    });
+                }
+            });
 
         }
 
