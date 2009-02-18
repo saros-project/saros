@@ -73,17 +73,22 @@ public class FileUtil {
      * @param readOnly
      *            <code>true</code> to set it to read-only, <code>false</code>
      *            to unset
+     * @return The state before setting read-only to the given value.
      */
-    public static void setReadOnly(IFile file, boolean readonly) {
+    public static boolean setReadOnly(IFile file, boolean readonly) {
         ResourceAttributes attributes = file.getResourceAttributes();
-        if (attributes == null)
-            return;
+        if (attributes == null) {
+            // TODO: Throw an FileNotFoundException and deal with it everywhere!
+            return false;
+        }
+        boolean result = attributes.isReadOnly();
         attributes.setReadOnly(readonly);
         try {
             file.setResourceAttributes(attributes);
         } catch (CoreException e) {
             // failure is not an option
         }
+        return result;
     }
 
     /**
