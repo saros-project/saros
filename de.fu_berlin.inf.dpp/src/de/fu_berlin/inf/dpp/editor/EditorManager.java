@@ -1175,8 +1175,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IDocumentProvider provider = this.editorAPI
                 .getDocumentProvider(input);
 
-            // save not necessary, if we have no modified document
+            // Save not necessary, if we have no modified document
             if (!this.connectedFiles.contains(file)) {
+                log.warn("Saving not necessary (not connected)!");
                 return;
             }
 
