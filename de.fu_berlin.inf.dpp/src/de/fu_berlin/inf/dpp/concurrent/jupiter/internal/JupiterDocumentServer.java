@@ -161,11 +161,11 @@ public class JupiterDocumentServer implements JupiterServer {
     public synchronized HashMap<JID, JupiterClient> getProxies()
         throws InterruptedException {
         /*
-         * Was Passiert, wenn wÃ¤hrend der Bearbeitung ein neuer proxy
-         * eingefÃ¼gt wird
+         * Was Passiert, wenn während der Bearbeitung ein neuer proxy eingefüt
+         * wird?
          */
 
-        // /* Synchronistation fÃ¼r das Client Management.*/
+        // /* Synchronistation für das Client Management.*/
         // while(waitForSerializer && requestSyncCounter == 0){
         // wait();
         // }
