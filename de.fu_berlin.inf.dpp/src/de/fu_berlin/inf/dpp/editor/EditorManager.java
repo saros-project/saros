@@ -548,6 +548,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             fireActivity(new TextSelectionActivity(offset, length, path));
     }
 
+    /**
+     * Asks the ConcurrentDocumentManager if there are currently any
+     * inconsistencies to resolve.
+     */
+    public boolean isConsistencyToResolve() {
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+
+        if (project == null)
+            return false;
+
+        return project.getConcurrentDocumentManager().getConsistencyToResolve()
+            .getVariable();
+
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -555,7 +571,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void textAboutToBeChanged(int offset, String text, int replace,
         IDocument document) {
-        if (!this.isDriver) {
+
+        /*
+         * TODO When Inconsistencies exists, all listeners should be stopped
+         * rather than catching events -> Think Start/Stop on the SharedProject
+         */
+        if (!this.isDriver || isConsistencyToResolve()) {
             this.currentExecuteActivity = null;
             return;
         }
