@@ -408,8 +408,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 cancelInvite.processPacket(packet);
 
-                receiver.processPacket(packet);
-
             } catch (Exception e) {
                 XMPPChatTransmitter.log.error(
                     "An internal error occurred while processing packets", e);
