@@ -974,8 +974,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendJupiterRequest(ISharedProject sharedProject,
         Request request, JID jid) {
-        XMPPChatTransmitter.log.info("send request to : " + jid + " request: "
-            + request);
+        XMPPChatTransmitter.log.info("Send JupiterRequest [" + jid.getName()
+            + "] " + request);
         sendMessage(jid, new RequestPacketExtension(Saros.getDefault()
             .getSessionManager().getSessionID(), request));
     }
