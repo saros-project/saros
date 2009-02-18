@@ -386,7 +386,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 objectOutputStream.writeObject(transferData);
                 objectOutputStream.writeObject(content);
                 objectOutputStream.flush();
-                logger.debug("Sent: " + transferData);
+                logger.debug("Jingle [" + connectTo.getName() + "] Send: "
+                    + transferData);
                 return;
             } catch (IOException e) {
                 throw new JingleSessionException("Jingle ["
