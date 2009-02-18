@@ -740,7 +740,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             this.concurrentDocuments.remove(path);
             /* init new server. */
             JupiterDocumentServer doc = initDocumentServer(path);
-            ConcurrentDocumentManager.logger.debug("Reset jupiter server : ");
+            ConcurrentDocumentManager.logger
+                .debug("Resetting jupiter server...");
             /* add proxy documents for active driver. */
             for (JID jid : this.driverManager.getDriversForDocument(path)) {
                 doc.addProxyClient(jid);
@@ -760,8 +761,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             this.clientDocs.remove(path);
             this.clientDocs.put(path, new JupiterDocumentClient(this.myJID,
                 this.forwarder, path));
-            ConcurrentDocumentManager.logger
-                .debug("Reset jupiter client doc : " + this.myJID);
+            ConcurrentDocumentManager.logger.debug("Reset jupiter client doc: "
+                + this.myJID);
         } else {
             ConcurrentDocumentManager.logger
                 .error("No jupter document exists for " + path.toOSString());
