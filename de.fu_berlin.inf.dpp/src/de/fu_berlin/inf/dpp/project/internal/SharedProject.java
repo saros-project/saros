@@ -582,6 +582,12 @@ public class SharedProject implements ISharedProject {
 
                                 ResourceAttributes attributes = new ResourceAttributes();
                                 attributes.setReadOnly(readonly);
+
+                                /*
+                                 * TODO Make sure this is necessary! We don't
+                                 * remove this flag, when switching into driver
+                                 * mode, thus it might cause problems.
+                                 */
                                 attributes.setArchive(readonly);
 
                                 for (IPath path : paths) {
