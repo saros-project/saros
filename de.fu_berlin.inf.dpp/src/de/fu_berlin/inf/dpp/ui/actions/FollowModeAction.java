@@ -52,7 +52,6 @@ public class FollowModeAction extends Action implements ISessionListener {
 
                 public void userJoined(JID user) {
                     // ignore
-
                 }
 
                 public void userLeft(JID user) {
