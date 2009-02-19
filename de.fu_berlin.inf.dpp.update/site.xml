@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
    <description url="http://dpp.sf.net/update">
-      Saros Update Site
+      Site to install the Saros Feature for Distributed Pair Programming
    </description>
-   <feature url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.feature_9.2.19.r708.jar?use_mirror=dfn" id="de.fu_berlin.inf.dpp.feature" version="9.2.19.r708">
+   <feature url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp.feature_9.2.19.r713.jar?use_mirror=dfn" id="de.fu_berlin.inf.dpp.feature" version="9.2.19.r713">
       <category name="DPP"/>
    </feature>
-   <archive path="plugins/de.fu_berlin.inf.dpp_9.2.19.r708.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_9.2.19.r708.jar?use_mirror=dfn"/>
+   <archive path="plugins/de.fu_berlin.inf.dpp_9.2.19.r713.jar" url="http://downloads.sourceforge.net/dpp/de.fu_berlin.inf.dpp_9.2.19.r713.jar?use_mirror=dfn"/>
    <category-def name="DPP" label="DPP"/>
 </site>
