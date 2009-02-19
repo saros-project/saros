@@ -141,8 +141,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      */
     private class ConsistencyWatchdog extends Job {
 
-        private boolean executingChecksumErrorHandling;
-
         public ConsistencyWatchdog(String name) {
             super(name);
         }
@@ -857,14 +855,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      */
     public VariableProxy<Boolean> getConsistencyToResolve() {
         return this.inconsistencyToResolve;
-    }
-
-    /**
-     * TODO CJ: write javadoc
-     * 
-     */
-    public boolean getExecutingChecksumErrorHandling() {
-        return consistencyWatchdog.executingChecksumErrorHandling;
     }
 
     public Set<IPath> getPathesWithWrongChecksums() {
