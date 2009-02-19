@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
@@ -25,7 +24,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
@@ -34,11 +32,11 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
     private static Logger log = Logger.getLogger(ConsistencyAction.class);
 
-    private boolean executingChecksumErrorHandling;
+    protected boolean executingChecksumErrorHandling;
 
-    private IToolBarManager toolBar;
+    protected IToolBarManager toolBar;
 
-    private Set<IPath> paths;
+    protected Set<IPath> paths;
 
     public ConsistencyAction(IToolBarManager toolBar) {
         this.toolBar = toolBar;
@@ -76,22 +74,32 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {
 
-                        // concatenate pathes
-                        String pathesOfInconsistencies = "";
+                        // Concatenate paths
+                        StringBuilder sb = new StringBuilder();
                         for (IPath path : paths) {
-                            pathesOfInconsistencies += path.toOSString() + " ";
+                            if (sb.length() > 0)
+                                sb.append(", ");
+
+                            sb.append(path.toOSString());
                         }
+                        String pathsOfInconsistencies = sb.toString();
 
                         // set tooltip
                         setToolTipText("Inconsistency Detected in file/s "
-                            + pathesOfInconsistencies);
+                            + pathsOfInconsistencies);
+
+                        // TODO Balloon is too aggressive at the moment, when
+                        // the host is slow in sending changes (for instance
+                        // when refactoring)
 
                         // show balloon notification
-                        BalloonNotification.showNotification(
-                            ((ToolBarManager) toolBar).getControl(),
-                            "Inconsistency Detected!", "In file/s "
-                                + pathesOfInconsistencies
-                                + " exists inconsistencies.", 5000);
+                        /*
+                         * BalloonNotification.showNotification(
+                         * ((ToolBarManager) toolBar).getControl(),
+                         * "Inconsistency Detected!",
+                         * "Inconsistencies detected in: " +
+                         * pathsOfInconsistencies, 5000);
+                         */
                     }
                 });
 
