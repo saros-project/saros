@@ -119,6 +119,9 @@ public class ConsistencyAction extends Action implements ISessionListener {
         public boolean receivedResource(JID from, Path path, InputStream input,
             int time) {
 
+            log.debug("Received consistency file [" + from.getName() + "] "
+                + path.toString());
+
             ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
             if (project == null)
