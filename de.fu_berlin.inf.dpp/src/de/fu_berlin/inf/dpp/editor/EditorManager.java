@@ -87,6 +87,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -549,19 +550,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Asks the ConcurrentDocumentManager if there are currently any
-     * inconsistencies to resolve.
+     * Asks the ConsistencyWatchdogHandler if there is currently any
+     * inconsistency resolution in progress.
      */
-    public boolean isConsistencyToResolve() {
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+    public boolean isConsistencyResolutionInProgress() {
+        ConsistencyWatchdogHandler watchDog = Saros.getDefault().getContainer()
+            .getComponent(ConsistencyWatchdogHandler.class);
 
-        if (project == null)
-            return false;
-
-        return project.getConcurrentDocumentManager().getConsistencyToResolve()
-            .getVariable();
-
+        return watchDog.isConsistencyResolutionInProgress();
     }
 
     /*
@@ -576,7 +572,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
          * TODO When Inconsistencies exists, all listeners should be stopped
          * rather than catching events -> Think Start/Stop on the SharedProject
          */
-        if (!this.isDriver || isConsistencyToResolve()) {
+        if (!this.isDriver || isConsistencyResolutionInProgress()) {
             this.currentExecuteActivity = null;
             return;
         }

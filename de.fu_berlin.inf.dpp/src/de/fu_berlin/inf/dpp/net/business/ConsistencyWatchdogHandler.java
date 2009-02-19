@@ -49,6 +49,8 @@ public class ConsistencyWatchdogHandler {
 
     protected long lastReceivedActivityTime;
 
+    protected boolean consistencyResolutionInProgress;
+
     public class FinishMonitor extends NullProgressMonitor {
 
         JID from;
@@ -142,19 +144,27 @@ public class ConsistencyWatchdogHandler {
 
     }
 
+    public boolean isConsistencyResolutionInProgress() {
+        return this.consistencyResolutionInProgress;
+    }
+
     ChecksumErrorExtension checksumError = new ChecksumErrorExtension() {
 
         @Override
         public void checksumErrorReceived(final JID from, final IPath path,
             boolean resolved) {
 
+            // TODO This is not reentrant! We can only resolve one consistency
+            // at a time! But no checking is performed!
             if (resolved) {
                 log.info("Synchronisation completed, inconsistency resolved");
+                consistencyResolutionInProgress = false;
                 ErrorMessageDialog.closeChecksumErrorMessage();
                 return;
             }
 
             log.debug("Checksum Error for " + path);
+            consistencyResolutionInProgress = true;
 
             ErrorMessageDialog.showChecksumErrorMessage(path.toOSString());
 
@@ -167,6 +177,10 @@ public class ConsistencyWatchdogHandler {
             Util.runSafeAsync("ConsistencyWatchdog-Start", log, new Runnable() {
                 public void run() {
 
+                    /*
+                     * TODO Use Messages to confirm that there are no more
+                     * activities being sent by all participants.
+                     */
                     // wait until no more activities are received
                     while (System.currentTimeMillis()
                         - lastReceivedActivityTime < 1500) {
