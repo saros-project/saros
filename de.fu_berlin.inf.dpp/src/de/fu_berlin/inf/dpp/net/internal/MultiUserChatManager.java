@@ -6,25 +6,22 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.net.IReceiver;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 
-public class MultiUserChatManager implements PacketListener {
+public class MultiUserChatManager {
 
     private static Logger log = Logger.getLogger(MultiUserChatManager.class
-            .getName());
+        .getName());
 
     // TODO: Room name should be configured by settings.
     /* name of multi user chat room */
@@ -48,13 +45,13 @@ public class MultiUserChatManager implements PacketListener {
     }
 
     public void initMUC(XMPPConnection connection, String user, String room)
-            throws XMPPException {
+        throws XMPPException {
         this.room = room;
         initMUC(connection, user);
     }
 
     public void initMUC(XMPPConnection connection, String user)
-            throws XMPPException {
+        throws XMPPException {
 
         /* create room domain of current connection. */
         // JID(connection.getUser()).getDomain();
@@ -84,10 +81,10 @@ public class MultiUserChatManager implements PacketListener {
 
                     // Add default answers to the form to submit
                     for (Iterator<FormField> fields = form.getFields(); fields
-                            .hasNext();) {
+                        .hasNext();) {
                         FormField field = fields.next();
                         if (!FormField.TYPE_HIDDEN.equals(field.getType())
-                                && (field.getVariable() != null)) {
+                            && (field.getVariable() != null)) {
                             // Sets the default value as the answer
                             submitForm.setDefaultAnswer(field.getVariable());
                         }
@@ -97,7 +94,7 @@ public class MultiUserChatManager implements PacketListener {
                     submitForm.setAnswer("muc#roomconfig_moderatedroom", true);
                     submitForm.setAnswer("muc#roomconfig_allowinvites", true);
                     submitForm
-                            .setAnswer("muc#roomconfig_persistentroom", false);
+                        .setAnswer("muc#roomconfig_persistentroom", false);
 
                     // Send the completed form (with default values) to the
                     // server to configure the room
@@ -125,7 +122,7 @@ public class MultiUserChatManager implements PacketListener {
     }
 
     public void sendActivities(ISharedProject sharedProject,
-            List<TimedActivity> activities) {
+        List<TimedActivity> activities) {
 
         // log.info("Sent muc activities: " + activities);
         try {
@@ -133,11 +130,10 @@ public class MultiUserChatManager implements PacketListener {
             Message newMessage = this.muc.createMessage();
             /* add packet extension. */
             newMessage.addExtension(new ActivitiesPacketExtension(Saros
-                    .getDefault().getSessionManager().getSessionID(),
-                    activities));
+                .getDefault().getSessionManager().getSessionID(), activities));
             /* add jid property */
             newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, Saros
-                    .getDefault().getMyJID().toString());
+                .getDefault().getMyJID().toString());
 
             // newMessage.setBody("test");
             this.muc.sendMessage(newMessage);
@@ -146,17 +142,9 @@ public class MultiUserChatManager implements PacketListener {
         } catch (XMPPException e) {
 
             Saros.getDefault().getLog().log(
-                    new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                            "Could not send message, message queued", e));
+                new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                    "Could not send message, message queued", e));
         }
-
-    }
-
-    public void processPacket(Packet packet) {
-        // TODO should processing here instead of MessagingManager?
-    }
-
-    public void setReceiver(IReceiver receiver) {
 
     }
 

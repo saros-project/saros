@@ -18,13 +18,13 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferData;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
 public class NetworkView extends ViewPart implements JingleTransportListener,
-        IJingleFileTransferListener, IConnectionListener {
+    IJingleFileTransferListener, IConnectionListener {
 
     private Text log;
 
@@ -56,9 +56,9 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     }
 
     public void transportEstablished(TransportCandidate local,
-            TransportCandidate remote) {
+        TransportCandidate remote) {
         log.append("Jingle transport estabblished: " + local.getLocalIp()
-                + " <-> " + remote.getLocalIp());
+            + " <-> " + remote.getLocalIp());
 
     }
 
@@ -66,7 +66,7 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 log.append("P2P Connected with " + protocol + " to " + remote
-                        + "\n");
+                    + "\n");
             }
         });
     }
@@ -77,29 +77,25 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     }
 
     public void failedToSendFileListWithJingle(JID jid,
-            JingleFileTransferData transferList) {
+        TransferDescription transferList) {
         log.append("Failed to send File with Jingle to " + jid);
     }
 
-    public void incomingFileList(String fileList_content, JID sender) {
-        // TODO Auto-generated method stub
-    }
-
-    public void incomingResourceFile(JingleFileTransferData data,
-            InputStream input) {
-        // TODO Auto-generated method stub
-
-    }
-
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
             ((XMPPChatTransmitter) Saros.getDefault().getSessionManager()
-                    .getTransmitter()).getJingleManager()
-                    .addJingleFileTransferListener(this);
+                .getTransmitter()).getJingleManager()
+                .addJingleFileTransferListener(this);
 
         } else if (newState == ConnectionState.NOT_CONNECTED) {
+            // TODO remove as listener?
         }
+
+    }
+
+    public void incomingData(TransferDescription data, InputStream input) {
+        // TODO Auto-generated method stub
 
     }
 

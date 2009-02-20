@@ -14,15 +14,15 @@ import de.fu_berlin.inf.dpp.FileList;
 public interface IIncomingInvitationProcess extends IInvitationProcess {
 
     /**
-     * Requests the file list of the remotly shared project. This methods blocks
-     * until the file list is retrieved.
+     * Requests the file list of the remotely shared project. This methods
+     * blocks until the file list is retrieved.
      * 
      * This method can be called while in INVITATION_SENT state.
      */
     public FileList requestRemoteFileList(IProgressMonitor monitor);
 
     /**
-     * @return the file list of the remotly shared project or <code>null</code>
+     * @return the file list of the remotely shared project or <code>null</code>
      *         if it hasn't been requested and retrieved yet. Make a call to
      *         {@link #requestRemoteFileList(IProgressMonitor)} before using
      *         this method.
@@ -51,7 +51,7 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      *             -
      */
     public void accept(IProject baseProject, String newProjectName,
-            IProgressMonitor monitor);
+        IProgressMonitor monitor);
 
     public void setInvitationUI(IInvitationUI inviteUI);
 

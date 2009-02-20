@@ -20,9 +20,9 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -49,6 +49,7 @@ public class NewSessionAction implements IObjectActionDelegate {
      * (non-Javadoc) Defined in IActionDelegate
      */
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+        // We deal with everything in selectionChanged
     }
 
     /*
@@ -62,11 +63,11 @@ public class NewSessionAction implements IObjectActionDelegate {
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
                     ErrorDialog.openError(
-                            Display.getDefault().getActiveShell(),
-                            "Error Starting Session",
-                            "Session could not be started", new Status(
-                                    IStatus.ERROR, "de.fu_berlin.inf.dpp",
-                                    IStatus.ERROR, e.getMessage(), e));
+                        Display.getDefault().getActiveShell(),
+                        "Error Starting Session",
+                        "Session could not be started", new Status(
+                            IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                            IStatus.ERROR, e.getMessage(), e));
                 }
             });
         }
@@ -86,18 +87,15 @@ public class NewSessionAction implements IObjectActionDelegate {
         // instead of being disabled.
 
         action.setEnabled(connected && !running
-                && (this.selectedProject != null)
-                && this.selectedProject.isAccessible());
+            && (this.selectedProject != null)
+            && this.selectedProject.isAccessible());
     }
 
     private IProject getProject(ISelection selection) {
         Object element = ((IStructuredSelection) selection).getFirstElement();
-        if (element instanceof IProject) {
-            return (IProject) element;
-        } else if (element instanceof IJavaProject) {
-            return ((IJavaProject) element).getProject();
+        if (element instanceof IResource) {
+            return ((IResource) element).getProject();
         }
-
         return null;
     }
 }

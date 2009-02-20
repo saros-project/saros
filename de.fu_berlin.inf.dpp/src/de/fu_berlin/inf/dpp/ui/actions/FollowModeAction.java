@@ -6,13 +6,13 @@ import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 public class FollowModeAction extends Action implements ISessionListener {
-
-    private boolean isFollowMode = false;
 
     public FollowModeAction() {
         super();
@@ -29,11 +29,10 @@ public class FollowModeAction extends Action implements ISessionListener {
     }
 
     public boolean getFollowMode() {
-        return this.isFollowMode;
+        return EditorManager.getDefault().isFollowing();
     }
 
     public void setFollowMode(boolean isFollowMode) {
-        this.isFollowMode = isFollowMode;
         EditorManager.getDefault().setEnableFollowing(isFollowMode);
         updateEnablement();
     }
@@ -42,9 +41,24 @@ public class FollowModeAction extends Action implements ISessionListener {
         // Automatically start follow mode at the beginning of a session if
         // Auto-Follow-Mode is enabled.
         if (Saros.getDefault().getPreferenceStore().getBoolean(
-                PreferenceConstants.AUTO_FOLLOW_MODE)) {
+            PreferenceConstants.AUTO_FOLLOW_MODE)) {
             setFollowMode(true);
         }
+        Saros.getDefault().getSessionManager().getSharedProject().addListener(
+            new ISharedProjectListener() {
+                public void driverChanged(JID driver, boolean replicated) {
+                    updateEnablement();
+                }
+
+                public void userJoined(JID user) {
+                    // ignore
+                }
+
+                public void userLeft(JID user) {
+                    // ignore
+                }
+            });
+
         updateEnablement();
     }
 
@@ -56,8 +70,10 @@ public class FollowModeAction extends Action implements ISessionListener {
         // ignore
     }
 
-    private void updateEnablement() {
-        setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
+    public void updateEnablement() {
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+        setEnabled(project != null && !project.isDriver());
         setChecked(getFollowMode());
     }
 }

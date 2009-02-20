@@ -49,7 +49,7 @@ public class SkypeAction extends SelectionProviderAction {
                     setEnabled(false);
                     SkypeManager sm = SkypeManager.getDefault();
                     SkypeAction.this.skypeURL = sm
-                            .getSkypeURL((RosterEntry) item);
+                        .getSkypeURL((RosterEntry) item);
                     setEnabled(SkypeAction.this.skypeURL != null);
                 }
             }).start();

@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -50,6 +50,9 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -62,29 +65,29 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
-import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
-import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
-import de.fu_berlin.inf.dpp.ui.actions.TakeDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
-        IPropertyChangeListener {
+    IPropertyChangeListener {
 
     private TableViewer viewer;
 
     private ISharedProject sharedProject;
 
-    private GiveDriverRoleAction giveDriverRoleAction;
+    // private GiveDriverRoleAction giveDriverRoleAction;
 
-    private TakeDriverRoleAction takeDriverRoleAction;
+    private GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
+
+    // private RemoveDriverRoleAction removeDriverRoleAction;
 
     private IPreferenceStore store = null;
 
     private FollowModeAction followModeAction;
 
     private class SessionContentProvider implements IStructuredContentProvider,
-            ISharedProjectListener {
+        ISharedProjectListener {
 
         private TableViewer tableViewer;
 
@@ -108,7 +111,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         public Object[] getElements(Object parent) {
             if (SessionView.this.sharedProject != null) {
                 return SessionView.this.sharedProject.getParticipants()
-                        .toArray();
+                    .toArray();
             }
 
             return new Object[] {};
@@ -116,14 +119,24 @@ public class SessionView extends ViewPart implements ISessionListener,
 
         public void driverChanged(JID driver, boolean replicated) {
             User participant = SessionView.this.sharedProject
-                    .getParticipant(driver);
+                .getParticipant(driver);
 
             // if the local host become driver leave follow mode
-            if (participant.getJid().equals(Saros.getDefault().getMyJID())) {
-                if (SessionView.this.sharedProject.isDriver(participant))
+            if (participant.getJID().equals(Saros.getDefault().getMyJID())) {
+                if (SessionView.this.sharedProject.isDriver(participant)) {
                     followModeAction.setFollowMode(false);
+                    BalloonNotification.showNotification(
+                        tableViewer.getTable(), "Role changed",
+                        "You are now a driver of this session.", 5000);
+                } else {
+                    BalloonNotification.showNotification(
+                        tableViewer.getTable(), "Role changed",
+                        "You are now an observer of this session.", 5000);
+                }
+
             }
             refreshTable();
+
         }
 
         public void userJoined(JID user) {
@@ -135,6 +148,7 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
 
         public void dispose() {
+            // Do nothing
         }
 
         private void refreshTable() {
@@ -147,20 +161,42 @@ public class SessionView extends ViewPart implements ISessionListener,
     }
 
     private class SessionLabelProvider extends LabelProvider implements
-            ITableLabelProvider, IColorProvider, ITableFontProvider {
+        ITableLabelProvider, IColorProvider, ITableFontProvider {
 
         private final Image userImage = SarosUI.getImage("icons/user.png");
         private final Image driverImage = SarosUI
-                .getImage("icons/user_edit.png");
+            .getImage("icons/user_edit.png");
         private Font boldFont = null;
 
         public String getColumnText(Object obj, int index) {
             User participant = (User) obj;
 
-            StringBuffer sb = new StringBuffer(participant.getJid().getName());
-            // if (participant.equals(sharedProject.getDriver())) {
-            if (SessionView.this.sharedProject.isDriver(participant)) {
+            String name;
 
+            if (participant == Saros.getDefault().getLocalUser()) {
+                name = "Yourself (" + participant.getJID().getBase() + ")";
+            } else {
+                name = participant.getJID().getBase();
+                XMPPConnection connection = Saros.getDefault().getConnection();
+                if (connection != null) {
+                    Roster roster = connection.getRoster();
+                    if (roster != null) {
+                        RosterEntry entry = roster.getEntry(participant
+                            .getJID().getBase());
+                        if (entry != null) {
+                            String nickName = entry.getName();
+                            if (nickName != null
+                                && nickName.trim().length() > 0) {
+                                name = nickName + " ("
+                                    + participant.getJID().getBase() + ")";
+                            }
+                        }
+                    }
+                }
+            }
+
+            StringBuffer sb = new StringBuffer(name);
+            if (SessionView.this.sharedProject.isDriver(participant)) {
                 sb.append(" (Driver)");
             }
 
@@ -172,51 +208,66 @@ public class SessionView extends ViewPart implements ISessionListener,
             User user = (User) obj;
             if (SessionView.this.sharedProject.isDriver(user)) {
                 return this.driverImage;
+            } else {
+                return this.userImage;
             }
-            // return user.equals(sharedProject.getDriver()) ? driverImage :
-            // userImage;
-            return this.userImage;
         }
 
         public Image getColumnImage(Object obj, int index) {
             return getImage(obj);
         }
 
-        // TODO getting current color doesnt uses when default was changed.
+        // TODO getting current color does not work if default was changed.
         public Color getBackground(Object element) {
             User user = (User) element;
 
-            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+            if (user.equals(Saros.getDefault().getLocalUser())) {
                 return null;
+            } else {
+                return getUserColor(user);
             }
+        }
 
-            int colorid = user.getColorID();
-            String mytype = SelectionAnnotation.TYPE + "."
-                    + new Integer(colorid + 1).toString();
+        public Color getForeground(Object element) {
+            User user = (User) element;
 
-            AnnotationPreferenceLookup lookup = org.eclipse.ui.editors.text.EditorsUI
-                    .getAnnotationPreferenceLookup();
-            AnnotationPreference ap = lookup.getAnnotationPreference(mytype);
+            if (user.equals(Saros.getDefault().getLocalUser())) {
+                return getUserColor(user);
+            }
+            return null;
+        }
+
+        private Color getUserColor(User user) {
+
+            int colorID = user.getColorID();
+
+            String annotationType = SelectionAnnotation.TYPE + "."
+                + new Integer(colorID + 1).toString();
+
+            AnnotationPreferenceLookup lookup = EditorsUI
+                .getAnnotationPreferenceLookup();
+            AnnotationPreference ap = lookup
+                .getAnnotationPreference(annotationType);
             if (ap == null) {
                 return null;
             }
 
-            IPreferenceStore store = EditorsUI.getPreferenceStore();
-            RGB rgb = PreferenceConverter.getColor(store, ap
+            RGB rgb;
+            try {
+                IPreferenceStore store = EditorsUI.getPreferenceStore();
+                rgb = PreferenceConverter.getColor(store, ap
                     .getColorPreferenceKey());
+            } catch (RuntimeException e) {
+                return null;
+            }
 
             return new Color(Display.getDefault(), rgb);
-
-        }
-
-        public Color getForeground(Object element) {
-            return null;
         }
 
         public Font getFont(Object element, int columnIndex) {
             if (this.boldFont == null) {
                 Display disp = SessionView.this.viewer.getControl()
-                        .getDisplay();
+                    .getDisplay();
                 FontData[] data = disp.getSystemFont().getFontData();
                 for (FontData fontData : data) {
                     fontData.setStyle(SWT.BOLD);
@@ -225,7 +276,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             }
 
             User user = (User) element;
-            if (user.getJid().equals(Saros.getDefault().getMyJID())) {
+            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
                 return this.boldFont;
             }
             return null;
@@ -284,13 +335,21 @@ public class SessionView extends ViewPart implements ISessionListener,
     @Override
     public void createPartControl(Composite parent) {
         this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-                | SWT.V_SCROLL);
+            | SWT.V_SCROLL);
         this.viewer.setContentProvider(new SessionContentProvider());
         this.viewer.setLabelProvider(new SessionLabelProvider());
         this.viewer.setInput(null);
 
-        this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer);
-        this.takeDriverRoleAction = new TakeDriverRoleAction(this.viewer);
+        /*
+         * this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
+         * "Give driver role");
+         */
+        this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
+            this.viewer, "Give exclusive driver role");
+        /*
+         * this.removeDriverRoleAction = new
+         * RemoveDriverRoleAction(this.viewer);
+         */
 
         contributeToActionBars();
         hookContextMenu();
@@ -329,9 +388,9 @@ public class SessionView extends ViewPart implements ISessionListener,
         IToolBarManager toolBar = bars.getToolBarManager();
 
         this.followModeAction = new FollowModeAction();
-        toolBar.add(new ConsistencyAction());
+        toolBar.add(new ConsistencyAction(toolBar));
         toolBar.add(new OpenInviteInterface());
-        toolBar.add(new RemoveAllDriverRoleAction());
+        // toolBar.add(new RemoveAllDriverRoleAction());
         toolBar.add(followModeAction);
         toolBar.add(new LeaveSessionAction());
     }
@@ -352,8 +411,9 @@ public class SessionView extends ViewPart implements ISessionListener,
     }
 
     private void fillContextMenu(IMenuManager manager) {
-        manager.add(this.giveDriverRoleAction);
-        manager.add(this.takeDriverRoleAction);
+        // manager.add(this.giveDriverRoleAction);
+        manager.add(this.giveExclusiveDriverRoleAction);
+        // manager.add(this.removeDriverRoleAction);
 
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -363,4 +423,9 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.viewer.refresh();
 
     }
+
+    public void updateFollowingMode() {
+        followModeAction.updateEnablement();
+    }
+
 }

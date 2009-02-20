@@ -8,6 +8,8 @@ import java.util.HashSet;
 
 public class StateChangeNotifier<T> extends HashSet<StateChangeListener<T>> {
 
+    private static final long serialVersionUID = 1398284794530268904L;
+
     public void notify(T sender) {
         for (StateChangeListener<T> cl : this) {
             cl.stateChangedNotification(sender);

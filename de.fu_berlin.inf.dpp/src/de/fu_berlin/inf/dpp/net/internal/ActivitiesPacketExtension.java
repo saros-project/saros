@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -22,6 +22,8 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.text.MessageFormat;
 import java.util.List;
 
+import org.jivesoftware.smack.filter.PacketExtensionFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -29,6 +31,11 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesPacketExtension implements PacketExtension {
+
+    public static PacketFilter getFilter() {
+        return new PacketExtensionFilter(ELEMENT, NAMESPACE);
+    }
+
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
     public static final String SESSION_ID = "sessionID";
@@ -40,19 +47,16 @@ public class ActivitiesPacketExtension implements PacketExtension {
     private List<TimedActivity> activities;
 
     MessageFormat textChangeFormat = new MessageFormat(
-            "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
+        "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
 
     private String sessionID;
 
-    // into
-
-    // consts
-
     public ActivitiesPacketExtension() {
+        // Default constructor, creating an empty Extension
     }
 
     public ActivitiesPacketExtension(String sessionID,
-            List<TimedActivity> activities) {
+        List<TimedActivity> activities) {
         this.sessionID = sessionID;
         setActivities(activities);
     }
@@ -114,7 +118,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     private String sessionIdToXML() {
         return "<" + ActivitiesPacketExtension.SESSION_ID + ">" + sessionID
-                + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
+            + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
     }
 
     /*

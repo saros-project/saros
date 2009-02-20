@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -34,108 +35,116 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
-public class ConnectDisconnectAction extends Action implements
-        IConnectionListener {
+public class ConnectDisconnectAction extends Action {
 
-    private final IPropertyChangeListener propertyListener;
+    private static final Logger log = Logger
+        .getLogger(ConnectDisconnectAction.class.getName());
 
     public ConnectDisconnectAction() {
         updateStatus();
-        Saros.getDefault().addListener(this);
 
-        this.propertyListener = new IPropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent event) {
-                if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
-                    updateStatus();
-                }
+        Saros.getDefault().addListener(new IConnectionListener() {
+            public void connectionStateChanged(XMPPConnection connection,
+                ConnectionState newState) {
+                updateStatus();
             }
-        };
+        });
+
         Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
-                this.propertyListener);
+            new IPropertyChangeListener() {
+                public void propertyChange(PropertyChangeEvent event) {
+                    if (event.getProperty()
+                        .equals(PreferenceConstants.USERNAME)) {
+                        updateStatus();
+                    }
+                }
+            });
+
     }
 
     @Override
     public void run() {
         new Thread(new Runnable() {
             public void run() {
-                Saros saros = Saros.getDefault();
-                if (saros.isConnected()) {
-                    saros.disconnect(null);
-                } else {
-
-                    // display task progress information (begin) in status line
-                    Display.getDefault().syncExec(new Runnable() {
-                        public void run() {
-                            IStatusLineManager slm = getStatusmanager();
-                            IProgressMonitor monitor = slm.getProgressMonitor();
-                            monitor.beginTask("Connecting...",
+                try {
+                    Saros saros = Saros.getDefault();
+                    if (saros.isConnected()) {
+                        saros.disconnect();
+                    } else {
+                        // display task progress information (begin) in status
+                        // line
+                        Display.getDefault().syncExec(new Runnable() {
+                            public void run() {
+                                IStatusLineManager slm = getStatusmanager();
+                                IProgressMonitor monitor = slm
+                                    .getProgressMonitor();
+                                monitor.beginTask("Connecting...",
                                     IProgressMonitor.UNKNOWN);
-                        }
-                    });
+                            }
+                        });
 
-                    saros.connect();
+                        saros.connect();
 
-                    // display task progress information (end) in status line
-                    Display.getDefault().syncExec(new Runnable() {
-                        public void run() {
-                            IStatusLineManager slm = getStatusmanager();
-                            slm.setMessage("Connecting..");
-                            IProgressMonitor monitor = slm.getProgressMonitor();
-                            monitor.done();
-                        }
-                    });
+                        // display task progress information (end) in status
+                        // line
+                        Display.getDefault().syncExec(new Runnable() {
+                            public void run() {
+                                IStatusLineManager slm = getStatusmanager();
+                                slm.setMessage("Connecting..");
+                                IProgressMonitor monitor = slm
+                                    .getProgressMonitor();
+                                monitor.done();
+                            }
+                        });
 
+                    }
+                } catch (RuntimeException e) {
+                    log.error("Internal error in ConnectDisconnectAction:", e);
                 }
             }
 
             private IStatusLineManager getStatusmanager() {
                 return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage().getViewReferences()[0].getView(false)
-                        .getViewSite().getActionBars().getStatusLineManager();
+                    .getActivePage().getViewReferences()[0].getView(false)
+                    .getViewSite().getActionBars().getStatusLineManager();
             }
         }).start();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-     */
-    public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
-        updateStatus();
-    }
+    public void updateStatus() {
+        try {
+            ConnectionState state = Saros.getDefault().getConnectionState();
 
-    private void updateStatus() {
-        ConnectionState state = Saros.getDefault().getConnectionState();
+            log.debug("New State == " + state);
 
-        switch (state) {
-        case CONNECTED:
-        case CONNECTING:
-            setImageDescriptor(SarosUI.getImageDescriptor("/icons/connect.png"));
-            break;
+            switch (state) {
+            case CONNECTED:
+            case CONNECTING:
+                setImageDescriptor(SarosUI
+                    .getImageDescriptor("/icons/connect.png"));
+                break;
 
-        case ERROR:
-        case NOT_CONNECTED:
-        case DISCONNECTING:
-            setImageDescriptor(SarosUI
+            case ERROR:
+            case NOT_CONNECTED:
+            case DISCONNECTING:
+            default:
+                setImageDescriptor(SarosUI
                     .getImageDescriptor("/icons/disconnect.png"));
-            break;
+                break;
+            }
+
+            String username = Saros.getDefault().getPreferenceStore()
+                .getString(PreferenceConstants.USERNAME);
+
+            boolean validUsername = (username != null)
+                && (username.length() > 0);
+            boolean canConnect = validUsername
+                && (state == ConnectionState.NOT_CONNECTED || state == ConnectionState.ERROR);
+            setEnabled(state == ConnectionState.CONNECTED || canConnect);
+
+            setText(SarosUI.getDescription(state));
+        } catch (RuntimeException e) {
+            log.error("Internal error in ConnectDisconnectAction:", e);
         }
-
-        String username = Saros.getDefault().getPreferenceStore().getString(
-                PreferenceConstants.USERNAME);
-
-        setEnabled((state == ConnectionState.CONNECTED)
-                || (((state == ConnectionState.NOT_CONNECTED) || (state == ConnectionState.ERROR)) && ((username != null) && (username
-                        .length() > 0))));
-        updateText();
-    }
-
-    private void updateText() {
-        ConnectionState state = Saros.getDefault().getConnectionState();
-        String text = SarosUI.getDescription(state);
-
-        setText(text);
     }
 }

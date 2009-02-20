@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -32,17 +32,15 @@ import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
     private IWorkbenchWindow window;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.IActionDelegate
-     */
     public void run(IAction action) {
         try {
             Shell shell = this.window.getShell();
-            new WizardDialog(shell, new CreateAccountWizard(true, true, true))
-                    .open();
+            WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
+                true, true, true));
+            wd.setHelpAvailable(false);
+            wd.open();
         } catch (Exception e) {
+            // TODO Use consistent way of dealing with Exceptions
             Saros.log("Could not create new Account.", e);
         }
     }
@@ -56,19 +54,11 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
         this.window = window;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.IActionDelegate
-     */
     public void selectionChanged(IAction action, ISelection selection) {
+        // We don't need to update on a selectionChanged
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.ui.IWorkbenchWindowActionDelegate
-     */
     public void dispose() {
+        // Nothing to dispose
     }
 }

@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -39,8 +38,10 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -71,7 +72,7 @@ import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
  * @author rdjemili
  */
 public class RosterView extends ViewPart implements IConnectionListener,
-        IRosterTree {
+    IRosterTree {
 
     private static Logger logger = Logger.getLogger(RosterView.class);
 
@@ -91,6 +92,10 @@ public class RosterView extends ViewPart implements IConnectionListener,
     private DeleteContactAction deleteContactAction;
 
     private SkypeAction skypeAction;
+
+    private Composite composite;
+
+    private Label label;
 
     /**
      * An item of the roster tree. Can be either a group or a single contact.
@@ -154,18 +159,20 @@ public class RosterView extends ViewPart implements IConnectionListener,
      * Provide tree content.
      */
     private class TreeContentProvider implements IStructuredContentProvider,
-            ITreeContentProvider {
+        ITreeContentProvider {
 
         /*
          * @see org.eclipse.jface.viewers.IContentProvider
          */
         public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+            // do nothing
         }
 
         /*
          * @see org.eclipse.jface.viewers.IContentProvider
          */
         public void dispose() {
+            // do nothing
         }
 
         /*
@@ -173,7 +180,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
          */
         public Object[] getElements(Object parent) {
             if (parent.equals(getViewSite())
-                    && (RosterView.this.roster != null)) {
+                && (RosterView.this.roster != null)) {
                 List<TreeItem> groups = new LinkedList<TreeItem>();
                 for (RosterGroup rg : RosterView.this.roster.getGroups()) {
                     GroupItem item = new GroupItem(rg);
@@ -246,9 +253,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
                 // append presence information if available
                 Presence presence = RosterView.this.roster.getPresence(entry
-                        .getUser());
+                    .getUser());
                 RosterEntry e = RosterView.this.roster
-                        .getEntry(entry.getUser());
+                    .getEntry(entry.getUser());
                 if (e.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
                     label = label + " (wait for permission)";
                 } else if (presence != null) {
@@ -264,7 +271,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
         @Override
         public Image getImage(Object element) {
             return element instanceof RosterEntry ? this.personImage
-                    : this.groupImage;
+                : this.groupImage;
         }
     }
 
@@ -284,11 +291,11 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
                     String user1 = entry1.getUser();
                     boolean presence1 = RosterView.this.roster
-                            .getPresence(user1) != null;
+                        .getPresence(user1) != null;
 
                     String user2 = entry2.getUser();
                     boolean presence2 = RosterView.this.roster
-                            .getPresence(user2) != null;
+                        .getPresence(user2) != null;
 
                     if (presence1 && !presence2) {
                         return -1;
@@ -304,19 +311,27 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     /**
-     * Creates an roster view..
-     */
-    public RosterView() {
-    }
-
-    /**
      * This is a callback that will allow us to create the viewer and initialize
      * it.
      */
     @Override
     public void createPartControl(Composite parent) {
-        this.viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
-                | SWT.V_SCROLL);
+        this.composite = parent;
+        this.composite.setBackground(Display.getDefault().getSystemColor(
+            SWT.COLOR_WHITE));
+
+        RowLayout layout = new RowLayout(SWT.VERTICAL);
+        layout.pack = true;
+        layout.spacing = 5;
+        composite.setLayout(layout);
+
+        label = new Label(composite, SWT.LEFT);
+        label.setText("Not Connected");
+        this.label.setBackground(Display.getDefault().getSystemColor(
+            SWT.COLOR_WHITE));
+
+        this.viewer = new TreeViewer(composite, SWT.MULTI | SWT.H_SCROLL
+            | SWT.V_SCROLL);
         this.viewer.setContentProvider(new TreeContentProvider());
         this.viewer.setLabelProvider(new ViewLabelProvider());
         this.viewer.setSorter(new NameSorter());
@@ -328,12 +343,13 @@ public class RosterView extends ViewPart implements IConnectionListener,
         // hookDoubleClickAction();
         contributeToActionBars();
         updateEnablement();
+        composite.layout();
 
         Saros saros = Saros.getDefault();
         saros.addListener(this);
 
         connectionStateChanged(saros.getConnection(), saros
-                .getConnectionState());
+            .getConnectionState());
     }
 
     /**
@@ -350,7 +366,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
      * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
      */
     public void connectionStateChanged(XMPPConnection connection,
-            final ConnectionState newState) {
+        final ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
             // roster = Saros.getDefault().getRoster();
             this.roster = connection.getRoster();
@@ -365,7 +381,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
-                updateStatusLine(newState);
+                updateStatusInformation(newState);
                 updateEnablement();
             }
         });
@@ -375,36 +391,36 @@ public class RosterView extends ViewPart implements IConnectionListener,
      * Needs to called from an UI thread.
      */
     private void updateEnablement() {
-        this.viewer.getControl().setEnabled(Saros.getDefault().isConnected());
+        this.label.setEnabled(Saros.getDefault().isConnected());
     }
 
     /**
      * Needs to called from an UI thread.
      */
-    private void updateStatusLine(final ConnectionState newState) {
-        IStatusLineManager statusLine = getViewSite().getActionBars()
-                .getStatusLineManager();
-        statusLine.setMessage(SarosUI.getDescription(newState));
+    private void updateStatusInformation(final ConnectionState newState) {
+        // IStatusLineManager statusLine = getViewSite().getActionBars()
+        // .getStatusLineManager();
+        // statusLine.setMessage(SarosUI.getDescription(newState));
+        label.setText(SarosUI.getDescription(newState));
+        composite.layout();
     }
 
     private void attachRosterListener() {
 
         this.connection.addPacketListener(new SubscriptionListener(
-                this.connection, this), new PacketTypeFilter(Presence.class));
+            this.connection, this), new PacketTypeFilter(Presence.class));
 
         this.connection.getRoster().addRosterListener(new RosterListener() {
             public void entriesAdded(Collection<String> addresses) {
+                refreshRosterTree(true);
             }
 
             public void entriesUpdated(Collection<String> addresses) {
                 for (String address : addresses) {
-                    logger.debug(address
-                            + ": "
-                            + connection.getRoster().getEntry(address)
-                                    .getType()
-                            + ", "
-                            + connection.getRoster().getEntry(address)
-                                    .getStatus());
+                    logger.debug(address + ": "
+                        + connection.getRoster().getEntry(address).getType()
+                        + ", "
+                        + connection.getRoster().getEntry(address).getStatus());
                 }
 
                 refreshRosterTree(true);
@@ -437,6 +453,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
             public void run() {
                 RosterView.this.viewer.refresh(updateLabels);
                 RosterView.this.viewer.expandAll();
+                RosterView.this.composite.layout();
             }
         });
     }

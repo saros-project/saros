@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.project;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IProject;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -13,6 +11,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public interface ISessionManager {
 
+    public final static String NOT_IN_SESSION = "NOT_IN_SESSION";
+
     /**
      * Starts a new shared project with the local user as only participant.
      * 
@@ -21,7 +21,7 @@ public interface ISessionManager {
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public abstract void startSession(IProject project) throws XMPPException;
+    public void startSession(IProject project) throws XMPPException;
 
     /**
      * Every Session is identified by an int as identifier.
@@ -31,21 +31,21 @@ public interface ISessionManager {
     public String getSessionID();
 
     /**
-     * Joins an remotly already running shared project.
+     * Joins an remotely already running shared project.
      * 
      * @param project
      *            the local Eclipse project which should be used to replicate
      *            the remote shared project.
      * @param host
-     *            the host of the remotly shared project.
+     *            the host of the remotely shared project.
      * @param driver
      *            the driver of the shared project.
-     * @param users
-     *            the participants of the shared project.
+     * @param myColorID
+     *            Color ID of the user.
+     * 
      * @return the shared project.
      */
-    public abstract ISharedProject joinSession(IProject project, JID host,
-            JID driver, List<JID> users);
+    public ISharedProject joinSession(IProject project, JID host, int myColorID);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -53,13 +53,13 @@ public interface ISessionManager {
      * 
      * Has no effect if there is no currently shared project.
      */
-    public abstract void leaveSession();
+    public void stopSharedProject();
 
     /**
      * @return the active SharedProject object or <code>null</code> if there is
      *         no active project.
      */
-    public abstract ISharedProject getSharedProject();
+    public ISharedProject getSharedProject();
 
     /**
      * Add the given session listener. Is ignored if the listener is already
@@ -68,7 +68,7 @@ public interface ISessionManager {
      * @param listener
      *            the listener that is to be added.
      */
-    public abstract void addSessionListener(ISessionListener listener);
+    public void addSessionListener(ISessionListener listener);
 
     /**
      * Removes the given session listener. Is ignored if the given listener
@@ -77,7 +77,7 @@ public interface ISessionManager {
      * @param listener
      *            the listener that is to be removed.
      */
-    public abstract void removeSessionListener(ISessionListener listener);
+    public void removeSessionListener(ISessionListener listener);
 
     /**
      * Is fired when an incoming invitation is received.
@@ -87,29 +87,34 @@ public interface ISessionManager {
      * @param description
      *            the informal description text that can be given with
      *            invitations.
-     * @param sessionID
-     *            the id of the session
+     * @param colorID
+     *            the assigned color id for the invited participant.
      * @return the process that represents the invitation and which handles the
      *         further interaction with the invitation.
      */
-    public abstract IIncomingInvitationProcess invitationReceived(JID from,
-            String sessionID, String projectName, String description);
+    public IIncomingInvitationProcess invitationReceived(JID from,
+        String sessionID, String projectName, String description, int colorID);
 
     /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
+     * @see IConnectionListener
      */
-    public abstract void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState);
+    public void connectionStateChanged(XMPPConnection connection,
+        ConnectionState newState);
 
-    public abstract void OnReconnect(int oldtimestamp);
+    public void OnReconnect(int oldtimestamp);
 
     /**
      * Get the transmitter of the session.
      * 
      * @return the transmitter of the session
      */
-    public abstract ITransmitter getTransmitter();
+    public ITransmitter getTransmitter();
 
+    /**
+     * Called by the Invitation Process if the invitation did not work out
+     * (joinSession was not called).
+     * 
+     * Set the SessionID to none, so that new Sessions can be begun.
+     */
+    public void cancelIncomingInvitation();
 }

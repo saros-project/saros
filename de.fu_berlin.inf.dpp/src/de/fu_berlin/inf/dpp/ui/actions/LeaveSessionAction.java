@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -19,7 +19,13 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -33,6 +39,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * session.
  * 
  * @author rdjemili
+ * @author oezbek
  */
 public class LeaveSessionAction extends Action implements ISessionListener {
 
@@ -46,10 +53,37 @@ public class LeaveSessionAction extends Action implements ISessionListener {
 
     @Override
     public void run() {
+
+        Shell shell = Display.getDefault().getActiveShell();
+        if (shell == null) {
+            return;
+        }
+
+        ISessionManager sessionManager = LeaveSessionAction.getSessionManager();
+
+        boolean reallyLeave;
+
+        if (sessionManager.getSharedProject().isHost()) {
+            reallyLeave = MessageDialog
+                .openQuestion(
+                    shell,
+                    "Confirm Closing Session",
+                    "Are you sure that you want to close this Saros session? Since you are the host of this session, it will be closed for all participants.");
+        } else {
+            reallyLeave = MessageDialog.openQuestion(shell,
+                "Confirm Leaving Session",
+                "Are you sure that you want to leave this Saros session?");
+        }
+
+        if (!reallyLeave)
+            return;
         try {
-            LeaveSessionAction.getSessionManager().leaveSession();
+            sessionManager.stopSharedProject();
         } catch (Exception e) {
-            e.printStackTrace();
+            ErrorDialog.openError(Display.getDefault().getActiveShell(),
+                "Internal Error Leaving Session", "Session could not be left",
+                new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
+                    IStatus.ERROR, e.getMessage(), e));
         }
     }
 

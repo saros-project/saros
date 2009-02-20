@@ -42,7 +42,7 @@ public class FileZipper {
         File[] files = (dir.listFiles());
 
         CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(
-                "/home/troll/archive.zip"), new Adler32());
+            "/home/troll/archive.zip"), new Adler32());
         ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(cos));
 
         File f;
@@ -71,7 +71,7 @@ public class FileZipper {
     }
 
     private static void addFile(String path, File file, ZipOutputStream zos)
-            throws Exception {
+        throws Exception {
         FileInputStream fis = null;
         int i;
 
@@ -88,19 +88,19 @@ public class FileZipper {
     }
 
     private static void addFolder(String path, File file, ZipOutputStream zos)
-            throws Exception {
+        throws Exception {
 
         File[] files = file.listFiles();
         for (File f : files) {
             if (f.isDirectory()) {
                 FileZipper.logger.debug("compress folder: " + file.getName());
                 FileZipper.addFolder(path + Path.SEPARATOR + file.getName(), f,
-                        zos);
+                    zos);
             } else {
                 FileZipper.logger.debug("compress file : " + file.getName()
-                        + " path " + path);
+                    + " path " + path);
                 FileZipper.addFile(path + Path.SEPARATOR + file.getName(), f,
-                        zos);
+                    zos);
             }
         }
 
@@ -108,7 +108,7 @@ public class FileZipper {
 
     public static void readZipArchive(String archive) throws Exception {
         CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
-                archive), new Adler32());
+            archive), new Adler32());
         ZipInputStream zis = new ZipInputStream(cis);
 
         String outputFolder = "/home/troll/test_archiv_output";
@@ -137,9 +137,9 @@ public class FileZipper {
     }
 
     public static void createProjectZipArchive(List<IPath> files,
-            String descPath, IProject project) throws Exception {
+        String descPath, IProject project) throws Exception {
         CheckedOutputStream cos = new CheckedOutputStream(new FileOutputStream(
-                descPath), new Adler32());
+            descPath), new Adler32());
         ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(cos));
 
         File f;
@@ -173,8 +173,10 @@ public class FileZipper {
     }
 
     public static void readInputStreamsProjectArchive(File file)
-            throws Exception {
+        throws Exception {
         ZipFile zip = new ZipFile(file);
+
+        @SuppressWarnings("unchecked")
         Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip.entries();
         while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
@@ -191,7 +193,7 @@ public class FileZipper {
         project.getFile(p);
 
         CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
-                "./archive.zip"), new Adler32());
+            "./archive.zip"), new Adler32());
         ZipInputStream zis = new ZipInputStream(cis);
 
         // entpacke archiv
@@ -202,7 +204,7 @@ public class FileZipper {
             FileZipper.logger.debug("unzip file: " + entry.getName());
             // zu entpackende Datei im Zielverzeichnis anlegen
             FileOutputStream fos = new FileOutputStream(new File(
-                    "zielverzeichns", entry.getName()));
+                "zielverzeichns", entry.getName()));
             while ((i = zis.read()) != -1) {
                 fos.write(i);
             }

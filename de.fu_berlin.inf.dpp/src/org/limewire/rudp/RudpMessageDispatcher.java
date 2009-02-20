@@ -3,8 +3,6 @@ package org.limewire.rudp;
 import java.net.InetSocketAddress;
 import java.util.concurrent.Executor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.limewire.concurrent.ExecutorsHelper;
 import org.limewire.rudp.messages.RUDPMessage;
 
@@ -13,11 +11,8 @@ import org.limewire.rudp.messages.RUDPMessage;
  */
 public class RudpMessageDispatcher implements MessageDispatcher {
 
-    private static final Log LOG = LogFactory
-            .getLog(DefaultMessageDispatcher.class);
-
     private final Executor executor = ExecutorsHelper
-            .newProcessingQueue("RUDPDispatch");
+        .newProcessingQueue("RUDPDispatch");
     private volatile UDPMultiplexor multiplexor;
 
     public void setUDPMultiplexor(UDPMultiplexor plexor) {

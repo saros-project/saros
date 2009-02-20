@@ -54,7 +54,7 @@ public class JoinSessionWizard extends Wizard {
 
     ShowDescriptionPage descriptionPage;
 
-    EnterNamePage namePage;
+    EnterProjectNamePage namePage;
 
     WizardDialogAccessable myWizardDlg;
 
@@ -81,16 +81,16 @@ public class JoinSessionWizard extends Wizard {
 
                         if (errorMsg != null) {
                             MessageDialog.openError(getShell(),
-                                    "Invitation aborted",
-                                    "Could not complete invitation because an error occurred ("
-                                            + errorMsg + ")");
+                                "Invitation aborted",
+                                "Could not complete invitation because an error occurred ("
+                                    + errorMsg + ")");
                         } else {
                             // errorMsg == null means canceled either by us or
                             // peer
                             if (replicated) {
                                 MessageDialog.openInformation(getShell(),
-                                        "Invitation cancelled",
-                                        "Invitation was cancelled by peer.");
+                                    "Invitation cancelled",
+                                    "Invitation was cancelled by peer.");
                             }
                         }
                         JoinSessionWizard.this.myWizardDlg.close();
@@ -99,7 +99,8 @@ public class JoinSessionWizard extends Wizard {
             }
 
             public void runGUIAsynch(Runnable runnable) {
-                // ignored, not needed atm
+                // TODO this cannot be ignored an InvitationUI like the
+                // JoinSessionWizard need to implement this
             }
 
             public void updateInvitationProgress(JID jid) {
@@ -117,7 +118,7 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public void addPages() {
         this.descriptionPage = new ShowDescriptionPage(this);
-        this.namePage = new EnterNamePage(this);
+        this.namePage = new EnterProjectNamePage(this);
 
         addPage(this.descriptionPage);
         addPage(this.namePage);
@@ -136,18 +137,18 @@ public class JoinSessionWizard extends Wizard {
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
-                        throws InvocationTargetException, InterruptedException {
+                    throws InvocationTargetException, InterruptedException {
 
                     JoinSessionWizard.this.process.accept(source, target,
-                            monitor);
+                        monitor);
                 }
             });
         } catch (InvocationTargetException e) {
             JoinSessionWizard.log.log(Level.WARNING,
-                    "Exception while requesting remote file list", e);
+                "Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
             JoinSessionWizard.log.log(Level.FINE,
-                    "Request of remote file list canceled/interrupted", e);
+                "Request of remote file list canceled/interrupted", e);
         }
 
         return true;

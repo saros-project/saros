@@ -86,18 +86,18 @@ public class Jupiter implements Algorithm {
     public Request generateRequest(Operation op) {
         // send(op, myMsgs, otherMsgs);
         Request req = new RequestImpl(getSiteId(), (Timestamp) this.vectorTime
-                .clone(), op);
+            .clone(), op);
 
         // add(op, myMsgs) to outgoing;
         if (op instanceof SplitOperation) {
             SplitOperation split = (SplitOperation) op;
             this.ackRequestList.add(new OperationWrapper(split.getFirst(),
-                    this.vectorTime.getLocalOperationCount()));
+                this.vectorTime.getLocalOperationCount()));
             this.ackRequestList.add(new OperationWrapper(split.getSecond(),
-                    this.vectorTime.getLocalOperationCount()));
+                this.vectorTime.getLocalOperationCount()));
         } else {
             this.ackRequestList.add(new OperationWrapper(op, this.vectorTime
-                    .getLocalOperationCount()));
+                .getLocalOperationCount()));
         }
 
         // myMsgs = myMsgs + 1;
@@ -113,7 +113,7 @@ public class Jupiter implements Algorithm {
         Timestamp timestamp = req.getTimestamp();
         if (!(timestamp instanceof JupiterVectorTime)) {
             throw new IllegalArgumentException(
-                    "Jupiter expects timestamps of type JupiterVectorTime");
+                "Jupiter expects timestamps of type JupiterVectorTime");
         }
         // TODO: check preconditions
         // try{
@@ -134,7 +134,7 @@ public class Jupiter implements Algorithm {
      *      de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp)
      */
     public void acknowledge(int siteId, Timestamp timestamp)
-            throws TransformationException {
+        throws TransformationException {
         discardAcknowledgedOperations((JupiterVectorTime) timestamp);
     }
 
@@ -143,7 +143,7 @@ public class Jupiter implements Algorithm {
      *      int[])
      */
     public int[] transformIndices(Timestamp timestamp, int[] indices)
-            throws TransformationException {
+        throws TransformationException {
         checkPreconditions((JupiterVectorTime) timestamp);
         discardAcknowledgedOperations((JupiterVectorTime) timestamp);
         int[] result = new int[indices.length];
@@ -191,7 +191,7 @@ public class Jupiter implements Algorithm {
         }
         // ASSERT msg.myMsgs == otherMsgs
         assert time.getLocalOperationCount() == this.vectorTime
-                .getRemoteOperationCount() : "msg.myMsgs != otherMsgs !!";
+            .getRemoteOperationCount() : "msg.myMsgs != otherMsgs !!";
     }
 
     /**
@@ -205,7 +205,7 @@ public class Jupiter implements Algorithm {
      */
     private Operation transform(Operation newOp) {
         for (int ackRequestListCnt = 0; ackRequestListCnt < this.ackRequestList
-                .size(); ackRequestListCnt++) {
+            .size(); ackRequestListCnt++) {
             OperationWrapper wrap = this.ackRequestList.get(ackRequestListCnt);
             Operation existingOp = wrap.getOperation();
 
@@ -214,39 +214,39 @@ public class Jupiter implements Algorithm {
                 SplitOperation split = (SplitOperation) newOp;
                 if (isClientSide()) {
                     split.setFirst(this.inclusion.transform(split.getFirst(),
-                            existingOp, Boolean.TRUE));
+                        existingOp, Boolean.TRUE));
                     split.setSecond(this.inclusion.transform(split.getSecond(),
-                            existingOp, Boolean.TRUE));
+                        existingOp, Boolean.TRUE));
                     existingOp = this.inclusion.transform(existingOp, split
-                            .getFirst(), Boolean.FALSE);
+                        .getFirst(), Boolean.FALSE);
                     existingOp = this.inclusion.transform(existingOp, split
-                            .getSecond(), Boolean.FALSE);
+                        .getSecond(), Boolean.FALSE);
                 } else {
                     split.setFirst(this.inclusion.transform(split.getFirst(),
-                            existingOp, Boolean.FALSE));
+                        existingOp, Boolean.FALSE));
                     split.setSecond(this.inclusion.transform(split.getSecond(),
-                            existingOp, Boolean.FALSE));
+                        existingOp, Boolean.FALSE));
                     existingOp = this.inclusion.transform(existingOp, split
-                            .getFirst(), Boolean.TRUE);
+                        .getFirst(), Boolean.TRUE);
                     existingOp = this.inclusion.transform(existingOp, split
-                            .getSecond(), Boolean.TRUE);
+                        .getSecond(), Boolean.TRUE);
                 }
                 transformedOp = split;
             } else {
                 if (isClientSide()) {
                     transformedOp = this.inclusion.transform(newOp, existingOp,
-                            Boolean.TRUE);
+                        Boolean.TRUE);
                     existingOp = this.inclusion.transform(existingOp, newOp,
-                            Boolean.FALSE);
+                        Boolean.FALSE);
                 } else {
                     transformedOp = this.inclusion.transform(newOp, existingOp,
-                            Boolean.FALSE);
+                        Boolean.FALSE);
                     existingOp = this.inclusion.transform(existingOp, newOp,
-                            Boolean.TRUE);
+                        Boolean.TRUE);
                 }
             }
             this.ackRequestList.set(ackRequestListCnt, new OperationWrapper(
-                    existingOp, wrap.getLocalOperationCount()));
+                existingOp, wrap.getLocalOperationCount()));
 
             newOp = transformedOp;
         }
@@ -261,18 +261,18 @@ public class Jupiter implements Algorithm {
      *            the request to be tested.
      */
     private void checkPreconditions(JupiterVectorTime time)
-            throws TransformationException {
+        throws TransformationException {
         if (!this.ackRequestList.isEmpty()
-                && (time.getRemoteOperationCount() < this.ackRequestList.get(0)
-                        .getLocalOperationCount())) {
+            && (time.getRemoteOperationCount() < this.ackRequestList.get(0)
+                .getLocalOperationCount())) {
             throw new TransformationException("precondition #1 violated.");
         } else if (time.getRemoteOperationCount() > this.vectorTime
-                .getLocalOperationCount()) {
+            .getLocalOperationCount()) {
             throw new TransformationException("precondition #2 violated.");
         } else if (time.getLocalOperationCount() != this.vectorTime
-                .getRemoteOperationCount()) {
+            .getRemoteOperationCount()) {
             throw new TransformationException("precondition #3 violated: "
-                    + time + " , " + this.vectorTime);
+                + time + " , " + this.vectorTime);
         }
     }
 
@@ -374,10 +374,10 @@ public class Jupiter implements Algorithm {
     }
 
     public void updateVectorTime(Timestamp timestamp)
-            throws TransformationException {
+        throws TransformationException {
         if (this.ackRequestList.size() > 0) {
             throw new TransformationException(
-                    "ackRequestList have entries. Update Vector time failed.");
+                "ackRequestList have entries. Update Vector time failed.");
         }
         int local = timestamp.getComponents()[0];
         int remote = timestamp.getComponents()[1];

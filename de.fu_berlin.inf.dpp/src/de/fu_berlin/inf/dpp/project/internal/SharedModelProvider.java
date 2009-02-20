@@ -18,37 +18,34 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
- * This model provider is responsible for keeping an session observer from
+ * This model provider is responsible for preventing an session observer from
  * modifying the file tree of a shared project on his own.
  * 
  * @author rdjemili
  */
 public class SharedModelProvider extends ModelProvider implements
-        ISessionListener {
+    ISessionListener {
 
     private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
     private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
 
     private static final IStatus ERROR_STATUS = new Status(IStatus.ERROR,
-            "de.fu_berlin.inf.dpp", 2, SharedModelProvider.ERROR_TEXT, null);
+        "de.fu_berlin.inf.dpp", 2, SharedModelProvider.ERROR_TEXT, null);
 
     private static final IStatus EXCLUSIVE_ERROR_STATUS = new Status(
-            IStatus.ERROR, "de.fu_berlin.inf.dpp", 2,
-            SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
+        IStatus.ERROR, "de.fu_berlin.inf.dpp", 2,
+        SharedModelProvider.EXCLUSIVE_ERROR_TEXT, null);
 
     /** the currently running shared project */
     private ISharedProject sharedProject;
 
-    public SharedModelProvider() {
-
-    }
-
     /**
-     * Validates the resource delta.
+     * Check each resource delta whether it is in a shared project. If we are
+     * not the exclusive driver set the appropriate flag.
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
-        private boolean isAllowed = true;
-        private boolean isExclusive = true;
+
+        private boolean isAffectingSharedProjectFiles = false;
 
         /*
          * (non-Javadoc)
@@ -56,32 +53,28 @@ public class SharedModelProvider extends ModelProvider implements
          * @see org.eclipse.core.resources.IResourceDeltaVisitor
          */
         public boolean visit(IResourceDelta delta) throws CoreException {
-            if ((SharedModelProvider.this.sharedProject == null)
-                    || SharedModelProvider.this.sharedProject.isDriver()) {
-                /* check driver status */
-                if (!(SharedModelProvider.this.sharedProject.isHost() && SharedModelProvider.this.sharedProject
-                        .exclusiveDriver())) {
-                    this.isExclusive = false;
-                }
-                return false;
-            }
+
+            // We already check this in validateChange
+            assert SharedModelProvider.this.sharedProject != null;
 
             IResource resource = delta.getResource();
+
+            // If workspace root continue
             if (resource.getProject() == null) {
                 return true;
             }
 
             if (resource.getProject() != SharedModelProvider.this.sharedProject
-                    .getProject()) {
+                .getProject()) {
                 return false;
             }
 
             if ((resource instanceof IFile) || (resource instanceof IFolder)) {
-                this.isAllowed = false;
+                this.isAffectingSharedProjectFiles = true;
                 return false;
             }
 
-            return delta.getKind() > 0;
+            return true;
         }
     }
 
@@ -95,6 +88,15 @@ public class SharedModelProvider extends ModelProvider implements
 
     @Override
     public IStatus validateChange(IResourceDelta delta, IProgressMonitor pm) {
+
+        // If we are currently not sharing a project, we don't have to prevent
+        // any file operations
+        if (this.sharedProject == null)
+            return Status.OK_STATUS;
+
+        if (this.sharedProject.isExclusiveDriver())
+            return Status.OK_STATUS;
+
         ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
 
         try {
@@ -103,15 +105,14 @@ public class SharedModelProvider extends ModelProvider implements
             e.printStackTrace();
         }
 
-        IStatus result = Status.OK_STATUS;
-        if (!visitor.isAllowed) {
-            result = SharedModelProvider.ERROR_STATUS;
+        if (!sharedProject.isDriver() && visitor.isAffectingSharedProjectFiles) {
+            return SharedModelProvider.ERROR_STATUS;
         }
-        if (!visitor.isExclusive) {
-            result = SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
+        if (!sharedProject.isExclusiveDriver()
+            && visitor.isAffectingSharedProjectFiles) {
+            return SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
         }
-        return result;
-        // return visitor.isAllowed ? Status.OK_STATUS : ERROR_STATUS;
+        return Status.OK_STATUS;
     }
 
     /*

@@ -24,9 +24,9 @@ class ShowDescriptionPage extends WizardPage {
 
         setTitle("Session Invitation");
         setDescription("You have been invited to join on a session for a "
-                + "shared project. Click next if you want to accept the invitation.");
+            + "shared project. Click next if you want to accept the invitation.");
         setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/start_invitation.png"));
+            .getImageDescriptor("icons/start_invitation.png"));
     }
 
     public void createControl(Composite parent) {
@@ -37,22 +37,22 @@ class ShowDescriptionPage extends WizardPage {
         inviterLabel.setText("Inviter");
 
         Text inviterText = new Text(composite, SWT.READ_ONLY | SWT.SINGLE
-                | SWT.BORDER);
+            | SWT.BORDER);
 
         inviterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false));
+            false));
         inviterText.setText(this.joinSessionWizard.process.getPeer().getBase());
 
         Label descriptionLabel = new Label(composite, SWT.NONE);
         descriptionLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING,
-                false, false));
+            false, false));
         descriptionLabel.setText("Project");
 
         Text descriptionText = new Text(composite, SWT.READ_ONLY | SWT.BORDER);
         descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                true));
+            true));
         descriptionText
-                .setText(this.joinSessionWizard.process.getDescription());
+            .setText(this.joinSessionWizard.process.getDescription());
 
         setControl(composite);
     }

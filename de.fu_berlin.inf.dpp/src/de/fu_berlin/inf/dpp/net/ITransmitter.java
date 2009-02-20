@@ -1,16 +1,16 @@
 /*
  * DPP - Serious Distributed Pair Programming (c) Freie Universitaet Berlin -
  * Fachbereich Mathematik und Informatik - 2006 (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 1, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc., 675 Mass
  * Ave, Cambridge, MA 02139, USA.
@@ -19,12 +19,12 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -74,7 +74,7 @@ public interface ITransmitter {
      *            invitation. Can not be <code>null</code>.
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-            String description);
+        String description, int colorID);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
@@ -102,8 +102,10 @@ public interface ITransmitter {
      * @throws XMPPException
      *             is thrown if there is some problem with the XMPP file
      *             transfer.
+     * @throws IOException
      */
-    public void sendFileList(JID jid, FileList fileList) throws XMPPException;
+    public void sendFileList(JID jid, FileList fileList,
+        IFileTransferCallback callback) throws IOException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -114,47 +116,55 @@ public interface ITransmitter {
     public void sendRequestForFileListMessage(JID recipient);
 
     /**
-     * Sends given file to given recipient.
-     * 
-     * @param recipient
-     *            the Jabber ID of the recipient.
-     * @param project
-     *            TODO
-     * @param path
-     *            the project-relative path of the resource that is to be sent.
-     * @param callback
-     *            an callback for the file transfer state. Can be
-     *            <code>null</code>.
-     */
-    public void sendFile(JID recipient, IProject project, IPath path,
-            IFileTransferCallback callback);
-
-    /**
      * Sends given file to given recipient with given timestamp.
      * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
-     *            TODO
+     *            the project of which the given path contains the file to be
+     *            sent.
      * @param path
      *            the project-relative path of the resource that is to be sent.
      * @param timestamp
      *            the time that will be associated with this activity.
      * @param callback
-     *            an callback for the file transfer state. Can be
-     *            <code>null</code>.
+     *            an callback for the file transfer state. CANNOT be null.
+     * @throws IOException
+     *             If we file could not be read, other errors are reported to
+     *             the callback.
      */
-    public void sendFile(JID recipient, IProject project, IPath path,
-            int timestamp, IFileTransferCallback callback);
+    public void sendFileAsync(JID recipient, IProject project, IPath path,
+        int timestamp, IFileTransferCallback callback) throws IOException;
 
     /**
-     * Sends given archive file to given recipient. (Fallback of jingle file
-     * transfer to achieve better transfer with IBB.)
+     * Sends given file to given recipient with given timestamp SYNCHRONOUSLY.
+     * 
+     * This methods thus block until the file has been sent or it failed.
      * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
-     *            TODO
+     *            the project of which the given path contains the file to be
+     *            sent.
+     * @param path
+     *            the project-relative path of the resource that is to be sent.
+     * @param timestamp
+     *            the time that will be associated with this activity.
+     * @throws IOException
+     *             If we file could not be read or an error occurred while
+     *             sending
+     */
+    public void sendFile(JID to, IProject project, IPath path, int timestamp,
+        IFileTransferCallback callback) throws IOException;
+
+    /**
+     * Sends given archive file to given recipient.
+     * 
+     * @param recipient
+     *            the Jabber ID of the recipient.
+     * @param project
+     *            the project of which the given path contains the file to be
+     *            sent.
      * @param archive
      *            the project-relative path of the resource that is to be sent.
      * @param callback
@@ -162,7 +172,7 @@ public interface ITransmitter {
      *            <code>null</code>.
      */
     public void sendProjectArchive(JID recipient, IProject project,
-            File archive, IFileTransferCallback callback);
+        File archive, IFileTransferCallback callback);
 
     /**
      * Sends queued file transfers.
@@ -182,16 +192,7 @@ public interface ITransmitter {
      * @param participants
      *            List of Users, of current shared project participants
      */
-    public void sendUserListTo(JID to, List<User> participants);
-
-    /**
-     * Sets my XMPP connection to the given connection - for changing the
-     * current connection (like after reconnect).
-     * 
-     * @param connection
-     *            the new XMPPConnection
-     */
-    public void setXMPPConnection(XMPPConnection connection);
+    public void sendUserListTo(JID to, Collection<User> participants);
 
     /**
      * Sends a request for activities to all users.
@@ -205,7 +206,7 @@ public interface ITransmitter {
      *            requested too
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
-            int timestamp, boolean andup);
+        int timestamp, boolean andup);
 
     /* ---------- etc --------- */
 
@@ -239,21 +240,21 @@ public interface ITransmitter {
      *            a list of timed activities.
      */
     public void sendActivities(ISharedProject sharedProject,
-            List<TimedActivity> activities);
+        List<TimedActivity> activities);
 
     /**
-     * Sends given list of activities with given timestamp to given participant
-     * of given shared project.
+     * Sends given request to given participant of given shared project.
      * 
      * @param sharedProject
      *            the shared project the activities refer to.
-     * @param activity
-     *            activity.
+     * @param request
+     *            the request to send.
      * @param jid
-     *            the recipient
+     *            the recipient of the request.
      */
+    // TODO Is "Jupiter" in the name really necessary?
     public void sendJupiterRequest(ISharedProject sharedProject,
-            Request request, JID jid);
+        Request request, JID jid);
 
     /**
      * Sends error message of checksum error to all clients.
@@ -274,15 +275,17 @@ public interface ITransmitter {
      *            the checksums
      */
     public void sendDocChecksumsToClients(
-            Collection<DocumentChecksum> collection);
+        Collection<DocumentChecksum> collection);
 
     /**
-     * Sends error messge of transformation error.
+     * Adds the given receiver to the top of the stack of the receivers notified
+     * when data arrives.
      * 
-     * @param to
-     *            the recipient
-     * @param path
-     *            appropriate file for jupiter transformtion error
+     * The receiver should return true if it has consumed the given data.
+     * 
+     * @param dataReceiver
      */
-    public void sendJupiterTransformationError(JID to, IPath path);
+    public void addDataReceiver(IDataReceiver dataReceiver);
+
+    public void removeDataReceiver(IDataReceiver receiver);
 }

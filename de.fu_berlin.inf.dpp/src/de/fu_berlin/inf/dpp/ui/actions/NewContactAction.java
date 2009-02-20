@@ -44,11 +44,13 @@ public class NewContactAction extends Action implements IConnectionListener {
     @Override
     public void run() {
         Shell shell = Display.getDefault().getActiveShell();
-        new WizardDialog(shell, new AddContactWizard()).open();
+        WizardDialog wd = new WizardDialog(shell, new AddContactWizard());
+        wd.setHelpAvailable(false);
+        wd.open();
     }
 
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         updateEnablement();
     }
 

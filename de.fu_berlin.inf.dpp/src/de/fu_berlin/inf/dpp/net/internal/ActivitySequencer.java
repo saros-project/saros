@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -20,8 +20,10 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -39,7 +41,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
@@ -59,7 +61,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private static Logger logger = Logger.getLogger(ActivitySequencer.class
-            .getName());
+        .getName());
 
     /**/
     public class ExecuterQueue {
@@ -84,9 +86,9 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         public synchronized boolean checkCreatedActivity(IActivity activity) {
             if (this.currentExecutedActivity != null) {
                 if ((activity instanceof TextEditActivity)
-                        && this.currentExecutedActivity.sameLike(activity)) {
+                    && this.currentExecutedActivity.sameLike(activity)) {
                     logger.debug("TextEditActivity " + activity
-                            + " is executed.");
+                        + " is executed.");
                     this.executed = true;
                     notify();
                 }
@@ -97,7 +99,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         public synchronized void addActivity(IActivity activity) {
             if (activity instanceof TextEditActivity) {
                 logger.debug("Add new Activity " + activity
-                        + " to executer queue.");
+                    + " to executer queue.");
                 this.executerQueue.add((TextEditActivity) activity);
                 notify();
             }
@@ -111,7 +113,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 this.currentExecutedActivity = this.executerQueue.remove(0);
                 this.executed = false;
                 logger.debug("Remove " + this.currentExecutedActivity
-                        + " form executer queue.");
+                    + " form executer queue.");
                 /* get next activity in queue. */
                 return this.currentExecutedActivity;
             } catch (InterruptedException e) {
@@ -122,10 +124,11 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         }
     }
 
-    private static final int UNDEFINED_TIME = -1;
+    public static final int UNDEFINED_TIME = -1;
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
+    // TODO never used!
     private final List<IActivity> flushedLog = new LinkedList<IActivity>();
 
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
@@ -136,29 +139,33 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private int timestamp = ActivitySequencer.UNDEFINED_TIME;
 
-    private ConcurrentManager concurrentManager;
+    private IConcurrentManager concurrentManager;
 
     /** outgoing queue for direct client sync messages for all driver. */
     private final List<Request> outgoingSyncActivities = new Vector<Request>();
 
-    private IActivity executedJupiterActivity;
-
     private final ExecuterQueue executer;
-
-    private ISharedProject sharedProject;
 
     public ActivitySequencer() {
         this.executer = new ExecuterQueue();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * TODO Refactor like this:
      * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityManager
+     * <code>
+     * concurrentManager.exec(activity); 
+     * editorManager.exec(activity);
+     * roleManager.exec(activity); 
+     * sharedResourceManager.exec(activity);
+     * </code>
+     * 
+     * Is easier to read and debug :-) But watch out for interdependencies
+     * between these.
      */
     public void exec(final IActivity activity) {
-        try {
 
+        try {
             if (activity instanceof EditorActivity) {
                 this.concurrentManager.exec(activity);
             }
@@ -166,7 +173,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 this.concurrentManager.exec(activity);
             }
             if (activity instanceof FolderActivity) {
-
+                // TODO
             }
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
@@ -177,13 +184,13 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                          * mechanism.
                          */
                         if (!ActivitySequencer.this.concurrentManager
-                                .isHostSide()
-                                && (ActivitySequencer.this.concurrentManager
-                                        .exec(activity) != null)) {
+                            .isHostSide()
+                            && (ActivitySequencer.this.concurrentManager
+                                .exec(activity) != null)) {
                             // CLIENT SIDE
                             logger
-                                    .debug("Execute received activity (without jupiter): "
-                                            + activity);
+                                .debug("Execute received activity (without jupiter): "
+                                    + activity);
                             for (IActivityProvider executor : ActivitySequencer.this.providers) {
                                 executor.exec(activity);
                             }
@@ -195,10 +202,11 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                             executor.exec(activity);
                         }
 
+                        // CO Checksums are not used at the moment, aren't they?
                         // Check for file checksum after incoming save file
                         // activity.
                         if ((activity instanceof EditorActivity)
-                                && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
+                            && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
                             checkSavedFile((EditorActivity) activity);
                         }
 
@@ -291,7 +299,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     public List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
-        out = optimize(out);
+        out = optimizeCO(out);
         this.flushedLog.addAll(out);
         return out.size() > 0 ? out : null;
     }
@@ -357,7 +365,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     public void activityCreated(IActivity activity) {
 
         if ((activity instanceof EditorActivity)
-                || (activity instanceof FileActivity)) {
+            || (activity instanceof FileActivity)) {
             /*
              * Host: start and stop jupiter server process depending on editor
              * activities of remote clients. Client: start and stop local
@@ -377,7 +385,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
              * logic.
              */
             IActivity resultAC = this.concurrentManager
-                    .activityCreated(activity);
+                .activityCreated(activity);
             /**
              * host activity: put into outgoing queue and send to all if
              * activity is generated by host. otherwise: send request to host.
@@ -437,8 +445,54 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     }
 
-    // TODO extract this into the activities themselves
-    // TODO CJ: review needed
+    /**
+     * This method tries to reduce the number of activities transmitted by
+     * removing activities that would overwrite each other and joining
+     * activities that can be send as a single activity.
+     */
+    private List<IActivity> optimizeCO(List<IActivity> toOptimize) {
+
+        List<IActivity> result = new ArrayList<IActivity>(toOptimize.size());
+
+        TextSelectionActivity selection = null;
+        LinkedHashMap<IPath, ViewportActivity> viewport = new LinkedHashMap<IPath, ViewportActivity>();
+
+        for (IActivity activity : toOptimize) {
+
+            if (activity instanceof TextEditActivity) {
+                TextEditActivity textEdit = (TextEditActivity) activity;
+                textEdit = joinTextEdits(result, textEdit);
+                result.add(textEdit);
+            } else if (activity instanceof TextSelectionActivity) {
+                selection = (TextSelectionActivity) activity;
+            } else if (activity instanceof ViewportActivity) {
+                ViewportActivity viewActivity = (ViewportActivity) activity;
+                viewport.remove(viewActivity.getEditor());
+                viewport.put(viewActivity.getEditor(), viewActivity);
+            } else {
+                result.add(activity);
+            }
+        }
+
+        // only send one selection activity
+        if (selection != null)
+            result.add(selection);
+
+        // Add only one viewport per editor
+        for (Map.Entry<IPath, ViewportActivity> entry : viewport.entrySet()) {
+            result.add(entry.getValue());
+        }
+
+        return result;
+    }
+
+    /**
+     * TODO extract this into the activities themselves
+     * 
+     * TODO CJ: review needed
+     * 
+     * TODO CO: I replaced this by a simpler optimizeCO
+     */
     private List<IActivity> optimize(List<IActivity> activities) {
         List<IActivity> result = new ArrayList<IActivity>(activities.size());
 
@@ -455,7 +509,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 textEdit = joinTextEdits(result, textEdit);
 
                 selection = new TextSelection(textEdit.offset
-                        + textEdit.text.length(), 0);
+                    + textEdit.text.length(), 0);
                 source = textEdit.getSource();
                 path = textEdit.getEditor();
                 result.add(textEdit);
@@ -464,7 +518,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 TextSelectionActivity textSelection = (TextSelectionActivity) activity;
 
                 selection = new TextSelection(textSelection.getOffset(),
-                        textSelection.getLength());
+                    textSelection.getLength());
                 source = textSelection.getSource();
                 path = textSelection.getEditor();
 
@@ -486,7 +540,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     private TextEditActivity joinTextEdits(List<IActivity> result,
-            TextEditActivity textEdit) {
+        TextEditActivity textEdit) {
         if (result.size() == 0) {
             return textEdit;
         }
@@ -496,15 +550,14 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
 
             if (((lastTextEdit.getSource() == null) || lastTextEdit.getSource()
-                    .equals(textEdit.getSource()))
-                    && (textEdit.offset == lastTextEdit.offset
-                            + lastTextEdit.text.length())) {
+                .equals(textEdit.getSource()))
+                && (textEdit.offset == lastTextEdit.offset
+                    + lastTextEdit.text.length())) {
                 result.remove(lastTextEdit);
                 textEdit = new TextEditActivity(lastTextEdit.offset,
-                        lastTextEdit.text + textEdit.text, lastTextEdit.replace
-                                + textEdit.replace);
+                    lastTextEdit.text + textEdit.text, lastTextEdit.length
+                        + textEdit.length, lastTextEdit.getEditor());
                 textEdit.setSource(lastTextEdit.getSource());
-                textEdit.setEditor(lastTextEdit.getEditor());
             }
         }
 
@@ -512,7 +565,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     private ITextSelection addSelection(List<IActivity> result,
-            ITextSelection selection, String source, IPath path) {
+        ITextSelection selection, String source, IPath path) {
         if (selection == null) {
             return null;
         }
@@ -523,8 +576,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
 
                 if ((selection.getOffset() == lastTextEdit.offset
-                        + lastTextEdit.text.length())
-                        && (selection.getLength() == 0)) {
+                    + lastTextEdit.text.length())
+                    && (selection.getLength() == 0)) {
 
                     return selection;
                 }
@@ -534,28 +587,25 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         // HACK TODO CJ: review
         if (path != null) {
             TextSelectionActivity newSel = new TextSelectionActivity(selection
-                    .getOffset(), selection.getLength(), path);
+                .getOffset(), selection.getLength(), path);
             newSel.setSource(source);
             result.add(newSel);
         }
 
-        selection = null;
-        return selection;
+        return null;
     }
 
     public void initConcurrentManager(
-            de.fu_berlin.inf.dpp.concurrent.ConcurrentManager.Side side,
-            de.fu_berlin.inf.dpp.User host, JID myJID,
-            ISharedProject sharedProject) {
+        de.fu_berlin.inf.dpp.concurrent.IConcurrentManager.Side side,
+        de.fu_berlin.inf.dpp.User host, JID myJID, ISharedProject sharedProject) {
         this.concurrentManager = new ConcurrentDocumentManager(side, host,
-                myJID, sharedProject);
-        this.sharedProject = sharedProject;
+            myJID, sharedProject);
         sharedProject.addListener(this.concurrentManager);
         this.concurrentManager.setRequestForwarder(this);
         this.concurrentManager.setActivitySequencer(this);
     }
 
-    public ConcurrentManager getConcurrentManager() {
+    public IConcurrentManager getConcurrentManager() {
         return this.concurrentManager;
     }
 
@@ -565,7 +615,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         if (req instanceof RequestError) {
             /* create save activity. */
             IActivity activity = new EditorActivity(Type.Saved, req
-                    .getEditorPath());
+                .getEditorPath());
             /* execute save activity and start consistency check. */
             exec(activity);
             return;
@@ -578,7 +628,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     public synchronized Request getNextOutgoingRequest()
-            throws InterruptedException {
+        throws InterruptedException {
         Request request = null;
         /* get next message and transfer to client. */
         while (!(this.outgoingSyncActivities.size() > 0)) {
@@ -599,20 +649,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
          * jupiter client side.
          */
         logger.debug("Receive request : " + request + " from "
-                + request.getJID());
+            + request.getJID());
         this.concurrentManager.receiveRequest(request);
-
-        // return null;
-        // IActivity activity = concurrentManager.receiveRequest(request);
-        // if (activity != null) {
-        // /* execute transformed activity */
-        // execTransformedActivity(activity);
-        // }
-        // return activity;
-    }
-
-    private boolean isHostSide() {
-        return this.concurrentManager.isHostSide();
     }
 
     /**
@@ -637,7 +675,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             // mark current execute activity
             // executedJupiterActivity = activity;
             // this.executedJupiterActivity = queueActivity;
-            this.executedJupiterActivity = activity;
+
+            // this.executedJupiterActivity = activity;
 
             for (IActivityProvider exec : this.providers) {
                 exec.exec(activity);
@@ -650,5 +689,36 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         } catch (Exception e) {
             logger.error("Error while executing activity.", e);
         }
+    }
+
+    /**
+     * Given a List of TimedActivities it will either return the Activity for
+     * the given timestamp (andup == false) or all activities that have a
+     * timestamp < than the given (andup == true).
+     * 
+     * If not Activities can be found an empty list is returned.
+     */
+    public static List<TimedActivity> filterActivityHistory(
+        List<TimedActivity> toFilter, int timestamp, boolean andup) {
+
+        List<TimedActivity> result = new LinkedList<TimedActivity>();
+
+        if (andup) {
+            for (TimedActivity tact : toFilter) {
+                if (tact.getTimestamp() >= timestamp) {
+                    result.add(tact);
+                }
+            }
+        } else {
+            for (TimedActivity tact : toFilter) {
+                if (tact.getTimestamp() == timestamp) {
+                    result.add(tact);
+                    // Found the one we were looking for
+                    return result;
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -1,33 +1,59 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.io.InputStream;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.IDataReceiver;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
 public class ConsistencyAction extends Action implements ISessionListener {
 
-    private static Logger logger = Logger.getLogger(ConsistencyAction.class);
+    private static Logger log = Logger.getLogger(ConsistencyAction.class);
 
-    private boolean executingChecksumErrorHandling;
+    protected boolean executingChecksumErrorHandling;
 
-    private static Set<IPath> pathes;
+    protected IToolBarManager toolBar;
 
-    public ConsistencyAction() {
+    protected Set<IPath> paths;
+
+    public ConsistencyAction(IToolBarManager toolBar) {
+        this.toolBar = toolBar;
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-                .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
-        setEnabled(false);
+            .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
+        setToolTipText("No inconsistencies");
+
+        // add ConsistencyListener if already in a session
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+        if (project != null) {
+            this.proxy = project.getConcurrentDocumentManager()
+                .getConsistencyToResolve();
+            proxy.addAndNotify(listener);
+        } else
+            setEnabled(false);
+
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
@@ -40,49 +66,140 @@ public class ConsistencyAction extends Action implements ISessionListener {
             ConsistencyAction.this.setEnabled(newValue);
 
             if (newValue) {
-                setToolTipText("Inconsistency Detected!");
-            } else {
-                setToolTipText("");
-                logger.debug("All Inconsistencies are resolved");
-                if (executingChecksumErrorHandling) {
-                    for (IPath path : pathes) {
-                        Saros.getDefault().getSessionManager().getTransmitter()
-                                .sendFileChecksumErrorMessage(path, true);
+                paths = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
+                    .getSessionManager().getSharedProject()
+                    .getConcurrentDocumentManager()
+                    .getPathesWithWrongChecksums());
+
+                Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+
+                        // Concatenate paths
+                        StringBuilder sb = new StringBuilder();
+                        for (IPath path : paths) {
+                            if (sb.length() > 0)
+                                sb.append(", ");
+
+                            sb.append(path.toOSString());
+                        }
+                        String pathsOfInconsistencies = sb.toString();
+
+                        // set tooltip
+                        setToolTipText("Inconsistency Detected in file/s "
+                            + pathsOfInconsistencies);
+
+                        // TODO Balloon is too aggressive at the moment, when
+                        // the host is slow in sending changes (for instance
+                        // when refactoring)
+
+                        // show balloon notification
+                        /*
+                         * BalloonNotification.showNotification(
+                         * ((ToolBarManager) toolBar).getControl(),
+                         * "Inconsistency Detected!",
+                         * "Inconsistencies detected in: " +
+                         * pathsOfInconsistencies, 5000);
+                         */
                     }
-                    pathes.clear();
-                    executingChecksumErrorHandling = false;
-                }
+                });
+
+            } else {
+                setToolTipText("No inconsistencies");
+                log.debug("All Inconsistencies are resolved");
+                setChecksumErrorHandling(false);
             }
         }
 
     };
 
+    IDataReceiver receiver = new IDataReceiver() {
+
+        public boolean receivedArchive(TransferDescription data,
+            InputStream input) {
+            return false;
+        }
+
+        public boolean receivedFileList(TransferDescription data,
+            InputStream input) {
+            return false;
+        }
+
+        public boolean receivedResource(JID from, Path path, InputStream input,
+            int time) {
+
+            log.debug("Received consistency file [" + from.getName() + "] "
+                + path.toString());
+
+            ISharedProject project = Saros.getDefault().getSessionManager()
+                .getSharedProject();
+            if (project == null)
+                return false;
+
+            IFile file = project.getProject().getFile(path);
+
+            FileUtil.writeFile(input, file);
+
+            return true;
+        }
+    };
+
+    public void setChecksumErrorHandling(boolean newState) {
+
+        if (newState != executingChecksumErrorHandling) {
+
+            executingChecksumErrorHandling = newState;
+
+            if (newState) {
+                Saros.getDefault().getSessionManager().getTransmitter()
+                    .addDataReceiver(receiver);
+            } else {
+
+                for (IPath path : paths) {
+                    Saros.getDefault().getSessionManager().getTransmitter()
+                        .sendFileChecksumErrorMessage(path, true);
+                }
+                paths.clear();
+
+                Saros.getDefault().getSessionManager().getTransmitter()
+                    .removeDataReceiver(receiver);
+            }
+        }
+    }
+
     @Override
     public void run() {
         super.run();
 
-        executingChecksumErrorHandling = true;
+        setChecksumErrorHandling(true);
 
-        pathes = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
-                .getSessionManager().getSharedProject()
-                .getConcurrentDocumentManager().getPathesWithWrongChecksums());
+        for (final IPath path : paths) {
+            // save document
+            Display.getDefault().syncExec(new Runnable() {
+                public void run() {
+                    Set<IEditorPart> editors = EditorManager.getDefault()
+                        .getEditors(path);
+                    if (editors != null && editors.size() > 0) {
+                        editors.iterator().next().doSave(
+                            new NullProgressMonitor());
+                    }
+                }
+            });
 
-        for (IPath path : pathes) {
             Saros.getDefault().getSessionManager().getTransmitter()
-                    .sendFileChecksumErrorMessage(path, false);
+                .sendFileChecksumErrorMessage(path, false);
         }
 
     }
 
     public void sessionStarted(ISharedProject session) {
 
-        ConsistencyAction.pathes = new CopyOnWriteArraySet<IPath>();
+        paths = new CopyOnWriteArraySet<IPath>();
         if (proxy != null) {
             proxy.remove(listener);
         }
 
         proxy = Saros.getDefault().getSessionManager().getSharedProject()
-                .getConcurrentDocumentManager().getConsistencyToResolve();
+            .getConcurrentDocumentManager().getConsistencyToResolve();
 
         proxy.add(listener);
     }
@@ -93,8 +210,8 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
     public void sessionEnded(ISharedProject session) {
 
-        if (pathes != null) {
-            ConsistencyAction.pathes.clear();
+        if (paths != null) {
+            paths.clear();
         }
 
         if (proxy != null) {

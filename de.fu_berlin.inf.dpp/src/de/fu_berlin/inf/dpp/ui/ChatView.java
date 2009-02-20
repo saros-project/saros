@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class ChatView extends ViewPart implements ISessionListener,
-        IConnectionListener, IChatListener {
+    IConnectionListener, IChatListener {
 
     private static Logger log = Logger.getLogger(ChatView.class.getName());
 
@@ -56,15 +56,15 @@ public class ChatView extends ViewPart implements ISessionListener,
         SashForm sash = new SashForm(rootComposite, SWT.VERTICAL);
 
         this.viewer = new SourceViewer(sash, null, null, true, SWT.BORDER
-                | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI | SWT.READ_ONLY);
+            | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI | SWT.READ_ONLY);
         this.viewer.configure(new TextSourceViewerConfiguration(EditorsUI
-                .getPreferenceStore()));
+            .getPreferenceStore()));
         this.viewer.setDocument(new Document());
         this.viewer.getTextWidget();
 
         this.inputText = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
         this.inputText
-                .setText("To Join the chat please use the connect button.");
+            .setText("To Join the chat please use the connect button.");
         this.inputText.setEditable(false);
 
         sash.setWeights(ChatView.WEIGHTS);
@@ -81,9 +81,9 @@ public class ChatView extends ViewPart implements ISessionListener,
 
                         if (!text.equals("")) { //$NON-NLS-1$
                             Saros.getDefault().getMessagingManager()
-                                    .getSession().sendMessage(text);
+                                .getSession().sendMessage(text);
                         }
-                        // append("ID-TODO", text);
+                        /* append("ID-TODO", text); */
                     }
                     break;
                 }
@@ -96,33 +96,34 @@ public class ChatView extends ViewPart implements ISessionListener,
 
                 // scrolls down, so the last line is visible
                 int lines = ChatView.this.viewer.getDocument()
-                        .getNumberOfLines();
+                    .getNumberOfLines();
                 ChatView.this.viewer.setTopIndex(lines);
             }
         });
 
         this.connectAction = new Action("Connect/DisConnect") {
 
+            @Override
             public void run() {
                 MessagingManager mm = Saros.getDefault().getMessagingManager();
                 Saros.getDefault().getConnection().getUser();
                 if (ChatView.this.joined) {
                     try {
                         ChatView.this.session
-                                .sendMessage("is leaving the chat..");
+                            .sendMessage("is leaving the chat...");
                         ChatView.this.inputText
-                                .setText("You have left the chat. To renter the chat please use the connect button.");
+                            .setText("You have left the chat. To re-enter the chat please use the connect button.");
                         mm.disconnectMultiUserChat();
                         ChatView.this.session = null;
                         ChatView.this.inputText.setEditable(false);
 
                     } catch (XMPPException e) {
                         ChatView.this.viewer.getDocument().set(
-                                "Error: Couldn't disconnect");
+                            "Error: Couldn't disconnect");
                     }
                     ChatView.this.joined = false;
                     ChatView.this.connectAction.setImageDescriptor(SarosUI
-                            .getImageDescriptor("/icons/disconnect.png"));
+                        .getImageDescriptor("/icons/disconnect.png"));
                 } else {
                     try {
                         mm.connectMultiUserChat();
@@ -131,14 +132,14 @@ public class ChatView extends ViewPart implements ISessionListener,
                         ChatView.this.inputText.setEditable(true);
                         ChatView.this.inputText.setText("");
                         ChatView.this.connectAction.setImageDescriptor(SarosUI
-                                .getImageDescriptor("/icons/connect.png"));
+                            .getImageDescriptor("/icons/connect.png"));
                         ChatView.this.session = Saros.getDefault()
-                                .getMessagingManager().getSession();
+                            .getMessagingManager().getSession();
                         ChatView.this.session
-                                .sendMessage("have joined the chat");
+                            .sendMessage("has joined the chat");
                     } catch (XMPPException e) {
                         ChatView.this.viewer.getDocument().set(
-                                "Error: Couldn't connect");
+                            "Error: Couldn't connect");
                     }
                 }
             }
@@ -146,10 +147,10 @@ public class ChatView extends ViewPart implements ISessionListener,
 
         if (this.joined) {
             this.connectAction.setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/connect.png"));
+                .getImageDescriptor("/icons/connect.png"));
         } else {
             this.connectAction.setImageDescriptor(SarosUI
-                    .getImageDescriptor("/icons/disconnect.png"));
+                .getImageDescriptor("/icons/disconnect.png"));
         }
 
         if (Saros.getDefault().isConnected()) {
@@ -168,6 +169,7 @@ public class ChatView extends ViewPart implements ISessionListener,
         Saros.getDefault().addListener(this);
     }
 
+    @Override
     public void setFocus() {
         // TODO Auto-generated method stub
 
@@ -189,7 +191,7 @@ public class ChatView extends ViewPart implements ISessionListener,
     }
 
     public void connectionStateChanged(XMPPConnection connection,
-            ConnectionState newState) {
+        ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
             this.connectAction.setEnabled(true);
         } else if (newState == ConnectionState.NOT_CONNECTED) {
@@ -198,29 +200,18 @@ public class ChatView extends ViewPart implements ISessionListener,
         }
     }
 
-    public void displayMessage(String body) {
-        Display.getDefault().asyncExec(new Runnable() {
-            public void run() {
-                // 
-            }
-        });
-
-    }
-
     public void chatMessageAdded(final String sender, final String message) {
         ChatView.log.debug("Received Message from " + sender + ": " + message);
         Display.getDefault().asyncExec(new Runnable() {
             public void run() {
                 int prefixPos = sender.indexOf('/') + 1;
                 String m = message.startsWith("\n") ? message.substring(1)
-                        : message;
+                    : message;
                 ChatView.this.viewer.getTextWidget().append(
-                        sender.substring(prefixPos, sender.indexOf('/',
-                                prefixPos))
-                                + ": " + m + "\n");
+                    sender.substring(prefixPos, sender.indexOf('/', prefixPos))
+                        + ": " + m + "\n");
             }
         });
-
     }
 
 }

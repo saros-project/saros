@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.IPath;
 public class EditorActivity implements IActivity {
     public static enum Type {
         Activated, Closed, Saved
-    };
+    }
 
     private final Type type;
 
@@ -48,7 +48,7 @@ public class EditorActivity implements IActivity {
     public EditorActivity(Type type, IPath path) {
         if ((type != Type.Activated) && (path == null)) {
             throw new IllegalArgumentException(
-                    "Null path for non-activation type editor activity given.");
+                "Null path for non-activation type editor activity given.");
         }
 
         this.type = type;
@@ -75,13 +75,14 @@ public class EditorActivity implements IActivity {
 
         EditorActivity other = (EditorActivity) obj;
         return (((this.path == null) && (other.path == null)) || this.path
-                .equals(other.path))
-                && this.type.equals(other.type);
+            .equals(other.path))
+            && this.type.equals(other.type);
     }
 
     @Override
     public String toString() {
-        return "EditorActivity(type:" + this.type + ", path:" + this.path + ")";
+        return "EditorActivity(type:" + this.type + ", path:"
+            + (this.path != null ? this.path.lastSegment() : "no path") + ")";
     }
 
     public String getSource() {

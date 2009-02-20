@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 public class JoinSessionWizardUtils {
 
     private static Logger log = Logger.getLogger(JoinSessionWizardUtils.class
-            .getName());
+        .getName());
 
     public static class ScanRunner implements Runnable {
 
@@ -39,17 +39,16 @@ public class JoinSessionWizardUtils {
             this.running = true;
 
             ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
-                    .getDefault().getActiveShell());
+                .getDefault().getActiveShell());
             try {
                 dialog.run(true, false, new IRunnableWithProgress() {
                     public void run(IProgressMonitor monitor) {
 
                         monitor.beginTask("Scanning workspace projects ... ",
-                                IProgressMonitor.UNKNOWN);
+                            IProgressMonitor.UNKNOWN);
                         ScanRunner.this.project = JoinSessionWizardUtils
-                                .getLocalProject(
-                                        ScanRunner.this.invitationProcess
-                                                .getRemoteFileList(), monitor);
+                            .getLocalProject(ScanRunner.this.invitationProcess
+                                .getRemoteFileList(), monitor);
                         monitor.done();
                         ScanRunner.this.running = false;
                     }
@@ -69,7 +68,7 @@ public class JoinSessionWizardUtils {
      * Run the scan for the best matching project as a blocking operation.
      */
     public static IProject getBestScanMatch(
-            IIncomingInvitationProcess invitationProcess) {
+        IIncomingInvitationProcess invitationProcess) {
 
         ScanRunner runner = new ScanRunner(invitationProcess);
 
@@ -83,7 +82,7 @@ public class JoinSessionWizardUtils {
             return remoteFileList.match(new FileList(project));
         } catch (CoreException e) {
             JoinSessionWizardUtils.log.log(Level.FINE,
-                    "Couldn't calculate match for project " + project, e);
+                "Couldn't calculate match for project " + project, e);
 
             return -1;
         }
@@ -96,7 +95,7 @@ public class JoinSessionWizardUtils {
      * To be considered a match, projects have to match at least 80%.
      */
     public static IProject getLocalProject(FileList remoteFileList,
-            IProgressMonitor monitor) {
+        IProgressMonitor monitor) {
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IProject[] projects = workspace.getRoot().getProjects();
@@ -113,7 +112,7 @@ public class JoinSessionWizardUtils {
             }
 
             int matchScore = JoinSessionWizardUtils.getMatch(remoteFileList,
-                    projects[i]);
+                projects[i]);
 
             if (matchScore > bestMatchScore) {
                 bestMatchScore = matchScore;
@@ -175,7 +174,7 @@ public class JoinSessionWizardUtils {
 
             // Then find the next available number
             while (!JoinSessionWizardUtils.projectIsUnique(projectProposal
-                    + " " + i, projects)) {
+                + " " + i, projects)) {
                 i++;
             }
 

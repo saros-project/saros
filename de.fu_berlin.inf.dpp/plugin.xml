@@ -24,12 +24,12 @@
             icon="icons/comment.png"
             id="de.fu_berlin.inf.dpp.ui.ChatView"
             name="Chat"/>
-	 <view
+	 <!--<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.NetworkView"
             icon="icons/connect.png"
             id="de.fu_berlin.inf.dpp.ui.NetworkViewView"
-            name="Network Monitor"/>
+            name="Network Monitor"/>-->
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -64,10 +64,7 @@
                label="Share project...">
          </action>
          <visibility>
-            <or>
                <objectClass name="org.eclipse.core.resources.IProject"/>
-               <objectClass name="org.eclipse.jdt.core.IJavaProject"/>
-            </or>
          </visibility>
       </objectContribution>
    </extension>
@@ -81,7 +78,18 @@
             lightweight="true"
             state="true">
          <enablement>
-            <objectClass name="org.eclipse.core.resources.IFile"/>
+            <objectClass name="org.eclipse.core.resources.IProject"/>
+         </enablement>
+      </decorator>
+      <decorator
+            adaptable="true"
+            class="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
+            id="de.fu_berlin.inf.dpp.ui.decorators.SharedProjectFileDecorator"
+            label="Shared Project File Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+      	   	<objectClass name="org.eclipse.core.resources.IFile"/>
          </enablement>
       </decorator>
    </extension>
@@ -92,7 +100,7 @@
             id="de.fu_berlin.inf.dpp.preferences"
             name="Saros"/>
       <page
-            category="de.fu_berlin.inf.dpp.preferences/"
+            category="de.fu_berlin.inf.dpp.preferences"
             class="de.fu_berlin.inf.dpp.ui.AdvancedPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.advanced"
             name="Advanced"/>
@@ -130,62 +138,111 @@
    </extension>
    <extension
          point="org.eclipse.ui.editors.annotationTypes">
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.viewport"
-            name="de.fu_berlin.inf.dpp.annotations.viewport"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.contribution"
-            name="de.fu_berlin.inf.dpp.annotations.contribution"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.contribution.1"
-            name="de.fu_berlin.inf.dpp.annotations.contribution.1"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.contribution.2"
-            name="de.fu_berlin.inf.dpp.annotations.contribution.2"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.contribution3"
-            name="de.fu_berlin.inf.dpp.annotations.contribution.3"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.contribution.4"
-            name="de.fu_berlin.inf.dpp.annotations.contribution.4"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.contribution.5"
-            name="de.fu_berlin.inf.dpp.annotations.contribution.5"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.selection.1"
-            name="de.fu_berlin.inf.dpp.annotations.selection.1"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.selection.2"
-            name="de.fu_berlin.inf.dpp.annotations.selection.2"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.selection.3"
-            name="de.fu_berlin.inf.dpp.annotations.selection.3"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.selection.4"
-            name="de.fu_berlin.inf.dpp.annotations.selection.4"/>
-      <type
-            markerType="de.fu_berlin.inf.dpp.annotations.selection.5"
-            name="de.fu_berlin.inf.dpp.annotations.selection.5"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.viewport.1"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.viewport.2"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.viewport.3"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.viewport.4"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.viewport.5"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.contribution"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.contribution.1"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.contribution.2"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.contribution.3"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.contribution.4"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.contribution.5"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.selection.1"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.selection.2"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.selection.3"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.selection.4"/>
+      <type name="de.fu_berlin.inf.dpp.annotations.selection.5"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
       <specification
-            annotationType="de.fu_berlin.inf.dpp.annotations.viewport"
-            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color"
-            colorPreferenceValue="0,255,0"
+            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.1"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.1"
+            colorPreferenceValue="255,128,128"
             contributesToHeader="true"
-            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.1"
             highlightPreferenceValue="false"
             includeOnPreferencePage="true"
             label="DPP Viewport"
-            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.1"
             overviewRulerPreferenceValue="true"
             presentationLayer="8"
-            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.1"
             textPreferenceValue="false"
             textStylePreferenceValue="NONE"
-            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.1"
             verticalRulerPreferenceValue="true"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.2"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.2"
+            colorPreferenceValue="128,255,128"
+            contributesToHeader="true"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.2"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            label="DPP Viewport"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.2"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.2"
+            textPreferenceValue="false"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.2"
+            verticalRulerPreferenceValue="true"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.3"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.3"
+            colorPreferenceValue="128,128,255"
+            contributesToHeader="true"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.3"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            label="DPP Viewport"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.3"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.3"
+            textPreferenceValue="false"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.3"
+            verticalRulerPreferenceValue="true"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.4"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.4"
+            colorPreferenceValue="255,255,128"
+            contributesToHeader="true"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.4"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            label="DPP Viewport"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.4"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.4"
+            textPreferenceValue="false"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.4"
+            verticalRulerPreferenceValue="true"/>
+      <specification
+            annotationType="de.fu_berlin.inf.dpp.annotations.viewport.5"
+            colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.color.5"
+            colorPreferenceValue="128,255,255"
+            contributesToHeader="true"
+            highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.highlight.5"
+            highlightPreferenceValue="false"
+            includeOnPreferencePage="true"
+            label="DPP Viewport"
+            overviewRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.overview.5"
+            overviewRulerPreferenceValue="true"
+            presentationLayer="8"
+            textPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.text.5"
+            textPreferenceValue="false"
+            textStylePreferenceValue="NONE"
+            verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.viewport.ruler.5"
+            verticalRulerPreferenceValue="true"/>
+
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.contribution"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.color"
@@ -194,7 +251,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler"
-            colorPreferenceValue="138,165,189"
+            colorPreferenceValue="211,224,234"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -213,7 +270,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.1"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.1"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.1"
-            colorPreferenceValue="255,0,0"
+            colorPreferenceValue="255,200,200"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -231,7 +288,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.2"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.2"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.2"
-            colorPreferenceValue="0,255,0"
+            colorPreferenceValue="200,255,200"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -249,7 +306,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.3"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.3"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.3"
-            colorPreferenceValue="0,0,255"
+            colorPreferenceValue="200,200,255"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -267,7 +324,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.4"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.4"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.4"
-            colorPreferenceValue="255,255,0"
+            colorPreferenceValue="255,255,200"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -285,7 +342,7 @@
             textPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.text.5"
             textStylePreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.textstyle.5"
             verticalRulerPreferenceKey="de.fu_berlin.inf.dpp.annotations.contribution.ruler.5"
-            colorPreferenceValue="0,255,255"
+            colorPreferenceValue="200,255,255"
             contributesToHeader="false"
             highlightPreferenceValue="true"
             includeOnPreferencePage="true"
@@ -295,10 +352,11 @@
             textPreferenceValue="true"
             textStylePreferenceValue="UNDERLINE"
             verticalRulerPreferenceValue="false"/>
+      
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.1"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.1"
-            colorPreferenceValue="255,0,0"
+            colorPreferenceValue="255,128,128"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.1"
             highlightPreferenceValue="true"
@@ -316,7 +374,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.2"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.2"
-            colorPreferenceValue="0,255,0"
+            colorPreferenceValue="128,255,128"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.2"
             highlightPreferenceValue="true"
@@ -334,7 +392,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.3"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.3"
-            colorPreferenceValue="0,0,255"
+            colorPreferenceValue="128,128,255"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.3"
             highlightPreferenceValue="true"
@@ -352,7 +410,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.4"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.4"
-            colorPreferenceValue="255,255,0"
+            colorPreferenceValue="255,255,128"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.4"
             highlightPreferenceValue="true"
@@ -370,7 +428,7 @@
       <specification
             annotationType="de.fu_berlin.inf.dpp.annotations.selection.5"
             colorPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.color.5"
-            colorPreferenceValue="0,255,255"
+            colorPreferenceValue="128,255,255"
             contributesToHeader="false"
             highlightPreferenceKey="de.fu_berlin.inf.dpp.annotations.selection.highlight.5"
             highlightPreferenceValue="true"

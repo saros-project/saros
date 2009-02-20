@@ -8,8 +8,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class FileActivity implements IActivity {
     public static enum Type {
-        Created, Removed, Error
-    };
+        Created, Removed
+    }
 
     private String source;
 
@@ -75,7 +75,7 @@ public class FileActivity implements IActivity {
             FileActivity activity = (FileActivity) obj;
 
             return (getPath().equals(activity.getPath()) && getType().equals(
-                    activity.getType()));
+                activity.getType()));
         }
 
         return false;

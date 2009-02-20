@@ -34,7 +34,7 @@ public class ViewportActivity implements IActivity {
         if (obj instanceof ViewportActivity) {
             ViewportActivity other = (ViewportActivity) obj;
             return (this.topIndex == other.topIndex)
-                    && (this.bottomIndex == other.bottomIndex);
+                && (this.bottomIndex == other.bottomIndex);
         }
 
         return false;
@@ -43,7 +43,7 @@ public class ViewportActivity implements IActivity {
     @Override
     public String toString() {
         return "ViewportActivity(top:" + this.topIndex + ",bottom:"
-                + this.bottomIndex + ")";
+            + this.bottomIndex + ")";
     }
 
     public String getSource() {

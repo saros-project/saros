@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
 public class SharedDocumentProvider extends TextFileDocumentProvider implements
-        ISessionListener, ISharedProjectListener {
+    ISessionListener, ISharedProjectListener {
 
     private ISharedProject sharedProject;
 
@@ -64,12 +64,8 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
         return this.isDriver && super.mustSaveDocument(element);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
     public void invitationReceived(IIncomingInvitationProcess process) {
+        // We are started later during the sessionStarted Method, not before.
     }
 
     /*

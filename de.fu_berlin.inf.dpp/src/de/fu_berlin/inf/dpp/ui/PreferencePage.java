@@ -34,7 +34,7 @@ import de.fu_berlin.inf.dpp.Saros;
  * @author rdjemili
  */
 public class PreferencePage extends FieldEditorPreferencePage implements
-        IWorkbenchPreferencePage {
+    IWorkbenchPreferencePage {
 
     public PreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -45,27 +45,27 @@ public class PreferencePage extends FieldEditorPreferencePage implements
     @Override
     public void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.SERVER, "Server:",
-                getFieldEditorParent()));
+            getFieldEditorParent()));
 
         addField(new StringFieldEditor(PreferenceConstants.USERNAME,
-                "Username:", getFieldEditorParent()));
+            "Username:", getFieldEditorParent()));
 
         StringFieldEditor passwordField = new StringFieldEditor(
-                PreferenceConstants.PASSWORD, "Password:",
-                getFieldEditorParent());
+            PreferenceConstants.PASSWORD, "Password:", getFieldEditorParent());
         passwordField.getTextControl(getFieldEditorParent()).setEchoChar('*');
         addField(passwordField);
 
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
-                "Automatically connect on startup.", getFieldEditorParent()));
+            "Automatically connect on startup.", getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
-                "Start in Follow Mode.", getFieldEditorParent()));
+            "Start in Follow Mode.", getFieldEditorParent()));
     }
 
     /*
      * @see org.eclipse.ui.IWorkbenchPreferencePage
      */
     public void init(IWorkbench workbench) {
+        // nothing to initialize
     }
 }

@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -85,6 +85,7 @@ public class FileList {
      * Creates an empty file list.
      */
     public FileList() {
+        // do nothing
     }
 
     /**
@@ -116,7 +117,7 @@ public class FileList {
      *             given container.
      */
     public FileList(IContainer container, boolean ignoreDerived)
-            throws CoreException {
+        throws CoreException {
 
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
         addMembers(container.members(), this.all, ignoreDerived);
@@ -167,9 +168,9 @@ public class FileList {
 
                 } else if (parser.getName().equals("file")) {
                     IPath path = new Path(parser
-                            .getAttributeValue(null, "path"));
+                        .getAttributeValue(null, "path"));
                     Long checksum = Long.parseLong(parser.getAttributeValue(
-                            null, "checksum"));
+                        null, "checksum"));
 
                     context.put(path, checksum);
 
@@ -179,7 +180,7 @@ public class FileList {
 
                 } else if (parser.getName().equals("folder")) {
                     IPath path = new Path(parser
-                            .getAttributeValue(null, "path"));
+                        .getAttributeValue(null, "path"));
 
                     context.put(path, null);
 
@@ -253,7 +254,7 @@ public class FileList {
      */
     public int match(FileList other) {
         return getPaths().size() == 0 ? 0 : 100
-                * diff(other).getUnalteredPaths().size() / getPaths().size();
+            * diff(other).getUnalteredPaths().size() / getPaths().size();
     }
 
     /**
@@ -310,9 +311,9 @@ public class FileList {
 
         FileList other = (FileList) obj;
         return this.all.equals(other.all) && this.added.equals(other.added)
-                && this.removed.equals(other.removed)
-                && this.altered.equals(other.altered)
-                && this.unaltered.equals(other.unaltered);
+            && this.removed.equals(other.removed)
+            && this.altered.equals(other.altered)
+            && this.unaltered.equals(other.unaltered);
     }
 
     @Override
@@ -327,7 +328,7 @@ public class FileList {
     }
 
     private void addMembers(IResource[] resources, Map<IPath, Long> members,
-            boolean ignoreDerived) throws CoreException {
+        boolean ignoreDerived) throws CoreException {
 
         for (IResource resource : resources) {
             if (ignoreDerived && resource.isDerived()) {
@@ -360,7 +361,7 @@ public class FileList {
     }
 
     private void appendFileGroup(StringBuilder sb, String element,
-            Map<IPath, Long> map) {
+        Map<IPath, Long> map) {
 
         if (map.size() == 0) {
             return;

@@ -40,13 +40,13 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.PASSWORD, "");
 
         store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
-        store.setDefault(PreferenceConstants.AUTO_FOLLOW_MODE, true);
+        store.setDefault(PreferenceConstants.AUTO_FOLLOW_MODE, false);
         store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
         store.setDefault(PreferenceConstants.DEBUG, false);
         store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
         store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
         store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
-        store.setDefault(PreferenceConstants.STUN, "");
+        store.setDefault(PreferenceConstants.STUN, "stunserver.org");
         store.setDefault(PreferenceConstants.STUN_PORT, 3478);
     }
 }

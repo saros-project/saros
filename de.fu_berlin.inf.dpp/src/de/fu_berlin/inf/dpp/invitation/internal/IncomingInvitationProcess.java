@@ -22,8 +22,6 @@ package de.fu_berlin.inf.dpp.invitation.internal;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -31,6 +29,7 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,10 +54,10 @@ import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
  * @author rdjemili
  */
 public class IncomingInvitationProcess extends InvitationProcess implements
-        IIncomingInvitationProcess {
+    IIncomingInvitationProcess {
 
     private static Logger logger = Logger
-            .getLogger(IncomingInvitationProcess.class);
+        .getLogger(IncomingInvitationProcess.class);
 
     private FileList remoteFileList;
 
@@ -74,9 +73,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     protected String projectName;
 
     public IncomingInvitationProcess(ITransmitter transmitter, JID from,
-            String projectName, String description) {
+        String projectName, String description, int colorID) {
 
-        super(transmitter, from, description);
+        super(transmitter, from, description, colorID);
 
         this.projectName = projectName;
         setState(State.INVITATION_SENT);
@@ -108,7 +107,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         assertState(State.INVITATION_SENT);
 
         monitor.beginTask("Requesting remote file list",
-                IProgressMonitor.UNKNOWN);
+            IProgressMonitor.UNKNOWN);
 
         this.transmitter.sendRequestForFileListMessage(this.peer);
         setState(State.HOST_FILELIST_REQUESTED);
@@ -122,13 +121,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 Thread.sleep(500);
                 monitor.worked(1);
             } catch (InterruptedException e) {
+                cancel(null, false);
             }
         }
 
         monitor.done();
-
-        // TODO: for testing
-        // tmode = TransferMode.IBB;
 
         return this.remoteFileList;
     }
@@ -139,11 +136,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
      */
     public void accept(IProject baseProject, String newProjectName,
-            IProgressMonitor monitor) {
+        IProgressMonitor monitor) {
 
         if ((newProjectName == null) && (baseProject == null)) {
             throw new IllegalArgumentException(
-                    "At least newProjectName or baseProject have to be not null.");
+                "At least newProjectName or baseProject have to be not null.");
         }
 
         try {
@@ -151,26 +148,27 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
             if (newProjectName != null) {
                 this.localProject = createNewProject(newProjectName,
-                        baseProject);
+                    baseProject);
             } else {
                 this.localProject = baseProject;
             }
 
             this.filesLeftToSynchronize = handleDiff(this.localProject,
-                    this.remoteFileList);
+                this.remoteFileList);
 
             this.progressMonitor = monitor;
-            if (this.tmode == TransferMode.IBB) {
-                this.progressMonitor
-                        .beginTask("Transfer archive file ...", 100);
+            if (this.transferMode == TransferMode.IBB) {
+                this.progressMonitor.beginTask("Synchronizing",
+                    100 + this.filesLeftToSynchronize);
+                this.progressMonitor.subTask("Receiving Archive...");
             } else {
-                this.progressMonitor.beginTask("Synchronizing...",
-                        this.filesLeftToSynchronize);
+                this.progressMonitor.beginTask("Synchronizing",
+                    this.filesLeftToSynchronize);
             }
             setState(State.SYNCHRONIZING);
 
             this.transmitter.sendFileList(this.peer, new FileList(
-                    this.localProject));
+                this.localProject), this);
 
             if (blockUntilAllFilesSynchronized(monitor)) {
                 done();
@@ -180,7 +178,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         } catch (Exception e) {
             ErrorMessageDialog.showErrorMessage(new Exception(
-                    "Exception during create project."));
+                "Exception during create project."));
             failed(e);
 
         } finally {
@@ -214,42 +212,37 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     public void resourceReceived(JID from, IPath path, InputStream in) {
         IncomingInvitationProcess.logger.debug("new file received: " + path);
         if (this.localProject == null) {
-            return; // we dont have started the new project yet, so received
-            // ressources are not welcomed
+            return; // we do not have started the new project yet, so received
+            // resources are not welcomed
         }
 
         try {
             IFile file = this.localProject.getFile(path);
             if (file.exists()) {
-                file.setReadOnly(false);
+                ResourceAttributes attributes = new ResourceAttributes();
+                attributes.setReadOnly(false);
+                file.setResourceAttributes(attributes);
                 file
-                        .setContents(in, IResource.FORCE,
-                                new NullProgressMonitor());
+                    .setContents(in, IResource.FORCE, new NullProgressMonitor());
+
+                // TODO Set ReadOnly again?
             } else {
                 file.create(in, true, new NullProgressMonitor());
                 IncomingInvitationProcess.logger.debug("New File created: "
-                        + file.getName());
+                    + file.getName());
             }
+
         } catch (Exception e) {
             failed(e);
         }
 
-        /*
-         * archive file for transfering data finished. Unzip separate files.
-         */
-        if (this.tmode == TransferMode.IBB) {
-            this.tmode = TransferMode.DEFAULT;
-            this.progressMonitor.beginTask("Files left: ",
-                    this.filesLeftToSynchronize);
-        }
-
         this.progressMonitor.worked(1);
         this.progressMonitor.subTask("Files left: "
-                + this.filesLeftToSynchronize);
+            + this.filesLeftToSynchronize);
 
         this.filesLeftToSynchronize--;
         IncomingInvitationProcess.logger.debug("file counter: "
-                + this.filesLeftToSynchronize);
+            + this.filesLeftToSynchronize);
     }
 
     /*
@@ -278,6 +271,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
+                return false;
             }
         }
 
@@ -297,13 +291,13 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      *             if something goes wrong while creating the new project.
      */
     private IProject createNewProject(String newProjectName,
-            final IProject baseProject) throws CoreException {
+        final IProject baseProject) throws CoreException {
 
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
         final File projectDir = new File(workspaceRoot.getLocation().toString()
-                + File.separator + newProjectName);
+            + File.separator + newProjectName);
         if (projectDir.exists()) {
             projectDir.delete();
         }
@@ -312,7 +306,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                        Display.getDefault().getActiveShell());
+                    Display.getDefault().getActiveShell());
                 try {
                     dialog.run(true, false, new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) {
@@ -320,25 +314,25 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                             try {
 
                                 monitor.beginTask("Copy local resources ... ",
-                                        IProgressMonitor.UNKNOWN);
+                                    IProgressMonitor.UNKNOWN);
 
                                 project.clearHistory(null);
                                 project.refreshLocal(IResource.DEPTH_INFINITE,
-                                        null);
+                                    null);
 
                                 if (baseProject == null) {
                                     project.create(new NullProgressMonitor());
                                     project.open(new NullProgressMonitor());
                                 } else {
                                     baseProject.copy(project.getFullPath(),
-                                            true, new NullProgressMonitor());
+                                        true, new NullProgressMonitor());
                                 }
 
                             } catch (CoreException e) {
                                 IncomingInvitationProcess.logger
-                                        .warn(
-                                                "Exception during copy local ressources",
-                                                e);
+                                    .warn(
+                                        "Exception during copy local ressources",
+                                        e);
                                 monitor.done();
                             }
 
@@ -378,7 +372,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      *             is thrown when getting all files of the local project.
      */
     private int handleDiff(IProject localProject, FileList remoteFileList)
-            throws CoreException {
+        throws CoreException {
 
         // TODO: Thread
         FileList diff = new FileList(localProject).diff(remoteFileList);
@@ -387,7 +381,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         int addedPaths = addAllFolders(localProject, diff);
 
         return diff.getAddedPaths().size() - addedPaths
-                + diff.getAlteredPaths().size();
+            + diff.getAlteredPaths().size();
     }
 
     /**
@@ -401,7 +395,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @throws CoreException
      */
     private void removeUnneededResources(IProject localProject, FileList diff)
-            throws CoreException {
+        throws CoreException {
 
         // TODO dont throw CoreException
         // TODO check if this triggers the resource listener
@@ -426,7 +420,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     private int addAllFolders(IProject localProject, FileList diff)
-            throws CoreException {
+        throws CoreException {
 
         int addedFolders = 0;
 
@@ -445,23 +439,18 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     /**
-     * Ends the incoming invitiation process.
+     * Ends the incoming invitation process.
      */
     private void done() {
         JID host = this.peer;
-        JID driver = this.peer;
-
-        // TODO: HACK
-        List<JID> users = new ArrayList<JID>();
-        users.add(host);
-        users.add(Saros.getDefault().getMyJID());
 
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.joinSession(
-                this.localProject, host, driver, users);
+            this.localProject, host, colorID);
 
+        // TODO Will block 1000 ms to ensure something...
         this.transmitter.sendJoinMessage(sharedProject);
-        this.transmitter.removeInvitationProcess(this); // HACK
+        this.transmitter.removeInvitationProcess(this);
 
         sharedProject.setProjectReadonly(true);
 
@@ -472,50 +461,16 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         return this.projectName;
     }
 
-    public void updateInvitationProgress(JID jid) {
-        // ignored, not needed atm
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
-     */
     public TransferMode getTransferMode() {
-        return this.tmode;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#jingleFallback()
-     */
-    public void jingleFallback() {
-        IncomingInvitationProcess.logger.warn("jingle fallback");
-        this.tmode = TransferMode.IBB;
-        /* if send file list failed. */
-        if (getState() == State.SYNCHRONIZING) {
-            IncomingInvitationProcess.logger
-                    .debug("send file list another one.");
-            try {
-                this.transmitter.sendFileList(this.peer, new FileList(
-                        this.localProject));
-            } catch (Exception e) {
-                ErrorMessageDialog.showErrorMessage(new Exception(
-                        "Exception during create project."));
-                failed(e);
-            }
-        }
+        return this.transferMode;
     }
 
     public void fileSent(IPath path) {
         // do nothing
-
     }
 
     public void fileTransferFailed(IPath path, Exception e) {
         failed(e);
-
     }
 
     public void transferProgress(int transfered) {
@@ -524,7 +479,13 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     public void setTransferMode(TransferMode mode) {
-        this.tmode = mode;
+        this.transferMode = mode;
     }
 
+    @Override
+    public void cancel(String errorMsg, boolean replicated) {
+        super.cancel(errorMsg, replicated);
+
+        Saros.getDefault().getSessionManager().cancelIncomingInvitation();
+    }
 }

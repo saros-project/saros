@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -19,10 +19,12 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -45,43 +47,24 @@ public interface ISharedProject {
      * @return a list of all participants of the shared project. This list
      *         includes yourself.
      */
-    public List<User> getParticipants();
+    public Collection<User> getParticipants();
 
     /**
-     * Sets the new driver. If given driver is already driver the call is
-     * ignored.
+     * Toggle the role of the given user. Driver becomes to an observer and vice
+     * versa.
      * 
-     * @param driver
-     *            the new driver.
+     * @param user
+     *            the user which role has to be changed.
      * @param replicated
      *            <code>false</code> if this event was created by this client.
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void setDriver(User driver, boolean replicated);
+    public void toggleUserRole(User user, boolean replicated);
 
     /**
-     * Remove driver role for given User.
-     * 
-     * @param driver
-     *            one current driver.
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    public void removeDriver(User driver, boolean replicated);
-
-    /**
-     * The driver is the person that is currently allowed to edit the resources.
-     * 
-     * @return the driver.
-     */
-    public User getDriver();
-
-    /**
-     * @return <code>true</code> if the local client is the current driver of
-     *         this shared project. <code>false</code> otherwise.
+     * @return <code>true</code> if the local client is a current driver of this
+     *         shared project. <code>false</code> otherwise.
      */
     public boolean isDriver();
 
@@ -113,8 +96,6 @@ public interface ISharedProject {
      */
     public void addUser(User user);
 
-    public void addUser(User user, int index);
-
     /**
      * Removes the user.
      * 
@@ -133,10 +114,11 @@ public interface ISharedProject {
      *            makes the decision to accept or decline the invitation.
      * @param inviteUI
      *            user interface of the invitation for feedback calls.
+     * 
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI);
+        boolean inactive, IInvitationUI inviteUI);
 
     /**
      * Adds the given shared project listener. This call is ignored if the
@@ -188,10 +170,10 @@ public interface ISharedProject {
     /**
      * Starts the invitation wizard to invite users.
      * 
-     * @param jid
-     *            the JID of a user to invite without manual selection
+     * @param list
+     *            the JIDs of users to invite manual selection
      */
-    public void startInvitation(JID jid);
+    public void startInvitation(@Nullable List<JID> list);
 
     /**
      * Activates sending of activities. The reason that this isn't done
@@ -210,8 +192,8 @@ public interface ISharedProject {
      * Sets all resources of the project to a readonly state on the local file
      * system.
      * 
-     * @param The
-     *            readonly state to set the file to.
+     * @param readonly
+     *            The readonly state to set the file to.
      */
     public void setProjectReadonly(boolean readonly);
 
@@ -220,7 +202,7 @@ public interface ISharedProject {
      * 
      * @return
      */
-    public boolean exclusiveDriver();
+    public boolean isExclusiveDriver();
 
     /**
      * the concurrent document manager is responsible for all jupiter controlled
@@ -229,4 +211,28 @@ public interface ISharedProject {
      * @return the concurrent document manager
      */
     public ConcurrentDocumentManager getConcurrentDocumentManager();
+
+    /**
+     * Get a free color from the pool.
+     * 
+     * @return an unused color ID or a default ID if all color IDs are in use.
+     */
+    public int getFreeColor();
+
+    /**
+     * Returns a color to the pool of available colors.
+     * 
+     * @param colorID
+     *            the color id that should be returned to the pool.
+     */
+    public void returnColor(int colorID);
+
+    /**
+     * Gets a driver. If there is more than one, there is no guarantee which one
+     * of them is returned.
+     * 
+     * @return a {@link User} with the driver role, or <code>null</code> if
+     *         there is no driver at all.
+     */
+    public User getADriver();
 }

@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -39,11 +39,21 @@ public class DeleteContactAction extends SelectionProviderAction {
         super(provider, "Delete");
         selectionChanged((IStructuredSelection) provider.getSelection());
 
-        setToolTipText("Set the nickname of this contact.");
+        setToolTipText("Delete this contact.");
 
         IWorkbench workbench = Saros.getDefault().getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
-                ISharedImages.IMG_TOOL_DELETE));
+            ISharedImages.IMG_TOOL_DELETE));
+    }
+
+    public static String toString(RosterEntry entry) {
+        StringBuilder sb = new StringBuilder();
+        String name = entry.getName();
+        if (name != null && name.trim().length() > 0) {
+            sb.append("'").append(name).append("' ");
+        }
+        sb.append(entry.getUser());
+        return sb.toString();
     }
 
     @Override
@@ -55,9 +65,8 @@ public class DeleteContactAction extends SelectionProviderAction {
         }
 
         if (MessageDialog.openQuestion(shell, "Confirm Delete",
-                "Are you sure you want to delete contact '"
-                        + this.rosterEntry.getName() + "' ('"
-                        + this.rosterEntry.getUser() + "')?")) {
+            "Are you sure you want to delete " + toString(this.rosterEntry)
+                + " from your roster?")) {
 
             try {
                 Saros.getDefault().removeContact(this.rosterEntry);
@@ -78,7 +87,5 @@ public class DeleteContactAction extends SelectionProviderAction {
             this.rosterEntry = null;
             setEnabled(false);
         }
-
-        // TODO disable if user == self
     }
 }

@@ -62,9 +62,9 @@ public class TextSelectionActivity implements IActivity {
         if (obj instanceof TextSelectionActivity) {
             TextSelectionActivity activity = (TextSelectionActivity) obj;
             return (this.offset == activity.offset)
-                    && (this.length == activity.length)
-                    && (this.source == activity.source)
-                    && (this.editor == activity.editor);
+                && (this.length == activity.length)
+                && (this.source == activity.source)
+                && (this.editor == activity.editor);
         }
 
         return false;
@@ -73,6 +73,6 @@ public class TextSelectionActivity implements IActivity {
     @Override
     public String toString() {
         return "TextSelectionActivity(offset:" + this.offset + ", length:"
-                + this.length + ", " + this.editor + ")";
+            + this.length + ", " + this.editor + ")";
     }
 }

@@ -17,8 +17,8 @@ public class JupiterTimestampFactory implements TimestampFactory {
     public Timestamp createTimestamp(int[] components) {
         if (components.length != 2) {
             throw new IllegalArgumentException(
-                    "JupiterTimestampFactory expects a component array"
-                            + "of length 2");
+                "JupiterTimestampFactory expects a component array"
+                    + "of length 2");
         }
         return new JupiterVectorTime(components[0], components[1]);
     }

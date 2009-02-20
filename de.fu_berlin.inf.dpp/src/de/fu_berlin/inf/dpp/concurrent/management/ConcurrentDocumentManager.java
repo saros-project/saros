@@ -9,10 +9,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
+import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filebuffers.LocationKind;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
@@ -25,7 +30,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
@@ -43,24 +48,26 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 
-public class ConcurrentDocumentManager implements ConcurrentManager,
-        ISessionListener {
+/**
+ * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
+ * etc.
+ */
+public class ConcurrentDocumentManager implements IConcurrentManager {
 
     private static Logger logger = Logger
-            .getLogger(ConcurrentDocumentManager.class);
+        .getLogger(ConcurrentDocumentManager.class);
 
     /** Jupiter server instance documents */
     private HashMap<IPath, JupiterDocumentServer> concurrentDocuments;
 
     /** current open editor at client side. */
-    private final HashMap<IPath, JupiterClient> clientDocs;
+    private final HashMap<IPath, JupiterClient> clientDocs = new HashMap<IPath, JupiterClient>();
 
     // private List<JID> drivers;
 
@@ -76,28 +83,63 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
     private final IDriverDocumentManager driverManager;
 
-    private final ISharedProject sharedProject;
-
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
-            "ConsistencyWatchdog");
+        "ConsistencyWatchdog");
 
     private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
-            false);
+        false);
 
-    private Set<IPath> pathesWithWrongChecksums;
+    private Set<IPath> pathesWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+
+    private ISharedProject sharedProject;
 
     /**
-     * This class consists of two parts. The first is a run-method which runs as
-     * an eclipse job on the host side. Once started with schedule() the job is
-     * scheduled to rerun every 5 seconds. The second part is a check method
-     * which checks the documents on this client side against the given
-     * checksums.
+     * Returns the TextFileBuffer associated with this project relative path OR
+     * null if the path could not be traced to a Buffer.
+     */
+    public ITextFileBuffer getTextFileBuffer(IPath docPath) {
+
+        if (sharedProject == null)
+            return null;
+
+        IResource resource = sharedProject.getProject().findMember(docPath);
+        if (resource == null)
+            return null;
+
+        IPath fullPath = resource.getFullPath();
+
+        ITextFileBufferManager tfbm = FileBuffers.getTextFileBufferManager();
+
+        ITextFileBuffer fileBuff = tfbm.getTextFileBuffer(fullPath,
+            LocationKind.IFILE);
+        if (fileBuff != null)
+            return fileBuff;
+        else {
+            try {
+                tfbm.connect(fullPath, LocationKind.IFILE,
+                    new NullProgressMonitor());
+            } catch (CoreException e) {
+                return null;
+            }
+            return tfbm.getTextFileBuffer(fullPath, LocationKind.IFILE);
+        }
+    }
+
+    /**
+     * This class is an eclipse job run on the host side ONLY.
+     * 
+     * The job computes checksums for all files currently managed by Jupiter
+     * (the ConcurrentDocumentManager) and sends them to all guests.
+     * 
+     * These will call their ConcurrentDocumentManager.check(...) method, to
+     * verify that their version is correct.
+     * 
+     * Once started with schedule() the job is scheduled to rerun every 5
+     * seconds.
      * 
      * @author chjacob
      */
     private class ConsistencyWatchdog extends Job {
-
-        private boolean executingChecksumErrorHandling;
 
         public ConsistencyWatchdog(String name) {
             super(name);
@@ -109,27 +151,15 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
         @Override
         protected IStatus run(IProgressMonitor monitor) {
 
-            // if not on host side cancel the job
-            if (!isHostSide()) {
-                logger.error("This job is intended to be run on host side!");
-                return Status.CANCEL_STATUS;
-            }
+            assert isHostSide() : "This job is intended to be run on host side!";
 
-            // get the documents which are controlled by jupiter
-            Set<IPath> docs = clientDocs.keySet();
-
-            // for all documents
-            for (IPath docPath : docs) {
+            // Update Checksums for all documents controlled by jupiter
+            for (IPath docPath : clientDocs.keySet()) {
 
                 // get document
-                IPath fullPath = Saros.getDefault().getSessionManager()
-                        .getSharedProject().getProject().findMember(docPath)
-                        .getFullPath();
-                ITextFileBuffer fileBuff = FileBuffers
-                        .getTextFileBufferManager().getTextFileBuffer(fullPath,
-                                LocationKind.IFILE);
+                ITextFileBuffer fileBuff = getTextFileBuffer(docPath);
 
-                // HACK
+                // TODO CO Handle missing files correctly
                 if (fileBuff == null) {
                     logger.error("Can't get File Buffer");
                     docsChecksums.remove(docPath);
@@ -140,109 +170,67 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                 // if no entry for this document exists create a new one
                 if (docsChecksums.get(docPath) == null) {
                     DocumentChecksum c = new DocumentChecksum(docPath, doc
-                            .getLength(), doc.get().hashCode());
+                        .getLength(), doc.get().hashCode());
                     docsChecksums.put(docPath, c);
-                    logger.debug(c.getHash());
                 } else {
                     DocumentChecksum c = docsChecksums.get(docPath);
                     if (c.getLength() != doc.getLength()) {
                         // length has changed, compute the hash new
                         c.setLength(doc.getLength());
                         c.setHash(doc.get().hashCode());
-                        docsChecksums.put(docPath, c);
                     }
                 }
             }
 
-            Saros.getDefault().getSessionManager().getTransmitter()
+            // Send to all Clients
+            if (docsChecksums.values().size() > 0) {
+                Saros.getDefault().getSessionManager().getTransmitter()
                     .sendDocChecksumsToClients(docsChecksums.values());
-
-            // schedule the next run in 3 seconds
-            schedule(3000);
-            return Status.OK_STATUS;
-        }
-
-        /**
-         * Checks the local documents against the given checksums. When an
-         * inconsistency occurs all at the concurrent document manager
-         * registered consistency listener are informed about the issue. When a
-         * previous consistency issue have resolved the listeners are also
-         * notified.
-         * 
-         * @param checksums
-         *            the checksums to check the documents against
-         */
-        private void check(DocumentChecksum[] checksums) {
-
-            for (DocumentChecksum checksum : checksums) {
-
-                IPath path = checksum.getPath();
-
-                IDocument doc = EditorManager.getDefault().getDocument(path);
-
-                // if doc == null there is no editor with this resource open
-                if (doc == null)
-                    continue;
-
-                if ((doc.getLength() != checksum.getLength())
-                        || (doc.get().hashCode() != checksum.getHash())) {
-
-                    logger.debug(path.toString() + ": " + doc.getLength() + "/"
-                            + checksum.getLength() + " ; "
-                            + doc.get().hashCode() + "/" + checksum.getHash());
-
-                    long lastEdited = (EditorManager.getDefault()
-                            .getLastEditTime(path));
-
-                    long lastRemoteEdited = (EditorManager.getDefault()
-                            .getLastRemoteEditTime(path));
-
-                    if ((System.currentTimeMillis() - lastEdited) > 2000
-                            && (System.currentTimeMillis() - lastRemoteEdited > 2000)) {
-                        logger.debug("Inconsistency detected in document "
-                                + path.toOSString());
-                        ConcurrentDocumentManager.this.pathesWithWrongChecksums
-                                .add(path);
-                        if (!inconsistencyToResolve.getVariable()) {
-                            ConcurrentDocumentManager.this.inconsistencyToResolve
-                                    .setVariable(true);
-                        }
-                    }
-                    return;
-                }
-                logger.debug("All Inconsistencies are resolved");
-                logger.debug(path.toString() + ": " + doc.getLength() + "/"
-                        + checksum.getLength() + " ; " + doc.get().hashCode()
-                        + "/" + checksum.getHash());
-
-                ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
-
-                if (inconsistencyToResolve.getVariable()) {
-                    ConcurrentDocumentManager.this.inconsistencyToResolve
-                            .setVariable(false);
-                }
             }
+
+            // Reschedule the next run in 10 seconds
+            schedule(10000);
+            return Status.OK_STATUS;
         }
     }
 
-    public ConcurrentDocumentManager(Side side, User host, JID myJID,
-            ISharedProject sharedProject) {
-        this.sharedProject = sharedProject;
-        this.clientDocs = new HashMap<IPath, JupiterClient>();
+    public ConcurrentDocumentManager(final Side side, User host, JID myJID,
+        ISharedProject sharedProject) {
+
         this.driverManager = DriverDocumentManager.getInstance();
         this.side = side;
-        this.host = host.getJid();
+        this.host = host.getJID();
         this.myJID = myJID;
+        this.sharedProject = sharedProject;
 
-        if (side == Side.HOST_SIDE) {
+        if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
-            logger.debug("starting consistency watchdog");
-            // consistencyWatchdog.setSystem(true);
-            // consistencyWatchdog.setPriority(Job.SHORT);
-            // consistencyWatchdog.schedule();
+            logger.debug("Starting consistency watchdog");
+            consistencyWatchdog.setSystem(true);
+            consistencyWatchdog.setPriority(Job.SHORT);
+            consistencyWatchdog.schedule();
         }
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+            new AbstractSessionListener() {
+
+                @Override
+                public void sessionEnded(ISharedProject endedProject) {
+
+                    assert endedProject == ConcurrentDocumentManager.this.sharedProject;
+
+                    Saros.getDefault().getSessionManager()
+                        .removeSessionListener(this);
+
+                    if (side == Side.HOST_SIDE) {
+                        consistencyWatchdog.cancel();
+                    }
+
+                    // TODO we should not need this
+                    pathesWithWrongChecksums.clear();
+                }
+            });
+
     }
 
     public void setActivitySequencer(IActivitySequencer sequencer) {
@@ -258,7 +246,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     }
 
     /**
-	 * 
+	 *
 	 */
     public IActivity activityCreated(IActivity activity) {
 
@@ -300,9 +288,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
             FileActivity file = (FileActivity) activity;
             if (file.getType() == FileActivity.Type.Created) {
-                if (isHostSide()) {
-
-                }
+                // Do nothing
             }
             if (file.getType() == FileActivity.Type.Removed) {
                 if (isHostSide()) {
@@ -335,7 +321,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
             /* no jupiter client already exists for this editor text edit */
             if (!this.clientDocs.containsKey(textEdit.getEditor())) {
                 jupClient = new JupiterDocumentClient(this.myJID,
-                        this.forwarder, textEdit.getEditor());
+                    this.forwarder, textEdit.getEditor());
                 // jupClient.setEditor(textEdit.getEditor());
                 this.clientDocs.put(textEdit.getEditor(), jupClient);
             }
@@ -366,7 +352,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
         /* no jupiter client already exists for this editor text edit */
         if (!this.clientDocs.containsKey(request.getEditorPath())) {
             jupClient = new JupiterDocumentClient(this.myJID, this.forwarder,
-                    request.getEditorPath());
+                request.getEditorPath());
             // jupClient.setEditor(request.getEditorPath());
             this.clientDocs.put(request.getEditorPath(), jupClient);
         }
@@ -384,11 +370,11 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                         op = jupiterClient.receiveRequest(request);
                     } catch (TransformationException e) {
                         ConcurrentDocumentManager.logger.error(
-                                "Error during transformation: ", e);
+                            "Error during transformation: ", e);
 
                         /* create save activity. */
                         IActivity activity = new EditorActivity(Type.Saved,
-                                request.getEditorPath());
+                            request.getEditorPath());
                         /* execute save activity and start consistency check. */
                         ConcurrentDocumentManager.this.sequencer.exec(activity);
                         return;
@@ -399,7 +385,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                         textEdit.setSource(request.getJID().toString());
                         /* execute activity in activity sequencer. */
                         ConcurrentDocumentManager.this.sequencer
-                                .execTransformedActivity(textEdit);
+                            .execTransformedActivity(textEdit);
                     }
                 }
             });
@@ -420,13 +406,13 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                 /* if one driver activate a new editor. */
                 // if (drivers.contains(sourceJID)
                 if (this.driverManager.isDriver(sourceJID)
-                        && ((editorAc.getType() == Type.Activated) || (editorAc
-                                .getType() == Type.Closed))) {
+                    && ((editorAc.getType() == Type.Activated) || (editorAc
+                        .getType() == Type.Closed))) {
                     /* start jupiter proxy for this driver. */
                     if (this.concurrentDocuments
-                            .containsKey(editorAc.getPath())) {
+                        .containsKey(editorAc.getPath())) {
                         JupiterServer server = this.concurrentDocuments
-                                .get(editorAc.getPath());
+                            .get(editorAc.getPath());
 
                         /* client has no proxy for this editor. */
                         if (!server.isExist(sourceJID)) {
@@ -442,28 +428,28 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                                 try {
 
                                     JupiterClient jupC = this.clientDocs
-                                            .get(editorAc.getPath());
+                                        .get(editorAc.getPath());
                                     if (jupC != null) {
                                         Timestamp ts = jupC.getTimestamp();
 
                                         /* create update vector time request. */
                                         Request updateRequest = new RequestImpl(
-                                                0, new JupiterVectorTime(ts
-                                                        .getComponents()[1], ts
-                                                        .getComponents()[0]),
-                                                new TimestampOperation());
+                                            0, new JupiterVectorTime(ts
+                                                .getComponents()[1], ts
+                                                .getComponents()[0]),
+                                            new TimestampOperation());
                                         updateRequest.setEditorPath(editorAc
-                                                .getPath());
+                                            .getPath());
                                         updateRequest.setJID(sourceJID);
 
                                         this.forwarder
-                                                .forwardOutgoingRequest(updateRequest);
+                                            .forwardOutgoingRequest(updateRequest);
                                     }
                                 } catch (Exception e) {
 
                                     ConcurrentDocumentManager.logger.error(
-                                            "Error during get timestamp of host proxy for "
-                                                    + editorAc.getPath(), e);
+                                        "Error during get timestamp of host proxy for "
+                                            + editorAc.getPath(), e);
                                 }
                             }
                         } else {
@@ -476,8 +462,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                         /* create new jupiter proxy client. */
                         if (editorAc.getType() == Type.Activated) {
                             Request createRequest = new RequestImpl(0,
-                                    new JupiterVectorTime(0, 0),
-                                    new TimestampOperation());
+                                new JupiterVectorTime(0, 0),
+                                new TimestampOperation());
                             createRequest.setEditorPath(editorAc.getPath());
                             createRequest.setJID(sourceJID);
 
@@ -503,17 +489,11 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
     }
 
     public boolean isHostSide() {
-        if (this.side == Side.HOST_SIDE) {
-            return true;
-        }
-        return false;
+        return this.side == Side.HOST_SIDE;
     }
 
     public boolean isHost(JID jid) {
-        if (jid != null && jid.equals(this.host)) {
-            return true;
-        }
-        return false;
+        return jid != null && jid.equals(this.host);
     }
 
     public void setHost(JID host) {
@@ -530,33 +510,33 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
         Operation op = null;
         // delete activity
-        if ((text.replace > 0) && (text.text.length() == 0)) {
+        if ((text.length > 0) && (text.text.length() == 0)) {
             /* string placeholder in length of delete area. */
             String placeholder = "";
-            for (int i = 0; i < text.replace; i++) {
+            for (int i = 0; i < text.length; i++) {
                 placeholder += 1;
             }
             op = new DeleteOperation(text.offset, placeholder);
         }
         // insert activity
-        if ((text.replace == 0) && (text.text.length() > 0)) {
+        if ((text.length == 0) && (text.text.length() > 0)) {
             op = new InsertOperation(text.offset, text.text);
         }
         // replace operation has to split into delete and insert operation
-        if ((text.replace > 0) && (text.text.length() > 0)) {
+        if ((text.length > 0) && (text.text.length() > 0)) {
             /* string placeholder in length of delete area. */
             String placeholder = "";
-            for (int i = 0; i < text.replace; i++) {
+            for (int i = 0; i < text.length; i++) {
                 placeholder += 1;
             }
             op = new SplitOperation(new DeleteOperation(text.offset,
-                    placeholder), new InsertOperation(text.offset, text.text));
+                placeholder), new InsertOperation(text.offset, text.text));
         }
         return op;
     }
 
     /**
-     * Convert Operation op to text edit activity. NoOperation will ignore.
+     * Convert Operation to text edit activity. NoOperation will be ignored.
      * 
      * @param op
      *            incoming transformed operation.
@@ -568,7 +548,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
         if (op instanceof DeleteOperation) {
             DeleteOperation del = (DeleteOperation) op;
             textEdit = new TextEditActivity(del.getPosition(), "", del
-                    .getTextLength());
+                .getTextLength());
             result.add(textEdit);
         }
         if (op instanceof InsertOperation) {
@@ -580,16 +560,16 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
             SplitOperation split = (SplitOperation) op;
             TextEditActivity op1 = getTextEditActivity(split.getFirst()).get(0);
             TextEditActivity op2 = getTextEditActivity(split.getSecond())
-                    .get(0);
+                .get(0);
 
             /*
              * if operation one is delete operation the offset of second
              * operation has to modified.
              */
-            if ((op1.replace > 0) && (op1.text.length() == 0)
-                    && (op2.replace > 0) && (op2.text.length() == 0)) {
-                op2 = new TextEditActivity(op2.offset - op1.replace, "",
-                        op2.replace);
+            if ((op1.length > 0) && (op1.text.length() == 0)
+                && (op2.length > 0) && (op2.text.length() == 0)) {
+                op2 = new TextEditActivity(op2.offset - op1.length, "",
+                    op2.length);
             }
             result.add(op1);
             result.add(op2);
@@ -621,8 +601,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
 
             /* if host side and server jupiter side of request */
             if (isHost(request.getJID()) && (request.getSiteId() == 0)) {
-                /* request already has transformed and have to be execute. */
-                // return execTextEditActivity(request);
+                /* Request already has been transformed and has to be executed. */
                 execTextEditActivity(request);
                 return;
             }
@@ -632,23 +611,15 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
              * if no jupiter document server exists.
              */
             if (!this.concurrentDocuments.containsKey(request.getEditorPath())) {
-                // /* create new document server. */
-                // docServer = new JupiterDocumentServer(forwarder);
-                // // docServer = new JupiterDocumentServer();
-                // docServer.setEditor(request.getEditorPath());
-                // /* create new local host document client. */
-                // docServer.addProxyClient(host);
-
                 docServer = initDocumentServer(request.getEditorPath());
 
                 if (!isHost(request.getJID())) {
-                    //
                     this.driverManager.addDriverToDocument(request
-                            .getEditorPath(), request.getJID());
+                        .getEditorPath(), request.getJID());
                     docServer.addProxyClient(request.getJID());
                 }
                 this.concurrentDocuments
-                        .put(request.getEditorPath(), docServer);
+                    .put(request.getEditorPath(), docServer);
             }
             docServer = this.concurrentDocuments.get(request.getEditorPath());
             try {
@@ -658,7 +629,7 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
                 }
             } catch (InterruptedException ie) {
                 ConcurrentDocumentManager.logger.error(
-                        "Error during get proxy list of jupiter server.", ie);
+                    "Error during get proxy list of jupiter server.", ie);
             }
 
             /* sync request with jupiter document server. */
@@ -670,52 +641,50 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
             if (request.getOperation() instanceof TimestampOperation) {
                 if (this.clientDocs.containsKey(request.getEditorPath())) {
                     ConcurrentDocumentManager.logger
-                            .info("update vector time : "
-                                    + request.getEditorPath());
+                        .info("update vector time : " + request.getEditorPath());
                     JupiterClient jupClient = this.clientDocs.get(request
-                            .getEditorPath());
+                        .getEditorPath());
                     try {
                         jupClient.updateVectorTime(request.getTimestamp());
                     } catch (TransformationException e) {
                         ConcurrentDocumentManager.logger.error(
-                                "Error during update jupiter client for "
-                                        + request.getEditorPath(), e);
+                            "Error during update jupiter client for "
+                                + request.getEditorPath(), e);
                     }
                 } else {
                     /* if no jupiter client exists. */
                     JupiterClient client = new JupiterDocumentClient(
-                            this.myJID, this.forwarder, request.getEditorPath());
+                        this.myJID, this.forwarder, request.getEditorPath());
                     // client.setEditor(request.getEditorPath());
                     try {
                         client.updateVectorTime(request.getTimestamp());
                         this.clientDocs.put(request.getEditorPath(), client);
                     } catch (TransformationException e) {
                         ConcurrentDocumentManager.logger.error(
-                                "Error during update jupiter client for "
-                                        + request.getEditorPath(), e);
+                            "Error during update jupiter client for "
+                                + request.getEditorPath(), e);
                     }
 
                 }
             } else {
-
                 /*
-                 * 2. receive request in local client component and return the
+                 * 2. receive request in local client component and execute the
                  * transformed operation as IActivity.
                  */
                 execTextEditActivity(request);
-                // return execTextEditActivity(request);
             }
         }
     }
 
     public void driverChanged(JID driver, boolean replicated) {
+
+        if (isHost(driver))
+            return;
         /*
          * 1. check if driver exists. 2. add new driver or remove driver. 3.
          */
-        // HOST
         if (isHostSide()) {
             /* if driver changed to observer */
-            // if (drivers.contains(driver)) {
             if (this.driverManager.isDriver(driver)) {
                 userLeft(driver);
             }
@@ -724,9 +693,8 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
             // drivers.add(driver);
             // //TODO: add driver to current open document proxy ?
             // }
-        }
-        // CLIENT
-        else {
+        } else {
+            // ClientSide
             if (driver.equals(this.myJID)) {
                 this.clientDocs.clear();
             }
@@ -759,70 +727,126 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
      * reset jupiter document server component.
      */
     public void resetJupiterDocument(IPath path) {
+
         // host side
-        if (isHostSide()) {
-            if (this.concurrentDocuments.containsKey(path)) {
-                /* remove document server. */
-                this.concurrentDocuments.remove(path);
-                /* init new server. */
-                JupiterDocumentServer doc = initDocumentServer(path);
-                ConcurrentDocumentManager.logger
-                        .debug("Reset jupiter server : ");
-                /* add proxy documents for active driver. */
-                for (JID jid : this.driverManager.getDriverForDocument(path)) {
-                    doc.addProxyClient(jid);
-                    ConcurrentDocumentManager.logger
-                            .debug("add driver proxy : " + jid);
-                }
+        if (!isHostSide()) {
+            return;
+        }
 
-                this.concurrentDocuments.put(path, doc);
-
-            } else {
-                ConcurrentDocumentManager.logger
-                        .error("No jupter document exists for "
-                                + path.toOSString());
+        if (this.concurrentDocuments.containsKey(path)) {
+            /* remove document server. */
+            this.concurrentDocuments.remove(path);
+            /* init new server. */
+            JupiterDocumentServer doc = initDocumentServer(path);
+            ConcurrentDocumentManager.logger
+                .debug("Resetting jupiter server...");
+            /* add proxy documents for active driver. */
+            for (JID jid : this.driverManager.getDriversForDocument(path)) {
+                doc.addProxyClient(jid);
+                ConcurrentDocumentManager.logger.debug("add driver proxy : "
+                    + jid);
             }
+
+            this.concurrentDocuments.put(path, doc);
+
+        } else {
+            ConcurrentDocumentManager.logger
+                .error("No jupter document exists for " + path.toOSString());
         }
 
         // reset client documents
         if (this.clientDocs.containsKey(path)) {
             this.clientDocs.remove(path);
             this.clientDocs.put(path, new JupiterDocumentClient(this.myJID,
-                    this.forwarder, path));
-            ConcurrentDocumentManager.logger
-                    .debug("Reset jupiter client doc : " + this.myJID);
+                this.forwarder, path));
+            ConcurrentDocumentManager.logger.debug("Reset jupiter client doc: "
+                + this.myJID);
         } else {
             ConcurrentDocumentManager.logger
-                    .error("No jupter document exists for " + path.toOSString());
+                .error("No jupter document exists for " + path.toOSString());
         }
 
     }
 
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void sessionEnded(ISharedProject session) {
-        this.consistencyWatchdog.cancel();
-        pathesWithWrongChecksums.clear();
-    }
-
-    public void sessionStarted(ISharedProject session) {
-        this.pathesWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
-    }
-
     /**
-     * Checks the local documents against the given checksums. When an
-     * inconsistency occurs all at the concurrent document manager registered
-     * consistency listener are informed about the issue. When a previous
-     * consistency issue have resolved the listeners are also notified.
+     * Checks the local documents against the given checksums.
+     * 
+     * Use the VariableProxy getConsistenciesToResolve() to be notified if
+     * inconsistencies are found or resolved.
      * 
      * @param checksums
      *            the checksums to check the documents against
      */
-    public void checkConsistency(DocumentChecksum[] checksums) {
-        consistencyWatchdog.check(checksums);
+    public void checkConsistency(List<DocumentChecksum> checksums) {
+
+        logger.debug(String.format(
+            "Received %d checksums for %d inconsistencies", checksums.size(),
+            pathesWithWrongChecksums.size()));
+
+        for (DocumentChecksum checksum : checksums) {
+
+            IPath path = checksum.getPath();
+
+            IFile file = sharedProject.getProject().getFile(path);
+            if (!file.exists()) {
+                ConcurrentDocumentManager.this.pathesWithWrongChecksums
+                    .add(path);
+                if (!inconsistencyToResolve.getVariable()) {
+                    inconsistencyToResolve.setVariable(true);
+                }
+                continue;
+            }
+
+            IDocument doc = EditorManager.getDefault().getDocument(path);
+
+            // if doc == null there is no editor with this resource open
+            if (doc == null) {
+                // get Document from FileBuffer
+                doc = getTextFileBuffer(path).getDocument();
+            }
+
+            // if doc is still null give up
+            if (doc == null) {
+                logger.warn("Could not check checksum of file "
+                    + path.toOSString());
+                continue;
+            }
+
+            if ((doc.getLength() != checksum.getLength())
+                || (doc.get().hashCode() != checksum.getHash())) {
+
+                long lastEdited = (EditorManager.getDefault()
+                    .getLastEditTime(path));
+
+                long lastRemoteEdited = (EditorManager.getDefault()
+                    .getLastRemoteEditTime(path));
+
+                if ((System.currentTimeMillis() - lastEdited) > 4000
+                    && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
+                    logger.debug(String.format(
+                        "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
+                        path.toString(), doc.getLength(),
+                        doc.getLength() == checksum.getLength() ? "==" : "!=",
+                        checksum.getLength(), doc.get().hashCode(), doc.get()
+                            .hashCode() == checksum.getHash() ? "==" : "!=",
+                        checksum.getHash()));
+
+                    ConcurrentDocumentManager.this.pathesWithWrongChecksums
+                        .add(path);
+                    if (!inconsistencyToResolve.getVariable()) {
+                        inconsistencyToResolve.setVariable(true);
+                    }
+                }
+                return;
+            }
+
+            ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
+
+            if (inconsistencyToResolve.getVariable()) {
+                logger.debug("All Inconsistencies are resolved");
+                inconsistencyToResolve.setVariable(false);
+            }
+        }
     }
 
     /**
@@ -831,14 +855,6 @@ public class ConcurrentDocumentManager implements ConcurrentManager,
      */
     public VariableProxy<Boolean> getConsistencyToResolve() {
         return this.inconsistencyToResolve;
-    }
-
-    /**
-     * TODO CJ: write javadoc
-     * 
-     */
-    public boolean getExecutingChecksumErrorHandling() {
-        return consistencyWatchdog.executingChecksumErrorHandling;
     }
 
     public Set<IPath> getPathesWithWrongChecksums() {

@@ -19,29 +19,38 @@
  */
 package de.fu_berlin.inf.dpp;
 
+import java.util.Date;
+
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class User {
     public enum UserConnectionState {
         UNKNOWN, ONLINE, OFFLINE
-    };
+    }
 
     public enum UserRole {
         DRIVER, OBSERVER
-    };
+    }
 
     private UserConnectionState presence = UserConnectionState.UNKNOWN;
 
     private final JID jid;
-    private int colorid = 0;
+
+    private int colorID;
+
+    /**
+     * Time stamp when User became offline the last time. In seconds.
+     */
     private long offlineTime = 0;
+
     private UserRole role = UserRole.OBSERVER;
 
-    public User(JID jid) {
+    public User(JID jid, int colorID) {
         this.jid = jid;
+        this.colorID = colorID;
     }
 
-    public JID getJid() {
+    public JID getJID() {
         return this.jid;
     }
 
@@ -80,26 +89,25 @@ public class User {
     }
 
     public int getColorID() {
-        return this.colorid;
-    }
-
-    public void setColorID(int c) {
-        this.colorid = c;
+        return this.colorID;
     }
 
     public UserConnectionState getPresence() {
         return this.presence;
     }
 
-    public void setPresence(UserConnectionState p) {
-        this.presence = p;
+    public void setPresence(UserConnectionState presence) {
+        this.presence = presence;
         if (this.presence == User.UserConnectionState.OFFLINE) {
-            this.offlineTime = (new java.util.Date().getTime());
+            this.offlineTime = new Date().getTime();
         }
     }
 
-    public int getOfflineSecs() {
-        return (int) (((new java.util.Date().getTime()) - this.offlineTime) / 1000);
+    public int getOfflineSeconds() {
+        if (this.presence == UserConnectionState.OFFLINE) {
+            return (int) (((new Date().getTime()) - this.offlineTime) / 1000);
+        } else {
+            return 0;
+        }
     }
-
 }

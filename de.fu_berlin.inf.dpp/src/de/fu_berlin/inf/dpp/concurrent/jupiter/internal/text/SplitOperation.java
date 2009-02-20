@@ -30,6 +30,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class SplitOperation implements Operation {
 
+    private static final long serialVersionUID = 3948091155375639761L;
+
     /**
      * The first operation.
      */
@@ -44,6 +46,7 @@ public class SplitOperation implements Operation {
      * Class constructor.
      */
     public SplitOperation() {
+        // Empty default constructor
     }
 
     /**
@@ -117,7 +120,7 @@ public class SplitOperation implements Operation {
         } else if (obj.getClass().equals(getClass())) {
             SplitOperation op = (SplitOperation) obj;
             return op.getFirst().equals(this.op1)
-                    && op.getSecond().equals(this.op2);
+                && op.getSecond().equals(this.op2);
         } else {
             return false;
         }

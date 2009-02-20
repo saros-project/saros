@@ -12,6 +12,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class RequestImpl implements Request {
 
+    private static final long serialVersionUID = 2843724349387550074L;
+
     /**
      * The site id of the request.
      */
@@ -33,7 +35,7 @@ public class RequestImpl implements Request {
     private JID jid;
 
     /**
-     * Path of the appropriate edior.
+     * Path of the appropriate editor.
      */
     private IPath editor;
 
@@ -65,7 +67,7 @@ public class RequestImpl implements Request {
      *            the operation
      */
     public RequestImpl(int siteId, Timestamp timestamp, Operation operation,
-            JID jid) {
+        JID jid) {
         this.siteId = siteId;
         this.timestamp = timestamp;
         this.operation = operation;
@@ -111,8 +113,8 @@ public class RequestImpl implements Request {
         } else if (obj instanceof Request) {
             Request request = (Request) obj;
             return (this.siteId == request.getSiteId())
-                    && nullSafeEquals(this.timestamp, request.getTimestamp())
-                    && nullSafeEquals(this.operation, request.getOperation());
+                && nullSafeEquals(this.timestamp, request.getTimestamp())
+                && nullSafeEquals(this.operation, request.getOperation());
         } else {
             return false;
         }
@@ -137,9 +139,9 @@ public class RequestImpl implements Request {
     public int hashCode() {
         int hashCode = 13 * this.siteId;
         hashCode += (this.timestamp != null) ? 17 * this.timestamp.hashCode()
-                : 0;
+            : 0;
         hashCode += (this.operation != null) ? 29 * this.operation.hashCode()
-                : 0;
+            : 0;
         return hashCode;
     }
 
@@ -157,6 +159,8 @@ public class RequestImpl implements Request {
         buffer.append(this.timestamp);
         buffer.append(",");
         buffer.append(this.operation);
+        buffer.append(",");
+        buffer.append(this.jid);
         buffer.append(")");
         return buffer.toString();
     }

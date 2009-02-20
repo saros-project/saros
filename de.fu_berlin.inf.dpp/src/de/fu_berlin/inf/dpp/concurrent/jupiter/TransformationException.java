@@ -6,6 +6,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
  */
 public class TransformationException extends Exception {
 
+    private static final long serialVersionUID = 569529120440589145L;
+
     /**
      * Creates a new TransformationException.
      */

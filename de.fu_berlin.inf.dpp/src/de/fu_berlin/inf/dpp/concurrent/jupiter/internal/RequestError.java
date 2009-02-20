@@ -21,9 +21,6 @@ public class RequestError implements Request {
         this.path = path;
     }
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = 3111067620344018430L;
 
     public IPath getEditorPath() {
@@ -55,7 +52,7 @@ public class RequestError implements Request {
     }
 
     public void setJID(JID jid) {
-
+        // JID is always returned as null
     }
 
 }

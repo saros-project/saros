@@ -37,7 +37,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
     protected State state;
 
     /** mode of file transfer. */
-    protected TransferMode tmode;
+    protected TransferMode transferMode;
 
     private Exception exception;
 
@@ -47,13 +47,16 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
     protected String description;
 
+    protected final int colorID;
+
     public InvitationProcess(ITransmitter transmitter, JID peer,
-            String description) {
+        String description, int colorID) {
         this.transmitter = transmitter;
         this.peer = peer;
         this.description = description;
+        this.colorID = colorID;
 
-        this.tmode = TransferMode.JINGLE;
+        this.transferMode = TransferMode.JINGLE;
 
         transmitter.addInvitationProcess(this);
     }
@@ -114,7 +117,13 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
         setState(State.CANCELED);
 
-        InvitationProcess.logger.error("Invitation was canceled. " + errorMsg);
+        if (errorMsg != null) {
+            InvitationProcess.logger
+                .error("Invitation was canceled because of an error: "
+                    + errorMsg);
+        } else {
+            InvitationProcess.logger.info("Invitation was canceled.");
+        }
 
         if (!replicated) {
             this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
@@ -128,12 +137,12 @@ public abstract class InvitationProcess implements IInvitationProcess {
     @Override
     public String toString() {
         return "InvitationProcess(peer:" + this.peer + ", state:" + this.state
-                + ")";
+            + ")";
     }
 
     /**
-     * Should be called if an exception occured. This saves the exception and
-     * sets the invitation to cancelled.
+     * Should be called if an exception occurred. This saves the exception and
+     * sets the invitation to canceled.
      */
     protected void failed(Exception e) {
         this.exception = e;
@@ -142,7 +151,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
     }
 
     /**
-     * Asssert that the process is in given state or throw an exception
+     * Assert that the process is in given state or throw an exception
      * otherwise.
      * 
      * @param expected
@@ -156,7 +165,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
     protected void failState() {
         throw new IllegalStateException("Bad input while in state "
-                + this.state);
+            + this.state);
     }
 
     public void setInvitationUI(IInvitationUI inviteUI) {

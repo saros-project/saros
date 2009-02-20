@@ -35,7 +35,7 @@ import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 public class ActivitiesProvider implements PacketExtensionProvider {
 
     public ActivitiesPacketExtension parseExtension(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
         int time = -1;
@@ -47,7 +47,7 @@ public class ActivitiesProvider implements PacketExtensionProvider {
             if (eventType == XmlPullParser.START_TAG) {
 
                 if (parser.getName().equals(
-                        ActivitiesPacketExtension.SESSION_ID)) {
+                    ActivitiesPacketExtension.SESSION_ID)) {
                     sessionID = parseSessionId(parser);
                 }
                 if (parser.getName().equals("timestamp")) {
@@ -55,7 +55,7 @@ public class ActivitiesProvider implements PacketExtensionProvider {
                 }
 
                 ActivityRegistry activityRegistry = ActivityRegistry
-                        .getDefault();
+                    .getDefault();
                 IActivity activity = activityRegistry.parseActivity(parser);
                 if (activity != null) {
                     timedActivities.add(new TimedActivity(activity, time));
@@ -73,7 +73,7 @@ public class ActivitiesProvider implements PacketExtensionProvider {
     }
 
     private String parseSessionId(XmlPullParser parser)
-            throws XmlPullParserException, IOException {
+        throws XmlPullParserException, IOException {
         parser.next(); // read text
         String sessionID = parser.getText();
         parser.next(); // read end tag
@@ -82,7 +82,7 @@ public class ActivitiesProvider implements PacketExtensionProvider {
     }
 
     private int parseTime(XmlPullParser parser) throws XmlPullParserException,
-            IOException {
+        IOException {
         parser.next(); // read text
         int time = Integer.parseInt(parser.getText());
         parser.next(); // read end tag

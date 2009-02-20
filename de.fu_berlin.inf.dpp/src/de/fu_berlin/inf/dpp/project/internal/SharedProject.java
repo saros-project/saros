@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -21,10 +21,11 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -46,12 +47,13 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
@@ -77,13 +79,11 @@ public class SharedProject implements ISharedProject {
 
     protected JID myID;
 
-    protected CopyOnWriteArrayList<User> participants = new CopyOnWriteArrayList<User>();
+    protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
     private final IProject project;
 
     private final List<ISharedProjectListener> listeners = new ArrayList<ISharedProjectListener>();
-
-    private User driver;
 
     private User host;
 
@@ -94,32 +94,33 @@ public class SharedProject implements ISharedProject {
     private final ActivitySequencer activitySequencer = new ActivitySequencer();
 
     private static final int MAX_USERCOLORS = 5;
-    private final int colorlist[] = new int[SharedProject.MAX_USERCOLORS + 1];
+    private FreeColors freeColors = null;
 
-    // private ConcurrentManager concurrentManager;
-
-    public SharedProject(ITransmitter transmitter, IProject project, JID myID) { // host
+    /**
+     * Constructor called for SharedProject of the host
+     */
+    public SharedProject(ITransmitter transmitter, IProject project, JID myID) {
         assert (transmitter != null && myID != null);
 
         this.transmitter = transmitter;
 
-        // concurrentManager = new ConcurrentDocumentManager();
+        this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
         this.myID = myID;
-        User u = new User(myID);
-        u.setUserRole(UserRole.DRIVER);
-        this.driver = this.host = u;
+        User user = new User(myID, 0);
+        user.setUserRole(UserRole.DRIVER);
+        this.host = user;
 
-        this.participants.add(this.host);
+        this.participants.put(this.host.getJID(), this.host);
 
         /* add host to driver list. */
         this.activitySequencer.initConcurrentManager(
-                ConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
+            IConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
 
         /* init driver manager */
         this.driverManager = DriverDocumentManager.getInstance();
         addListener(this.driverManager);
-        this.driverManager.addDriver(this.host.getJid());
+        this.driverManager.addDriver(this.host.getJID());
 
         // activitySequencer.getConcurrentManager().addDriver(host.getJid());
 
@@ -128,23 +129,21 @@ public class SharedProject implements ISharedProject {
     }
 
     public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
-            JID host, JID driver, List<JID> allParticipants) {
+        JID hostID, int myColorID) {
 
         this.transmitter = transmitter;
 
         this.myID = myID;
 
-        this.host = new User(host);
-        this.driver = new User(driver);
+        User host = new User(hostID, 0);
+        host.setUserRole(UserRole.DRIVER);
+        this.participants.put(hostID, host);
+        this.participants.put(myID, new User(myID, myColorID));
+
+        this.host = getParticipant(hostID);
 
         this.activitySequencer.initConcurrentManager(
-                ConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
-
-        for (JID jid : allParticipants) { // HACK
-            User user = new User(jid);
-            this.participants.add(user);
-            assignColorId(user);
-        }
+            IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
 
         this.project = project;
     }
@@ -154,8 +153,8 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public List<User> getParticipants() {
-        return this.participants;
+    public Collection<User> getParticipants() {
+        return this.participants.values();
     }
 
     /*
@@ -181,108 +180,43 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public void setDriver(User driver, boolean replicated) {
+    public void toggleUserRole(User driver, boolean replicated) {
+
         assert driver != null;
 
+        User myself = getParticipant(this.myID);
+
         /* if user has current role observer */
-        if (getParticipant(driver.getJid()).getUserRole() == UserRole.OBSERVER) {
+        if (driver.getUserRole() == UserRole.OBSERVER) {
 
             /* set new driver status in participant list of sharedProject. */
-            getParticipant(driver.getJid()).setUserRole(UserRole.DRIVER);
-
-            /*
-             * TODO: 1. actual the host never lost the driver status and added
-             * new driver to driverlist
-             */
-
-            // host
-            if ((this.activitySequencer.getConcurrentManager() != null)
-                    && this.activitySequencer.getConcurrentManager()
-                            .isHostSide()) {
-                // if replicated=false check for privileges
-                if (driver.equals(this.driver)) {
-                    return;
-                }
-
-                /* add new driver to list. */
-                // TODO: durch hinzufügen von isharedprojectlistener zum
-                // concurrentmanager
-                // könnte dieser punkt ausgelagert werden.
-                // activitySequencer.getConcurrentManager().addDriver(driver.getJid());
-            }
-            // client
-            else {
-                // if replicated=false check for privileges
-                if (driver.equals(this.driver)) {
-                    return;
-                }
-
-                /*
-                 * set driver in client to observer driver actions or to set the
-                 * local driver status.
-                 */
-
-                /* currently, no other driver than host can be followed. */
-                // this.driver = driver;
-            }
-
-            // // TODO if replicated=false check for privileges
-            // if (driver.equals(this.driver))
-            // return;
-            //
-            // this.driver = driver;
+            driver.setUserRole(UserRole.DRIVER);
 
             /* set local file settings. */
-            if (driver.getJid().equals(this.myID)) {
+            if (driver.equals(myself)) {
                 setProjectReadonly(!isDriver());
             }
 
         } else {
-            /* changed state form observer to driver */
-            if (getParticipant(driver.getJid()).getUserRole() == UserRole.DRIVER) {
+
+            /* changed state form driver to observer */
+            if (driver.getUserRole() == UserRole.DRIVER) {
 
                 /* set the local driver state to observer */
-                if (driver.getJid().equals(this.myID)
-                        && isDriver(new User(this.myID))) {
+                if (driver.equals(myself) && isDriver(myself)) {
                     setProjectReadonly(true);
-                    this.driver = this.host;
                 }
 
                 /* set observer state. */
-                getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
-
+                driver.setUserRole(UserRole.OBSERVER);
             }
         }
 
         /* inform observer. */
-        JID jid = driver.getJid();
+        JID jid = driver.getJID();
         for (ISharedProjectListener listener : this.listeners) {
             listener.driverChanged(jid, replicated);
         }
-    }
-
-    public void removeDriver(User driver, boolean replicated) {
-        /* set new observer status in participant list of sharedProject. */
-        getParticipant(driver.getJid()).setUserRole(UserRole.OBSERVER);
-
-        this.driver = this.host;
-        /**
-         * communicate driver role change to listener.
-         */
-        JID jid = driver.getJid();
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.driverChanged(jid, replicated);
-        }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
-    public User getDriver() {
-        return this.driver;
     }
 
     /*
@@ -307,23 +241,17 @@ public class SharedProject implements ISharedProject {
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.fu_berlin.inf.dpp.project.ISharedProject#isDriver(de.fu_berlin.inf
-     * .dpp.User)
-     */
     public boolean isDriver(User user) {
-        // HOST
+        /*
+         * TODO Is the distinction host vs. client really necessary here?
+         */
         if (this.driverManager != null) {
-            return this.driverManager.isDriver(user.getJid());
+            // HOST
+            return this.driverManager.isDriver(user.getJID());
+        } else {
+            // CLIENT
+            return getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER;
         }
-        // CLIENT
-        if (getParticipant(user.getJid()).getUserRole() == UserRole.DRIVER) {
-            return true;
-        }
-        return false;
     }
 
     /*
@@ -341,7 +269,7 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public boolean isHost() {
-        return this.host.getJid().equals(this.myID);
+        return this.host.getJID().equals(this.myID);
     }
 
     /*
@@ -349,66 +277,59 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
      */
-    public boolean exclusiveDriver() {
-        return this.driverManager.exclusiveDriver();
+    public boolean isExclusiveDriver() {
+        /*
+         * TODO Is the distinction host vs. client really necessary here?
+         */
+        if (this.driverManager != null) {
+            // HOST
+            return (this.driverManager.isDriver(Saros.getDefault().getMyJID()) && this.driverManager
+                .isExclusiveDriver());
+        } else {
+            // CLIENT
+            if (!isDriver()) {
+                return false;
+            } else {
+                for (User user : participants.values()) {
+                    if (user.equals(Saros.getDefault().getLocalUser()))
+                        continue;
+                    else if (user.getUserRole() == UserRole.DRIVER)
+                        return false;
+                }
+                return true;
+            }
+        }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public void addUser(User user) {
-        addUser(user, -1);
+
+        if (this.participants.containsKey(user.getJID())) {
+            log.warn("User " + user.getJID() + " added twice to SharedProject");
+        }
+        participants.putIfAbsent(user.getJID(), user);
+        for (ISharedProjectListener listener : this.listeners) {
+            listener.userJoined(user.getJID());
+        }
+        SharedProject.log.info("User " + user.getJID() + " joined session");
     }
 
-    public void addUser(User user, int index) {
-        if (this.participants.contains(user)) {
-            if ((index >= 0) && (this.participants.indexOf(user) != index)) {
-                this.participants.remove(user);
-                this.participants.add(index, user);
-            }
-            /* update exists user. */
-            this.participants.remove(user);
-            this.participants.add(user);
-            for (ISharedProjectListener listener : this.listeners) {
-                listener.userJoined(user.getJid());
-            }
+    public void removeUser(User user) {
+        if (this.participants.remove(user.getJID()) == null) {
+            log.warn("Tried to remove user who was not in participants: "
+                + user.getJID());
             return;
         }
+        if (isHost()) {
+            returnColor(user.getColorID());
+        }
 
-        this.participants.add(user);
-
-        // find free color and assign it to user
-        assignColorId(user);
+        // TODO what is to do here if no driver exists anymore?
 
         for (ISharedProjectListener listener : this.listeners) {
-            listener.userJoined(user.getJid());
+            listener.userLeft(user.getJID());
         }
 
-        SharedProject.log.info("User " + user.getJid() + " joined session");
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
-    public void removeUser(User user) {
-        this.participants.remove(user);
-
-        // free colorid
-        this.colorlist[user.getColorID()] = 0;
-
-        if (this.driver.equals(user)) {
-            setDriver(this.participants.get(0), true);
-        }
-
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.userLeft(user.getJid());
-        }
-
-        SharedProject.log.info("User " + user.getJid() + " left session");
+        SharedProject.log.info("User " + user.getJID() + " left session");
     }
 
     /*
@@ -417,9 +338,9 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-            boolean inactive, IInvitationUI inviteUI) {
+        boolean inactive, IInvitationUI inviteUI) {
         return new OutgoingInvitationProcess(this.transmitter, jid, this,
-                description, inactive, inviteUI);
+            description, inactive, inviteUI, getFreeColor());
     }
 
     /*
@@ -474,32 +395,34 @@ public class SharedProject implements ISharedProject {
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+
                 if (SharedProject.this.participants.size() <= 1) {
                     SharedProject.this.activitySequencer.flush();
-
                 } else {
                     List<TimedActivity> activities = SharedProject.this.activitySequencer
-                            .flushTimed();
+                        .flushTimed();
 
                     if (activities != null) {
                         SharedProject.this.transmitter.sendActivities(
-                                SharedProject.this, activities);
+                            SharedProject.this, activities);
                     }
                 }
 
-                // missing activities? (cant execute all)
+                // TODO CO 2009-02-06 this is disabled internally. Why?
+
+                // missing activities? (can not execute all)
                 if (SharedProject.this.activitySequencer.getQueuedActivities() > 0) {
                     SharedProject.queuedsince++;
 
                     // if i am missing activities for REQUEST_ACTIVITY_ON_AGE
-                    // seconds, ask all (because I dont know the origin)
+                    // seconds, ask all (because I do not know the origin)
                     // to send it to me again.
                     if (SharedProject.queuedsince >= SharedProject.REQUEST_ACTIVITY_ON_AGE) {
 
-                        SharedProject.this.transmitter.sendRequestForActivity(
-                                SharedProject.this,
+                        SharedProject.this.transmitter
+                            .sendRequestForActivity(SharedProject.this,
                                 SharedProject.this.activitySequencer
-                                        .getTimestamp(), false);
+                                    .getTimestamp(), false);
 
                         SharedProject.queuedsince = 0;
 
@@ -512,19 +435,21 @@ public class SharedProject implements ISharedProject {
             }
         }, 0, SharedProject.MILLIS_UPDATE);
 
+        stopped = false;
+
         /* 2. start thread for sending jupiter requests. */
         this.requestTransmitter = new Thread(new Runnable() {
-
             public void run() {
-                while (true) {
+                while (!stopped && !Thread.interrupted()) {
                     sendRequest();
                 }
-
             }
-
         });
         this.requestTransmitter.start();
     }
+
+    // TODO Review sendRequest for InterruptedException and remove this flag.
+    boolean stopped;
 
     /*
      * (non-Javadoc)
@@ -533,7 +458,8 @@ public class SharedProject implements ISharedProject {
      */
     public void stop() {
         this.flushTimer.cancel();
-        this.requestTransmitter = null;
+        this.requestTransmitter.interrupt();
+        stopped = true;
     }
 
     /*
@@ -542,51 +468,31 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public User getParticipant(JID jid) {
-        if (participants != null) {
-            for (User participant : this.participants) {
-                if (participant.getJid().equals(jid)) {
-                    return participant;
-                }
+        return this.participants.get(jid);
+    }
+
+    public User getADriver() {
+        for (User user : getParticipants()) {
+            if (isDriver(user)) {
+                return user;
             }
         }
-
         return null;
     }
 
-    boolean assignColorId(User user) {
-
-        // already has a color assigned
-        if (user.getColorID() == -1) {
-            return true;
-        }
-
-        for (int i = 0; i < SharedProject.MAX_USERCOLORS; i++) {
-            if (this.colorlist[i] == 0) {
-                user.setColorID(i);
-                this.colorlist[user.getColorID()] = 1;
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void startInvitation(final JID jid) {
+    public void startInvitation(final @Nullable List<JID> toInvite) {
 
         Shell shell = Display.getDefault().getActiveShell();
 
         if (searchUnsavedChangesInProject(false)) {
             if (MessageDialog
-                    .openQuestion(
-                            shell,
-                            "Unsaved file modifications",
-                            "Before inviting users and therefore synchronizing files, "
-                                    + "this project needs to be saved to disk. "
-                                    + "Do you want to save all unsaved files of this project now?")) {
+                .openQuestion(
+                    shell,
+                    "Unsaved file modifications",
+                    "Before inviting users and therefore synchronizing files, "
+                        + "this project needs to be saved to disk. "
+                        + "Do you want to save all unsaved files of this project now?")) {
 
-                // save
-                // PlatformUI.getWorkbench().saveAllEditors(false); // saves all
-                // editors
                 searchUnsavedChangesInProject(true);
 
             } else {
@@ -598,19 +504,14 @@ public class SharedProject implements ISharedProject {
             public void run() {
                 try {
                     Shell shell = Display.getDefault().getActiveShell();
-                    Window iw = new InvitationDialog(shell, jid);
+                    // TODO check if anybody is online, empty dialog feels
+                    // strange
+                    Window iw = new InvitationDialog(shell, toInvite);
                     iw.open();
                 } catch (Exception e) {
-                    Saros
-                            .getDefault()
-                            .getLog()
-                            .log(
-                                    new Status(
-                                            IStatus.ERROR,
-                                            Saros.SAROS,
-                                            IStatus.ERROR,
-                                            "Error while running invitation helper",
-                                            e));
+                    Saros.getDefault().getLog().log(
+                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
+                            "Error while running invitation helper", e));
                 }
             }
         });
@@ -623,25 +524,25 @@ public class SharedProject implements ISharedProject {
         try {
             flist = new FileList(getProject());
         } catch (CoreException e) {
-            // TODO Auto-generated catch block
+            // Show this to user?
             e.printStackTrace();
             return false;
         }
 
         try {
             IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench()
-                    .getWorkbenchWindows();
+                .getWorkbenchWindows();
             for (IWorkbenchWindow window : wbWindows) {
                 IWorkbenchPage activePage = window.getActivePage();
                 IEditorReference[] editorRefs = activePage
-                        .getEditorReferences();
+                    .getEditorReferences();
                 for (IEditorReference editorRef : editorRefs) {
                     if (editorRef.isDirty()
-                            && (editorRef.getEditorInput() instanceof IFileEditorInput)) {
+                        && (editorRef.getEditorInput() instanceof IFileEditorInput)) {
 
                         IPath fp = ((IFileEditorInput) editorRef
-                                .getEditorInput()).getFile()
-                                .getProjectRelativePath();
+                            .getEditorInput()).getFile()
+                            .getProjectRelativePath();
 
                         // is that dirty file in my project?
                         if (flist.getPaths().contains(fp)) {
@@ -667,98 +568,97 @@ public class SharedProject implements ISharedProject {
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
                 ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                        Display.getDefault().getActiveShell());
+                    Display.getDefault().getActiveShell());
                 try {
                     dialog.run(true, false, new IRunnableWithProgress() {
                         public void run(IProgressMonitor monitor) {
-
-                            FileList flist;
                             try {
-                                flist = new FileList(SharedProject.this.project);
+
+                                Collection<IPath> paths = new FileList(
+                                    SharedProject.this.project).getPaths();
 
                                 monitor.beginTask("Project settings ... ",
-                                        flist.getPaths().size());
+                                    paths.size());
 
                                 ResourceAttributes attributes = new ResourceAttributes();
                                 attributes.setReadOnly(readonly);
+
+                                /*
+                                 * TODO Make sure this is necessary! We don't
+                                 * remove this flag, when switching into driver
+                                 * mode, thus it might cause problems.
+                                 */
                                 attributes.setArchive(readonly);
 
-                                for (int i = 0; i < flist.getPaths().size(); i++) {
-                                    IPath path = flist.getPaths().get(i);
-                                    path = path.makeAbsolute();
-                                    IFile file = getProject().getFile(path);
+                                for (IPath path : paths) {
+                                    IFile file = getProject().getFile(
+                                        path.makeAbsolute());
                                     if ((file != null) && file.exists()) {
                                         file.setResourceAttributes(attributes);
                                     }
-
                                     monitor.worked(1);
                                 }
                             } catch (CoreException e) {
-                                // log.log(Level.WARNING, "",e);
                                 SharedProject.log.warn("", e);
+                            } finally {
                                 monitor.done();
                             }
-
-                            monitor.done();
-
                         }
-
                     });
                 } catch (InvocationTargetException e) {
-                    // log.log(Level.WARNING, "",e);
                     SharedProject.log.warn("", e);
-                    e.printStackTrace();
                 } catch (InterruptedException e) {
-                    // log.log(Level.WARNING, "",e);
                     SharedProject.log.warn("", e);
-                    e.printStackTrace();
                 }
-
             }
         });
 
     }
 
     public void sendRequest() {
+
+        Request request;
         try {
-            // Request request = outgoing.getNextOutgoingRequest();
-            Request request = this.activitySequencer.getNextOutgoingRequest();
-
-            if (isHost()) {
-
-                /*
-                 * if jupiter server request to has to execute locally on host
-                 * side.
-                 */
-                if (request.getJID().equals(this.host.getJid())) {
-                    SharedProject.log
-                            .debug("Send host request back for local execution: "
-                                    + request);
-                    this.activitySequencer.receiveRequest(request);
-                } else {
-                    /* send operation to client. */
-                    SharedProject.log.debug("Send request to client: "
-                            + request + request.getJID());
-                    this.transmitter.sendJupiterRequest(this, request, request
-                            .getJID());
-                }
-            } else {
-                SharedProject.log.debug("Send request to host : " + request);
-                this.transmitter.sendJupiterRequest(this, request, this.host
-                        .getJid());
-            }
-            // connection.sendOperation(new
-            // NetworkRequest(this.jid,request.getJID(),request), 0);
+            request = this.activitySequencer.getNextOutgoingRequest();
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return;
+        }
 
-            e.printStackTrace();
+        if (isHost()) {
+
+            /*
+             * if jupiter server request to has to execute locally on host side.
+             */
+            if (request.getJID().equals(this.host.getJID())) {
+                SharedProject.log
+                    .debug("Send host request back for local execution: "
+                        + request);
+                this.activitySequencer.receiveRequest(request);
+            } else {
+                /* send operation to client. */
+                SharedProject.log.debug("Send request to client: " + request);
+                this.transmitter.sendJupiterRequest(this, request, request
+                    .getJID());
+            }
+        } else {
+            SharedProject.log.debug("Send request to host : " + request);
+            this.transmitter.sendJupiterRequest(this, request, this.host
+                .getJID());
         }
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
         return (ConcurrentDocumentManager) this.activitySequencer
-                .getConcurrentManager();
+            .getConcurrentManager();
 
     }
 
+    public int getFreeColor() {
+        return freeColors.get();
+    }
+
+    public void returnColor(int colorID) {
+        freeColors.add(colorID);
+    }
 }

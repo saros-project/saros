@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IPath;
 public class FolderActivity implements IActivity {
     public static enum Type {
         Created, Removed
-    };
+    }
 
     private String source;
 

@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class InsertOperation implements Operation {
 
+    private static final long serialVersionUID = -1285726114177092936L;
+
     /**
      * the text to be inserted.
      */
@@ -47,13 +49,6 @@ public class InsertOperation implements Operation {
      * context, a least synchronization point (LSP) would have to be determined.
      */
     private int origin;
-
-    /**
-     * Class constructor.
-     * 
-     */
-    public InsertOperation() {
-    }
 
     /**
      * Class constructor.
@@ -194,11 +189,11 @@ public class InsertOperation implements Operation {
     @Override
     public String toString() {
         return "Insert("
-                + this.position
-                + ",'"
-                + (this.text != null ? ((this.text.length() > 20) ? this.text
-                        .substring(0, 20)
-                        + "..." : this.text) : "") + "'," + this.origin + ")";
+            + this.position
+            + ",'"
+            + (this.text != null ? ((this.text.length() > 20) ? this.text
+                .substring(0, 20)
+                + "..." : this.text) : "") + "'," + this.origin + ")";
     }
 
     /**
@@ -213,7 +208,7 @@ public class InsertOperation implements Operation {
         } else if (obj.getClass().equals(getClass())) {
             InsertOperation op = (InsertOperation) obj;
             return (op.position == this.position) && op.text.equals(this.text)
-                    && (op.origin == this.origin);
+                && (op.origin == this.origin);
         } else {
             return false;
         }
