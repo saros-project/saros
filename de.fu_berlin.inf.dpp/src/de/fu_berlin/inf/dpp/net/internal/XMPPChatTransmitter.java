@@ -21,13 +21,13 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -1241,6 +1241,11 @@ public class XMPPChatTransmitter implements ITransmitter,
         receivers.remove(receiver);
     }
 
+    /**
+     * Will dispatch the received data to the IDataReceivers registered.
+     * 
+     * Closes the input stream, before returning.
+     */
     protected void receiveData(TransferDescription data, InputStream input) {
 
         try {
@@ -1342,29 +1347,34 @@ public class XMPPChatTransmitter implements ITransmitter,
         public boolean receivedArchive(TransferDescription data,
             InputStream input) {
 
-            File archiveFile = new File("./incoming_archive.zip");
-            XMPPChatTransmitter.log.debug("Archive file: "
-                + archiveFile.getAbsolutePath());
+            log.debug("Incoming archive [" + data.sender.getName() + "]");
+
+            long time = System.currentTimeMillis();
+
+            ZipInputStream zip = new ZipInputStream(input);
 
             try {
-                FileUtils.writeByteArrayToFile(archiveFile, IOUtils
-                    .toByteArray(input));
-
-                ZipFile zip = new ZipFile(archiveFile);
-                @SuppressWarnings("unchecked")
-                Enumeration<ZipEntry> entries = (Enumeration<ZipEntry>) zip
-                    .entries();
-                while (entries.hasMoreElements()) {
-                    ZipEntry entry = entries.nextElement();
-                    XMPPChatTransmitter.log.debug(entry.getName());
-
+                ZipEntry entry;
+                while ((entry = zip.getNextEntry()) != null) {
                     receivedResource(data.getSender(),
-                        new Path(entry.getName()), zip.getInputStream(entry),
-                        data.timestamp);
+                        new Path(entry.getName()), new FilterInputStream(zip) {
+                            @Override
+                            public void close() throws IOException {
+                                // don't close the ZipInputStream, we close the
+                                // entry ourselves...
+                            }
+                        }, data.timestamp);
+
+                    zip.closeEntry();
                 }
-                archiveFile.delete();
+                log.debug(String.format("Unpacked archive [%s] in %d s",
+                    data.sender.getName(),
+                    (System.currentTimeMillis() - time) / 1000));
+
             } catch (IOException e) {
-                log.error("Failed to receive and unpack archive");
+                log.error("Failed to receive and unpack archive", e);
+            } finally {
+                IOUtils.closeQuietly(zip);
             }
             return true;
         }
