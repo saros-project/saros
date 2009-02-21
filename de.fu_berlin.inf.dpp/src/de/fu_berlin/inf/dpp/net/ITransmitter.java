@@ -160,6 +160,8 @@ public interface ITransmitter {
     /**
      * Sends given archive file to given recipient.
      * 
+     * This is a blocking method.
+     * 
      * @param recipient
      *            the Jabber ID of the recipient.
      * @param project
