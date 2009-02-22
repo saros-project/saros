@@ -68,7 +68,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     /** size of project archive file */
     private final long fileSize = 100;
-    private File archive;
+
     /** size of current transfered part of archive file. */
     private long transferedFileSize = 0;
 
@@ -278,29 +278,33 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             return;
         }
 
-        this.archive = new File("./" + getPeer().getName() + "_Project.zip");
-        OutgoingInvitationProcess.log
-            .debug("Project archive file has to be send. "
-                + this.archive.getAbsolutePath() + " length: "
-                + this.archive.length());
+        File archive = new File("./" + getPeer().getName() + "_Project.zip");
 
         try {
-
             this.setProgressInfo("Creating Archive");
 
-            /* Create project archive. */
+            long time = System.currentTimeMillis();
+
+            // Create project archive.
             // TODO Track Progress and provide possibility to cancel
-            FileZipper.createProjectZipArchive(this.toSend, this.archive
+            FileZipper.createProjectZipArchive(this.toSend, archive
                 .getAbsolutePath(), this.sharedProject.getProject());
+
+            log.debug(String.format(
+                "Created project archive in %d s (%d KB): %s", (System
+                    .currentTimeMillis() - time) / 1000,
+                archive.length() / 1024, archive.getAbsolutePath()));
 
             this.setProgressInfo("Sending project archive");
 
-            /* Send data. */
+            // Send data.
             // TODO Track Progress and provide possibility to cancel
             this.transmitter.sendProjectArchive(this.peer, this.sharedProject
-                .getProject(), this.archive, this);
+                .getProject(), archive, this);
         } catch (Exception e) {
             failed(e);
+        } finally {
+            archive.delete();
         }
     }
 

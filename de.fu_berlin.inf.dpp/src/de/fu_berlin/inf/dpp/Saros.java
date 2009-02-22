@@ -622,7 +622,6 @@ public class Saros extends AbstractUIPlugin {
     public static boolean getFileTransferModeViaChat() {
         return getDefault().getPreferenceStore().getBoolean(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
-    
     }
 
 }
