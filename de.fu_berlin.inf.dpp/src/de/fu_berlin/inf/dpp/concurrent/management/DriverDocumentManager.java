@@ -208,6 +208,12 @@ public class DriverDocumentManager implements IDriverDocumentManager,
     }
 
     public void driverChanged(JID driver, boolean replicated) {
+
+        if (Saros.getDefault().getSessionManager().getSharedProject().getHost()
+            .equals(driver)) {
+            return;
+        }
+
         if (isDriver(driver)) {
             removeDriver(driver);
         } else {

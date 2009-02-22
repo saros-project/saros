@@ -242,16 +242,7 @@ public class SharedProject implements ISharedProject {
     }
 
     public boolean isDriver(User user) {
-        /*
-         * TODO Is the distinction host vs. client really necessary here?
-         */
-        if (this.driverManager != null) {
-            // HOST
-            return this.driverManager.isDriver(user.getJID());
-        } else {
-            // CLIENT
-            return getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER;
-        }
+        return getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER;
     }
 
     /*
@@ -278,26 +269,16 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
      */
     public boolean isExclusiveDriver() {
-        /*
-         * TODO Is the distinction host vs. client really necessary here?
-         */
-        if (this.driverManager != null) {
-            // HOST
-            return (this.driverManager.isDriver(Saros.getDefault().getMyJID()) && this.driverManager
-                .isExclusiveDriver());
+        if (!isDriver()) {
+            return false;
         } else {
-            // CLIENT
-            if (!isDriver()) {
-                return false;
-            } else {
-                for (User user : participants.values()) {
-                    if (user.equals(Saros.getDefault().getLocalUser()))
-                        continue;
-                    else if (user.getUserRole() == UserRole.DRIVER)
-                        return false;
-                }
-                return true;
+            for (User user : participants.values()) {
+                if (user.equals(Saros.getDefault().getLocalUser()))
+                    continue;
+                else if (user.getUserRole() == UserRole.DRIVER)
+                    return false;
             }
+            return true;
         }
     }
 
