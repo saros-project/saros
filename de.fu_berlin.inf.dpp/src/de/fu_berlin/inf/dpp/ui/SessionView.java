@@ -54,6 +54,7 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
@@ -65,9 +66,12 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
+import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
+import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 
 public class SessionView extends ViewPart implements ISessionListener,
     IPropertyChangeListener {
@@ -76,11 +80,11 @@ public class SessionView extends ViewPart implements ISessionListener,
 
     private ISharedProject sharedProject;
 
-    // private GiveDriverRoleAction giveDriverRoleAction;
+    private GiveDriverRoleAction giveDriverRoleAction;
 
     private GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
 
-    // private RemoveDriverRoleAction removeDriverRoleAction;
+    private RemoveDriverRoleAction removeDriverRoleAction;
 
     private IPreferenceStore store = null;
 
@@ -340,16 +344,15 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.viewer.setLabelProvider(new SessionLabelProvider());
         this.viewer.setInput(null);
 
-        /*
-         * this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
-         * "Give driver role");
-         */
+        if (isMultiDriverEnabled()) {
+            this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
+                "Give driver role");
+            this.removeDriverRoleAction = new RemoveDriverRoleAction(
+                this.viewer);
+        }
+
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
             this.viewer, "Give exclusive driver role");
-        /*
-         * this.removeDriverRoleAction = new
-         * RemoveDriverRoleAction(this.viewer);
-         */
 
         contributeToActionBars();
         hookContextMenu();
@@ -390,7 +393,10 @@ public class SessionView extends ViewPart implements ISessionListener,
         this.followModeAction = new FollowModeAction();
         toolBar.add(new ConsistencyAction(toolBar));
         toolBar.add(new OpenInviteInterface());
-        // toolBar.add(new RemoveAllDriverRoleAction());
+        if (isMultiDriverEnabled()) {
+            toolBar.add(new RemoveAllDriverRoleAction());
+        }
+
         toolBar.add(followModeAction);
         toolBar.add(new LeaveSessionAction());
     }
@@ -411,12 +417,21 @@ public class SessionView extends ViewPart implements ISessionListener,
     }
 
     private void fillContextMenu(IMenuManager manager) {
-        // manager.add(this.giveDriverRoleAction);
+
         manager.add(this.giveExclusiveDriverRoleAction);
-        // manager.add(this.removeDriverRoleAction);
+
+        if (isMultiDriverEnabled()) {
+            manager.add(this.giveDriverRoleAction);
+            manager.add(this.removeDriverRoleAction);
+        }
 
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    }
+
+    protected boolean isMultiDriverEnabled() {
+        return Saros.getDefault().getPreferenceStore().getBoolean(
+            PreferenceConstants.MULTI_DRIVER);
     }
 
     public void propertyChange(PropertyChangeEvent event) {

@@ -50,4 +50,6 @@ public class PreferenceConstants {
     public static final String STUN = "stun_server";
     public static final String STUN_PORT = "stun_server_port";
 
+    public static final String MULTI_DRIVER = "multidriver";
+
 }

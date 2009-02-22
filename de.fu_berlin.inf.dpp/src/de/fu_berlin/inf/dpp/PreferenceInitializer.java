@@ -48,5 +48,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
         store.setDefault(PreferenceConstants.STUN, "stunserver.org");
         store.setDefault(PreferenceConstants.STUN_PORT, 3478);
+        store.setDefault(PreferenceConstants.MULTI_DRIVER, false);
     }
 }
