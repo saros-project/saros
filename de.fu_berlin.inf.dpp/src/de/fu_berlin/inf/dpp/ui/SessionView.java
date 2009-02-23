@@ -122,9 +122,11 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
 
         public void roleChanged(User user, boolean replicated) {
-            // if the local host become driver leave follow mode
+            // if the local user becomes driver, then leave follow mode
             if (user.equals(Saros.getDefault().getLocalUser())) {
                 if (user.isDriver()) {
+                    // TODO this is never set to true again, except for starting
+                    // a new session!
                     followModeAction.setFollowMode(false);
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
