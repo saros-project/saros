@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
@@ -33,6 +34,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Leaves the current Saros session. Is deactivated if there is no running
@@ -43,6 +45,9 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  */
 public class LeaveSessionAction extends Action implements ISessionListener {
 
+    private static final Logger log = Logger.getLogger(LeaveSessionAction.class
+        .getName());
+
     public LeaveSessionAction() {
         setToolTipText("Leave the session");
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
@@ -51,8 +56,19 @@ public class LeaveSessionAction extends Action implements ISessionListener {
         updateEnablement();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runLeaveSession();
+            }
+        });
+    }
+
+    public void runLeaveSession() {
 
         Shell shell = Display.getDefault().getActiveShell();
         if (shell == null) {

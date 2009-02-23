@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -29,14 +30,21 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 /**
  * Renames the nickname of the selected roster entry.
  * 
  * @author rdjemili
  */
 public class RenameContactAction extends SelectionProviderAction {
+
+    private static final Logger log = Logger
+        .getLogger(RenameContactAction.class.getName());
+
     private class InputValidator implements IInputValidator {
         public String isValid(String newText) {
+            // TODO Review this
             return null;
         }
     }
@@ -50,8 +58,19 @@ public class RenameContactAction extends SelectionProviderAction {
         setToolTipText("Set the nickname of this contact.");
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runRename();
+            }
+        });
+    }
+
+    public void runRename() {
         Shell shell = Display.getDefault().getActiveShell();
         if ((shell == null) || (this.rosterEntry == null)) {
             return;

@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VariableProxy;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
@@ -210,15 +211,25 @@ public class ConsistencyAction extends Action implements ISessionListener {
         }
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
-        super.run();
 
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                executeConsistencyHandling();
+            }
+        });
+    }
+
+    public void executeConsistencyHandling() {
         setChecksumErrorHandling(true);
 
         for (final IPath path : paths) {
             // save document
-            Display.getDefault().syncExec(new Runnable() {
+            Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     Set<IEditorPart> editors = EditorManager.getDefault()
                         .getEditors(path);
@@ -232,7 +243,6 @@ public class ConsistencyAction extends Action implements ISessionListener {
             Saros.getDefault().getSessionManager().getTransmitter()
                 .sendFileChecksumErrorMessage(path, false);
         }
-
     }
 
     public void sessionStarted(ISharedProject session) {

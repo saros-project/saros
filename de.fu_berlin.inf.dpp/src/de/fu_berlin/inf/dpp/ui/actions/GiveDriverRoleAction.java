@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
@@ -13,8 +14,12 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class GiveDriverRoleAction extends SelectionProviderAction {
+
+    private static final Logger log = Logger
+        .getLogger(GiveDriverRoleAction.class.getName());
 
     protected User selectedUser;
 
@@ -58,8 +63,19 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         updateEnablemnet();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runToggleUserRole();
+            }
+        });
+    }
+
+    public void runToggleUserRole() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
         project.setUserRole(this.selectedUser, UserRole.DRIVER, false);

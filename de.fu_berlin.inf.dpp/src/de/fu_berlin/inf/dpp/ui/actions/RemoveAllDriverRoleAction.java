@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -30,6 +31,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * this action remove all remote driver from project. Only the project host has
@@ -41,6 +43,9 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 public class RemoveAllDriverRoleAction extends Action implements
     ISharedProjectListener, ISessionListener {
 
+    private static final Logger log = Logger
+        .getLogger(RemoveAllDriverRoleAction.class.getName());
+
     public RemoveAllDriverRoleAction() {
         super("Remove driver roles");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
@@ -50,9 +55,20 @@ public class RemoveAllDriverRoleAction extends Action implements
         updateEnablement();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
-        // getSharedProject().setDriver(getSharedProject().getHost(), false);
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runRemoveAllDrivers();
+            }
+        });
+    }
+
+    public void runRemoveAllDrivers() {
+
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
         for (User user : project.getParticipants()) {

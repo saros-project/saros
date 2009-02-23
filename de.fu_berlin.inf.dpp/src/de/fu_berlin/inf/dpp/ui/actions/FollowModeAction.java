@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -12,8 +13,12 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class FollowModeAction extends Action implements ISessionListener {
+
+    private static final Logger log = Logger.getLogger(FollowModeAction.class
+        .getName());
 
     public FollowModeAction() {
         super();
@@ -24,9 +29,16 @@ public class FollowModeAction extends Action implements ISessionListener {
         updateEnablement();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
-        setFollowMode(!getFollowMode());
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                setFollowMode(!getFollowMode());
+            }
+        });
     }
 
     public boolean getFollowMode() {

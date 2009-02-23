@@ -32,8 +32,19 @@ public class SkypeAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/telephone.png"));
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runOpenSkype();
+            }
+        });
+    }
+
+    public void runOpenSkype() {
         if (this.skypeURL == null) {
             return;
         }

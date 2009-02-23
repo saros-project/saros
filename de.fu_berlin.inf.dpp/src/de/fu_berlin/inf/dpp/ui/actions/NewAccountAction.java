@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -26,23 +27,38 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
+import de.fu_berlin.inf.dpp.util.Util;
 
+/**
+ * TODO Why is this not a normal Action like all the others?
+ * 
+ * Use PlatformUI to get a Shell?
+ */
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
+
+    private static final Logger log = Logger.getLogger(NewAccountAction.class
+        .getName());
+
     private IWorkbenchWindow window;
 
+    /**
+     * @review runSafe OK
+     */
     public void run(IAction action) {
-        try {
-            Shell shell = this.window.getShell();
-            WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
-                true, true, true));
-            wd.setHelpAvailable(false);
-            wd.open();
-        } catch (Exception e) {
-            // TODO Use consistent way of dealing with Exceptions
-            Saros.log("Could not create new Account.", e);
-        }
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runNewAccount();
+            }
+        });
+    }
+
+    public void runNewAccount() {
+        Shell shell = this.window.getShell();
+        WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(true,
+            true, true));
+        wd.setHelpAvailable(false);
+        wd.open();
     }
 
     /*

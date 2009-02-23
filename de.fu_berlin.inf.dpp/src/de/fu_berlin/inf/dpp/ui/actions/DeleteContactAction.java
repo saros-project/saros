@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -31,8 +32,13 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class DeleteContactAction extends SelectionProviderAction {
+
+    private static final Logger log = Logger
+        .getLogger(DeleteContactAction.class.getName());
+
     private RosterEntry rosterEntry;
 
     public DeleteContactAction(ISelectionProvider provider) {
@@ -56,8 +62,19 @@ public class DeleteContactAction extends SelectionProviderAction {
         return sb.toString();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runDeleteAction();
+            }
+        });
+    }
+
+    public void runDeleteAction() {
 
         Shell shell = Display.getDefault().getActiveShell();
         if ((shell == null) || (this.rosterEntry == null)) {

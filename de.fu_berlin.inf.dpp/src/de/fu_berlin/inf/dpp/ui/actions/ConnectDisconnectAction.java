@@ -68,49 +68,16 @@ public class ConnectDisconnectAction extends Action {
 
         Util.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
             public void run() {
-                try {
-                    Saros saros = Saros.getDefault();
-                    if (saros.isConnected()) {
-                        saros.disconnect();
-                    } else {
-                        // display task progress information (begin) in status
-                        // line
-                        Display.getDefault().syncExec(new Runnable() {
-                            public void run() {
-                                IStatusLineManager slm = getStatusmanager();
-                                IProgressMonitor monitor = slm
-                                    .getProgressMonitor();
-                                monitor.beginTask("Connecting...",
-                                    IProgressMonitor.UNKNOWN);
-                            }
-                        });
-
-                        saros.connect();
-
-                        // display task progress information (end) in status
-                        // line
-                        Display.getDefault().syncExec(new Runnable() {
-                            public void run() {
-                                IStatusLineManager slm = getStatusmanager();
-                                slm.setMessage("Connecting..");
-                                IProgressMonitor monitor = slm
-                                    .getProgressMonitor();
-                                monitor.done();
-                            }
-                        });
-
-                    }
-                } catch (RuntimeException e) {
-                    log.error("Internal error in ConnectDisconnectAction:", e);
-                }
-            }
-
-            private IStatusLineManager getStatusmanager() {
-                return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getActivePage().getViewReferences()[0].getView(false)
-                    .getViewSite().getActionBars().getStatusLineManager();
+                runConnectDisconnect();
             }
         });
+    }
+
+    protected IStatusLineManager getStatusmanager() {
+        // TODO check for NPE
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            .getActivePage().getViewReferences()[0].getView(false)
+            .getViewSite().getActionBars().getStatusLineManager();
     }
 
     public void updateStatus() {
@@ -145,6 +112,42 @@ public class ConnectDisconnectAction extends Action {
             setEnabled(state == ConnectionState.CONNECTED || canConnect);
 
             setText(SarosUI.getDescription(state));
+        } catch (RuntimeException e) {
+            log.error("Internal error in ConnectDisconnectAction:", e);
+        }
+    }
+
+    protected void runConnectDisconnect() {
+        try {
+            Saros saros = Saros.getDefault();
+            if (saros.isConnected()) {
+                saros.disconnect();
+            } else {
+                // display task progress information (begin) in status
+                // line
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        IStatusLineManager slm = getStatusmanager();
+                        IProgressMonitor monitor = slm.getProgressMonitor();
+                        monitor.beginTask("Connecting...",
+                            IProgressMonitor.UNKNOWN);
+                    }
+                });
+
+                saros.connect();
+
+                // display task progress information (end) in status
+                // line
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        IStatusLineManager slm = getStatusmanager();
+                        slm.setMessage("Connecting..");
+                        IProgressMonitor monitor = slm.getProgressMonitor();
+                        monitor.done();
+                    }
+                });
+
+            }
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);
         }

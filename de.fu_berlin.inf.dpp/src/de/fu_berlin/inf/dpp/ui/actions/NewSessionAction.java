@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +35,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Start to share a project (a "session").
@@ -43,7 +45,10 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
  */
 public class NewSessionAction implements IObjectActionDelegate {
 
-    private IProject selectedProject;
+    private static final Logger log = Logger.getLogger(NewSessionAction.class
+        .getName());
+
+    protected IProject selectedProject;
 
     /*
      * (non-Javadoc) Defined in IActionDelegate
@@ -52,10 +57,18 @@ public class NewSessionAction implements IObjectActionDelegate {
         // We deal with everything in selectionChanged
     }
 
-    /*
-     * (non-Javadoc) Defined in IActionDelegate
+    /**
+     * @review runSafe OK
      */
     public void run(IAction action) {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runNewSession();
+            }
+        });
+    }
+
+    public void runNewSession() {
         try {
             ISessionManager sm = Saros.getDefault().getSessionManager();
             sm.startSession(this.selectedProject);
@@ -73,9 +86,6 @@ public class NewSessionAction implements IObjectActionDelegate {
         }
     }
 
-    /*
-     * (non-Javadoc) Defined in IActionDelegate
-     */
     public void selectionChanged(IAction action, ISelection selection) {
         this.selectedProject = getProject(selection);
 
@@ -91,7 +101,7 @@ public class NewSessionAction implements IObjectActionDelegate {
             && this.selectedProject.isAccessible());
     }
 
-    private IProject getProject(ISelection selection) {
+    protected IProject getProject(ISelection selection) {
         Object element = ((IStructuredSelection) selection).getFirstElement();
         if (element instanceof IResource) {
             return ((IResource) element).getProject();

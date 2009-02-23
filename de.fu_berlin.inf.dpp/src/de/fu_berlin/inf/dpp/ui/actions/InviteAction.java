@@ -36,6 +36,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Action to start an Invitation for the currently selected RosterEntries.
@@ -75,8 +76,19 @@ public class InviteAction extends SelectionProviderAction {
         updateEnablement();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runInvite();
+            }
+        });
+    }
+
+    public void runInvite() {
         try {
             ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();

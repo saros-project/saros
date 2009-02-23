@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
@@ -30,31 +31,46 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.AddContactWizard;
+import de.fu_berlin.inf.dpp.util.Util;
 
-public class NewContactAction extends Action implements IConnectionListener {
+public class NewContactAction extends Action {
+
+    private static final Logger log = Logger.getLogger(NewContactAction.class
+        .getName());
 
     public NewContactAction() {
         setToolTipText("Add a new contact");
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/user_add.png"));
 
-        Saros.getDefault().addListener(this);
+        Saros.getDefault().addListener(new IConnectionListener() {
+            public void connectionStateChanged(XMPPConnection connection,
+                ConnectionState newState) {
+                updateEnablement();
+            }
+        });
         updateEnablement();
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
+        Util.runSafeSync(log, new Runnable() {
+            public void run() {
+                runNewContact();
+            }
+        });
+    }
+
+    public void runNewContact() {
         Shell shell = Display.getDefault().getActiveShell();
         WizardDialog wd = new WizardDialog(shell, new AddContactWizard());
         wd.setHelpAvailable(false);
         wd.open();
     }
 
-    public void connectionStateChanged(XMPPConnection connection,
-        ConnectionState newState) {
-        updateEnablement();
-    }
-
-    private void updateEnablement() {
+    protected void updateEnablement() {
         setEnabled(Saros.getDefault().isConnected());
     }
 }
