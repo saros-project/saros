@@ -21,9 +21,14 @@ package de.fu_berlin.inf.dpp;
 
 import java.util.Date;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class User {
+
+    private static final Logger log = Logger.getLogger(User.class.getName());
+
     public enum UserConnectionState {
         UNKNOWN, ONLINE, OFFLINE
     }
@@ -100,12 +105,31 @@ public class User {
 
     @Override
     public boolean equals(Object obj) {
+        JID otherJID = null;
+
+        if (obj instanceof String) {
+            otherJID = new JID((String) obj);
+        }
+        if (obj instanceof JID) {
+            otherJID = (JID) obj;
+        }
         if (obj instanceof User) {
-            User other = (User) obj;
-            return this.jid.equals(other.jid);
+            otherJID = ((User) obj).jid;
         }
 
+        if (otherJID != null) {
+            return this.jid.equals(otherJID);
+        }
+
+        log
+            .warn("Comparing a User to an Object that is not a User, String or JID");
+
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.jid.hashCode();
     }
 
     public int getColorID() {
