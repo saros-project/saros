@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -138,8 +139,12 @@ public class JoinSessionWizardUtils {
 
     public static boolean projectIsUnique(String name, IProject[] projects) {
 
-        for (IProject p : projects) {
-            if (p.getName().equals(name)) {
+        // Use File to compare so the comparison is case-sensitive depending on
+        // the underlying platform
+        File newProjectName = new File(name);
+
+        for (IProject project : projects) {
+            if (new File(project.getName()).equals(newProjectName)) {
                 return false;
             }
         }
