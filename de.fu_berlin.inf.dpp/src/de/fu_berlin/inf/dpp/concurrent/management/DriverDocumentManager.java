@@ -217,6 +217,8 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         // TODO DriverDocumentManager needs the host to be a driver
         if (Saros.getDefault().getSessionManager().getSharedProject().getHost()
             .equals(user)) {
+
+            assert assertRoles();
             return;
         }
         JID jid = user.getJID();
@@ -226,6 +228,70 @@ public class DriverDocumentManager implements IDriverDocumentManager,
             addDriver(jid);
         }
 
+        assert assertRoles();
+
+    }
+
+    /**
+     * @return true if the role information managed by this
+     *         DriverDocumentManager is consistent with the information managed
+     *         by the SharedProject.
+     * 
+     *         Caution: The host is always a driver for us
+     */
+    public boolean assertRoles() {
+
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+
+        if (project == null && !drivers.isEmpty()) {
+            logger.error("Project is null, but drivers is not empty");
+            return false;
+        }
+
+        for (JID driver : drivers) {
+
+            if (project.getParticipant(driver) == null) {
+                logger.error("Driver [" + driver.getBase()
+                    + "] is not a participant in project");
+                return false;
+            }
+
+            // If not host
+            if (!project.getParticipant(driver).equals(project.getHost())) {
+                // If not driver
+                if (!project.getParticipant(driver).isDriver()) {
+                    logger
+                        .error("Host ["
+                            + driver.getBase()
+                            + "] is not a driver in SharedProject but in DriverDocumentManager");
+                    return false;
+                }
+            }
+        }
+
+        for (User participant : project.getParticipants()) {
+
+            if (participant.isDriver()
+                && !drivers.contains(participant.getJID())) {
+                logger
+                    .error("User ["
+                        + participant.getJID().getBase()
+                        + "] is driver in SharedProject but not in DriverDocumentManager");
+                return false;
+            }
+
+            if (participant.equals(project.getHost())) {
+                // The host is always a driver
+                if (!drivers.contains(participant.getJID())) {
+                    logger.error("Host [" + participant.getJID().getBase()
+                        + "] is not a driver in DriverDocumentManager");
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public void userJoined(JID user) {

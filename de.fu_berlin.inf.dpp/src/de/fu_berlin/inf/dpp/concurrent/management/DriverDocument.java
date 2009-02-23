@@ -6,10 +6,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.concurrent.IDriverManager;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class DriverDocument implements IDriverManager {
+public class DriverDocument {
 
     private static Logger logger = Logger.getLogger(DriverDocument.class);
 
@@ -60,11 +59,6 @@ public class DriverDocument implements IDriverManager {
         return currentDrivers.size() == 1;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
-     */
     public List<JID> getDrivers() {
         return this.currentDrivers;
     }

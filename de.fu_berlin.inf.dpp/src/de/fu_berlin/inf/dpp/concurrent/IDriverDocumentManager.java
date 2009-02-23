@@ -8,8 +8,15 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
-public interface IDriverDocumentManager extends IDriverManager,
-    ISharedProjectListener {
+public interface IDriverDocumentManager extends ISharedProjectListener {
+
+    public void addDriver(JID jid);
+
+    public void removeDriver(JID jid);
+
+    public boolean isDriver(JID jid);
+
+    public List<JID> getDrivers();
 
     public void receiveActivity(IActivity activity);
 
