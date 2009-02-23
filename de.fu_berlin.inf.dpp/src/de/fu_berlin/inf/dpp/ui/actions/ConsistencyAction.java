@@ -78,7 +78,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 paths = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
                     .getSessionManager().getSharedProject()
                     .getConcurrentDocumentManager()
-                    .getPathesWithWrongChecksums());
+                    .getPathsWithWrongChecksums());
 
                 Display.getDefault().asyncExec(new Runnable() {
                     public void run() {

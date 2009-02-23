@@ -89,7 +89,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
         false);
 
-    private Set<IPath> pathesWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+    private Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
     private ISharedProject sharedProject;
 
@@ -227,7 +227,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                     }
 
                     // TODO we should not need this
-                    pathesWithWrongChecksums.clear();
+                    pathsWithWrongChecksums.clear();
                 }
             });
 
@@ -782,72 +782,76 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         logger.debug(String.format(
             "Received %d checksums for %d inconsistencies", checksums.size(),
-            pathesWithWrongChecksums.size()));
+            pathsWithWrongChecksums.size()));
 
         for (DocumentChecksum checksum : checksums) {
+            if (isInconsistent(checksum)) {
 
-            IPath path = checksum.getPath();
+                ConcurrentDocumentManager.this.pathsWithWrongChecksums
+                    .add(checksum.getPath());
 
-            IFile file = sharedProject.getProject().getFile(path);
-            if (!file.exists()) {
-                ConcurrentDocumentManager.this.pathesWithWrongChecksums
-                    .add(path);
                 if (!inconsistencyToResolve.getVariable()) {
                     inconsistencyToResolve.setVariable(true);
                 }
-                continue;
-            }
-
-            IDocument doc = EditorManager.getDefault().getDocument(path);
-
-            // if doc == null there is no editor with this resource open
-            if (doc == null) {
-                // get Document from FileBuffer
-                doc = getTextFileBuffer(path).getDocument();
-            }
-
-            // if doc is still null give up
-            if (doc == null) {
-                logger.warn("Could not check checksum of file "
-                    + path.toOSString());
-                continue;
-            }
-
-            if ((doc.getLength() != checksum.getLength())
-                || (doc.get().hashCode() != checksum.getHash())) {
-
-                long lastEdited = (EditorManager.getDefault()
-                    .getLastEditTime(path));
-
-                long lastRemoteEdited = (EditorManager.getDefault()
-                    .getLastRemoteEditTime(path));
-
-                if ((System.currentTimeMillis() - lastEdited) > 4000
-                    && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
-                    logger.debug(String.format(
-                        "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
-                        path.toString(), doc.getLength(),
-                        doc.getLength() == checksum.getLength() ? "==" : "!=",
-                        checksum.getLength(), doc.get().hashCode(), doc.get()
-                            .hashCode() == checksum.getHash() ? "==" : "!=",
-                        checksum.getHash()));
-
-                    ConcurrentDocumentManager.this.pathesWithWrongChecksums
-                        .add(path);
-                    if (!inconsistencyToResolve.getVariable()) {
-                        inconsistencyToResolve.setVariable(true);
-                    }
-                }
                 return;
             }
+        }
 
-            ConcurrentDocumentManager.this.pathesWithWrongChecksums.clear();
+        ConcurrentDocumentManager.this.pathsWithWrongChecksums.clear();
 
-            if (inconsistencyToResolve.getVariable()) {
-                logger.debug("All Inconsistencies are resolved");
-                inconsistencyToResolve.setVariable(false);
+        if (inconsistencyToResolve.getVariable()) {
+            logger.debug("All Inconsistencies are resolved");
+            inconsistencyToResolve.setVariable(false);
+        }
+
+    }
+
+    private boolean isInconsistent(DocumentChecksum checksum) {
+        IPath path = checksum.getPath();
+
+        IFile file = sharedProject.getProject().getFile(path);
+        if (!file.exists()) {
+            return true;
+        }
+
+        IDocument doc = EditorManager.getDefault().getDocument(path);
+
+        // if doc == null there is no editor with this resource open
+        if (doc == null) {
+            // get Document from FileBuffer
+            doc = getTextFileBuffer(path).getDocument();
+        }
+
+        // if doc is still null give up
+        if (doc == null) {
+            logger
+                .warn("Could not check checksum of file " + path.toOSString());
+            return false;
+        }
+
+        if ((doc.getLength() != checksum.getLength())
+            || (doc.get().hashCode() != checksum.getHash())) {
+
+            long lastEdited = (EditorManager.getDefault().getLastEditTime(path));
+
+            long lastRemoteEdited = (EditorManager.getDefault()
+                .getLastRemoteEditTime(path));
+
+            if ((System.currentTimeMillis() - lastEdited) > 4000
+                && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
+
+                logger.debug(String.format(
+                    "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)", path
+                        .toString(), doc.getLength(),
+                    doc.getLength() == checksum.getLength() ? "==" : "!=",
+                    checksum.getLength(), doc.get().hashCode(), doc.get()
+                        .hashCode() == checksum.getHash() ? "==" : "!=",
+                    checksum.getHash()));
+
+                return true;
             }
         }
+        return false;
     }
 
     /**
@@ -858,7 +862,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         return this.inconsistencyToResolve;
     }
 
-    public Set<IPath> getPathesWithWrongChecksums() {
-        return this.pathesWithWrongChecksums;
+    public Set<IPath> getPathsWithWrongChecksums() {
+        return this.pathsWithWrongChecksums;
     }
 }
