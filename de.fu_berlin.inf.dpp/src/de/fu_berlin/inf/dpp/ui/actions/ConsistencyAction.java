@@ -7,12 +7,14 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
@@ -237,21 +239,55 @@ public class ConsistencyAction extends Action implements ISessionListener {
         setChecksumErrorHandling(true);
 
         for (final IPath path : paths) {
-            // save document
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    Set<IEditorPart> editors = EditorManager.getDefault()
-                        .getEditors(path);
-                    if (editors != null && editors.size() > 0) {
-                        editors.iterator().next().doSave(
-                            new NullProgressMonitor());
-                    }
+            // Save document
+            for (IEditorPart editor : EditorManager.getDefault().getEditors(
+                path)) {
+                if (!saveEditor(editor)) {
+                    log
+                        .info("Consistency Check canceled by user! Diff might be inaccurate");
                 }
-            });
+            }
 
+            // Send checksumErrorMessage to Host
             Saros.getDefault().getSessionManager().getTransmitter()
                 .sendFileChecksumErrorMessage(path, false);
         }
+    }
+
+    /**
+     * @return true when the editor was successfully saved
+     */
+    public static boolean saveEditor(final IEditorPart editor) {
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final IProgressMonitor monitor = new NullProgressMonitor() {
+            @Override
+            public void done() {
+                latch.countDown();
+            }
+        };
+
+        // save document
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                try {
+                    editor.doSave(monitor);
+                } catch (RuntimeException e) {
+                    log.error("Internal error: ", e);
+                }
+            }
+        });
+
+        // Wait for saving to be done
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return !monitor.isCanceled();
+
     }
 
     public void sessionStarted(ISharedProject session) {
