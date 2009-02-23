@@ -763,9 +763,6 @@ public class XMPPChatTransmitter implements ITransmitter,
                 throw new IOException("Error in IBB-FileTransfer wrong state: "
                     + transfer.getStatus());
             }
-
-            log.debug("Sent successfully via IBB to " + data.getRecipient()
-                + ": " + data.toString());
         }
 
         public boolean isSuitable(JID jid) {
