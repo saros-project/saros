@@ -97,9 +97,13 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
         assert jid != null;
 
-        DriverDocumentManager.logger.debug("add driver for jid: " + jid);
         if (!this.drivers.contains(jid)) {
+            DriverDocumentManager.logger.debug("Add driver [" + jid.getBase()
+                + "]");
             this.drivers.add(jid);
+        } else {
+            DriverDocumentManager.logger.warn("User [" + jid.getBase()
+                + "] is already driver!");
         }
     }
 
@@ -209,6 +213,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
 
     public void roleChanged(JID user, boolean replicated) {
 
+        // TODO DriverDocumentManager needs the host to be a driver
         if (Saros.getDefault().getSessionManager().getSharedProject().getHost()
             .equals(user)) {
             return;
