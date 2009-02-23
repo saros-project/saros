@@ -70,7 +70,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected ISharedProjectListener projectListener = new ISharedProjectListener() {
 
-        public void driverChanged(JID driver, boolean replicated) {
+        public void roleChanged(JID user, boolean replicated) {
             updateDecoratorsAsync(null);
         }
 

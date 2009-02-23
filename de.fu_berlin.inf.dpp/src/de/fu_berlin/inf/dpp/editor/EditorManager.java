@@ -647,13 +647,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
-    public void driverChanged(JID driver, boolean replicated) {
+    public void roleChanged(JID user, boolean replicated) {
         this.isDriver = this.sharedProject.isDriver();
         activateOpenEditors();
 
         removeAllAnnotations(ContributionAnnotation.TYPE);
 
-        if (Saros.getDefault().getMyJID().equals(driver)) {
+        if (Saros.getDefault().getMyJID().equals(user)) {
 
             // get the session view
             IViewPart view = findView("de.fu_berlin.inf.dpp.ui.SessionView");

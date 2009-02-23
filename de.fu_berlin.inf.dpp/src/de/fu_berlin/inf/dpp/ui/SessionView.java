@@ -121,9 +121,9 @@ public class SessionView extends ViewPart implements ISessionListener,
             return new Object[] {};
         }
 
-        public void driverChanged(JID driver, boolean replicated) {
+        public void roleChanged(JID user, boolean replicated) {
             User participant = SessionView.this.sharedProject
-                .getParticipant(driver);
+                .getParticipant(user);
 
             // if the local host become driver leave follow mode
             if (participant.getJID().equals(Saros.getDefault().getMyJID())) {

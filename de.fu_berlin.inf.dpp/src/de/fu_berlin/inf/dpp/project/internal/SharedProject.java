@@ -180,42 +180,42 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public void toggleUserRole(User driver, boolean replicated) {
+    public void toggleUserRole(User user, boolean replicated) {
 
-        assert driver != null;
+        assert user != null;
 
         User myself = getParticipant(this.myID);
 
         /* if user has current role observer */
-        if (driver.getUserRole() == UserRole.OBSERVER) {
+        if (user.getUserRole() == UserRole.OBSERVER) {
 
             /* set new driver status in participant list of sharedProject. */
-            driver.setUserRole(UserRole.DRIVER);
+            user.setUserRole(UserRole.DRIVER);
 
             /* set local file settings. */
-            if (driver.equals(myself)) {
-                setProjectReadonly(!isDriver());
+            if (user.equals(myself)) {
+                setProjectReadonly(false);
             }
 
         } else {
 
             /* changed state form driver to observer */
-            if (driver.getUserRole() == UserRole.DRIVER) {
+            if (user.getUserRole() == UserRole.DRIVER) {
 
                 /* set the local driver state to observer */
-                if (driver.equals(myself) && isDriver(myself)) {
+                if (user.equals(myself)) {
                     setProjectReadonly(true);
                 }
 
                 /* set observer state. */
-                driver.setUserRole(UserRole.OBSERVER);
+                user.setUserRole(UserRole.OBSERVER);
             }
         }
 
         /* inform observer. */
-        JID jid = driver.getJID();
+        JID jid = user.getJID();
         for (ISharedProjectListener listener : this.listeners) {
-            listener.driverChanged(jid, replicated);
+            listener.roleChanged(jid, replicated);
         }
     }
 

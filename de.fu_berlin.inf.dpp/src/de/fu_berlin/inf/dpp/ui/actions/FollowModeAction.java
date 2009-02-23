@@ -46,7 +46,7 @@ public class FollowModeAction extends Action implements ISessionListener {
         }
         Saros.getDefault().getSessionManager().getSharedProject().addListener(
             new ISharedProjectListener() {
-                public void driverChanged(JID driver, boolean replicated) {
+                public void roleChanged(JID user, boolean replicated) {
                     updateEnablement();
                 }
 

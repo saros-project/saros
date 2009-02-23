@@ -95,7 +95,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
-    public void driverChanged(JID driver, boolean replicated) {
+    public void roleChanged(JID user, boolean replicated) {
         updateEnablement();
     }
 

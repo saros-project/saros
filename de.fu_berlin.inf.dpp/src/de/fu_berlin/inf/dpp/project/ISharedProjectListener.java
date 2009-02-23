@@ -34,15 +34,15 @@ public interface ISharedProjectListener {
     /**
      * The driver role of one participant has changed.
      * 
-     * @param driver
-     *            the new driver.
+     * @param user
+     *            the user who's role changed.
      * 
      * @param replicated
      *            <code>false</code> if this event was created by this client.
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void driverChanged(JID driver, boolean replicated);
+    public void roleChanged(JID user, boolean replicated);
 
     /**
      * The driver role of one participant has changed.

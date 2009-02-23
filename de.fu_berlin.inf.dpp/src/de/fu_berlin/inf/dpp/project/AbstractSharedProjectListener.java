@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public abstract class AbstractSharedProjectListener implements
     ISharedProjectListener {
 
-    public void driverChanged(JID driver, boolean replicated) {
+    public void roleChanged(JID user, boolean replicated) {
         // Do nothing.
     }
 

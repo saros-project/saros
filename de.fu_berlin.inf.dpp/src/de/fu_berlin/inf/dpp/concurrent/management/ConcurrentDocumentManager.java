@@ -676,17 +676,17 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         }
     }
 
-    public void driverChanged(JID driver, boolean replicated) {
+    public void roleChanged(JID user, boolean replicated) {
 
-        if (isHost(driver))
+        if (isHost(user))
             return;
         /*
          * 1. check if driver exists. 2. add new driver or remove driver. 3.
          */
         if (isHostSide()) {
             /* if driver changed to observer */
-            if (this.driverManager.isDriver(driver)) {
-                userLeft(driver);
+            if (this.driverManager.isDriver(user)) {
+                userLeft(user);
             }
             // /* new driver added to project. */
             // else {
@@ -695,7 +695,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             // }
         } else {
             // ClientSide
-            if (driver.equals(this.myJID)) {
+            if (user.equals(this.myJID)) {
                 this.clientDocs.clear();
             }
         }

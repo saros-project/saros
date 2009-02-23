@@ -19,7 +19,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
     private ISharedProjectListener projectListener = new ISharedProjectListener() {
 
-        public void driverChanged(JID driver, boolean replicated) {
+        public void roleChanged(JID user, boolean replicated) {
             updateEnablemnet();
         }
 

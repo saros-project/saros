@@ -207,17 +207,17 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         }
     }
 
-    public void driverChanged(JID driver, boolean replicated) {
+    public void roleChanged(JID user, boolean replicated) {
 
         if (Saros.getDefault().getSessionManager().getSharedProject().getHost()
-            .equals(driver)) {
+            .equals(user)) {
             return;
         }
 
-        if (isDriver(driver)) {
-            removeDriver(driver);
+        if (isDriver(user)) {
+            removeDriver(user);
         } else {
-            addDriver(driver);
+            addDriver(user);
         }
 
     }

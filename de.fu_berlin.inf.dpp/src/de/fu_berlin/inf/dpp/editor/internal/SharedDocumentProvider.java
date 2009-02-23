@@ -94,7 +94,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
      * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
      */
-    public void driverChanged(JID driver, boolean replicated) {
+    public void roleChanged(JID user, boolean replicated) {
         if (this.sharedProject != null) {
             this.isDriver = this.sharedProject.isDriver(); // HACK
         }
