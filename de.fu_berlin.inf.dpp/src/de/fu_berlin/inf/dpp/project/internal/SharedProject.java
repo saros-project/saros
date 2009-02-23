@@ -122,8 +122,6 @@ public class SharedProject implements ISharedProject {
         addListener(this.driverManager);
         this.driverManager.addDriver(this.host.getJID());
 
-        // activitySequencer.getConcurrentManager().addDriver(host.getJid());
-
         this.project = project;
         setProjectReadonly(false);
     }
