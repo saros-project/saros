@@ -75,6 +75,9 @@ public class User {
 
     /**
      * Utility method to determine whether this user has the UserRole.DRIVER
+     * 
+     * @return <code>true</code> if this User is driver, <code>false</code>
+     *         otherwise.
      */
     public boolean isDriver() {
         return this.role == UserRole.DRIVER;
@@ -82,6 +85,9 @@ public class User {
 
     /**
      * Utility method to determine whether this user has the UserRole.OBSERVER
+     * 
+     * @return <code>true</code> if this User is observer, <code>false</code>
+     *         otherwise.
      */
     public boolean isObserver() {
         return this.role == UserRole.OBSERVER;

@@ -55,7 +55,7 @@ public class RemoveAllDriverRoleAction extends Action implements
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
         for (User user : project.getParticipants()) {
-            if (project.isDriver(user)) {
+            if (user.isDriver()) {
                 project.toggleUserRole(user, false);
             }
         }
@@ -95,7 +95,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
         updateEnablement();
     }
 

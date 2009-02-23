@@ -647,13 +647,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
         this.isDriver = this.sharedProject.isDriver();
         activateOpenEditors();
 
         removeAllAnnotations(ContributionAnnotation.TYPE);
 
-        if (Saros.getDefault().getMyJID().equals(user)) {
+        if (Saros.getDefault().getLocalUser().equals(user)) {
 
             // get the session view
             IViewPart view = findView("de.fu_berlin.inf.dpp.ui.SessionView");
@@ -831,7 +831,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         User user = sharedProject
             .getParticipant(new JID(selection.getSource()));
 
-        if (sharedProject.isDriver(user)) {
+        if (user.isDriver()) {
             setDriverTextSelection(user, textSelection);
         }
 
@@ -851,7 +851,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     // TODO selectable driver to follow
     protected boolean shouldIFollow(User user) {
-        return isFollowing && sharedProject.isDriver(user);
+        return isFollowing && user.isDriver();
     }
 
     private void execViewport(ViewportActivity viewport) {
@@ -1459,7 +1459,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            sets the current text selection that is used by the driver.
      */
     private void setDriverTextSelection(User user, ITextSelection selection) {
-        if (user.getUserRole() == User.UserRole.DRIVER) {
+        if (user.isDriver()) {
             this.driverTextSelections.put(user, selection);
         }
     }

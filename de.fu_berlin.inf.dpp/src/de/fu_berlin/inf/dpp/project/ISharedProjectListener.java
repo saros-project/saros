@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -42,7 +43,7 @@ public interface ISharedProjectListener {
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void roleChanged(JID user, boolean replicated);
+    public void roleChanged(User user, boolean replicated);
 
     /**
      * The driver role of one participant has changed.

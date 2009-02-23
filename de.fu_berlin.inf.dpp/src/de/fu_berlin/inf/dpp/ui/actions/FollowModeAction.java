@@ -4,6 +4,7 @@ import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -46,7 +47,7 @@ public class FollowModeAction extends Action implements ISessionListener {
         }
         Saros.getDefault().getSessionManager().getSharedProject().addListener(
             new ISharedProjectListener() {
-                public void roleChanged(JID user, boolean replicated) {
+                public void roleChanged(User user, boolean replicated) {
                     updateEnablement();
                 }
 

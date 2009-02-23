@@ -98,9 +98,9 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
      */
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
         if (!replicated) {
-            IActivity activity = new RoleActivity(user);
+            IActivity activity = new RoleActivity(user.getJID());
             for (IActivityListener listener : this.activityListeners) {
                 listener.activityCreated(activity);
             }

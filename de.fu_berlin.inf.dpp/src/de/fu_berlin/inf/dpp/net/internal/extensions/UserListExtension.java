@@ -63,7 +63,7 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         for (int i = 0; i < n; i++) {
             String jidS = userlistExtension.getValue("User" + i);
             if (jidS == null) {
-                break;
+                break; // TODO We know the length (n) so this should not happen.
             }
             JID jid = new JID(jidS);
             int colorID = Integer.parseInt(userlistExtension

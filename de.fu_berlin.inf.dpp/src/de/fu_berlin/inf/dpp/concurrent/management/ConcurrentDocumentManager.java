@@ -676,17 +676,18 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         }
     }
 
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
+        JID jid = user.getJID();
 
-        if (isHost(user))
+        if (isHost(jid))
             return;
         /*
          * 1. check if driver exists. 2. add new driver or remove driver. 3.
          */
         if (isHostSide()) {
             /* if driver changed to observer */
-            if (this.driverManager.isDriver(user)) {
-                userLeft(user);
+            if (this.driverManager.isDriver(jid)) {
+                userLeft(jid);
             }
             // /* new driver added to project. */
             // else {

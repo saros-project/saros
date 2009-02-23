@@ -121,13 +121,10 @@ public class SessionView extends ViewPart implements ISessionListener,
             return new Object[] {};
         }
 
-        public void roleChanged(JID user, boolean replicated) {
-            User participant = SessionView.this.sharedProject
-                .getParticipant(user);
-
+        public void roleChanged(User user, boolean replicated) {
             // if the local host become driver leave follow mode
-            if (participant.getJID().equals(Saros.getDefault().getMyJID())) {
-                if (SessionView.this.sharedProject.isDriver(participant)) {
+            if (user.equals(Saros.getDefault().getLocalUser())) {
+                if (user.isDriver()) {
                     followModeAction.setFollowMode(false);
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
@@ -175,24 +172,24 @@ public class SessionView extends ViewPart implements ISessionListener,
         public String getColumnText(Object obj, int index) {
             User participant = (User) obj;
 
+            // TODO Maybe use a StringBuffer here.
             String name;
+            String jidBase = participant.getJID().getBase();
 
             if (participant == Saros.getDefault().getLocalUser()) {
-                name = "Yourself (" + participant.getJID().getBase() + ")";
+                name = "Yourself (" + jidBase + ")";
             } else {
-                name = participant.getJID().getBase();
+                name = jidBase;
                 XMPPConnection connection = Saros.getDefault().getConnection();
                 if (connection != null) {
                     Roster roster = connection.getRoster();
                     if (roster != null) {
-                        RosterEntry entry = roster.getEntry(participant
-                            .getJID().getBase());
+                        RosterEntry entry = roster.getEntry(jidBase);
                         if (entry != null) {
                             String nickName = entry.getName();
                             if (nickName != null
                                 && nickName.trim().length() > 0) {
-                                name = nickName + " ("
-                                    + participant.getJID().getBase() + ")";
+                                name = nickName + " (" + jidBase + ")";
                             }
                         }
                     }
@@ -200,7 +197,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             }
 
             StringBuffer sb = new StringBuffer(name);
-            if (SessionView.this.sharedProject.isDriver(participant)) {
+            if (participant.isDriver()) {
                 sb.append(" (Driver)");
             }
 
@@ -209,12 +206,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
         @Override
         public Image getImage(Object obj) {
-            User user = (User) obj;
-            if (SessionView.this.sharedProject.isDriver(user)) {
-                return this.driverImage;
-            } else {
-                return this.userImage;
-            }
+            return ((User) obj).isDriver() ? this.driverImage : this.userImage;
         }
 
         public Image getColumnImage(Object obj, int index) {

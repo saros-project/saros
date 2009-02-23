@@ -608,8 +608,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * @return the jid of the local user or null if not connected with a jabber
-     *         server
+     * @return the local user or null if not connected with a jabber server
      */
     public User getLocalUser() {
         if (!isConnected())

@@ -34,6 +34,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -70,7 +71,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected ISharedProjectListener projectListener = new ISharedProjectListener() {
 
-        public void roleChanged(JID user, boolean replicated) {
+        public void roleChanged(User user, boolean replicated) {
             updateDecoratorsAsync(null);
         }
 

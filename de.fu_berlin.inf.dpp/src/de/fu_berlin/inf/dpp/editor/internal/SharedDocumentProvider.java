@@ -5,6 +5,7 @@ import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -94,7 +95,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
      * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
      */
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
         if (this.sharedProject != null) {
             this.isDriver = this.sharedProject.isDriver(); // HACK
         }

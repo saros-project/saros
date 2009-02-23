@@ -69,12 +69,6 @@ public interface ISharedProject {
     public boolean isDriver();
 
     /**
-     * @return <code>true</code> if the given user is one of the current driver
-     *         of this shared project. <code>false</code> otherwise.
-     */
-    public boolean isDriver(User user);
-
-    /**
      * The host is the person that initiated this SharedProject and holds all
      * original files.
      * 

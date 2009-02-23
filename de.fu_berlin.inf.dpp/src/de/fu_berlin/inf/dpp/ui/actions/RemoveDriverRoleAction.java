@@ -19,7 +19,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
     private ISharedProjectListener projectListener = new ISharedProjectListener() {
 
-        public void roleChanged(JID user, boolean replicated) {
+        public void roleChanged(User user, boolean replicated) {
             updateEnablemnet();
         }
 
@@ -62,7 +62,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
-        if (project.isDriver(selectedUser))
+        if (selectedUser.isDriver())
             project.toggleUserRole(selectedUser, false);
         updateEnablemnet();
     }
@@ -78,7 +78,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
             .getSharedProject();
 
         boolean enabled = ((project != null) && (this.selectedUser != null)
-            && project.isHost() && project.isDriver(this.selectedUser));
+            && project.isHost() && this.selectedUser.isDriver());
         setEnabled(enabled);
     }
 }

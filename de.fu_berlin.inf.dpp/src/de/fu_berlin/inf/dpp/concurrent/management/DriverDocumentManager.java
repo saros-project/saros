@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -211,18 +212,18 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         }
     }
 
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
 
         // TODO DriverDocumentManager needs the host to be a driver
         if (Saros.getDefault().getSessionManager().getSharedProject().getHost()
             .equals(user)) {
             return;
         }
-
-        if (isDriver(user)) {
-            removeDriver(user);
+        JID jid = user.getJID();
+        if (isDriver(jid)) {
+            removeDriver(jid);
         } else {
-            addDriver(user);
+            addDriver(jid);
         }
 
     }

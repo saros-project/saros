@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -10,7 +11,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public abstract class AbstractSharedProjectListener implements
     ISharedProjectListener {
 
-    public void roleChanged(JID user, boolean replicated) {
+    public void roleChanged(User user, boolean replicated) {
         // Do nothing.
     }
 

@@ -185,7 +185,7 @@ public class SharedProject implements ISharedProject {
         User myself = getParticipant(this.myID);
 
         /* if user has current role observer */
-        if (user.getUserRole() == UserRole.OBSERVER) {
+        if (user.isObserver()) {
 
             /* set new driver status in participant list of sharedProject. */
             user.setUserRole(UserRole.DRIVER);
@@ -196,24 +196,17 @@ public class SharedProject implements ISharedProject {
             }
 
         } else {
-
-            /* changed state form driver to observer */
-            if (user.getUserRole() == UserRole.DRIVER) {
-
-                /* set the local driver state to observer */
-                if (user.equals(myself)) {
-                    setProjectReadonly(true);
-                }
-
-                /* set observer state. */
-                user.setUserRole(UserRole.OBSERVER);
+            /* set the local driver state to observer */
+            if (user.equals(myself)) {
+                setProjectReadonly(true);
             }
+
+            /* set observer state. */
+            user.setUserRole(UserRole.OBSERVER);
         }
 
-        /* inform observer. */
-        JID jid = user.getJID();
         for (ISharedProjectListener listener : this.listeners) {
-            listener.roleChanged(jid, replicated);
+            listener.roleChanged(user, replicated);
         }
     }
 
@@ -234,13 +227,9 @@ public class SharedProject implements ISharedProject {
         // activitySequencer.getConcurrentManager().isDriver(driver.getJid());
         // }
         // CLIENT
-        return (getParticipant(this.myID).getUserRole() == UserRole.DRIVER);
+        return (getParticipant(this.myID).isDriver());
         // return driver.getJid().equals(myID);
 
-    }
-
-    public boolean isDriver(User user) {
-        return getParticipant(user.getJID()).getUserRole() == UserRole.DRIVER;
     }
 
     /*
@@ -273,7 +262,7 @@ public class SharedProject implements ISharedProject {
             for (User user : participants.values()) {
                 if (user.equals(Saros.getDefault().getLocalUser()))
                     continue;
-                else if (user.getUserRole() == UserRole.DRIVER)
+                else if (user.isDriver())
                     return false;
             }
             return true;
@@ -460,7 +449,7 @@ public class SharedProject implements ISharedProject {
 
     public User getADriver() {
         for (User user : getParticipants()) {
-            if (isDriver(user)) {
+            if (user.isDriver()) {
                 return user;
             }
         }
