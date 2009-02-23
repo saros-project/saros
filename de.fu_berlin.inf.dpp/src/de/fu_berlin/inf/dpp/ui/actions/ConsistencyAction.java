@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -144,37 +145,40 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
             IFile file = project.getProject().getFile(path);
 
-            try {
-                // get stream from old file
-                InputStream oldStream = file.getContents();
+            if (log.isDebugEnabled()) {
+                try {
+                    // save input in a byte[] for later
+                    byte[] inputBytes = IOUtils.toByteArray(input);
 
-                // save input in a new String for later
-                String inputStr = IOUtils.toString(input);
-                input = IOUtils.toInputStream(inputStr);
+                    // reset input
+                    input = new ByteArrayInputStream(inputBytes);
 
-                // read Lines from
-                Object[] oldContent = IOUtils.readLines(oldStream).toArray();
-                Object[] newContent = IOUtils.readLines(input).toArray();
+                    // get stream from old file
+                    InputStream oldStream = file.getContents();
+                    InputStream newStream = new ByteArrayInputStream(inputBytes);
 
-                // set input again from saved String
-                input = IOUtils.toInputStream(inputStr);
+                    // read Lines from
+                    Object[] oldContent = IOUtils.readLines(oldStream)
+                        .toArray();
+                    Object[] newContent = IOUtils.readLines(newStream)
+                        .toArray();
 
-                // Calculate diff of the two files
-                Diff diff = new Diff(oldContent, newContent);
-                Diff.change script = diff.diff_2(false);
+                    // Calculate diff of the two files
+                    Diff diff = new Diff(oldContent, newContent);
+                    Diff.change script = diff.diff_2(false);
 
-                // log diff
-                DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
-                    oldContent, newContent);
-                Writer writer = new StringWriter();
-                print.setOutput(writer);
-                print.print_script(script);
-                log.debug("Diff of inconsistency: \n" + writer);
-
-            } catch (CoreException e) {
-                log.error("Can't read file content", e);
-            } catch (IOException e) {
-                log.error("Can't convert file content to String", e);
+                    // log diff
+                    DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
+                        oldContent, newContent);
+                    Writer writer = new StringWriter();
+                    print.setOutput(writer);
+                    print.print_script(script);
+                    log.debug("Diff of inconsistency: \n" + writer);
+                } catch (CoreException e) {
+                    log.error("Can't read file content", e);
+                } catch (IOException e) {
+                    log.error("Can't convert file content to String", e);
+                }
             }
 
             FileUtil.writeFile(input, file);
