@@ -22,6 +22,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The InsertOperation is used to hold a text together with its position index.
@@ -191,9 +192,10 @@ public class InsertOperation implements Operation {
         return "Insert("
             + this.position
             + ",'"
-            + (this.text != null ? ((this.text.length() > 20) ? this.text
-                .substring(0, 20)
-                + "..." : this.text) : "") + "'," + this.origin + ")";
+            + (this.text != null ? ((this.text.length() > 20) ? Util
+                .escapeForLogging(this.text).substring(0, 20)
+                + "..." : Util.escapeForLogging(this.text)) : "") + "',"
+            + this.origin + ")";
     }
 
     /**
