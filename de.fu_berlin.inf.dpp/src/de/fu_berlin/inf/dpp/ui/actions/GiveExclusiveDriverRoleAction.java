@@ -6,6 +6,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -66,13 +67,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         // set all participants other than the selected to observer
         for (User user : project.getParticipants()) {
             if ((user.isDriver() && !user.equals(this.selectedUser))) {
-                project.toggleUserRole(user, false);
+                project.setUserRole(user, UserRole.OBSERVER, false);
             }
         }
 
         // if selected user is not already driver give him driver role
         if (this.selectedUser.isObserver())
-            project.toggleUserRole(this.selectedUser, false);
+            project.setUserRole(this.selectedUser, UserRole.DRIVER, false);
     }
 
     @Override

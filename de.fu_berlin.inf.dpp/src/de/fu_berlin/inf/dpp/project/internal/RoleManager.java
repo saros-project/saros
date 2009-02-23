@@ -7,6 +7,7 @@ import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -88,8 +89,9 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
         if (activity instanceof RoleActivity) {
             RoleActivity roleActivity = (RoleActivity) activity;
             User user = this.sharedProject.getParticipant(roleActivity
-                .getDriver());
-            this.sharedProject.toggleUserRole(user, true);
+                .getUser());
+            UserRole role = roleActivity.getRole();
+            this.sharedProject.setUserRole(user, role, true);
         }
     }
 
@@ -100,7 +102,8 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      */
     public void roleChanged(User user, boolean replicated) {
         if (!replicated) {
-            IActivity activity = new RoleActivity(user.getJID());
+            IActivity activity = new RoleActivity(user.getJID(), user
+                .getUserRole());
             for (IActivityListener listener : this.activityListeners) {
                 listener.activityCreated(activity);
             }
@@ -131,9 +134,11 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public IActivity fromXML(XmlPullParser parser) {
-        if (parser.getName().equals("driver")) {
+        if (parser.getName().equals("user")) {
             JID user = new JID(parser.getAttributeValue(null, "id"));
-            return new RoleActivity(user);
+            UserRole role = UserRole.valueOf(parser.getAttributeValue(null,
+                "role"));
+            return new RoleActivity(user, role);
         }
 
         return null;
@@ -147,7 +152,8 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
     public String toXML(IActivity activity) {
         if (activity instanceof RoleActivity) {
             RoleActivity roleActivity = (RoleActivity) activity;
-            return "<driver id=\"" + roleActivity.getDriver() + "\" />";
+            return "<user id=\"" + roleActivity.getUser() + "\" role=\""
+                + roleActivity.getRole() + "\" />";
         }
 
         return null;

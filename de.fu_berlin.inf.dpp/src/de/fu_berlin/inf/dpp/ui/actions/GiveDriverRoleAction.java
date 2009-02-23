@@ -6,6 +6,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -61,7 +62,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
-        project.toggleUserRole(this.selectedUser, false);
+        project.setUserRole(this.selectedUser, UserRole.DRIVER, false);
     }
 
     @Override

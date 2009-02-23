@@ -6,6 +6,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -63,7 +64,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
         if (selectedUser.isDriver())
-            project.toggleUserRole(selectedUser, false);
+            project.setUserRole(selectedUser, UserRole.OBSERVER, false);
         updateEnablemnet();
     }
 

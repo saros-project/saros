@@ -178,31 +178,13 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public void toggleUserRole(User user, boolean replicated) {
+    public void setUserRole(User user, UserRole role, boolean replicated) {
 
         assert user != null;
 
-        User myself = getParticipant(this.myID);
-
-        /* if user has current role observer */
-        if (user.isObserver()) {
-
-            /* set new driver status in participant list of sharedProject. */
-            user.setUserRole(UserRole.DRIVER);
-
-            /* set local file settings. */
-            if (user.equals(myself)) {
-                setProjectReadonly(false);
-            }
-
-        } else {
-            /* set the local driver state to observer */
-            if (user.equals(myself)) {
-                setProjectReadonly(true);
-            }
-
-            /* set observer state. */
-            user.setUserRole(UserRole.OBSERVER);
+        user.setUserRole(role);
+        if (user.equals(getParticipant(this.myID))) {
+            setProjectReadonly(user.isObserver());
         }
 
         for (ISharedProjectListener listener : this.listeners) {
@@ -227,7 +209,7 @@ public class SharedProject implements ISharedProject {
         // activitySequencer.getConcurrentManager().isDriver(driver.getJid());
         // }
         // CLIENT
-        return (getParticipant(this.myID).isDriver());
+        return getParticipant(this.myID).isDriver();
         // return driver.getJid().equals(myID);
 
     }

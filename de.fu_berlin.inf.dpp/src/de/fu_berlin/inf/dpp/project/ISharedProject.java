@@ -28,6 +28,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
@@ -50,17 +51,18 @@ public interface ISharedProject {
     public Collection<User> getParticipants();
 
     /**
-     * Toggle the role of the given user. Driver becomes to an observer and vice
-     * versa.
+     * Set the role of the given user.
      * 
      * @param user
-     *            the user which role has to be changed.
+     *            the user which role has to be set.
+     * @param role
+     *            The new role of the user.
      * @param replicated
      *            <code>false</code> if this event was created by this client.
      *            <code>true</code> if it was created by another client and only
      *            replicated to this client.
      */
-    public void toggleUserRole(User user, boolean replicated);
+    public void setUserRole(User user, UserRole role, boolean replicated);
 
     /**
      * @return <code>true</code> if the local client is a current driver of this

@@ -23,6 +23,7 @@ import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -56,7 +57,7 @@ public class RemoveAllDriverRoleAction extends Action implements
             .getSharedProject();
         for (User user : project.getParticipants()) {
             if (user.isDriver()) {
-                project.toggleUserRole(user, false);
+                project.setUserRole(user, UserRole.OBSERVER, false);
             }
         }
     }

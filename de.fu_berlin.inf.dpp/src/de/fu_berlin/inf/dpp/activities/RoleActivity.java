@@ -19,36 +19,42 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class RoleActivity implements IActivity {
 
     private String source;
 
-    private final JID driver;
+    private final JID user;
+    private final UserRole role;
 
-    public RoleActivity(JID newDriver) {
-        this.driver = newDriver;
+    public RoleActivity(JID user, UserRole role) {
+        this.user = user;
+        this.role = role;
     }
 
-    public JID getDriver() {
-        return this.driver;
+    public JID getUser() {
+        return this.user;
+    }
+
+    public UserRole getRole() {
+        return role;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof RoleActivity) {
-            RoleActivity driverChange = (RoleActivity) obj;
-
-            return driverChange.getDriver().equals(this.driver);
+            RoleActivity activity = (RoleActivity) obj;
+            return activity.getUser().equals(this.user);
         }
-
         return false;
     }
 
     @Override
     public String toString() {
-        return "RoleActivity(driver:" + this.driver + ")";
+        return "RoleActivity(user:" + this.user + ",role:" + this.getRole()
+            + ")";
     }
 
     public String getSource() {
@@ -57,6 +63,5 @@ public class RoleActivity implements IActivity {
 
     public void setSource(String source) {
         this.source = source;
-
     }
 }
