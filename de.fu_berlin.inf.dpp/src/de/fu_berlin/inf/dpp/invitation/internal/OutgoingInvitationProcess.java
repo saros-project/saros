@@ -180,11 +180,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         setState(State.GUEST_FILELIST_SENT);
 
         // Run asynchronously
-        new Thread(new Runnable() {
-            public void run() {
-                startSynchronization();
-            }
-        }).start();
+        Util.runSafeAsync("OutgoingInvitationProcess-synchronisation-", log,
+            new Runnable() {
+                public void run() {
+                    startSynchronization();
+                }
+            });
     }
 
     /**

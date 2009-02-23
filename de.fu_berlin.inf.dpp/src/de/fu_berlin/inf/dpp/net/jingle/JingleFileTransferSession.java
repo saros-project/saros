@@ -68,36 +68,42 @@ public class JingleFileTransferSession extends JingleMediaSession {
             this.input = ii;
         }
 
+        /**
+         * @review runSafe OK
+         */
         @Override
         public void run() {
 
-            while (!isInterrupted()) {
-                TransferDescription data;
-                try {
-                    data = (TransferDescription) input.readObject();
-                } catch (IOException e) {
-                    return;
-                } catch (ClassNotFoundException e) {
-                    logger.error("Received unexpected object in ReceiveThread",
-                        e);
-                    continue;
+            try {
+                while (!isInterrupted()) {
+                    TransferDescription data;
+                    try {
+                        data = (TransferDescription) input.readObject();
+                    } catch (IOException e) {
+                        return;
+                    } catch (ClassNotFoundException e) {
+                        logger.error(
+                            "Received unexpected object in ReceiveThread", e);
+                        continue;
+                    }
+                    byte[] content;
+                    try {
+                        content = (byte[]) input.readObject();
+                    } catch (IOException e) {
+                        return;
+                    } catch (ClassNotFoundException e) {
+                        logger.error(
+                            "Received unexpected object in ReceiveThread", e);
+                        continue;
+                    }
+                    for (IJingleFileTransferListener listener : listeners) {
+                        listener.incomingData(data, new ByteArrayInputStream(
+                            content));
+                    }
                 }
-                byte[] content;
-                try {
-                    content = (byte[]) input.readObject();
-                } catch (IOException e) {
-                    return;
-                } catch (ClassNotFoundException e) {
-                    logger.error("Received unexpected object in ReceiveThread",
-                        e);
-                    continue;
-                }
-                for (IJingleFileTransferListener listener : listeners) {
-                    listener.incomingData(data, new ByteArrayInputStream(
-                        content));
-                }
+            } catch (RuntimeException e) {
+                logger.error("Internal Error in Receive Thread: ", e);
             }
-
         }
     }
 

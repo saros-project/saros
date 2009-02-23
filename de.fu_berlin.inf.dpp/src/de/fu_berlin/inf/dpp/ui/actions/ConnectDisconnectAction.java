@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class ConnectDisconnectAction extends Action {
 
@@ -64,7 +65,8 @@ public class ConnectDisconnectAction extends Action {
 
     @Override
     public void run() {
-        new Thread(new Runnable() {
+
+        Util.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
             public void run() {
                 try {
                     Saros saros = Saros.getDefault();
@@ -108,7 +110,7 @@ public class ConnectDisconnectAction extends Action {
                     .getActivePage().getViewReferences()[0].getView(false)
                     .getViewSite().getActionBars().getStatusLineManager();
             }
-        }).start();
+        });
     }
 
     public void updateStatus() {

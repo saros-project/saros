@@ -10,56 +10,63 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.Util;
 
-public class Serializer extends Thread {
+/**
+ * FIXME The Serializer is never stopped!
+ */
+public class Serializer {
 
-    private static Logger logger = Logger.getLogger(Serializer.class);
+    private static Logger log = Logger.getLogger(Serializer.class);
 
-    JupiterServer server;
-
-    private final boolean run = true;
+    protected JupiterServer server;
 
     public Serializer(JupiterServer server) {
         this.server = server;
-        start();
     }
 
-    @Override
-    public void run() {
-        Serializer.logger.debug("Start Serializer");
+    protected void dispatch() throws InterruptedException,
+        TransformationException {
 
-        Request request = null;
-        HashMap<JID, JupiterClient> proxies = null;
-        JupiterClient proxy = null;
-        while (this.run) {
-            try {
-                /* get next request in queue. */
-                request = this.server.getNextRequestInSynchronizedQueue();
+        // get next request in queue.
+        Request request = server.getNextRequestInSynchronizedQueue();
 
-                proxies = this.server.getProxies();
-                /* 1. execute receive action at appropriate proxy client. */
-                proxy = proxies.get(request.getJID());
-                Operation op = proxy.receiveRequest(request);
-                /* 2. execute generate action at other proxy clients. */
-                for (JID j : proxies.keySet()) {
-                    proxy = proxies.get(j);
+        HashMap<JID, JupiterClient> proxies = server.getProxies();
 
-                    if (!j.toString().equals(request.getJID().toString())) {
-                        /*
-                         * create submit op as local proxy operation and send to
-                         * client.
-                         */
-                        proxy.generateRequest(op);
-                    }
+        // 1. execute receive action at appropriate proxy client.
+        JupiterClient proxy = proxies.get(request.getJID());
 
-                }
+        Operation op = proxy.receiveRequest(request);
 
-            } catch (InterruptedException e) {
-                Serializer.logger.warn("Interrupt Exception", e);
-            } catch (TransformationException e) {
-                Serializer.logger.error("Transformation Exception ", e);
-                this.server.transformationErrorOccured();
+        // 2. execute generate action at other proxy clients.
+        for (JID jid : proxies.keySet()) {
+            proxy = proxies.get(jid);
+
+            if (!jid.toString().equals(request.getJID().toString())) {
+                // create submit op as local proxy operation and send to client.
+                proxy.generateRequest(op);
             }
         }
+    }
+
+    public void start() {
+        Serializer.log.debug("Start Serializer");
+
+        Util.runSafeAsync("Serializer-", log, new Runnable() {
+            public void run() {
+
+                while (true) {
+                    try {
+                        dispatch();
+                    } catch (InterruptedException e) {
+                        Serializer.log.warn("Interrupt Exception", e);
+                        return;
+                    } catch (TransformationException e) {
+                        Serializer.log.error("Transformation Exception ", e);
+                        server.transformationErrorOccured();
+                    }
+                }
+            }
+        });
     }
 }

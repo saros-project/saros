@@ -245,11 +245,11 @@ public class Saros extends AbstractUIPlugin {
     }
 
     public void asyncConnect() {
-        new Thread(new Runnable() {
+        Util.runSafeAsync("Saros-AsyncConnect-", logger, new Runnable() {
             public void run() {
                 connect();
             }
-        }).start();
+        });
     }
 
     /**

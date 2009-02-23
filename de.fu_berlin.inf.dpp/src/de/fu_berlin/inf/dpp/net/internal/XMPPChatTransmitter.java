@@ -201,44 +201,44 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         public void fileTransferRequest(final FileTransferRequest request) {
 
-            new Thread(new Runnable() {
+            Util.runSafeAsync("IBBTransferListener-fileTransferRequest-", log,
+                new Runnable() {
 
-                public void run() {
-                    try {
-                        TransferDescription data = TransferDescription
-                            .fromBase64(request.getDescription());
-
-                        XMPPChatTransmitter.log
-                            .debug("Incoming file transfer via IBB: "
-                                + data.toString());
-
-                        IncomingFileTransfer accept = request.accept();
-
-                        InputStream in = accept.recieveFile();
-
-                        byte[] content;
+                    public void run() {
                         try {
-                            content = IOUtils.toByteArray(in);
-                        } finally {
-                            IOUtils.closeQuietly(in);
-                        }
-                        setLastUsedTransferMode(data.getSender(),
-                            TransferMode.IBB);
-                        receiveData(data, new ByteArrayInputStream(content));
+                            TransferDescription data = TransferDescription
+                                .fromBase64(request.getDescription());
 
-                    } catch (Exception e) {
-                        XMPPChatTransmitter.log.error(
-                            "Incoming File Transfer via IBB failed: ", e);
-                        for (IInvitationProcess process : XMPPChatTransmitter.this.processes) {
-                            if (process.getPeer().equals(
-                                new JID(request.getRequestor()))) {
-                                process.cancel(e.getMessage(), false);
+                            XMPPChatTransmitter.log
+                                .debug("Incoming file transfer via IBB: "
+                                    + data.toString());
+
+                            IncomingFileTransfer accept = request.accept();
+
+                            InputStream in = accept.recieveFile();
+
+                            byte[] content;
+                            try {
+                                content = IOUtils.toByteArray(in);
+                            } finally {
+                                IOUtils.closeQuietly(in);
+                            }
+                            setLastUsedTransferMode(data.getSender(),
+                                TransferMode.IBB);
+                            receiveData(data, new ByteArrayInputStream(content));
+                        } catch (Exception e) {
+                            XMPPChatTransmitter.log.error(
+                                "Incoming File Transfer via IBB failed: ", e);
+                            for (IInvitationProcess process : XMPPChatTransmitter.this.processes) {
+                                if (process.getPeer().equals(
+                                    new JID(request.getRequestor()))) {
+                                    process.cancel(e.getMessage(), false);
+                                }
                             }
                         }
-                    }
 
-                }
-            }).start();
+                    }
+                });
         }
     }
 
@@ -1203,6 +1203,9 @@ public class XMPPChatTransmitter implements ITransmitter,
         if (!Saros.getFileTransferModeViaChat()) {
             // Start Jingle Manager asynchronous
             this.startingJingleThread = new Thread(new Runnable() {
+                /**
+                 * @review runSafe OK
+                 */
                 public void run() {
                     try {
                         jingleManager = new JingleFileTransferManager(

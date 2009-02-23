@@ -420,9 +420,17 @@ public class SharedProject implements ISharedProject {
 
         /* 2. start thread for sending jupiter requests. */
         this.requestTransmitter = new Thread(new Runnable() {
+            /**
+             * @review runSafe OK
+             */
             public void run() {
-                while (!stopped && !Thread.interrupted()) {
-                    sendRequest();
+                try {
+                    while (!stopped && !Thread.interrupted()) {
+                        sendRequest();
+                    }
+                } catch (RuntimeException e) {
+                    log.error(
+                        "Internal error in SharedProject Dispatch Thread: ", e);
                 }
             }
         });

@@ -63,6 +63,9 @@ public class FileTransferProgressMonitor extends Thread {
         return (int) (100 * getProgress());
     }
 
+    /**
+     * @review runSafe OK
+     */
     @Override
     public void run() {
         try {

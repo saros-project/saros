@@ -17,6 +17,11 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * TODO [CO] Document and review this class
+ * 
+ * FIXME JupiterDocumentServer is never stopped
+ */
 public class JupiterDocumentServer implements JupiterServer {
 
     private static Logger logger = Logger
@@ -29,20 +34,25 @@ public class JupiterDocumentServer implements JupiterServer {
 
     private final List<Request> requestList;
 
-    // /** outgoing queue to transfer request to appropriate clients. */
+    /**
+     * outgoing queue to transfer request to appropriate clients.
+     */
     private final List<Request> outgoingQueue;
 
     private IPath editor;
+
     /**
      * forward outgoing request to activity sequencer;
      */
     private RequestTransmitter transmitter;
 
+    private Serializer serializer;
+
     /**
      * this forwarder reads request form the local outgoing queue and transmit
      * the requests to the global outgoing queue.
      */
-    class RequestTransmitter extends Thread {
+    class RequestTransmitter {
 
         private final RequestForwarder rf;
         private static final int MILLIS = 100;
@@ -53,30 +63,38 @@ public class JupiterDocumentServer implements JupiterServer {
 
         public Timer flushTimer = new Timer(true);
 
-        @Override
-        public void run() {
+        public void start() {
             this.flushTimer.schedule(new TimerTask() {
 
+                /**
+                 * @review runSafe OK
+                 */
                 @Override
                 public void run() {
-                    /* forwarding */
+
                     try {
-                        JupiterDocumentServer.logger
-                            .debug("Forwarding requests to activity sequencer. ");
-                        RequestTransmitter.this.rf
-                            .forwardOutgoingRequest(getNextOutgoingRequest());
-                        JupiterDocumentServer.logger
-                            .debug("Forwarding is sended to activity sequencer. ");
-                    } catch (InterruptedException e) {
-                        JupiterDocumentServer.logger.warn(
-                            "Exception forwarding request.", e);
+                        forwardRequest();
+                    } catch (RuntimeException e) {
+                        logger.error("Failed to forward request: ", e);
                     }
-
                 }
-
             }, 0, RequestTransmitter.MILLIS);
         }
 
+        private void forwardRequest() {
+
+            /* forwarding */
+            try {
+                JupiterDocumentServer.logger
+                    .debug("Forwarding requests to activity sequencer. ");
+                this.rf.forwardOutgoingRequest(getNextOutgoingRequest());
+                JupiterDocumentServer.logger
+                    .debug("Forwarding is sended to activity sequencer. ");
+            } catch (InterruptedException e) {
+                JupiterDocumentServer.logger.warn(
+                    "Exception forwarding request.", e);
+            }
+        }
     }
 
     /**
@@ -88,7 +106,8 @@ public class JupiterDocumentServer implements JupiterServer {
         this.requestList = new Vector<Request>();
         this.outgoingQueue = new Vector<Request>();
 
-        new Serializer(this);
+        this.serializer = new Serializer(this);
+        this.serializer.start();
         this.transmitter = new RequestTransmitter(forwarder);
         this.transmitter.start();
     }
@@ -101,14 +120,14 @@ public class JupiterDocumentServer implements JupiterServer {
         this.proxies = new HashMap<JID, JupiterClient>();
         this.requestList = new Vector<Request>();
         this.outgoingQueue = new Vector<Request>();
-
-        new Serializer(this);
+        this.serializer = new Serializer(this);
+        this.serializer.start();
     }
 
     public synchronized void addProxyClient(JID jid) {
         JupiterClient proxy = new ProxyJupiterDocument(jid, this);
         proxy.setEditor(this.editor);
-        // /* add to serializer. */
+        // add to serializer.
         // waitForSerializer = true;
         // TODO: Sync with serializer before add action.
         JupiterDocumentServer.logger.debug("add new proxy client : " + jid);

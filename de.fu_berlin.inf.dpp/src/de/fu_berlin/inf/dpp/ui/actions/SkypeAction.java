@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.URLHyperlink;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -9,6 +10,7 @@ import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A action for skyping other users.
@@ -16,6 +18,10 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * @author rdjemili
  */
 public class SkypeAction extends SelectionProviderAction {
+
+    private static final Logger log = Logger.getLogger(SkypeAction.class
+        .getName());
+
     private String skypeURL;
 
     public SkypeAction(ISelectionProvider provider) {
@@ -42,9 +48,8 @@ public class SkypeAction extends SelectionProviderAction {
 
         if ((selection.size() != 1) || !(item instanceof RosterEntry)) {
             setEnabled(false);
-
         } else {
-            new Thread(new Runnable() {
+            Util.runSafeAsync("SkypeAction-", log, new Runnable() {
                 public void run() {
                     setEnabled(false);
                     SkypeManager sm = SkypeManager.getDefault();
@@ -52,7 +57,7 @@ public class SkypeAction extends SelectionProviderAction {
                         .getSkypeURL((RosterEntry) item);
                     setEnabled(SkypeAction.this.skypeURL != null);
                 }
-            }).start();
+            });
         }
     }
 }
