@@ -3,17 +3,12 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
 /**
- * This operation update have new vector time for the algorithm.
+ * This operation contains a new vector time for the algorithm.
  * 
  * @author orieger
- * 
  */
-
 public class TimestampOperation implements Operation {
 
-    /**
-	 * 
-	 */
     private static final long serialVersionUID = 2756378905499193184L;
 
     /**
