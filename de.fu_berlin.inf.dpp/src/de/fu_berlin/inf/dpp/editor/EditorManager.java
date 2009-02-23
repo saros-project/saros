@@ -223,7 +223,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     file.setResourceAttributes(resourceAttributes);
                     makeReadable = true;
                 } catch (CoreException e) {
-                    log.warn(
+                    log.error(
                         "Error making file readable for delimiter conversion:",
                         e);
                 }
