@@ -174,7 +174,16 @@ public class ConsistencyAction extends Action implements ISessionListener {
                     Writer writer = new StringWriter();
                     print.setOutput(writer);
                     print.print_script(script);
-                    log.debug("Diff of inconsistency: \n" + writer);
+
+                    String diffAsString = writer.toString();
+
+                    if (diffAsString == null
+                        || diffAsString.trim().length() == 0) {
+                        log.error("No inconsistency found in file ["
+                            + from.getName() + "] " + path.toString());
+                    } else {
+                        log.debug("Diff of inconsistency: \n" + writer);
+                    }
                 } catch (CoreException e) {
                     log.error("Can't read file content", e);
                 } catch (IOException e) {
