@@ -23,6 +23,8 @@ import java.io.Serializable;
 
 import org.jivesoftware.smack.util.StringUtils;
 
+import de.fu_berlin.inf.dpp.User;
+
 /**
  * A Jabber ID which is used to identify the users of the Jabber network.
  * 
@@ -87,6 +89,9 @@ public class JID implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            obj = ((User) obj).getJID();
+        }
         if (obj instanceof String) {
             obj = new JID((String) obj);
         }
