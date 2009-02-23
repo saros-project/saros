@@ -19,13 +19,6 @@ public interface IDriverManager {
     public boolean isDriver(JID jid);
 
     /**
-     * only one active driver exists in the system.
-     * 
-     * @return
-     */
-    public boolean isExclusiveDriver();
-
-    /**
      * get all active driver
      * 
      * @return list of active driver.

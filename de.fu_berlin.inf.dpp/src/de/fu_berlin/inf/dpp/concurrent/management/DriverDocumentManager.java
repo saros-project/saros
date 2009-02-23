@@ -232,11 +232,6 @@ public class DriverDocumentManager implements IDriverDocumentManager,
             /* remove driver status. */
             removeDriver(user);
         }
-
-    }
-
-    public boolean isExclusiveDriver() {
-        return drivers.size() == 1;
     }
 
     public void invitationReceived(IIncomingInvitationProcess invitation) {
