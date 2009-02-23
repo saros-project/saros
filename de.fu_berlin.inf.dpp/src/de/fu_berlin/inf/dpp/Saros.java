@@ -565,6 +565,7 @@ public class Saros extends AbstractUIPlugin {
                                 .getTimestamp();
                         }
 
+                        // TODO NPE
                         while (!Saros.this.connection.isConnected()) {
                             connect();
 
