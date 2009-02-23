@@ -130,6 +130,7 @@ public class DriverDocumentManager implements IDriverDocumentManager,
     public void removeDriver(JID jid) {
         DriverDocumentManager.logger.debug("remove driver " + jid);
 
+        // TODO ConcurrentModificationException when called from setUserRole...
         /* remove driver from all documents */
         for (IPath path : this.documents.keySet()) {
             removeDriverFromDocument(path, jid);
