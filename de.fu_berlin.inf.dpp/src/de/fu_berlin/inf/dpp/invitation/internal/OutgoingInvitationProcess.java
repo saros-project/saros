@@ -388,6 +388,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                     EditorActivity.Type.Activated, path));
 
                 // HACK Get one of possibly more editors for given path.
+                // TODO Possible NPE if no editor found!
                 IEditorPart editorPart = editorManager.getEditors(path)
                     .iterator().next();
                 final ITextViewer viewer = EditorAPI.getViewer(editorPart);
