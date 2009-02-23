@@ -1,11 +1,16 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
@@ -16,6 +21,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import bmsi.util.Diff;
+import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -136,6 +143,39 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 return false;
 
             IFile file = project.getProject().getFile(path);
+
+            try {
+                // get stream from old file
+                InputStream oldStream = file.getContents();
+
+                // save input in a new String for later
+                String inputStr = IOUtils.toString(input);
+                input = IOUtils.toInputStream(inputStr);
+
+                // read Lines from
+                Object[] oldContent = IOUtils.readLines(oldStream).toArray();
+                Object[] newContent = IOUtils.readLines(input).toArray();
+
+                // set input again from saved String
+                input = IOUtils.toInputStream(inputStr);
+
+                // Calculate diff of the two files
+                Diff diff = new Diff(oldContent, newContent);
+                Diff.change script = diff.diff_2(false);
+
+                // log diff
+                DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
+                    oldContent, newContent);
+                Writer writer = new StringWriter();
+                print.setOutput(writer);
+                print.print_script(script);
+                log.debug("Diff of inconsistency: \n" + writer);
+
+            } catch (CoreException e) {
+                log.error("Can't read file content", e);
+            } catch (IOException e) {
+                log.error("Can't convert file content to String", e);
+            }
 
             FileUtil.writeFile(input, file);
 
