@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -246,6 +247,10 @@ public class Util {
      */
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
         Display.getDefault().syncExec(wrapSafe(log, runnable));
+    }
+
+    public static String escapeForLogging(String s) {
+        return StringEscapeUtils.escapeJava(s);
     }
 
     /**
