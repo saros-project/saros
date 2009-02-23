@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
@@ -20,7 +21,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -68,8 +71,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     /** current open editor at client side. */
     private final HashMap<IPath, JupiterClient> clientDocs = new HashMap<IPath, JupiterClient>();
-
-    // private List<JID> drivers;
 
     private JID host;
 
@@ -153,10 +154,13 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
             assert isHostSide() : "This job is intended to be run on host side!";
 
+            Set<IDocument> missingDocuments = new HashSet<IDocument>(
+                registeredDocuments);
+
             // Update Checksums for all documents controlled by jupiter
             for (IPath docPath : clientDocs.keySet()) {
 
-                // get document
+                // Get document
                 ITextFileBuffer fileBuff = getTextFileBuffer(docPath);
 
                 // TODO CO Handle missing files correctly
@@ -167,19 +171,38 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 }
                 IDocument doc = fileBuff.getDocument();
 
-                // if no entry for this document exists create a new one
+                // Update listener management
+                missingDocuments.remove(doc);
+                if (!registeredDocuments.contains(doc)) {
+                    registeredDocuments.add(doc);
+                    doc.addDocumentListener(dirtyListener);
+                    dirtyDocument.add(doc);
+                }
+
+                // If document not changed, skip
+                if (!dirtyDocument.contains(doc))
+                    continue;
+
+                // If no entry for this document exists create a new one
                 if (docsChecksums.get(docPath) == null) {
                     DocumentChecksum c = new DocumentChecksum(docPath, doc
                         .getLength(), doc.get().hashCode());
                     docsChecksums.put(docPath, c);
                 } else {
+                    // else set new length and hash
                     DocumentChecksum c = docsChecksums.get(docPath);
-                    if (c.getLength() != doc.getLength()) {
-                        // length has changed, compute the hash new
-                        c.setLength(doc.getLength());
-                        c.setHash(doc.get().hashCode());
-                    }
+                    c.setLength(doc.getLength());
+                    c.setHash(doc.get().hashCode());
                 }
+            }
+
+            // Reset dirty states
+            dirtyDocument.clear();
+
+            // Unregister all documents that are no longer there
+            for (IDocument missing : missingDocuments) {
+                registeredDocuments.remove(missing);
+                missing.removeDocumentListener(dirtyListener);
             }
 
             // Send to all Clients
@@ -191,6 +214,36 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             // Reschedule the next run in 10 seconds
             schedule(10000);
             return Status.OK_STATUS;
+        }
+
+        Set<IDocument> registeredDocuments = new HashSet<IDocument>();
+
+        Set<IDocument> dirtyDocument = new HashSet<IDocument>();
+
+        public IDocumentListener dirtyListener = new IDocumentListener() {
+
+            public void documentAboutToBeChanged(DocumentEvent event) {
+                // we are only interested in events after the change
+            }
+
+            public void documentChanged(DocumentEvent event) {
+                dirtyDocument.add(event.getDocument());
+            }
+        };
+
+        public void stop() {
+
+            // Cancel Job
+            cancel();
+
+            // Unregister from all documents
+            for (IDocument document : registeredDocuments) {
+                document.removeDocumentListener(dirtyListener);
+            }
+            registeredDocuments.clear();
+
+            // Reset all dirty states
+            dirtyDocument.clear();
         }
     }
 
@@ -223,7 +276,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                         .removeSessionListener(this);
 
                     if (side == Side.HOST_SIDE) {
-                        consistencyWatchdog.cancel();
+                        consistencyWatchdog.stop();
                     }
 
                     // TODO we should not need this
@@ -543,17 +596,19 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      * @return List with executable text edit activities.
      */
     public List<TextEditActivity> getTextEditActivity(Operation op) {
-        List<TextEditActivity> result = new Vector<TextEditActivity>();
-        TextEditActivity textEdit = null;
+
+        List<TextEditActivity> result = new ArrayList<TextEditActivity>(2);
+
         if (op instanceof DeleteOperation) {
             DeleteOperation del = (DeleteOperation) op;
-            textEdit = new TextEditActivity(del.getPosition(), "", del
-                .getTextLength());
+            TextEditActivity textEdit = new TextEditActivity(del.getPosition(),
+                "", del.getTextLength());
             result.add(textEdit);
         }
         if (op instanceof InsertOperation) {
             InsertOperation ins = (InsertOperation) op;
-            textEdit = new TextEditActivity(ins.getPosition(), ins.getText(), 0);
+            TextEditActivity textEdit = new TextEditActivity(ins.getPosition(),
+                ins.getText(), 0);
             result.add(textEdit);
         }
         if (op instanceof SplitOperation) {
