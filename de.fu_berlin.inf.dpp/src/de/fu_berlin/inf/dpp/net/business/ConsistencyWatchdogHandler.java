@@ -224,9 +224,10 @@ public class ConsistencyWatchdogHandler {
                     }
                 });
             } catch (RejectedExecutionException e) {
-                // Ignore Checksums that arrive before we are done processing
-                // the
-                // last set of Checksums.
+                /*
+                 * Ignore Checksums that arrive before we are done processing
+                 * the last set of Checksums.
+                 */
                 log
                     .warn("Received Checksums before processing of previous checksums finished");
             }
