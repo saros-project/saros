@@ -73,6 +73,20 @@ public class User {
         return this.role;
     }
 
+    /**
+     * Utility method to determine whether this user has the UserRole.DRIVER
+     */
+    public boolean isDriver() {
+        return this.role == UserRole.DRIVER;
+    }
+
+    /**
+     * Utility method to determine whether this user has the UserRole.OBSERVER
+     */
+    public boolean isObserver() {
+        return this.role == UserRole.OBSERVER;
+    }
+
     @Override
     public String toString() {
         return this.jid.getName();
