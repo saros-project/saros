@@ -126,7 +126,10 @@ public class SharedProject implements ISharedProject {
         setProjectReadonly(false);
     }
 
-    public SharedProject(ITransmitter transmitter, IProject project, JID myID, // guest
+    /**
+     * Constructor of client
+     */
+    public SharedProject(ITransmitter transmitter, IProject project, JID myID,
         JID hostID, int myColorID) {
 
         this.transmitter = transmitter;
