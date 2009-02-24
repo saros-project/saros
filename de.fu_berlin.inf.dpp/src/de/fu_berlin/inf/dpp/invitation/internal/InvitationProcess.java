@@ -55,24 +55,19 @@ public abstract class InvitationProcess implements IInvitationProcess {
         this.peer = peer;
         this.description = description;
         this.colorID = colorID;
-
         this.transferMode = TransferMode.JINGLE;
 
         transmitter.addInvitationProcess(this);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public Exception getException() {
         return this.exception;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public State getState() {
@@ -87,18 +82,14 @@ public abstract class InvitationProcess implements IInvitationProcess {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public JID getPeer() {
         return this.peer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public String getDescription() {
