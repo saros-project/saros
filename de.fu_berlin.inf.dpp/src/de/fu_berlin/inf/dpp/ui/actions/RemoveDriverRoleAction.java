@@ -88,6 +88,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     public void selectionChanged(IStructuredSelection selection) {
         this.selectedUser = (selection.size() == 1) ? (User) selection
             .getFirstElement() : null;
+        updateEnablemnet();
     }
 
     private void updateEnablemnet() {
