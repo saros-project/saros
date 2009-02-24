@@ -30,12 +30,15 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.RowLayout;
@@ -54,6 +57,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
+import org.jivesoftware.smack.packet.Presence.Type;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
@@ -234,10 +238,25 @@ public class RosterView extends ViewPart implements IConnectionListener,
     /**
      * Shows user name and state in parenthesis.
      */
-    private class ViewLabelProvider extends LabelProvider {
+    private class ViewLabelProvider extends LabelProvider implements
+        IStyledLabelProvider {
         private final Image groupImage = SarosUI.getImage("icons/group.png");
 
         private final Image personImage = SarosUI.getImage("icons/user.png");
+
+        private Image personOfflineImage;
+
+        public Image getPersonOfflineImage() {
+            if (personOfflineImage == null) {
+                synchronized (this) {
+                    if (personOfflineImage == null) {
+                        personOfflineImage = new Image(Display.getDefault(),
+                            personImage, SWT.IMAGE_DISABLE);
+                    }
+                }
+            }
+            return personOfflineImage;
+        }
 
         @Override
         public String getText(Object obj) {
@@ -270,8 +289,62 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         @Override
         public Image getImage(Object element) {
-            return element instanceof RosterEntry ? this.personImage
-                : this.groupImage;
+
+            if (element instanceof RosterEntry) {
+                RosterEntry entry = (RosterEntry) element;
+
+                Presence presence = roster.getPresence(entry.getUser());
+
+                if (presence.isAvailable()) {
+                    return this.personImage;
+                } else {
+                    return getPersonOfflineImage();
+                }
+            }
+            return this.groupImage;
+        }
+
+        public StyledString getStyledText(Object element) {
+            if (element instanceof RosterEntry) {
+                RosterEntry entry = (RosterEntry) element;
+
+                StyledString result = new StyledString();
+
+                String label = entry.getName();
+
+                // show JID if entry has no nickname
+                if (label == null) {
+                    result.append(entry.getUser());
+                } else {
+                    result.append(label);
+                }
+
+                // append presence information if available
+                Presence presence = RosterView.this.roster.getPresence(entry
+                    .getUser());
+                RosterEntry e = RosterView.this.roster
+                    .getEntry(entry.getUser());
+                if (e.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
+                    result.append(" (wait for permission)",
+                        StyledString.COUNTER_STYLER);
+                } else if (presence != null
+                    && presence.getType() != Type.available
+                    && presence.getType() != Type.unavailable) {
+                    // Available and Unavailable are visible in the icon color
+                    result.append(" (" + presence.getType() + ")",
+                        StyledString.COUNTER_STYLER);
+                }
+
+                // TODO Append Jingle State information
+                // if (presence != null && presence.isAvailable()) {
+                // // Append Jingle Information
+                // result.append(" [IBB]", StyledString.QUALIFIER_STYLER);
+                // }
+
+                return result;
+            }
+
+            return new StyledString(element.toString());
         }
     }
 
@@ -289,18 +362,28 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 if (elem2 instanceof RosterEntry) {
                     RosterEntry entry2 = (RosterEntry) elem2;
 
-                    String user1 = entry1.getUser();
-                    boolean presence1 = RosterView.this.roster
-                        .getPresence(user1) != null;
+                    Presence presence1 = RosterView.this.roster
+                        .getPresence(entry1.getUser());
 
-                    String user2 = entry2.getUser();
-                    boolean presence2 = RosterView.this.roster
-                        .getPresence(user2) != null;
+                    Presence presence2 = RosterView.this.roster
+                        .getPresence(entry2.getUser());
 
-                    if (presence1 && !presence2) {
-                        return -1;
-                    } else if (!presence1 && presence2) {
-                        return 1;
+                    if (presence1 == null) {
+                        if (presence2 != null) {
+                            return 1;
+                        }
+                    } else {
+                        if (presence2 == null) {
+                            return -1;
+                        }
+
+                        // Both not null
+                        if (presence1.isAvailable() && !presence2.isAvailable()) {
+                            return -1;
+                        } else if (!presence1.isAvailable()
+                            && presence2.isAvailable()) {
+                            return 1;
+                        }
                     }
                 }
             }
@@ -321,19 +404,21 @@ public class RosterView extends ViewPart implements IConnectionListener,
             SWT.COLOR_WHITE));
 
         RowLayout layout = new RowLayout(SWT.VERTICAL);
-        layout.pack = true;
+        layout.wrap = false;
+        layout.fill = true;
         layout.spacing = 5;
         composite.setLayout(layout);
 
-        label = new Label(composite, SWT.LEFT);
-        label.setText("Not Connected");
+        this.label = new Label(composite, SWT.LEFT);
+        this.label.setText("Not Connected");
         this.label.setBackground(Display.getDefault().getSystemColor(
             SWT.COLOR_WHITE));
 
-        this.viewer = new TreeViewer(composite, SWT.MULTI | SWT.H_SCROLL
-            | SWT.V_SCROLL);
+        // TODO Should scroll
+        this.viewer = new TreeViewer(composite, SWT.MULTI);
         this.viewer.setContentProvider(new TreeContentProvider());
-        this.viewer.setLabelProvider(new ViewLabelProvider());
+        this.viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
+            new ViewLabelProvider()));
         this.viewer.setSorter(new NameSorter());
         this.viewer.setInput(getViewSite());
         this.viewer.expandAll();
