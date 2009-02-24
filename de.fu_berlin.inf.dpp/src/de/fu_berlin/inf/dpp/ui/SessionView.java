@@ -125,8 +125,6 @@ public class SessionView extends ViewPart implements ISessionListener,
             // if the local user becomes driver, then leave follow mode
             if (user.equals(Saros.getDefault().getLocalUser())) {
                 if (user.isDriver()) {
-                    // TODO this is never set to true again, except for starting
-                    // a new session!
                     followModeAction.setFollowMode(false);
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
@@ -135,6 +133,7 @@ public class SessionView extends ViewPart implements ISessionListener,
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
                         "You are now an observer of this session.", 5000);
+                    followModeAction.setFollowMode(isStartingInFollowMode());
                 }
 
             }
@@ -426,6 +425,11 @@ public class SessionView extends ViewPart implements ISessionListener,
     protected boolean isMultiDriverEnabled() {
         return Saros.getDefault().getPreferenceStore().getBoolean(
             PreferenceConstants.MULTI_DRIVER);
+    }
+
+    protected boolean isStartingInFollowMode() {
+        return Saros.getDefault().getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_FOLLOW_MODE);
     }
 
     public void propertyChange(PropertyChangeEvent event) {
