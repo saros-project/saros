@@ -598,8 +598,21 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             .getProjectRelativePath();
 
         if (path != null) {
+
+            String replacedText;
+            try {
+                replacedText = document.get(offset, replace);
+            } catch (BadLocationException e) {
+                log.error("Offset and replace invalid", e);
+
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < replace; i++)
+                    sb.append("?");
+                replacedText = sb.toString();
+            }
+
             TextEditActivity activity = new TextEditActivity(offset, text,
-                replace, path);
+                replacedText, path);
             /*
              * check if text edit activity is executed by other driver activity
              * recently.
@@ -815,8 +828,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);
-        replaceText(file, textEdit.offset, textEdit.length, textEdit.text,
-            (driverJID != null) ? driverJID.toString() : "");
+        replaceText(file, textEdit.offset, textEdit.replacedText,
+            textEdit.text, (driverJID != null) ? driverJID.toString() : "");
 
         Set<IEditorPart> editors = editorPool.getEditors(path);
         for (IEditorPart editorPart : editors) {
@@ -1019,7 +1032,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             TextEditActivity textEditActivity = (TextEditActivity) activity;
             return "<edit " + "path=\"" + textEditActivity.getEditor() + "\" "
                 + "offset=\"" + textEditActivity.offset + "\" " + "replace=\""
-                + textEditActivity.length + "\">" + "<![CDATA["
+                + textEditActivity.replacedText + "\">" + "<![CDATA["
                 + textEditActivity.text + "]]>" + "</edit>";
 
         } else if (activity instanceof TextSelectionActivity) {
@@ -1053,10 +1066,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Path path = pathString.equals("null") ? null : new Path(pathString);
 
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-        // TODO This value is the length of the old text, so "replace" should be
-        // renamed.
-        int replace = Integer.parseInt(parser
-            .getAttributeValue(null, "replace"));
+
+        String replace = parser.getAttributeValue(null, "replace");
 
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
@@ -1108,8 +1119,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             .getProject()));
     }
 
-    private void replaceText(IFile file, int offset, int replace, String text,
-        String source) {
+    private void replaceText(IFile file, int offset, String replacedText,
+        String text, String source) {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
 
@@ -1120,7 +1131,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             IDocument doc = provider.getDocument(input);
-            doc.replace(offset, replace, text);
+
+            // TODO assert that the replaceText is really the one replace here
+
+            doc.replace(offset, replacedText.length(), text);
             EditorManager.this.lastRemoteEditTimes.put(file
                 .getProjectRelativePath(), System.currentTimeMillis());
 

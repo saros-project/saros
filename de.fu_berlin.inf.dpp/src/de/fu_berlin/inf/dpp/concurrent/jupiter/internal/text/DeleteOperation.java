@@ -22,6 +22,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The DeleteOperation is used to hold a text together with its position that is
@@ -134,7 +135,8 @@ public class DeleteOperation implements Operation {
      */
     @Override
     public String toString() {
-        return "Delete(" + this.position + ",'" + this.text + "')";
+        return "Delete(" + this.position + ",'"
+            + Util.escapeForLogging(this.text) + "')";
     }
 
     /**

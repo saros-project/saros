@@ -19,7 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
+
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A simple immutable text activity.
@@ -27,33 +30,39 @@ import org.eclipse.core.runtime.IPath;
  * @author rdjemili
  */
 public class TextEditActivity implements IActivity {
+
     public final int offset;
+
+    /**
+     * This string only uses \n as line delimiter. Keep this in mind when adding
+     * it to an IDocument with probably other line delimiters.
+     */
+    public final String text;
+
+    public final String replacedText;
 
     private String source = null;
 
     private String originalSource = null;
 
     private IPath editor;
-    /**
-     * This string only uses \n as line delimiter. Keep this in mind when adding
-     * it to an IDocument with probably other line delimiters.
-     */
-    public String text;
-
-    public final int length;
 
     /**
      * @param offset
      *            the offset inside the document where this activity happened.
      * @param text
      *            the text that was inserted.
-     * @param length
-     *            the length of text that was replaced by this activity.
+     * @param replacedText
+     *            the text that was replaced by this activity.
      */
-    public TextEditActivity(int offset, String text, int length) {
+    public TextEditActivity(int offset, String text, String replacedText) {
+        if (text == null)
+            throw new IllegalArgumentException("Text cannot be null");
+        if (replacedText == null)
+            throw new IllegalArgumentException("ReplacedText cannot be null");
         this.offset = offset;
         this.text = text;
-        this.length = length;
+        this.replacedText = replacedText;
     }
 
     /**
@@ -61,13 +70,14 @@ public class TextEditActivity implements IActivity {
      *            the offset inside the document where this activity happened.
      * @param text
      *            the text that was inserted.
-     * @param length
-     *            the length of text that was replaced by this activity.
+     * @param replacedText
+     *            the text that was replaced by this activity.
      * @param editor
      *            path of the editor where this activity happened.
      */
-    public TextEditActivity(int offset, String text, int length, IPath editor) {
-        this(offset, text, length);
+    public TextEditActivity(int offset, String text, String replacedText,
+        IPath editor) {
+        this(offset, text, replacedText);
         this.editor = editor;
     }
 
@@ -80,23 +90,39 @@ public class TextEditActivity implements IActivity {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof TextEditActivity) {
-            TextEditActivity other = (TextEditActivity) obj;
-            return (this.offset == other.offset)
-                && this.text.equals(other.text)
-                && (this.length == other.length)
-                && (this.source == other.source);
-        }
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + offset;
+        result = prime * result
+            + ((replacedText == null) ? 0 : replacedText.hashCode());
+        result = prime * result + ((source == null) ? 0 : source.hashCode());
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        return result;
+    }
 
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof TextEditActivity))
+            return false;
+        TextEditActivity other = (TextEditActivity) obj;
+
+        return (this.offset == other.offset) && this.text.equals(other.text)
+            && (this.replacedText.equals(other.replacedText))
+            && (ObjectUtils.equals(this.source, other.source));
     }
 
     @Override
     public String toString() {
-        return "TextEditActivity(offset:" + this.offset + ",text:" + this.text
-            + ",length:" + this.length + ",path:" + this.editor.toString()
-            + ",src:" + this.source + ",oSrc:" + this.originalSource + ")";
+        return "TextEditActivity(" + this.offset + ",new:'"
+            + Util.escapeForLogging(this.text) + "',old:'"
+            + Util.escapeForLogging(this.replacedText) + "',path:"
+            + this.editor.toString() + ",src:" + this.source + ",oSrc:"
+            + this.originalSource + ")";
     }
 
     /**
@@ -112,7 +138,7 @@ public class TextEditActivity implements IActivity {
             return (this.offset == other.offset) && (this.editor != null)
                 && (other.editor != null) && this.editor.equals(other.editor)
                 && this.text.equals(other.text)
-                && (this.length == other.length);
+                && (this.replacedText.equals(replacedText));
         }
         return false;
     }

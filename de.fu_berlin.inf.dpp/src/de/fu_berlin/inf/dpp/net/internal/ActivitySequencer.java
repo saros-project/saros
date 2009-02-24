@@ -555,8 +555,9 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                     + lastTextEdit.text.length())) {
                 result.remove(lastTextEdit);
                 textEdit = new TextEditActivity(lastTextEdit.offset,
-                    lastTextEdit.text + textEdit.text, lastTextEdit.length
-                        + textEdit.length, lastTextEdit.getEditor());
+                    lastTextEdit.text + textEdit.text,
+                    lastTextEdit.replacedText + textEdit.replacedText,
+                    lastTextEdit.getEditor());
                 textEdit.setSource(lastTextEdit.getSource());
             }
         }

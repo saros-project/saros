@@ -250,7 +250,14 @@ public class Util {
     }
 
     public static String escapeForLogging(String s) {
+        if (s == null)
+            return null;
+
         return StringEscapeUtils.escapeJava(s);
+        /* // Try to put nice symbols for non-readable characters sometime
+         * return s.replace(' ', '\uc2b7').replace('\t',
+         * '\uc2bb').replace('\n','\uc2b6').replace('\r', '\uc2a4');
+         */
     }
 
     /**

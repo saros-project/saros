@@ -189,13 +189,8 @@ public class InsertOperation implements Operation {
      */
     @Override
     public String toString() {
-        return "Insert("
-            + this.position
-            + ",'"
-            + (this.text != null ? ((this.text.length() > 20) ? Util
-                .escapeForLogging(this.text).substring(0, 20)
-                + "..." : Util.escapeForLogging(this.text)) : "") + "',"
-            + this.origin + ")";
+        return "Insert(" + this.position + ",'"
+            + Util.escapeForLogging(this.text) + "'," + this.origin + ")";
     }
 
     /**
