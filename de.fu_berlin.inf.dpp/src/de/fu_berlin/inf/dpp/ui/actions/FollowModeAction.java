@@ -6,26 +6,79 @@ import org.eclipse.jface.action.Action;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class FollowModeAction extends Action implements ISessionListener {
+/**
+ * Action to enter into FollowMode
+ * 
+ * TODO Allow to track individual observers
+ */
+public class FollowModeAction extends Action {
 
     private static final Logger log = Logger.getLogger(FollowModeAction.class
         .getName());
 
+    ISharedProjectListener roleChangeListener = new AbstractSharedProjectListener() {
+        @Override
+        public void roleChanged(User user, boolean replicated) {
+            if (Saros.getDefault().getLocalUser().equals(user)) {
+                updateEnablement();
+            }
+        }
+    };
+
+    ISessionListener sessionListener = new AbstractSessionListener() {
+        @Override
+        public void sessionStarted(ISharedProject session) {
+            /*
+             * Automatically start follow mode at the beginning of a session if
+             * Auto-Follow-Mode is enabled.
+             */
+            if (Saros.getDefault().getPreferenceStore().getBoolean(
+                PreferenceConstants.AUTO_FOLLOW_MODE)) {
+                setFollowing(true);
+            }
+            session.addListener(roleChangeListener);
+            updateEnablement();
+        }
+
+        @Override
+        public void sessionEnded(ISharedProject session) {
+            session.removeListener(roleChangeListener);
+            updateEnablement();
+        }
+    };
+
     public FollowModeAction() {
-        super();
+        super(null, AS_CHECK_BOX);
+
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
         setToolTipText("Enable/disable follow mode");
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        EditorManager.getDefault().addSharedEditorListener(
+            new AbstractSharedEditorListener() {
+                @Override
+                public void followModeChanged(final boolean enabled) {
+                    Util.runSafeSWTAsync(log, new Runnable() {
+                        public void run() {
+                            log.error("Button enabled == " + enabled);
+                            setChecked(enabled);
+                        }
+                    });
+
+                }
+            });
+
+        Saros.getDefault().getSessionManager().addSessionListener(
+            sessionListener);
         updateEnablement();
     }
 
@@ -36,57 +89,31 @@ public class FollowModeAction extends Action implements ISessionListener {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                setFollowMode(!getFollowMode());
+                log.info("setFollowing to " + !isFollowing());
+                setFollowing(!isFollowing());
             }
         });
     }
 
-    public boolean getFollowMode() {
+    public boolean isFollowing() {
         return EditorManager.getDefault().isFollowing();
     }
 
-    public void setFollowMode(boolean isFollowMode) {
-        EditorManager.getDefault().setEnableFollowing(isFollowMode);
-        updateEnablement();
-    }
-
-    public void sessionStarted(ISharedProject session) {
-        // Automatically start follow mode at the beginning of a session if
-        // Auto-Follow-Mode is enabled.
-        if (Saros.getDefault().getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_FOLLOW_MODE)) {
-            setFollowMode(true);
-        }
-        Saros.getDefault().getSessionManager().getSharedProject().addListener(
-            new ISharedProjectListener() {
-                public void roleChanged(User user, boolean replicated) {
-                    updateEnablement();
-                }
-
-                public void userJoined(JID user) {
-                    // ignore
-                }
-
-                public void userLeft(JID user) {
-                    // ignore
-                }
-            });
-
-        updateEnablement();
-    }
-
-    public void sessionEnded(ISharedProject session) {
-        updateEnablement();
-    }
-
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
+    public void setFollowing(boolean enable) {
+        EditorManager.getDefault().setEnableFollowing(enable);
     }
 
     public void updateEnablement() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
-        setEnabled(project != null && !project.isDriver());
-        setChecked(getFollowMode());
+
+        boolean canFollow = project != null && !project.isDriver();
+
+        if (!canFollow && isFollowing()) {
+            setFollowing(false);
+        }
+
+        if (isEnabled() != canFollow)
+            setEnabled(canFollow);
     }
 }

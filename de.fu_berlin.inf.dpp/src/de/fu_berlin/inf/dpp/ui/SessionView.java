@@ -102,6 +102,7 @@ public class SessionView extends ViewPart implements ISessionListener,
             }
 
             SessionView.this.sharedProject = (ISharedProject) newInput;
+
             if (SessionView.this.sharedProject != null) {
                 SessionView.this.sharedProject.addListener(this);
             }
@@ -122,10 +123,9 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
 
         public void roleChanged(User user, boolean replicated) {
-            // if the local user becomes driver, then leave follow mode
+            // Show balloon notification
             if (user.equals(Saros.getDefault().getLocalUser())) {
                 if (user.isDriver()) {
-                    followModeAction.setFollowMode(false);
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
                         "You are now a driver of this session.", 5000);
@@ -133,9 +133,7 @@ public class SessionView extends ViewPart implements ISessionListener,
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
                         "You are now an observer of this session.", 5000);
-                    followModeAction.setFollowMode(isStartingInFollowMode());
                 }
-
             }
             refreshTable();
 
@@ -171,38 +169,36 @@ public class SessionView extends ViewPart implements ISessionListener,
         private Font boldFont = null;
 
         public String getColumnText(Object obj, int index) {
+
             User participant = (User) obj;
 
-            // TODO Maybe use a StringBuffer here.
-            String name;
-            String jidBase = participant.getJID().getBase();
+            return getName(participant)
+                + (participant.isDriver() ? " (Driver)" : "");
+        }
+
+        private String getName(User participant) {
 
             if (participant == Saros.getDefault().getLocalUser()) {
-                name = "Yourself (" + jidBase + ")";
-            } else {
-                name = jidBase;
-                XMPPConnection connection = Saros.getDefault().getConnection();
-                if (connection != null) {
-                    Roster roster = connection.getRoster();
-                    if (roster != null) {
-                        RosterEntry entry = roster.getEntry(jidBase);
-                        if (entry != null) {
-                            String nickName = entry.getName();
-                            if (nickName != null
-                                && nickName.trim().length() > 0) {
-                                name = nickName + " (" + jidBase + ")";
-                            }
+                return "You";
+            }
+
+            String jidBase = participant.getJID().getBase();
+
+            XMPPConnection connection = Saros.getDefault().getConnection();
+            if (connection != null) {
+                Roster roster = connection.getRoster();
+                if (roster != null) {
+                    RosterEntry entry = roster.getEntry(jidBase);
+                    if (entry != null) {
+                        String nickName = entry.getName();
+                        if (nickName != null && nickName.trim().length() > 0) {
+                            return nickName + " (" + jidBase + ")";
                         }
                     }
                 }
             }
 
-            StringBuffer sb = new StringBuffer(name);
-            if (participant.isDriver()) {
-                sb.append(" (Driver)");
-            }
-
-            return sb.toString();
+            return jidBase;
         }
 
         @Override
@@ -427,18 +423,8 @@ public class SessionView extends ViewPart implements ISessionListener,
             PreferenceConstants.MULTI_DRIVER);
     }
 
-    protected boolean isStartingInFollowMode() {
-        return Saros.getDefault().getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_FOLLOW_MODE);
-    }
-
     public void propertyChange(PropertyChangeEvent event) {
         this.viewer.refresh();
 
     }
-
-    public void updateFollowingMode() {
-        followModeAction.updateEnablement();
-    }
-
 }

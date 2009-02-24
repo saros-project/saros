@@ -92,7 +92,6 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
-import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
@@ -412,6 +411,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.sharedProject.getActivityManager().addProvider(this);
         this.contributionAnnotationManager = new ContributionAnnotationManager(
             session);
+
+        // TODO Review Why?
         activateOpenEditors();
     }
 
@@ -649,6 +650,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void roleChanged(User user, boolean replicated) {
         this.isDriver = this.sharedProject.isDriver();
+
+        // TODO Review, because this is causing problems with FollowMode
         activateOpenEditors();
 
         removeAllAnnotations(ContributionAnnotation.TYPE);
@@ -920,19 +923,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             if (activeDriverEditor != null
                 && (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart))) {
                 setEnableFollowing(false);
-                updateFollowModeUI();
             }
         }
-    }
-
-    protected void updateFollowModeUI() {
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                IViewPart sessionView = findView("de.fu_berlin.inf.dpp.ui.SessionView");
-                if (sessionView != null)
-                    ((SessionView) sessionView).updateFollowingMode();
-            }
-        });
     }
 
     public void partClosed(IEditorPart editorPart) {
@@ -947,7 +939,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (isFollowing && activeDriverEditor != null
             && activeDriverEditor.equals(path)) {
             setEnableFollowing(false);
-            updateFollowModeUI();
         }
 
         this.editorPool.remove(editorPart);
@@ -1041,7 +1032,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         } else if (activity instanceof ViewportActivity) {
             ViewportActivity viewportActvity = (ViewportActivity) activity;
+
+            // TODO This assertion has failed => Could not get editor?
             assert viewportActvity.getEditor() != null;
+
             return "<viewport " + "top=\"" + viewportActvity.getTopIndex()
                 + "\" " + "bottom=\"" + viewportActvity.getBottomIndex()
                 + "\" " + "editor=\""
@@ -1434,14 +1428,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                         .getFile(path);
                     resetText(file);
 
-                    if (!EditorManager.this.isFollowing) {
-                        return;
-                    }
-
-                    Set<IEditorPart> editors = EditorManager.this.editorPool
-                        .getEditors(path);
-                    for (IEditorPart part : editors) {
-                        EditorManager.this.editorAPI.closeEditor(part);
+                    if (EditorManager.this.isFollowing) {
+                        for (IEditorPart part : editorPool.getEditors(path)) {
+                            editorAPI.closeEditor(part);
+                        }
                     }
                 }
             });
