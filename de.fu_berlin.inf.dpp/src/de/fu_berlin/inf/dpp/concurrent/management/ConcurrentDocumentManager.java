@@ -207,6 +207,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
             // Send to all Clients
             if (docsChecksums.values().size() > 0) {
+                // TODO Connection of Transmitter might be closed at the moment
                 Saros.getDefault().getSessionManager().getTransmitter()
                     .sendDocChecksumsToClients(docsChecksums.values());
             }
@@ -563,27 +564,17 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         Operation op = null;
         // delete activity
-        if ((text.length > 0) && (text.text.length() == 0)) {
-            /* string placeholder in length of delete area. */
-            String placeholder = "";
-            for (int i = 0; i < text.length; i++) {
-                placeholder += 1;
-            }
-            op = new DeleteOperation(text.offset, placeholder);
+        if ((text.replacedText.length() > 0) && (text.text.length() == 0)) {
+            op = new DeleteOperation(text.offset, text.replacedText);
         }
         // insert activity
-        if ((text.length == 0) && (text.text.length() > 0)) {
+        if ((text.replacedText.length() == 0) && (text.text.length() > 0)) {
             op = new InsertOperation(text.offset, text.text);
         }
         // replace operation has to split into delete and insert operation
-        if ((text.length > 0) && (text.text.length() > 0)) {
-            /* string placeholder in length of delete area. */
-            String placeholder = "";
-            for (int i = 0; i < text.length; i++) {
-                placeholder += 1;
-            }
+        if ((text.replacedText.length() > 0) && (text.text.length() > 0)) {
             op = new SplitOperation(new DeleteOperation(text.offset,
-                placeholder), new InsertOperation(text.offset, text.text));
+                text.replacedText), new InsertOperation(text.offset, text.text));
         }
         return op;
     }
@@ -602,13 +593,13 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         if (op instanceof DeleteOperation) {
             DeleteOperation del = (DeleteOperation) op;
             TextEditActivity textEdit = new TextEditActivity(del.getPosition(),
-                "", del.getTextLength());
+                "", del.getText());
             result.add(textEdit);
         }
         if (op instanceof InsertOperation) {
             InsertOperation ins = (InsertOperation) op;
             TextEditActivity textEdit = new TextEditActivity(ins.getPosition(),
-                ins.getText(), 0);
+                ins.getText(), "");
             result.add(textEdit);
         }
         if (op instanceof SplitOperation) {
@@ -618,13 +609,13 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 .get(0);
 
             /*
-             * if operation one is delete operation the offset of second
-             * operation has to modified.
+             * if op1 is a delete operation the offset of the second operation
+             * has to be modified.
              */
-            if ((op1.length > 0) && (op1.text.length() == 0)
-                && (op2.length > 0) && (op2.text.length() == 0)) {
-                op2 = new TextEditActivity(op2.offset - op1.length, "",
-                    op2.length);
+            if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
+                && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
+                op2 = new TextEditActivity(op2.offset
+                    - op1.replacedText.length(), "", op2.replacedText);
             }
             result.add(op1);
             result.add(op2);
