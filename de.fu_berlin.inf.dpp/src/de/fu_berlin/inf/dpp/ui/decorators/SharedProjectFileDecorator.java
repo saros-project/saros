@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -69,18 +69,11 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
-    protected ISharedProjectListener projectListener = new ISharedProjectListener() {
+    protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
+        @Override
         public void roleChanged(User user, boolean replicated) {
             updateDecoratorsAsync(null);
-        }
-
-        public void userJoined(JID user) {
-            // ignore
-        }
-
-        public void userLeft(JID user) {
-            // ignore
         }
     };
 

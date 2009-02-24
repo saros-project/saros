@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -22,10 +23,23 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * 
  * @author rdjemili
  */
-public class RoleManager implements IActivityProvider, ISharedProjectListener {
+public class RoleManager implements IActivityProvider {
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
     private ISharedProject sharedProject;
+
+    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+        @Override
+        public void roleChanged(User user, boolean replicated) {
+            if (!replicated) {
+                IActivity activity = new RoleActivity(user.getJID(), user
+                    .getUserRole());
+                for (IActivityListener listener : RoleManager.this.activityListeners) {
+                    listener.activityCreated(activity);
+                }
+            }
+        }
+    };
 
     public RoleManager() {
         Saros.getDefault().getSessionManager().addSessionListener(this);
@@ -38,7 +52,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      */
     public void sessionStarted(ISharedProject session) {
         this.sharedProject = session;
-        this.sharedProject.addListener(this);
+        this.sharedProject.addListener(this.sharedProjectListener);
         this.sharedProject.getActivityManager().addProvider(this);
     }
 
@@ -48,7 +62,7 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-        this.sharedProject.removeListener(this);
+        this.sharedProject.removeListener(this.sharedProjectListener);
         this.sharedProject.getActivityManager().removeProvider(this);
         this.sharedProject = null;
     }
@@ -93,39 +107,6 @@ public class RoleManager implements IActivityProvider, ISharedProjectListener {
             UserRole role = roleActivity.getRole();
             this.sharedProject.setUserRole(user, role, true);
         }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
-     */
-    public void roleChanged(User user, boolean replicated) {
-        if (!replicated) {
-            IActivity activity = new RoleActivity(user.getJID(), user
-                .getUserRole());
-            for (IActivityListener listener : this.activityListeners) {
-                listener.activityCreated(activity);
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
-     */
-    public void userJoined(JID user) {
-        // ignore
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProjectListener
-     */
-    public void userLeft(JID user) {
-        // ignore
     }
 
     /*

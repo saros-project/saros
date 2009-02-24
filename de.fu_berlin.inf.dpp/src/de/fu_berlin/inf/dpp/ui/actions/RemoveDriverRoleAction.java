@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -23,20 +23,12 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
     private User selectedUser;
 
-    private ISharedProjectListener projectListener = new ISharedProjectListener() {
+    private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
+        @Override
         public void roleChanged(User user, boolean replicated) {
             updateEnablemnet();
         }
-
-        public void userJoined(JID user) {
-            // ignore
-        }
-
-        public void userLeft(JID user) {
-            // ignore
-        }
-
     };
 
     public RemoveDriverRoleAction(ISelectionProvider provider) {

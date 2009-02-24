@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -41,10 +41,17 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  */
 public class RemoveAllDriverRoleAction extends Action implements
-    ISharedProjectListener, ISessionListener {
+    ISessionListener {
 
     private static final Logger log = Logger
         .getLogger(RemoveAllDriverRoleAction.class.getName());
+
+    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+        @Override
+        public void roleChanged(User user, boolean replicated) {
+            updateEnablement();
+        }
+    };
 
     public RemoveAllDriverRoleAction() {
         super("Remove driver roles");
@@ -84,7 +91,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-        session.addListener(this);
+        session.addListener(this.sharedProjectListener);
         updateEnablement();
     }
 
@@ -94,7 +101,7 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionEnded(ISharedProject session) {
-        session.removeListener(this);
+        session.removeListener(this.sharedProjectListener);
         updateEnablement();
     }
 
@@ -104,33 +111,6 @@ public class RemoveAllDriverRoleAction extends Action implements
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void roleChanged(User user, boolean replicated) {
-        updateEnablement();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void userJoined(JID user) {
-        // ignore
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void userLeft(JID user) {
         // ignore
     }
 
