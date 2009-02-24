@@ -279,15 +279,4 @@ public interface ITransmitter {
     public void sendDocChecksumsToClients(
         Collection<DocumentChecksum> collection);
 
-    /**
-     * Adds the given receiver to the top of the stack of the receivers notified
-     * when data arrives.
-     * 
-     * The receiver should return true if it has consumed the given data.
-     * 
-     * @param dataReceiver
-     */
-    public void addDataReceiver(IDataReceiver dataReceiver);
-
-    public void removeDataReceiver(IDataReceiver receiver);
 }

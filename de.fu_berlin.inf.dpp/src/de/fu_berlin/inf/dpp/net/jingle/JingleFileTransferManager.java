@@ -30,6 +30,7 @@ import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 /**
  * This class manages all Jingle Peer to Peer Sessions. Jingle is a
@@ -314,7 +315,7 @@ public class JingleFileTransferManager {
      * @param transferDescription
      * @throws JingleSessionException
      */
-    public void send(final TransferDescription transferDescription,
+    public NetTransferMode send(final TransferDescription transferDescription,
         final byte[] content) throws JingleSessionException {
 
         JID toJID = transferDescription.getRecipient();
@@ -349,7 +350,7 @@ public class JingleFileTransferManager {
         }
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
-            connection.fileTransfer.send(transferDescription, content);
+            return connection.fileTransfer.send(transferDescription, content);
         } else {
             // If we want to reconnect, then we should not set this to ERROR
             connection.state = JingleConnectionState.ERROR;

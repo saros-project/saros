@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 
@@ -84,9 +84,9 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
     public void connectionStateChanged(XMPPConnection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
-            ((XMPPChatTransmitter) Saros.getDefault().getSessionManager()
-                .getTransmitter()).getJingleManager()
-                .addJingleFileTransferListener(this);
+            // ((XMPPChatTransmitter) Saros.getDefault().getSessionManager()
+            // .getTransmitter()).getJingleManager()
+            // .addJingleFileTransferListener(this);
 
         } else if (newState == ConnectionState.NOT_CONNECTED) {
             // TODO remove as listener?
@@ -94,7 +94,8 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
 
     }
 
-    public void incomingData(TransferDescription data, InputStream input) {
+    public void incomingData(TransferDescription data, InputStream input,
+        NetTransferMode mode) {
         // TODO Auto-generated method stub
 
     }

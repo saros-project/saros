@@ -41,7 +41,8 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -62,23 +63,30 @@ import org.jivesoftware.smack.packet.Presence.Type;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.ITransferModeListener;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
 import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This view displays the roster (also known as contact list) of the local user.
+ * 
+ * FIXME RosterView does not work if a User is in several groups!
  * 
  * @author rdjemili
  */
 public class RosterView extends ViewPart implements IConnectionListener,
     IRosterTree {
 
-    private static Logger logger = Logger.getLogger(RosterView.class);
+    private static Logger log = Logger.getLogger(RosterView.class);
 
     private TreeViewer viewer;
 
@@ -100,6 +108,28 @@ public class RosterView extends ViewPart implements IConnectionListener,
     private Composite composite;
 
     private Label label;
+
+    public RosterView() {
+
+        DataTransferManager manager = Saros.getDefault().getContainer()
+            .getComponent(DataTransferManager.class);
+        manager.addTransferModeListener(new ITransferModeListener() {
+
+            public void clear() {
+                Util.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
+                        viewer.refresh();
+                    }
+                });
+            }
+
+            public void setTransferMode(final JID jid, NetTransferMode newMode,
+                boolean incoming) {
+
+                refreshRosterTree(jid);
+            }
+        });
+    }
 
     /**
      * An item of the roster tree. Can be either a group or a single contact.
@@ -335,11 +365,43 @@ public class RosterView extends ViewPart implements IConnectionListener,
                         StyledString.COUNTER_STYLER);
                 }
 
-                // TODO Append Jingle State information
-                // if (presence != null && presence.isAvailable()) {
-                // // Append Jingle Information
-                // result.append(" [IBB]", StyledString.QUALIFIER_STYLER);
-                // }
+                // Append DataTransfer State information
+                if (presence != null && presence.isAvailable()) {
+
+                    DataTransferManager data = Saros.getDefault()
+                        .getContainer().getComponent(DataTransferManager.class);
+
+                    JID jid = new JID(entry.getUser());
+
+                    NetTransferMode incoming = data
+                        .getIncomingTransferMode(jid);
+                    NetTransferMode outgoing = data
+                        .getOutgoingTransferMode(jid);
+
+                    if (incoming == null) {
+                        if (outgoing == null) {
+                            result.append(" [???]",
+                                StyledString.QUALIFIER_STYLER);
+                        } else {
+                            result.append(" [" + outgoing.toString()
+                                + "<->???]", StyledString.QUALIFIER_STYLER);
+                        }
+                    } else {
+                        if (outgoing == null) {
+                            result.append(" [???<->" + incoming.toString()
+                                + "]", StyledString.QUALIFIER_STYLER);
+                        } else {
+                            if (incoming.equals(outgoing)) {
+                                result.append(" [" + outgoing.toString() + "]",
+                                    StyledString.QUALIFIER_STYLER);
+                            } else {
+                                result.append(" [" + outgoing.toString()
+                                    + "<->" + incoming.toString() + "]",
+                                    StyledString.QUALIFIER_STYLER);
+                            }
+                        }
+                    }
+                }
 
                 return result;
             }
@@ -403,19 +465,19 @@ public class RosterView extends ViewPart implements IConnectionListener,
         this.composite.setBackground(Display.getDefault().getSystemColor(
             SWT.COLOR_WHITE));
 
-        RowLayout layout = new RowLayout(SWT.VERTICAL);
-        layout.wrap = false;
-        layout.fill = true;
-        layout.spacing = 5;
+        GridLayout layout = new GridLayout(1, true);
         composite.setLayout(layout);
 
         this.label = new Label(composite, SWT.LEFT);
         this.label.setText("Not Connected");
         this.label.setBackground(Display.getDefault().getSystemColor(
             SWT.COLOR_WHITE));
+        this.label.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         // TODO Should scroll
         this.viewer = new TreeViewer(composite, SWT.MULTI);
+        this.viewer.getControl().setLayoutData(
+            new GridData(SWT.FILL, SWT.FILL, true, true));
         this.viewer.setContentProvider(new TreeContentProvider());
         this.viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
             new ViewLabelProvider()));
@@ -502,12 +564,16 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
             public void entriesUpdated(Collection<String> addresses) {
                 for (String address : addresses) {
-                    logger.debug(address + ": "
+                    log.debug(address + ": "
                         + connection.getRoster().getEntry(address).getType()
                         + ", "
                         + connection.getRoster().getEntry(address).getStatus());
                 }
-
+                /*
+                 * TODO Maybe we could only update those elements that have been
+                 * updated (but make sure that the given addresses have not
+                 * structurally changed/new buddy groups)
+                 */
                 refreshRosterTree(true);
             }
 
@@ -516,8 +582,28 @@ public class RosterView extends ViewPart implements IConnectionListener,
             }
 
             public void presenceChanged(Presence presence) {
-                logger.debug(presence.getFrom() + ": " + presence);
-                refreshRosterTree(true);
+                log.debug(presence.getFrom() + ": " + presence);
+                refreshRosterTree(new JID(presence.getFrom()));
+            }
+        });
+    }
+
+    protected void refreshRosterTree(final JID jid) {
+        if (this.viewer.getControl().isDisposed()) {
+            return;
+        }
+
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                if (roster == null)
+                    return;
+
+                RosterEntry entry = roster.getEntry(jid.getBase());
+
+                if (entry == null)
+                    return;
+
+                viewer.update(entry, null);
             }
         });
     }
@@ -534,7 +620,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
             return;
         }
 
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 RosterView.this.viewer.refresh(updateLabels);
                 RosterView.this.viewer.expandAll();

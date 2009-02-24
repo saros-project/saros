@@ -58,6 +58,7 @@ import de.fu_berlin.inf.dpp.net.business.JupiterHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
@@ -135,7 +136,7 @@ public class Saros extends AbstractUIPlugin {
                 XMPPChatReceiver.class).addComponent(InvitationHandler.class)
             .addComponent(LeaveHandler.class).addComponent(
                 RequestForActivityHandler.class).addComponent(
-                UserListHandler.class);
+                UserListHandler.class).addComponent(DataTransferManager.class);
 
         // Code snippet for reinjection:
         // Reinjector injection = new Reinjector(this.container);

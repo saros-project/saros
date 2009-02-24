@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -206,8 +207,8 @@ public class ConsistencyAction extends Action implements ISessionListener {
             executingChecksumErrorHandling = newState;
 
             if (newState) {
-                Saros.getDefault().getSessionManager().getTransmitter()
-                    .addDataReceiver(receiver);
+                Saros.getDefault().getContainer().getComponent(
+                    DataTransferManager.class).addDataReceiver(receiver);
             } else {
 
                 for (IPath path : paths) {
@@ -216,8 +217,8 @@ public class ConsistencyAction extends Action implements ISessionListener {
                 }
                 paths.clear();
 
-                Saros.getDefault().getSessionManager().getTransmitter()
-                    .removeDataReceiver(receiver);
+                Saros.getDefault().getContainer().getComponent(
+                    DataTransferManager.class).removeDataReceiver(receiver);
             }
         }
     }

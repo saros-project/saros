@@ -37,6 +37,7 @@ import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -96,9 +97,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
                             "Received unexpected object in ReceiveThread", e);
                         continue;
                     }
+
                     for (IJingleFileTransferListener listener : listeners) {
                         listener.incomingData(data, new ByteArrayInputStream(
-                            content));
+                            content), connectionType);
                     }
                 }
             } catch (RuntimeException e) {
@@ -114,7 +116,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private Set<IJingleFileTransferListener> listeners;
     private UDPSelectorProvider udpSelectorProvider;
 
-    private String connectionType = null;
+    private NetTransferMode connectionType = NetTransferMode.UNKNOWN;
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
@@ -221,15 +223,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         ArrayList<SocketCreator> creators = new ArrayList<SocketCreator>(2);
 
-        creators.add(SocketCreator.getWrapped("TCP", Util
+        creators.add(SocketCreator.getWrapped(NetTransferMode.JINGLETCP, Util
             .retryEvery500ms(new Callable<Socket>() {
                 public Socket call() throws Exception {
                     return new Socket(remoteIp, remotePort);
                 }
             })));
 
-        creators.add(SocketCreator.getWrapped("UDP", Util.delay(7500, Util
-            .retryEvery500ms(new Callable<Socket>() {
+        creators.add(SocketCreator.getWrapped(NetTransferMode.JINGLEUDP, Util
+            .delay(7500, Util.retryEvery500ms(new Callable<Socket>() {
                 public Socket call() throws Exception {
 
                     Socket usock = udpSelectorProvider.openSocketChannel()
@@ -249,7 +251,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         ArrayList<SocketCreator> creators = new ArrayList<SocketCreator>(2);
 
-        creators.add(new SocketCreator("TCP") {
+        creators.add(new SocketCreator(NetTransferMode.JINGLETCP) {
 
             public Socket call() throws Exception {
 
@@ -260,7 +262,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             }
         });
 
-        creators.add(new SocketCreator("UDP") {
+        creators.add(new SocketCreator(NetTransferMode.JINGLEUDP) {
 
             public Socket call() throws Exception {
                 Socket usock = udpSelectorProvider.openAcceptorSocketChannel()
@@ -279,17 +281,17 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     abstract static class SocketCreator implements Callable<Socket> {
 
-        SocketCreator(String type) {
+        SocketCreator(NetTransferMode type) {
             this.type = type;
         }
 
-        String type;
+        NetTransferMode type;
 
-        public String getType() {
+        public NetTransferMode getType() {
             return this.type;
         }
 
-        public static SocketCreator getWrapped(String type,
+        public static SocketCreator getWrapped(NetTransferMode type,
             final Callable<Socket> callable) {
             return new SocketCreator(type) {
                 public Socket call() throws Exception {
@@ -352,7 +354,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 this.connectionType = futures.get(socketFuture).getType();
 
                 for (IJingleFileTransferListener listener : listeners) {
-                    listener.connected(this.connectionType, remoteIp);
+                    listener
+                        .connected(this.connectionType.toString(), remoteIp);
                 }
 
                 // Make sure the other connect-futures are canceled
@@ -384,7 +387,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * @throws JingleSessionException
      *             if sending failed.
      */
-    public synchronized void send(TransferDescription transferData,
+    public synchronized NetTransferMode send(TransferDescription transferData,
         byte[] content) throws JingleSessionException {
 
         if (objectOutputStream != null) {
@@ -394,7 +397,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 objectOutputStream.flush();
                 logger.debug("Jingle [" + connectTo.getName() + "] Send: "
                     + transferData);
-                return;
+                return connectionType;
             } catch (IOException e) {
                 throw new JingleSessionException("Jingle ["
                     + connectTo.getName() + "] Failed to send files");
@@ -459,7 +462,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         return objectInputStream != null && objectOutputStream != null;
     }
 
-    public String getConnectionType() {
+    public NetTransferMode getConnectionType() {
         return connectionType;
     }
 }
