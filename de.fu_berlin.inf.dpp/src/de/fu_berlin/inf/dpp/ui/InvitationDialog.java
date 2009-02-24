@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -85,6 +86,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private class InviterData {
         JID jid;
         String name;
+        String error = "";
         IOutgoingInvitationProcess outgoingProcess;
     }
 
@@ -110,11 +112,15 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 }
             case 2:
                 if (item.outgoingProcess != null) {
-                    if (item.outgoingProcess.getState() == IInvitationProcess.State.SYNCHRONIZING) {
+
+                    switch (item.outgoingProcess.getState()) {
+                    case SYNCHRONIZING:
                         return "" + (item.outgoingProcess.getProgressCurrent())
                             + " of " + item.outgoingProcess.getProgressMax()
                             + ": " + item.outgoingProcess.getProgressInfo();
-                    } else {
+                    case CANCELED:
+                        return item.error;
+                    default:
                         return "";
                     }
                 } else {
@@ -156,7 +162,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         comTable.setLayout(gl);
         comTable.setLayoutData(gd);
 
-        // avoid multi selection
         this.tableviewer = new TableViewer(comTable, SWT.FULL_SELECTION
             | SWT.MULTI);
         this.table = this.tableviewer.getTable();
@@ -208,11 +213,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 InvitationDialog.this.cancelSelectedInvitationButton
                     .setEnabled(isSelectionCancelable());
 
-                InviterData data = (InviterData) InvitationDialog.this.table
-                    .getSelection()[0].getData();
-
-                setInviteable(InvitationDialog.this.table.getSelectionCount() > 0
-                    && data.outgoingProcess == null);
+                setInviteable(isSelectionInvitable());
             }
         });
 
@@ -281,6 +282,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         });
     }
 
+    /**
+     * Implemented for InvitationUI Interface
+     */
     public void runGUIAsynch(final Runnable r) {
 
         if (this.display == null || this.display.isDisposed())
@@ -370,7 +374,22 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         return true;
     }
 
-    void cancelInvite() {
+    protected boolean isSelectionInvitable() {
+        if (InvitationDialog.this.table.getSelectionCount() == 0) {
+            return false;
+        }
+
+        for (TableItem o : table.getSelection()) {
+            InviterData data = (InviterData) o.getData();
+            if (data.outgoingProcess != null
+                && data.outgoingProcess.getState() != State.CANCELED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected void cancelInvite() {
         TableItem[] selection = this.table.getSelection();
 
         for (TableItem item : selection) {
@@ -396,10 +415,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         return InvitationDialog.StateNames[state.ordinal()];
     }
 
-    public void cancel(String errorMsg, boolean replicated) {
+    public void cancel(JID jid, String errorMsg, boolean replicated) {
 
-        // TODO Error Message is not displayed
-        updateInvitationProgress(null);
+        for (InviterData data : input) {
+            if (data.jid.equals(jid)) {
+                data.error = errorMsg;
+            }
+        }
+        updateInvitationProgress(jid);
     }
 
     /**
@@ -458,18 +481,22 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         // save selection
         TableItem[] oldSelection = table.getSelection();
 
-        this.input.clear();
         this.table.removeAll();
 
-        if (this.roster == null) {
+        if (this.roster == null)
             return;
+
+        // Save currently running Invitations...
+        HashMap<JID, IOutgoingInvitationProcess> currentInvitations = new HashMap<JID, IOutgoingInvitationProcess>();
+        for (InviterData data : input) {
+            if (data.outgoingProcess != null)
+                currentInvitations.put(data.jid, data.outgoingProcess);
         }
+        this.input.clear();
 
         for (RosterEntry entry : this.roster.getEntries()) {
 
-            String username = entry.getUser();
-
-            Presence presence = this.roster.getPresence(username);
+            Presence presence = this.roster.getPresence(entry.getUser());
             if (presence == null || !presence.isAvailable())
                 continue;
 
@@ -482,7 +509,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             invdat.jid = new JID(entry.getUser());
             invdat.name = (entry.getName() == null) ? entry.getUser() : entry
                 .getName();
-            invdat.outgoingProcess = null;
+            // Check if we have a running invitation for the user
+            invdat.outgoingProcess = currentInvitations.get(invdat.jid);
 
             this.input.add(invdat);
         }

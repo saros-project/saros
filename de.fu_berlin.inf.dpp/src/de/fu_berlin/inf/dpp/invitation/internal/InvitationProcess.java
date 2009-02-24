@@ -105,10 +105,11 @@ public abstract class InvitationProcess implements IInvitationProcess {
         return this.description;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * We are called because the invitation was canceled.
      * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess
+     * @param replicated
+     *            true if the message originated remotely, false if locally.
      */
     public void cancel(String errorMsg, boolean replicated) {
         if (this.state == State.CANCELED) {
@@ -129,7 +130,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
             this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
         }
 
-        this.invitationUI.cancel(errorMsg, replicated);
+        this.invitationUI.cancel(this.peer, errorMsg, replicated);
 
         this.transmitter.removeInvitationProcess(this);
     }

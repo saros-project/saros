@@ -75,15 +75,18 @@ public class JoinSessionWizard extends Wizard {
     public IInvitationUI getInvitationUI() {
         return new IInvitationUI() {
 
-            public void cancel(final String errorMsg, final boolean replicated) {
+            public void cancel(final JID jid, final String errorMsg,
+                final boolean replicated) {
                 JoinSessionWizard.this.current.asyncExec(new Runnable() {
                     public void run() {
 
                         if (errorMsg != null) {
                             MessageDialog.openError(getShell(),
                                 "Invitation aborted",
-                                "Could not complete invitation because an error occurred ("
-                                    + errorMsg + ")");
+                                "Could not complete invitation with "
+                                    + jid.getBase()
+                                    + " because an error occurred (" + errorMsg
+                                    + ")");
                         } else {
                             // errorMsg == null means canceled either by us or
                             // peer

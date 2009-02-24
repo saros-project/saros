@@ -28,6 +28,7 @@ public interface IInvitationProcess extends IFileTransferCallback {
     public interface IInvitationUI {
 
         /**
+         * Cancel the invitation UI for the given JID.
          * 
          * @param errorMsg
          *            Is null if the cancelation was due to a user action.
@@ -35,7 +36,7 @@ public interface IInvitationProcess extends IFileTransferCallback {
          *            Is true if this message originated on the remote side or
          *            false if the message originated on the local side.
          */
-        public void cancel(String errorMsg, boolean replicated);
+        public void cancel(JID jid, String errorMsg, boolean replicated);
 
         /**
          * Update the status information for the given JID
