@@ -24,6 +24,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 public class User {
 
@@ -121,8 +122,9 @@ public class User {
             return this.jid.equals(otherJID);
         }
 
-        log
-            .warn("Comparing a User to an Object that is not a User, String or JID");
+        log.warn(
+            "Comparing a User to an Object that is not a User, String or JID",
+            new StackTrace());
 
         return false;
     }
