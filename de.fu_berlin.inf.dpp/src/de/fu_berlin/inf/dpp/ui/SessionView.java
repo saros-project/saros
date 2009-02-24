@@ -327,6 +327,8 @@ public class SessionView extends ViewPart implements ISessionListener,
      */
     @Override
     public void createPartControl(Composite parent) {
+
+        // TODO Add 5 pixels of padding
         this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
             | SWT.V_SCROLL);
         this.viewer.setContentProvider(new SessionContentProvider());
