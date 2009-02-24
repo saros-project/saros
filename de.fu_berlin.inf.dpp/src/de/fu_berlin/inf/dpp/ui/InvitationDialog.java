@@ -346,6 +346,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.getButton(IDialogConstants.CANCEL_ID)
             .setEnabled(allDoneOrCanceled);
         this.cancelSelectedInvitationButton.setEnabled(isSelectionCancelable());
+        this.getButton(IDialogConstants.OK_ID).setEnabled(
+            isSelectionInvitable());
 
         // Are all invites done?
         if (atLeastOneInvitationWasStarted && allSuccessfullyDone) {
