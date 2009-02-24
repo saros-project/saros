@@ -247,7 +247,7 @@ public class Saros extends AbstractUIPlugin {
     public void asyncConnect() {
         Util.runSafeAsync("Saros-AsyncConnect-", logger, new Runnable() {
             public void run() {
-                connect();
+                connect(false);
             }
         });
     }
@@ -259,7 +259,7 @@ public class Saros extends AbstractUIPlugin {
      * If there is already a established connection when calling this method, it
      * disconnects before connecting (including state transitions!).
      */
-    public void connect() {
+    public void connect(boolean failSilently) {
 
         IPreferenceStore prefStore = getPreferenceStore();
         final String server = prefStore.getString(PreferenceConstants.SERVER);
@@ -313,15 +313,18 @@ public class Saros extends AbstractUIPlugin {
         } catch (final Exception e) {
 
             setConnectionState(ConnectionState.ERROR, e.getMessage());
-            Display.getDefault().syncExec(new Runnable() {
-                public void run() {
-                    MessageDialog.openError(Display.getDefault()
-                        .getActiveShell(), "Error Connecting",
-                        "Could not connect to server '" + server
-                            + "' as user '" + username
-                            + "'.\nErrorMessage was: " + e.getMessage());
-                }
-            });
+
+            if (!failSilently) {
+                Display.getDefault().syncExec(new Runnable() {
+                    public void run() {
+                        MessageDialog.openError(Display.getDefault()
+                            .getActiveShell(), "Error Connecting",
+                            "Could not connect to server '" + server
+                                + "' as user '" + username
+                                + "'.\nErrorMessage was:\n" + e.getMessage());
+                    }
+                });
+            }
         }
     }
 
@@ -565,11 +568,13 @@ public class Saros extends AbstractUIPlugin {
                                 .getTimestamp();
                         }
 
-                        // TODO NPE
-                        while (!Saros.this.connection.isConnected()) {
-                            connect();
+                        while (!isConnected()) {
 
-                            if (!Saros.this.connection.isConnected()) {
+                            logger.info("Reconnecting...");
+
+                            connect(true);
+
+                            if (!isConnected()) {
                                 try {
                                     Thread.sleep(5000);
                                 } catch (InterruptedException e) {

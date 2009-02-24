@@ -146,7 +146,7 @@ public class SarosUI implements ISessionListener {
     /**
      * @param state
      * @return a nice string description of the given state, which can be used
-     *         to be shown in labels (e.g. CONNECTING becomes "Connecting..").
+     *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
      */
     public static String getDescription(ConnectionState state) {
         switch (state) {

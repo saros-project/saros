@@ -75,9 +75,35 @@ public class ConnectDisconnectAction extends Action {
 
     protected IStatusLineManager getStatusmanager() {
         // TODO check for NPE
-        return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            .getActivePage().getViewReferences()[0].getView(false)
-            .getViewSite().getActionBars().getStatusLineManager();
+
+        try {
+            return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage().getViewReferences()[0].getView(false)
+                .getViewSite().getActionBars().getStatusLineManager();
+
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    public void setStatusBar(final String message, final boolean start) {
+        // display task progress information (begin) in status
+        // line
+        Display.getDefault().syncExec(new Runnable() {
+            public void run() {
+                IStatusLineManager slm = getStatusmanager();
+                if (slm == null)
+                    return;
+                IProgressMonitor monitor = slm.getProgressMonitor();
+                slm.setMessage(message);
+
+                if (start)
+                    monitor.beginTask(message, IProgressMonitor.UNKNOWN);
+                else
+                    monitor.done();
+            }
+        });
+
     }
 
     public void updateStatus() {
@@ -88,15 +114,32 @@ public class ConnectDisconnectAction extends Action {
 
             switch (state) {
             case CONNECTED:
-            case CONNECTING:
+                String user = "";
+                XMPPConnection c = Saros.getDefault().getConnection();
+                if (c != null)
+                    user = " as " + c.getUser();
+                setStatusBar("Connected" + user, false);
                 setImageDescriptor(SarosUI
                     .getImageDescriptor("/icons/connect.png"));
                 break;
-
+            case CONNECTING:
+                setStatusBar("Connecting...", true);
+                setImageDescriptor(SarosUI
+                    .getImageDescriptor("/icons/connect.png"));
+                break;
             case ERROR:
+                setStatusBar("Error...", false);
+                setImageDescriptor(SarosUI
+                    .getImageDescriptor("/icons/disconnect.png"));
+                break;
             case NOT_CONNECTED:
+                setStatusBar("Not connected", false);
+                setImageDescriptor(SarosUI
+                    .getImageDescriptor("/icons/disconnect.png"));
+                break;
             case DISCONNECTING:
             default:
+                setStatusBar("Disconnecting...", true);
                 setImageDescriptor(SarosUI
                     .getImageDescriptor("/icons/disconnect.png"));
                 break;
@@ -120,33 +163,11 @@ public class ConnectDisconnectAction extends Action {
     protected void runConnectDisconnect() {
         try {
             Saros saros = Saros.getDefault();
+
             if (saros.isConnected()) {
                 saros.disconnect();
             } else {
-                // display task progress information (begin) in status
-                // line
-                Display.getDefault().syncExec(new Runnable() {
-                    public void run() {
-                        IStatusLineManager slm = getStatusmanager();
-                        IProgressMonitor monitor = slm.getProgressMonitor();
-                        monitor.beginTask("Connecting...",
-                            IProgressMonitor.UNKNOWN);
-                    }
-                });
-
-                saros.connect();
-
-                // display task progress information (end) in status
-                // line
-                Display.getDefault().syncExec(new Runnable() {
-                    public void run() {
-                        IStatusLineManager slm = getStatusmanager();
-                        slm.setMessage("Connecting..");
-                        IProgressMonitor monitor = slm.getProgressMonitor();
-                        monitor.done();
-                    }
-                });
-
+                saros.connect(false);
             }
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);
