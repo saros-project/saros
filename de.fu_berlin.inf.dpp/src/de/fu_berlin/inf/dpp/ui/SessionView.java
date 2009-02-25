@@ -50,9 +50,6 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -72,6 +69,7 @@ import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class SessionView extends ViewPart implements ISessionListener,
     IPropertyChangeListener {
@@ -176,31 +174,6 @@ public class SessionView extends ViewPart implements ISessionListener,
                 + (participant.isDriver() ? " (Driver)" : "");
         }
 
-        private String getName(User participant) {
-
-            if (participant == Saros.getDefault().getLocalUser()) {
-                return "You";
-            }
-
-            String jidBase = participant.getJID().getBase();
-
-            XMPPConnection connection = Saros.getDefault().getConnection();
-            if (connection != null) {
-                Roster roster = connection.getRoster();
-                if (roster != null) {
-                    RosterEntry entry = roster.getEntry(jidBase);
-                    if (entry != null) {
-                        String nickName = entry.getName();
-                        if (nickName != null && nickName.trim().length() > 0) {
-                            return nickName + " (" + jidBase + ")";
-                        }
-                    }
-                }
-            }
-
-            return jidBase;
-        }
-
         @Override
         public Image getImage(Object obj) {
             return ((User) obj).isDriver() ? this.driverImage : this.userImage;
@@ -286,9 +259,22 @@ public class SessionView extends ViewPart implements ISessionListener,
         }
     }
 
-    /**
-     * The constructor.
-     */
+    public static String getName(User participant) {
+
+        if (participant.equals(Saros.getDefault().getLocalUser())) {
+            return "You";
+        }
+
+        String nickName = Util.getNickname(participant.getJID());
+        String jidBase = participant.getJID().getBase();
+
+        if (nickName != null && nickName.trim().length() > 0) {
+            return nickName + " (" + jidBase + ")";
+        }
+
+        return jidBase;
+    }
+
     public SessionView() {
         this.store = EditorsUI.getPreferenceStore();
         this.store.addPropertyChangeListener(this);

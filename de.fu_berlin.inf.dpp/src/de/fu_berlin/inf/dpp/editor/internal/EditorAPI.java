@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -443,8 +444,13 @@ public class EditorAPI implements IEditorAPI {
                     reveal(editorPart, selection);
                 }
 
-                // Use Nick instead!
-                String label = "Selection of " + new JID(source).getName();
+                String nick = Util.getNickname(new JID(source));
+                String label;
+                if (nick == null) {
+                    label = "Selection of " + new JID(source).getName();
+                } else {
+                    label = "Selection of " + nick;
+                }
                 Position position = new Position(selection.getOffset(),
                     selection.getLength());
                 AnnotationSaros newAnnotation = new SelectionAnnotation(label,

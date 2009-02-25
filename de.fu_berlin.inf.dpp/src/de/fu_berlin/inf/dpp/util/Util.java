@@ -18,9 +18,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
+import org.jivesoftware.smack.Roster;
+import org.jivesoftware.smack.RosterEntry;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Nullable;
+
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.net.JID;
 
 public class Util {
 
@@ -254,7 +260,8 @@ public class Util {
             return null;
 
         return StringEscapeUtils.escapeJava(s);
-        /* // Try to put nice symbols for non-readable characters sometime
+        /*
+         * // Try to put nice symbols for non-readable characters sometime
          * return s.replace(' ', '\uc2b7').replace('\t',
          * '\uc2bb').replace('\n','\uc2b6').replace('\r', '\uc2a4');
          */
@@ -278,6 +285,32 @@ public class Util {
      */
     public static void runSafeSync(Logger log, Runnable runnable) {
         wrapSafe(log, runnable).run();
+    }
+
+    /**
+     * @return The nickname associated with the given JID in the current roster
+     *         or null if the current roster is not available or the nickname
+     *         has not been set.
+     */
+    public static String getNickname(JID jid) {
+
+        Saros saros = Saros.getDefault();
+        if (saros != null) {
+            XMPPConnection connection = saros.getConnection();
+            if (connection != null) {
+                Roster roster = connection.getRoster();
+                if (roster != null) {
+                    RosterEntry entry = roster.getEntry(jid.getBase());
+                    if (entry != null) {
+                        String nickName = entry.getName();
+                        if (nickName != null && nickName.trim().length() > 0) {
+                            return nickName;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }
