@@ -118,6 +118,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
             public void clear() {
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
+                        if (viewer.getControl().isDisposed()) {
+                            return;
+                        }
                         viewer.refresh();
                     }
                 });
@@ -378,28 +381,13 @@ public class RosterView extends ViewPart implements IConnectionListener,
                     NetTransferMode outgoing = data
                         .getOutgoingTransferMode(jid);
 
-                    if (incoming == null) {
-                        if (outgoing == null) {
-                            result.append(" [???]",
-                                StyledString.QUALIFIER_STYLER);
-                        } else {
-                            result.append(" [" + outgoing.toString()
-                                + "<->???]", StyledString.QUALIFIER_STYLER);
-                        }
+                    if (incoming.equals(outgoing)) {
+                        result.append(" [" + outgoing.toString() + "]",
+                            StyledString.QUALIFIER_STYLER);
                     } else {
-                        if (outgoing == null) {
-                            result.append(" [???<->" + incoming.toString()
-                                + "]", StyledString.QUALIFIER_STYLER);
-                        } else {
-                            if (incoming.equals(outgoing)) {
-                                result.append(" [" + outgoing.toString() + "]",
-                                    StyledString.QUALIFIER_STYLER);
-                            } else {
-                                result.append(" [" + outgoing.toString()
-                                    + "<->" + incoming.toString() + "]",
-                                    StyledString.QUALIFIER_STYLER);
-                            }
-                        }
+                        result.append(" [" + outgoing.toString() + "<->"
+                            + incoming.toString() + "]",
+                            StyledString.QUALIFIER_STYLER);
                     }
                 }
 

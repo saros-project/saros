@@ -5,7 +5,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 
 /**
@@ -18,10 +17,6 @@ public abstract class AbstractFileTransferCallback implements
     }
 
     public void fileTransferFailed(IPath path, Exception e) {
-        // Do nothing
-    }
-
-    public void setTransferMode(TransferMode mode) {
         // Do nothing
     }
 

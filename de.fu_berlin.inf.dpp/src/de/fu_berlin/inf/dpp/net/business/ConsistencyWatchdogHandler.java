@@ -24,7 +24,6 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.TransferMode;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -116,10 +115,6 @@ public class ConsistencyWatchdogHandler {
                 public void fileTransferFailed(IPath path, Exception e) {
                     // do nothing
 
-                }
-
-                public void setTransferMode(TransferMode mode) {
-                    // do nothing
                 }
 
                 public void transferProgress(int transfered) {

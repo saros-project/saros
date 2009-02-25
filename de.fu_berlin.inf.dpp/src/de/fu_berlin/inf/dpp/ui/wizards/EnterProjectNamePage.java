@@ -23,7 +23,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
@@ -92,26 +94,26 @@ class EnterProjectNamePage extends WizardPage {
      */
     private void updateConnectionStatus() {
 
-        switch (this.joinSessionWizard.process.getTransferMode()) {
-        case DEFAULT:
-            setDescription("Attention: No P2P connection with Jingle available! Using Chat instead!"
-                + '\n'
-                + "Suggestion: Update an existing project or copy resources from another project.");
+        DataTransferManager manager = Saros.getDefault().getContainer()
+            .getComponent(DataTransferManager.class);
+
+        switch (manager.getIncomingTransferMode(joinSessionWizard.process
+            .getPeer())) {
+        case JINGLETCP:
+        case JINGLEUDP:
+            setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
             setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/ibb_connection.png"));
+                .getImageDescriptor("icons/jingle_connection.png"));
             break;
+        case UNKNOWN:
+        case HANDMADE:
         case IBB:
+        default:
             setDescription("Attention: No P2P connection with Jingle available! Using IBB instead!"
                 + '\n'
                 + "Suggestion: Update an existing project or copy resources from another project.");
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/ibb_connection.png"));
-            break;
-        case JINGLE:
-            setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
-            setImageDescriptor(SarosUI
-                .getImageDescriptor("icons/jingle_connection.png"));
-            break;
         }
     }
 

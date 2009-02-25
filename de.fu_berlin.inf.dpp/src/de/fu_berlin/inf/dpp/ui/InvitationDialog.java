@@ -99,6 +99,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
 
         public String getColumnText(Object element, int columnIndex) {
+
             InviterData item = (InviterData) element;
 
             switch (columnIndex) {

@@ -56,10 +56,6 @@ public interface IInvitationProcess extends IFileTransferCallback {
         INITIALIZED, INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
     }
 
-    public static enum TransferMode {
-        JINGLE, IBB, DEFAULT
-    }
-
     /**
      * @return the exception that occurred while executing the process or
      *         <code>null</code> if no exception was thrown.
@@ -70,11 +66,6 @@ public interface IInvitationProcess extends IFileTransferCallback {
      * @return the current state of the process.
      */
     public State getState();
-
-    /**
-     * @return the current transfer mode.
-     */
-    public TransferMode getTransferMode();
 
     /**
      * @return the peer that is participating with us in this process. For an

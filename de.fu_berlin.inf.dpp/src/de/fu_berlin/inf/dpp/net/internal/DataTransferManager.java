@@ -685,18 +685,25 @@ public class DataTransferManager implements ConnectionSessionListener {
     }
 
     public enum NetTransferMode {
-        UNKNOWN("???"), IBB("IBB"), JINGLETCP("Jingle/TCP"), JINGLEUDP(
-            "Jingle/UDP"), HANDMADE("Chat");
+        UNKNOWN("???", false), IBB("IBB", false), JINGLETCP("Jingle/TCP", true), JINGLEUDP(
+            "Jingle/UDP", true), HANDMADE("Chat", false);
 
         String name;
 
-        NetTransferMode(String name) {
+        boolean p2p;
+
+        NetTransferMode(String name, boolean p2p) {
             this.name = name;
+            this.p2p = p2p;
         }
 
         @Override
         public String toString() {
             return name;
+        }
+
+        public boolean isP2P() {
+            return p2p;
         }
     }
 
@@ -724,11 +731,16 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     /**
      * @return the last TransferMode used when receiving a file from the given
-     *         user or null if no file was received since the last
+     *         user or UNKNOWN if no file was received since the last
      *         connection-reset.
      */
     public NetTransferMode getIncomingTransferMode(JID jid) {
-        return incomingTransferModes.get(jid);
+        NetTransferMode result = incomingTransferModes.get(jid);
+        if (result == null) {
+            return NetTransferMode.UNKNOWN;
+        } else {
+            return result;
+        }
     }
 
     /**
@@ -737,7 +749,12 @@ public class DataTransferManager implements ConnectionSessionListener {
      *         connection-reset.
      */
     public NetTransferMode getOutgoingTransferMode(JID jid) {
-        return outgoingTransferModes.get(jid);
+        NetTransferMode result = outgoingTransferModes.get(jid);
+        if (result == null) {
+            return NetTransferMode.UNKNOWN;
+        } else {
+            return result;
+        }
     }
 
     public void dispose() {

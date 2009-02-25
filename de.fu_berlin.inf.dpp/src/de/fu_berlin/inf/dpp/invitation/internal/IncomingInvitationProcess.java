@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
@@ -158,13 +159,17 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 this.remoteFileList);
 
             this.progressMonitor = monitor;
-            if (this.transferMode == TransferMode.IBB) {
+
+            DataTransferManager manager = Saros.getDefault().getContainer()
+                .getComponent(DataTransferManager.class);
+
+            if (manager.getIncomingTransferMode(getPeer()).isP2P()) {
+                this.progressMonitor.beginTask("Synchronizing",
+                    this.filesLeftToSynchronize);
+            } else {
                 this.progressMonitor.beginTask("Synchronizing",
                     100 + this.filesLeftToSynchronize);
                 this.progressMonitor.subTask("Receiving Archive...");
-            } else {
-                this.progressMonitor.beginTask("Synchronizing",
-                    this.filesLeftToSynchronize);
             }
             setState(State.SYNCHRONIZING);
 
@@ -472,10 +477,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         return this.projectName;
     }
 
-    public TransferMode getTransferMode() {
-        return this.transferMode;
-    }
-
     public void fileSent(IPath path) {
         // do nothing
     }
@@ -487,10 +488,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     public void transferProgress(int transfered) {
         this.progressMonitor.worked(transfered - this.transferedFileSize);
         this.transferedFileSize = transfered;
-    }
-
-    public void setTransferMode(TransferMode mode) {
-        this.transferMode = mode;
     }
 
     @Override

@@ -32,6 +32,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.ui.IEditorPart;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
@@ -41,6 +42,8 @@ import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -53,28 +56,30 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class OutgoingInvitationProcess extends InvitationProcess implements
     IOutgoingInvitationProcess {
 
-    private static Logger log = Logger
+    protected static Logger log = Logger
         .getLogger(OutgoingInvitationProcess.class);
 
-    private final ISharedProject sharedProject;
+    protected final ISharedProject sharedProject;
 
-    private int progress_done;
-    private int progress_max;
-    private String progress_info = "";
+    protected int progress_done;
+    protected int progress_max;
+    protected String progress_info = "";
 
-    private FileList remoteFileList;
+    protected NetTransferMode netTransferMode = NetTransferMode.UNKNOWN;
 
-    private List<IPath> toSend;
+    protected FileList remoteFileList;
+
+    protected List<IPath> toSend;
 
     /** size of project archive file */
-    private final long fileSize = 100;
+    protected final long fileSize = 100;
 
     /** size of current transfered part of archive file. */
-    private long transferedFileSize = 0;
+    protected long transferedFileSize = 0;
 
     public int getProgressCurrent() {
         // TODO CJ: Jingle File Transfer progress information
-        if (this.transferMode == TransferMode.IBB) {
+        if (!netTransferMode.isP2P()) {
             return (int) (this.transferedFileSize);
         } else {
             return this.progress_done + 1;
@@ -82,7 +87,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     public int getProgressMax() {
-        if (this.transferMode == TransferMode.IBB) {
+        if (!netTransferMode.isP2P()) {
             return (int) (this.fileSize);
         } else {
             return this.progress_max;
@@ -129,12 +134,16 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             this.progress_max = this.toSend.size();
             this.progress_done = 0;
 
-            /* transfer all data with archive. */
-            if (transferMode == TransferMode.IBB) {
-                sendArchive();
-            } else {
-                /* send separate files. */
+            DataTransferManager manager = Saros.getDefault().getContainer()
+                .getComponent(DataTransferManager.class);
+
+            netTransferMode = manager.getOutgoingTransferMode(getPeer());
+
+            // If fast p2p connection send individual files, otherwise archive
+            if (netTransferMode.isP2P()) {
                 sendNext();
+            } else {
+                sendArchive();
             }
 
             if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
@@ -223,7 +232,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public void fileSent(IPath path) {
 
-        if (transferMode == TransferMode.IBB) {
+        if (!netTransferMode.isP2P()) {
             setState(State.SYNCHRONIZING_DONE);
         } else {
             progress_done++;
@@ -236,10 +245,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         // Tell the UI to update itself
         invitationUI.updateInvitationProgress(peer);
-    }
-
-    public void setTransferMode(TransferMode newMode) {
-        transferMode = newMode;
     }
 
     private void sendNext() {
@@ -326,9 +331,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             }
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return false;
             }
         }
 
@@ -409,15 +415,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public String getProjectName() {
         return this.sharedProject.getProject().getName();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.invitation.IInvitationProcess#getTransferMode()
-     */
-    public TransferMode getTransferMode() {
-        return this.transferMode;
     }
 
     @Override
