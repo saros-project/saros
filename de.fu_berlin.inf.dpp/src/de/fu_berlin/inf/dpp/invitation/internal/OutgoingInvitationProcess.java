@@ -43,7 +43,8 @@ import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -65,7 +66,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     protected int progress_max;
     protected String progress_info = "";
 
-    protected NetTransferMode netTransferMode = NetTransferMode.UNKNOWN;
+    protected boolean isP2P = false;
 
     protected FileList remoteFileList;
 
@@ -79,18 +80,18 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public int getProgressCurrent() {
         // TODO CJ: Jingle File Transfer progress information
-        if (!netTransferMode.isP2P()) {
-            return (int) (this.transferedFileSize);
-        } else {
+        if (isP2P) {
             return this.progress_done + 1;
+        } else {
+            return (int) (this.transferedFileSize);
         }
     }
 
     public int getProgressMax() {
-        if (!netTransferMode.isP2P()) {
-            return (int) (this.fileSize);
-        } else {
+        if (isP2P) {
             return this.progress_max;
+        } else {
+            return (int) (this.fileSize);
         }
     }
 
@@ -137,12 +138,15 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             DataTransferManager manager = Saros.getDefault().getContainer()
                 .getComponent(DataTransferManager.class);
 
-            netTransferMode = manager.getOutgoingTransferMode(getPeer());
+            JingleFileTransferManager jingleManager = manager
+                .getJingleManager();
 
             // If fast p2p connection send individual files, otherwise archive
-            if (netTransferMode.isP2P()) {
+            if (jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
+                isP2P = true;
                 sendNext();
             } else {
+                isP2P = false;
                 sendArchive();
             }
 
@@ -232,11 +236,11 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public void fileSent(IPath path) {
 
-        if (!netTransferMode.isP2P()) {
-            setState(State.SYNCHRONIZING_DONE);
-        } else {
+        if (isP2P) {
             progress_done++;
             sendNext();
+        } else {
+            setState(State.SYNCHRONIZING_DONE);
         }
     }
 
