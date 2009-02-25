@@ -442,8 +442,11 @@ public class EditorAPI implements IEditorAPI {
                     reveal(editorPart, selection);
                 }
 
-                Position position = new Position(selection.getOffset(),
-                    selection.getLength());
+                // Length can be minimal 1 to display the cursor position as
+                // selection.
+                // TODO [MR] If cursor is at line end, it is not displayed.
+                Position position = new Position(selection.getOffset(), Math
+                    .max(1, selection.getLength()));
                 SarosAnnotation newAnnotation = new SelectionAnnotation(source);
 
                 for (@SuppressWarnings("unchecked")

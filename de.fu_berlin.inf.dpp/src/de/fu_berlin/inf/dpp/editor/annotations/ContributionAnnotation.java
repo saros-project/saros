@@ -17,7 +17,7 @@ public class ContributionAnnotation extends SarosAnnotation {
     protected IAnnotationModel model;
 
     public ContributionAnnotation(String source, IAnnotationModel model) {
-        super(ContributionAnnotation.TYPE, true, "", source);
+        super(ContributionAnnotation.TYPE, false, "", source);
         this.model = model;
     }
 
