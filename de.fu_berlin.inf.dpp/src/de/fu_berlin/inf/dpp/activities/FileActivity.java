@@ -6,12 +6,10 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class FileActivity implements IActivity {
+public class FileActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
     }
-
-    private String source;
 
     private final Type type;
 
@@ -66,7 +64,7 @@ public class FileActivity implements IActivity {
 
     @Override
     public String toString() {
-        return "FileActivity(type:" + this.type + ", path:" + this.path + ")";
+        return "FileActivity(type:" + this.type + ",path:" + this.path + ")";
     }
 
     @Override
@@ -79,13 +77,5 @@ public class FileActivity implements IActivity {
         }
 
         return false;
-    }
-
-    public String getSource() {
-        return this.source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 }

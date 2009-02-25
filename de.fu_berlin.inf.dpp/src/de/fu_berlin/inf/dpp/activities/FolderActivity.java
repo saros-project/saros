@@ -2,12 +2,10 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
-public class FolderActivity implements IActivity {
+public class FolderActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
     }
-
-    private String source;
 
     private final Type type;
 
@@ -28,15 +26,6 @@ public class FolderActivity implements IActivity {
 
     @Override
     public String toString() {
-        return "FolderActivity(type:" + this.type + ", path:" + this.path + ")";
-    }
-
-    public String getSource() {
-        return this.source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-
+        return "FolderActivity(type:" + this.type + ",path:" + this.path + ")";
     }
 }

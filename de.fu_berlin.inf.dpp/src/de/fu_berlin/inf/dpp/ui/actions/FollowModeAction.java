@@ -69,7 +69,6 @@ public class FollowModeAction extends Action {
                 public void followModeChanged(final boolean enabled) {
                     Util.runSafeSWTAsync(log, new Runnable() {
                         public void run() {
-                            log.error("Button enabled == " + enabled);
                             setChecked(enabled);
                         }
                     });

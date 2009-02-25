@@ -29,7 +29,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  */
-public class TextEditActivity implements IActivity {
+public class TextEditActivity extends AbstractActivity {
 
     public final int offset;
 
@@ -40,8 +40,6 @@ public class TextEditActivity implements IActivity {
     public final String text;
 
     public final String replacedText;
-
-    private String source = null;
 
     private String originalSource = null;
 
@@ -81,12 +79,21 @@ public class TextEditActivity implements IActivity {
         this.editor = editor;
     }
 
-    public String getSource() {
-        return this.source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
+    /**
+     * @param offset
+     *            the offset inside the document where this activity happened.
+     * @param text
+     *            the text that was inserted.
+     * @param replacedText
+     *            the text that was replaced by this activity.
+     * @param editor
+     *            path of the editor where this activity happened.
+     */
+    public TextEditActivity(int offset, String text, String replacedText,
+        IPath editor, String source) {
+        this(offset, text, replacedText);
+        setSource(source);
+        this.editor = editor;
     }
 
     @Override

@@ -2,12 +2,10 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
-public class ViewportActivity implements IActivity {
+public class ViewportActivity extends AbstractActivity {
     public final int topIndex;
 
     public final int bottomIndex;
-
-    private String source;
 
     private IPath editor;
 
@@ -44,13 +42,5 @@ public class ViewportActivity implements IActivity {
     public String toString() {
         return "ViewportActivity(top:" + this.topIndex + ",bottom:"
             + this.bottomIndex + ")";
-    }
-
-    public String getSource() {
-        return this.source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 }

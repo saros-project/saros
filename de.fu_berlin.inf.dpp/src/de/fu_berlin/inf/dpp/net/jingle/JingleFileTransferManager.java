@@ -161,7 +161,7 @@ public class JingleFileTransferManager {
         IJingleFileTransferListener listener) {
         this.xmppConnection = connection;
 
-        logger.debug("Starting to initialized jingle file transfer manager.");
+        logger.debug("Starting to initialize jingle file transfer manager.");
 
         this.listeners.add(listener);
         initialize();

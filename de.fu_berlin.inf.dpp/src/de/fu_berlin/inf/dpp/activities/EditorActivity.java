@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IPath;
  * 
  * @author rdjemili
  */
-public class EditorActivity implements IActivity {
+public class EditorActivity extends AbstractActivity {
     public static enum Type {
         Activated, Closed, Saved
     }
@@ -35,8 +35,6 @@ public class EditorActivity implements IActivity {
     private final Type type;
 
     private final IPath path;
-
-    private String source;
 
     private long checksum = -1;
 
@@ -81,16 +79,8 @@ public class EditorActivity implements IActivity {
 
     @Override
     public String toString() {
-        return "EditorActivity(type:" + this.type + ", path:"
+        return "EditorActivity(type:" + this.type + ",path:"
             + (this.path != null ? this.path.lastSegment() : "no path") + ")";
-    }
-
-    public String getSource() {
-        return this.source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 
     public long getChecksum() {

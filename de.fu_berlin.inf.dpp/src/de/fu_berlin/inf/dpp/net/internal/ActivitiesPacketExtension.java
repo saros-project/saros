@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.text.MessageFormat;
 import java.util.List;
 
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
@@ -46,19 +45,12 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     private List<TimedActivity> activities;
 
-    MessageFormat textChangeFormat = new MessageFormat(
-        "<{0} offset=\"{1}\" replace=\"{2}\">{3}</{4}>"); // TODO extract
-
     private String sessionID;
-
-    public ActivitiesPacketExtension() {
-        // Default constructor, creating an empty Extension
-    }
 
     public ActivitiesPacketExtension(String sessionID,
         List<TimedActivity> activities) {
         this.sessionID = sessionID;
-        setActivities(activities);
+        this.activities = activities;
     }
 
     /*
@@ -77,10 +69,6 @@ public class ActivitiesPacketExtension implements PacketExtension {
      */
     public String getNamespace() {
         return ActivitiesPacketExtension.NAMESPACE;
-    }
-
-    public void setActivities(List<TimedActivity> activities) {
-        this.activities = activities;
     }
 
     public List<TimedActivity> getActivities() {
