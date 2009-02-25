@@ -6,15 +6,10 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
 /**
- * this class contains method for jingle file transfer action
- * 
- * @author orieger
- * 
+ * Callback to be informed when a file arrived via Jingle
  */
 public interface IJingleFileTransferListener {
 
     public void incomingData(TransferDescription data, InputStream input,
         NetTransferMode mode);
-
-    public void connected(String protocol, String remote);
 }

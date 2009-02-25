@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectio
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VariableProxy;
 
 /**
  * This class is responsible for handling all transfers of binary data
@@ -136,8 +137,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected Map<String, IncomingFile> incomingFiles;
 
-    protected JingleFileTransferManager jingleManager;
-
     protected Thread startingJingleThread;
 
     protected JingleDiscoveryManager jingleDiscovery;
@@ -155,6 +154,9 @@ public class DataTransferManager implements ConnectionSessionListener {
         transferModeListeners.add(trackingTransferModeListener);
     }
 
+    public VariableProxy<JingleFileTransferManager> jingleManager = new VariableProxy<JingleFileTransferManager>(
+        null);
+
     public JingleFileTransferManager getJingleManager() {
         try {
             if (startingJingleThread == null)
@@ -164,7 +166,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         } catch (InterruptedException e) {
             // do nothing
         }
-        return jingleManager;
+        return jingleManager.getVariable();
     }
 
     /**
@@ -194,10 +196,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             setTransferMode(data.getSender(), mode, true);
             receiveData(data, input);
-        }
-
-        public void connected(String protocol, String remote) {
-            // ignore, because we only need to know when a file arrived
         }
     }
 
@@ -648,7 +646,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         this.incomingFiles = new HashMap<String, IncomingFile>();
         this.receivers = new LinkedList<IDataReceiver>();
         this.receivers.add(defaultReceiver);
-        this.jingleManager = null;
+        this.jingleManager.setVariable(null);
 
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager
@@ -671,12 +669,13 @@ public class DataTransferManager implements ConnectionSessionListener {
                  */
                 public void run() {
                     try {
-                        jingleManager = new JingleFileTransferManager(
-                            connection, new JingleTransferListener());
+                        jingleManager
+                            .setVariable(new JingleFileTransferManager(
+                                connection, new JingleTransferListener()));
                         log.debug("Jingle Manager started");
                     } catch (Exception e) {
                         log.error("Jingle Manager could not be started", e);
-                        jingleManager = null;
+                        jingleManager.setVariable(null);
                     }
                 }
             });
@@ -769,7 +768,23 @@ public class DataTransferManager implements ConnectionSessionListener {
             connection.removePacketListener(handmadeDataTransferExtension);
 
         connection = null;
-        jingleManager = null;
+
+        // If Jingle is still starting, wait for it...
+        if (startingJingleThread != null) {
+            try {
+                startingJingleThread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // Terminate all Jingle connections and notify everybody who used this
+        // JingleFileTransferManager
+        if (jingleManager.getVariable() != null) {
+            jingleManager.getVariable().terminateAllJingleSessions();
+            jingleManager.setVariable(null);
+        }
+
         fileTransferManager = null;
         jingleDiscovery = null;
         startingJingleThread = null;

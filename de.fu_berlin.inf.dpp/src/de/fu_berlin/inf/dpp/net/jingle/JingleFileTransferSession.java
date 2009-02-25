@@ -353,11 +353,6 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
                 this.connectionType = futures.get(socketFuture).getType();
 
-                for (IJingleFileTransferListener listener : listeners) {
-                    listener
-                        .connected(this.connectionType.toString(), remoteIp);
-                }
-
                 // Make sure the other connect-futures are canceled
                 for (Future<Socket> future : futures.keySet()) {
                     future.cancel(true);

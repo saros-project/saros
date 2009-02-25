@@ -695,7 +695,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         chats.clear();
         processes.clear();
         messageTransferQueue.clear();
-        dataManager.dispose();
         chatmanager = null;
     }
 

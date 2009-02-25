@@ -63,11 +63,13 @@ import org.jivesoftware.smack.packet.Presence.Type;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
+import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
@@ -75,6 +77,7 @@ import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VariableProxyListener;
 
 /**
  * This view displays the roster (also known as contact list) of the local user.
@@ -111,25 +114,44 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     public RosterView() {
 
-        DataTransferManager manager = Saros.getDefault().getContainer()
-            .getComponent(DataTransferManager.class);
-        manager.addTransferModeListener(new ITransferModeListener() {
+        Util.runSafeSWTAsync(log, new Runnable() {
 
-            public void clear() {
-                Util.runSafeSWTAsync(log, new Runnable() {
-                    public void run() {
-                        if (viewer.getControl().isDisposed()) {
-                            return;
+            public void run() {
+                DataTransferManager manager = Saros.getDefault().getContainer()
+                    .getComponent(DataTransferManager.class);
+
+                manager.jingleManager
+                    .addAndNotify(new VariableProxyListener<JingleFileTransferManager>() {
+
+                        IJingleStateListener stateListener = new IJingleStateListener() {
+                            public void setState(JID jid,
+                                JingleConnectionState state) {
+
+                                log.info("JingleManager sent state update");
+
+                                refreshRosterTree(jid);
+                            }
+                        };
+
+                        JingleFileTransferManager currentManager = null;
+
+                        public void setVariable(
+                            JingleFileTransferManager newValue) {
+
+                            if (currentManager != null) {
+                                currentManager
+                                    .removeJingleStateListener(stateListener);
+                            }
+
+                            currentManager = newValue;
+
+                            if (currentManager != null) {
+                                currentManager
+                                    .addJingleStateListener(stateListener);
+                            }
+                            refreshRosterTree(true);
                         }
-                        viewer.refresh();
-                    }
-                });
-            }
-
-            public void setTransferMode(final JID jid, NetTransferMode newMode,
-                boolean incoming) {
-
-                refreshRosterTree(jid);
+                    });
             }
         });
     }
@@ -374,20 +396,26 @@ public class RosterView extends ViewPart implements IConnectionListener,
                     DataTransferManager data = Saros.getDefault()
                         .getContainer().getComponent(DataTransferManager.class);
 
-                    JID jid = new JID(entry.getUser());
+                    JingleFileTransferManager manager = data.jingleManager
+                        .getVariable();
 
-                    NetTransferMode incoming = data
-                        .getIncomingTransferMode(jid);
-                    NetTransferMode outgoing = data
-                        .getOutgoingTransferMode(jid);
+                    if (manager != null) {
+                        JID jid = new JID(entry.getUser());
 
-                    if (incoming.equals(outgoing)) {
-                        result.append(" [" + outgoing.toString() + "]",
-                            StyledString.QUALIFIER_STYLER);
-                    } else {
-                        result.append(" [" + outgoing.toString() + "<->"
-                            + incoming.toString() + "]",
-                            StyledString.QUALIFIER_STYLER);
+                        FileTransferConnection connection = manager
+                            .getConnection(jid);
+
+                        if (connection != null) {
+                            JingleConnectionState state = connection.getState();
+                            if (state == JingleConnectionState.ESTABLISHED) {
+                                result.append(" ["
+                                    + connection.getTransferMode().toString()
+                                    + "]", StyledString.QUALIFIER_STYLER);
+                            } else {
+                                result.append(" [" + state.toString() + "]",
+                                    StyledString.QUALIFIER_STYLER);
+                            }
+                        }
                     }
                 }
 

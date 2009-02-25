@@ -94,6 +94,16 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
 
     }
 
+    /*
+     * NetTransferMode incoming = data .getIncomingTransferMode(jid);
+     * NetTransferMode outgoing = data .getOutgoingTransferMode(jid);
+     * 
+     * if (incoming.equals(outgoing)) { result.append(" [" + outgoing.toString()
+     * + "]", StyledString.QUALIFIER_STYLER); } else { result.append(" [" +
+     * outgoing.toString() + "<->" + incoming.toString() + "]",
+     * StyledString.QUALIFIER_STYLER); }
+     */
+
     public void incomingData(TransferDescription data, InputStream input,
         NetTransferMode mode) {
         // TODO Auto-generated method stub
