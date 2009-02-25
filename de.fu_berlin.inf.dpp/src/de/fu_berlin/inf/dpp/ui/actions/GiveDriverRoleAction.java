@@ -27,7 +27,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
 
         @Override
         public void roleChanged(User user, boolean replicated) {
-            updateEnablemnet();
+            updateEnablement();
         }
     };
 
@@ -53,7 +53,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
                 }
             });
 
-        updateEnablemnet();
+        updateEnablement();
     }
 
     /**
@@ -63,25 +63,22 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                runToggleUserRole();
+                ISharedProject project = Saros.getDefault().getSessionManager()
+                    .getSharedProject();
+                project.setUserRole(GiveDriverRoleAction.this.selectedUser,
+                    UserRole.DRIVER, false);
             }
         });
-    }
-
-    public void runToggleUserRole() {
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
-        project.setUserRole(this.selectedUser, UserRole.DRIVER, false);
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
         this.selectedUser = (selection.size() == 1) ? (User) selection
             .getFirstElement() : null;
-        updateEnablemnet();
+        updateEnablement();
     }
 
-    private void updateEnablemnet() {
+    private void updateEnablement() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 

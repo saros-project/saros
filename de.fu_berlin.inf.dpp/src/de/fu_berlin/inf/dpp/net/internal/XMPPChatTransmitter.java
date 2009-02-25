@@ -407,11 +407,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         XMPPChatTransmitter.log.info("Sent activities: " + timedActivities);
 
-        if (timedActivities != null) {
-            sendMessageToAll(sharedProject, new ActivitiesPacketExtension(Saros
-                .getDefault().getSessionManager().getSessionID(),
-                timedActivities));
-        }
+        sendMessageToAll(sharedProject, new ActivitiesPacketExtension(Saros
+            .getDefault().getSessionManager().getSessionID(), timedActivities));
     }
 
     public void sendFileList(JID recipient, FileList fileList,

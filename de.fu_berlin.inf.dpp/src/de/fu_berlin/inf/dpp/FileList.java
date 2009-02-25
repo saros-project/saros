@@ -250,7 +250,7 @@ public class FileList {
 
     /**
      * @return the amount in percentage by which this file list has the same
-     *         files as the other filelist.
+     *         files as the other file list.
      */
     public int match(FileList other) {
         return getPaths().size() == 0 ? 0 : 100
