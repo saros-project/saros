@@ -519,8 +519,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
             this.roster = connection.getRoster();
             this.connection = connection;
             attachRosterListener();
-
-        } else if (newState == ConnectionState.NOT_CONNECTED) {
+        } else {
+            // FIXME unregister from Roster!
             this.roster = null;
         }
 
