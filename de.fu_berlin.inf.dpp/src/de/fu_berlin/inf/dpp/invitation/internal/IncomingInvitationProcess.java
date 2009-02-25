@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.invitation.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 
@@ -136,7 +137,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
      */
     public void accept(IProject baseProject, String newProjectName,
-        IProgressMonitor monitor) {
+        IProgressMonitor monitor) throws InterruptedException {
 
         if ((newProjectName == null) && (baseProject == null)) {
             throw new IllegalArgumentException(
@@ -175,29 +176,31 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             } else {
                 cancel(null, false);
             }
-
-        } catch (Exception e) {
+        } catch (CoreException e) {
             ErrorMessageDialog.showErrorMessage(new Exception(
-                "Exception during create project."));
+                "Exception during create project.", e));
             failed(e);
-
+        } catch (IOException e) {
+            ErrorMessageDialog.showErrorMessage(new Exception(
+                "Exception during create project.", e));
+            failed(e);
+        } catch (RuntimeException e) {
+            ErrorMessageDialog.showErrorMessage(new Exception(
+                "Exception during create project.", e));
+            failed(e);
         } finally {
             monitor.done();
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
     public void invitationAccepted(JID from) {
         failState();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
     public void joinReceived(JID from) {
@@ -262,14 +265,22 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      *         <code>false</code> if operation was canceled by user.
      */
     private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
+
         // TODO: deadlock abfangen.
         while (this.filesLeftToSynchronize > 0) {
-            if (monitor.isCanceled() || (getState() == State.CANCELED)) {
+
+            // Operation canceled by the local user
+            if (monitor.isCanceled()) {
+                return false;
+            }
+
+            // Operation canceled by state change
+            if (getState() == State.CANCELED) {
                 return false;
             }
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 return false;
             }

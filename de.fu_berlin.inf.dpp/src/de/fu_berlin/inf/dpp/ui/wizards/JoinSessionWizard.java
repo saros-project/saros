@@ -20,9 +20,8 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -50,13 +49,14 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class JoinSessionWizard extends Wizard {
 
-    static Logger log = Logger.getLogger(JoinSessionWizard.class.getName());
+    private static final Logger log = Logger.getLogger(JoinSessionWizard.class
+        .getName());
 
     ShowDescriptionPage descriptionPage;
 
     EnterProjectNamePage namePage;
 
-    WizardDialogAccessable myWizardDlg;
+    WizardDialogAccessable wizardDialog;
 
     IIncomingInvitationProcess process;
 
@@ -96,7 +96,16 @@ public class JoinSessionWizard extends Wizard {
                                     "Invitation was cancelled by peer.");
                             }
                         }
-                        JoinSessionWizard.this.myWizardDlg.close();
+
+                        if (replicated) {
+                            /*
+                             * TODO The entanglement between UI and process is
+                             * too complicated to sort out, how to close this
+                             * dialog when it is currently executing the
+                             * finishing synchronization
+                             */
+                            wizardDialog.close();
+                        }
                     }
                 });
             }
@@ -147,11 +156,9 @@ public class JoinSessionWizard extends Wizard {
                 }
             });
         } catch (InvocationTargetException e) {
-            JoinSessionWizard.log.log(Level.WARNING,
-                "Exception while requesting remote file list", e);
+            log.warn("Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
-            JoinSessionWizard.log.log(Level.FINE,
-                "Request of remote file list canceled/interrupted", e);
+            log.debug("Request of remote file list canceled/interrupted", e);
         }
 
         return true;
@@ -159,12 +166,16 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        this.process.cancel(null, false);
+        try {
+            this.process.cancel(null, false);
+        } catch (RuntimeException e) {
+            log.error("Failed to cancel process: ", e);
+        }
 
-        return super.performCancel();
+        return true;
     }
 
     public void setWizardDlg(WizardDialogAccessable wd) {
-        this.myWizardDlg = wd;
+        this.wizardDialog = wd;
     }
 }
