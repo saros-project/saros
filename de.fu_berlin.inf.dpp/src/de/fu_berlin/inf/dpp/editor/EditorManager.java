@@ -79,8 +79,8 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -823,7 +823,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         JID driverJID = Saros.getDefault().getSessionManager()
             .getSharedProject().getADriver().getJID();
         if (driverJID == null) {
-            log.warn("There is no driver at all.");
+            log.error("There is no driver at all.");
         }
 
         IPath path = textEdit.getEditor();
@@ -1319,6 +1319,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 for (Iterator<Annotation> it = model.getAnnotationIterator(); it
                     .hasNext();) {
                     Annotation annotation = it.next();
+                    // TODO Use the type (in the sense of class) here instead of
+                    // the string.
                     if (annotation.getType().startsWith(annotationType)) {
                         model.removeAnnotation(annotation);
                     }
@@ -1358,7 +1360,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     continue;
                 }
 
-                AnnotationSaros sarosAnnotation = (AnnotationSaros) annotation;
+                SarosAnnotation sarosAnnotation = (SarosAnnotation) annotation;
                 if (forUserID == null
                     || sarosAnnotation.getSource().equals(forUserID)) {
 

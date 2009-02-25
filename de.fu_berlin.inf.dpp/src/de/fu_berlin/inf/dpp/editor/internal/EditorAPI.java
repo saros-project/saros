@@ -64,13 +64,11 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.annotations.AnnotationSaros;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -444,29 +442,20 @@ public class EditorAPI implements IEditorAPI {
                     reveal(editorPart, selection);
                 }
 
-                String nick = Util.getNickname(new JID(source));
-                String label;
-                if (nick == null) {
-                    label = "Selection of " + new JID(source).getName();
-                } else {
-                    label = "Selection of " + nick;
-                }
                 Position position = new Position(selection.getOffset(),
                     selection.getLength());
-                AnnotationSaros newAnnotation = new SelectionAnnotation(label,
-                    source);
+                SarosAnnotation newAnnotation = new SelectionAnnotation(source);
 
                 for (@SuppressWarnings("unchecked")
                 Iterator<Annotation> it = model.getAnnotationIterator(); it
                     .hasNext();) {
                     Annotation annotation = it.next();
 
-                    if (annotation.getType().startsWith(
-                        SelectionAnnotation.TYPE) == false) {
+                    if (!(annotation instanceof SelectionAnnotation)) {
                         continue;
                     }
 
-                    AnnotationSaros oldAnnotation = (AnnotationSaros) annotation;
+                    SarosAnnotation oldAnnotation = (SarosAnnotation) annotation;
                     if (oldAnnotation.getSource().equals(source)) {
                         // If model supports IAnnotationModelExtension we can
                         // just update the existing annotation.
@@ -711,7 +700,7 @@ public class EditorAPI implements IEditorAPI {
         for (@SuppressWarnings("unchecked")
         Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
             Annotation annotation = it.next();
-            if (annotation.getType().startsWith(ViewportAnnotation.TYPE)) {
+            if (annotation instanceof ViewportAnnotation) {
                 model.removeAnnotation(annotation);
             }
         }
@@ -722,11 +711,7 @@ public class EditorAPI implements IEditorAPI {
 
             int start = document.getLineOffset(top);
             int end = document.getLineOffset(bottom);
-
-            JID jid = new JID(source);
-            String text = "Visible scope of " + jid.getName();
-
-            AnnotationSaros annotation = new ViewportAnnotation(text, source);
+            SarosAnnotation annotation = new ViewportAnnotation(source);
             Position position = new Position(start, end - start);
             model.addAnnotation(annotation, position);
         } catch (BadLocationException e) {

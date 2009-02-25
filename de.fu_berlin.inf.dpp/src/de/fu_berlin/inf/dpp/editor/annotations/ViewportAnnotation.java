@@ -2,8 +2,6 @@ package de.fu_berlin.inf.dpp.editor.annotations;
 
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.text.source.IAnnotationPresentation;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
@@ -16,15 +14,16 @@ import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
 /**
- * The annotation that shows the viewport of the driver.
+ * The annotation that shows the viewports of the drivers.
  * 
- * Preferences are set in the plug-in XML
+ * Configuration of this annotation is done in the plugin-xml.
  * 
  * @author rdjemili
  */
-public class ViewportAnnotation extends AnnotationSaros implements
-    IAnnotationPresentation, IPropertyChangeListener {
+public class ViewportAnnotation extends SarosAnnotation implements
+    IAnnotationPresentation {
 
+    // TODO Make this field protected.
     public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
 
     public static final int LAYER = 6;
@@ -39,8 +38,9 @@ public class ViewportAnnotation extends AnnotationSaros implements
 
     private static Color fillColor;
 
-    public ViewportAnnotation(String label, String source) {
-        super(ViewportAnnotation.TYPE, false, label, source);
+    public ViewportAnnotation(String source) {
+        super(ViewportAnnotation.TYPE, false, createLabel("Visible scope of",
+            source), source);
 
         String annotationType = ViewportAnnotation.TYPE + "."
             + (getColorIdForUser(source) + 1);
@@ -85,35 +85,7 @@ public class ViewportAnnotation extends AnnotationSaros implements
         return IAnnotationPresentation.DEFAULT_LAYER;
     }
 
-    public void propertyChange(PropertyChangeEvent event) {
-        /*
-         * TODO [MR] This annotations color depends on the driver, so this
-         * method should be obsolete.
-         */
-        assert false;
-        if (event.getProperty().equals(
-            ViewportAnnotation.getColorPreferenceKey())) {
-            if (ViewportAnnotation.strokeColor != null) {
-                ViewportAnnotation.strokeColor.dispose();
-                ViewportAnnotation.strokeColor = null;
-
-                ViewportAnnotation.fillColor.dispose();
-                ViewportAnnotation.fillColor = null;
-            }
-        }
-    }
-
-    public static String getColorPreferenceKey() {
-        AnnotationPreferenceLookup lookup = EditorsUI
-            .getAnnotationPreferenceLookup();
-
-        AnnotationPreference preference = lookup
-            .getAnnotationPreference(ViewportAnnotation.TYPE);
-
-        return preference.getColorPreferenceKey();
-    }
-
-    protected RGB scaleColor(RGB rgb, double scale) {
+    protected static RGB scaleColor(RGB rgb, double scale) {
         int red = (int) ((1.0 - scale) * rgb.red + 255 * scale);
         int green = (int) ((1.0 - scale) * rgb.green + 255 * scale);
         int blue = (int) ((1.0 - scale) * rgb.blue + 255 * scale);

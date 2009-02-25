@@ -70,7 +70,7 @@ public class ContributionAnnotationManager {
                 .hasNext();) {
                 Annotation annotation = it.next();
 
-                if (annotation.getType().equals(ContributionAnnotation.TYPE)
+                if (annotation instanceof ContributionAnnotation
                     && model.getPosition(annotation).includes(offset)
                     && ((ContributionAnnotation) annotation).getSource()
                         .equals(source)) {
@@ -99,7 +99,7 @@ public class ContributionAnnotationManager {
         Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
             Annotation annotation = it.next();
 
-            if (annotation.getType().equals(ContributionAnnotation.TYPE)) {
+            if (annotation instanceof ContributionAnnotation) {
 
                 Position pos = model.getPosition(annotation);
 

@@ -220,8 +220,7 @@ public class SessionView extends ViewPart implements ISessionListener,
 
             RGB rgb;
             try {
-                IPreferenceStore store = EditorsUI.getPreferenceStore();
-                rgb = PreferenceConverter.getColor(store, ap
+                rgb = PreferenceConverter.getColor(SessionView.this.store, ap
                     .getColorPreferenceKey());
             } catch (RuntimeException e) {
                 return null;
