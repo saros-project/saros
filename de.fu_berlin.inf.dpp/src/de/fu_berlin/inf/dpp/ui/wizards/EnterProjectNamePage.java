@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
 
+import org.apache.log4j.Logger;
 import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -31,6 +31,9 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  * overwrite the project selected by the {@link ProjectSelectionPage}.
  */
 class EnterProjectNamePage extends WizardPage {
+
+    private static final Logger log = Logger
+        .getLogger(EnterProjectNamePage.class.getName());
 
     private final JoinSessionWizard joinSessionWizard;
 
@@ -274,11 +277,9 @@ class EnterProjectNamePage extends WizardPage {
                 }
             });
         } catch (InvocationTargetException e) {
-            JoinSessionWizard.log.log(Level.WARNING,
-                "Exception while requesting remote file list", e);
+            log.warn("Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
-            JoinSessionWizard.log.log(Level.FINE,
-                "Request of remote file list canceled/interrupted", e);
+            log.debug("Request of remote file list canceled/interrupted", e);
         }
     }
 
