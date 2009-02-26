@@ -194,9 +194,7 @@ public interface ISharedProject {
     public void setProjectReadonly(boolean readonly);
 
     /**
-     * true, if single driver is active, false otherwise.
-     * 
-     * @return
+     * @return true, if there is exactly one driver, false otherwise.
      */
     public boolean isExclusiveDriver();
 
