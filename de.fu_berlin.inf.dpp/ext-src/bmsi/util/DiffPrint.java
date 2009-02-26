@@ -104,12 +104,12 @@ public class DiffPrint {
          * PRINTFUN takes a subscript which belongs together (with a null link
          * at the end) and prints it.
          */
-        public void print_script(Diff.change script) {
+        public void print_script(Diff.Change script) {
             setupOutput();
-            Diff.change next = script;
+            Diff.Change next = script;
 
             while (next != null) {
-                Diff.change t, end;
+                Diff.Change t, end;
 
                 /* Find a set of changes that belong together. */
                 t = next;
@@ -138,7 +138,7 @@ public class DiffPrint {
          * belongs together with the start of the tail.
          */
 
-        protected Diff.change hunkfun(Diff.change hunk) {
+        protected Diff.Change hunkfun(Diff.Change hunk) {
             return hunk;
         }
 
@@ -159,10 +159,10 @@ public class DiffPrint {
          * ignorable lines are inserted or deleted, both are set to 0.
          */
 
-        protected void analyze_hunk(Diff.change hunk) {
+        protected void analyze_hunk(Diff.Change hunk) {
             int f0, l0 = 0, f1, l1 = 0, show_from = 0, show_to = 0;
             int i;
-            Diff.change next;
+            Diff.Change next;
             boolean nontrivial = (ignore == null);
 
             show_from = show_to = 0;
@@ -205,7 +205,7 @@ public class DiffPrint {
             setupOutput();
         }
 
-        protected abstract void print_hunk(Diff.change hunk);
+        protected abstract void print_hunk(Diff.Change hunk);
 
         protected void print_1_line(String pre, Object linbuf) {
             outfile.println(pre + linbuf.toString());
@@ -256,7 +256,7 @@ public class DiffPrint {
          */
 
         @Override
-        protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.Change hunk) {
 
             /* Determine range of line numbers involved in each file. */
             analyze_hunk(hunk);
@@ -297,7 +297,7 @@ public class DiffPrint {
 
         /** Print a hunk of an ed diff */
         @Override
-        protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.Change hunk) {
 
             /* Determine range of line numbers involved in each file. */
             analyze_hunk(hunk);
@@ -389,7 +389,7 @@ public class DiffPrint {
         }
 
         @Override
-        protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.Change hunk) {
 
             /* Determine range of line numbers involved in each file. */
 
@@ -419,7 +419,7 @@ public class DiffPrint {
             outfile.println(" ****");
 
             if (deletes != 0) {
-                Diff.change next = hunk;
+                Diff.Change next = hunk;
 
                 for (int i = first0; i <= last0; i++) {
                     /*
@@ -450,7 +450,7 @@ public class DiffPrint {
             outfile.println(" ----");
 
             if (inserts != 0) {
-                Diff.change next = hunk;
+                Diff.Change next = hunk;
 
                 for (int i = first1; i <= last1; i++) {
                     /*
@@ -509,7 +509,7 @@ public class DiffPrint {
         }
 
         @Override
-        protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.Change hunk) {
             /* Determine range of line numbers involved in each file. */
             analyze_hunk(hunk);
 
@@ -537,7 +537,7 @@ public class DiffPrint {
 
             outfile.println();
 
-            Diff.change next = hunk;
+            Diff.Change next = hunk;
             int i = first0;
             int j = first1;
 
@@ -629,7 +629,7 @@ public class DiffPrint {
             }
         }
         boolean reverse = style == 'e';
-        Diff.change script = d.diff_2(reverse);
+        Diff.Change script = d.diff_2(reverse);
         if (script == null)
             System.err.println("No differences");
         else {

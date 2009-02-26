@@ -165,7 +165,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
                     // Calculate diff of the two files
                     Diff diff = new Diff(oldContent, newContent);
-                    Diff.change script = diff.diff_2(false);
+                    Diff.Change script = diff.diff_2(false);
 
                     // log diff
                     DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(

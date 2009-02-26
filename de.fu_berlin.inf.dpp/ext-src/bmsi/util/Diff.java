@@ -398,7 +398,7 @@ public class Diff {
          *            number of lines in 2nd file
          * @return a linked list of changes - or null
          */
-        public change build_script(boolean[] changed0, int len0,
+        public Change build_script(boolean[] changed0, int len0,
             boolean[] changed1, int len1);
     }
 
@@ -408,9 +408,9 @@ public class Diff {
      */
 
     static class ReverseScript implements ScriptBuilder {
-        public change build_script(final boolean[] changed0, int len0,
+        public Change build_script(final boolean[] changed0, int len0,
             final boolean[] changed1, int len1) {
-            change script = null;
+            Change script = null;
             int i0 = 0, i1 = 0;
             while (i0 < len0 || i1 < len1) {
                 if (changed0[1 + i0] || changed1[1 + i1]) {
@@ -423,7 +423,7 @@ public class Diff {
                         ++i1;
 
                     /* Record this change. */
-                    script = new change(line0, line1, i0 - line0, i1 - line1,
+                    script = new Change(line0, line1, i0 - line0, i1 - line1,
                         script);
                 }
 
@@ -441,9 +441,9 @@ public class Diff {
          * Scan the tables of which lines are inserted and deleted, producing an
          * edit script in forward order.
          */
-        public change build_script(final boolean[] changed0, int len0,
+        public Change build_script(final boolean[] changed0, int len0,
             final boolean[] changed1, int len1) {
-            change script = null;
+            Change script = null;
             int i0 = len0, i1 = len1;
 
             while (i0 >= 0 || i1 >= 0) {
@@ -457,7 +457,7 @@ public class Diff {
                         --i1;
 
                     /* Record this change. */
-                    script = new change(i0, i1, line0 - i0, line1 - i1, script);
+                    script = new Change(i0, i1, line0 - i0, line1 - i1, script);
                 }
 
                 /* We have reached lines in the two files that match each other. */
@@ -477,7 +477,7 @@ public class Diff {
      * Report the differences of two files. DEPTH is the current directory
      * depth.
      */
-    public final change diff_2(final boolean reverse) {
+    public final Change diff_2(final boolean reverse) {
         return diff(reverse ? reverseScript : forwardScript);
     }
 
@@ -491,7 +491,7 @@ public class Diff {
      *            an object to build the script from change flags
      * @return the head of a list of changes
      */
-    public change diff(final ScriptBuilder bld) {
+    public Change diff(final ScriptBuilder bld) {
 
         /*
          * Some lines are obviously insertions or deletions because they don't
@@ -551,9 +551,9 @@ public class Diff {
      * insertion was done; vice versa for INSERTED and LINE1.
      */
 
-    public static class change {
+    public static class Change {
         /** Previous or next edit command. */
-        public change link;
+        public Change link;
         /** # lines of file 1 changed here. */
         public final int inserted;
         /** # lines of file 0 changed here. */
@@ -572,8 +572,8 @@ public class Diff {
          * If DELETED is 0 then LINE0 is the number of the line before which the
          * insertion was done; vice versa for INSERTED and LINE1.
          */
-        public change(int line0, int line1, int deleted, int inserted,
-            change old) {
+        public Change(int line0, int line1, int deleted, int inserted,
+            Change old) {
             this.line0 = line0;
             this.line1 = line1;
             this.inserted = inserted;
