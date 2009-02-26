@@ -278,15 +278,16 @@ public class MessagingManager implements PacketListener, MessageListener,
          * @see de.fu_berlin.inf.dpp.MessagingManager.SessionProvider
          */
         public void sendMessage(String text) {
-            try {
 
+            if (this.muc == null) {
+                log.error("MUC does not exist");
+                return;
+            }
+
+            try {
                 Message msg = this.muc.createMessage();
                 msg.setBody(text);
-
-                if (this.muc != null) {
-                    this.muc.sendMessage(msg);
-                }
-
+                this.muc.sendMessage(msg);
             } catch (XMPPException e1) {
                 e1.printStackTrace();
                 addChatLine("error", "Couldn't send message");
