@@ -443,25 +443,20 @@ public class EditorAPI implements IEditorAPI {
                 }
 
                 // If the selection's length is 0 it will be displayed as
-                // cursor. If the cursor is at the end of the line, the
-                // selection is not visible in the text view.
-                // it is moved one character to the left, otherwise the
+                // cursor. It is moved one character to the left if the offset
+                // is at the end of the line but not already at the start of the
+                // line.
+                // So the cursor is not displayed in completely empty lines. :-(
                 int offset = selection.getOffset();
                 int length = selection.getLength();
                 boolean isCursor = length == 0;
-                if (false /* isCursor */) {
+                if (isCursor) {
                     length = 1;
                     IDocument document = docProvider.getDocument(input);
                     if (document != null) {
-                        try {
-                            char characterAtCursor = document.getChar(offset);
-
-                            if (characterAtCursor == '\n'
-                                || characterAtCursor == '\r') {
-                                offset--;
-                            }
-                        } catch (BadLocationException e) {
-                            // Ignore.
+                        if (offset > 0 && isLineEnd(document, offset)
+                            && !isLineEnd(document, offset - 1)) {
+                            offset--;
                         }
                     }
                 }
@@ -495,6 +490,26 @@ public class EditorAPI implements IEditorAPI {
 
                 model.addAnnotation(newAnnotation, position);
             }
+        }
+    }
+
+    /**
+     * Check if there is a line end in a {@link IDocument} at a given offset.
+     * 
+     * If the offset is not within the document the method returns
+     * <code>false</code>.
+     * 
+     * @param document
+     * @param offset
+     * @return <code>true</code> if there is a line end at the given offset in
+     *         the given document, <code>false</code> otherwise.
+     */
+    protected boolean isLineEnd(IDocument document, int offset) {
+        try {
+            char character = document.getChar(offset);
+            return character == '\n' || character == '\r';
+        } catch (BadLocationException e) {
+            return false;
         }
     }
 
