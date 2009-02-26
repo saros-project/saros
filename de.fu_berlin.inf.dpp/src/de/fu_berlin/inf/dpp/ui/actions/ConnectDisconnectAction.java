@@ -110,6 +110,10 @@ public class ConnectDisconnectAction extends Action {
         try {
             ConnectionState state = Saros.getDefault().getConnectionState();
 
+            /*
+             * FIXME The ConnectDisconnectAction should not be the one that is
+             * printing the logging messages
+             */
             log.debug("New State == " + state);
 
             switch (state) {
