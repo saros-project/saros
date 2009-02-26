@@ -113,18 +113,6 @@ public class JupiterDocumentServer implements JupiterServer {
         this.editor = path;
     }
 
-    /**
-     * default constructor. The server contains his own outgoing forwarding
-     * queue.
-     */
-    public JupiterDocumentServer(IPath path) {
-        this.proxies = new HashMap<JID, JupiterClient>();
-        this.requestList = new Vector<Request>();
-        this.outgoingQueue = new Vector<Request>();
-        this.serializer = new Serializer(this);
-        this.serializer.start();
-    }
-
     public synchronized void addProxyClient(JID jid) {
         logger.debug("Add new proxy client : " + jid);
         this.proxies.put(jid, new ProxyJupiterDocument(jid, this, editor));
