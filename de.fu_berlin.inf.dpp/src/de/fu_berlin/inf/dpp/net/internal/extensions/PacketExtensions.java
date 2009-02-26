@@ -244,7 +244,7 @@ public class PacketExtensions {
             });
     }
 
-    public static MutablePicoContainer container;
+    protected static MutablePicoContainer container;
 
     /**
      * Returns a PicoContainer which contains default implementation of all
