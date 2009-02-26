@@ -52,7 +52,7 @@ public class TextSelectionActivity extends AbstractActivity {
             TextSelectionActivity activity = (TextSelectionActivity) obj;
             return (this.offset == activity.offset)
                 && (this.length == activity.length)
-                && (this.source == activity.source)
+                && (this.source.equals(activity.source))
                 && (this.editor == activity.editor);
         }
 
@@ -62,6 +62,7 @@ public class TextSelectionActivity extends AbstractActivity {
     @Override
     public String toString() {
         return "TextSelectionActivity(offset:" + this.offset + ",length:"
-            + this.length + "," + this.editor + ")";
+            + this.length + ",src:" + getSource() + ",path:" + this.editor
+            + ")";
     }
 }

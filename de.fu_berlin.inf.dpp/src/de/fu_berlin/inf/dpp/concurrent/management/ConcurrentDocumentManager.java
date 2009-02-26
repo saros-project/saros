@@ -420,6 +420,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             Display.getDefault().syncExec(new Runnable() {
                 public void run() {
                     Operation op;
+                    IPath editorPath = request.getEditorPath();
                     try {
                         op = jupiterClient.receiveRequest(request);
                     } catch (TransformationException e) {
@@ -428,15 +429,16 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
                         /* create save activity. */
                         IActivity activity = new EditorActivity(Type.Saved,
-                            request.getEditorPath());
+                            editorPath);
                         /* execute save activity and start consistency check. */
                         ConcurrentDocumentManager.this.sequencer.exec(activity);
                         return;
                     }
 
-                    for (TextEditActivity textEdit : getTextEditActivity(op)) {
-                        textEdit.setEditor(request.getEditorPath());
-                        textEdit.setSource(request.getJID().toString());
+                    String source = request.getJID().toString();
+                    List<TextEditActivity> textEditActivities = getTextEditActivities(
+                        op, editorPath, source);
+                    for (TextEditActivity textEdit : textEditActivities) {
                         /* execute activity in activity sequencer. */
                         ConcurrentDocumentManager.this.sequencer
                             .execTransformedActivity(textEdit);
@@ -560,7 +562,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      * @param text
      * @return
      */
-    public Operation getOperation(TextEditActivity text) {
+    protected Operation getOperation(TextEditActivity text) {
 
         Operation op = null;
         // delete activity
@@ -584,29 +586,31 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      * 
      * @param op
      *            incoming transformed operation.
+     * @param path
+     * @param source
      * @return List with executable text edit activities.
      */
-    public List<TextEditActivity> getTextEditActivity(Operation op) {
+    protected List<TextEditActivity> getTextEditActivities(Operation op,
+        IPath path, String source) {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>(2);
 
         if (op instanceof DeleteOperation) {
             DeleteOperation del = (DeleteOperation) op;
             TextEditActivity textEdit = new TextEditActivity(del.getPosition(),
-                "", del.getText());
+                "", del.getText(), path, source);
             result.add(textEdit);
-        }
-        if (op instanceof InsertOperation) {
+        } else if (op instanceof InsertOperation) {
             InsertOperation ins = (InsertOperation) op;
             TextEditActivity textEdit = new TextEditActivity(ins.getPosition(),
-                ins.getText(), "");
+                ins.getText(), "", path, source);
             result.add(textEdit);
-        }
-        if (op instanceof SplitOperation) {
+        } else if (op instanceof SplitOperation) {
             SplitOperation split = (SplitOperation) op;
-            TextEditActivity op1 = getTextEditActivity(split.getFirst()).get(0);
-            TextEditActivity op2 = getTextEditActivity(split.getSecond())
-                .get(0);
+            TextEditActivity op1 = getTextEditActivities(split.getFirst(),
+                path, source).get(0);
+            TextEditActivity op2 = getTextEditActivities(split.getSecond(),
+                path, source).get(0);
 
             /*
              * if op1 is a delete operation the offset of the second operation
@@ -615,7 +619,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
                 && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
                 op2 = new TextEditActivity(op2.offset
-                    - op1.replacedText.length(), "", op2.replacedText);
+                    - op1.replacedText.length(), "", op2.replacedText, path,
+                    source);
             }
             result.add(op1);
             result.add(op2);

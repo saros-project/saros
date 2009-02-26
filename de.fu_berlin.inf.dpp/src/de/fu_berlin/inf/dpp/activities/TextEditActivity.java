@@ -52,8 +52,11 @@ public class TextEditActivity extends AbstractActivity {
      *            the text that was inserted.
      * @param replacedText
      *            the text that was replaced by this activity.
+     * @param editor
+     *            path of the editor where this activity happened.
      */
-    public TextEditActivity(int offset, String text, String replacedText) {
+    public TextEditActivity(int offset, String text, String replacedText,
+        IPath editor) {
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
         if (replacedText == null)
@@ -61,21 +64,6 @@ public class TextEditActivity extends AbstractActivity {
         this.offset = offset;
         this.text = text;
         this.replacedText = replacedText;
-    }
-
-    /**
-     * @param offset
-     *            the offset inside the document where this activity happened.
-     * @param text
-     *            the text that was inserted.
-     * @param replacedText
-     *            the text that was replaced by this activity.
-     * @param editor
-     *            path of the editor where this activity happened.
-     */
-    public TextEditActivity(int offset, String text, String replacedText,
-        IPath editor) {
-        this(offset, text, replacedText);
         this.editor = editor;
     }
 
@@ -88,10 +76,12 @@ public class TextEditActivity extends AbstractActivity {
      *            the text that was replaced by this activity.
      * @param editor
      *            path of the editor where this activity happened.
+     * @param source
+     *            source of this activity.
      */
     public TextEditActivity(int offset, String text, String replacedText,
         IPath editor, String source) {
-        this(offset, text, replacedText);
+        this(offset, text, replacedText, editor);
         setSource(source);
         this.editor = editor;
     }
@@ -145,7 +135,7 @@ public class TextEditActivity extends AbstractActivity {
             return (this.offset == other.offset) && (this.editor != null)
                 && (other.editor != null) && this.editor.equals(other.editor)
                 && this.text.equals(other.text)
-                && (this.replacedText.equals(replacedText));
+                && (this.replacedText.equals(other.replacedText));
         }
         return false;
     }
