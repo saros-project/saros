@@ -1,10 +1,12 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -31,38 +33,31 @@ public class FileUtil {
      * @return checksum of file or -1 if checksum calculation has been failed.
      */
     public static Long checksum(IFile file) {
-        InputStream contents = null;
 
+        // Adler-32 checksum
+        InputStream contents;
         try {
-            // Adler-32 checksum
             contents = file.getContents();
-            CheckedInputStream cis = new CheckedInputStream(contents,
-                new Adler32());
-
-            byte[] tempBuf = new byte[128];
-            while (cis.read(tempBuf) >= 0) {
-                // continue until buffer empty
-            }
-            long checksum = cis.getChecksum().getValue();
-            return new Long(checksum);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-
         } catch (CoreException e) {
-            e.printStackTrace();
-
-        } finally {
-            try {
-                if (contents != null) {
-                    contents.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            log.error("Failed to calculate checksum:", e);
+            return -1L;
         }
 
-        return new Long(-1);
+        CheckedInputStream cis = new CheckedInputStream(contents, new Adler32());
+        InputStream in = new BufferedInputStream(cis);
+        byte[] tempBuf = new byte[8192];
+        try {
+            while (in.read(tempBuf) >= 0) {
+                // continue until buffer empty
+            }
+            return Long.valueOf(cis.getChecksum().getValue());
+        } catch (IOException e) {
+            log.error("Failed to calculate checksum:", e);
+        } finally {
+            IOUtils.closeQuietly(in);
+        }
+
+        return -1L;
     }
 
     /**
