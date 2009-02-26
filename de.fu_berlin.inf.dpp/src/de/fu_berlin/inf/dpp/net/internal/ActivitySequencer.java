@@ -140,7 +140,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
 
     private int timestamp = ActivitySequencer.UNDEFINED_TIME;
 
-    private IConcurrentManager concurrentManager;
+    private ConcurrentDocumentManager concurrentManager;
 
     /** outgoing queue for direct client sync messages for all driver. */
     private final List<Request> outgoingSyncActivities = new Vector<Request>();
@@ -184,10 +184,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                          * check if document is already managed by jupiter
                          * mechanism.
                          */
-                        if (!ActivitySequencer.this.concurrentManager
-                            .isHostSide()
-                            && (ActivitySequencer.this.concurrentManager
-                                .exec(activity) != null)) {
+                        if (!concurrentManager.isHostSide()
+                            && (concurrentManager.exec(activity) != null)) {
                             // CLIENT SIDE
                             logger
                                 .debug("Execute received activity (without jupiter): "
@@ -203,7 +201,8 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                             executor.exec(activity);
                         }
 
-                        // CO Checksums are not used at the moment, aren't they?
+                        // TODO CO Checksums are not used at the moment, aren't
+                        // they?
                         // Check for file checksum after incoming save file
                         // activity.
                         if ((activity instanceof EditorActivity)
