@@ -119,7 +119,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                         for (int i = 0; i < maxIndex; i++) {
                             sData += ifile.messageBuffer.get(i);
                         }
-                        incomingFiles.remove(ifile);
+                        incomingFiles.remove(ifile.name);
                     }
                 }
             }
