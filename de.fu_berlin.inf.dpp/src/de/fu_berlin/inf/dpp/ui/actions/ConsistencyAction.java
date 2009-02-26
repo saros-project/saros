@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
@@ -46,12 +45,9 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
     protected boolean executingChecksumErrorHandling;
 
-    protected IToolBarManager toolBar;
-
     protected Set<IPath> paths;
 
-    public ConsistencyAction(IToolBarManager toolBar) {
-        this.toolBar = toolBar;
+    public ConsistencyAction() {
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setToolTipText("No inconsistencies");

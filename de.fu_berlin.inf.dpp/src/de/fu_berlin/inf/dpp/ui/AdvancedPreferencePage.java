@@ -53,7 +53,7 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             "STUN server port (needs restart)", getFieldEditorParent()));
 
         addField(new BooleanFieldEditor(PreferenceConstants.MULTI_DRIVER,
-            "Enable multi driver Support (EXPERIMENTAL, needs restart)",
+            "Enable multi driver Support (EXPERIMENTAL)",
             getFieldEditorParent()));
     }
 
