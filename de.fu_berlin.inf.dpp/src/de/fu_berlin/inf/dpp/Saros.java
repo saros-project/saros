@@ -127,7 +127,7 @@ public class Saros extends AbstractUIPlugin {
      * Create the shared instance.
      */
     public Saros() {
-        Saros.plugin = this;
+        setDefault(this);
 
         this.container = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
@@ -215,7 +215,11 @@ public class Saros extends AbstractUIPlugin {
 
         disconnect();
 
-        Saros.plugin = null;
+        setDefault(null);
+    }
+
+    public static void setDefault(Saros newPlugin) {
+        Saros.plugin = newPlugin;
     }
 
     /**
