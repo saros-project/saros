@@ -101,7 +101,7 @@ public interface ISessionManager {
     public void connectionStateChanged(XMPPConnection connection,
         ConnectionState newState);
 
-    public void OnReconnect(int oldtimestamp);
+    public void onReconnect(int oldtimestamp);
 
     /**
      * Get the transmitter of the session.

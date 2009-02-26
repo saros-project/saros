@@ -74,14 +74,15 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         saros.addListener(this);
     }
 
+    Random sessionRandom = new Random(System.currentTimeMillis());
+
     public void startSession(IProject project) throws XMPPException {
         if (!saros.isConnected()) {
             throw new XMPPException("No connection");
         }
 
         JID myJID = saros.getMyJID();
-        this.sessionID = String.valueOf(new Random(System.currentTimeMillis())
-            .nextInt());
+        this.sessionID = String.valueOf(sessionRandom.nextInt());
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
             project, myJID);
@@ -190,7 +191,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
     }
 
-    public void OnReconnect(int oldtimestamp) {
+    public void onReconnect(int oldtimestamp) {
 
         SharedProject project = currentlySharedProject.getValue();
 
