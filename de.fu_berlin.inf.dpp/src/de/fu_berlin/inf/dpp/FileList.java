@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,12 +62,9 @@ public class FileList {
 
     private final Comparator<IPath> comparator = new PathLengthComprarator();
 
-    private class PathLengthComprarator implements Comparator<IPath> {
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.util.Comparator
-         */
+    public static class PathLengthComprarator implements Comparator<IPath>,
+        Serializable {
+
         public int compare(IPath p1, IPath p2) {
             int l1 = p1.toString().length();
             int l2 = p2.toString().length();
