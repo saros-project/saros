@@ -28,6 +28,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -44,10 +45,10 @@ import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
+import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
  * This class is responsible for handling all transfers of binary data
@@ -154,8 +155,8 @@ public class DataTransferManager implements ConnectionSessionListener {
         transferModeListeners.add(trackingTransferModeListener);
     }
 
-    public ObservableValue<JingleFileTransferManager> jingleManager = new ObservableValue<JingleFileTransferManager>(
-        null);
+    @Inject
+    public JingleFileTransferManagerObservable jingleManager;
 
     public JingleFileTransferManager getJingleManager() {
         try {
@@ -669,9 +670,8 @@ public class DataTransferManager implements ConnectionSessionListener {
                  */
                 public void run() {
                     try {
-                        jingleManager
-                            .setValue(new JingleFileTransferManager(
-                                connection, new JingleTransferListener()));
+                        jingleManager.setValue(new JingleFileTransferManager(
+                            connection, new JingleTransferListener()));
                         log.debug("Jingle Manager started");
                     } catch (Exception e) {
                         log.error("Jingle Manager could not be started", e);

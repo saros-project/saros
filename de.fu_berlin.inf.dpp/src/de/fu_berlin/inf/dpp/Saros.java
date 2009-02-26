@@ -45,10 +45,12 @@ import org.jivesoftware.smackx.packet.Jingle;
 import org.osgi.framework.BundleContext;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
+import org.picocontainer.PicoCompositionException;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
+import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -62,6 +64,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
@@ -93,6 +96,12 @@ public class Saros extends AbstractUIPlugin {
     public String xmppFeatureID;
 
     private MutablePicoContainer container;
+
+    /**
+     * The reinjector used to inject dependencies for those objects that are
+     * created by Eclipse and not by our PicoContainer.
+     */
+    private Reinjector reinjector;
 
     private XMPPConnection connection;
 
@@ -136,11 +145,33 @@ public class Saros extends AbstractUIPlugin {
                 XMPPChatReceiver.class).addComponent(InvitationHandler.class)
             .addComponent(LeaveHandler.class).addComponent(
                 RequestForActivityHandler.class).addComponent(
-                UserListHandler.class).addComponent(DataTransferManager.class);
+                UserListHandler.class).addComponent(DataTransferManager.class)
+            .addComponent(JingleFileTransferManagerObservable.class);
 
-        // Code snippet for reinjection:
-        // Reinjector injection = new Reinjector(this.container);
-        // injection.reinject(A.class, new AnnotatedFieldInjection());
+        reinjector = new Reinjector(this.container);
+    }
+
+    /**
+     * Injects dependencies into the annotated fields of the given object.
+     */
+    public synchronized void reinject(Object toInjectInto) {
+        try {
+            // Remove the component, in case an instance of it was already
+            // registered
+            this.container.removeComponent(toInjectInto.getClass());
+
+            // Add the given instance to the container
+            this.container.addComponent(toInjectInto.getClass(), toInjectInto);
+
+            /*
+             * Ask PicoContainer to inject into the component via fields
+             * annotated with @Inject
+             */
+            reinjector.reinject(toInjectInto.getClass(),
+                new AnnotatedFieldInjection());
+        } catch (PicoCompositionException e) {
+            logger.error("Internal error in reinjection:", e);
+        }
     }
 
     /**

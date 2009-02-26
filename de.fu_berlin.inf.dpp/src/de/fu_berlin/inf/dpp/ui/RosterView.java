@@ -59,17 +59,18 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.Presence.Type;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
+import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
@@ -112,48 +113,43 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     private Label label;
 
+    @Inject
+    protected JingleFileTransferManagerObservable jingleManager;
+
     public RosterView() {
 
-        Util.runSafeSWTAsync(log, new Runnable() {
+        // Make sure that we get all dependencies injected
+        Saros.getDefault().reinject(this);
 
-            public void run() {
-                DataTransferManager manager = Saros.getDefault().getContainer()
-                    .getComponent(DataTransferManager.class);
+        jingleManager
+            .addAndNotify(new ValueChangeListener<JingleFileTransferManager>() {
 
-                manager.jingleManager
-                    .addAndNotify(new ValueChangeListener<JingleFileTransferManager>() {
+                IJingleStateListener stateListener = new IJingleStateListener() {
+                    public void setState(JID jid, JingleConnectionState state) {
 
-                        IJingleStateListener stateListener = new IJingleStateListener() {
-                            public void setState(JID jid,
-                                JingleConnectionState state) {
+                        log.info("JingleManager sent state update");
 
-                                log.info("JingleManager sent state update");
+                        refreshRosterTree(jid);
+                    }
+                };
 
-                                refreshRosterTree(jid);
-                            }
-                        };
+                JingleFileTransferManager currentManager = null;
 
-                        JingleFileTransferManager currentManager = null;
+                public void setValue(JingleFileTransferManager newValue) {
 
-                        public void setValue(
-                            JingleFileTransferManager newValue) {
+                    if (currentManager != null) {
+                        currentManager.removeJingleStateListener(stateListener);
+                    }
 
-                            if (currentManager != null) {
-                                currentManager
-                                    .removeJingleStateListener(stateListener);
-                            }
+                    currentManager = newValue;
 
-                            currentManager = newValue;
+                    if (currentManager != null) {
+                        currentManager.addJingleStateListener(stateListener);
+                    }
+                    refreshRosterTree(true);
+                }
+            });
 
-                            if (currentManager != null) {
-                                currentManager
-                                    .addJingleStateListener(stateListener);
-                            }
-                            refreshRosterTree(true);
-                        }
-                    });
-            }
-        });
     }
 
     /**
@@ -393,10 +389,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 // Append DataTransfer State information
                 if (presence != null && presence.isAvailable()) {
 
-                    DataTransferManager data = Saros.getDefault()
-                        .getContainer().getComponent(DataTransferManager.class);
-
-                    JingleFileTransferManager manager = data.jingleManager
+                    JingleFileTransferManager manager = jingleManager
                         .getValue();
 
                     if (manager != null) {
@@ -513,6 +506,13 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         connectionStateChanged(saros.getConnection(), saros
             .getConnectionState());
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+
+        Saros.getDefault().removeListener(this);
     }
 
     /**
@@ -632,7 +632,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
      *            <code>false</code> otherwise.
      */
     public void refreshRosterTree(final boolean updateLabels) {
-        if (this.viewer.getControl().isDisposed()) {
+        if (this.viewer == null || this.viewer.getControl().isDisposed()) {
             return;
         }
 
