@@ -112,12 +112,12 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         addDriver(jid);
 
         DriverDocumentManager.logger.debug("add activer driver " + jid
-            + " to document " + path.lastSegment().toString());
+            + " to document " + path.lastSegment());
         /* add driver to new document. */
         DriverDocument doc = this.documents.get(path);
         if ((doc == null) || !this.documents.containsKey(path)) {
             DriverDocumentManager.logger.debug("New document creates for "
-                + path.lastSegment().toString());
+                + path.lastSegment());
             /* create new instance of this documents. */
             doc = new DriverDocument(path);
             this.documents.put(path, doc);
@@ -155,9 +155,9 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         }
         /* check for other driver or delete if no other driver exists. */
         if (doc.noDriver()) {
-            DriverDocumentManager.logger.debug("no driver exists for document "
-                + path.lastSegment().toString()
-                + ". Document delete from driver manager.");
+            DriverDocumentManager.logger
+                .debug("no driver exists for document " + path.lastSegment()
+                    + ". Document delete from driver manager.");
             /* delete driver document. */
             this.documents.remove(doc.getEditor());
         }
@@ -245,9 +245,14 @@ public class DriverDocumentManager implements IDriverDocumentManager,
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 
-        if (project == null && !drivers.isEmpty()) {
-            logger.error("Project is null, but drivers is not empty");
-            return false;
+        if (project == null) {
+
+            if (!drivers.isEmpty()) {
+                logger.error("Project is null, but drivers is not empty");
+                return false;
+            } else {
+                return true;
+            }
         }
 
         for (JID driver : drivers) {

@@ -31,8 +31,7 @@ public class DriverDocument {
             this.currentDrivers.add(jid);
         } else {
             DriverDocument.logger.debug("Driver " + jid
-                + " is already Driver for "
-                + this.editor.lastSegment().toString());
+                + " is already Driver for " + this.editor.lastSegment());
         }
     }
 
@@ -50,7 +49,7 @@ public class DriverDocument {
         } else {
             DriverDocument.logger.warn("JID " + jid
                 + " is not driver for this document "
-                + this.editor.lastSegment().toString());
+                + this.editor.lastSegment());
         }
 
     }
