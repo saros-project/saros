@@ -22,10 +22,14 @@ package de.fu_berlin.inf.dpp.activities;
 import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * A simple immutable text activity.
+ * An immutable text activity.
  * 
  * @author rdjemili
  */
@@ -41,9 +45,11 @@ public class TextEditActivity extends AbstractActivity {
 
     public final String replacedText;
 
-    private String originalSource = null;
+    public final IPath editor;
 
-    private IPath editor;
+    public IPath getEditor() {
+        return this.editor;
+    }
 
     /**
      * @param offset
@@ -61,6 +67,9 @@ public class TextEditActivity extends AbstractActivity {
             throw new IllegalArgumentException("Text cannot be null");
         if (replacedText == null)
             throw new IllegalArgumentException("ReplacedText cannot be null");
+        if (editor == null)
+            throw new IllegalArgumentException("IPath cannot be null");
+
         this.offset = offset;
         this.text = text;
         this.replacedText = replacedText;
@@ -77,23 +86,30 @@ public class TextEditActivity extends AbstractActivity {
      * @param editor
      *            path of the editor where this activity happened.
      * @param source
-     *            source of this activity.
+     *            JID as String of the user that caused this activity
      */
     public TextEditActivity(int offset, String text, String replacedText,
         IPath editor, String source) {
         this(offset, text, replacedText, editor);
         setSource(source);
-        this.editor = editor;
+    }
+
+    @Override
+    public String toString() {
+        return "TextEditActivity(" + this.offset + ",new:'"
+            + Util.escapeForLogging(this.text) + "',old:'"
+            + Util.escapeForLogging(this.replacedText) + "',path:"
+            + this.editor.toString() + ",src:" + this.source + ")";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
+        int result = super.hashCode();
+        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
         result = prime * result + offset;
         result = prime * result
             + ((replacedText == null) ? 0 : replacedText.hashCode());
-        result = prime * result + ((source == null) ? 0 : source.hashCode());
         result = prime * result + ((text == null) ? 0 : text.hashCode());
         return result;
     }
@@ -102,24 +118,26 @@ public class TextEditActivity extends AbstractActivity {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
+        if (!super.equals(obj))
             return false;
         if (!(obj instanceof TextEditActivity))
             return false;
+
         TextEditActivity other = (TextEditActivity) obj;
 
-        return (this.offset == other.offset) && this.text.equals(other.text)
-            && (this.replacedText.equals(other.replacedText))
-            && (ObjectUtils.equals(this.source, other.source));
-    }
+        if (offset != other.offset)
+            return false;
 
-    @Override
-    public String toString() {
-        return "TextEditActivity(" + this.offset + ",new:'"
-            + Util.escapeForLogging(this.text) + "',old:'"
-            + Util.escapeForLogging(this.replacedText) + "',path:"
-            + this.editor.toString() + ",src:" + this.source + ",oSrc:"
-            + this.originalSource + ")";
+        if (!ObjectUtils.equals(this.editor, other.editor))
+            return false;
+
+        if (!ObjectUtils.equals(this.replacedText, other.replacedText))
+            return false;
+
+        if (!ObjectUtils.equals(this.text, other.text))
+            return false;
+
+        return true;
     }
 
     /**
@@ -140,11 +158,28 @@ public class TextEditActivity extends AbstractActivity {
         return false;
     }
 
-    public IPath getEditor() {
-        return this.editor;
-    }
+    /**
+     * Convert this TextEditActivity to an Operation
+     */
+    public Operation toOperation() {
 
-    public void setEditor(IPath editor) {
-        this.editor = editor;
+        // delete activity
+        if ((replacedText.length() > 0) && (text.length() == 0)) {
+            return new DeleteOperation(offset, replacedText);
+        }
+        // insert activity
+        if ((replacedText.length() == 0) && (text.length() > 0)) {
+            return new InsertOperation(offset, text);
+        }
+        // replace operation has to be split into delete and insert operation
+        if ((replacedText.length() > 0) && (text.length() > 0)) {
+            return new SplitOperation(
+                new DeleteOperation(offset, replacedText), new InsertOperation(
+                    offset, text));
+        }
+
+        // Cannot happen
+        assert false;
+        return null;
     }
 }

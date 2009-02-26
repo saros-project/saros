@@ -32,8 +32,6 @@ public interface IConcurrentManager extends IRequestManager,
 
     public boolean isHost(JID jid);
 
-    public void setHost(JID jid);
-
     public IActivity activityCreated(IActivity activity);
 
     public IActivity exec(IActivity activity);

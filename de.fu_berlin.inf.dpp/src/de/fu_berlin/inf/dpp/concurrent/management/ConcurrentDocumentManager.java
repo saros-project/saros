@@ -70,7 +70,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     private HashMap<IPath, JupiterDocumentServer> concurrentDocuments;
 
     /** current open editor at client side. */
-    private final HashMap<IPath, JupiterClient> clientDocs = new HashMap<IPath, JupiterClient>();
+    private final HashMap<IPath, JupiterDocumentClient> clientDocs = new HashMap<IPath, JupiterDocumentClient>();
 
     private JID host;
 
@@ -276,7 +276,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                     Saros.getDefault().getSessionManager()
                         .removeSessionListener(this);
 
-                    if (side == Side.HOST_SIDE) {
+                    if (isHostSide()) {
                         consistencyWatchdog.stop();
                     }
 
@@ -304,10 +304,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 	 */
     public IActivity activityCreated(IActivity activity) {
 
+        // TODO this does nothing!
         editorActivitiy(activity);
 
         if (createdTextEditActivity(activity)) {
-            /* handled by jupiter and is sended by request transmitting. */
+            /* handled by jupiter and is sent by request transmitting. */
             return null;
         }
         return activity;
@@ -369,31 +370,23 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     private boolean createdTextEditActivity(IActivity activity) {
 
         if (activity instanceof TextEditActivity) {
+
             TextEditActivity textEdit = (TextEditActivity) activity;
-            // if (!isHostSide()) {
-            JupiterClient jupClient = null;
-            /* no jupiter client already exists for this editor text edit */
-            if (!this.clientDocs.containsKey(textEdit.getEditor())) {
-                jupClient = new JupiterDocumentClient(this.myJID,
-                    this.forwarder, textEdit.getEditor());
-                // jupClient.setEditor(textEdit.getEditor());
-                this.clientDocs.put(textEdit.getEditor(), jupClient);
+
+            IPath path = textEdit.getEditor();
+
+            /* No jupiter client exists for this path */
+            if (!this.clientDocs.containsKey(path)) {
+                this.clientDocs.put(path, new JupiterDocumentClient(this.myJID,
+                    this.forwarder, path));
             }
 
             /* generate request. */
-            jupClient = this.clientDocs.get(textEdit.getEditor());
-            if (jupClient != null) {
-                Operation op = getOperation(textEdit);
-                jupClient.generateRequest(op);
-
-                /* already set and forward inside of jup client. */
-                // /* add appropriate Editor path. */
-                // req.setEditorPath(textEdit.getEditor());
-                // /* transmit request */
-                // forwarder.forwardOutgoingRequest(req);
+            JupiterClient jupiterClient = this.clientDocs.get(path);
+            if (jupiterClient != null) {
+                jupiterClient.generateRequest(textEdit.toOperation());
                 return true;
             }
-            // }
         }
         return false;
     }
@@ -402,7 +395,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     private void execTextEditActivity(final Request request) {
 
         // if (!isHostSide()) {
-        JupiterClient jupClient = null;
+        JupiterDocumentClient jupClient = null;
         /* no jupiter client already exists for this editor text edit */
         if (!this.clientDocs.containsKey(request.getEditorPath())) {
             jupClient = new JupiterDocumentClient(this.myJID, this.forwarder,
@@ -552,35 +545,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         return jid != null && jid.equals(this.host);
     }
 
-    public void setHost(JID host) {
-        this.host = host;
-    }
-
-    /**
-     * convert TextEditActivity to Operation op
-     * 
-     * @param text
-     * @return
-     */
-    protected Operation getOperation(TextEditActivity text) {
-
-        Operation op = null;
-        // delete activity
-        if ((text.replacedText.length() > 0) && (text.text.length() == 0)) {
-            op = new DeleteOperation(text.offset, text.replacedText);
-        }
-        // insert activity
-        if ((text.replacedText.length() == 0) && (text.text.length() > 0)) {
-            op = new InsertOperation(text.offset, text.text);
-        }
-        // replace operation has to split into delete and insert operation
-        if ((text.replacedText.length() > 0) && (text.text.length() > 0)) {
-            op = new SplitOperation(new DeleteOperation(text.offset,
-                text.replacedText), new InsertOperation(text.offset, text.text));
-        }
-        return op;
-    }
-
     /**
      * Convert Operation to text edit activity. NoOperation will be ignored.
      * 
@@ -704,7 +668,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                     }
                 } else {
                     /* if no jupiter client exists. */
-                    JupiterClient client = new JupiterDocumentClient(
+                    JupiterDocumentClient client = new JupiterDocumentClient(
                         this.myJID, this.forwarder, request.getEditorPath());
                     // client.setEditor(request.getEditorPath());
                     try {
