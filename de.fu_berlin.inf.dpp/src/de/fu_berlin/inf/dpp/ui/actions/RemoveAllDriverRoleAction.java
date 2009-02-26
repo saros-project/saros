@@ -43,6 +43,9 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class RemoveAllDriverRoleAction extends Action implements
     ISessionListener {
 
+    public static final String ACTION_ID = RemoveAllDriverRoleAction.class
+        .getName();
+
     private static final Logger log = Logger
         .getLogger(RemoveAllDriverRoleAction.class.getName());
 
@@ -57,6 +60,7 @@ public class RemoveAllDriverRoleAction extends Action implements
         super("Remove driver roles");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Remove driver roles");
+        setId(ACTION_ID);
 
         Saros.getDefault().getSessionManager().addSessionListener(this);
         updateEnablement();

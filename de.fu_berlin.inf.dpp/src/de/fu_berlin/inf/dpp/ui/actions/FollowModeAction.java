@@ -23,6 +23,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class FollowModeAction extends Action {
 
+    public static final String ACTION_ID = FollowModeAction.class.getName();
+
     private static final Logger log = Logger.getLogger(FollowModeAction.class
         .getName());
 
@@ -62,6 +64,7 @@ public class FollowModeAction extends Action {
 
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
         setToolTipText("Enable/disable follow mode");
+        setId(ACTION_ID);
 
         EditorManager.getDefault().addSharedEditorListener(
             new AbstractSharedEditorListener() {
