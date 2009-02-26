@@ -297,14 +297,17 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         private Image personOfflineImage;
 
-        public Image getPersonOfflineImage() {
+        public synchronized void createPersonOfflineImage() {
             if (personOfflineImage == null) {
-                synchronized (this) {
-                    if (personOfflineImage == null) {
-                        personOfflineImage = new Image(Display.getDefault(),
-                            personImage, SWT.IMAGE_DISABLE);
-                    }
-                }
+                personOfflineImage = new Image(Display.getDefault(),
+                    personImage, SWT.IMAGE_DISABLE);
+            }
+        }
+
+        public Image getPersonOfflineImage() {
+
+            if (personOfflineImage == null) {
+                createPersonOfflineImage();
             }
             return personOfflineImage;
         }
