@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -109,20 +110,34 @@ public class ActivitiesPacketExtension implements PacketExtension {
             + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+            + ((activities == null) ? 0 : activities.hashCode());
+        result = prime * result
+            + ((sessionID == null) ? 0 : sessionID.hashCode());
+        return result;
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ActivitiesPacketExtension) {
-            ActivitiesPacketExtension other = (ActivitiesPacketExtension) obj;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof ActivitiesPacketExtension))
+            return false;
+        ActivitiesPacketExtension other = (ActivitiesPacketExtension) obj;
 
-            return this.activities.equals(other.getActivities());
-        }
+        if (!ObjectUtils.equals(this.sessionID, other.sessionID))
+            return false;
 
-        return false;
+        if (!ObjectUtils.equals(this.activities, other.activities))
+            return false;
+
+        return true;
     }
 
     public String getSessionID() {
