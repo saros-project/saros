@@ -614,8 +614,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             TextEditActivity activity = new TextEditActivity(offset, text,
                 replacedText, path);
             /*
-             * check if text edit activity is executed by other driver activity
-             * recently.
+             * Check if this activity was executed by another driver recently.
              */
             if (activity.sameLike(this.currentExecuteActivity)) {
                 this.currentExecuteActivity = null;
