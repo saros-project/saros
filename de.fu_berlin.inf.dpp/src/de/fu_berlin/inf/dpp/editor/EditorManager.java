@@ -890,7 +890,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         boolean following = shouldIFollow(user);
         if (driverSelection != null) {
             int driverCursor = driverSelection.getEndLine();
-            following &= (driverCursor < top || driverCursor > bottom);
+            following = following
+                && (driverCursor < top || driverCursor > bottom);
         }
 
         Set<IEditorPart> editors = this.editorPool.getEditors(path);
