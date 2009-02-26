@@ -59,7 +59,7 @@ public class RemoveAllDriverRoleAction extends Action implements
     public RemoveAllDriverRoleAction() {
         super("Remove driver roles");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
-        setToolTipText("Remove driver roles");
+        setToolTipText("Remove all driver roles");
         setId(ACTION_ID);
 
         Saros.getDefault().getSessionManager().addSessionListener(this);
@@ -122,8 +122,6 @@ public class RemoveAllDriverRoleAction extends Action implements
         ISharedProject project = getSharedProject();
         boolean enabled = ((project != null) && project.isHost());
         setEnabled(enabled);
-        // setEnabled(project != null && project.isHost() &&
-        // !project.isDriver());
     }
 
     private ISharedProject getSharedProject() {
