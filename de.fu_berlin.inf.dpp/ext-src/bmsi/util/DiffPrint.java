@@ -28,15 +28,17 @@
  */
 package bmsi.util;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Date;
-import java.util.Vector;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 interface UnaryPredicate {
     boolean execute(Object obj);
@@ -586,17 +588,14 @@ public class DiffPrint {
      * sequences of whitespace to a single space for comparison purposes.
      */
     static String[] slurp(String file) throws IOException {
-        BufferedReader rdr = new BufferedReader(new FileReader(file));
-        Vector<String> s = new Vector<String>();
-        for (;;) {
-            String line = rdr.readLine();
-            if (line == null)
-                break;
-            s.addElement(line);
+        InputStream in = new FileInputStream(file);
+        try {
+            @SuppressWarnings("unchecked")
+            List<String> lines = IOUtils.readLines(in);
+            return lines.toArray(new String[lines.size()]);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
-        String[] a = new String[s.size()];
-        s.copyInto(a);
-        return a;
     }
 
     public static void main(String[] argv) throws IOException {
