@@ -619,7 +619,7 @@ public class Saros extends AbstractUIPlugin {
                             }
                         }
 
-                        getSessionManager().OnReconnect(inErrorSince);
+                        getSessionManager().onReconnect(inErrorSince);
                         setConnectionState(ConnectionState.CONNECTED, null);
                         logger.debug("XMPP reconnected");
                     }
