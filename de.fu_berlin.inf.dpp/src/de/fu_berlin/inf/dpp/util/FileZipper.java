@@ -33,7 +33,7 @@ public class FileZipper {
      * CheckedInputStream cis = new CheckedInputStream(inputStream, new
      * Adler32());
      */
-    public static boolean calculateChecksum = false;
+    public final static boolean calculateChecksum = false;
 
     public static void createProjectZipArchive(List<IPath> files,
         String descPath, IProject project) throws Exception {
@@ -69,7 +69,7 @@ public class FileZipper {
         zipStream.close();
 
         // Checksum
-        if (cos != null) {
+        if (calculateChecksum && cos != null) {
             FileZipper.logger
                 .debug("Checksum: " + cos.getChecksum().getValue());
         }
