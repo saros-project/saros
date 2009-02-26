@@ -433,8 +433,8 @@ public class EditorAPI implements IEditorAPI {
         IDocumentProvider docProvider = textEditor.getDocumentProvider();
 
         if (docProvider != null) {
-            IAnnotationModel model = docProvider.getAnnotationModel(textEditor
-                .getEditorInput());
+            IEditorInput input = textEditor.getEditorInput();
+            IAnnotationModel model = docProvider.getAnnotationModel(input);
 
             if (model != null) {
 
@@ -442,12 +442,32 @@ public class EditorAPI implements IEditorAPI {
                     reveal(editorPart, selection);
                 }
 
-                // Length can be minimal 1 to display the cursor position as
-                // selection.
-                // TODO [MR] If cursor is at line end, it is not displayed.
-                Position position = new Position(selection.getOffset(), Math
-                    .max(1, selection.getLength()));
-                SarosAnnotation newAnnotation = new SelectionAnnotation(source);
+                // If the selection's length is 0 it will be displayed as
+                // cursor. If the cursor is at the end of the line, the
+                // selection is not visible in the text view.
+                // it is moved one character to the left, otherwise the
+                int offset = selection.getOffset();
+                int length = selection.getLength();
+                boolean isCursor = length == 0;
+                if (isCursor) {
+                    length = 1;
+                    IDocument document = docProvider.getDocument(input);
+                    if (document != null) {
+                        try {
+                            char characterAtCursor = document.getChar(offset);
+
+                            if (characterAtCursor == '\n'
+                                || characterAtCursor == '\r') {
+                                offset--;
+                            }
+                        } catch (BadLocationException e) {
+                            // Ignore.
+                        }
+                    }
+                }
+                Position position = new Position(offset, length);
+                SarosAnnotation newAnnotation = new SelectionAnnotation(source,
+                    isCursor);
 
                 for (@SuppressWarnings("unchecked")
                 Iterator<Annotation> it = model.getAnnotationIterator(); it
