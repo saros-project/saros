@@ -449,7 +449,7 @@ public class EditorAPI implements IEditorAPI {
                 int offset = selection.getOffset();
                 int length = selection.getLength();
                 boolean isCursor = length == 0;
-                if (isCursor) {
+                if (false /* isCursor */) {
                     length = 1;
                     IDocument document = docProvider.getDocument(input);
                     if (document != null) {
