@@ -12,19 +12,22 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * The client-side handling for a single document
+ */
 public class JupiterDocumentClient implements JupiterClient {
-
-    /**
-     * 1. Outgoing queue 2. request forwarder
-     * 
-     */
 
     private static Logger logger = Logger.getLogger(JupiterDocumentClient.class
         .toString());
 
-    /** jid of remote client */
+    /**
+     * JID of remote client
+     */
     private final JID jid;
-    /** jupiter sync algorithm. */
+
+    /**
+     * jupiter sync algorithm.
+     */
     private final Algorithm jupiter;
 
     private IPath editor;
@@ -74,7 +77,6 @@ public class JupiterDocumentClient implements JupiterClient {
 
     public void setEditor(IPath path) {
         this.editor = path;
-
     }
 
     public Timestamp getTimestamp() {
