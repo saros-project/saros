@@ -96,8 +96,14 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 
-        boolean enabled = ((project != null) && (this.selectedUser != null)
-            && project.isHost() && this.selectedUser.isObserver());
+        // Only the host can use this action
+        boolean enabled = project != null && project.isHost();
+
+        // Only enable if the user is observer or there are more than one driver
+        enabled = enabled && (this.selectedUser != null);
+        enabled = enabled
+            && (this.selectedUser.isObserver() || !project.isExclusiveDriver());
+
         setEnabled(enabled);
     }
 }
