@@ -213,7 +213,7 @@ public class Util {
                 } catch (Error e) {
                     log.error("Internal Fatal Error:", e);
 
-                    // Rethrow errors (such as out of memory error)
+                    // Rethrow errors (such as an OutOfMemoryError)
                     throw e;
                 }
             }
