@@ -21,7 +21,7 @@ public abstract class RequestActivityExtension extends
         DefaultPacketExtension extension = create();
 
         // TODO create string constants for the used keys
-        extension.setValue("ID", (new Integer(timestamp)).toString());
+        extension.setValue("ID", String.valueOf(timestamp));
 
         if (andup) {
             extension.setValue("ANDUP", "true");
