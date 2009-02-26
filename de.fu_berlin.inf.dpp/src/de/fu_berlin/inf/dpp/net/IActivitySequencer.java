@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.project.IActivityManager;
  */
 public interface IActivitySequencer extends IActivityListener, IRequestManager,
     IActivityManager {
+
     /**
      * Gets all activities since last flush.
      * 
