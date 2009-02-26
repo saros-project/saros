@@ -34,18 +34,18 @@ public class Serializer {
 
         HashMap<JID, JupiterClient> proxies = server.getProxies();
 
-        // 1. execute receive action at appropriate proxy client.
+        // 1. Use JupiterClient of sender to transform request
         JupiterClient sourceProxy = proxies.get(request.getJID());
         Operation op = sourceProxy.receiveRequest(request);
 
-        // 2. execute generate action at other proxy clients.
+        // 2. Send resulting operation to all other clients
         for (Map.Entry<JID, JupiterClient> entry : proxies.entrySet()) {
 
             JID jid = entry.getKey();
             JupiterClient remoteProxy = entry.getValue();
 
-            if (!jid.toString().equals(request.getJID().toString())) {
-                // create submit op as local proxy operation and send to client.
+            if (!jid.equals(request.getJID())) {
+                // submit operation as local proxy operation and send to client.
                 remoteProxy.generateRequest(op);
             }
         }
@@ -56,7 +56,6 @@ public class Serializer {
 
         Util.runSafeAsync("Serializer-", log, new Runnable() {
             public void run() {
-
                 while (true) {
                     try {
                         dispatch();

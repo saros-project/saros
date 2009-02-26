@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
-import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -46,9 +44,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
@@ -56,6 +51,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
@@ -299,31 +295,12 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         return this.forwarder;
     }
 
-    /**
-	 *
-	 */
     public IActivity activityCreated(IActivity activity) {
 
-        // TODO this does nothing!
-        editorActivitiy(activity);
-
-        if (createdTextEditActivity(activity)) {
-            /* handled by jupiter and is sent by request transmitting. */
-            return null;
-        }
-        return activity;
-    }
-
-    /**
-     * handled closed editor activity to remove the local jupiter clients.
-     * 
-     * @param activity
-     */
-    private void editorActivitiy(IActivity activity) {
         if (activity instanceof EditorActivity) {
             EditorActivity editor = (EditorActivity) activity;
 
-            // if (isHostSide()) {
+            // TODO Consistency Check?
             if (editor.getType() == Type.Saved) {
                 // // calculate checksum for saved file
                 // long checksum = FileUtil.checksum(this.sharedProject
@@ -335,7 +312,22 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 // + " for path : "
                 // + editor.getPath().toOSString());
             }
+
+            // We did not handle it!
+            return activity;
         }
+
+        if (activity instanceof TextEditActivity) {
+
+            TextEditActivity textEdit = (TextEditActivity) activity;
+
+            JupiterDocumentClient document = getClientDoc(textEdit.getEditor());
+            document.generateRequest(textEdit.toOperation());
+
+            // We did consume this activity
+            return null;
+        }
+        return activity;
     }
 
     private void fileActivity(IActivity activity) {
@@ -348,124 +340,72 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             if (file.getType() == FileActivity.Type.Removed) {
                 if (isHostSide()) {
                     /* remove jupiter document server */
-                    if (this.concurrentDocuments.containsKey(file.getPath())) {
-                        this.concurrentDocuments.remove(file.getPath());
-                    }
+                    this.concurrentDocuments.remove(file.getPath());
                 }
 
                 // Client Side
-                if (this.clientDocs.containsKey(file.getPath())) {
-                    this.clientDocs.remove(file.getPath());
-                }
+                this.clientDocs.remove(file.getPath());
             }
         }
-    }
-
-    /**
-     * handles text edit activities with jupiter.
-     * 
-     * @param activity
-     * @return true if activity is transformed with jupiter.
-     */
-    private boolean createdTextEditActivity(IActivity activity) {
-
-        if (activity instanceof TextEditActivity) {
-
-            TextEditActivity textEdit = (TextEditActivity) activity;
-
-            IPath path = textEdit.getEditor();
-
-            /* No jupiter client exists for this path */
-            if (!this.clientDocs.containsKey(path)) {
-                this.clientDocs.put(path, new JupiterDocumentClient(this.myJID,
-                    this.forwarder, path));
-            }
-
-            /* generate request. */
-            JupiterClient jupiterClient = this.clientDocs.get(path);
-            if (jupiterClient != null) {
-                jupiterClient.generateRequest(textEdit.toOperation());
-                return true;
-            }
-        }
-        return false;
     }
 
     // TODO CJ: review
     private void execTextEditActivity(final Request request) {
 
-        // if (!isHostSide()) {
-        JupiterDocumentClient jupClient = null;
-        /* no jupiter client already exists for this editor text edit */
-        if (!this.clientDocs.containsKey(request.getEditorPath())) {
-            jupClient = new JupiterDocumentClient(this.myJID, this.forwarder,
-                request.getEditorPath());
-            // jupClient.setEditor(request.getEditorPath());
-            this.clientDocs.put(request.getEditorPath(), jupClient);
-        }
+        final JupiterDocumentClient jupiterClient = getClientDoc(request
+            .getEditorPath());
 
-        /* generate request. */
-        jupClient = this.clientDocs.get(request.getEditorPath());
-        if (jupClient != null) {
+        Util.runSafeSWTSync(logger, new Runnable() {
+            public void run() {
+                Operation op;
+                try {
+                    op = jupiterClient.receiveRequest(request);
+                } catch (TransformationException e) {
+                    ConcurrentDocumentManager.logger.error(
+                        "Error during transformation: ", e);
 
-            /* operational transformation. */
-            final JupiterClient jupiterClient = jupClient;
-            Display.getDefault().syncExec(new Runnable() {
-                public void run() {
-                    Operation op;
-                    IPath editorPath = request.getEditorPath();
-                    try {
-                        op = jupiterClient.receiveRequest(request);
-                    } catch (TransformationException e) {
-                        ConcurrentDocumentManager.logger.error(
-                            "Error during transformation: ", e);
-
-                        /* create save activity. */
-                        IActivity activity = new EditorActivity(Type.Saved,
-                            editorPath);
-                        /* execute save activity and start consistency check. */
-                        ConcurrentDocumentManager.this.sequencer.exec(activity);
-                        return;
-                    }
-
-                    String source = request.getJID().toString();
-                    List<TextEditActivity> textEditActivities = getTextEditActivities(
-                        op, editorPath, source);
-                    for (TextEditActivity textEdit : textEditActivities) {
-                        /* execute activity in activity sequencer. */
-                        ConcurrentDocumentManager.this.sequencer
-                            .execTransformedActivity(textEdit);
-                    }
+                    /*
+                     * TODO If this happens we should start an consistency check
+                     * automatically
+                     */
+                    return;
                 }
-            });
-        }
+
+                /* execute activity in activity sequencer. */
+                for (TextEditActivity textEdit : op.toTextEdit(request
+                    .getEditorPath(), request.getJID().toString())) {
+
+                    sequencer.execTransformedActivity(textEdit);
+                }
+            }
+        });
     }
 
     public IActivity exec(IActivity activity) {
 
         if (activity instanceof EditorActivity) {
-            EditorActivity editorAc = (EditorActivity) activity;
+            EditorActivity editorActivity = (EditorActivity) activity;
 
             if (isHostSide()) {
-                JID sourceJID = new JID(editorAc.getSource());
+                JID sourceJID = new JID(editorActivity.getSource());
 
                 /* inform driver document manager */
                 this.driverManager.receiveActivity(activity);
 
-                /* if one driver activate a new editor. */
-                // if (drivers.contains(sourceJID)
+                /* if one driver activated a new editor. */
                 if (this.driverManager.isDriver(sourceJID)
-                    && ((editorAc.getType() == Type.Activated) || (editorAc
+                    && ((editorActivity.getType() == Type.Activated) || (editorActivity
                         .getType() == Type.Closed))) {
+
                     /* start jupiter proxy for this driver. */
-                    if (this.concurrentDocuments
-                        .containsKey(editorAc.getPath())) {
+                    if (this.concurrentDocuments.containsKey(editorActivity
+                        .getPath())) {
                         JupiterServer server = this.concurrentDocuments
-                            .get(editorAc.getPath());
+                            .get(editorActivity.getPath());
 
                         /* client has no proxy for this editor. */
                         if (!server.isExist(sourceJID)) {
-                            if (editorAc.getType() == Type.Activated) {
+                            if (editorActivity.getType() == Type.Activated) {
                                 server.addProxyClient(sourceJID);
                                 /* update vector time for new proxy. */
                                 // TODO: stop serializer and after this update
@@ -477,7 +417,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                                 try {
 
                                     JupiterClient jupC = this.clientDocs
-                                        .get(editorAc.getPath());
+                                        .get(editorActivity.getPath());
                                     if (jupC != null) {
                                         Timestamp ts = jupC.getTimestamp();
 
@@ -487,8 +427,9 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                                                 .getComponents()[1], ts
                                                 .getComponents()[0]),
                                             new TimestampOperation());
-                                        updateRequest.setEditorPath(editorAc
-                                            .getPath());
+                                        updateRequest
+                                            .setEditorPath(editorActivity
+                                                .getPath());
                                         updateRequest.setJID(sourceJID);
 
                                         this.forwarder
@@ -498,22 +439,23 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
                                     ConcurrentDocumentManager.logger.error(
                                         "Error during get timestamp of host proxy for "
-                                            + editorAc.getPath(), e);
+                                            + editorActivity.getPath(), e);
                                 }
                             }
                         } else {
                             /* remove proxy for this jid. */
-                            if (editorAc.getType() == Type.Closed) {
+                            if (editorActivity.getType() == Type.Closed) {
                                 server.removeProxyClient(sourceJID);
                             }
                         }
                     } else {
                         /* create new jupiter proxy client. */
-                        if (editorAc.getType() == Type.Activated) {
+                        if (editorActivity.getType() == Type.Activated) {
                             Request createRequest = new RequestImpl(0,
                                 new JupiterVectorTime(0, 0),
                                 new TimestampOperation());
-                            createRequest.setEditorPath(editorAc.getPath());
+                            createRequest.setEditorPath(editorActivity
+                                .getPath());
                             createRequest.setJID(sourceJID);
 
                         }
@@ -545,149 +487,101 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         return jid != null && jid.equals(this.host);
     }
 
-    /**
-     * Convert Operation to text edit activity. NoOperation will be ignored.
-     * 
-     * @param op
-     *            incoming transformed operation.
-     * @param path
-     * @param source
-     * @return List with executable text edit activities.
-     */
-    protected List<TextEditActivity> getTextEditActivities(Operation op,
-        IPath path, String source) {
-
-        List<TextEditActivity> result = new ArrayList<TextEditActivity>(2);
-
-        if (op instanceof DeleteOperation) {
-            DeleteOperation del = (DeleteOperation) op;
-            TextEditActivity textEdit = new TextEditActivity(del.getPosition(),
-                "", del.getText(), path, source);
-            result.add(textEdit);
-        } else if (op instanceof InsertOperation) {
-            InsertOperation ins = (InsertOperation) op;
-            TextEditActivity textEdit = new TextEditActivity(ins.getPosition(),
-                ins.getText(), "", path, source);
-            result.add(textEdit);
-        } else if (op instanceof SplitOperation) {
-            SplitOperation split = (SplitOperation) op;
-            TextEditActivity op1 = getTextEditActivities(split.getFirst(),
-                path, source).get(0);
-            TextEditActivity op2 = getTextEditActivities(split.getSecond(),
-                path, source).get(0);
-
-            /*
-             * if op1 is a delete operation the offset of the second operation
-             * has to be modified.
-             */
-            if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
-                && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
-                op2 = new TextEditActivity(op2.offset
-                    - op1.replacedText.length(), "", op2.replacedText, path,
-                    source);
-            }
-            result.add(op1);
-            result.add(op2);
-        }
-
-        return result;
-    }
-
     private JupiterDocumentServer initDocumentServer(IPath path) {
-        JupiterDocumentServer docServer = null;
+
         /* create new document server. */
-        docServer = new JupiterDocumentServer(this.forwarder);
-        // docServer = new JupiterDocumentServer();
-        docServer.setEditor(path);
+        JupiterDocumentServer docServer = new JupiterDocumentServer(
+            this.forwarder, path);
+
         /* create new local host document client. */
         docServer.addProxyClient(this.host);
         return docServer;
     }
 
+    protected void receiveRequestHostSide(Request request) {
+
+        JID sender = request.getJID();
+        IPath path = request.getEditorPath();
+
+        /* if host side and server jupiter side of request */
+        if (isHost(sender) && (request.getSiteId() == 0)) {
+            /* Request already has been transformed and has to be executed. */
+            execTextEditActivity(request);
+            return;
+        }
+
+        JupiterDocumentServer docServer = null;
+        /**
+         * if no jupiter document server exists.
+         */
+        if (!this.concurrentDocuments.containsKey(path)) {
+            docServer = initDocumentServer(path);
+
+            if (!isHost(sender)) {
+                this.driverManager.addDriverToDocument(path, sender);
+                docServer.addProxyClient(sender);
+            }
+            this.concurrentDocuments.put(path, docServer);
+        }
+        docServer = this.concurrentDocuments.get(path);
+
+        /* check if sender id exists in proxy list. */
+        if (!docServer.getProxies().containsKey(sender)) {
+            docServer.addProxyClient(sender);
+        }
+
+        /* sync request with jupiter document server. */
+        docServer.addRequest(request);
+    }
+
     /**
-     * sync received request with right jupiter server document and local
-     * client.
-     * 
+     * Synchronizes the given request with the jupiter server document (if host)
+     * and local clients (if host or client).
      */
     public void receiveRequest(Request request) {
-
-        /* 1. Sync with jupiter server component. */
         if (isHostSide()) {
-
-            /* if host side and server jupiter side of request */
-            if (isHost(request.getJID()) && (request.getSiteId() == 0)) {
-                /* Request already has been transformed and has to be executed. */
-                execTextEditActivity(request);
-                return;
-            }
-
-            JupiterDocumentServer docServer = null;
-            /**
-             * if no jupiter document server exists.
-             */
-            if (!this.concurrentDocuments.containsKey(request.getEditorPath())) {
-                docServer = initDocumentServer(request.getEditorPath());
-
-                if (!isHost(request.getJID())) {
-                    this.driverManager.addDriverToDocument(request
-                        .getEditorPath(), request.getJID());
-                    docServer.addProxyClient(request.getJID());
-                }
-                this.concurrentDocuments
-                    .put(request.getEditorPath(), docServer);
-            }
-            docServer = this.concurrentDocuments.get(request.getEditorPath());
-            try {
-                /* check if sender id exists in proxy list. */
-                if (!docServer.getProxies().containsKey(request.getJID())) {
-                    docServer.addProxyClient(request.getJID());
-                }
-            } catch (InterruptedException ie) {
-                ConcurrentDocumentManager.logger.error(
-                    "Error during get proxy list of jupiter server.", ie);
-            }
-
-            /* sync request with jupiter document server. */
-            docServer.addRequest(request);
-
-            return;
+            receiveRequestHostSide(request);
         } else {
-            /* update timestamp of local jupiter client. */
-            if (request.getOperation() instanceof TimestampOperation) {
-                if (this.clientDocs.containsKey(request.getEditorPath())) {
-                    ConcurrentDocumentManager.logger
-                        .info("update vector time : " + request.getEditorPath());
-                    JupiterClient jupClient = this.clientDocs.get(request
-                        .getEditorPath());
-                    try {
-                        jupClient.updateVectorTime(request.getTimestamp());
-                    } catch (TransformationException e) {
-                        ConcurrentDocumentManager.logger.error(
-                            "Error during update jupiter client for "
-                                + request.getEditorPath(), e);
-                    }
-                } else {
-                    /* if no jupiter client exists. */
-                    JupiterDocumentClient client = new JupiterDocumentClient(
-                        this.myJID, this.forwarder, request.getEditorPath());
-                    // client.setEditor(request.getEditorPath());
-                    try {
-                        client.updateVectorTime(request.getTimestamp());
-                        this.clientDocs.put(request.getEditorPath(), client);
-                    } catch (TransformationException e) {
-                        ConcurrentDocumentManager.logger.error(
-                            "Error during update jupiter client for "
-                                + request.getEditorPath(), e);
-                    }
+            receiveRequestClientSide(request);
+        }
+    }
 
-                }
-            } else {
-                /*
-                 * 2. receive request in local client component and execute the
-                 * transformed operation as IActivity.
-                 */
-                execTextEditActivity(request);
+    public JupiterDocumentClient getClientDoc(IPath path) {
+
+        if (this.clientDocs.containsKey(path)) {
+            return this.clientDocs.get(path);
+        } else {
+            JupiterDocumentClient client = new JupiterDocumentClient(
+                this.myJID, this.forwarder, path);
+            this.clientDocs.put(path, client);
+            return client;
+        }
+    }
+
+    protected void receiveRequestClientSide(Request request) {
+
+        if (request.getOperation() instanceof TimestampOperation) {
+            /*
+             * Update timestamp
+             */
+
+            JupiterClient jupClient = getClientDoc(request.getEditorPath());
+
+            try {
+                jupClient.updateVectorTime(request.getTimestamp());
+            } catch (TransformationException e) {
+                logger.error(
+                    "Jupiter[Client] - Error during vector time update for "
+                        + request.getEditorPath(), e);
             }
+        } else {
+            /*
+             * This is an answer we received from the Host upon our
+             * JupiterRequest
+             * 
+             * Transform it locally and execute it.
+             */
+            execTextEditActivity(request);
         }
     }
 
@@ -696,31 +590,26 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         if (isHost(jid))
             return;
+
         /*
-         * 1. check if driver exists. 2. add new driver or remove driver. 3.
+         * The following code only removes drivers, because new drivers are
+         * added lazyly
          */
         if (isHostSide()) {
             /* if driver changed to observer */
             if (this.driverManager.isDriver(jid)) {
                 userLeft(jid);
             }
-            // /* new driver added to project. */
-            // else {
-            // drivers.add(driver);
-            // //TODO: add driver to current open document proxy ?
-            // }
         } else {
             // ClientSide
             if (user.equals(this.myJID)) {
                 this.clientDocs.clear();
             }
         }
-
     }
 
     public void userJoined(JID user) {
         // do nothing
-
     }
 
     public void userLeft(JID user) {
@@ -779,7 +668,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 + this.myJID);
         } else {
             ConcurrentDocumentManager.logger
-                .error("No jupter document exists for " + path.toOSString());
+                .error("No Jupiter document exists for " + path.toOSString());
         }
 
     }

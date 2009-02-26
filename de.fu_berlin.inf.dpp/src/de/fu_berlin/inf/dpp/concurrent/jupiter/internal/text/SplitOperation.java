@@ -20,6 +20,12 @@
  */
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.runtime.IPath;
+
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
 /**
@@ -136,4 +142,31 @@ public class SplitOperation implements Operation {
         return hashcode;
     }
 
+    public List<TextEditActivity> toTextEdit(IPath path, String source) {
+
+        List<TextEditActivity> first = getFirst().toTextEdit(path,
+            source);
+        assert first.size() == 1;
+        TextEditActivity op1 = first.get(0);
+
+        List<TextEditActivity> second = getSecond().toTextEdit(path,
+            source);
+        assert second.size() == 1;
+        TextEditActivity op2 = second.get(0);
+
+        /*
+         * if op1 is a delete operation the offset of the second operation has
+         * to be modified.
+         */
+        if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
+            && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
+            op2 = new TextEditActivity(op2.offset - op1.replacedText.length(),
+                "", op2.replacedText, path, source);
+        }
+
+        List<TextEditActivity> result = new ArrayList<TextEditActivity>(2);
+        result.add(op1);
+        result.add(op2);
+        return result;
+    }
 }

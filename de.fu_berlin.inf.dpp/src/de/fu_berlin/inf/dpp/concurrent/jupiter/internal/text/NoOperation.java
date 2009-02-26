@@ -21,6 +21,12 @@
 
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.core.runtime.IPath;
+
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
 /**
@@ -108,5 +114,9 @@ public class NoOperation implements Operation {
     public int hashCode() {
         int hashcode = 37;
         return hashcode;
+    }
+
+    public List<TextEditActivity> toTextEdit(IPath path, String source) {
+        return Collections.emptyList();
     }
 }

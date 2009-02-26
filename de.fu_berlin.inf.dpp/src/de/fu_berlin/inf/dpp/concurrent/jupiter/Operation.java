@@ -1,6 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.eclipse.core.runtime.IPath;
+
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 
 /**
  * This interface must be implemented by all operations. An operation is
@@ -8,5 +13,7 @@ import java.io.Serializable;
  * specific methods at all.
  */
 public interface Operation extends Serializable {
-    // This interface is a marker interface and left intentionally empty
+
+    List<TextEditActivity> toTextEdit(IPath path, String source);
+
 }

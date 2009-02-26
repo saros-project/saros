@@ -21,6 +21,12 @@
 
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.eclipse.core.runtime.IPath;
+
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -164,5 +170,10 @@ public class DeleteOperation implements Operation {
         int hashcode = this.position;
         hashcode += 13 * this.text.hashCode();
         return hashcode;
+    }
+
+    public List<TextEditActivity> toTextEdit(IPath path, String source) {
+        return Collections.singletonList(new TextEditActivity(getPosition(),
+            "", getText(), path, source));
     }
 }

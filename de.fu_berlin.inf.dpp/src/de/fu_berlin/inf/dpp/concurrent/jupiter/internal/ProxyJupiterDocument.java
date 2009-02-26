@@ -30,10 +30,11 @@ public class ProxyJupiterDocument implements JupiterClient {
 
     private IPath editor;
 
-    public ProxyJupiterDocument(JID jid, RequestForwarder forwarder) {
+    public ProxyJupiterDocument(JID jid, RequestForwarder forwarder, IPath path) {
         this.jid = jid;
         this.jupiter = new Jupiter(false);
         this.forwarder = forwarder;
+        this.editor = path;
     }
 
     public Request generateRequest(Operation op) {
@@ -62,19 +63,8 @@ public class ProxyJupiterDocument implements JupiterClient {
         return op;
     }
 
-    /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient#getJID()
-     */
     public JID getJID() {
         return this.jid;
-    }
-
-    public IPath getEditor() {
-        return this.editor;
-    }
-
-    public void setEditor(IPath path) {
-        this.editor = path;
     }
 
     public Timestamp getTimestamp() {

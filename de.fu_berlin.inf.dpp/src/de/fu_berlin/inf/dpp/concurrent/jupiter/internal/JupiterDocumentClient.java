@@ -57,26 +57,20 @@ public class JupiterDocumentClient implements JupiterClient {
     }
 
     public Operation receiveRequest(Request req) throws TransformationException {
-        Operation op = null;
+
         JupiterDocumentClient.logger.debug(this.jid.toString()
             + " client receive request " + req.getOperation());
-        /* receive request action */
-        op = this.jupiter.receiveRequest(req);
+
+        Operation result = this.jupiter.receiveRequest(req);
+
         JupiterDocumentClient.logger.debug(this.jid.toString()
-            + " client operation of IT: " + op);
-        return op;
+            + " client operation of IT: " + result);
+
+        return result;
     }
 
     public JID getJID() {
         return this.jid;
-    }
-
-    public IPath getEditor() {
-        return this.editor;
-    }
-
-    public void setEditor(IPath path) {
-        this.editor = path;
     }
 
     public Timestamp getTimestamp() {

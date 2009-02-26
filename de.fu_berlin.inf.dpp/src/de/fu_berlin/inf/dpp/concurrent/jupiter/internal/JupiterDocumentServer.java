@@ -101,7 +101,7 @@ public class JupiterDocumentServer implements JupiterServer {
      * this constructor init an external request forwarder. The generate answer
      * request of the proxy clients forwarding to this forwarder.
      */
-    public JupiterDocumentServer(RequestForwarder forwarder) {
+    public JupiterDocumentServer(RequestForwarder forwarder, IPath path) {
         this.proxies = new HashMap<JID, JupiterClient>();
         this.requestList = new Vector<Request>();
         this.outgoingQueue = new Vector<Request>();
@@ -110,13 +110,14 @@ public class JupiterDocumentServer implements JupiterServer {
         this.serializer.start();
         this.transmitter = new RequestTransmitter(forwarder);
         this.transmitter.start();
+        this.editor = path;
     }
 
     /**
      * default constructor. The server contains his own outgoing forwarding
      * queue.
      */
-    public JupiterDocumentServer() {
+    public JupiterDocumentServer(IPath path) {
         this.proxies = new HashMap<JID, JupiterClient>();
         this.requestList = new Vector<Request>();
         this.outgoingQueue = new Vector<Request>();
@@ -125,13 +126,8 @@ public class JupiterDocumentServer implements JupiterServer {
     }
 
     public synchronized void addProxyClient(JID jid) {
-        JupiterClient proxy = new ProxyJupiterDocument(jid, this);
-        proxy.setEditor(this.editor);
-        // add to serializer.
-        // waitForSerializer = true;
-        // TODO: Sync with serializer before add action.
-        JupiterDocumentServer.logger.debug("add new proxy client : " + jid);
-        this.proxies.put(jid, proxy);
+        logger.debug("Add new proxy client : " + jid);
+        this.proxies.put(jid, new ProxyJupiterDocument(jid, this, editor));
     }
 
     public synchronized void removeProxyClient(JID jid) {
@@ -139,7 +135,7 @@ public class JupiterDocumentServer implements JupiterServer {
         /**
          * TODO: sync with serializer.
          * 
-         * 1. save current action count 2. stop serializer after this cound and
+         * 1. save current action count 2. stop serializer after this count and
          * remove client.
          */
         this.proxies.remove(jid);
@@ -177,17 +173,13 @@ public class JupiterDocumentServer implements JupiterServer {
         return this.requestList.remove(0);
     }
 
-    public synchronized HashMap<JID, JupiterClient> getProxies()
-        throws InterruptedException {
+    public synchronized HashMap<JID, JupiterClient> getProxies() {
         /*
-         * Was Passiert, wenn während der Bearbeitung ein neuer proxy eingefüt
+         * TODO Make sure that this is not a problem:
+         * 
+         * Was Passiert, wenn während der Bearbeitung ein neuer proxy eingefügt
          * wird?
          */
-
-        // /* Synchronistation für das Client Management.*/
-        // while(waitForSerializer && requestSyncCounter == 0){
-        // wait();
-        // }
         JupiterDocumentServer.logger.debug("Get jupiter proxies.");
         return this.proxies;
     }
@@ -236,15 +228,6 @@ public class JupiterDocumentServer implements JupiterServer {
         // return outgoing.getNextOutgoingRequest();
     }
 
-    public IPath getEditor() {
-        return this.editor;
-    }
-
-    public void setEditor(IPath path) {
-        this.editor = path;
-
-    }
-
     public boolean isExist(JID jid) {
         if (this.proxies.containsKey(jid)) {
             return true;
@@ -261,9 +244,6 @@ public class JupiterDocumentServer implements JupiterServer {
                     new JupiterVectorTime(ts.getComponents()[1], ts
                         .getComponents()[0]));
             } catch (TransformationException e) {
-                JupiterDocumentServer.logger.error(
-                    "Error during update vector time for " + dest, e);
-            } catch (InterruptedException e) {
                 JupiterDocumentServer.logger.error(
                     "Error during update vector time for " + dest, e);
             }

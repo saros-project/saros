@@ -4,8 +4,7 @@ import java.util.HashMap;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public interface JupiterServer extends SynchronizedQueue, RequestForwarder,
-    JupiterEditor {
+public interface JupiterServer extends SynchronizedQueue, RequestForwarder {
 
     public void addProxyClient(JID jid);
 

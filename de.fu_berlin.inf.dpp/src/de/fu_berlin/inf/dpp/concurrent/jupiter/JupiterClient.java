@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import de.fu_berlin.inf.dpp.net.JID;
 
-public interface JupiterClient extends JupiterEditor {
+public interface JupiterClient {
 
     public Request generateRequest(Operation op);
 

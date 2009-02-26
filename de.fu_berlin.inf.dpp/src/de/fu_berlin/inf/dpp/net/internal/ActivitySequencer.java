@@ -357,8 +357,9 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         return this.flushedLog;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * All the ActivityProviders will call this method when new events occurred
+     * in the UI.
      * 
      * @see de.fu_berlin.inf.dpp.IActivityListener
      */
