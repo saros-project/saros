@@ -57,7 +57,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class OutgoingInvitationProcess extends InvitationProcess implements
     IOutgoingInvitationProcess {
 
-    protected static Logger log = Logger
+    protected final static Logger log = Logger
         .getLogger(OutgoingInvitationProcess.class);
 
     protected final ISharedProject sharedProject;
