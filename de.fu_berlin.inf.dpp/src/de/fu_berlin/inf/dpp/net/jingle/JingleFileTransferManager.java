@@ -209,6 +209,7 @@ public class JingleFileTransferManager {
 
         mediaManager = new FileMediaManager(icetm0);
 
+        // TODO Do not proceed if the connection is closed in the meantime
         jm = new JingleManager(xmppConnection, Collections
             .singletonList((JingleMediaManager) mediaManager));
 
