@@ -217,7 +217,7 @@ public class SessionView extends ViewPart implements ISessionListener {
             int colorID = user.getColorID();
 
             String annotationType = SelectionAnnotation.TYPE + "."
-                + new Integer(colorID + 1).toString();
+                + String.valueOf(colorID + 1);
 
             AnnotationPreferenceLookup lookup = EditorsUI
                 .getAnnotationPreferenceLookup();
