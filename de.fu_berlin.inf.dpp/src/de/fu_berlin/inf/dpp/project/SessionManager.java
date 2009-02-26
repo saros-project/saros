@@ -86,7 +86,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         SharedProject sharedProject = new SharedProject(this.transmitter,
             project, myJID);
 
-        this.currentlySharedProject.setVariable(sharedProject);
+        this.currentlySharedProject.setValue(sharedProject);
 
         sharedProject.start();
 
@@ -112,7 +112,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
             project, saros.getMyJID(), host, colorID);
-        this.currentlySharedProject.setVariable(sharedProject);
+        this.currentlySharedProject.setValue(sharedProject);
 
         sharedProject.start();
 
@@ -127,7 +127,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     public void stopSharedProject() {
 
-        SharedProject project = currentlySharedProject.getVariable();
+        SharedProject project = currentlySharedProject.getValue();
 
         if (project == null) {
             return;
@@ -140,7 +140,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         project.stop();
 
-        this.currentlySharedProject.setVariable(null);
+        this.currentlySharedProject.setValue(null);
 
         for (ISessionListener listener : this.listeners) {
             listener.sessionEnded(project);
@@ -152,7 +152,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     public ISharedProject getSharedProject() {
-        return this.currentlySharedProject.getVariable();
+        return this.currentlySharedProject.getValue();
     }
 
     public void addSessionListener(ISessionListener listener) {
@@ -192,7 +192,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     public void OnReconnect(int oldtimestamp) {
 
-        SharedProject project = currentlySharedProject.getVariable();
+        SharedProject project = currentlySharedProject.getValue();
 
         if (project == null) {
             return;

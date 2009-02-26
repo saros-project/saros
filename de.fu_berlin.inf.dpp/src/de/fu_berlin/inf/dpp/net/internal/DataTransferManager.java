@@ -47,7 +47,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectio
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.VariableProxy;
+import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
  * This class is responsible for handling all transfers of binary data
@@ -154,7 +154,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         transferModeListeners.add(trackingTransferModeListener);
     }
 
-    public VariableProxy<JingleFileTransferManager> jingleManager = new VariableProxy<JingleFileTransferManager>(
+    public ObservableValue<JingleFileTransferManager> jingleManager = new ObservableValue<JingleFileTransferManager>(
         null);
 
     public JingleFileTransferManager getJingleManager() {
@@ -166,7 +166,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         } catch (InterruptedException e) {
             // do nothing
         }
-        return jingleManager.getVariable();
+        return jingleManager.getValue();
     }
 
     /**
@@ -646,7 +646,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         this.incomingFiles = new HashMap<String, IncomingFile>();
         this.receivers = new LinkedList<IDataReceiver>();
         this.receivers.add(defaultReceiver);
-        this.jingleManager.setVariable(null);
+        this.jingleManager.setValue(null);
 
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager
@@ -670,12 +670,12 @@ public class DataTransferManager implements ConnectionSessionListener {
                 public void run() {
                     try {
                         jingleManager
-                            .setVariable(new JingleFileTransferManager(
+                            .setValue(new JingleFileTransferManager(
                                 connection, new JingleTransferListener()));
                         log.debug("Jingle Manager started");
                     } catch (Exception e) {
                         log.error("Jingle Manager could not be started", e);
-                        jingleManager.setVariable(null);
+                        jingleManager.setValue(null);
                     }
                 }
             });
@@ -780,9 +780,9 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         // Terminate all Jingle connections and notify everybody who used this
         // JingleFileTransferManager
-        if (jingleManager.getVariable() != null) {
-            jingleManager.getVariable().terminateAllJingleSessions();
-            jingleManager.setVariable(null);
+        if (jingleManager.getValue() != null) {
+            jingleManager.getValue().terminateAllJingleSessions();
+            jingleManager.setValue(null);
         }
 
         fileTransferManager = null;

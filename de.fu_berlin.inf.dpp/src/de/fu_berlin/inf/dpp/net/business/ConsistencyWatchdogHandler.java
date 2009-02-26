@@ -210,7 +210,7 @@ public class ConsistencyWatchdogHandler {
                 executor.submit(new Runnable() {
                     public void run() {
                         try {
-                            project.getVariable()
+                            project.getValue()
                                 .getConcurrentDocumentManager()
                                 .checkConsistency(checksums);
                         } catch (RuntimeException e) {

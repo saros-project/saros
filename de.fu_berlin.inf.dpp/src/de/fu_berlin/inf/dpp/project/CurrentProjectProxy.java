@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
-import de.fu_berlin.inf.dpp.util.VariableProxy;
+import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
  * This proxy contains the SharedProject that is currently open or null if no
@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.util.VariableProxy;
  * before the ISessionListeners are notified that the Session is has ended.
  * 
  */
-public class CurrentProjectProxy extends VariableProxy<SharedProject> {
+public class CurrentProjectProxy extends ObservableValue<SharedProject> {
 
     public CurrentProjectProxy() {
         super(null);

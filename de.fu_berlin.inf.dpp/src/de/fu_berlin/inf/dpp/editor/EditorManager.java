@@ -93,7 +93,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.VariableProxyListener;
+import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -383,8 +383,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         // Add ConsistencyListener
         Saros.getDefault().getSessionManager().getSharedProject()
             .getConcurrentDocumentManager().getConsistencyToResolve().add(
-                new VariableProxyListener<Boolean>() {
-                    public void setVariable(Boolean inconsistency) {
+                new ValueChangeListener<Boolean>() {
+                    public void setValue(Boolean inconsistency) {
                         if (inconsistency) {
                             Util.runSafeSWTSync(log, new Runnable() {
                                 public void run() {
@@ -561,7 +561,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             return false;
 
         return project.getConcurrentDocumentManager().getConsistencyToResolve()
-            .getVariable();
+            .getValue();
 
     }
 

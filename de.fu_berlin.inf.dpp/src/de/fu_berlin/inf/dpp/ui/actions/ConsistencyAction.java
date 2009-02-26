@@ -36,8 +36,8 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.VariableProxy;
-import de.fu_berlin.inf.dpp.util.VariableProxyListener;
+import de.fu_berlin.inf.dpp.util.ObservableValue;
+import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 public class ConsistencyAction extends Action implements ISessionListener {
 
@@ -65,11 +65,11 @@ public class ConsistencyAction extends Action implements ISessionListener {
         Saros.getDefault().getSessionManager().addSessionListener(this);
     }
 
-    VariableProxy<Boolean> proxy;
+    ObservableValue<Boolean> proxy;
 
-    VariableProxyListener<Boolean> listener = new VariableProxyListener<Boolean>() {
+    ValueChangeListener<Boolean> listener = new ValueChangeListener<Boolean>() {
 
-        public void setVariable(Boolean newValue) {
+        public void setValue(Boolean newValue) {
 
             ConsistencyAction.this.setEnabled(newValue);
 

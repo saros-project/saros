@@ -39,7 +39,7 @@ public class SarosRosterListener implements ConnectionSessionListener {
 
         public void presenceChanged(Presence presence) {
 
-            SharedProject project = currentlySharedProject.getVariable();
+            SharedProject project = currentlySharedProject.getValue();
 
             if (project == null) {
                 return;

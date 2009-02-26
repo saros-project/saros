@@ -77,7 +77,7 @@ import de.fu_berlin.inf.dpp.ui.actions.NewContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.RenameContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.SkypeAction;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.VariableProxyListener;
+import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * This view displays the roster (also known as contact list) of the local user.
@@ -121,7 +121,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
                     .getComponent(DataTransferManager.class);
 
                 manager.jingleManager
-                    .addAndNotify(new VariableProxyListener<JingleFileTransferManager>() {
+                    .addAndNotify(new ValueChangeListener<JingleFileTransferManager>() {
 
                         IJingleStateListener stateListener = new IJingleStateListener() {
                             public void setState(JID jid,
@@ -135,7 +135,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
                         JingleFileTransferManager currentManager = null;
 
-                        public void setVariable(
+                        public void setValue(
                             JingleFileTransferManager newValue) {
 
                             if (currentManager != null) {
@@ -397,7 +397,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
                         .getContainer().getComponent(DataTransferManager.class);
 
                     JingleFileTransferManager manager = data.jingleManager
-                        .getVariable();
+                        .getValue();
 
                     if (manager != null) {
                         JID jid = new JID(entry.getUser());

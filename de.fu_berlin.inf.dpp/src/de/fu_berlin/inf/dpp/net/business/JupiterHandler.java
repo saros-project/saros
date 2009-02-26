@@ -45,7 +45,7 @@ public class JupiterHandler {
             log.debug("Received request : "
                 + packetExtension.getRequest().toString());
 
-            ISharedProject project = currentProject.getVariable();
+            ISharedProject project = currentProject.getValue();
 
             assert project != null;
 

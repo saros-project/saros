@@ -55,7 +55,7 @@ import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.VariableProxy;
+import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
  * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
@@ -87,7 +87,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
         "ConsistencyWatchdog");
 
-    private VariableProxy<Boolean> inconsistencyToResolve = new VariableProxy<Boolean>(
+    private ObservableValue<Boolean> inconsistencyToResolve = new ObservableValue<Boolean>(
         false);
 
     private Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
@@ -836,8 +836,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                 ConcurrentDocumentManager.this.pathsWithWrongChecksums
                     .add(checksum.getPath());
 
-                if (!inconsistencyToResolve.getVariable()) {
-                    inconsistencyToResolve.setVariable(true);
+                if (!inconsistencyToResolve.getValue()) {
+                    inconsistencyToResolve.setValue(true);
                 }
                 return;
             }
@@ -845,9 +845,9 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
         ConcurrentDocumentManager.this.pathsWithWrongChecksums.clear();
 
-        if (inconsistencyToResolve.getVariable()) {
+        if (inconsistencyToResolve.getValue()) {
             logger.debug("All Inconsistencies are resolved");
-            inconsistencyToResolve.setVariable(false);
+            inconsistencyToResolve.setValue(false);
         }
 
     }
@@ -904,7 +904,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      * Returns the variable proxy which stores the current inconsistency state
      * 
      */
-    public VariableProxy<Boolean> getConsistencyToResolve() {
+    public ObservableValue<Boolean> getConsistencyToResolve() {
         return this.inconsistencyToResolve;
     }
 

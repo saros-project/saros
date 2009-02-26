@@ -8,8 +8,8 @@ package de.fu_berlin.inf.dpp.util;
  * @author oezbek
  * 
  */
-public interface VariableProxyListener<T> {
+public interface VetoableValueChangeListener<T> {
 
-    public void setVariable(T newValue);
+    public boolean setVariable(T newValue, T oldValue);
 
 }

@@ -5,10 +5,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class DeferredVariableProxyListener<T> implements
-    VariableProxyListener<T> {
+public class DeferredValueChangeListener<T> implements ValueChangeListener<T> {
 
-    VariableProxyListener<T> wrapped;
+    ValueChangeListener<T> wrapped;
 
     ScheduledExecutorService executor;
 
@@ -18,23 +17,23 @@ public class DeferredVariableProxyListener<T> implements
 
     TimeUnit timeUnit;
 
-    public static <S> VariableProxyListener<S> defer(
-        VariableProxyListener<S> wrap, long time, TimeUnit timeUnit) {
-        return new DeferredVariableProxyListener<S>(wrap, time, timeUnit);
+    public static <S> ValueChangeListener<S> defer(ValueChangeListener<S> wrap,
+        long time, TimeUnit timeUnit) {
+        return new DeferredValueChangeListener<S>(wrap, time, timeUnit);
     }
 
-    public DeferredVariableProxyListener(VariableProxyListener<T> wrapped) {
+    public DeferredValueChangeListener(ValueChangeListener<T> wrapped) {
         this(wrapped, 1, TimeUnit.SECONDS);
     }
 
-    public DeferredVariableProxyListener(VariableProxyListener<T> wrapped,
+    public DeferredValueChangeListener(ValueChangeListener<T> wrapped,
         long time, TimeUnit timeUnit) {
         this.wrapped = wrapped;
         this.time = time;
         this.timeUnit = timeUnit;
     }
 
-    public void setVariable(final T newValue) {
+    public void setValue(final T newValue) {
 
         // Lazyly create Thread-Pool Executor
         if (executor == null)
@@ -46,7 +45,7 @@ public class DeferredVariableProxyListener<T> implements
 
         setFilterFuture = executor.schedule(new Runnable() {
             public void run() {
-                wrapped.setVariable(newValue);
+                wrapped.setValue(newValue);
             }
         }, time, timeUnit);
     }
