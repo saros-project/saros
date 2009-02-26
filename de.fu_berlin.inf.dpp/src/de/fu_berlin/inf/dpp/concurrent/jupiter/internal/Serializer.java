@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 
@@ -34,17 +35,18 @@ public class Serializer {
         HashMap<JID, JupiterClient> proxies = server.getProxies();
 
         // 1. execute receive action at appropriate proxy client.
-        JupiterClient proxy = proxies.get(request.getJID());
-
-        Operation op = proxy.receiveRequest(request);
+        JupiterClient sourceProxy = proxies.get(request.getJID());
+        Operation op = sourceProxy.receiveRequest(request);
 
         // 2. execute generate action at other proxy clients.
-        for (JID jid : proxies.keySet()) {
-            proxy = proxies.get(jid);
+        for (Map.Entry<JID, JupiterClient> entry : proxies.entrySet()) {
+
+            JID jid = entry.getKey();
+            JupiterClient remoteProxy = entry.getValue();
 
             if (!jid.toString().equals(request.getJID().toString())) {
                 // create submit op as local proxy operation and send to client.
-                proxy.generateRequest(op);
+                remoteProxy.generateRequest(op);
             }
         }
     }
