@@ -14,17 +14,14 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class ProxyJupiterDocument implements JupiterClient {
 
-    /**
-     * 1. Outgoing queue 2. request forwarder
-     * 
-     */
-
     private static Logger logger = Logger.getLogger(ProxyJupiterDocument.class);
 
     /** jid of remote client */
     private final JID jid;
+
     /** jupiter sync algorithm. */
     private final Algorithm jupiter;
+
     /** forwarder send request to client. */
     private final RequestForwarder forwarder;
 
