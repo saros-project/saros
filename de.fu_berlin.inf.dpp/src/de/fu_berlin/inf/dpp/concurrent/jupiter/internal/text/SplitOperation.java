@@ -144,13 +144,18 @@ public class SplitOperation implements Operation {
 
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
 
-        List<TextEditActivity> first = getFirst().toTextEdit(path,
-            source);
+        List<TextEditActivity> first = getFirst().toTextEdit(path, source);
+        List<TextEditActivity> second = getSecond().toTextEdit(path, source);
+        if (first.size() == 0) {
+            return second;
+        }
+        if (second.size() == 0) {
+            return first;
+        }
+
         assert first.size() == 1;
         TextEditActivity op1 = first.get(0);
 
-        List<TextEditActivity> second = getSecond().toTextEdit(path,
-            source);
         assert second.size() == 1;
         TextEditActivity op2 = second.get(0);
 
