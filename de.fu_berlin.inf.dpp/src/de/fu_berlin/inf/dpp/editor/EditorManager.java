@@ -92,7 +92,6 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -1204,8 +1203,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             // Save not necessary, if we have no modified document
             if (!this.connectedFiles.contains(file)) {
-                log.warn("Saving not necessary (not connected)!",
-                    new StackTrace());
+                log.warn("Saving not necessary (not connected)!");
                 return;
             }
 
