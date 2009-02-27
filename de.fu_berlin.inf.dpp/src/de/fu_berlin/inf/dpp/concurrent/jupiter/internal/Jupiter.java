@@ -265,10 +265,11 @@ public class Jupiter implements Algorithm {
         if (!this.ackRequestList.isEmpty()
             && (time.getRemoteOperationCount() < this.ackRequestList.get(0)
                 .getLocalOperationCount())) {
-            throw new TransformationException("precondition #1 violated.");
+            throw new TransformationException("Precondition #1 violated.");
         } else if (time.getRemoteOperationCount() > this.vectorTime
             .getLocalOperationCount()) {
-            throw new TransformationException("precondition #2 violated.");
+            throw new TransformationException(
+                "precondition #2 violated (Remote vector time is greater than local vector time).");
         } else if (time.getLocalOperationCount() != this.vectorTime
             .getRemoteOperationCount()) {
             throw new TransformationException(

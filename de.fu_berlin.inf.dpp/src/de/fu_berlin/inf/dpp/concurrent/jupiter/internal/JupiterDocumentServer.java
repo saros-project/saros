@@ -179,12 +179,8 @@ public class JupiterDocumentServer implements JupiterServer {
      */
     public synchronized void forwardOutgoingRequest(Request req) {
         /* add request to outgoing queue. */
-        // if(outgoing == null){
         this.outgoingQueue.add(req);
-        // }else{
-        // /* forward request.*/
-        // outgoing.forwardOutgoingRequest(req);
-        // }
+
         JupiterDocumentServer.logger.debug("add request to outgoing queue : "
             + req.getJID() + " " + req);
         notify();
