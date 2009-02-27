@@ -168,7 +168,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     /**
      * A group item which holds a number of users.
      */
-    private class GroupItem implements TreeItem {
+    public static class GroupItem implements TreeItem {
         private final RosterGroup group;
 
         public GroupItem(RosterGroup group) {
@@ -176,8 +176,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
         }
 
         /*
-         * (non-Javadoc)
-         * 
          * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
          */
         public Object[] getChildren() {
