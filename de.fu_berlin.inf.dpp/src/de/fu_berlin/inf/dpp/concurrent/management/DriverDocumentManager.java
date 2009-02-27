@@ -12,8 +12,9 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -25,8 +26,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * 
  * @host Only the host needs to manage JupiterDocuments in detail
  */
-public class DriverDocumentManager implements ISessionListener,
-    ISharedProjectListener {
+public class DriverDocumentManager {
 
     private static Logger logger = Logger
         .getLogger(DriverDocumentManager.class);
@@ -41,10 +41,56 @@ public class DriverDocumentManager implements ISessionListener,
      */
     private final HashMap<IPath, DriverDocument> documents = new HashMap<IPath, DriverDocument>();
 
+    private final ISharedProject project;
+
     public DriverDocumentManager(ISharedProject project) {
-        Saros.getDefault().getSessionManager().addSessionListener(this);
-        project.addListener(this);
+        this.project = project;
+        Saros.getDefault().getSessionManager().addSessionListener(
+            sessionListener);
+        project.addListener(projectListener);
     }
+
+    ISessionListener sessionListener = new AbstractSessionListener() {
+        @Override
+        public void sessionEnded(ISharedProject session) {
+            if (session == project) {
+                project.removeListener(projectListener);
+                Saros.getDefault().getSessionManager().removeSessionListener(
+                    sessionListener);
+            }
+        }
+    };
+
+    ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+
+        @Override
+        public void userLeft(JID user) {
+            if (isDriver(user)) {
+                /* remove driver status. */
+                removeDriver(user);
+            }
+        }
+
+        @Override
+        public void roleChanged(User user, boolean replicated) {
+
+            // TODO DriverDocumentManager needs the host to be a driver
+            if (Saros.getDefault().getSessionManager().getSharedProject()
+                .getHost().equals(user)) {
+
+                assert assertRoles();
+                return;
+            }
+            JID jid = user.getJID();
+            if (isDriver(jid)) {
+                removeDriver(jid);
+            } else {
+                addDriver(jid);
+            }
+
+            assert assertRoles();
+        }
+    };
 
     /**
      * @param jid
@@ -52,12 +98,10 @@ public class DriverDocumentManager implements ISessionListener,
      * @return true if driver exists in active driver list, false otherwise
      */
     public boolean isDriver(JID jid) {
-        if (jid != null) {
-            return this.drivers.contains(jid);
-        } else {
-            logger.warn("jid null");
-            return false;
-        }
+
+        assert jid != null;
+
+        return this.drivers.contains(jid);
     }
 
     public List<JID> getDriversForDocument(IPath path) {
@@ -67,11 +111,6 @@ public class DriverDocumentManager implements ISessionListener,
         return new Vector<JID>();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.concurrent.IDriverManager#getActiveDriver()
-     */
     public List<JID> getDrivers() {
         return this.drivers;
     }
@@ -195,26 +234,6 @@ public class DriverDocumentManager implements ISessionListener,
         }
     }
 
-    public void roleChanged(User user, boolean replicated) {
-
-        // TODO DriverDocumentManager needs the host to be a driver
-        if (Saros.getDefault().getSessionManager().getSharedProject().getHost()
-            .equals(user)) {
-
-            assert assertRoles();
-            return;
-        }
-        JID jid = user.getJID();
-        if (isDriver(jid)) {
-            removeDriver(jid);
-        } else {
-            addDriver(jid);
-        }
-
-        assert assertRoles();
-
-    }
-
     /**
      * @return true if the role information managed by this
      *         DriverDocumentManager is consistent with the information managed
@@ -280,39 +299,6 @@ public class DriverDocumentManager implements ISessionListener,
         }
 
         return true;
-    }
-
-    public void userJoined(JID user) {
-        // nothing to do
-
-    }
-
-    public void userLeft(JID user) {
-        if (isDriver(user)) {
-            /* remove driver status. */
-            removeDriver(user);
-        }
-    }
-
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // ignore
-    }
-
-    public void sessionEnded(ISharedProject session) {
-        drivers.clear();
-    }
-
-    public void sessionStarted(ISharedProject session) {
-
-        // when this is called the host is already active Driver, remove all
-        // other
-        if (drivers.size() > 1) {
-            for (JID participant : drivers) {
-                if (!participant.equals(session.getHost().getJID())) {
-                    drivers.remove(participant);
-                }
-            }
-        }
     }
 
 }
