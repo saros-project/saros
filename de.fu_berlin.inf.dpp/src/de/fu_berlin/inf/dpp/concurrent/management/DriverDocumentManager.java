@@ -1,10 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
-/**
- * this manager class handles driver event and the appropriate documents.
- * Additional this class is managing exclusive lock for temporary single driver
- * actions.
- */
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -17,19 +12,19 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
 /**
- * 
- * @author orieger
- * 
+ * This manager class handles driver event and the appropriate documents.
+ * Additional this class is managing exclusive lock for temporary single driver
+ * actions.
  */
-public class DriverDocumentManager implements IDriverDocumentManager,
-    ISessionListener {
+public class DriverDocumentManager implements ISessionListener,
+    ISharedProjectListener {
 
     private static Logger logger = Logger
         .getLogger(DriverDocumentManager.class);
