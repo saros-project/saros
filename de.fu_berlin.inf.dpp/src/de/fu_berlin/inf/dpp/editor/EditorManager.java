@@ -1473,9 +1473,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @param path
      *            the project relative path of the resource
-     * @return java system time of last local edit
+     * @return System.currentTimeMillis() of last local edit or 0 if there was
+     *         no edit.
      */
     public long getLastEditTime(IPath path) {
+        if (!this.lastEditTimes.containsKey(path)) {
+            log.warn("File has never been edited: " + path);
+            return 0;
+        }
         return this.lastEditTimes.get(path);
     }
 
@@ -1487,6 +1492,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @return java system time of last remote edit
      */
     public long getLastRemoteEditTime(IPath path) {
+        if (!this.lastRemoteEditTimes.containsKey(path)) {
+            log.warn("File has never been edited: " + path);
+            return 0;
+        }
         return this.lastRemoteEditTimes.get(path);
     }
 
