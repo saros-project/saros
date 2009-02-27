@@ -32,7 +32,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -512,7 +511,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendRemainingFiles() {
 
-        throw new NotImplementedException();
+        log.warn("Sending remaining files is not implemented!");
         //        
         // if (this.fileTransferQueue.size() > 0) {
         // // sendNextFile();
