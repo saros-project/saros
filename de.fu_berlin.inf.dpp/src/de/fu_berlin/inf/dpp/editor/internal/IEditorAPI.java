@@ -7,7 +7,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -81,13 +81,10 @@ public interface IEditorAPI {
         String source, boolean following);
 
     /**
-     * Return the viewport for given editor.
-     * 
-     * @param editorPart
-     *            the editor for which to get the viewport
-     * @return the viewport. Never <code>null</code>.
+     * @return Return the viewport for given editor or null, if this editorPart
+     *         does not have ITextViewer associated.
      */
-    public ILineRange getViewport(IEditorPart editorPart);
+    public LineRange getViewport(IEditorPart editorPart);
 
     /**
      * Enables/disables the ability to edit the document in given editor.

@@ -497,8 +497,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     // TODO CJ: find a better solution
     public IPath getPathOfDocument(IDocument doc) {
         IPath path = null;
-        Set<IEditorPart> editors = editorPool.getAllEditors();
-        for (IEditorPart editor : editors) {
+        for (IEditorPart editor : editorPool.getAllEditors()) {
             if (editorAPI.getDocument(editor) == doc) {
                 path = editorAPI.getEditorResource(editor)
                     .getProjectRelativePath();
@@ -523,12 +522,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
-    public void viewportChanged(int top, int bottom, IPath editor) {
+    public void viewportChanged(IPath editor, ILineRange viewport) {
         if (!this.sharedProject.isDriver()) {
             return;
         }
 
-        fireActivity(new ViewportActivity(top, bottom, editor));
+        fireActivity(new ViewportActivity(viewport, editor));
     }
 
     /*
@@ -586,8 +585,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IEditorPart changedEditor = null;
 
         // search editor which changed
-        Set<IEditorPart> editors = editorPool.getAllEditors();
-        for (IEditorPart editor : editors) {
+        for (IEditorPart editor : editorPool.getAllEditors()) {
             if (editorAPI.getDocument(editor) == document) {
                 changedEditor = editor;
                 break;
@@ -831,8 +829,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         replaceText(file, textEdit.offset, textEdit.replacedText,
             textEdit.text, (driverJID != null) ? driverJID.toString() : "");
 
-        Set<IEditorPart> editors = editorPool.getEditors(path);
-        for (IEditorPart editorPart : editors) {
+        for (IEditorPart editorPart : editorPool.getEditors(path)) {
             editorAPI.setSelection(editorPart, new TextSelection(
                 textEdit.offset + textEdit.text.length(), 0), source,
                 shouldIFollow(user));
@@ -963,7 +960,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Checks wether given resource is currently opened.
+     * Checks whether given resource is currently opened.
      * 
      * @param path
      *            the project-relative path to the resource.
@@ -1292,9 +1289,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         setDriverTextSelection(Saros.getDefault().getLocalUser(), selection);
 
         ILineRange viewport = this.editorAPI.getViewport(editorPart);
-        int startLine = viewport.getStartLine();
-        viewportChanged(startLine, startLine + viewport.getNumberOfLines(),
-            editorPath);
+        if (viewport == null) {
+            log.warn("Shared Editor does not have a Viewport: " + editorPart);
+        } else {
+            viewportChanged(editorPath, viewport);
+        }
     }
 
     private void setAllEditorsToEditable() {
@@ -1342,7 +1341,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     private void removeAllAnnotations(String forUserID, String typeAnnotation) {
 
-        for (IEditorPart editor : this.editorPool.getAllEditors()) {
+        for (IEditorPart editor : editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
             IDocumentProvider provider = this.editorAPI
                 .getDocumentProvider(input);
@@ -1408,7 +1407,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     }
                 });
             }
-
         } else {
             IActivity activity = new EditorActivity(Type.Activated, path);
             for (IActivityListener listener : this.activityListeners) {
@@ -1502,5 +1500,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public boolean isFollowing() {
         return isFollowing;
+    }
+
+    /**
+     * Return the Viewport for one of the EditorParts (it is undefined which)
+     * associated with the given path or null if no Viewport has been found.
+     */
+    public ILineRange getCurrentViewport(IPath path) {
+
+        // TODO We need to find a way to identify individual editor on the
+        // client and not only paths.
+
+        for (IEditorPart editorPart : getEditors(path)) {
+            ILineRange viewport = editorAPI.getViewport(editorPart);
+            if (viewport != null)
+                return viewport;
+        }
+        return null;
     }
 }

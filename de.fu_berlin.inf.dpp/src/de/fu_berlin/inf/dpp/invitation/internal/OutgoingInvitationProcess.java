@@ -28,8 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.jface.text.source.ILineRange;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -37,7 +36,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -375,7 +373,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * Send activities which set the active editors and their viewports.
      */
     private void sendDriverEditors() {
-        EditorManager editorManager = EditorManager.getDefault();
+        final EditorManager editorManager = EditorManager.getDefault();
         ArrayList<IPath> driverEditors = new ArrayList<IPath>(editorManager
             .getDriverEditors());
 
@@ -397,20 +395,20 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 sequencer.activityCreated(new EditorActivity(
                     EditorActivity.Type.Activated, path));
 
-                // HACK Get one of possibly more editors for given path.
-                // TODO Possible NPE if no editor found!
-                IEditorPart editorPart = editorManager.getEditors(path)
-                    .iterator().next();
-                final ITextViewer viewer = EditorAPI.getViewer(editorPart);
-                if (viewer != null) {
-                    Util.runSafeSWTSync(log, new Runnable() {
-                        public void run() {
+                Util.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        ILineRange range = editorManager
+                            .getCurrentViewport(path);
+
+                        if (range != null) {
+                            // TODO Investigate whether it is okay to dispatch
+                            // directly
                             sequencer.activityCreated(new ViewportActivity(
-                                viewer.getTopIndex(), viewer.getBottomIndex(),
-                                path));
+                                range, path));
                         }
-                    });
-                }
+                    }
+                });
+
             } else {
                 log.warn("Editor " + path + " is not a driver's editor!");
             }

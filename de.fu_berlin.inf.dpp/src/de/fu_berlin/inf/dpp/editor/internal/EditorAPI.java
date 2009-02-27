@@ -29,7 +29,6 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
-import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -152,12 +151,10 @@ public class EditorAPI implements IEditorAPI {
         public void viewportChanged(int verticalOffset) {
             // TODO why doesnt this react to window resizes?
 
-            int top = this.viewer.getTopIndex();
-            int bottom = this.viewer.getBottomIndex();
             IPath editor = EditorAPI.this.editorManager
                 .getPathOfDocument(this.viewer.getDocument());
 
-            EditorAPI.this.editorManager.viewportChanged(top, bottom, editor);
+            editorManager.viewportChanged(editor, getViewport(viewer));
         }
 
         /*
@@ -715,13 +712,25 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    public ILineRange getViewport(IEditorPart editorPart) {
-        ITextViewer viewer = EditorAPI.getViewer(editorPart);
-
+    public LineRange getViewport(ITextViewer viewer) {
         int top = viewer.getTopIndex();
         int bottom = viewer.getBottomIndex();
 
+        if (bottom < top) {
+            log.warn("Viewport Range Problem Bottom == " + bottom
+                + " < Top == " + top);
+            bottom = top;
+        }
+
         return new LineRange(top, bottom - top);
+    }
+
+    public LineRange getViewport(IEditorPart editorPart) {
+        ITextViewer textViewer = EditorAPI.getViewer(editorPart);
+        if (textViewer == null)
+            return null;
+
+        return getViewport(textViewer);
     }
 
     private void updateViewportAnnotation(ITextViewer viewer, int top,
@@ -748,12 +757,16 @@ public class EditorAPI implements IEditorAPI {
             bottom = Math.max(0, Math.min(document.getLength() - 1, bottom));
 
             int start = document.getLineOffset(top);
+            if (start == -1)
+                throw new BadLocationException("Start line -1");
             int end = document.getLineOffset(bottom);
+            if (end == -1 || end < start)
+                throw new BadLocationException("End line -1 or less than start");
             SarosAnnotation annotation = new ViewportAnnotation(source);
             Position position = new Position(start, end - start);
             model.addAnnotation(annotation, position);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            log.warn("Internal Error:", e);
         }
     }
 
