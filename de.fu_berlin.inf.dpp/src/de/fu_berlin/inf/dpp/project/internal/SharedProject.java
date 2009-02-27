@@ -577,24 +577,19 @@ public class SharedProject implements ISharedProject {
             return;
         }
 
-        if (isHost()) {
+        // FIXME Check if possible to clean this up
 
-            /*
-             * if jupiter server request to has to execute locally on host side.
-             */
+        if (isHost()) {
             if (request.getJID().equals(this.host.getJID())) {
-                SharedProject.log
-                    .debug("Send host request back for local execution: "
-                        + request);
-                this.activitySequencer.receiveRequest(request);
+                log.debug("Execute locally: " + request);
+                getConcurrentDocumentManager().receiveRequest(request);
             } else {
-                /* send operation to client. */
-                SharedProject.log.debug("Send request to client: " + request);
+                log.debug("Send request to client: " + request);
                 this.transmitter.sendJupiterRequest(this, request, request
                     .getJID());
             }
         } else {
-            SharedProject.log.debug("Send request to host : " + request);
+            log.debug("Send request to host : " + request);
             this.transmitter.sendJupiterRequest(this, request, this.host
                 .getJID());
         }

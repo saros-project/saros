@@ -8,6 +8,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
@@ -15,6 +16,11 @@ import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
+ * 
+ * This is the network component, that receives all JupiterRequests. The
+ * requests are dispatched to the receiveRequest method of the
+ * ActivitySequencer.
+ * 
  * @Component The single instance of this class per application is managed by
  *            PicoContainer
  */
@@ -42,14 +48,17 @@ public class JupiterHandler {
 
             assert packetExtension != null;
 
-            log.debug("Received request : "
-                + packetExtension.getRequest().toString());
+            Request request = packetExtension.getRequest();
 
             ISharedProject project = currentProject.getValue();
 
             assert project != null;
 
-            project.getSequencer().receiveRequest(packetExtension.getRequest());
+            log.debug("Receive request [" + request.getJID().getBase() + "]: "
+                + request);
+
+            project.getConcurrentDocumentManager().receiveRequest(
+                packetExtension.getRequest());
         }
     };
 }

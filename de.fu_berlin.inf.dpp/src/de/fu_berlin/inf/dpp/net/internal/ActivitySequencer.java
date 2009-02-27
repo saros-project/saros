@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -54,6 +53,7 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Implements {@link IActivitySequencer} and {@link IActivityManager}.
@@ -176,47 +176,48 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
             if (activity instanceof FolderActivity) {
                 // TODO
             }
-            Display.getDefault().syncExec(new Runnable() {
-                public void run() {
-                    if (activity instanceof TextEditActivity) {
-
-                        /*
-                         * check if document is already managed by jupiter
-                         * mechanism.
-                         */
-                        if (!concurrentManager.isHostSide()
-                            && (concurrentManager.exec(activity) != null)) {
-                            // CLIENT SIDE
-                            logger
-                                .debug("Execute received activity (without jupiter): "
-                                    + activity);
-                            for (IActivityProvider executor : ActivitySequencer.this.providers) {
-                                executor.exec(activity);
-                            }
-                        }
-                    } else {
-
-                        // Execute all other activities
-                        for (IActivityProvider executor : ActivitySequencer.this.providers) {
-                            executor.exec(activity);
-                        }
-
-                        // TODO CO Checksums are not used at the moment, aren't
-                        // they?
-                        // Check for file checksum after incoming save file
-                        // activity.
-                        if ((activity instanceof EditorActivity)
-                            && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
-                            checkSavedFile((EditorActivity) activity);
-                        }
-
-                    }
-                }
-            });
-
         } catch (Exception e) {
             logger.error("Error while executing activity.", e);
         }
+
+        Util.runSafeSWTSync(logger, new Runnable() {
+            public void run() {
+                if (activity instanceof TextEditActivity) {
+
+                    /*
+                     * check if document is already managed by jupiter
+                     * mechanism.
+                     */
+                    if (!concurrentManager.isHostSide()
+                        && (concurrentManager.exec(activity) != null)) {
+                        // CLIENT SIDE
+                        logger
+                            .debug("Execute received activity (without jupiter): "
+                                + activity);
+                        for (IActivityProvider executor : ActivitySequencer.this.providers) {
+                            executor.exec(activity);
+                        }
+                    }
+                } else {
+
+                    // Execute all other activities
+                    for (IActivityProvider executor : ActivitySequencer.this.providers) {
+                        executor.exec(activity);
+                    }
+
+                    // TODO CO Checksums are not used at the moment, aren't
+                    // they?
+                    // Check for file checksum after incoming save file
+                    // activity.
+                    if ((activity instanceof EditorActivity)
+                        && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
+                        checkSavedFile((EditorActivity) activity);
+                    }
+
+                }
+            }
+        });
+
     }
 
     /**
@@ -642,19 +643,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     }
 
     /**
-     * Receive request from ITransmitter and transfer to concurrent control.
-     */
-    public void receiveRequest(Request request) {
-        /*
-         * sync with jupiter server on host side and transform operation with
-         * jupiter client side.
-         */
-        logger.debug("Receive request : " + request + " from "
-            + request.getJID());
-        this.concurrentManager.receiveRequest(request);
-    }
-
-    /**
      * Execute activity after jupiter transforming process.
      * 
      * @param activity
@@ -662,22 +650,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     public void execTransformedActivity(IActivity activity) {
         try {
             logger.debug("execute transformed activity: " + activity);
-
-            // /* add new activity to executer queue. */
-            // this.executer.addActivity(activity);
-            //
-            // /*
-            // * get next activity from queue or waiting for finishing of
-            // current
-            // * execute activity.
-            // */
-            // IActivity queueActivity = this.executer.getNextActivity();
-
-            // mark current execute activity
-            // executedJupiterActivity = activity;
-            // this.executedJupiterActivity = queueActivity;
-
-            // this.executedJupiterActivity = activity;
 
             for (IActivityProvider exec : this.providers) {
                 exec.exec(activity);
