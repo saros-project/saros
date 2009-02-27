@@ -704,6 +704,7 @@ public class EditorAPI implements IEditorAPI {
         if (following) {
             try {
                 // Show the middle of the driver's viewport.
+                // TODO FIX BadLocationException
                 viewer.revealRange(viewer.getDocument().getLineOffset(
                     top + ((bottom - top) / 2)), 0);
             } catch (BadLocationException e) {
