@@ -22,6 +22,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * This manager class handles driver event and the appropriate documents.
  * Additional this class is managing exclusive lock for temporary single driver
  * actions.
+ * 
+ * @host Only the host needs to manage JupiterDocuments in detail
  */
 public class DriverDocumentManager implements ISessionListener,
     ISharedProjectListener {
@@ -29,18 +31,17 @@ public class DriverDocumentManager implements ISessionListener,
     private static Logger logger = Logger
         .getLogger(DriverDocumentManager.class);
 
-    /** All drivers. Only used on host side. */
-    private final List<JID> drivers;
-
-    /* list of documents with appropriate drivers. */
-    private final HashMap<IPath, DriverDocument> documents;
+    /**
+     * List of all drivers
+     */
+    private final List<JID> drivers = new Vector<JID>();
 
     /**
-     * private constructor for singleton pattern.
+     * The drivers for each document
      */
+    private final HashMap<IPath, DriverDocument> documents = new HashMap<IPath, DriverDocument>();
+
     public DriverDocumentManager(ISharedProject project) {
-        this.drivers = new Vector<JID>();
-        this.documents = new HashMap<IPath, DriverDocument>();
         Saros.getDefault().getSessionManager().addSessionListener(this);
         project.addListener(this);
     }
