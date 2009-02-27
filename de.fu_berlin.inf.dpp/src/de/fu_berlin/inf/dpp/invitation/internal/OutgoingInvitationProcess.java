@@ -37,9 +37,9 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
@@ -386,7 +386,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         // Create editor activated activities and viewport information for all
         // the driver's editors.
-        final IActivitySequencer sequencer = this.sharedProject.getSequencer();
+        final ActivitySequencer sequencer = this.sharedProject.getSequencer();
         for (final IPath path : driverEditors) {
             // HACK Why do we need to check whether the file really belongs to
             // project? See else branch.

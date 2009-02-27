@@ -59,7 +59,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -154,7 +153,7 @@ public class SharedProject implements ISharedProject {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public IActivitySequencer getSequencer() {
+    public ActivitySequencer getSequencer() {
         return this.activitySequencer;
     }
 

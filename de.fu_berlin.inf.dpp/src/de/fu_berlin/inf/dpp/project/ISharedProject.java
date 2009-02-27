@@ -32,8 +32,8 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
-import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 
 /**
  * Shared projects are the central concept of this plugin. They are associated
@@ -155,7 +155,7 @@ public interface ISharedProject {
      * @return the sequencer that is responsible for sending and receiving
      *         activities.
      */
-    public IActivitySequencer getSequencer();
+    public ActivitySequencer getSequencer();
 
     /**
      * @return the activity manager that is responsible for all activity

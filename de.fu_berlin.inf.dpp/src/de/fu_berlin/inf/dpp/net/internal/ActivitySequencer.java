@@ -46,20 +46,22 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
-import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * Implements {@link IActivitySequencer} and {@link IActivityManager}.
- * 
+ * The IActivitySequencer is responsible for making sure that activities are
+ * sent and received in the right order.
+ *
  * @author rdjemili
  */
-public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
+public class ActivitySequencer implements RequestForwarder, IActivityListener,
+    IActivityManager {
 
     private static Logger logger = Logger.getLogger(ActivitySequencer.class
         .getName());
@@ -120,7 +122,6 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
                 e.printStackTrace();
                 return null;
             }
-
         }
     }
 
@@ -144,11 +145,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
     /** outgoing queue for direct client sync messages for all driver. */
     private final List<Request> outgoingSyncActivities = new Vector<Request>();
 
-    private final ExecuterQueue executer;
-
-    public ActivitySequencer() {
-        this.executer = new ExecuterQueue();
-    }
+    private final ExecuterQueue executer = new ExecuterQueue();
 
     /**
      * TODO Refactor like this:
@@ -281,21 +278,16 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         execQueue();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Add the given activities to the queue and call execQueue.
      * 
-     * @see de.fu_berlin.inf.dpp.IActivitySequencer
+     * @param activities
      */
     public void exec(List<TimedActivity> activities) {
         this.queue.addAll(activities);
         execQueue();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityManager
-     */
     public List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
@@ -304,10 +296,11 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         return out.size() > 0 ? out : null;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Gets all activities since last flush.
      * 
-     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
+     * @return the activities that have accumulated since the last flush or
+     *         <code>null</code> if no activities are are available.
      */
     public List<TimedActivity> flushTimed() {
         List<IActivity> activities = flush();

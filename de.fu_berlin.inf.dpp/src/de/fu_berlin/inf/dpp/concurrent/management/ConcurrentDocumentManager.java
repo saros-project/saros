@@ -48,8 +48,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -84,7 +84,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
 
     private RequestForwarder forwarder;
 
-    private IActivitySequencer sequencer;
+    private ActivitySequencer sequencer;
 
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
         "ConsistencyWatchdog");
@@ -288,7 +288,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
 
     }
 
-    public void setActivitySequencer(IActivitySequencer sequencer) {
+    public void setActivitySequencer(ActivitySequencer sequencer) {
         this.sequencer = sequencer;
     }
 
