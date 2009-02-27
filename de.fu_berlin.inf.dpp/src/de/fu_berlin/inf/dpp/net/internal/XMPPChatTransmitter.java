@@ -250,13 +250,13 @@ public class XMPPChatTransmitter implements ITransmitter,
                  * placeholder to bump the timestamp. the real fileActivity will
                  * be processed by using a file transfer.
                  */
-                if (!(activity instanceof FileActivity)
-                    || !((FileActivity) activity).getType().equals(
+                if (activity instanceof FileActivity
+                    && ((FileActivity) activity).getType().equals(
                         FileActivity.Type.Created)) {
-
-                    project.getSequencer().exec(timedActivity);
-
+                    continue;
                 }
+
+                project.getSequencer().exec(timedActivity);
             }
         }
     }
