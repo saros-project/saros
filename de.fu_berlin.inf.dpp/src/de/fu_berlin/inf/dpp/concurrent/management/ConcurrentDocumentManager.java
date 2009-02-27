@@ -247,18 +247,24 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     public ConcurrentDocumentManager(final Side side, User host, JID myJID,
         ISharedProject sharedProject) {
 
-        this.driverManager = DriverDocumentManager.getInstance();
         this.side = side;
         this.host = host.getJID();
         this.myJID = myJID;
         this.sharedProject = sharedProject;
 
         if (isHostSide()) {
+
+            this.driverManager = new DriverDocumentManager(sharedProject);
+            this.driverManager.addDriver(this.host);
+
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
             logger.debug("Starting consistency watchdog");
             consistencyWatchdog.setSystem(true);
             consistencyWatchdog.setPriority(Job.SHORT);
             consistencyWatchdog.schedule();
+        } else {
+            // Clients don't have a Driver Manager
+            this.driverManager = null;
         }
 
         Saros.getDefault().getSessionManager().addSessionListener(

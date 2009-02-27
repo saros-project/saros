@@ -54,10 +54,8 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
-import de.fu_berlin.inf.dpp.concurrent.IDriverDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
-import de.fu_berlin.inf.dpp.concurrent.management.DriverDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -89,8 +87,6 @@ public class SharedProject implements ISharedProject {
 
     private final ITransmitter transmitter;
 
-    private IDriverDocumentManager driverManager;
-
     private final ActivitySequencer activitySequencer = new ActivitySequencer();
 
     private static final int MAX_USERCOLORS = 5;
@@ -116,11 +112,6 @@ public class SharedProject implements ISharedProject {
         /* add host to driver list. */
         this.activitySequencer.initConcurrentManager(
             IConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
-
-        /* init driver manager */
-        this.driverManager = DriverDocumentManager.getInstance();
-        addListener(this.driverManager);
-        this.driverManager.addDriver(this.host.getJID());
 
         this.project = project;
         setProjectReadonly(false);

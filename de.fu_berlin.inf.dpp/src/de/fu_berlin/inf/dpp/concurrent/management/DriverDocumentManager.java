@@ -40,28 +40,14 @@ public class DriverDocumentManager implements IDriverDocumentManager,
     /* list of documents with appropriate drivers. */
     private final HashMap<IPath, DriverDocument> documents;
 
-    private static DriverDocumentManager manager;
-
     /**
      * private constructor for singleton pattern.
      */
-    private DriverDocumentManager() {
+    public DriverDocumentManager(ISharedProject project) {
         this.drivers = new Vector<JID>();
         this.documents = new HashMap<IPath, DriverDocument>();
         Saros.getDefault().getSessionManager().addSessionListener(this);
-    }
-
-    /**
-     * get instance of this singleton object
-     * 
-     * @return instance of DriverDocumentManager
-     */
-    public static DriverDocumentManager getInstance() {
-        /* at first time, create new manager. */
-        if (DriverDocumentManager.manager == null) {
-            DriverDocumentManager.manager = new DriverDocumentManager();
-        }
-        return DriverDocumentManager.manager;
+        project.addListener(this);
     }
 
     /**
