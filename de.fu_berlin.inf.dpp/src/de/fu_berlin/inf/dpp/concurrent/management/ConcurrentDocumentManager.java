@@ -83,8 +83,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     private IActivitySequencer sequencer;
 
-    private final DriverDocumentManager driverManager;
-
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
         "ConsistencyWatchdog");
 
@@ -258,18 +256,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         this.sharedProject = sharedProject;
 
         if (isHostSide()) {
-
-            this.driverManager = new DriverDocumentManager(sharedProject);
-            this.driverManager.addDriver(this.host);
-
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
             logger.debug("Starting consistency watchdog");
             consistencyWatchdog.setSystem(true);
             consistencyWatchdog.setPriority(Job.SHORT);
             consistencyWatchdog.schedule();
-        } else {
-            // Clients don't have a Driver Manager
-            this.driverManager = null;
         }
 
         Saros.getDefault().getSessionManager().addSessionListener(
@@ -392,6 +383,11 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         });
     }
 
+    public boolean shouldBeManagedByJupiter(JID jid) {
+        return sharedProject.getHost().getJID().equals(jid)
+            || sharedProject.getParticipant(jid).isDriver();
+    }
+
     public IActivity exec(IActivity activity) {
 
         if (activity instanceof EditorActivity) {
@@ -400,11 +396,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             if (isHostSide()) {
                 JID sourceJID = new JID(editorActivity.getSource());
 
-                /* inform driver document manager */
-                this.driverManager.receiveActivity(activity);
-
                 /* if one driver activated a new editor. */
-                if (this.driverManager.isDriver(sourceJID)
+                if (shouldBeManagedByJupiter(sourceJID)
                     && ((editorActivity.getType() == Type.Activated) || (editorActivity
                         .getType() == Type.Closed))) {
 
@@ -516,7 +509,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     protected void receiveRequestHostSide(Request request) {
 
         assert isHostSide() : "receiveRequestHostSide called on the Client";
-        
+
         JID sender = request.getJID();
         IPath path = request.getEditorPath();
 
@@ -536,10 +529,6 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
             this.concurrentDocuments.put(path, docServer);
         }
         docServer = this.concurrentDocuments.get(path);
-
-        if (!isHost(sender)) {
-            this.driverManager.addDriverToDocument(path, sender);
-        }
 
         /* check if sender id exists in proxy list. */
         if (!docServer.getProxies().containsKey(sender)) {
@@ -613,7 +602,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
          */
         if (isHostSide()) {
             /* if driver changed to observer */
-            if (this.driverManager.isDriver(jid)) {
+            if (user.isObserver()) {
                 userLeft(jid);
             }
         } else {
@@ -630,15 +619,10 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     public void userLeft(JID user) {
         if (isHostSide()) {
-            /* remove user from driver list */
-            // drivers.remove(user);
             /* remove user proxies from jupiter server. */
             for (JupiterServer server : this.concurrentDocuments.values()) {
                 if (server.isExist(user)) {
                     server.removeProxyClient(user);
-
-                    /* if only host has an proxy */
-
                 }
             }
         }
@@ -655,20 +639,18 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         }
 
         if (this.concurrentDocuments.containsKey(path)) {
-            /* remove document server. */
-            this.concurrentDocuments.remove(path);
-            /* init new server. */
-            JupiterDocumentServer doc = initDocumentServer(path);
-            ConcurrentDocumentManager.logger
-                .debug("Resetting jupiter server...");
-            /* add proxy documents for active driver. */
-            for (JID jid : this.driverManager.getDriversForDocument(path)) {
-                doc.addProxyClient(jid);
-                ConcurrentDocumentManager.logger.debug("add driver proxy : "
-                    + jid);
+            logger.debug("Resetting jupiter server...");
+
+            JupiterDocumentServer oldServer = this.concurrentDocuments
+                .remove(path);
+
+            JupiterDocumentServer newServer = initDocumentServer(path);
+
+            for (JID jid : oldServer.getProxies().keySet()) {
+                newServer.addProxyClient(jid);
             }
 
-            this.concurrentDocuments.put(path, doc);
+            this.concurrentDocuments.put(path, newServer);
 
         } else {
             ConcurrentDocumentManager.logger
