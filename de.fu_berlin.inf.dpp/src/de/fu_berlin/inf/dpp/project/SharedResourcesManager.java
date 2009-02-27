@@ -141,14 +141,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
         private IActivity handleFileDelta(IPath path, int kind) {
             switch (kind) {
             case IResourceDelta.CHANGED:
+                // fall through
+
             case IResourceDelta.ADDED:
                 // ignore opened files because otherwise we might send CHANGED
                 // events for files that are also handled by the editor manager.
                 if (EditorManager.getDefault().isOpened(path)) {
                     return null;
                 }
-
-                // fall through
 
                 return new FileActivity(FileActivity.Type.Created, path);
 
