@@ -41,12 +41,11 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
-import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager.Side;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -607,7 +606,7 @@ public class ActivitySequencer implements RequestForwarder, IActivitySequencer {
         this.concurrentManager.setActivitySequencer(this);
     }
 
-    public IConcurrentManager getConcurrentManager() {
+    public ConcurrentDocumentManager getConcurrentManager() {
         return this.concurrentManager;
     }
 

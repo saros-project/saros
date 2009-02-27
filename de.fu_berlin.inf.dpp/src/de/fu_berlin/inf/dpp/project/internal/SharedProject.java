@@ -53,9 +53,9 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -110,8 +110,8 @@ public class SharedProject implements ISharedProject {
         this.participants.put(this.host.getJID(), this.host);
 
         /* add host to driver list. */
-        this.activitySequencer.initConcurrentManager(
-            IConcurrentManager.Side.HOST_SIDE, this.host, myID, this);
+        this.activitySequencer.initConcurrentManager(Side.HOST_SIDE, this.host,
+            myID, this);
 
         this.project = project;
         setProjectReadonly(false);
@@ -134,8 +134,8 @@ public class SharedProject implements ISharedProject {
 
         this.host = getParticipant(hostID);
 
-        this.activitySequencer.initConcurrentManager(
-            IConcurrentManager.Side.CLIENT_SIDE, this.host, myID, this);
+        this.activitySequencer.initConcurrentManager(Side.CLIENT_SIDE,
+            this.host, myID, this);
 
         this.project = project;
     }
@@ -596,9 +596,7 @@ public class SharedProject implements ISharedProject {
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
-        return (ConcurrentDocumentManager) this.activitySequencer
-            .getConcurrentManager();
-
+        return this.activitySequencer.getConcurrentManager();
     }
 
     public int getFreeColor() {

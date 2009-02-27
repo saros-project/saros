@@ -36,9 +36,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.IConcurrentManager;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
@@ -54,6 +52,7 @@ import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -62,7 +61,11 @@ import de.fu_berlin.inf.dpp.util.Util;
  * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
  * etc.
  */
-public class ConcurrentDocumentManager implements IConcurrentManager {
+public class ConcurrentDocumentManager implements ISharedProjectListener {
+
+    public static enum Side {
+        CLIENT_SIDE, HOST_SIDE
+    }
 
     private static Logger logger = Logger
         .getLogger(ConcurrentDocumentManager.class);
@@ -404,7 +407,7 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
                     /* start jupiter proxy for this driver. */
                     if (this.concurrentDocuments.containsKey(editorActivity
                         .getPath())) {
-                        JupiterServer server = this.concurrentDocuments
+                        JupiterDocumentServer server = this.concurrentDocuments
                             .get(editorActivity.getPath());
 
                         /* client has no proxy for this editor. */
@@ -620,7 +623,8 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
     public void userLeft(JID user) {
         if (isHostSide()) {
             /* remove user proxies from jupiter server. */
-            for (JupiterServer server : this.concurrentDocuments.values()) {
+            for (JupiterDocumentServer server : this.concurrentDocuments
+                .values()) {
                 if (server.isExist(user)) {
                     server.removeProxyClient(user);
                 }
