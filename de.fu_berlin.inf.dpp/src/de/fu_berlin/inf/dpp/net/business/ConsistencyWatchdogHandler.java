@@ -3,11 +3,6 @@ package de.fu_berlin.inf.dpp.net.business;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -22,6 +17,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -200,32 +196,15 @@ public class ConsistencyWatchdogHandler {
 
     ChecksumExtension checksum = new ChecksumExtension() {
 
-        ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
-            TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1));
-
         @Override
         public void checksumsReceived(JID sender,
             final List<DocumentChecksum> checksums) {
-            try {
-                executor.submit(new Runnable() {
-                    public void run() {
-                        try {
-                            project.getValue()
-                                .getConcurrentDocumentManager()
-                                .checkConsistency(checksums);
-                        } catch (RuntimeException e) {
-                            log.error("Failed to check consistency", e);
-                        }
-                    }
-                });
-            } catch (RejectedExecutionException e) {
-                /*
-                 * Ignore Checksums that arrive before we are done processing
-                 * the last set of Checksums.
-                 */
-                log
-                    .warn("Received Checksums before processing of previous checksums finished");
-            }
+
+            ConcurrentDocumentManager concurrentManager = project.getValue()
+                .getConcurrentDocumentManager();
+
+            concurrentManager.setChecksums(checksums);
+            concurrentManager.checkConsistency();
         }
     };
 

@@ -35,8 +35,8 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
+import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 public class ConsistencyAction extends Action implements ISessionListener {
@@ -191,6 +191,9 @@ public class ConsistencyAction extends Action implements ISessionListener {
             }
 
             FileUtil.writeFile(input, file);
+
+            Saros.getDefault().getSessionManager().getSharedProject()
+                .getConcurrentDocumentManager().checkConsistency();
 
             return true;
         }

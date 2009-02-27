@@ -4,7 +4,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -49,6 +54,7 @@ import de.fu_berlin.inf.dpp.net.IActivitySequencer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -503,8 +509,14 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
         return docServer;
     }
 
+    /**
+     * 
+     * @host
+     */
     protected void receiveRequestHostSide(Request request) {
 
+        assert isHostSide() : "receiveRequestHostSide called on the Client";
+        
         JID sender = request.getJID();
         IPath path = request.getEditorPath();
 
@@ -521,14 +533,13 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
          */
         if (!this.concurrentDocuments.containsKey(path)) {
             docServer = initDocumentServer(path);
-
-            if (!isHost(sender)) {
-                this.driverManager.addDriverToDocument(path, sender);
-                docServer.addProxyClient(sender);
-            }
             this.concurrentDocuments.put(path, docServer);
         }
         docServer = this.concurrentDocuments.get(path);
+
+        if (!isHost(sender)) {
+            this.driverManager.addDriverToDocument(path, sender);
+        }
 
         /* check if sender id exists in proxy list. */
         if (!docServer.getProxies().containsKey(sender)) {
@@ -678,6 +689,46 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
 
     }
 
+    ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
+        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1),
+        new NamedThreadFactory("ChecksumCruncher-"));
+
+    /**
+     * Starts a new Consistency Check.
+     * 
+     * If a check is already in progress, nothing happens (but a warning)
+     * 
+     * @nonBlocking This method returns immediately.
+     */
+    public void checkConsistency() {
+
+        try {
+            executor.submit(new Runnable() {
+                public void run() {
+                    try {
+                        performCheck(currentChecksums);
+                    } catch (RuntimeException e) {
+                        logger.error("Failed to check consistency", e);
+                    }
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            /*
+             * Ignore Checksums that arrive before we are done processing the
+             * last set of Checksums.
+             */
+            logger
+                .warn("Received Checksums before processing of previous checksums finished");
+        }
+
+    }
+
+    List<DocumentChecksum> currentChecksums;
+
+    public void setChecksums(List<DocumentChecksum> checksums) {
+        this.currentChecksums = checksums;
+    }
+
     /**
      * Checks the local documents against the given checksums.
      * 
@@ -686,8 +737,16 @@ public class ConcurrentDocumentManager implements IConcurrentManager {
      * 
      * @param checksums
      *            the checksums to check the documents against
+     * 
+     * @nonReentrant This method cannot be called twice at the same time.
      */
-    public void checkConsistency(List<DocumentChecksum> checksums) {
+    public void performCheck(List<DocumentChecksum> checksums) {
+
+        if (checksums == null) {
+            logger
+                .warn("Consistency Check triggered with out preceeding call to setChecksums()");
+            return;
+        }
 
         logger.debug(String.format(
             "Received %d checksums for %d inconsistencies", checksums.size(),
