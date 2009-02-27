@@ -271,8 +271,9 @@ public class Jupiter implements Algorithm {
             throw new TransformationException("precondition #2 violated.");
         } else if (time.getLocalOperationCount() != this.vectorTime
             .getRemoteOperationCount()) {
-            throw new TransformationException("precondition #3 violated: "
-                + time + " , " + this.vectorTime);
+            throw new TransformationException(
+                "Precondition #3 violated (Vector time does not match): "
+                    + time + " , " + this.vectorTime);
         }
     }
 
