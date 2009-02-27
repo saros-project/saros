@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.net;
 import java.util.List;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.concurrent.IRequestManager;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 
@@ -14,8 +13,7 @@ import de.fu_berlin.inf.dpp.project.IActivityManager;
  * @author rdjemili
  * 
  */
-public interface IActivitySequencer extends IActivityListener, IRequestManager,
-    IActivityManager {
+public interface IActivitySequencer extends IActivityListener, IActivityManager {
 
     /**
      * Gets all activities since last flush.
