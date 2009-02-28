@@ -77,7 +77,6 @@ public class ConsistencyWatchdogHandler {
                     public void run() {
                         finishConsistencyCheck(from, path, wasReadOnly);
                     }
-
                 });
         }
     }
