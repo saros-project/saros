@@ -87,7 +87,8 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
             transformedOp = transform((DeleteOperation) op1,
                 (DeleteOperation) op2);
         } else {
-            throw new InvalidParameterException();
+            // TODO This was caused once by a complicated combination of split ops
+            throw new InvalidParameterException("op1: " + op1 + ", op2: " + op2);
         }
         return transformedOp;
     }
@@ -200,7 +201,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         } else {
             /*
              * Operation B (insert) is in the range of operation A (delete).
-             * Operation A' must be splitted up into two delete operations. (B):
+             * Operation A' must be split up into two delete operations. (B):
              * "ABCD" (A): "123456" (A'): "1" "23456"
              */
             DeleteOperation del1 = new DeleteOperation(posA, delA.getText()
