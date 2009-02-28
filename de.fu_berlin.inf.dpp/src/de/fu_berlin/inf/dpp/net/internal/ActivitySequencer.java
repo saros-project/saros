@@ -25,7 +25,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -57,7 +59,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * The IActivitySequencer is responsible for making sure that activities are
  * sent and received in the right order.
- *
+ * 
  * @author rdjemili
  */
 public class ActivitySequencer implements RequestForwarder, IActivityListener,
@@ -143,7 +145,7 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
     private ConcurrentDocumentManager concurrentManager;
 
     /** outgoing queue for direct client sync messages for all driver. */
-    private final List<Request> outgoingSyncActivities = new Vector<Request>();
+    private final BlockingQueue<Request> outgoingSyncActivities = new LinkedBlockingQueue<Request>();
 
     private final ExecuterQueue executer = new ExecuterQueue();
 
@@ -617,21 +619,10 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
 
         /* put request into outgoing queue. */
         this.outgoingSyncActivities.add(req);
-
-        notify();
     }
 
-    public synchronized Request getNextOutgoingRequest()
-        throws InterruptedException {
-        Request request = null;
-        /* get next message and transfer to client. */
-        while (!(this.outgoingSyncActivities.size() > 0)) {
-            wait();
-        }
-        /* remove first queue element. */
-        request = this.outgoingSyncActivities.remove(0);
-
-        return request;
+    public Request getNextOutgoingRequest() throws InterruptedException {
+        return this.outgoingSyncActivities.take();
     }
 
     /**
