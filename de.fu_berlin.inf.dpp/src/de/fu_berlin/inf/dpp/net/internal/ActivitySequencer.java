@@ -20,12 +20,14 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -56,10 +58,11 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * The IActivitySequencer is responsible for making sure that activities are
- * sent and received in the right order.
+ * The ActivitySequencer is responsible for making sure that activities are sent
+ * and received in the right order.
  * 
  * @author rdjemili
+ * @author coezbek
  */
 public class ActivitySequencer implements RequestForwarder, IActivityListener,
     IActivityManager {
@@ -76,7 +79,12 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
 
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
-    private final List<TimedActivity> queue = new CopyOnWriteArrayList<TimedActivity>();
+    private final Queue<TimedActivity> queue = new PriorityQueue<TimedActivity>(
+        128, new Comparator<TimedActivity>() {
+            public int compare(TimedActivity o1, TimedActivity o2) {
+                return Integer.signum(o2.getTimestamp() - o1.getTimestamp());
+            }
+        });
 
     private final List<TimedActivity> activityHistory = new LinkedList<TimedActivity>();
 
@@ -84,7 +92,9 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
 
     private ConcurrentDocumentManager concurrentManager;
 
-    /** outgoing queue for direct client sync messages for all driver. */
+    /**
+     * outgoing queue for direct client sync messages for all driver.
+     */
     private final BlockingQueue<Request> outgoingSyncActivities = new LinkedBlockingQueue<Request>();
 
     /**
@@ -208,24 +218,45 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
         // }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
-     */
-    public void exec(TimedActivity timedActivity) {
-        this.queue.add(timedActivity);
-        execQueue();
-    }
-
     /**
-     * Add the given activities to the queue and call execQueue.
+     * The central entry point for receiving Activities from the Network
+     * component (either via message or data transfer, thus the following is
+     * synchronized on the queue).
      * 
-     * @param activities
+     * The activities are sorted (in the queue) and executed in order.
+     * 
+     * If an activity is missing, this method just returns and queues the given
+     * activity
      */
-    public void exec(List<TimedActivity> activities) {
-        this.queue.addAll(activities);
-        execQueue();
+    public void exec(TimedActivity nextActivity) {
+
+        assert nextActivity != null;
+
+        synchronized (queue) {
+            queue.add(nextActivity);
+
+            // If this is our first activity, set out timestamp
+            if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
+                /*
+                 * TODO this might not be a good idea, since our first event
+                 * might be out of Sync
+                 */
+                this.timestamp = queue.peek().getTimestamp();
+            }
+
+            TimedActivity timedActivity;
+            while ((timedActivity = queue.poll()) != null
+                && timedActivity.getTimestamp() <= this.timestamp) {
+
+                if (this.timestamp < timedActivity.getTimestamp()) {
+                    logger.error("Received event with duplicate timestamp: "
+                        + timedActivity);
+                }
+
+                this.timestamp++;
+                exec(timedActivity.getActivity());
+            }
+        }
     }
 
     public List<IActivity> flush() {
@@ -348,34 +379,6 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
 
     public List<TimedActivity> getActivityHistory() {
         return this.activityHistory;
-    }
-
-    /**
-     * Executes as much activities as possible from the current queue regarding
-     * to their individual time stamps.
-     */
-    private void execQueue() {
-        boolean executed;
-
-        do {
-            executed = false;
-
-            for (TimedActivity timedActivity : this.queue) {
-                if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
-                    this.timestamp = timedActivity.getTimestamp();
-                }
-
-                if (timedActivity.getTimestamp() <= this.timestamp) {
-                    this.queue.remove(timedActivity);
-
-                    this.timestamp++;
-                    exec(timedActivity.getActivity());
-                    executed = true;
-                }
-            }
-
-        } while (executed);
-
     }
 
     /**
