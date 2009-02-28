@@ -23,10 +23,12 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * The SplitOperation contains two operations. It is used when an operation
@@ -35,6 +37,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  * @see ch.iserver.ace.algorithm.Operation
  */
 public class SplitOperation implements Operation {
+
+    private static final Logger log = Logger.getLogger(SplitOperation.class
+        .getName());
 
     private static final long serialVersionUID = 3948091155375639761L;
 
@@ -146,32 +151,40 @@ public class SplitOperation implements Operation {
 
         List<TextEditActivity> first = getFirst().toTextEdit(path, source);
         List<TextEditActivity> second = getSecond().toTextEdit(path, source);
-        if (first.size() == 0) {
-            return second;
+
+        List<TextEditActivity> result = new ArrayList<TextEditActivity>(first
+            .size()
+            + second.size());
+        result.addAll(first);
+        result.addAll(second);
+
+        if (result.size() <= 1)
+            return result;
+
+        if (result.size() == 2) {
+
+            // TODO Somehow delete operations need to be shifted, don't know why
+            TextEditActivity op1 = result.get(0);
+            TextEditActivity op2 = result.get(1);
+
+            if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
+                && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
+
+                log.warn("Split operation shifts first delete operation:"
+                    + this);
+
+                result.set(1, new TextEditActivity(op2.offset
+                    - op1.replacedText.length(), "", op2.replacedText, path,
+                    source));
+            }
+            return result;
         }
-        if (second.size() == 0) {
-            return first;
+
+        if (result.size() > 2) {
+            log.warn("SplitOperation larger than expected: " + this,
+                new StackTrace());
         }
-
-        assert first.size() == 1;
-        TextEditActivity op1 = first.get(0);
-
-        assert second.size() == 1;
-        TextEditActivity op2 = second.get(0);
-
-        /*
-         * if op1 is a delete operation the offset of the second operation has
-         * to be modified.
-         */
-        if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
-            && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
-            op2 = new TextEditActivity(op2.offset - op1.replacedText.length(),
-                "", op2.replacedText, path, source);
-        }
-
-        List<TextEditActivity> result = new ArrayList<TextEditActivity>(2);
-        result.add(op1);
-        result.add(op2);
         return result;
+
     }
 }
