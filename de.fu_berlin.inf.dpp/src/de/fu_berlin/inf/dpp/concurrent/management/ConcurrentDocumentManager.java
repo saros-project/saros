@@ -569,9 +569,6 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
     protected void receiveRequestClientSide(Request request) {
 
         if (request.getOperation() instanceof TimestampOperation) {
-            /*
-             * Update timestamp
-             */
 
             JupiterClient jupClient = getClientDoc(request.getEditorPath());
 
@@ -579,7 +576,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
                 jupClient.updateVectorTime(request.getTimestamp());
             } catch (TransformationException e) {
                 logger.error(
-                    "Jupiter[Client] - Error during vector time update for "
+                    "Jupiter [Client] - Error during vector time update for "
                         + request.getEditorPath(), e);
             }
         } else {
@@ -634,31 +631,34 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
 
     /**
      * reset jupiter document server component.
+     * 
+     * @host and @client It can be called from the client as well, but is not
+     *       called anywhere at the moment.
      */
     public void resetJupiterDocument(IPath path) {
 
-        // host side
-        if (!isHostSide()) {
-            return;
-        }
+        if (isHostSide()) {
 
-        if (this.concurrentDocuments.containsKey(path)) {
-            logger.debug("Resetting jupiter server...");
+            if (this.concurrentDocuments.containsKey(path)) {
+                logger.debug("Resetting jupiter server...");
 
-            JupiterDocumentServer oldServer = this.concurrentDocuments
-                .remove(path);
+                JupiterDocumentServer oldServer = this.concurrentDocuments
+                    .remove(path);
 
-            JupiterDocumentServer newServer = initDocumentServer(path);
+                JupiterDocumentServer newServer = initDocumentServer(path);
 
-            for (JID jid : oldServer.getProxies().keySet()) {
-                newServer.addProxyClient(jid);
+                for (JID jid : oldServer.getProxies().keySet()) {
+                    if (!newServer.getProxies().containsKey(jid)) {
+                        newServer.addProxyClient(jid);
+                    }
+                }
+
+                this.concurrentDocuments.put(path, newServer);
+
+            } else {
+                ConcurrentDocumentManager.logger
+                    .error("No jupter document exists for " + path.toOSString());
             }
-
-            this.concurrentDocuments.put(path, newServer);
-
-        } else {
-            ConcurrentDocumentManager.logger
-                .error("No jupter document exists for " + path.toOSString());
         }
 
         // reset client documents
