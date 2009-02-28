@@ -24,7 +24,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -68,65 +67,6 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
     private static Logger logger = Logger.getLogger(ActivitySequencer.class
         .getName());
 
-    public static class ExecuterQueue {
-
-        /** Queue with IActivity Elements */
-        private final List<TextEditActivity> executerQueue;
-
-        private TextEditActivity currentExecutedActivity;
-
-        private boolean executed = true;
-
-        public ExecuterQueue() {
-            this.executerQueue = new Vector<TextEditActivity>();
-        }
-
-        /**
-         * check status of created activity. After execution in
-         * ActivitySequencer activity has created new call of activityCreated.
-         * 
-         * @param activity
-         */
-        public synchronized boolean checkCreatedActivity(IActivity activity) {
-            if (this.currentExecutedActivity != null) {
-                if ((activity instanceof TextEditActivity)
-                    && this.currentExecutedActivity.sameLike(activity)) {
-                    logger.debug("TextEditActivity " + activity
-                        + " is executed.");
-                    this.executed = true;
-                    notify();
-                }
-            }
-            return this.executed;
-        }
-
-        public synchronized void addActivity(IActivity activity) {
-            if (activity instanceof TextEditActivity) {
-                logger.debug("Add new Activity " + activity
-                    + " to executer queue.");
-                this.executerQueue.add((TextEditActivity) activity);
-                notify();
-            }
-        }
-
-        public synchronized IActivity getNextActivity() {
-            try {
-                while ((this.executerQueue.size() < 1) && !this.executed) {
-                    wait();
-                }
-                this.currentExecutedActivity = this.executerQueue.remove(0);
-                this.executed = false;
-                logger.debug("Remove " + this.currentExecutedActivity
-                    + " form executer queue.");
-                /* get next activity in queue. */
-                return this.currentExecutedActivity;
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-    }
-
     public static final int UNDEFINED_TIME = -1;
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
@@ -146,8 +86,6 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
 
     /** outgoing queue for direct client sync messages for all driver. */
     private final BlockingQueue<Request> outgoingSyncActivities = new LinkedBlockingQueue<Request>();
-
-    private final ExecuterQueue executer = new ExecuterQueue();
 
     /**
      * TODO Refactor like this:
@@ -372,9 +310,7 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
 
         if (activity instanceof TextEditActivity) {
 
-            /* check for execute next activity in queue. */
             logger.debug("activity created : " + activity);
-            this.executer.checkCreatedActivity(activity);
 
             /*
              * new text edit activity has been created and has to be
