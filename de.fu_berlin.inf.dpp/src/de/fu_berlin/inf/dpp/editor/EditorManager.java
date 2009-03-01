@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.editor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -53,6 +54,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
+import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Display;
@@ -664,6 +666,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         // TODO Review, because this is causing problems with FollowMode
         activateOpenEditors();
 
+        // TODO Why remove all?
         removeAllAnnotations(ContributionAnnotation.TYPE);
 
         if (Saros.getDefault().getLocalUser().equals(user)) {
@@ -810,23 +813,16 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         User user = Saros.getDefault().getSessionManager().getSharedProject()
             .getParticipant(new JID(source));
 
-        /* set current execute activity to avoid circular executions. */
+        // FIXME We should much rather disable the listeners and then reactivate
+        // them after the replace has been executed.
+
+        // set current execute activity to avoid circular executions.
         currentExecuteActivity = textEdit;
-        /*
-         * Really ugly hack. Because there is just one driver allowed at the
-         * moment we can use this information to set the color for contribution
-         * annotations, regardless of the real origin of contributions.
-         */
-        JID driverJID = Saros.getDefault().getSessionManager()
-            .getSharedProject().getADriver().getJID();
-        if (driverJID == null) {
-            log.error("There is no driver at all.");
-        }
 
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);
         replaceText(file, textEdit.offset, textEdit.replacedText,
-            textEdit.text, (driverJID != null) ? driverJID.toString() : "");
+            textEdit.text, source);
 
         for (IEditorPart editorPart : editorPool.getEditors(path)) {
             editorAPI.setSelection(editorPart, new TextSelection(
@@ -1331,16 +1327,37 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 .getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
-            if (model != null) {
-                for (Iterator<Annotation> it = model.getAnnotationIterator(); it
-                    .hasNext();) {
-                    Annotation annotation = it.next();
-                    // TODO Use the type (in the sense of class) here instead of
-                    // the string.
-                    if (annotation.getType().startsWith(annotationType)) {
-                        model.removeAnnotation(annotation);
-                    }
+            if (model == null) {
+                return;
+            }
+
+            ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
+            for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+                .hasNext();) {
+                Annotation annotation = it.next();
+                // TODO Use the type (in the sense of class) here instead of
+                // the string.
+                if (annotation.getType().startsWith(annotationType)) {
+                    annotations.add(annotation);
                 }
+            }
+
+            removeAnnotations(model, annotations);
+        }
+    }
+
+    private void removeAnnotations(IAnnotationModel model,
+        ArrayList<Annotation> annotations) {
+
+        if (model instanceof IAnnotationModelExtension) {
+            IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
+            extension.replaceAnnotations(annotations
+                .toArray(new Annotation[annotations.size()]), Collections
+                .emptyMap());
+        } else {
+            // TODO maybe warn once!
+            for (Annotation annotation : annotations) {
+                model.removeAnnotation(annotation);
             }
         }
     }
@@ -1352,7 +1369,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            the id of the user whos annotations will be removed, if null
      *            annotations of given type for all users are removed
      * @param typeAnnotation
-     *            the type of the annotations to remove
+     *            the type of the annotations to remove if null all annotations
+     *            are removed
      */
     private void removeAllAnnotations(String forUserID, String typeAnnotation) {
 
@@ -1366,23 +1384,24 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 continue;
             }
 
+            ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
             for (@SuppressWarnings("unchecked")
             Iterator<Annotation> it = model.getAnnotationIterator(); it
                 .hasNext();) {
                 Annotation annotation = it.next();
                 String type = annotation.getType();
 
-                if ((typeAnnotation == null) || (!typeAnnotation.equals(type))) {
+                if (typeAnnotation != null && !typeAnnotation.equals(type)) {
                     continue;
                 }
 
                 SarosAnnotation sarosAnnotation = (SarosAnnotation) annotation;
                 if (forUserID == null
                     || sarosAnnotation.getSource().equals(forUserID)) {
-
-                    model.removeAnnotation(annotation);
+                    annotations.add(annotation);
                 }
             }
+            removeAnnotations(model, annotations);
         }
     }
 
