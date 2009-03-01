@@ -11,9 +11,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TimestampFactory;
  */
 public class JupiterTimestampFactory implements TimestampFactory {
 
-    /**
-	 * 
-	 */
     public Timestamp createTimestamp(int[] components) {
         if (components.length != 2) {
             throw new IllegalArgumentException(
