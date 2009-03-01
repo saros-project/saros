@@ -503,6 +503,13 @@ public class SharedProject implements ISharedProject {
                         // is that dirty file in my project?
                         if (flist.getPaths().contains(fp)) {
                             if (save) {
+                                /*
+                                 * FIXME doSave is a non-blocking method, we
+                                 * might get a race condition here.
+                                 * 
+                                 * Have a look at ConsistencyWatchDog how it
+                                 * needs to be done!
+                                 */
                                 editorRef.getEditor(false).doSave(null);
                             } else {
                                 return true;
