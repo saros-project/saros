@@ -228,7 +228,7 @@ public class ConsistencyAction extends Action implements ISessionListener {
     @Override
     public void run() {
 
-        Util.runSafeSync(log, new Runnable() {
+        Util.runSafeAsync(log, new Runnable() {
             public void run() {
                 executeConsistencyHandling();
             }
