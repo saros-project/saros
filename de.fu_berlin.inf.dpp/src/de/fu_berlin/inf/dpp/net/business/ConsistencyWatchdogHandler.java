@@ -29,6 +29,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -199,7 +200,11 @@ public class ConsistencyWatchdogHandler {
         public void checksumsReceived(JID sender,
             final List<DocumentChecksum> checksums) {
 
-            ConcurrentDocumentManager concurrentManager = project.getValue()
+            ISharedProject currentProject = project.getValue();
+
+            assert currentProject != null;
+
+            ConcurrentDocumentManager concurrentManager = currentProject
                 .getConcurrentDocumentManager();
 
             concurrentManager.setChecksums(checksums);
