@@ -149,42 +149,48 @@ public class SplitOperation implements Operation {
 
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
 
-        List<TextEditActivity> first = getFirst().toTextEdit(path, source);
-        List<TextEditActivity> second = getSecond().toTextEdit(path, source);
+        try {
+            List<TextEditActivity> first = getFirst().toTextEdit(path, source);
+            List<TextEditActivity> second = getSecond()
+                .toTextEdit(path, source);
 
-        List<TextEditActivity> result = new ArrayList<TextEditActivity>(first
-            .size()
-            + second.size());
-        result.addAll(first);
-        result.addAll(second);
+            List<TextEditActivity> result = new ArrayList<TextEditActivity>(
+                first.size() + second.size());
+            result.addAll(first);
+            result.addAll(second);
 
-        if (result.size() <= 1)
-            return result;
+            if (result.size() <= 1)
+                return result;
 
-        if (result.size() == 2) {
+            if (result.size() == 2) {
 
-            // TODO Somehow delete operations need to be shifted, don't know why
-            TextEditActivity op1 = result.get(0);
-            TextEditActivity op2 = result.get(1);
+                // TODO Somehow delete operations need to be shifted, don't know
+                // why
+                TextEditActivity op1 = result.get(0);
+                TextEditActivity op2 = result.get(1);
 
-            if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
-                && (op2.replacedText.length() > 0) && (op2.text.length() == 0)) {
+                if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
+                    && (op2.replacedText.length() > 0)
+                    && (op2.text.length() == 0)) {
 
-                log.warn("Split operation shifts first delete operation:"
-                    + this);
+                    log.warn("Split operation shifts second delete operation:"
+                        + this);
 
-                result.set(1, new TextEditActivity(op2.offset
-                    - op1.replacedText.length(), "", op2.replacedText, path,
-                    source));
+                    result.set(1, new TextEditActivity(op2.offset
+                        - op1.replacedText.length(), "", op2.replacedText,
+                        path, source));
+                }
+                return result;
+            }
+
+            if (result.size() > 2) {
+                log.warn("SplitOperation larger than expected: " + this,
+                    new StackTrace());
             }
             return result;
+        } catch (RuntimeException e) {
+            log.error("Internal error in SplitOperation: " + this, e);
+            throw e;
         }
-
-        if (result.size() > 2) {
-            log.warn("SplitOperation larger than expected: " + this,
-                new StackTrace());
-        }
-        return result;
-
     }
 }
