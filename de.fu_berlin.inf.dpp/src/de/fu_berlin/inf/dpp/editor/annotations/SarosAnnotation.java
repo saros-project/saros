@@ -25,7 +25,7 @@ public abstract class SarosAnnotation extends Annotation {
      * @param type
      *            of the {@link Annotation}.
      * @param isNumbered
-     *            wether the type should be extended by the color ID of the
+     *            whether the type should be extended by the color ID of the
      *            source.
      * @param text
      *            for the tooltip.
