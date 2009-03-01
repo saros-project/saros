@@ -1129,9 +1129,26 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             IDocument doc = provider.getDocument(input);
 
-            // TODO assert that the replaceText is really the one replace here
+            // Check if the replaced text is really there.
+            try {
+                assert doc.get(offset, replacedText.length()).equals(
+                    replacedText);
+            } catch (BadLocationException e) {
+                // Ignore, because this is going to fail again just below
+            }
 
-            doc.replace(offset, replacedText.length(), text);
+            // Try to replace
+            try {
+                doc.replace(offset, replacedText.length(), text);
+            } catch (BadLocationException e) {
+                log
+                    .error(String
+                        .format(
+                            "Could not apply TextEdit at %d-%d of document with length %d.\\nWas supposed to replace '%s' with '%s'.",
+                            offset, offset + replacedText.length(), doc
+                                .getLength(), replacedText, text));
+                throw e;
+            }
             EditorManager.this.lastRemoteEditTimes.put(file
                 .getProjectRelativePath(), System.currentTimeMillis());
 
