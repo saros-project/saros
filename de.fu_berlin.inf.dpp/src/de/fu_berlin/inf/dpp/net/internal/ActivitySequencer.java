@@ -45,7 +45,6 @@ import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
@@ -55,6 +54,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -64,8 +64,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  * @author coezbek
  */
-public class ActivitySequencer implements RequestForwarder, IActivityListener,
-    IActivityManager {
+public class ActivitySequencer implements IActivityListener, IActivityManager {
 
     private static Logger logger = Logger.getLogger(ActivitySequencer.class
         .getName());
@@ -95,7 +94,7 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
     /**
      * outgoing queue for direct client sync messages for all driver.
      */
-    private final BlockingQueue<Request> outgoingSyncActivities = new LinkedBlockingQueue<Request>();
+    private final BlockingQueue<Pair<JID, Request>> outgoingSyncActivities = new LinkedBlockingQueue<Pair<JID, Request>>();
 
     /**
      * TODO Refactor like this:
@@ -534,17 +533,14 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
     public void initConcurrentManager(Side side, User host, JID myJID,
         ISharedProject sharedProject) {
         this.concurrentManager = new ConcurrentDocumentManager(side, host,
-            myJID, sharedProject);
-        sharedProject.addListener(this.concurrentManager);
-        this.concurrentManager.setRequestForwarder(this);
-        this.concurrentManager.setActivitySequencer(this);
+            myJID, sharedProject, this);
     }
 
     public ConcurrentDocumentManager getConcurrentManager() {
         return this.concurrentManager;
     }
 
-    public synchronized void forwardOutgoingRequest(Request req) {
+    public synchronized void forwardOutgoingRequest(JID to, Request req) {
 
         /* check for errors. */
         if (req instanceof RequestError) {
@@ -557,10 +553,11 @@ public class ActivitySequencer implements RequestForwarder, IActivityListener,
         }
 
         /* put request into outgoing queue. */
-        this.outgoingSyncActivities.add(req);
+        this.outgoingSyncActivities.add(new Pair<JID, Request>(to, req));
     }
 
-    public Request getNextOutgoingRequest() throws InterruptedException {
+    public Pair<JID, Request> getNextOutgoingRequest()
+        throws InterruptedException {
         return this.outgoingSyncActivities.take();
     }
 

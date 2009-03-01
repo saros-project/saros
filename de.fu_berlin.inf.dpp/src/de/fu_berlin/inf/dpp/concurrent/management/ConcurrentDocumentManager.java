@@ -3,7 +3,9 @@ package de.fu_berlin.inf.dpp.concurrent.management;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ExecutorService;
@@ -39,7 +41,6 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentClient;
@@ -51,6 +52,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -61,7 +63,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
  * etc.
  */
-public class ConcurrentDocumentManager implements ISharedProjectListener {
+public class ConcurrentDocumentManager {
 
     public static enum Side {
         CLIENT_SIDE, HOST_SIDE
@@ -76,25 +78,25 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
     /** current open editor at client side. */
     private final HashMap<IPath, JupiterDocumentClient> clientDocs = new HashMap<IPath, JupiterDocumentClient>();
 
-    private JID host;
+    private final JID host;
 
     private final JID myJID;
 
     private final Side side;
 
-    private RequestForwarder forwarder;
-
-    private ActivitySequencer sequencer;
+    private final ActivitySequencer sequencer;
 
     private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
         "ConsistencyWatchdog");
 
-    private ObservableValue<Boolean> inconsistencyToResolve = new ObservableValue<Boolean>(
+    private final ObservableValue<Boolean> inconsistencyToResolve = new ObservableValue<Boolean>(
         false);
 
-    private Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+    private final Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
-    private ISharedProject sharedProject;
+    private final ISharedProject sharedProject;
+
+    private final ISharedProjectListener projectListener;
 
     /**
      * Returns the TextFileBuffer associated with this project relative path OR
@@ -251,12 +253,13 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
     }
 
     public ConcurrentDocumentManager(final Side side, User host, JID myJID,
-        ISharedProject sharedProject) {
+        ISharedProject sharedProject, ActivitySequencer sequencer) {
 
         this.side = side;
         this.host = host.getJID();
         this.myJID = myJID;
         this.sharedProject = sharedProject;
+        this.sequencer = sequencer;
 
         if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
@@ -264,7 +267,13 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
             consistencyWatchdog.setSystem(true);
             consistencyWatchdog.setPriority(Job.SHORT);
             consistencyWatchdog.schedule();
+
+            projectListener = new HostSideProjectListener();
+        } else {
+            projectListener = new ClientSideProjectListener();
         }
+
+        sharedProject.addListener(projectListener);
 
         Saros.getDefault().getSessionManager().addSessionListener(
             new AbstractSessionListener() {
@@ -277,6 +286,8 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
                     Saros.getDefault().getSessionManager()
                         .removeSessionListener(this);
 
+                    endedProject.removeListener(projectListener);
+
                     if (isHostSide()) {
                         consistencyWatchdog.stop();
                     }
@@ -285,19 +296,50 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
                     pathsWithWrongChecksums.clear();
                 }
             });
-
     }
 
-    public void setActivitySequencer(ActivitySequencer sequencer) {
-        this.sequencer = sequencer;
+    public class HostSideProjectListener extends AbstractSharedProjectListener {
+
+        @Override
+        public void roleChanged(User user, boolean replicated) {
+            JID jid = user.getJID();
+
+            if (isHost(jid))
+                return;
+
+            /* if driver changed to observer */
+            if (user.isObserver()) {
+                /*
+                 * The following code only removes drivers (and does not add
+                 * them), because new drivers are added lazily, once they edit a
+                 * file
+                 */
+                userLeft(jid);
+            }
+
+        }
+
+        @Override
+        public void userLeft(JID user) {
+            /* remove user proxies from jupiter server. */
+            for (JupiterDocumentServer server : concurrentDocuments.values()) {
+                if (server.isExist(user)) {
+                    server.removeProxyClient(user);
+                }
+            }
+        }
     }
 
-    public void setRequestForwarder(RequestForwarder f) {
-        this.forwarder = f;
-    }
+    public class ClientSideProjectListener extends
+        AbstractSharedProjectListener {
 
-    public RequestForwarder getRequestForwarder() {
-        return this.forwarder;
+        @Override
+        public void roleChanged(User user, boolean replicated) {
+            // Clear clientdocs
+            if (user.getJID().equals(myJID)) {
+                clientDocs.clear();
+            }
+        }
     }
 
     public IActivity activityCreated(IActivity activity) {
@@ -327,7 +369,15 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
             TextEditActivity textEdit = (TextEditActivity) activity;
 
             JupiterDocumentClient document = getClientDoc(textEdit.getEditor());
-            document.generateRequest(textEdit.toOperation());
+            Request request = document.generateRequest(textEdit.toOperation());
+
+            if (isHostSide()) {
+                // Skip network and apply directly...
+                receiveRequestHostSide(request);
+            } else {
+                // Send to host
+                sequencer.forwardOutgoingRequest(host, request);
+            }
 
             // We did consume this activity
             return null;
@@ -439,8 +489,8 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
                                                 .getPath());
                                         updateRequest.setJID(sourceJID);
 
-                                        this.forwarder
-                                            .forwardOutgoingRequest(updateRequest);
+                                        this.sequencer.forwardOutgoingRequest(
+                                            sourceJID, updateRequest);
                                     }
                                 } catch (Exception e) {
 
@@ -497,8 +547,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
     private JupiterDocumentServer initDocumentServer(IPath path) {
 
         /* create new document server. */
-        JupiterDocumentServer docServer = new JupiterDocumentServer(
-            this.forwarder, path);
+        JupiterDocumentServer docServer = new JupiterDocumentServer(path);
 
         /* create new local host document client. */
         docServer.addProxyClient(this.host);
@@ -516,13 +565,6 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
         JID sender = request.getJID();
         IPath path = request.getEditorPath();
 
-        /* if host side and server jupiter side of request */
-        if (isHost(sender) && (request.getSiteId() == 0)) {
-            /* Request already has been transformed and has to be executed. */
-            execTextEditActivity(request);
-            return;
-        }
-
         JupiterDocumentServer docServer = null;
         /**
          * if no jupiter document server exists.
@@ -534,12 +576,31 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
         docServer = this.concurrentDocuments.get(path);
 
         /* check if sender id exists in proxy list. */
-        if (!docServer.getProxies().containsKey(sender)) {
+        if (!docServer.isExist(sender)) {
             docServer.addProxyClient(sender);
         }
 
         /* sync request with jupiter document server. */
-        docServer.addRequest(request);
+        Map<JID, Request> outgoing;
+        try {
+            outgoing = docServer.transformRequest(request);
+        } catch (TransformationException e) {
+            // TODO this should trigger a consistency check
+            logger.error("Transformation error: ", e);
+            return;
+        }
+
+        for (Entry<JID, Request> entry : outgoing.entrySet()) {
+
+            JID to = entry.getKey();
+            Request transformed = entry.getValue();
+
+            if (to.equals(host)) {
+                execTextEditActivity(transformed);
+            } else {
+                sequencer.forwardOutgoingRequest(to, transformed);
+            }
+        }
     }
 
     /**
@@ -560,7 +621,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
             return this.clientDocs.get(path);
         } else {
             JupiterDocumentClient client = new JupiterDocumentClient(
-                this.myJID, this.forwarder, path);
+                this.myJID, path);
             this.clientDocs.put(path, client);
             return client;
         }
@@ -590,45 +651,6 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
         }
     }
 
-    public void roleChanged(User user, boolean replicated) {
-        JID jid = user.getJID();
-
-        if (isHost(jid))
-            return;
-
-        /*
-         * The following code only removes drivers, because new drivers are
-         * added lazyly
-         */
-        if (isHostSide()) {
-            /* if driver changed to observer */
-            if (user.isObserver()) {
-                userLeft(jid);
-            }
-        } else {
-            // ClientSide
-            if (user.equals(this.myJID)) {
-                this.clientDocs.clear();
-            }
-        }
-    }
-
-    public void userJoined(JID user) {
-        // do nothing
-    }
-
-    public void userLeft(JID user) {
-        if (isHostSide()) {
-            /* remove user proxies from jupiter server. */
-            for (JupiterDocumentServer server : this.concurrentDocuments
-                .values()) {
-                if (server.isExist(user)) {
-                    server.removeProxyClient(user);
-                }
-            }
-        }
-    }
-
     /**
      * reset jupiter document server component.
      * 
@@ -648,7 +670,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
                 JupiterDocumentServer newServer = initDocumentServer(path);
 
                 for (JID jid : oldServer.getProxies().keySet()) {
-                    if (!newServer.getProxies().containsKey(jid)) {
+                    if (!newServer.isExist(jid)) {
                         newServer.addProxyClient(jid);
                     }
                 }
@@ -665,7 +687,7 @@ public class ConcurrentDocumentManager implements ISharedProjectListener {
         if (this.clientDocs.containsKey(path)) {
             this.clientDocs.remove(path);
             this.clientDocs.put(path, new JupiterDocumentClient(this.myJID,
-                this.forwarder, path));
+                path));
             ConcurrentDocumentManager.logger.debug("Reset jupiter client doc: "
                 + this.myJID);
         } else {

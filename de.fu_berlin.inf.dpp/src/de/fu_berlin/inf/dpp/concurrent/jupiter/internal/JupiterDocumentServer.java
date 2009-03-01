@@ -1,27 +1,23 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
 import java.util.HashMap;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterServer;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * TODO [CO] Document and review this class
  * 
  * FIXME JupiterDocumentServer is never stopped
  */
-public class JupiterDocumentServer implements JupiterServer {
+public class JupiterDocumentServer {
 
     private static Logger logger = Logger
         .getLogger(JupiterDocumentServer.class);
@@ -29,77 +25,20 @@ public class JupiterDocumentServer implements JupiterServer {
     /**
      * List of proxy clients.
      */
-    protected final HashMap<JID, JupiterClient> proxies;
-
-    /**
-     * Incoming Queue of Request to apply to the proxies.
-     */
-    protected final BlockingQueue<Request> incomingQueue;
-
-    /**
-     * outgoing queue to transfer request to appropriate clients.
-     */
-    protected final BlockingQueue<Request> outgoingQueue;
+    protected final HashMap<JID, Jupiter> proxies = new HashMap<JID, Jupiter>();
 
     protected final IPath editor;
-
-    /**
-     * forward outgoing request to activity sequencer;
-     */
-    protected final RequestTransmitter transmitter;
-
-    protected final Serializer serializer;
-
-    /**
-     * this forwarder reads request form the local outgoing queue and transmit
-     * the requests to the global outgoing queue.
-     */
-    class RequestTransmitter {
-
-        private final RequestForwarder rf;
-
-        public RequestTransmitter(RequestForwarder forw) {
-            this.rf = forw;
-        }
-
-        public void start() {
-            Util.runSafeAsync("JupiterDocumentServer-" + editor.lastSegment()
-                + "-", logger, new Runnable() {
-                public void run() {
-                    while (true) {
-                        try {
-                            rf.forwardOutgoingRequest(getNextOutgoingRequest());
-                        } catch (InterruptedException e) {
-                            return;
-                        } catch (RuntimeException e) {
-                            logger.error("Failed to forward request: ", e);
-                        }
-
-                    }
-                }
-            });
-        }
-    }
 
     /**
      * this constructor init an external request forwarder. The generate answer
      * request of the proxy clients forwarding to this forwarder.
      */
-    public JupiterDocumentServer(RequestForwarder forwarder, IPath path) {
+    public JupiterDocumentServer(IPath path) {
         this.editor = path;
-        this.proxies = new HashMap<JID, JupiterClient>();
-        this.incomingQueue = new LinkedBlockingQueue<Request>();
-        this.outgoingQueue = new LinkedBlockingQueue<Request>();
-
-        this.serializer = new Serializer(this);
-        this.transmitter = new RequestTransmitter(forwarder);
-
-        this.transmitter.start();
-        this.serializer.start();
     }
 
     public void addProxyClient(JID jid) {
-        this.proxies.put(jid, new ProxyJupiterDocument(jid, this, editor));
+        this.proxies.put(jid, new Jupiter(false));
     }
 
     /**
@@ -112,21 +51,36 @@ public class JupiterDocumentServer implements JupiterServer {
         this.proxies.remove(jid);
     }
 
-    /**
-     * add request from transmitter to request queue.
-     * 
-     * TODO: Sync with serializer.
-     */
-    public void addRequest(Request request) {
-        this.incomingQueue.add(request);
-    }
+    public Map<JID, Request> transformRequest(Request request)
+        throws TransformationException {
 
-    /**
-     * next message in request queue.
-     */
-    public Request getNextRequestInSynchronizedQueue()
-        throws InterruptedException {
-        return incomingQueue.take();
+        JID source = request.getJID();
+
+        Map<JID, Request> result = new HashMap<JID, Request>();
+
+        // 1. Use JupiterClient of sender to transform request
+        Jupiter sourceProxy = proxies.get(source);
+        Operation op = sourceProxy.receiveRequest(request);
+
+        // 2. Generate outgoing requests for all other clients and the host
+        for (Map.Entry<JID, Jupiter> entry : proxies.entrySet()) {
+
+            JID jid = entry.getKey();
+
+            // Skip sender
+            if (jid.equals(source))
+                continue;
+
+            Jupiter remoteProxy = entry.getValue();
+
+            Request transformed = remoteProxy.generateRequest(op);
+            transformed.setEditorPath(editor);
+            transformed.setJID(source);
+
+            result.put(jid, transformed);
+        }
+
+        return result;
     }
 
     /*
@@ -135,24 +89,8 @@ public class JupiterDocumentServer implements JupiterServer {
      * Was Passiert, wenn während der Bearbeitung ein neuer proxy eingefügt
      * wird?
      */
-    public HashMap<JID, JupiterClient> getProxies() {
+    public HashMap<JID, Jupiter> getProxies() {
         return this.proxies;
-    }
-
-    /* start transfer section. */
-
-    /**
-     * Called from Proxies when they want to add generated request to outgoing queue.
-     */
-    public void forwardOutgoingRequest(Request req) {
-        this.outgoingQueue.add(req);
-    }
-
-    /**
-     * transmitter interface get next request for transfer.
-     */
-    public Request getNextOutgoingRequest() throws InterruptedException {
-        return outgoingQueue.take();
     }
 
     public boolean isExist(JID jid) {
@@ -163,7 +101,7 @@ public class JupiterDocumentServer implements JupiterServer {
     }
 
     public void updateVectorTime(JID source, JID dest) {
-        JupiterClient proxy = this.proxies.get(source);
+        Jupiter proxy = this.proxies.get(source);
         if (proxy != null) {
             try {
                 Timestamp ts = proxy.getTimestamp();
@@ -180,9 +118,4 @@ public class JupiterDocumentServer implements JupiterServer {
         }
 
     }
-
-    public void transformationErrorOccured() {
-        forwardOutgoingRequest(new RequestError(this.editor));
-    }
-
 }

@@ -17,6 +17,8 @@ public class RequestError implements Request {
 
     private IPath path;
 
+    private JID jid;
+
     public RequestError(IPath path) {
         this.path = path;
     }
@@ -28,8 +30,7 @@ public class RequestError implements Request {
     }
 
     public JID getJID() {
-
-        return null;
+        return jid;
     }
 
     public Operation getOperation() {
@@ -52,7 +53,7 @@ public class RequestError implements Request {
     }
 
     public void setJID(JID jid) {
-        // JID is always returned as null
+        this.jid = jid;
     }
 
 }

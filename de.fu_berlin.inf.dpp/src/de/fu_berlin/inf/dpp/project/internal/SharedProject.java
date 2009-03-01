@@ -67,6 +67,8 @@ import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
+import de.fu_berlin.inf.dpp.util.Pair;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class SharedProject implements ISharedProject {
     private static Logger log = Logger.getLogger(SharedProject.class.getName());
@@ -381,21 +383,24 @@ public class SharedProject implements ISharedProject {
         stopped = false;
 
         /* 2. start thread for sending jupiter requests. */
-        this.requestTransmitter = new Thread(new Runnable() {
+        this.requestTransmitter = new Thread(Util.wrapSafe(log, new Runnable() {
             /**
              * @review runSafe OK
              */
             public void run() {
-                try {
-                    while (!stopped && !Thread.interrupted()) {
-                        sendRequest();
+                while (!stopped && !Thread.interrupted()) {
+                    Pair<JID, Request> toSend;
+                    try {
+                        toSend = activitySequencer.getNextOutgoingRequest();
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        return;
                     }
-                } catch (RuntimeException e) {
-                    log.error(
-                        "Internal error in SharedProject Dispatch Thread: ", e);
+                    transmitter.sendJupiterRequest(SharedProject.this,
+                        toSend.v, toSend.p);
                 }
             }
-        });
+        }));
         this.requestTransmitter.start();
     }
 
@@ -564,34 +569,6 @@ public class SharedProject implements ISharedProject {
             }
         });
 
-    }
-
-    public void sendRequest() {
-
-        Request request;
-        try {
-            request = this.activitySequencer.getNextOutgoingRequest();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return;
-        }
-
-        // FIXME Check if possible to clean this up
-
-        if (isHost()) {
-            if (request.getJID().equals(this.host.getJID())) {
-                log.debug("Execute locally: " + request);
-                getConcurrentDocumentManager().receiveRequest(request);
-            } else {
-                log.debug("Send request to client: " + request);
-                this.transmitter.sendJupiterRequest(this, request, request
-                    .getJID());
-            }
-        } else {
-            log.debug("Send request to host : " + request);
-            this.transmitter.sendJupiterRequest(this, request, this.host
-                .getJID());
-        }
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
