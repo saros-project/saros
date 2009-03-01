@@ -82,6 +82,9 @@ public class ConsistencyWatchdogHandler {
         }
     }
 
+    /**
+     * @host This is only called on the host
+     */
     private void finishConsistencyCheck(JID from, IPath path,
         boolean wasReadOnly) {
 
@@ -93,7 +96,7 @@ public class ConsistencyWatchdogHandler {
 
         // Reset jupiter
         Saros.getDefault().getSessionManager().getSharedProject()
-            .getConcurrentDocumentManager().resetJupiterDocument(path);
+            .getConcurrentDocumentManager().resetJupiterServer(from, path);
 
         // Send the file to client
         try {

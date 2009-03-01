@@ -27,19 +27,18 @@ import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
-public class ConsistencyAction extends Action implements ISessionListener {
+public class ConsistencyAction extends Action {
 
     private static Logger log = Logger.getLogger(ConsistencyAction.class);
 
@@ -62,7 +61,34 @@ public class ConsistencyAction extends Action implements ISessionListener {
         } else
             setEnabled(false);
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+            new AbstractSessionListener() {
+                @Override
+                public void sessionStarted(ISharedProject session) {
+
+                    paths = new CopyOnWriteArraySet<IPath>();
+                    if (proxy != null) {
+                        proxy.remove(listener);
+                    }
+
+                    proxy = session.getConcurrentDocumentManager()
+                        .getConsistencyToResolve();
+                    proxy.add(listener);
+                }
+
+                @Override
+                public void sessionEnded(ISharedProject session) {
+
+                    if (paths != null) {
+                        paths.clear();
+                    }
+
+                    if (proxy != null) {
+                        proxy.remove(listener);
+                        proxy = null;
+                    }
+                }
+            });
     }
 
     ObservableValue<Boolean> proxy;
@@ -140,64 +166,74 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
             ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
+
+            // Project might have ended in between
             if (project == null)
                 return false;
 
             IFile file = project.getProject().getFile(path);
 
             if (log.isDebugEnabled()) {
-                try {
-                    // save input in a byte[] for later
-                    byte[] inputBytes = IOUtils.toByteArray(input);
-
-                    // reset input
-                    input = new ByteArrayInputStream(inputBytes);
-
-                    // get stream from old file
-                    InputStream oldStream = file.getContents();
-                    InputStream newStream = new ByteArrayInputStream(inputBytes);
-
-                    // read Lines from
-                    Object[] oldContent = IOUtils.readLines(oldStream)
-                        .toArray();
-                    Object[] newContent = IOUtils.readLines(newStream)
-                        .toArray();
-
-                    // Calculate diff of the two files
-                    Diff diff = new Diff(oldContent, newContent);
-                    Diff.Change script = diff.diff_2(false);
-
-                    // log diff
-                    DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
-                        oldContent, newContent);
-                    Writer writer = new StringWriter();
-                    print.setOutput(writer);
-                    print.print_script(script);
-
-                    String diffAsString = writer.toString();
-
-                    if (diffAsString == null
-                        || diffAsString.trim().length() == 0) {
-                        log.error("No inconsistency found in file ["
-                            + from.getName() + "] " + path.toString());
-                    } else {
-                        log.debug("Diff of inconsistency: \n" + writer);
-                    }
-                } catch (CoreException e) {
-                    log.error("Can't read file content", e);
-                } catch (IOException e) {
-                    log.error("Can't convert file content to String", e);
-                }
+                input = logDiff(log, from, path, input, file);
             }
 
             FileUtil.writeFile(input, file);
 
-            Saros.getDefault().getSessionManager().getSharedProject()
-                .getConcurrentDocumentManager().checkConsistency();
+            // The file contents has been replaced, now reset Jupiter
+            project.getConcurrentDocumentManager().resetJupiterClient(path);
+
+            // Trigger a new consistency check, so we don't have to wait for new
+            // checksums from the host
+            project.getConcurrentDocumentManager().checkConsistency();
 
             return true;
         }
+
     };
+
+    public static InputStream logDiff(Logger log, JID from, Path path,
+        InputStream input, IFile file) {
+        try {
+            // save input in a byte[] for later
+            byte[] inputBytes = IOUtils.toByteArray(input);
+
+            // reset input
+            input = new ByteArrayInputStream(inputBytes);
+
+            // get stream from old file
+            InputStream oldStream = file.getContents();
+            InputStream newStream = new ByteArrayInputStream(inputBytes);
+
+            // read Lines from
+            Object[] oldContent = IOUtils.readLines(oldStream).toArray();
+            Object[] newContent = IOUtils.readLines(newStream).toArray();
+
+            // Calculate diff of the two files
+            Diff diff = new Diff(oldContent, newContent);
+            Diff.Change script = diff.diff_2(false);
+
+            // log diff
+            DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
+                oldContent, newContent);
+            Writer writer = new StringWriter();
+            print.setOutput(writer);
+            print.print_script(script);
+
+            String diffAsString = writer.toString();
+
+            if (diffAsString == null || diffAsString.trim().length() == 0) {
+                log.error("No inconsistency found in file [" + from.getName()
+                    + "] " + path.toString());
+            } else {
+                log.debug("Diff of inconsistency: \n" + writer);
+            }
+        } catch (CoreException e) {
+            log.error("Can't read file content", e);
+        } catch (IOException e) {
+            log.error("Can't convert file content to String", e);
+        }
+        return input;
+    }
 
     public void setChecksumErrorHandling(boolean newState) {
 
@@ -288,35 +324,6 @@ public class ConsistencyAction extends Action implements ISessionListener {
 
         return !monitor.isCanceled();
 
-    }
-
-    public void sessionStarted(ISharedProject session) {
-
-        paths = new CopyOnWriteArraySet<IPath>();
-        if (proxy != null) {
-            proxy.remove(listener);
-        }
-
-        proxy = Saros.getDefault().getSessionManager().getSharedProject()
-            .getConcurrentDocumentManager().getConsistencyToResolve();
-
-        proxy.add(listener);
-    }
-
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // ignore
-    }
-
-    public void sessionEnded(ISharedProject session) {
-
-        if (paths != null) {
-            paths.clear();
-        }
-
-        if (proxy != null) {
-            proxy.remove(listener);
-            proxy = null;
-        }
     }
 
 }

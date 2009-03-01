@@ -651,47 +651,58 @@ public class ConcurrentDocumentManager {
     }
 
     /**
-     * reset jupiter document server component.
+     * Resets the JupiterServer for the given combination and path and user.
      * 
-     * @host and @client It can be called from the client as well, but is not
-     *       called anywhere at the moment.
+     * When this is called on the host, a call to resetJupiterClient should be
+     * executed at the same time on the side of the given user.
+     * 
+     * @host
      */
-    public void resetJupiterDocument(IPath path) {
+    public void resetJupiterServer(JID jid, IPath path) {
 
-        if (isHostSide()) {
+        assert isHostSide();
 
-            if (this.concurrentDocuments.containsKey(path)) {
-                logger.debug("Resetting jupiter server...");
+        if (this.concurrentDocuments.containsKey(path)) {
+            logger.debug("Resetting jupiter server...");
 
-                JupiterDocumentServer oldServer = this.concurrentDocuments
-                    .remove(path);
+            JupiterDocumentServer server = this.concurrentDocuments
+                .remove(path);
 
-                JupiterDocumentServer newServer = initDocumentServer(path);
-
-                for (JID jid : oldServer.getProxies().keySet()) {
-                    if (!newServer.isExist(jid)) {
-                        newServer.addProxyClient(jid);
-                    }
-                }
-
-                this.concurrentDocuments.put(path, newServer);
-
+            if (server.isExist(jid)) {
+                server.removeProxyClient(jid);
+                server.addProxyClient(jid);
             } else {
-                ConcurrentDocumentManager.logger
-                    .error("No jupter document exists for " + path.toOSString());
+                logger.warn("No Jupiter server for user [" + jid.getBase()
+                    + "]: " + path.toOSString());
             }
-        }
 
-        // reset client documents
+        } else {
+            logger.warn("No Jupiter server for path: " + path.toOSString());
+        }
+    }
+
+    /**
+     * Resets the JupiterClient for the given path.
+     * 
+     * When this is called on the client (or on the host for one of his
+     * JupiterClient), a call to resetJupiterServer should be executed at the
+     * same time on the side of the host.
+     * 
+     * @client and @host This can be called on the host as well, if the host
+     *         wants to reset his client document (which at the moment never
+     *         happens, because the version of the host is the authoritative one
+     *         and thus does not need to be reset).
+     */
+    public void resetJupiterClient(IPath path) {
         if (this.clientDocs.containsKey(path)) {
+            logger.debug("Resetting jupiter server...");
+
             this.clientDocs.remove(path);
-            ConcurrentDocumentManager.logger.debug("Reset jupiter client doc: "
-                + this.myJID);
         } else {
             ConcurrentDocumentManager.logger
-                .error("No Jupiter document exists for " + path.toOSString());
+                .warn("No Jupiter document exists for path: "
+                    + path.toOSString());
         }
-
     }
 
     ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
