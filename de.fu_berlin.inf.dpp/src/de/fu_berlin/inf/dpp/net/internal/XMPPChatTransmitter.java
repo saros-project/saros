@@ -263,7 +263,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     /**
      * A simple struct that is used to queue message transfers.
      */
-    private class MessageTransfer {
+    private static class MessageTransfer {
         public JID receipient;
         public PacketExtension packetextension;
     }
@@ -359,8 +359,13 @@ public class XMPPChatTransmitter implements ITransmitter,
             if (activity instanceof TextEditActivity) {
                 log.debug("sendActivities: " + activity);
                 TextEditActivity textEditActivity = (TextEditActivity) activity;
-                textEditActivity.setSource(Saros.getDefault().getMyJID()
-                    .toString());
+
+                if (textEditActivity.getSource() == null) {
+                    log.warn("TextEditActivities does not have a source: "
+                        + textEditActivity);
+                    textEditActivity.setSource(Saros.getDefault().getMyJID()
+                        .toString());
+                }
             }
 
             if (activity instanceof FileActivity) {
