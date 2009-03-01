@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
@@ -612,7 +613,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             TextEditActivity activity = new TextEditActivity(offset, text,
-                replacedText, path);
+                replacedText, path, Saros.getDefault().getMyJID().toString());
             /*
              * Check if this activity was executed by another driver recently.
              */
@@ -1023,10 +1024,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         } else if (activity instanceof TextEditActivity) {
             TextEditActivity textEditActivity = (TextEditActivity) activity;
-            return "<edit " + "path=\"" + textEditActivity.getEditor() + "\" "
-                + "offset=\"" + textEditActivity.offset + "\" " + "replace=\""
-                + textEditActivity.replacedText + "\">" + "<![CDATA["
-                + textEditActivity.text + "]]>" + "</edit>";
+
+            return String
+                .format(
+                    "<edit path=\"%s\" offset=\"%d\" replace=\"%s\" text=\"%s\" source=\"%s\"/>",
+                    textEditActivity.getEditor(), textEditActivity.offset,
+                    StringEscapeUtils.escapeXml(textEditActivity.replacedText),
+                    StringEscapeUtils.escapeXml(textEditActivity.text),
+                    textEditActivity.getSource());
 
         } else if (activity instanceof TextSelectionActivity) {
             TextSelectionActivity textSelection = (TextSelectionActivity) activity;
@@ -1056,18 +1061,18 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // extract current editor for text edit.
         String pathString = parser.getAttributeValue(null, "path");
-        Path path = pathString.equals("null") ? null : new Path(pathString);
 
+        assert pathString != null;
+
+        Path path = new Path(pathString);
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
+        String replace = StringEscapeUtils.unescapeXml(parser
+            .getAttributeValue(null, "replace"));
+        String text = StringEscapeUtils.unescapeXml(parser.getAttributeValue(
+            null, "text"));
+        String source = parser.getAttributeValue(null, "source");
 
-        String replace = parser.getAttributeValue(null, "replace");
-
-        String text = "";
-        if (parser.next() == XmlPullParser.TEXT) {
-            text = parser.getText();
-        }
-
-        return new TextEditActivity(offset, text, replace, path);
+        return new TextEditActivity(offset, text, replace, path, source);
     }
 
     private IActivity parseEditorActivity(XmlPullParser parser) {
