@@ -38,12 +38,11 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterClient;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentClient;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
@@ -76,7 +75,7 @@ public class ConcurrentDocumentManager {
     private HashMap<IPath, JupiterDocumentServer> concurrentDocuments;
 
     /** current open editor at client side. */
-    private final HashMap<IPath, JupiterDocumentClient> clientDocs = new HashMap<IPath, JupiterDocumentClient>();
+    private final HashMap<IPath, Jupiter> clientDocs = new HashMap<IPath, Jupiter>();
 
     private final JID host;
 
@@ -368,8 +367,10 @@ public class ConcurrentDocumentManager {
 
             TextEditActivity textEdit = (TextEditActivity) activity;
 
-            JupiterDocumentClient document = getClientDoc(textEdit.getEditor());
+            Jupiter document = getClientDoc(textEdit.getEditor());
             Request request = document.generateRequest(textEdit.toOperation());
+            request.setJID(myJID);
+            request.setEditorPath(textEdit.getEditor());
 
             if (isHostSide()) {
                 // Skip network and apply directly...
@@ -407,8 +408,7 @@ public class ConcurrentDocumentManager {
     // TODO CJ: review
     private void execTextEditActivity(final Request request) {
 
-        final JupiterDocumentClient jupiterClient = getClientDoc(request
-            .getEditorPath());
+        final Jupiter jupiterClient = getClientDoc(request.getEditorPath());
 
         Util.runSafeSWTSync(logger, new Runnable() {
             public void run() {
@@ -473,7 +473,7 @@ public class ConcurrentDocumentManager {
                                 /* get vector time of host for this editor path. */
                                 try {
 
-                                    JupiterClient jupC = this.clientDocs
+                                    Jupiter jupC = this.clientDocs
                                         .get(editorActivity.getPath());
                                     if (jupC != null) {
                                         Timestamp ts = jupC.getTimestamp();
@@ -615,13 +615,12 @@ public class ConcurrentDocumentManager {
         }
     }
 
-    public JupiterDocumentClient getClientDoc(IPath path) {
+    public Jupiter getClientDoc(IPath path) {
 
         if (this.clientDocs.containsKey(path)) {
             return this.clientDocs.get(path);
         } else {
-            JupiterDocumentClient client = new JupiterDocumentClient(
-                this.myJID, path);
+            Jupiter client = new Jupiter(true);
             this.clientDocs.put(path, client);
             return client;
         }
@@ -631,7 +630,7 @@ public class ConcurrentDocumentManager {
 
         if (request.getOperation() instanceof TimestampOperation) {
 
-            JupiterClient jupClient = getClientDoc(request.getEditorPath());
+            Jupiter jupClient = getClientDoc(request.getEditorPath());
 
             try {
                 jupClient.updateVectorTime(request.getTimestamp());
@@ -686,8 +685,6 @@ public class ConcurrentDocumentManager {
         // reset client documents
         if (this.clientDocs.containsKey(path)) {
             this.clientDocs.remove(path);
-            this.clientDocs.put(path, new JupiterDocumentClient(this.myJID,
-                path));
             ConcurrentDocumentManager.logger.debug("Reset jupiter client doc: "
                 + this.myJID);
         } else {
