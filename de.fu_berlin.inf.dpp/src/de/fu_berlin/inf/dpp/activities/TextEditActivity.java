@@ -60,38 +60,25 @@ public class TextEditActivity extends AbstractActivity {
      *            the text that was replaced by this activity.
      * @param editor
      *            path of the editor where this activity happened.
-     */
-    public TextEditActivity(int offset, String text, String replacedText,
-        IPath editor) {
-        if (text == null)
-            throw new IllegalArgumentException("Text cannot be null");
-        if (replacedText == null)
-            throw new IllegalArgumentException("ReplacedText cannot be null");
-        if (editor == null)
-            throw new IllegalArgumentException("IPath cannot be null");
-
-        this.offset = offset;
-        this.text = text;
-        this.replacedText = replacedText;
-        this.editor = editor;
-    }
-
-    /**
-     * @param offset
-     *            the offset inside the document where this activity happened.
-     * @param text
-     *            the text that was inserted.
-     * @param replacedText
-     *            the text that was replaced by this activity.
-     * @param editor
-     *            path of the editor where this activity happened.
      * @param source
      *            JID as String of the user that caused this activity
      */
     public TextEditActivity(int offset, String text, String replacedText,
         IPath editor, String source) {
-        this(offset, text, replacedText, editor);
-        setSource(source);
+        if (text == null)
+            throw new IllegalArgumentException("Text cannot be null");
+        if (replacedText == null)
+            throw new IllegalArgumentException("ReplacedText cannot be null");
+        if (editor == null)
+            throw new IllegalArgumentException("Editor cannot be null");
+        if (source == null)
+            throw new IllegalArgumentException("Source cannot be null");
+
+        this.offset = offset;
+        this.text = text;
+        this.replacedText = replacedText;
+        this.editor = editor;
+        this.source = source;
     }
 
     @Override
