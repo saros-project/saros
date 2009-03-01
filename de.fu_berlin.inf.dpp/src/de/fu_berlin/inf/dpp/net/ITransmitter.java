@@ -254,7 +254,6 @@ public interface ITransmitter {
      * @param jid
      *            the recipient of the request.
      */
-    // TODO Is "Jupiter" in the name really necessary?
     public void sendJupiterRequest(ISharedProject sharedProject,
         Request request, JID jid);
 
