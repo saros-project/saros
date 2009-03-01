@@ -573,7 +573,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
             for (IActivityProvider exec : this.providers) {
                 exec.exec(activity);
             }
-            /* send activity to all observer. */
+
+            /*
+             * FIXME The following will send the activities to everybody, so all
+             * drivers will receive the message twice!
+             */
+
+            // send activity to everybody
             if (this.concurrentManager.isHostSide()) {
                 logger.debug("send transformed activity: " + activity);
                 this.activities.add(activity);
