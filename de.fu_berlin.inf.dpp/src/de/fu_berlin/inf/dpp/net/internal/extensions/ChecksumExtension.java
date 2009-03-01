@@ -9,6 +9,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -18,6 +20,12 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
+
+    @Override
+    public PacketFilter getFilter() {
+        return new AndFilter(super.getFilter(), PacketExtensions
+            .getInSessionFilter());
+    }
 
     public ChecksumExtension() {
         super("DocChecksum");
