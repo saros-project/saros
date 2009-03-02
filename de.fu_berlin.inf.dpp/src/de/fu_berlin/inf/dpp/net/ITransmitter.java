@@ -270,10 +270,14 @@ public interface ITransmitter {
     /**
      * Sends the checksum of all concurrent documents to all clients.
      * 
+     * If the XMPP connection is closed this method will fail silently.
+     * 
      * @param to
      *            the recipient
      * @param collection
      *            the checksums
+     * 
+     * @host This method should only be called on the host.
      */
     public void sendDocChecksumsToClients(
         Collection<DocumentChecksum> collection);

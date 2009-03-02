@@ -476,7 +476,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         Collection<User> participants = Saros.getDefault().getSessionManager()
             .getSharedProject().getParticipants();
 
-        XMPPChatTransmitter.log.debug("Sending checksum error message of file "
+        XMPPChatTransmitter.log.debug("Sending checksum "
+            + (resolved ? "resolved" : "error") + " message of file "
             + path.lastSegment() + " to all");
         for (User user : participants) {
             sendMessage(user.getJID(), ChecksumErrorExtension.getDefault()
@@ -484,11 +485,11 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    /**
-     * 
-     * @see de.fu_berlin.inf.dpp.net.ITransmitter
-     */
     public void sendDocChecksumsToClients(Collection<DocumentChecksum> checksums) {
+
+        if (!connection.isConnected())
+            return;
+
         // send checksums to all clients
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
