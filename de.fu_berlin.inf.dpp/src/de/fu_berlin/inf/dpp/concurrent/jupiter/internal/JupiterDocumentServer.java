@@ -54,9 +54,9 @@ public class JupiterDocumentServer {
     public Map<JID, Request> transformRequest(Request request)
         throws TransformationException {
 
-        JID source = request.getJID();
-
         Map<JID, Request> result = new HashMap<JID, Request>();
+
+        JID source = request.getJID();
 
         // 1. Use JupiterClient of sender to transform request
         Jupiter sourceProxy = proxies.get(source);
