@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
@@ -1025,13 +1024,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         } else if (activity instanceof TextEditActivity) {
             TextEditActivity textEditActivity = (TextEditActivity) activity;
 
-            return String
+            String result = String
                 .format(
-                    "<edit path=\"%s\" offset=\"%d\" replace=\"%s\" text=\"%s\" source=\"%s\"/>",
+                    "<edit path=\"%s\" offset=\"%d\" source=\"%s\"><text>%s</text><replace>%s</replace></edit>",
                     textEditActivity.getEditor(), textEditActivity.offset,
-                    StringEscapeUtils.escapeXml(textEditActivity.replacedText),
-                    StringEscapeUtils.escapeXml(textEditActivity.text),
-                    textEditActivity.getSource());
+                    textEditActivity.getSource(), Util
+                        .escapeCDATA(textEditActivity.text), Util
+                        .escapeCDATA(textEditActivity.replacedText));
+            log.error("Escaped: " + result);
+            return result;
 
         } else if (activity instanceof TextSelectionActivity) {
             TextSelectionActivity textSelection = (TextSelectionActivity) activity;
@@ -1056,6 +1057,27 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return null;
     }
 
+    /**
+     * This was an attempt to do some CDATA escaping
+     * 
+     * <code>
+    String text = "";
+    if (parser.next() == XmlPullParser.START_TAG) {
+        if (parser.next() == XmlPullParser.TEXT) {
+            text = parser.getText();
+            parser.next(); // close tag
+        }
+    }
+
+    String replace = "";
+    if (parser.next() == XmlPullParser.START_TAG) {
+        if (parser.next() == XmlPullParser.TEXT) {
+            replace = parser.getText();
+            parser.next(); // close tag
+        }
+    }
+    </code>
+     */
     private IActivity parseTextEditActivity(XmlPullParser parser)
         throws XmlPullParserException, IOException {
 
@@ -1066,12 +1088,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         Path path = new Path(pathString);
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-        String replace = StringEscapeUtils.unescapeXml(parser
-            .getAttributeValue(null, "replace"));
-        String text = StringEscapeUtils.unescapeXml(parser.getAttributeValue(
-            null, "text"));
         String source = parser.getAttributeValue(null, "source");
+        String text = "";
+        if (parser.next() == XmlPullParser.START_TAG) {
+            if (parser.next() == XmlPullParser.TEXT) {
+                text = parser.getText();
+                parser.next(); // close tag
+            }
+        }
 
+        String replace = "";
+        if (parser.next() == XmlPullParser.START_TAG) {
+            if (parser.next() == XmlPullParser.TEXT) {
+                replace = parser.getText();
+                parser.next(); // close tag
+            }
+        }
         return new TextEditActivity(offset, text, replace, path, source);
     }
 
@@ -1399,6 +1431,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 if (typeAnnotation != null && !typeAnnotation.equals(type)) {
                     continue;
                 }
+
+                if (!(annotation instanceof SarosAnnotation))
+                    continue;
 
                 SarosAnnotation sarosAnnotation = (SarosAnnotation) annotation;
                 if (forUserID == null
