@@ -242,7 +242,14 @@ public class XMPPChatTransmitter implements ITransmitter,
             for (TimedActivity timedActivity : timedActivities) {
 
                 IActivity activity = timedActivity.getActivity();
-                activity.setSource(source);
+
+                /*
+                 * Some activities save space in the message by not setting the
+                 * source
+                 */
+                if (activity.getSource() == null) {
+                    activity.setSource(source);
+                }
 
                 /*
                  * incoming fileActivities that add files are only used as
