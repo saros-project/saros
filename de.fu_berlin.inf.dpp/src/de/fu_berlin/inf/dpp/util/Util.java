@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -29,6 +30,61 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class Util {
+
+    public static String escapeBase64(String toEscape) {
+
+        byte[] toEncode;
+        try {
+            toEncode = toEscape.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            toEncode = toEscape.getBytes();
+        }
+
+        byte[] encoded = Base64.encodeBase64(toEncode);
+
+        try {
+            return new String(encoded, "UTF-8");
+        } catch (UnsupportedEncodingException e1) {
+            return new String(encoded);
+        }
+    }
+
+    public static String unescapeBase64(String toUnescape) {
+
+        byte[] toDecode;
+        try {
+            toDecode = toUnescape.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            toDecode = toUnescape.getBytes();
+        }
+
+        byte[] decoded = Base64.decodeBase64(toDecode);
+
+        try {
+            return new String(decoded, "UTF-8");
+        } catch (UnsupportedEncodingException e1) {
+            return new String(decoded);
+        }
+    }
+
+    public static String escapeCDATA(String toEscape) {
+        if (toEscape == null || toEscape.length() == 0) {
+            return "";
+        } else {
+            // HACK otherwise there are problems which I don't understand...
+            if (toEscape.endsWith("]")) {
+                return escapeCDATA(toEscape.substring(0, toEscape.length() - 1))
+                    + "]";
+            }
+            if (!toEscape.endsWith("]]>") && toEscape.endsWith("]>")) {
+                return escapeCDATA(toEscape.substring(0, toEscape.length() - 2))
+                    + "]&gt;";
+            }
+
+            return "<![CDATA[" + toEscape.replaceAll("]]>", "]]]><![CDATA[]>")
+                + "]]>";
+        }
+    }
 
     /**
      * Obtain a free port we can use.
