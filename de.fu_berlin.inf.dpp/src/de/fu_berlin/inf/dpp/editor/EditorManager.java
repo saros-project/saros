@@ -1031,7 +1031,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     textEditActivity.getSource(), Util
                         .escapeCDATA(textEditActivity.text), Util
                         .escapeCDATA(textEditActivity.replacedText));
-            log.error("Escaped: " + result);
             return result;
 
         } else if (activity instanceof TextSelectionActivity) {
