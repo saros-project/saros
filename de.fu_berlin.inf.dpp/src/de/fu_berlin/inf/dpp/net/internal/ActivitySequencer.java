@@ -113,10 +113,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
         try {
             if (activity instanceof EditorActivity) {
-                this.concurrentManager.exec(activity);
+                this.concurrentManager.execEditorActivity(activity);
             }
             if (activity instanceof FileActivity) {
-                this.concurrentManager.exec(activity);
+                this.concurrentManager.execFileActivity(activity);
             }
             if (activity instanceof FolderActivity) {
                 // TODO
@@ -127,39 +127,30 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
         Util.runSafeSWTSync(logger, new Runnable() {
             public void run() {
+
                 if (activity instanceof TextEditActivity) {
+                    if (concurrentManager.isHostSide())
+                        return;
 
-                    /*
-                     * check if document is already managed by jupiter
-                     * mechanism.
-                     */
-                    if (!concurrentManager.isHostSide()
-                        && (concurrentManager.exec(activity) != null)) {
-                        // CLIENT SIDE
-                        logger
-                            .debug("Execute received activity (without jupiter): "
-                                + activity);
-                        for (IActivityProvider executor : ActivitySequencer.this.providers) {
-                            executor.exec(activity);
-                        }
-                    }
-                } else {
-
-                    // Execute all other activities
-                    for (IActivityProvider executor : ActivitySequencer.this.providers) {
-                        executor.exec(activity);
-                    }
-
-                    // TODO CO Checksums are not used at the moment, aren't
-                    // they?
-                    // Check for file checksum after incoming save file
-                    // activity.
-                    if ((activity instanceof EditorActivity)
-                        && (((EditorActivity) activity).getType() == EditorActivity.Type.Saved)) {
-                        checkSavedFile((EditorActivity) activity);
-                    }
-
+                    if (concurrentManager.isManagedByJupiter(activity))
+                        return;
                 }
+
+                // Execute all other activities
+                for (IActivityProvider executor : ActivitySequencer.this.providers) {
+                    executor.exec(activity);
+                }
+
+                /*
+                 * TODO CO Checksums are not used at the moment, aren't they?
+                 */
+                // // Check for file checksum after incoming save file
+                // // activity.
+                // if ((activity instanceof EditorActivity)
+                // && (((EditorActivity) activity).getType() ==
+                // EditorActivity.Type.Saved)) {
+                // checkSavedFile((EditorActivity) activity);
+                // }
             }
         });
 
