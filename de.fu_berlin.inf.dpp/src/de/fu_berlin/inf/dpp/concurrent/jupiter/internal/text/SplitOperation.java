@@ -25,9 +25,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * The SplitOperation contains two operations. It is used when an operation
@@ -158,43 +162,43 @@ public class SplitOperation implements Operation {
             result.addAll(first);
             result.addAll(second);
 
-            // // FIXME: is this really necessary?
-            // if (result.size() <= 1)
-            // return result;
-            //
-            // if (result.size() == 2) {
-            //
-            // // TODO Somehow delete operations need to be shifted, don't know
-            // // why
-            // TextEditActivity op1 = result.get(0);
-            // TextEditActivity op2 = result.get(1);
-            //
-            // if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
-            // && (op2.replacedText.length() > 0)
-            // && (op2.text.length() == 0)) {
-            //
-            // log.warn("Split operation shifts second delete operation:"
-            // + this);
-            // Saros.getDefault().getLog().log(
-            // new Status(IStatus.WARNING, Saros.SAROS, IStatus.OK,
-            // "Split operation shifts second delete operation:"
-            // + this, new StackTrace()));
-            //
-            // result.set(1, new TextEditActivity(op2.offset
-            // - op1.replacedText.length(), "", op2.replacedText,
-            // path, source));
-            // }
-            // return result;
-            // }
-            //
-            // if (result.size() > 2) {
-            // log.warn("SplitOperation larger than expected: " + this,
-            // new StackTrace());
-            // Saros.getDefault().getLog().log(
-            // new Status(IStatus.WARNING, Saros.SAROS, IStatus.OK,
-            // "SplitOperation larger than expected: " + this,
-            // new StackTrace()));
-            // }
+            // FIXME: is this really necessary?
+            if (result.size() <= 1)
+                return result;
+
+            if (result.size() == 2) {
+
+                // TODO Somehow delete operations need to be shifted, don't know
+                // why
+                TextEditActivity op1 = result.get(0);
+                TextEditActivity op2 = result.get(1);
+
+                if ((op1.replacedText.length() > 0) && (op1.text.length() == 0)
+                    && (op2.replacedText.length() > 0)
+                    && (op2.text.length() == 0)) {
+
+                    log.warn("Split operation shifts second delete operation:"
+                        + this);
+                    Saros.getDefault().getLog().log(
+                        new Status(IStatus.WARNING, Saros.SAROS, IStatus.OK,
+                            "Split operation shifts second delete operation:"
+                                + this, new StackTrace()));
+
+                    result.set(1, new TextEditActivity(op2.offset
+                        - op1.replacedText.length(), "", op2.replacedText,
+                        path, source));
+                }
+                return result;
+            }
+
+            if (result.size() > 2) {
+                log.warn("SplitOperation larger than expected: " + this,
+                    new StackTrace());
+                Saros.getDefault().getLog().log(
+                    new Status(IStatus.WARNING, Saros.SAROS, IStatus.OK,
+                        "SplitOperation larger than expected: " + this,
+                        new StackTrace()));
+            }
             return result;
         } catch (RuntimeException e) {
             log.error("Internal error in SplitOperation: " + this, e);
