@@ -1162,13 +1162,19 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IDocument doc = provider.getDocument(input);
 
             // Check if the replaced text is really there.
-            try {
-                assert doc.get(offset, replacedText.length()).equals(
-                    replacedText);
-            } catch (BadLocationException e) {
-                // Ignore, because this is going to fail again just below
-            }
+            if (log.isDebugEnabled()) {
 
+                String is;
+                try {
+                    is = doc.get(offset, replacedText.length());
+                    if (!is.equals(replacedText)) {
+                        log.error("replaceText should be '" + replacedText
+                            + "' is '" + is + "'");
+                    }
+                } catch (BadLocationException e) {
+                    // Ignore, because this is going to fail again just below
+                }
+            }
             // Try to replace
             try {
                 doc.replace(offset, replacedText.length(), text);
