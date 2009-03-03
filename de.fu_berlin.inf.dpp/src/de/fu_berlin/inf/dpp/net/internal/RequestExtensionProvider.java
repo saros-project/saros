@@ -143,6 +143,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         if (parser.getName().equals(RequestPacketExtension.SPLIT_OP)) {
             parser.next(); // Open tag
             Operation op1 = parseOperation(parser);
+            parser.next(); // Advance to next operation
             Operation op2 = parseOperation(parser);
             parser.next(); // Advance to next operation
             return new SplitOperation(op1, op2);
