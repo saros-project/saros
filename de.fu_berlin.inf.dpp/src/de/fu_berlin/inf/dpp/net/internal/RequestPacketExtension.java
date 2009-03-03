@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.util.List;
-import java.util.Vector;
-
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -15,7 +12,11 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
+import de.fu_berlin.inf.dpp.util.Util;
 
+/**
+ * FIXME The way this XML is created is ugly and fragile
+ */
 public class RequestPacketExtension implements PacketExtension {
 
     public static PacketFilter getFilter() {
@@ -88,26 +89,21 @@ public class RequestPacketExtension implements PacketExtension {
             return "";
         }
 
-        StringBuffer buf = new StringBuffer();
-        buf.append("<").append(getElementName());
-        buf.append(" xmlns=\"").append(getNamespace() + "\"");
+        StringBuilder sb = new StringBuilder();
+        sb.append("<").append(getElementName());
+        sb.append(" xmlns=\"").append(getNamespace() + "\"");
+        sb.append(">");
 
-        // buf.append(" xmlns=\"").append(getNamespace()).append("\">");
+        sb.append(sessionIdToXML());
+        sb.append(pathToXML());
+        sb.append(jidToXML());
+        sb.append(sideIDToXML());
+        sb.append(vectorTimeToXML());
+        operationToXML(sb, request.getOperation());
 
-        buf.append(">");
+        sb.append("</").append(getElementName()).append(">");
 
-        buf.append(sessionIdToXML());
-        buf.append(pathToXML());
-        buf.append(jidToXML());
-        buf.append(sideIDToXML());
-        buf.append(vectorTimeToXML());
-        buf.append(operationToXML());
-
-        // buf.append(requestToXML());
-
-        buf.append("</").append(getElementName()).append(">");
-        return buf.toString();
-        // return "<request></request>";
+        return sb.toString();
     }
 
     private String sessionIdToXML() {
@@ -141,67 +137,56 @@ public class RequestPacketExtension implements PacketExtension {
         return xml;
     }
 
-    private String operationToXML() {
-        Operation op = this.request.getOperation();
-        String xml = "";
+    private void operationToXML(StringBuilder sb, Operation op) {
         if (op instanceof InsertOperation) {
-            xml += insertOp(op);
+            insertOp(sb, (InsertOperation) op);
         }
         if (op instanceof DeleteOperation) {
-            xml += deleteOp(op);
+            deleteOp(sb, (DeleteOperation) op);
         }
         if (op instanceof NoOperation) {
-            // NoOperation no = (NoOperation) op;
-            xml += "<" + RequestPacketExtension.NO_OP + "/>";
+            noOp(sb, (NoOperation) op);
         }
         if (op instanceof TimestampOperation) {
-            xml += "<" + RequestPacketExtension.TIMESTAMP_OP + "/>";
+            timestampOp(sb, (TimestampOperation) op);
         }
         if (op instanceof SplitOperation) {
-            SplitOperation split = (SplitOperation) op;
-
-            List<Operation> ops = new Vector<Operation>();
-            ops.add(split.getFirst());
-            ops.add(split.getSecond());
-
-            xml += "<" + RequestPacketExtension.SPLIT_OP + ">";
-            for (Operation o : ops) {
-                if (o instanceof InsertOperation) {
-                    xml += insertOp(o);
-                }
-                if (o instanceof DeleteOperation) {
-                    xml += deleteOp(o);
-                }
-                if (o instanceof NoOperation) {
-                    xml += "<" + RequestPacketExtension.NO_OP + "/>";
-                }
-            }
-            xml += "</" + RequestPacketExtension.SPLIT_OP + ">";
+            splitOp(sb, (SplitOperation) op);
         }
-        return xml;
     }
 
-    private String insertOp(Operation op) {
-        String xml = "";
-        InsertOperation ins = (InsertOperation) op;
-        xml += "<" + RequestPacketExtension.INSERT_OP + " "
+    private void timestampOp(StringBuilder sb, TimestampOperation op) {
+        sb.append("<" + RequestPacketExtension.TIMESTAMP_OP + "/>");
+    }
+
+    private void noOp(StringBuilder sb, NoOperation op) {
+        sb.append("<" + RequestPacketExtension.NO_OP + "/>");
+    }
+
+    private void splitOp(StringBuilder sb, SplitOperation split) {
+        sb.append("<" + RequestPacketExtension.SPLIT_OP + ">");
+        operationToXML(sb, split.getFirst());
+        operationToXML(sb, split.getSecond());
+        sb.append("</" + RequestPacketExtension.SPLIT_OP + ">");
+    }
+
+    private void insertOp(StringBuilder sb, InsertOperation ins) {
+
+        sb.append("<" + RequestPacketExtension.INSERT_OP + " "
             + RequestPacketExtension.POSITION + "=\"" + ins.getPosition()
             + "\"" + " " + RequestPacketExtension.ORIGIN + "=\""
-            + ins.getOrigin() + "\"" + ">";
-        xml += "<![CDATA[" + ins.getText() + "]]>";
-        xml += "</" + RequestPacketExtension.INSERT_OP + ">";
-        return xml;
+            + ins.getOrigin() + "\"" + ">");
+        sb.append(Util.escapeCDATA(ins.getText()));
+        sb.append("</" + RequestPacketExtension.INSERT_OP + ">");
     }
 
-    private String deleteOp(Operation op) {
-        String xml = "";
-        DeleteOperation del = (DeleteOperation) op;
-        xml += "<" + RequestPacketExtension.DELETE_OP + " "
+    private void deleteOp(StringBuilder sb, DeleteOperation del) {
+
+        sb.append("<" + RequestPacketExtension.DELETE_OP + " "
             + RequestPacketExtension.POSITION + "=\"" + del.getPosition()
-            + "\"" + ">";
-        xml += "<![CDATA[" + del.getText() + "]]>";
-        xml += "</" + RequestPacketExtension.DELETE_OP + ">";
-        return xml;
+            + "\"" + ">");
+        sb.append(Util.escapeCDATA(del.getText()));
+        sb.append("</" + RequestPacketExtension.DELETE_OP + ">");
     }
 
     public String getSessionID() {

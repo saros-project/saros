@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Path;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
@@ -20,7 +21,16 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * Class responsible for parsing a Jupiter Request.
+ * 
+ * @author orieger
+ * @author oezbek
+ */
 public class RequestExtensionProvider implements PacketExtensionProvider {
+
+    private static final Logger log = Logger
+        .getLogger(RequestExtensionProvider.class.getName());
 
     public PacketExtension parseExtension(XmlPullParser parser)
         throws XmlPullParserException, IOException {
@@ -30,52 +40,42 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         String path = null;
         String jid = null;
         try {
-            boolean done = false;
-            while (!done) {
-                int eventType = parser.next();
-                if (eventType == XmlPullParser.START_TAG) {
+            int eventType = parser.next();
+            if (eventType == XmlPullParser.START_TAG) {
 
-                    if (parser.getName().equals(RequestPacketExtension.ELEMENT)) {
-                        parser.next();
-                    }
-
-                    if (parser.getName().equals(
-                        RequestPacketExtension.SESSION_ID)) {
-                        sessionID = parseSessionId(parser);
-                        parser.next();
-                    }
-
-                    if (parser.getName().equals(RequestPacketExtension.PATH)) {
-                        path = parsePath(parser);
-                        parser.next();
-                    }
-
-                    if (parser.getName().equals(RequestPacketExtension.JID)) {
-                        jid = parseJID(parser);
-                        parser.next();
-                    }
-
-                    request = parseRequest(parser);
-
-                    request.setEditorPath(new Path(path));
-                    request.setJID(new JID(jid));
-
-                } else if (eventType == XmlPullParser.END_TAG) {
-                    if (parser.getName().equals(RequestPacketExtension.ELEMENT)) {
-                        done = true;
-                    }
+                if (parser.getName().equals(RequestPacketExtension.ELEMENT)) {
+                    parser.next();
                 }
+
+                if (parser.getName().equals(RequestPacketExtension.SESSION_ID)) {
+                    sessionID = parseSessionId(parser);
+                    parser.next();
+                }
+
+                if (parser.getName().equals(RequestPacketExtension.PATH)) {
+                    path = parsePath(parser);
+                    parser.next();
+                }
+
+                if (parser.getName().equals(RequestPacketExtension.JID)) {
+                    jid = parseJID(parser);
+                    parser.next();
+                }
+
+                request = parseRequest(parser);
+                request.setEditorPath(new Path(path));
+                request.setJID(new JID(jid));
             }
         } catch (Exception e) {
-            // System.out.println("Mist");
-            e.printStackTrace();
+            log.error("Internal error while parsing RequestPacket: ", e);
+            return null;
         }
 
+        // TODO Even if we failed???
         return new RequestPacketExtension(sessionID, request);
-        // return null;
     }
 
-    private String parseSessionId(XmlPullParser parser)
+    protected String parseSessionId(XmlPullParser parser)
         throws XmlPullParserException, IOException {
         parser.next(); // read text
         String sessionID = parser.getText();
@@ -84,7 +84,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         return sessionID;
     }
 
-    private String parsePath(XmlPullParser parser)
+    protected String parsePath(XmlPullParser parser)
         throws XmlPullParserException, IOException {
         parser.next(); // read text
         String path = parser.getText();
@@ -93,7 +93,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         return path;
     }
 
-    private String parseJID(XmlPullParser parser)
+    protected String parseJID(XmlPullParser parser)
         throws XmlPullParserException, IOException {
         parser.next(); // read text
         String jid = parser.getText();
@@ -102,7 +102,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         return jid;
     }
 
-    private int parseSideID(XmlPullParser parser)
+    protected int parseSideID(XmlPullParser parser)
         throws XmlPullParserException, IOException {
         parser.next(); // read text
         int id = Integer.parseInt(parser.getText());
@@ -111,12 +111,12 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         return id;
     }
 
-    private Request parseRequest(XmlPullParser parser)
+    protected Request parseRequest(XmlPullParser parser)
         throws XmlPullParserException, IOException {
         // // extract current editor for text edit.
         int id = 0;
         Timestamp timestamp = null;
-        Operation op = null;
+
         if (parser.getName().equals(RequestPacketExtension.SIDE_ID)) {
             id = parseSideID(parser);
             parser.next();
@@ -132,58 +132,43 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
             parser.next();
         }
 
-        // if(parser.getName().equals(RequestPacketExtension.INSERT_OP)){
-        // op = parseInsertOperation(parser);
-        // return new RequestImpl(id,timestamp,op);
-        // }
-        //		
-        // if(parser.getName().equals(RequestPacketExtension.DELETE_OP)){
-        // op = parseDeleteOperation(parser);
-        // return new RequestImpl(id,timestamp,op);
-        // }
-        // if(parser.getName().equals(RequestPacketExtension.NO_OP)){
-        // op = new NoOperation();
-        // return new RequestImpl(id,timestamp,op);
-        // }
-        if (parser.getName().equals(RequestPacketExtension.SPLIT_OP)) {
-            parser.next();
-            Operation op1 = parseSingleOperation(parser);
-            parser.next();
-            parser.next();
-            Operation op2 = parseSingleOperation(parser);
-            op = new SplitOperation(op1, op2);
-            return new RequestImpl(id, timestamp, op);
-        } else {
-            op = parseSingleOperation(parser);
-        }
+        Operation op = parseOperation(parser);
 
-        Request req = new RequestImpl(id, timestamp, op);
-        //		
-        return req;
+        return new RequestImpl(id, timestamp, op);
     }
 
-    private Operation parseSingleOperation(XmlPullParser parser)
+    protected Operation parseOperation(XmlPullParser parser)
         throws XmlPullParserException, IOException {
-        Operation op = null;
+
+        if (parser.getName().equals(RequestPacketExtension.SPLIT_OP)) {
+            parser.next(); // Open tag
+            Operation op1 = parseOperation(parser);
+            Operation op2 = parseOperation(parser);
+            parser.next(); // Advance to next operation
+            return new SplitOperation(op1, op2);
+        }
         if (parser.getName().equals(RequestPacketExtension.INSERT_OP)) {
             return parseInsertOperation(parser);
         }
         if (parser.getName().equals(RequestPacketExtension.DELETE_OP)) {
             return parseDeleteOperation(parser);
-
         }
         if (parser.getName().equals(RequestPacketExtension.NO_OP)) {
+            parser.next();
             return new NoOperation();
         }
         if (parser.getName().equals(RequestPacketExtension.TIMESTAMP_OP)) {
+            parser.next();
             return new TimestampOperation();
         }
-        return op;
+
+        throw new IllegalArgumentException("Unexpected parser token: "
+            + parser.getName());
     }
 
-    private Operation parseInsertOperation(XmlPullParser parser)
+    protected Operation parseInsertOperation(XmlPullParser parser)
         throws XmlPullParserException, IOException {
-        Operation op = null;
+
         int pos = Integer.parseInt(parser.getAttributeValue(null,
             RequestPacketExtension.POSITION));
         int origin = Integer.parseInt(parser.getAttributeValue(null,
@@ -192,42 +177,24 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
             text = parser.getText();
+            assert parser.next() == XmlPullParser.END_TAG; // Close tag
         }
-        op = new InsertOperation(pos, text, origin);
-        return op;
+        parser.next(); // Advance to next operation
+        return new InsertOperation(pos, text, origin);
     }
 
-    private Operation parseDeleteOperation(XmlPullParser parser)
+    protected Operation parseDeleteOperation(XmlPullParser parser)
         throws XmlPullParserException, IOException {
-        Operation op = null;
+
         int pos = Integer.parseInt(parser.getAttributeValue(null,
             RequestPacketExtension.POSITION));
 
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
             text = parser.getText();
+            assert parser.next() == XmlPullParser.END_TAG; // Close tag
         }
-        op = new DeleteOperation(pos, text);
-        return op;
+        parser.next(); // Advance to next operation
+        return new DeleteOperation(pos, text);
     }
-    //	
-    // private IActivity parseTextEditActivity(XmlPullParser parser) throws
-    // XmlPullParserException,
-    // IOException {
-    //	
-    // // extract current editor for text edit.
-    // String pathString = parser.getAttributeValue(null, "path");
-    // Path path = pathString.equals("null") ? null : new Path(pathString);
-    //		
-    // int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-    // int replace = Integer.parseInt(parser.getAttributeValue(null,
-    // "replace"));
-    //	
-    // String text = "";
-    // if (parser.next() == XmlPullParser.TEXT) {
-    // text = parser.getText();
-    // }
-    //	
-    // return new TextEditActivity(offset, text, replace,path);
-    // }
 }
