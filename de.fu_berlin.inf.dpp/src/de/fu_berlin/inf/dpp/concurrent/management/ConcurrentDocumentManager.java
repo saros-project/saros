@@ -141,7 +141,7 @@ public class ConcurrentDocumentManager {
      * 
      * @author chjacob
      */
-    private class ConsistencyWatchdog extends Job {
+    public class ConsistencyWatchdog extends Job {
 
         public ConsistencyWatchdog(String name) {
             super(name);
@@ -302,6 +302,11 @@ public class ConcurrentDocumentManager {
             });
     }
 
+    /**
+     * ISharedProjectListener for updating Jupiter documents on the host.
+     * 
+     * @host
+     */
     public class HostSideProjectListener extends AbstractSharedProjectListener {
 
         @Override
@@ -334,6 +339,12 @@ public class ConcurrentDocumentManager {
         }
     }
 
+    /**
+     * ISharedProjectListener used to reset Jupiter on the client side, when the
+     * user is no longer a driver.
+     * 
+     * @client
+     */
     public class ClientSideProjectListener extends
         AbstractSharedProjectListener {
 
