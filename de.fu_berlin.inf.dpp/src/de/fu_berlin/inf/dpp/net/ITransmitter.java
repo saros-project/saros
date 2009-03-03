@@ -282,4 +282,14 @@ public interface ITransmitter {
     public void sendDocChecksumsToClients(
         Collection<DocumentChecksum> collection);
 
+    /**
+     * Execute the given runnable as if it was received via the network
+     * component.
+     * 
+     * This is used by the ConcurrentDocumentManager to skip sending a
+     * JupiterRequest via the network which originated on the host to the
+     * JupiterServer.
+     */
+    public void executeAsDispatch(Runnable runnable);
+
 }

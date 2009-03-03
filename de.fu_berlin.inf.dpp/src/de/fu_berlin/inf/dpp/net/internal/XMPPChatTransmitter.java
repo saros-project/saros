@@ -118,6 +118,33 @@ public class XMPPChatTransmitter implements ITransmitter,
         dataManager.chatTransmitter = this;
     }
 
+    ExecutorService dispatch = Executors
+        .newSingleThreadExecutor(new NamedThreadFactory(
+            "XMPPChatTransmitter-Dispatch"));
+
+    public class XMPPChatTransmitterPacketListener implements PacketListener {
+
+        GodPacketListener godListener = new GodPacketListener();
+
+        PacketFilter sessionFilter = PacketExtensions
+            .getSessionIDPacketFilter();
+
+        public void processPacket(final Packet packet) {
+            executeAsDispatch(new Runnable() {
+                public void run() {
+                    if (sessionFilter.accept(packet)) {
+                        godListener.processPacket(packet);
+                    }
+                    receiver.processPacket(packet);
+                }
+            });
+        }
+    }
+
+    public void executeAsDispatch(Runnable runnable) {
+        dispatch.submit(Util.wrapSafe(log, runnable));
+    }
+
     /**
      * TODO break this up into many individually registered Listeners
      */
@@ -364,7 +391,6 @@ public class XMPPChatTransmitter implements ITransmitter,
             IActivity activity = timedActivity.getActivity();
 
             if (activity instanceof TextEditActivity) {
-                log.debug("sendActivities: " + activity);
                 TextEditActivity textEditActivity = (TextEditActivity) activity;
 
                 if (textEditActivity.getSource() == null) {
@@ -416,7 +442,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             }
         }
 
-        XMPPChatTransmitter.log.info("Sent activities: " + timedActivities);
+        XMPPChatTransmitter.log.info("Sent Activities: " + timedActivities);
 
         sendMessageToAll(sharedProject, new ActivitiesPacketExtension(Saros
             .getDefault().getSessionManager().getSessionID(), timedActivities));
@@ -547,8 +573,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendJupiterRequest(ISharedProject sharedProject,
         Request request, JID jid) {
-        XMPPChatTransmitter.log.info("Send JupiterRequest [" + jid.getName()
-            + "]: " + request);
+        XMPPChatTransmitter.log.info("Send Jupiter [" + jid.getName() + "]: "
+            + request);
         sendMessage(jid, new RequestPacketExtension(Saros.getDefault()
             .getSessionManager().getSessionID(), request));
     }
@@ -725,34 +751,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.chatmanager = connection.getChatManager();
 
         // Register PacketListeners
-        this.connection.addPacketListener(new PacketListener() {
-
-            GodPacketListener godListener = new GodPacketListener();
-
-            PacketFilter sessionFilter = PacketExtensions
-                .getSessionIDPacketFilter();
-
-            ExecutorService executor = Executors
-                .newSingleThreadExecutor(new NamedThreadFactory(
-                    "XMPPChatTransmitter-Dispatch"));
-
-            public void processPacket(final Packet packet) {
-                executor.submit(new Runnable() {
-                    public void run() {
-                        try {
-                            if (sessionFilter.accept(packet)) {
-                                godListener.processPacket(packet);
-                            }
-                            receiver.processPacket(packet);
-                        } catch (RuntimeException e) {
-                            log.error("Internal Error:", e);
-                        }
-                    }
-                });
-            }
-
-        }, null);
-
+        this.connection.addPacketListener(
+            new XMPPChatTransmitterPacketListener(), null);
     }
 
     public void start() {

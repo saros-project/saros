@@ -397,14 +397,22 @@ public class ConcurrentDocumentManager {
             public boolean receive(TextEditActivity textEdit) {
 
                 Jupiter document = getClientDoc(textEdit.getEditor());
-                Request request = document.generateRequest(textEdit
+                final Request request = document.generateRequest(textEdit
                     .toOperation());
                 request.setJID(myJID);
                 request.setEditorPath(textEdit.getEditor());
 
                 if (isHostSide()) {
-                    // Skip network and apply directly...
-                    receiveRequestHostSide(request);
+
+                    // Skip network and apply directly but make sure that we use
+                    // the same thread as the messages that really arrive via
+                    // the network.
+                    Saros.getDefault().getSessionManager().getTransmitter()
+                        .executeAsDispatch(new Runnable() {
+                            public void run() {
+                                receiveRequestHostSide(request);
+                            }
+                        });
 
                     /*
                      * This activity still needs to be sent to all observers,
@@ -590,8 +598,11 @@ public class ConcurrentDocumentManager {
     /**
      * 
      * @host
+     * 
+     * @notSWT This method may not be called from SWT, otherwise a deadlock
+     *         might occur!!
      */
-    protected void receiveRequestHostSide(Request request) {
+    protected synchronized void receiveRequestHostSide(Request request) {
 
         assert isHostSide() : "receiveRequestHostSide called on the Client";
 
@@ -644,6 +655,8 @@ public class ConcurrentDocumentManager {
     /**
      * Synchronizes the given request with the jupiter server document (if host)
      * and local clients (if host or client).
+     * 
+     * This is called only from the JupiterHandler (the network layer).
      */
     public void receiveRequest(Request request) {
         if (isHostSide()) {
