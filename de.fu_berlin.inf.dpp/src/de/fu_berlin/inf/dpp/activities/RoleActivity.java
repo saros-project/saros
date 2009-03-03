@@ -77,4 +77,8 @@ public class RoleActivity extends AbstractActivity {
         return "RoleActivity(user:" + this.user + ",new role:" + this.getRole()
             + ")";
     }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 }

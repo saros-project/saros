@@ -42,4 +42,6 @@ public interface IActivity {
      * @return jabber_id
      */
     public String getSource();
+
+    public boolean dispatch(IActivityReceiver receiver);
 }

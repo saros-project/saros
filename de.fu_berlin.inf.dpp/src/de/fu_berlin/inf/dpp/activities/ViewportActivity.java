@@ -56,4 +56,8 @@ public class ViewportActivity extends AbstractActivity {
         return "ViewportActivity(top:" + this.topIndex + ",bottom:"
             + this.bottomIndex + ")";
     }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 }

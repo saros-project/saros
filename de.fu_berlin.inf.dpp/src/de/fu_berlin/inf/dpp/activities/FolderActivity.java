@@ -28,4 +28,8 @@ public class FolderActivity extends AbstractActivity {
     public String toString() {
         return "FolderActivity(type:" + this.type + ",path:" + this.path + ")";
     }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 }

@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
  * @author rdjemili
  */
 public class EditorActivity extends AbstractActivity {
+
     public static enum Type {
         Activated, Closed, Saved
     }
@@ -89,5 +90,9 @@ public class EditorActivity extends AbstractActivity {
 
     public void setChecksum(long checksum) {
         this.checksum = checksum;
+    }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
     }
 }

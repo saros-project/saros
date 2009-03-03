@@ -65,4 +65,8 @@ public class TextSelectionActivity extends AbstractActivity {
             + this.length + ",src:" + getSource() + ",path:" + this.editor
             + ")";
     }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 }

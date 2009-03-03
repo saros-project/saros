@@ -78,4 +78,8 @@ public class FileActivity extends AbstractActivity {
 
         return false;
     }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 }

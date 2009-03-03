@@ -169,4 +169,8 @@ public class TextEditActivity extends AbstractActivity {
         assert false;
         return null;
     }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 }
