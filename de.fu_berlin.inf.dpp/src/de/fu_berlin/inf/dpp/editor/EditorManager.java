@@ -75,6 +75,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -299,25 +300,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
-    private class DocumentListener implements IDocumentListener {
-
-        public void documentAboutToBeChanged(final DocumentEvent event) {
-            // boolean checksumErrorHandling = Saros.getDefault()
-            // .getSessionManager().getSharedProject()
-            // .getConcurrentDocumentManager()
-            // .getExecutingChecksumErrorHandling();
-            // if (checksumErrorHandling)
-            // return;
-            String text = event.getText() == null ? "" : event.getText();
-            textAboutToBeChanged(event.getOffset(), text, event.getLength(),
-                event.getDocument());
-        }
-
-        public void documentChanged(final DocumentEvent event) {
-            // do nothing. We handeled everything in documentAboutToBeChanged
-        }
-    }
-
     private static Logger log = Logger.getLogger(EditorManager.class.getName());
 
     private static EditorManager instance;
@@ -336,7 +318,25 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final ElementStateListener elementStateListener = new ElementStateListener();
 
-    private final DocumentListener documentListener = new DocumentListener();
+    public class StoppableDocumentListener implements IDocumentListener {
+
+        boolean enabled = true;
+
+        public void documentAboutToBeChanged(final DocumentEvent event) {
+
+            if (enabled) {
+                String text = event.getText() == null ? "" : event.getText();
+                textAboutToBeChanged(event.getOffset(), text,
+                    event.getLength(), event.getDocument());
+            }
+        }
+
+        public void documentChanged(final DocumentEvent event) {
+            // do nothing. We handeled everything in documentAboutToBeChanged
+        }
+    }
+
+    private final StoppableDocumentListener documentListener = new StoppableDocumentListener();
 
     // TODO save only the editor of the followed driver
     private IPath activeDriverEditor;
@@ -350,10 +350,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final List<ISharedEditorListener> editorListeners = new ArrayList<ISharedEditorListener>();
 
-    /* this activity has arrived and will be execute now. */
-    private IActivity currentExecuteActivity;
-
     public HashMap<IPath, Long> lastEditTimes = new HashMap<IPath, Long>();
+
     public HashMap<IPath, Long> lastRemoteEditTimes = new HashMap<IPath, Long>();
 
     private ContributionAnnotationManager contributionAnnotationManager;
@@ -579,7 +577,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
          * rather than catching events -> Think Start/Stop on the SharedProject
          */
         if (!this.isDriver || isConsistencyToResolve()) {
-            this.currentExecuteActivity = null;
+
+            /**
+             * TODO: If we are not a driver, then receiving this event might
+             * indicate that the user somehow achieved to change his document.
+             * We should run a consistency check.
+             * 
+             * But watch out for changes because of a consistency check!
+             */
             return;
         }
 
@@ -603,7 +608,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             try {
                 replacedText = document.get(offset, replace);
             } catch (BadLocationException e) {
-                log.error("Offset and replace invalid", e);
+                log.error("Offset and/or replace invalid", e);
 
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < replace; i++)
@@ -613,25 +618,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             TextEditActivity activity = new TextEditActivity(offset, text,
                 replacedText, path, Saros.getDefault().getMyJID().toString());
-            /*
-             * Check if this activity was executed by another driver recently.
-             */
-            if (activity.sameLike(this.currentExecuteActivity)) {
-                this.currentExecuteActivity = null;
-                return;
-            }
 
             EditorManager.this.lastEditTimes.put(path, System
                 .currentTimeMillis());
 
             fireActivity(activity);
 
-            IEditorInput input = changedEditor.getEditorInput();
-            IDocumentProvider provider = this.editorAPI
-                .getDocumentProvider(input);
-            IAnnotationModel model = provider.getAnnotationModel(input);
-
-            contributionAnnotationManager.splitAnnotation(model, offset);
+            /*
+             * TODO Investigate if this is really needed here
+             */
+            {
+                IEditorInput input = changedEditor.getEditorInput();
+                IDocumentProvider provider = this.editorAPI
+                    .getDocumentProvider(input);
+                IAnnotationModel model = provider.getAnnotationModel(input);
+                contributionAnnotationManager.splitAnnotation(model, offset);
+            }
         } else {
             log.error("Can't get editor path");
         }
@@ -777,34 +779,48 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         this.activityListeners.remove(listener);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * 
+     * @swt This must be called from the SWT thread.
      * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(final IActivity activity) {
 
-        if (activity instanceof EditorActivity) {
-            EditorActivity editorActivity = (EditorActivity) activity;
+        activity.dispatch(new AbstractActivityReceiver() {
 
-            if (editorActivity.getType().equals(Type.Activated)) {
-                setActiveDriverEditor(editorActivity.getPath(), true);
+            @Override
+            public boolean receive(EditorActivity editorActivity) {
+                if (editorActivity.getType().equals(Type.Activated)) {
+                    setActiveDriverEditor(editorActivity.getPath(), true);
 
-            } else if (editorActivity.getType().equals(Type.Closed)) {
-                removeDriverEditor(editorActivity.getPath(), true);
+                } else if (editorActivity.getType().equals(Type.Closed)) {
+                    removeDriverEditor(editorActivity.getPath(), true);
 
-            } else if (editorActivity.getType().equals(Type.Saved)) {
-                saveText(editorActivity.getPath());
+                } else if (editorActivity.getType().equals(Type.Saved)) {
+                    saveText(editorActivity.getPath());
+                }
+                return true;
             }
-        }
 
-        if (activity instanceof TextEditActivity) {
-            execTextEdit((TextEditActivity) activity);
-        } else if (activity instanceof TextSelectionActivity) {
-            execTextSelection((TextSelectionActivity) activity);
-        } else if (activity instanceof ViewportActivity) {
-            execViewport((ViewportActivity) activity);
-        }
+            @Override
+            public boolean receive(TextEditActivity textEditActivity) {
+                execTextEdit(textEditActivity);
+                return true;
+            }
+
+            @Override
+            public boolean receive(TextSelectionActivity textSelectionActivity) {
+                execTextSelection(textSelectionActivity);
+                return true;
+            }
+
+            @Override
+            public boolean receive(ViewportActivity viewportActivity) {
+                execViewport(viewportActivity);
+                return true;
+            }
+        });
     }
 
     private void execTextEdit(TextEditActivity textEdit) {
@@ -813,16 +829,19 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         User user = Saros.getDefault().getSessionManager().getSharedProject()
             .getParticipant(new JID(source));
 
-        // FIXME We should much rather disable the listeners and then reactivate
-        // them after the replace has been executed.
-
-        // set current execute activity to avoid circular executions.
-        currentExecuteActivity = textEdit;
-
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);
+
+        /*
+         * Disable documentListner temporarily to avoid being notified of the
+         * change
+         */
+        documentListener.enabled = false;
+
         replaceText(file, textEdit.offset, textEdit.replacedText,
             textEdit.text, source);
+
+        documentListener.enabled = true;
 
         for (IEditorPart editorPart : editorPool.getEditors(path)) {
             editorAPI.setSelection(editorPart, new TextSelection(
@@ -1182,7 +1201,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 log
                     .error(String
                         .format(
-                            "Could not apply TextEdit at %d-%d of document with length %d.\\nWas supposed to replace '%s' with '%s'.",
+                            "Could not apply TextEdit at %d-%d of document with length %d.\nWas supposed to replace '%s' with '%s'.",
                             offset, offset + replacedText.length(), doc
                                 .getLength(), replacedText, text));
                 throw e;
@@ -1210,7 +1229,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Needs to be called from a UI thread.
+     * TODO document what this does
+     * 
+     * @swt Needs to be called from a UI thread.
      */
     private void resetText(IFile file) {
         if (!file.exists()) {
@@ -1296,14 +1317,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             listener.driverEditorSaved(path, false);
         }
 
-        IActivity activity = new EditorActivity(Type.Saved, path);
-        for (IActivityListener listener : this.activityListeners) {
-            listener.activityCreated(activity);
-        }
+        fireActivity(new EditorActivity(Type.Saved, path));
     }
 
     /**
-     * Sends given activity to all registered activity listeners.
+     * Sends given activity to all registered activity listeners (most
+     * importantly the ActivitySequencer).
+     * 
      */
     private void fireActivity(IActivity activity) {
         for (IActivityListener listener : this.activityListeners) {
@@ -1487,10 +1507,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 });
             }
         } else {
-            IActivity activity = new EditorActivity(Type.Activated, path);
-            for (IActivityListener listener : this.activityListeners) {
-                listener.activityCreated(activity);
-            }
+            fireActivity(new EditorActivity(Type.Activated, path));
         }
     }
 
@@ -1530,12 +1547,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     }
                 }
             });
-
         } else {
-            IActivity activity = new EditorActivity(Type.Closed, path);
-            for (IActivityListener listener : this.activityListeners) {
-                listener.activityCreated(activity);
-            }
+            fireActivity(new EditorActivity(Type.Closed, path));
         }
     }
 

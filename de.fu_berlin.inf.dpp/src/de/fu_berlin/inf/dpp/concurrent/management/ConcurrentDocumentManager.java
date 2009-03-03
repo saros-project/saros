@@ -34,6 +34,7 @@ import org.eclipse.jface.text.IDocumentListener;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -357,49 +358,67 @@ public class ConcurrentDocumentManager {
         }
     }
 
-    public IActivity activityCreated(IActivity activity) {
+    /**
+     * Called from the ActivitySequencer when a local activity has occurred.
+     * 
+     * If the event is handled by Jupiter then true should be returned, false
+     * otherwise.
+     */
+    public boolean activityCreated(IActivity activity) {
 
-        if (activity instanceof EditorActivity) {
-            EditorActivity editor = (EditorActivity) activity;
+        return activity.dispatch(new AbstractActivityReceiver() {
+            @Override
+            public boolean receive(EditorActivity editor) {
 
-            // TODO Consistency Check?
-            if (editor.getType() == Type.Saved) {
-                // // calculate checksum for saved file
-                // long checksum = FileUtil.checksum(this.sharedProject
-                // .getProject().getFile(editor.getPath()));
-                // editor.setChecksum(checksum);
-                // ConcurrentDocumentManager.logger
-                // .debug("Add checksumme to created editor save activity : "
-                // + checksum
-                // + " for path : "
-                // + editor.getPath().toOSString());
+                /*
+                 * Host: start and stop jupiter server process depending on
+                 * editor activities of remote clients. Client: start and stop
+                 * local jupiter clients depending on editor activities.
+                 */
+
+                // TODO Consistency Check?
+                if (editor.getType() == Type.Saved) {
+                    // // calculate checksum for saved file
+                    // long checksum = FileUtil.checksum(this.sharedProject
+                    // .getProject().getFile(editor.getPath()));
+                    // editor.setChecksum(checksum);
+                    // ConcurrentDocumentManager.logger
+                    //.debug("Add checksumme to created editor save activity : "
+                    // + checksum
+                    // + " for path : "
+                    // + editor.getPath().toOSString());
+                }
+
+                // We did not handle it!
+                return false;
             }
 
-            // We did not handle it!
-            return activity;
-        }
+            @Override
+            public boolean receive(TextEditActivity textEdit) {
 
-        if (activity instanceof TextEditActivity) {
+                Jupiter document = getClientDoc(textEdit.getEditor());
+                Request request = document.generateRequest(textEdit
+                    .toOperation());
+                request.setJID(myJID);
+                request.setEditorPath(textEdit.getEditor());
 
-            TextEditActivity textEdit = (TextEditActivity) activity;
+                if (isHostSide()) {
+                    // Skip network and apply directly...
+                    receiveRequestHostSide(request);
 
-            Jupiter document = getClientDoc(textEdit.getEditor());
-            Request request = document.generateRequest(textEdit.toOperation());
-            request.setJID(myJID);
-            request.setEditorPath(textEdit.getEditor());
-
-            if (isHostSide()) {
-                // Skip network and apply directly...
-                receiveRequestHostSide(request);
-            } else {
-                // Send to host
-                sequencer.forwardOutgoingRequest(host, request);
+                    /*
+                     * This activity still needs to be sent to all observers,
+                     * because they are not notified by
+                     * receiveRequestHostSide(...).
+                     */
+                    return false;
+                } else {
+                    // Send to host
+                    sequencer.forwardOutgoingRequest(host, request);
+                    return true;
+                }
             }
-
-            // We did consume this activity
-            return null;
-        }
-        return activity;
+        });
     }
 
     public void execFileActivity(IActivity activity) {
