@@ -143,7 +143,6 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         if (parser.getName().equals(RequestPacketExtension.SPLIT_OP)) {
             parser.next(); // Open tag
             Operation op1 = parseOperation(parser);
-            parser.next(); // Advance to next operation
             Operation op2 = parseOperation(parser);
             parser.next(); // Advance to next operation
             return new SplitOperation(op1, op2);
@@ -178,7 +177,8 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
             text = parser.getText();
-            assert parser.next() == XmlPullParser.END_TAG; // Close tag
+            int type = parser.next();
+            assert type == XmlPullParser.END_TAG; // Close tag
         }
         parser.next(); // Advance to next operation
         return new InsertOperation(pos, text, origin);
@@ -193,7 +193,8 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         String text = "";
         if (parser.next() == XmlPullParser.TEXT) {
             text = parser.getText();
-            assert parser.next() == XmlPullParser.END_TAG; // Close tag
+            int type = parser.next();
+            assert type == XmlPullParser.END_TAG; // Close tag
         }
         parser.next(); // Advance to next operation
         return new DeleteOperation(pos, text);
