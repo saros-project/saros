@@ -281,7 +281,7 @@ public class Util {
      * Run the given runnable in a new thread (with the given name) and log any
      * RuntimeExceptions to the given logger.
      * 
-     * This method returns immediately.
+     * @nonBlocking
      */
     public static void runSafeAsync(@Nullable String name, final Logger log,
         final Runnable runnable) {
@@ -296,7 +296,7 @@ public class Util {
      * Run the given runnable in a new thread and log any RuntimeExceptions to
      * the given logger.
      * 
-     * This method returns immediately.
+     * @nonBlocking
      */
     public static void runSafeAsync(final Logger log, final Runnable runnable) {
         runSafeAsync(null, log, runnable);
@@ -306,7 +306,7 @@ public class Util {
      * Run the given runnable in the SWT-Thread, log any RuntimeExceptions to
      * the given logger and block until the runnable returns.
      * 
-     * This method is BLOCKING.
+     * @blocking
      */
     public static void runSafeSWTSync(final Logger log, final Runnable runnable) {
         Display.getDefault().syncExec(wrapSafe(log, runnable));
@@ -328,7 +328,7 @@ public class Util {
      * Run the given runnable in the SWT-Thread and log any RuntimeExceptions to
      * the given logger.
      * 
-     * This method is returns immediately.
+     * @nonBlocking
      */
     public static void runSafeSWTAsync(final Logger log, final Runnable runnable) {
         Display.getDefault().asyncExec(wrapSafe(log, runnable));
@@ -338,7 +338,7 @@ public class Util {
      * Run the given runnable and log any RuntimeExceptions to the given logger
      * and block until the runnable returns.
      * 
-     * This method is BLOCKING.
+     * @blocking
      */
     public static void runSafeSync(Logger log, Runnable runnable) {
         wrapSafe(log, runnable).run();

@@ -280,6 +280,9 @@ public class Saros extends AbstractUIPlugin {
         return getContainer().getComponent(SessionManager.class);
     }
 
+    /**
+     * @nonBlocking
+     */
     public void asyncConnect() {
         Util.runSafeAsync("Saros-AsyncConnect-", logger, new Runnable() {
             public void run() {
@@ -289,11 +292,12 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Connects using the credentials from the preferences. This is a blocking
-     * method.
+     * Connects using the credentials from the preferences.
      * 
      * If there is already a established connection when calling this method, it
      * disconnects before connecting (including state transitions!).
+     * 
+     * @blocking
      */
     public void connect(boolean failSilently) {
 
@@ -365,7 +369,9 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Disconnects. This is a blocking method.
+     * Disconnects.
+     * 
+     * @blocking
      */
     public void disconnect() {
         setConnectionState(ConnectionState.DISCONNECTING, null);
@@ -383,8 +389,9 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Creates the given account on the given Jabber server. This is a blocking
-     * method.
+     * Creates the given account on the given Jabber server.
+     * 
+     * @blocking
      * 
      * @param server
      *            the server on which to create the account.
@@ -416,7 +423,9 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Adds given contact to the roster. This is a blocking method.
+     * Adds given contact to the roster.
+     * 
+     * @blocking
      * 
      * @param jid
      *            the Jabber ID of the contact.
@@ -459,7 +468,9 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Removes given contact from the roster. This is a blocking method.
+     * Removes given contact from the roster.
+     * 
+     * @blocking
      * 
      * @param rosterEntry
      *            the contact that is to be removed
