@@ -117,6 +117,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private class ElementStateListener implements IElementStateListener {
         public void elementDirtyStateChanged(Object element, boolean isDirty) {
+
+            // FIXME When driver, but receiving a EditorActivty#SAVE we should
+            // not trigger another save activity.
             if (!EditorManager.this.isDriver || isDirty
                 || !(element instanceof FileEditorInput)) {
                 return;
@@ -1256,6 +1259,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void saveText(IPath path) {
 
+        /*
+         * FIXME Calling saveText should not cause an EditorActivity of type
+         * save to be generated!
+         */
+
         IFile file = this.sharedProject.getProject().getFile(path);
 
         if (!file.exists()) {
@@ -1277,8 +1285,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IDocumentProvider provider = this.editorAPI
                 .getDocumentProvider(input);
 
-            // Save not necessary, if we have no modified document
             if (!this.connectedFiles.contains(file)) {
+                // Save not necessary, if we have no modified document
+                // If this warning is printed we must suspect an inconsistency...
                 log.warn("Saving not necessary (not connected)!");
                 return;
             }
@@ -1287,13 +1296,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             IAnnotationModel model = provider.getAnnotationModel(input);
             model.connect(doc);
-
+            
             provider.saveDocument(new NullProgressMonitor(), input, doc, true);
             EditorManager.log.debug("Saved document " + path);
 
             model.disconnect(doc);
 
-            // TODO Set file readonly again?
+            // FIXME Set file readonly again?
 
             provider.disconnect(input);
             this.connectedFiles.remove(file);
