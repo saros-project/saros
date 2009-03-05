@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -20,10 +19,8 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
-import org.eclipse.jface.text.IViewportListener;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
@@ -32,14 +29,8 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.custom.VerifyKeyListener;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
@@ -127,101 +118,6 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    private class EditorListener implements IViewportListener, MouseListener,
-        KeyListener, ISelectionChangedListener {
-
-        private final ITextViewer viewer;
-
-        private ITextSelection lastSelection = new TextSelection(-1, -1);
-
-        public EditorListener(ITextViewer viewer) {
-            this.viewer = viewer;
-
-            viewer.getTextWidget().addMouseListener(this);
-            viewer.getTextWidget().addKeyListener(this);
-            viewer.getSelectionProvider().addSelectionChangedListener(this);
-            viewer.addViewportListener(this);
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.text.IViewportListener
-         */
-        public void viewportChanged(int verticalOffset) {
-            // TODO why doesnt this react to window resizes?
-
-            IPath editor = EditorAPI.this.editorManager
-                .getPathOfDocument(this.viewer.getDocument());
-
-            editorManager.viewportChanged(editor, getViewport(viewer));
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.swt.events.MouseListener
-         */
-        public void mouseDown(MouseEvent e) {
-            checkSelection();
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.swt.events.MouseListener
-         */
-        public void mouseUp(MouseEvent e) {
-            checkSelection();
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.swt.events.MouseListener
-         */
-        public void mouseDoubleClick(MouseEvent e) {
-            // ignore
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.swt.events.KeyListener
-         */
-        public void keyReleased(KeyEvent e) {
-            checkSelection();
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.swt.events.KeyListener
-         */
-        public void keyPressed(KeyEvent e) {
-            // ignore
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.viewers.ISelectionChangedListener
-         */
-        public void selectionChanged(SelectionChangedEvent event) {
-            checkSelection();
-        }
-
-        private void checkSelection() {
-            ISelectionProvider sp = this.viewer.getSelectionProvider();
-            ITextSelection selection = (ITextSelection) sp.getSelection();
-
-            if (!this.lastSelection.equals(selection)) {
-                EditorAPI.this.editorManager.selectionChanged(selection, sp);
-                this.lastSelection = selection;
-            }
-        }
-    }
-
     private static Logger log = Logger.getLogger(EditorAPI.class.getName());
 
     private final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
@@ -248,7 +144,7 @@ public class EditorAPI implements IEditorAPI {
         }
     };
 
-    private EditorManager editorManager;
+    EditorManager editorManager;
 
     /** Editors where the user isn't allowed to write */
     private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
@@ -680,7 +576,7 @@ public class EditorAPI implements IEditorAPI {
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
     public void addSharedEditorListener(IEditorPart editorPart) {
-        new EditorListener(EditorAPI.getViewer(editorPart)); // HACK
+        new EditorListener(this, editorManager, EditorAPI.getViewer(editorPart)); // HACK
     }
 
     /*

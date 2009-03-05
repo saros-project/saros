@@ -509,6 +509,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     // TODO CJ: find a better solution
     public IPath getPathOfDocument(IDocument doc) {
+
         IPath path = null;
         for (IEditorPart editor : editorPool.getAllEditors()) {
             if (editorAPI.getDocument(editor) == doc) {
