@@ -293,22 +293,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         private final Image personImage = SarosUI.getImage("icons/user.png");
 
-        private Image personOfflineImage;
-
-        public synchronized void createPersonOfflineImage() {
-            if (personOfflineImage == null) {
-                personOfflineImage = new Image(Display.getDefault(),
-                    personImage, SWT.IMAGE_DISABLE);
-            }
-        }
-
-        public Image getPersonOfflineImage() {
-
-            if (personOfflineImage == null) {
-                createPersonOfflineImage();
-            }
-            return personOfflineImage;
-        }
+        private final Image personOfflineImage = new Image(
+            Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
 
         @Override
         public String getText(Object obj) {
@@ -350,7 +336,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 if (presence.isAvailable()) {
                     return this.personImage;
                 } else {
-                    return getPersonOfflineImage();
+                    return this.personOfflineImage;
                 }
             }
             return this.groupImage;
