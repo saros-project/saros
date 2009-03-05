@@ -32,12 +32,9 @@ public class JoinSessionWizardUtils {
 
         IIncomingInvitationProcess invitationProcess;
 
-        boolean running;
-
         IProject project;
 
         public void run() {
-            this.running = true;
 
             ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
@@ -51,7 +48,6 @@ public class JoinSessionWizardUtils {
                             .getLocalProject(ScanRunner.this.invitationProcess
                                 .getRemoteFileList(), monitor);
                         monitor.done();
-                        ScanRunner.this.running = false;
                     }
 
                 });
