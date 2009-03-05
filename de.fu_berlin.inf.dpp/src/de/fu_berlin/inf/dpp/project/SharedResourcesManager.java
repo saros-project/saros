@@ -23,9 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -141,15 +140,21 @@ public class SharedResourcesManager implements IResourceChangeListener,
         private IActivity handleFileDelta(IPath path, int kind) {
             switch (kind) {
             case IResourceDelta.CHANGED:
-                // fall through
+
+                /*
+                 * FIXME If a CHANGED event happens and it was not triggered by
+                 * the user or us saving the file, then we must think about what
+                 * we want to do
+                 */
+                return null;
 
             case IResourceDelta.ADDED:
                 // ignore opened files because otherwise we might send CHANGED
                 // events for files that are also handled by the editor manager.
                 if (EditorManager.getDefault().isOpened(path)) {
+                    // TODO Think about if this is needed...
                     return null;
                 }
-
                 return new FileActivity(FileActivity.Type.Created, path);
 
             case IResourceDelta.REMOVED:
@@ -237,8 +242,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         try {
             event.getDelta().accept(this.visitor);
         } catch (CoreException e) {
-            SharedResourcesManager.log.log(Level.SEVERE,
-                "Couldn't handle resource change.", e);
+            log.error("Couldn't handle resource change.", e);
         }
     }
 
@@ -258,8 +262,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
 
         } catch (CoreException e) {
-            SharedResourcesManager.log.log(Level.SEVERE,
-                "Failed to execute resource activity.", e);
+            log.error("Failed to execute resource activity.", e);
 
         } finally {
             this.replicationInProgess = false;
@@ -281,9 +284,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
 
         } catch (IOException e) {
-            SharedResourcesManager.log.severe("Couldn't parse message");
+            log.error("Couldn't parse message");
         } catch (XmlPullParserException e) {
-            SharedResourcesManager.log.severe("Couldn't parse message");
+            log.error("Couldn't parse message");
         }
 
         return null;
