@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  * @author rdjemili
  */
 public class TimedActivity {
+
     private final IActivity activity;
 
     private final int timestamp;
@@ -21,6 +22,10 @@ public class TimedActivity {
      *            the timestamp that belongs to the activity.
      */
     public TimedActivity(IActivity activity, int timestamp) {
+
+        if (activity == null)
+            throw new IllegalArgumentException("Activity cannot be null");
+
         this.activity = activity;
         this.timestamp = timestamp;
     }
@@ -45,10 +50,25 @@ public class TimedActivity {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+            + ((activity == null) ? 0 : activity.hashCode());
+        result = prime * result + timestamp;
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof TimedActivity)) {
+        if (this == obj)
+            return true;
+
+        if (obj == null)
             return false;
-        }
+
+        if (!(obj instanceof TimedActivity))
+            return false;
 
         TimedActivity other = (TimedActivity) obj;
         return other.activity.equals(this.activity)
