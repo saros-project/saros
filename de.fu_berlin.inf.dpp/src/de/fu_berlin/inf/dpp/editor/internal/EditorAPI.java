@@ -528,23 +528,27 @@ public class EditorAPI implements IEditorAPI {
      * 
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
-    public void setEditable(final IEditorPart editorPart, final boolean editable) {
-        EditorAPI.log.debug(editorPart + " set to editable:" + editable);
+    public void setEditable(final IEditorPart editorPart, final boolean newIsEditable) {
 
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
-                updateStatusLine(editorPart, editable);
-
                 ITextViewerExtension textViewer = (ITextViewerExtension) EditorAPI
                     .getViewer(editorPart);
 
-                if (textViewer == null) {
+                if (textViewer == null)
                     return;
-                }
 
-                if (editable
-                    && EditorAPI.this.lockedEditors.contains(editorPart)) {
-                    EditorAPI.this.lockedEditors.remove(editorPart);
+                boolean isEditable = !lockedEditors.contains(editorPart);
+
+                // Already as we want it?
+                if (newIsEditable == isEditable)
+                    return;
+
+                log.debug(editorPart + " set to editable:" + newIsEditable);
+                updateStatusLine(editorPart, newIsEditable);
+
+                if (newIsEditable) {
+                    lockedEditors.remove(editorPart);
                     textViewer
                         .removeVerifyKeyListener(EditorAPI.this.keyVerifier);
 
@@ -555,9 +559,8 @@ public class EditorAPI implements IEditorAPI {
                     // TODO use undoLevel from Preferences (TextEditorPlugin)
                     sourceViewer.getUndoManager().setMaximalUndoLevel(200);
 
-                } else if (!editable
-                    && !EditorAPI.this.lockedEditors.contains(editorPart)) {
-                    EditorAPI.this.lockedEditors.add(editorPart);
+                } else {
+                    lockedEditors.add(editorPart);
                     textViewer
                         .appendVerifyKeyListener(EditorAPI.this.keyVerifier);
 
