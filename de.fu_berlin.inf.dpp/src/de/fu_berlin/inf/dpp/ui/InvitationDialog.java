@@ -83,7 +83,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private Display display;
 
     // assigned to any of the entries of the invite-tableview
-    private class InviterData {
+    protected static class InviterData {
         JID jid;
         String name;
         String error = "";
