@@ -18,8 +18,7 @@ import org.eclipse.swt.events.MouseListener;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
-class EditorListener implements IViewportListener, MouseListener, KeyListener,
-    ISelectionChangedListener {
+public class EditorListener {
 
     private final EditorManager manager;
 
@@ -35,80 +34,54 @@ class EditorListener implements IViewportListener, MouseListener, KeyListener,
         this.viewer = viewer;
         this.editorAPI = editorAPI;
 
-        viewer.getTextWidget().addMouseListener(this);
-        viewer.getTextWidget().addKeyListener(this);
-        viewer.getSelectionProvider().addSelectionChangedListener(this);
-        viewer.addViewportListener(this);
+        viewer.getTextWidget().addMouseListener(mouseListener);
+        viewer.getTextWidget().addKeyListener(keyListener);
+        viewer.getSelectionProvider().addSelectionChangedListener(
+            selectionChangedListener);
+        viewer.addViewportListener(viewportListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.text.IViewportListener
-     */
-    public void viewportChanged(int verticalOffset) {
-        // TODO why doesnt this react to window resizes?
+    protected final MouseListener mouseListener = new MouseListener() {
 
-        IPath editor = manager.getPathOfDocument(this.viewer.getDocument());
+        public void mouseDown(MouseEvent e) {
+            checkSelection();
+        }
 
-        manager.viewportChanged(editor, this.editorAPI.getViewport(viewer));
-    }
+        public void mouseUp(MouseEvent e) {
+            checkSelection();
+        }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.swt.events.MouseListener
-     */
-    public void mouseDown(MouseEvent e) {
-        checkSelection();
-    }
+        public void mouseDoubleClick(MouseEvent e) {
+            // ignore
+        }
+    };
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.swt.events.MouseListener
-     */
-    public void mouseUp(MouseEvent e) {
-        checkSelection();
-    }
+    protected final KeyListener keyListener = new KeyListener() {
+        public void keyReleased(KeyEvent e) {
+            checkSelection();
+        }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.swt.events.MouseListener
-     */
-    public void mouseDoubleClick(MouseEvent e) {
-        // ignore
-    }
+        public void keyPressed(KeyEvent e) {
+            // ignore
+        }
+    };
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.swt.events.KeyListener
-     */
-    public void keyReleased(KeyEvent e) {
-        checkSelection();
-    }
+    protected IViewportListener viewportListener = new IViewportListener() {
+        public void viewportChanged(int verticalOffset) {
+            // TODO why doesn't this react to window resizes?
+            IPath editor = manager.getPathOfDocument(viewer.getDocument());
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.swt.events.KeyListener
-     */
-    public void keyPressed(KeyEvent e) {
-        // ignore
-    }
+            manager.viewportChanged(editor, editorAPI.getViewport(viewer));
+        }
+    };
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.jface.viewers.ISelectionChangedListener
-     */
-    public void selectionChanged(SelectionChangedEvent event) {
-        checkSelection();
-    }
+    protected ISelectionChangedListener selectionChangedListener = new ISelectionChangedListener() {
+        public void selectionChanged(SelectionChangedEvent event) {
+            checkSelection();
+        }
+    };
 
-    private void checkSelection() {
+    protected void checkSelection() {
         ISelectionProvider sp = this.viewer.getSelectionProvider();
         ITextSelection selection = (ITextSelection) sp.getSelection();
 
