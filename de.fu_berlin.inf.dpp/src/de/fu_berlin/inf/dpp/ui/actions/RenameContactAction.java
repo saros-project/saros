@@ -42,7 +42,7 @@ public class RenameContactAction extends SelectionProviderAction {
     private static final Logger log = Logger
         .getLogger(RenameContactAction.class.getName());
 
-    private class InputValidator implements IInputValidator {
+    protected static class InputValidator implements IInputValidator {
         public String isValid(String newText) {
             // TODO Review this
             return null;
