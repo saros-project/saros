@@ -62,7 +62,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
     private final String CHAT_ROOM = "saros";
 
-    public class ChatLine {
+    public static class ChatLine {
         public String sender;
 
         public String text;
