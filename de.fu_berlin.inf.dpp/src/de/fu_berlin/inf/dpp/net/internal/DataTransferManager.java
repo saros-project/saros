@@ -174,7 +174,7 @@ public class DataTransferManager implements ConnectionSessionListener {
      * A simple struct that is used to manage incoming chunked files via
      * chat-file transfer
      */
-    private class IncomingFile {
+    protected static class IncomingFile {
         String name;
         int receivedChunks;
         int chunkCount;
