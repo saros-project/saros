@@ -7,7 +7,8 @@ Content
 1. Introduction
 2. The repository
 3. Java packages
-4. Special Topics
+4. Documentation Tags
+5. Special Topics
 
 -----------------------------------------------------------------
 
@@ -130,17 +131,19 @@ Content
 
 4. Documentation tags
 
-We use the following JavaDoc tags for highlighting important aspects of a method
+We use the following JavaDoc tags for highlighting important aspects of a method or a class
 
-  @client - This method is intended to be called on the client side of a Saros session.
+  @client - This method or class is intended to be called or used on the client side of a Saros session.
 
-  @host - This method is intended to be called on the host side of a Saros session.
+  @host - This method or class is intended to be called or used on the host side of a Saros session.
 
   @swt - This method needs to be called from the SWT thread, otherwise an exception might occur.
   
   @nonBlocking - This method does return before finishing its activities.
   
-  @blocking - This method is potentially long-running and blocks until it is done. 
+  @blocking - This method is potentially long-running and blocks until it is done.
+  
+  @valueObject - The objects of this class are immutable. All methods are side effect free.
 
 5. Special topics
 
