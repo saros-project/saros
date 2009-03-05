@@ -45,10 +45,10 @@ public class AddContactWizard extends Wizard {
 
     public static final boolean allowToEnterNick = false;
 
-    private class AddContactPage extends WizardPage {
-        private Text idText;
+    public static class AddContactPage extends WizardPage {
+        protected Text idText;
 
-        private Text nicknameText;
+        protected Text nicknameText;
 
         protected AddContactPage() {
             super("create");
