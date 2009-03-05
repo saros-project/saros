@@ -144,6 +144,8 @@ We use the following JavaDoc tags for highlighting important aspects of a method
   @blocking - This method is potentially long-running and blocks until it is done.
   
   @valueObject - The objects of this class are immutable. All methods are side effect free.
+  
+  @nonReentrant - This method cannot be called twice at the same time.
 
 5. Special topics
 
