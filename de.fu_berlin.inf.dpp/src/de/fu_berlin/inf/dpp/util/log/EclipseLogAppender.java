@@ -1,63 +1,67 @@
 package de.fu_berlin.inf.dpp.util.log;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
+import org.apache.log4j.spi.LoggingEvent;
+import org.apache.log4j.spi.ThrowableInformation;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.picocontainer.annotations.Nullable;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.Layout;
-import org.apache.log4j.helpers.LogLog;
+import de.fu_berlin.inf.dpp.Saros;
 
 /**
  * Appender which appends to the Eclipse log of our plug-in
  */
-public class EclipseLogAppender extends FileAppender {
+public class EclipseLogAppender extends AppenderSkeleton {
 
-    public EclipseLogAppender() {
-        // Default constructor
+    public static Throwable getThrowable(LoggingEvent event) {
+        ThrowableInformation information = event.getThrowableInformation();
+        if (information != null) {
+            return information.getThrowable();
+        } else {
+            return null;
+        }
     }
 
-    public EclipseLogAppender(Layout layout, String filename)
-        throws IOException {
-        super(layout, filename, true);
-    }
+    public void log(int level, String message, @Nullable Throwable t) {
 
-    protected String fileBackup;
+        Saros saros = Saros.getDefault();
+
+        if (saros != null) {
+            IStatus logMessage = new Status(level, Saros.SAROS, IStatus.OK,
+                message, t);
+            saros.getLog().log(logMessage);
+        }
+    }
 
     @Override
-    public void setFile(String file) {
-        super.setFile(file);
-        this.fileBackup = getFile();
-    }
+    protected void append(LoggingEvent event) {
 
-    @Override
-    public synchronized void setFile(String fileName, boolean append,
-        boolean bufferedIO, int bufferSize) throws IOException {
-        SimpleDateFormat sdf = new SimpleDateFormat(fileBackup);
-        String actualFileName = sdf.format(new Date());
-        makeDirs(actualFileName);
-        super.setFile(actualFileName, append, bufferedIO, bufferSize);
-    }
+        if (event.getLevel().isGreaterOrEqual(Level.WARN)) {
 
-    /**
-     * Ensures that all of the directories for the given path exist. Anything
-     * after the last / or \ is assumed to be a filename.
-     */
-    protected void makeDirs(String path) {
-        int indexSlash = path.lastIndexOf("/");
-        int indexBackSlash = path.lastIndexOf("\\");
-        int index = Math.max(indexSlash, indexBackSlash);
-        if (index > 0) {
-            String dirs = path.substring(0, index);
-            File dir = new File(dirs);
-            if (!dir.exists()) {
-                boolean success = dir.mkdirs();
-                if (!success) {
-                    LogLog.error("Unable to create directories for " + dirs);
-                }
+            String message = this.layout.format(event);
+
+            if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
+                log(IStatus.ERROR, message, getThrowable(event));
+            } else if (event.getLevel().equals(Level.WARN)) {
+                log(IStatus.WARNING, message, getThrowable(event));
             }
         }
+    }
+
+    @Override
+    public Priority getThreshold() {
+        return Level.WARN;
+    }
+
+    public void close() {
+        // Do nothing
+    }
+
+    public boolean requiresLayout() {
+        return true;
     }
 
 }
