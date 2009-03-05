@@ -26,6 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -179,12 +180,16 @@ public class ConsistencyAction extends Action {
 
             FileUtil.writeFile(input, file);
 
+            ConcurrentDocumentManager concurrentManager = project
+                .getConcurrentDocumentManager();
+
             // The file contents has been replaced, now reset Jupiter
-            project.getConcurrentDocumentManager().resetJupiterClient(path);
+            if (concurrentManager.isManagedByJupiter(path))
+                concurrentManager.resetJupiterClient(path);
 
             // Trigger a new consistency check, so we don't have to wait for new
             // checksums from the host
-            project.getConcurrentDocumentManager().checkConsistency();
+            concurrentManager.checkConsistency();
 
             return true;
         }

@@ -714,12 +714,11 @@ public class ConcurrentDocumentManager {
         assert isHostSide();
 
         if (this.concurrentDocuments.containsKey(path)) {
-            logger.warn("Resetting jupiter server for [" + jid.getBase()
-                + "]: " + path.toOSString());
-
             JupiterDocumentServer server = this.concurrentDocuments.get(path);
 
             if (server.isExist(jid)) {
+                logger.info("Resetting jupiter server for [" + jid.getBase()
+                    + "]: " + path.toOSString());
                 server.removeProxyClient(jid);
                 server.addProxyClient(jid);
             } else {
@@ -729,6 +728,25 @@ public class ConcurrentDocumentManager {
         } else {
             logger.warn("No Jupiter server for path: " + path.toOSString());
         }
+    }
+
+    /**
+     * Returns true if a JupiterServer exists for the given path and a proxy
+     * document for the given user exists.
+     */
+    public boolean isManagedByJupiterServer(JID jid, IPath path) {
+        JupiterDocumentServer server = this.concurrentDocuments.get(path);
+        if (server == null)
+            return false;
+        else
+            return server.isExist(jid);
+    }
+
+    /**
+     * Returns true if a JupiterClient exists for the given path.
+     */
+    public boolean isManagedByJupiter(IPath path) {
+        return this.clientDocs.containsKey(path);
     }
 
     /**

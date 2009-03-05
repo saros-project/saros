@@ -88,20 +88,23 @@ public class ConsistencyWatchdogHandler {
     private void finishConsistencyCheck(JID from, IPath path,
         boolean wasReadOnly) {
 
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+
         // Reset Read Only flag
         if (wasReadOnly) {
-            FileUtil.setReadOnly(Saros.getDefault().getSessionManager()
-                .getSharedProject().getProject().getFile(path), true);
+            FileUtil.setReadOnly(project.getProject().getFile(path), true);
         }
 
         // Reset jupiter
-        Saros.getDefault().getSessionManager().getSharedProject()
-            .getConcurrentDocumentManager().resetJupiterServer(from, path);
+        ConcurrentDocumentManager concurrentManager = project
+            .getConcurrentDocumentManager();
+        if (concurrentManager.isManagedByJupiterServer(from, path))
+            concurrentManager.resetJupiterServer(from, path);
 
         // Send the file to client
         try {
-            transmitter.sendFile(from, Saros.getDefault().getSessionManager()
-                .getSharedProject().getProject(), path, -1,
+            transmitter.sendFile(from, project.getProject(), path, -1,
             /*
              * TODO CO The Callback should be used to show progress to the user
              */
