@@ -298,6 +298,19 @@ public class FileList {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((added == null) ? 0 : added.hashCode());
+        result = prime * result + ((all == null) ? 0 : all.hashCode());
+        result = prime * result + ((altered == null) ? 0 : altered.hashCode());
+        result = prime * result + ((removed == null) ? 0 : removed.hashCode());
+        result = prime * result
+            + ((unaltered == null) ? 0 : unaltered.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
