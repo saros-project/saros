@@ -99,7 +99,7 @@ public interface IEditorAPI {
      * Connecting to an editorPart multiple times, will result in multiple
      * events. The caller is responsible for organizing connections.
      * 
-     * Needs to be called from a UI thread.
+     * @swt Needs to be called from the SWT-UI thread.
      */
     public void addSharedEditorListener(IEditorPart editorPart);
 

@@ -570,13 +570,11 @@ public class EditorAPI implements IEditorAPI {
         });
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-     */
     public void addSharedEditorListener(IEditorPart editorPart) {
-        new EditorListener(this, editorManager, EditorAPI.getViewer(editorPart)); // HACK
+        // HACK 1: It is ugly that the EditorListener is added in the
+        // constructor
+        // HACK 2: The EditorListener is never removed from the EditorPart!
+        new EditorListener(editorPart, editorManager);
     }
 
     /*
@@ -609,7 +607,7 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    public LineRange getViewport(ITextViewer viewer) {
+    public static LineRange getViewport(ITextViewer viewer) {
         int top = viewer.getTopIndex();
         int bottom = viewer.getBottomIndex();
 

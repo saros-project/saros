@@ -50,13 +50,11 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -507,20 +505,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return editor.getDocumentProvider().getDocument(input);
     }
 
-    // TODO CJ: find a better solution
-    public IPath getPathOfDocument(IDocument doc) {
-
-        IPath path = null;
-        for (IEditorPart editor : editorPool.getAllEditors()) {
-            if (editorAPI.getDocument(editor) == doc) {
-                path = editorAPI.getEditorResource(editor)
-                    .getProjectRelativePath();
-                break;
-            }
-        }
-        return path;
-    }
-
     /**
      * @param user
      *            User for who's text selection will be returned.
@@ -536,26 +520,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
-    public void viewportChanged(IPath editor, ILineRange viewport) {
+    public void viewportChanged(IEditorPart part, ILineRange viewport) {
         if (!this.sharedProject.isDriver()) {
             return;
         }
 
-        fireActivity(new ViewportActivity(viewport, editor));
+        IPath path = editorAPI.getEditorResource(part).getProjectRelativePath();
+
+        fireActivity(new ViewportActivity(viewport, path));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
-     */
-    public void selectionChanged(ITextSelection selection, ISelectionProvider sp) {
+    public void selectionChanged(IEditorPart part, ITextSelection newSelection) {
 
-        IDocument doc = ((ITextViewer) sp).getDocument();
+        IPath path = editorAPI.getEditorResource(part).getProjectRelativePath();
 
-        int offset = selection.getOffset();
-        int length = selection.getLength();
-        IPath path = getPathOfDocument(doc);
+        int offset = newSelection.getOffset();
+        int length = newSelection.getLength();
 
         if (path == null) {
             log.error("Couldn't get editor!");
@@ -1388,7 +1368,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (viewport == null) {
             log.warn("Shared Editor does not have a Viewport: " + editorPart);
         } else {
-            viewportChanged(editorPath, viewport);
+            viewportChanged(editorPart, viewport);
         }
     }
 
