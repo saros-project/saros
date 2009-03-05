@@ -43,9 +43,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestError;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -506,15 +504,16 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
     public synchronized void forwardOutgoingRequest(JID to, Request req) {
 
-        /* check for errors. */
-        if (req instanceof RequestError) {
-            /* create save activity. */
-            IActivity activity = new EditorActivity(Type.Saved, req
-                .getEditorPath());
-            /* execute save activity and start consistency check. */
-            exec(activity);
-            return;
-        }
+        // TODO FIXME RequestErrors are never sent
+        // /* check for errors. */
+        // if (req instanceof RequestError) {
+        // /* create save activity. */
+        // IActivity activity = new EditorActivity(Type.Saved, req
+        // .getEditorPath());
+        // /* execute save activity and start consistency check. */
+        // exec(activity);
+        // return;
+        // }
 
         /* put request into outgoing queue. */
         this.outgoingSyncActivities.add(new Pair<JID, Request>(to, req));
