@@ -95,6 +95,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -115,15 +116,23 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  */
 public class EditorManager implements IActivityProvider, ISharedProjectListener {
 
-    private class ElementStateListener implements IElementStateListener {
+    private class DirtyStateListener implements IElementStateListener {
+
+        public boolean enabled = true;
+
         public void elementDirtyStateChanged(Object element, boolean isDirty) {
 
-            // FIXME When driver, but receiving a EditorActivty#SAVE we should
-            // not trigger another save activity.
-            if (!EditorManager.this.isDriver || isDirty
-                || !(element instanceof FileEditorInput)) {
+            if (!enabled)
                 return;
-            }
+
+            if (isDirty)
+                return;
+
+            if (!isDriver)
+                return;
+
+            if (!(element instanceof FileEditorInput))
+                return;
 
             FileEditorInput fileEditorInput = (FileEditorInput) element;
             IFile file = fileEditorInput.getFile();
@@ -180,7 +189,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 .getDocumentProvider(editorPart.getEditorInput());
 
             documentProvider
-                .addElementStateListener(EditorManager.this.elementStateListener);
+                .addElementStateListener(EditorManager.this.dirtyStateListener);
 
             IDocument document = EditorManager.this.editorAPI
                 .getDocument(editorPart);
@@ -319,7 +328,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final EditorPool editorPool = new EditorPool();
 
-    private final ElementStateListener elementStateListener = new ElementStateListener();
+    private final DirtyStateListener dirtyStateListener = new DirtyStateListener();
 
     public class StoppableDocumentListener implements IDocumentListener {
 
@@ -427,6 +436,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     public void sessionEnded(ISharedProject session) {
         setAllEditorsToEditable();
         removeAllAnnotations(null, null);
+
+        // FIXME remove this.dirtyStateListener from IDocumentProvider
 
         this.sharedProject.removeListener(this);
         this.sharedProject.getActivityManager().removeProvider(this);
@@ -1251,24 +1262,28 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Saves the driver editor.
+     * Programmatically saves the given editor.
+     * 
+     * Calling this method will trigger a call to all registered
+     * SharedEditorListeners (independent of the success of this method).
+     * 
+     * Calling this method will NOT trigger a {@link EditorActivity} of type
+     * Save to be sent to the other clients.
      * 
      * @param path
-     *            the project relative path to the resource that the driver was
-     *            editing.
+     *            the project relative path to the file that is supposed to be
+     *            saved to disk.
+     * 
+     * @swt This method must be called from the SWT thread
+     * 
+     * @nonReentrant This method cannot be called twice at the same time.
      */
     public void saveText(IPath path) {
-
-        /*
-         * FIXME Calling saveText should not cause an EditorActivity of type
-         * save to be generated!
-         */
 
         IFile file = this.sharedProject.getProject().getFile(path);
 
         if (!file.exists()) {
-            EditorManager.log.warn("Cannot save file that does not exist:"
-                + path.toString());
+            log.warn("Cannot save file that does not exist:" + path.toString());
             return;
         }
 
@@ -1277,40 +1292,38 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        try {
-            ResourceAttributes attributes = new ResourceAttributes();
-            attributes.setReadOnly(false);
-            file.setResourceAttributes(attributes);
 
-            IDocumentProvider provider = this.editorAPI
-                .getDocumentProvider(input);
+        IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
 
-            if (!this.connectedFiles.contains(file)) {
-                // Save not necessary, if we have no modified document
-                // If this warning is printed we must suspect an inconsistency...
-                log.warn("Saving not necessary (not connected)!");
-                return;
-            }
-
-            IDocument doc = provider.getDocument(input);
-
-            IAnnotationModel model = provider.getAnnotationModel(input);
-            model.connect(doc);
-            
-            provider.saveDocument(new NullProgressMonitor(), input, doc, true);
-            EditorManager.log.debug("Saved document " + path);
-
-            model.disconnect(doc);
-
-            // FIXME Set file readonly again?
-
-            provider.disconnect(input);
-            this.connectedFiles.remove(file);
-
-        } catch (CoreException e) {
-            EditorManager.log.error("Failed to save document.", e);
+        if (!this.connectedFiles.contains(file)) {
+            // Save not necessary, if we have no modified document
+            // If this warning is printed we must suspect an
+            // inconsistency...
+            log.warn("Saving not necessary (not connected)!");
+            return;
         }
+        boolean wasReadonly = FileUtil.setReadOnly(file, false);
 
+        IDocument doc = provider.getDocument(input);
+        IAnnotationModel model = provider.getAnnotationModel(input);
+        model.connect(doc);
+
+        dirtyStateListener.enabled = false;
+        try {
+            provider.saveDocument(new NullProgressMonitor(), input, doc, true);
+            log.debug("Saved document: " + path);
+        } catch (CoreException e) {
+            log.error("Failed to save document: " + path, e);
+        }
+        dirtyStateListener.enabled = true;
+
+        model.disconnect(doc);
+        provider.disconnect(input);
+        this.connectedFiles.remove(file);
+
+        // Reset readonly state
+        if (wasReadonly)
+            FileUtil.setReadOnly(file, true);
     }
 
     /**
