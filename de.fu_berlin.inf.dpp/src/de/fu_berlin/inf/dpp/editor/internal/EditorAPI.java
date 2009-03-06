@@ -289,13 +289,23 @@ public class EditorAPI implements IEditorAPI {
         IEditorInput input = editorPart.getEditorInput();
 
         if (input instanceof IPathEditorInput) {
+
+            // TODO Why do we not directly try to get an IResource?
             IResource resource = (IResource) input.getAdapter(IFile.class);
 
             if (resource == null) {
                 resource = (IResource) input.getAdapter(IResource.class);
             }
 
+            if (resource == null) {
+                log.warn("Could not get resource from EditorInput");
+            }
+
             return resource;
+        } else {
+            log
+                .warn("The input of this editor is not an IPathEditorInput but a "
+                    + input.getClass().getName());
         }
 
         return null;
