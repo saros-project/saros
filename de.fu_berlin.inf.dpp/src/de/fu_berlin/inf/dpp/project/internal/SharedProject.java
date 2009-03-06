@@ -34,8 +34,6 @@ import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -440,7 +438,7 @@ public class SharedProject implements ISharedProject {
 
         Shell shell = Display.getDefault().getActiveShell();
 
-        if (searchUnsavedChangesInProject(false)) {
+        if (searchUnsavedChangesInProject(getProject(), false)) {
             if (MessageDialog
                 .openQuestion(
                     shell,
@@ -449,39 +447,40 @@ public class SharedProject implements ISharedProject {
                         + "this project needs to be saved to disk. "
                         + "Do you want to save all unsaved files of this project now?")) {
 
-                searchUnsavedChangesInProject(true);
-
+                searchUnsavedChangesInProject(getProject(), true);
             } else {
                 return;
             }
         }
 
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                try {
-                    Shell shell = Display.getDefault().getActiveShell();
-                    // TODO check if anybody is online, empty dialog feels
-                    // strange
-                    Window iw = new InvitationDialog(shell, toInvite);
-                    iw.open();
-                } catch (Exception e) {
-                    Saros.getDefault().getLog().log(
-                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                            "Error while running invitation helper", e));
-                }
+                Shell shell = Display.getDefault().getActiveShell();
+                // TODO check if anybody is online, empty dialog feels
+                // strange
+                Window iw = new InvitationDialog(shell, toInvite);
+                iw.open();
             }
         });
 
     }
 
-    boolean searchUnsavedChangesInProject(boolean save) {
-        FileList flist = null;
+    public static boolean searchUnsavedChangesInProject(IProject project,
+        boolean save) {
 
+        /*
+         * FIXME
+         * https://sourceforge.net/tracker2/?func=detail&aid=2668025&group_id
+         * =167540&atid=843359
+         * 
+         * Computing a FileList is too expensive because of checksums!
+         */
+
+        FileList flist = null;
         try {
-            flist = new FileList(getProject());
+            flist = new FileList(project);
         } catch (CoreException e) {
-            // Show this to user?
-            e.printStackTrace();
+            log.error("Could not create filelist: ", e);
             return false;
         }
 
@@ -518,8 +517,8 @@ public class SharedProject implements ISharedProject {
                     }
                 }
             }
-        } catch (CoreException e1) {
-            System.out.println(e1.getMessage());
+        } catch (CoreException e) {
+            log.error("Could not save/check for files to save: ", e);
         }
 
         return false;
