@@ -532,11 +532,12 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
 
         for (User participant : participants) {
-            if (project.getHost().getJID().equals(participant.getJID())) {
-                continue;
-            }
 
             JID jid = participant.getJID();
+
+            if (project.getHost().getJID().equals(jid)) {
+                continue;
+            }
 
             try {
                 sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault()
