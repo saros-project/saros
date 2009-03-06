@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -46,8 +47,11 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class SarosUI implements ISessionListener {
+
+    private static final Logger log = Logger.getLogger(SarosUI.class.getName());
 
     private static final String SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
 
@@ -85,22 +89,16 @@ public class SarosUI implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void invitationReceived(final IIncomingInvitationProcess process) {
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                try {
-                    Shell shell = Display.getDefault().getActiveShell();
-                    JoinSessionWizard jsw = new JoinSessionWizard(process);
-                    WizardDialogAccessable wd = new WizardDialogAccessable(
-                        shell, jsw);
-                    wd.setHelpAvailable(false);
-                    jsw.setWizardDlg(wd);
-                    process.setInvitationUI(jsw.getInvitationUI());
-                    wd.open();
-                } catch (Exception e) {
-                    Saros.getDefault().getLog().log(
-                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                            "Error while joining a session", e));
-                }
+                Shell shell = Display.getDefault().getActiveShell();
+                JoinSessionWizard jsw = new JoinSessionWizard(process);
+                WizardDialogAccessable wd = new WizardDialogAccessable(
+                    shell, jsw);
+                wd.setHelpAvailable(false);
+                jsw.setWizardDlg(wd);
+                process.setInvitationUI(jsw.getInvitationUI());
+                wd.open();
             }
         });
     }
