@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -41,6 +43,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -1311,12 +1314,32 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         model.connect(doc);
 
         dirtyStateListener.enabled = false;
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final IProgressMonitor monitor = new NullProgressMonitor() {
+            @Override
+            public void done() {
+                latch.countDown();
+            }
+        };
+
         try {
-            provider.saveDocument(new NullProgressMonitor(), input, doc, true);
+            provider.saveDocument(monitor, input, doc, true);
             log.debug("Saved document: " + path);
         } catch (CoreException e) {
             log.error("Failed to save document: " + path, e);
         }
+
+        // Wait for saving to be done
+        try {
+            if (!latch.await(5, TimeUnit.SECONDS)) {
+                log.warn("Timeout expired on saving document: " + path);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         dirtyStateListener.enabled = true;
 
         model.disconnect(doc);
