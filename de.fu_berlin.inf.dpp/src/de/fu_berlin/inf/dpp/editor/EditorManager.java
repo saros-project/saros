@@ -320,7 +320,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-    private boolean isFollowing;
+    private boolean isFollowing = false;
 
     private boolean isDriver;
 
@@ -936,12 +936,27 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     protected void checkFollowMode(IEditorPart editorPart) {
-        // if the opened editor is not the followed one, leave following mode
-        IResource resource = this.editorAPI.getEditorResource(editorPart);
-        IPath path = resource.getProjectRelativePath();
-        if (isFollowing) {
-            if (activeDriverEditor != null
-                && (!activeDriverEditor.equals(path) || !isSharedEditor(editorPart))) {
+
+        if (isFollowing && activeDriverEditor != null) {
+
+            if (!isSharedEditor(editorPart)) {
+                setEnableFollowing(false);
+                return;
+            }
+
+            // if the opened editor is not the followed one, leave following
+            // mode
+            IResource resource = this.editorAPI.getEditorResource(editorPart);
+
+            if (resource == null) {
+                log.warn("Resource not found");
+                setEnableFollowing(false);
+                return;
+            }
+
+            IPath path = resource.getProjectRelativePath();
+
+            if (!activeDriverEditor.equals(path)) {
                 setEnableFollowing(false);
             }
         }
@@ -1157,9 +1172,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private boolean isSharedEditor(IEditorPart editorPart) {
+        if (sharedProject == null)
+            return false;
+        
         IResource resource = this.editorAPI.getEditorResource(editorPart);
-        return ((this.sharedProject != null) && (resource.getProject() == this.sharedProject
-            .getProject()));
+        return (resource.getProject() == this.sharedProject
+            .getProject());
     }
 
     private void replaceText(IFile file, int offset, String replacedText,
