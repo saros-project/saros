@@ -44,9 +44,8 @@ public class JID implements Serializable {
      *            is optional.
      */
     public JID(String jid) {
-        // TODO
-        // if (jid == null)
-        // throw new IllegalArgumentException();
+        if (jid == null)
+            throw new IllegalArgumentException();
         this.jid = jid;
     }
 
