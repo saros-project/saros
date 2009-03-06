@@ -149,11 +149,6 @@ public class EditorAPI implements IEditorAPI {
     /** Editors where the user isn't allowed to write */
     private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-     */
     public void setEditorManager(EditorManager editorManager) {
         this.editorManager = editorManager;
 
@@ -528,7 +523,8 @@ public class EditorAPI implements IEditorAPI {
      * 
      * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
-    public void setEditable(final IEditorPart editorPart, final boolean newIsEditable) {
+    public void setEditable(final IEditorPart editorPart,
+        final boolean newIsEditable) {
 
         Display.getDefault().syncExec(new Runnable() {
             public void run() {
