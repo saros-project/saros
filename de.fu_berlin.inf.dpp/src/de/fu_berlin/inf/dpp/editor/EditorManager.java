@@ -1174,10 +1174,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private boolean isSharedEditor(IEditorPart editorPart) {
         if (sharedProject == null)
             return false;
-        
+
         IResource resource = this.editorAPI.getEditorResource(editorPart);
-        return (resource.getProject() == this.sharedProject
-            .getProject());
+
+        if (resource == null)
+            return false;
+
+        return (resource.getProject() == this.sharedProject.getProject());
     }
 
     private void replaceText(IFile file, int offset, String replacedText,
