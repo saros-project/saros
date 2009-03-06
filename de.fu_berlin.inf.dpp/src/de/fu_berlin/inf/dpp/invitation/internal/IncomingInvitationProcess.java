@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.invitation.internal;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -312,11 +311,15 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
-        final File projectDir = new File(workspaceRoot.getLocation().toString()
-            + File.separator + newProjectName);
-        if (projectDir.exists()) {
-            projectDir.delete();
-        }
+        // FIXME Deleting the existing project looks like a bad idea.
+        // final File projectDir = new
+        // File(workspaceRoot.getLocation().toString()
+        // + File.separator + newProjectName);
+        // if (projectDir.exists()) {
+        // if (!projectDir.delete()){
+        // logger.warn("Could not delete projectDirectory: " + projectDir);
+        // }
+        // }
 
         /* run project read only settings in progress monitor thread. */
         Display.getDefault().syncExec(new Runnable() {
