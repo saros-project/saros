@@ -28,4 +28,8 @@ public class WizardDialogAccessable extends WizardDialog {
         }
     }
 
+    @Override
+    public void buttonPressed(int buttonId) {
+        super.buttonPressed(buttonId);
+    }
 }
