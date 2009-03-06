@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -320,6 +321,10 @@ class EnterProjectNamePage extends WizardPage {
 
         updateConnectionStatus();
         updateEnabled();
+
+        if (joinSessionWizard.isAutoAcceptInvitation()) {
+            joinSessionWizard.pressWizardButton(IDialogConstants.FINISH_ID);
+        }
     }
 
     public boolean isUpdateSelected() {

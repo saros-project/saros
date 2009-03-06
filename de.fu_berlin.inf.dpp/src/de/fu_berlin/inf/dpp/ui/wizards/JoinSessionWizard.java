@@ -30,10 +30,13 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A wizard that guides the user through an incoming invitiation process.
@@ -177,5 +180,28 @@ public class JoinSessionWizard extends Wizard {
 
     public void setWizardDlg(WizardDialogAccessable wd) {
         this.wizardDialog = wd;
+    }
+
+    public boolean isAutoAcceptInvitation() {
+        return Saros.getDefault().getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_ACCEPT_INVITATION);
+    }
+
+    public void pressWizardButton(final int buttonID) {
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    log.warn("Internal error: ", e);
+                    return;
+                }
+                Util.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
+                        wizardDialog.buttonPressed(buttonID);
+                    }
+                });
+            }
+        });
     }
 }

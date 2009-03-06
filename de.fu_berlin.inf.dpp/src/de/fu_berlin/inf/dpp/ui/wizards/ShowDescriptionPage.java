@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -55,5 +56,9 @@ class ShowDescriptionPage extends WizardPage {
             .setText(this.joinSessionWizard.process.getDescription());
 
         setControl(composite);
+
+        if (joinSessionWizard.isAutoAcceptInvitation()) {
+            joinSessionWizard.pressWizardButton(IDialogConstants.NEXT_ID);
+        }
     }
 }

@@ -55,6 +55,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         addField(new BooleanFieldEditor(PreferenceConstants.MULTI_DRIVER,
             "Enable multi driver Support (EXPERIMENTAL)",
             getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.AUTO_ACCEPT_INVITATION,
+            "Automatically accept incoming invitation (for debugging)",
+            getFieldEditorParent()));
     }
 
     /*
