@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -108,20 +109,10 @@ public class RequestImpl implements Request {
         } else if (obj instanceof Request) {
             Request request = (Request) obj;
             return (this.siteId == request.getSiteId())
-                && nullSafeEquals(this.timestamp, request.getTimestamp())
-                && nullSafeEquals(this.operation, request.getOperation());
+                && ObjectUtils.equals(this.timestamp, request.getTimestamp())
+                && ObjectUtils.equals(this.operation, request.getOperation());
         } else {
             return false;
-        }
-    }
-
-    private boolean nullSafeEquals(Object o1, Object o2) {
-        if (o1 == o2) {
-            return true;
-        } else if ((o1 == null) || (o2 == null)) {
-            return false;
-        } else {
-            return o1.equals(o2);
         }
     }
 
