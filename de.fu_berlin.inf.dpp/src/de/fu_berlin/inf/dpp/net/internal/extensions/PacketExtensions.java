@@ -215,13 +215,13 @@ public class PacketExtensions {
      */
     public static PacketFilter getFromHostFilter() {
         return new PacketFilter() {
-            public boolean accept(Packet arg0) {
+            public boolean accept(Packet packet) {
                 ISharedProject project = Saros.getDefault().getSessionManager()
                     .getSharedProject();
 
                 return project != null
                     && project.getHost().getJID().equals(
-                        new JID(arg0.getFrom()));
+                        new JID(packet.getFrom()));
             }
         };
     }
