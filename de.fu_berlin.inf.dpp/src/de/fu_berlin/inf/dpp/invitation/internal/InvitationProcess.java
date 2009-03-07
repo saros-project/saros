@@ -134,7 +134,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
      */
     protected void failed(Exception e) {
         this.exception = e;
-        e.printStackTrace(); // HACK
+        logger.error("Invitation process failed", e);
         cancel(e.getMessage(), false);
     }
 
