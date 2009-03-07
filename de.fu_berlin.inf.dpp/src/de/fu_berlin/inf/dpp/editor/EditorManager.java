@@ -178,6 +178,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             IResource resource = EditorManager.this.editorAPI
                 .getEditorResource(editorPart);
+
+            if (resource == null) {
+                log.warn("Resource not found: " + editorPart.getTitle());
+                return;
+            }
+
             IPath path = resource.getProjectRelativePath();
 
             if (path == null) {
@@ -237,7 +243,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         public Set<IEditorPart> getEditors(IPath path) {
 
             if (!editorParts.containsKey(path)) {
-                return editorParts.put(path, new HashSet<IEditorPart>());
+                HashSet<IEditorPart> result = new HashSet<IEditorPart>();
+                editorParts.put(path, result);
+                return result;
             }
             return editorParts.get(path);
         }
@@ -868,7 +876,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         this.editorPool.add(editorPart);
         sharedEditorActivated(editorPart); // HACK: Why does this not work via
-                                           // partActivated?
+        // partActivated?
     }
 
     public void partActivated(IEditorPart editorPart) {
