@@ -1,31 +1,55 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 
-public class SharedDocumentProvider extends TextFileDocumentProvider implements
-    ISessionListener {
+/**
+ * This Document provider tries tell others that files are not editable if not a
+ * driver.
+ */
+public class SharedDocumentProvider extends TextFileDocumentProvider {
 
-    private ISharedProject sharedProject;
+    private static final Logger log = Logger
+        .getLogger(SharedDocumentProvider.class.getName());
 
-    private boolean isDriver;
+    protected ISharedProject sharedProject;
+
+    protected boolean isDriver;
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+
+        @Override
+        public void sessionStarted(ISharedProject session) {
+            sharedProject = session;
+            isDriver = sharedProject.isDriver();
+            sharedProject.addListener(sharedProjectListener);
+        }
+
+        @Override
+        public void sessionEnded(ISharedProject session) {
+            sharedProject.removeListener(sharedProjectListener);
+            sharedProject = null;
+        }
+    };
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void roleChanged(User user, boolean replicated) {
-            if (SharedDocumentProvider.this.sharedProject != null) {
-                SharedDocumentProvider.this.isDriver = SharedDocumentProvider.this.sharedProject
-                    .isDriver(); // HACK
+            if (sharedProject != null) {
+                isDriver = sharedProject.isDriver();
+            } else {
+                log.warn("Internal error: Shared project null in roleChanged!");
             }
         }
     };
@@ -33,15 +57,14 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
     public SharedDocumentProvider() {
         ISessionManager sm = Saros.getDefault().getSessionManager();
         if (sm.getSharedProject() != null) {
-            sessionStarted(sm.getSharedProject());
+            sessionListener.sessionStarted(sm.getSharedProject());
         }
-
-        sm.addSessionListener(this);
+        sm.addSessionListener(sessionListener);
     }
 
     @Override
     public boolean isReadOnly(Object element) {
-        if ((this.sharedProject == null) || !isInSharedProject(element)) {
+        if (!isInSharedProject(element)) {
             return super.isReadOnly(element);
         }
 
@@ -50,7 +73,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
 
     @Override
     public boolean isModifiable(Object element) {
-        if ((this.sharedProject == null) || !isInSharedProject(element)) {
+        if (!isInSharedProject(element)) {
             return super.isModifiable(element);
         }
 
@@ -59,7 +82,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
 
     @Override
     public boolean canSaveDocument(Object element) {
-        if ((this.sharedProject == null) || !isInSharedProject(element)) {
+        if (!isInSharedProject(element)) {
             return super.canSaveDocument(element);
         }
 
@@ -68,43 +91,21 @@ public class SharedDocumentProvider extends TextFileDocumentProvider implements
 
     @Override
     public boolean mustSaveDocument(Object element) {
-        if ((this.sharedProject == null) || !isInSharedProject(element)) {
+        if (!isInSharedProject(element)) {
             return super.mustSaveDocument(element);
         }
 
         return this.isDriver && super.mustSaveDocument(element);
     }
 
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // We are started later during the sessionStarted Method, not before.
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-        this.sharedProject = session;
-        this.isDriver = this.sharedProject.isDriver();
-
-        this.sharedProject.addListener(this.sharedProjectListener);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-        this.sharedProject.removeListener(this.sharedProjectListener);
-        this.sharedProject = null;
-    }
-
     private boolean isInSharedProject(Object element) {
+
+        if (sharedProject == null)
+            return false;
+
         IFileEditorInput fileEditorInput = (IFileEditorInput) element;
         IProject project = fileEditorInput.getFile().getProject();
 
-        return project.equals(this.sharedProject.getProject());
+        return project.equals(sharedProject.getProject());
     }
 }
