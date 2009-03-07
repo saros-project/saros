@@ -373,6 +373,13 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * Send activities which set the active editors and their viewports.
      */
     private void sendDriverEditors() {
+
+        /*
+         * TODO Instead of sending this information to everybody, we should
+         * rather use a subscription mechanism so that everybody can ask us
+         * where we are
+         */
+
         final EditorManager editorManager = EditorManager.getDefault();
         ArrayList<IPath> driverEditors = new ArrayList<IPath>(editorManager
             .getDriverEditors());
