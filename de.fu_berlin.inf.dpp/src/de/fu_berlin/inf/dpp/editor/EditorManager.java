@@ -867,7 +867,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         this.editorPool.add(editorPart);
-        sharedEditorActivated(editorPart); // HACK
+        sharedEditorActivated(editorPart); // HACK: Why does this not work via
+                                           // partActivated?
     }
 
     public void partActivated(IEditorPart editorPart) {
