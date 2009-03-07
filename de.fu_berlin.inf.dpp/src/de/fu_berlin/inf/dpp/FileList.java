@@ -95,6 +95,12 @@ public class FileList {
      * @throws CoreException
      *             exception that might happen while fetching the files from the
      *             given container.
+     * 
+     *             TODO 6 - Not all users of FileList need the checksums, so we
+     *             should not always calculate them.
+     * 
+     *             TODO 4 - Use ProgressMonitors to keep track of the creation
+     *             of a FileList
      */
     public FileList(IContainer container) throws CoreException {
         container.refreshLocal(IResource.DEPTH_INFINITE, null);
