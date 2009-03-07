@@ -312,6 +312,42 @@ public class Util {
         Display.getDefault().syncExec(wrapSafe(log, runnable));
     }
 
+    /**
+     * Class used for reporting the results of a Callable<T> inside a different
+     * thread.
+     * 
+     * It is kind of like a Future Light.
+     */
+    public static class CallableResult<T> {
+        public T result;
+        public Exception e;
+    }
+
+    /**
+     * Runs the given callable in the SWT Thread returning the result of the
+     * computation or throwing an exception that was thrown by the callable.
+     */
+    public static <T> T runSWTSync(final Logger log, final Callable<T> callable)
+        throws Exception {
+
+        final CallableResult<T> result = new CallableResult<T>();
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                try {
+                    result.result = callable.call();
+                } catch (Exception e) {
+                    result.e = e;
+                }
+            }
+        });
+
+        if (result.e != null)
+            throw result.e;
+        else
+            return result.result;
+    }
+
     public static String escapeForLogging(String s) {
         if (s == null)
             return null;
