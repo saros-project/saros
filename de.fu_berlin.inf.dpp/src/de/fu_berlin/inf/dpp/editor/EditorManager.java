@@ -143,6 +143,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 return;
             }
 
+            log.debug("Dirty state reset for: " + file.toString());
+
             IPath path = file.getProjectRelativePath();
             sendEditorActivitySaved(path);
         }
@@ -207,6 +209,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
                 if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
                     .equals("\n")) {
+                    // FIXME #2671663: Converting Line Delimiters causes Save
                     convertLineDelimiters(editorPart);
                 }
                 ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
@@ -223,6 +226,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         public void remove(IEditorPart editorPart) {
             IResource resource = EditorManager.this.editorAPI
                 .getEditorResource(editorPart);
+
+            if (resource == null) {
+                log.warn("Resource not found: " + editorPart.getTitle());
+                return;
+            }
+
             IPath path = resource.getProjectRelativePath();
 
             if (path == null) {
@@ -894,7 +903,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IResource resource = this.editorAPI.getEditorResource(editorPart);
 
             if (resource == null) {
-                log.warn("Resource not found");
+                log.warn("Resource not found: " + editorPart.getTitle());
                 setEnableFollowing(false);
                 return;
             }
