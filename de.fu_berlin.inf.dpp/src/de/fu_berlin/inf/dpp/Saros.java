@@ -546,6 +546,7 @@ public class Saros extends AbstractUIPlugin {
             logger = Logger.getLogger("de.fu_berlin.inf.dpp");
 
         } catch (SecurityException e) {
+            System.err.println("Could not start logging:");
             e.printStackTrace();
         }
     }
