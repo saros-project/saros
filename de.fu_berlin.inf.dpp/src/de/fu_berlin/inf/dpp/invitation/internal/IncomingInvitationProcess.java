@@ -19,9 +19,11 @@
  */
 package de.fu_berlin.inf.dpp.invitation.internal;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -34,7 +36,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
@@ -48,6 +53,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * An incoming invitation process.
@@ -136,7 +142,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * 
      * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
      */
-    public void accept(IProject baseProject, String newProjectName,
+    public void accept(final IProject baseProject, final String newProjectName,
         IProgressMonitor monitor) throws InterruptedException {
 
         if ((newProjectName == null) && (baseProject == null)) {
@@ -148,8 +154,28 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             assertState(State.HOST_FILELIST_SENT);
 
             if (newProjectName != null) {
-                this.localProject = createNewProject(newProjectName,
-                    baseProject);
+
+                try {
+                    this.localProject = Util.runSWTSync(logger,
+                        new Callable<IProject>() {
+                            public IProject call() throws Exception {
+                                return createNewProject(newProjectName,
+                                    baseProject);
+
+                            }
+                        });
+                } catch (CoreException e) {
+                    // Eclipse reported an error
+                    throw e;
+                } catch (InterruptedException e) {
+                    // Canceled by user
+                    cancel(null, false);
+                    return;
+                } catch (Exception e) {
+                    // We are probably at fault!
+                    throw new RuntimeException(e);
+                }
+
             } else {
                 this.localProject = baseProject;
             }
@@ -304,76 +330,65 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @return the new project.
      * @throws CoreException
      *             if something goes wrong while creating the new project.
+     * @throws InterruptedException
+     *             If this operation was canceled by the user.
+     * 
+     * @swt Needs to be run from the SWT UI Thread
      */
-    private IProject createNewProject(String newProjectName,
-        final IProject baseProject) throws CoreException {
+    private static IProject createNewProject(String newProjectName,
+        final IProject baseProject) throws CoreException, InterruptedException {
 
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
-        // FIXME Deleting the existing project looks like a bad idea.
-        // final File projectDir = new
-        // File(workspaceRoot.getLocation().toString()
-        // + File.separator + newProjectName);
-        // if (projectDir.exists()) {
-        // if (!projectDir.delete()){
-        // logger.warn("Could not delete projectDirectory: " + projectDir);
-        // }
-        // }
+        final File projectDir = new File(workspaceRoot.getLocation().toString()
+            + File.separator + newProjectName);
 
-        /* run project read only settings in progress monitor thread. */
-        Display.getDefault().syncExec(new Runnable() {
-            public void run() {
-                ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                    Display.getDefault().getActiveShell());
-                try {
-                    dialog.run(true, false, new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) {
+        if (projectDir.exists()) {
+            throw new CoreException(new Status(IStatus.ERROR, Saros.SAROS,
+                "Project " + newProjectName + " already exists!"));
+        }
 
-                            try {
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
 
-                                monitor.beginTask("Copy local resources ... ",
-                                    IProgressMonitor.UNKNOWN);
+        try {
+            dialog.run(true, true, new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException, InterruptedException {
+                    try {
+                        SubMonitor subMonitor = SubMonitor.convert(monitor,
+                            "Copy local resources ... ", 200);
 
-                                project.clearHistory(null);
-                                project.refreshLocal(IResource.DEPTH_INFINITE,
-                                    null);
+                        project.clearHistory(null);
+                        project.refreshLocal(IResource.DEPTH_INFINITE, null);
 
-                                if (baseProject == null) {
-                                    project.create(new NullProgressMonitor());
-                                    project.open(new NullProgressMonitor());
-                                } else {
-                                    baseProject.copy(project.getFullPath(),
-                                        true, new NullProgressMonitor());
-                                }
-
-                            } catch (CoreException e) {
-                                IncomingInvitationProcess.logger
-                                    .warn(
-                                        "Exception during copy local ressources",
-                                        e);
-                                monitor.done();
-                            }
-
-                            monitor.done();
-
+                        if (baseProject == null) {
+                            project.create(subMonitor.newChild(100));
+                            project.open(subMonitor.newChild(100));
+                        } else {
+                            baseProject.copy(project.getFullPath(), true,
+                                subMonitor.newChild(200));
                         }
-
-                    });
-                } catch (InvocationTargetException e) {
-                    IncomingInvitationProcess.logger.warn("", e);
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    IncomingInvitationProcess.logger.warn("", e);
-                    e.printStackTrace();
+                    } catch (CoreException e) {
+                        throw new InvocationTargetException(e);
+                    } finally {
+                        monitor.done();
+                    }
                 }
 
+            });
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof CoreException) {
+                throw (CoreException) e.getCause();
+            } else {
+                if (e.getCause() instanceof RuntimeException) {
+                    throw (RuntimeException) e.getCause();
+                } else {
+                    throw new RuntimeException(e);
+                }
             }
-        });
-
-        // TODO CO: What is this???
-        // project.clearHistory(null);
-        // project.refreshLocal(IProject.DEPTH_INFINITE, null);
+        }
 
         return project;
     }
