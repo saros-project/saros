@@ -428,9 +428,16 @@ class EnterProjectNamePage extends WizardPage {
         }
     }
 
+    /**
+     * Returns the name of the project to use during the shared session.
+     * 
+     * Caution: This project will be synchronized with the data from the host
+     * and all local changes will be lost.
+     * 
+     * Will return null if the getSourceProject() should be overwritten.
+     */
     public String getTargetProjectName() {
         if (isUpdateSelected()) {
-
             if (this.copyCheckbox.getSelection()) {
                 return this.copyToBeforeUpdateText.getText();
             } else {
@@ -441,16 +448,16 @@ class EnterProjectNamePage extends WizardPage {
         }
     }
 
+    /**
+     * Will return the project to use as a base version during synchronization
+     * or null if the user wants to start synchronization from scratch.
+     * 
+     */
     public IProject getSourceProject() {
 
         if (isUpdateSelected()) {
-            if (this.copyCheckbox.getSelection()) {
-                return ResourcesPlugin.getWorkspace().getRoot().getProject(
-                    this.copyToBeforeUpdateText.getText());
-            } else {
-                return ResourcesPlugin.getWorkspace().getRoot().getProject(
-                    this.updateProjectText.getText());
-            }
+            return ResourcesPlugin.getWorkspace().getRoot().getProject(
+                this.updateProjectText.getText());
         } else {
             return null;
         }
