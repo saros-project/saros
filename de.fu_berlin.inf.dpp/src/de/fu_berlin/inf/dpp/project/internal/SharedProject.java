@@ -469,11 +469,10 @@ public class SharedProject implements ISharedProject {
         boolean save) {
 
         /*
-         * FIXME
+         * FIXME Computing a FileList is too expensive because of checksums!
+         * 
          * https://sourceforge.net/tracker2/?func=detail&aid=2668025&group_id
          * =167540&atid=843359
-         * 
-         * Computing a FileList is too expensive because of checksums!
          */
 
         FileList flist = null;
