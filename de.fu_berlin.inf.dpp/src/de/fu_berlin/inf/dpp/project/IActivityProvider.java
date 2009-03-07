@@ -23,8 +23,4 @@ public interface IActivityProvider extends ISessionListener {
      */
     public IActivity fromXML(XmlPullParser parser);
 
-    /**
-     * Converts the given activity to a XML format.
-     */
-    public String toXML(IActivity activity);
 }

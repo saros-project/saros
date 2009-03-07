@@ -169,9 +169,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      */
     private class EditorPool {
+
         private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
         public void add(IEditorPart editorPart) {
+
             IResource resource = EditorManager.this.editorAPI
                 .getEditorResource(editorPart);
             IPath path = resource.getProjectRelativePath();
@@ -216,66 +218,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             editors.add(editorPart);
             lastEditTimes.put(path, System.currentTimeMillis());
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
-        }
-
-        private void convertLineDelimiters(IEditorPart editorPart) {
-
-            EditorManager.log.debug("Converting line delimiters...");
-
-            // get path of file
-            IFile file = ((FileEditorInput) editorPart.getEditorInput())
-                .getFile();
-            IPath[] paths = new IPath[1];
-            paths[0] = file.getFullPath();
-
-            boolean makeReadable = false;
-
-            ResourceAttributes resourceAttributes = file
-                .getResourceAttributes();
-            if (resourceAttributes.isReadOnly()) {
-                resourceAttributes.setReadOnly(false);
-                try {
-                    file.setResourceAttributes(resourceAttributes);
-                    makeReadable = true;
-                } catch (CoreException e) {
-                    log.error(
-                        "Error making file readable for delimiter conversion:",
-                        e);
-                }
-            }
-
-            ITextFileBufferManager buffManager = FileBuffers
-                .getTextFileBufferManager();
-
-            // convert operation to change line delimiters
-            TextFileBufferOperation convertOperation = new ConvertLineDelimitersOperation(
-                "\n");
-
-            // operation runner for the convert operation
-            FileBufferOperationRunner runner = new FileBufferOperationRunner(
-                buffManager, null);
-
-            // execute convert operation in runner
-            try {
-                runner.execute(paths, convertOperation,
-                    new NullProgressMonitor());
-            } catch (OperationCanceledException e) {
-                EditorManager.log.error("Can't convert line delimiters:", e);
-            } catch (CoreException e) {
-                EditorManager.log.error("Can't convert line delimiters:", e);
-            }
-
-            if (makeReadable) {
-                resourceAttributes.setReadOnly(true);
-                try {
-                    file.setResourceAttributes(resourceAttributes);
-                } catch (CoreException e) {
-                    EditorManager.log
-                        .error(
-                            "Error restoring readable state to false after delimiter conversion:",
-                            e);
-                }
-            }
         }
 
         public void remove(IEditorPart editorPart) {
@@ -1039,76 +981,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityProvider
-     */
-    public String toXML(IActivity activity) {
-        if (activity instanceof EditorActivity) {
-            EditorActivity editorActivity = (EditorActivity) activity;
-
-            // TODO What is that checksum?
-            return "<editor " + "path=\"" + editorActivity.getPath() + "\" "
-                + "type=\"" + editorActivity.getType() + "\" " + "checksum=\""
-                + editorActivity.getChecksum() + "\"  />";
-
-        } else if (activity instanceof TextEditActivity) {
-            TextEditActivity textEditActivity = (TextEditActivity) activity;
-
-            String result = String
-                .format(
-                    "<edit path=\"%s\" offset=\"%d\" source=\"%s\"><text>%s</text><replace>%s</replace></edit>",
-                    textEditActivity.getEditor(), textEditActivity.offset,
-                    textEditActivity.getSource(), Util
-                        .escapeCDATA(textEditActivity.text), Util
-                        .escapeCDATA(textEditActivity.replacedText));
-            return result;
-
-        } else if (activity instanceof TextSelectionActivity) {
-            TextSelectionActivity textSelection = (TextSelectionActivity) activity;
-            assert textSelection.getEditor() != null;
-            return "<textSelection " + "offset=\"" + textSelection.getOffset()
-                + "\" " + "length=\"" + textSelection.getLength() + "\" "
-                + "editor=\"" + textSelection.getEditor().toPortableString()
-                + "\" />";
-
-        } else if (activity instanceof ViewportActivity) {
-            ViewportActivity viewportActvity = (ViewportActivity) activity;
-
-            // TODO This assertion has failed => Could not get editor?
-            assert viewportActvity.getEditor() != null;
-
-            return "<viewport " + "top=\"" + viewportActvity.getTopIndex()
-                + "\" " + "bottom=\"" + viewportActvity.getBottomIndex()
-                + "\" " + "editor=\""
-                + viewportActvity.getEditor().toPortableString() + "\" />";
-        }
-
-        return null;
-    }
-
-    /**
-     * This was an attempt to do some CDATA escaping
-     * 
-     * <code>
-    String text = "";
-    if (parser.next() == XmlPullParser.START_TAG) {
-        if (parser.next() == XmlPullParser.TEXT) {
-            text = parser.getText();
-            parser.next(); // close tag
-        }
-    }
-
-    String replace = "";
-    if (parser.next() == XmlPullParser.START_TAG) {
-        if (parser.next() == XmlPullParser.TEXT) {
-            replace = parser.getText();
-            parser.next(); // close tag
-        }
-    }
-    </code>
-     */
     private IActivity parseTextEditActivity(XmlPullParser parser)
         throws XmlPullParserException, IOException {
 
@@ -1666,4 +1538,61 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
         return null;
     }
+
+    public static void convertLineDelimiters(IEditorPart editorPart) {
+
+        EditorManager.log.debug("Converting line delimiters...");
+
+        // get path of file
+        IFile file = ((FileEditorInput) editorPart.getEditorInput()).getFile();
+        IPath[] paths = new IPath[1];
+        paths[0] = file.getFullPath();
+
+        boolean makeReadable = false;
+
+        ResourceAttributes resourceAttributes = file.getResourceAttributes();
+        if (resourceAttributes.isReadOnly()) {
+            resourceAttributes.setReadOnly(false);
+            try {
+                file.setResourceAttributes(resourceAttributes);
+                makeReadable = true;
+            } catch (CoreException e) {
+                log.error(
+                    "Error making file readable for delimiter conversion:", e);
+            }
+        }
+
+        ITextFileBufferManager buffManager = FileBuffers
+            .getTextFileBufferManager();
+
+        // convert operation to change line delimiters
+        TextFileBufferOperation convertOperation = new ConvertLineDelimitersOperation(
+            "\n");
+
+        // operation runner for the convert operation
+        FileBufferOperationRunner runner = new FileBufferOperationRunner(
+            buffManager, null);
+
+        // execute convert operation in runner
+        try {
+            runner.execute(paths, convertOperation, new NullProgressMonitor());
+        } catch (OperationCanceledException e) {
+            EditorManager.log.error("Can't convert line delimiters:", e);
+        } catch (CoreException e) {
+            EditorManager.log.error("Can't convert line delimiters:", e);
+        }
+
+        if (makeReadable) {
+            resourceAttributes.setReadOnly(true);
+            try {
+                file.setResourceAttributes(resourceAttributes);
+            } catch (CoreException e) {
+                EditorManager.log
+                    .error(
+                        "Error restoring readable state to false after delimiter conversion:",
+                        e);
+            }
+        }
+    }
+
 }

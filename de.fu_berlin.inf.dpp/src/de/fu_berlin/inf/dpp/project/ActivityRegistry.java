@@ -54,22 +54,6 @@ public class ActivityRegistry {
     }
 
     /**
-     * Converts given activity into a XML format.
-     */
-    public String toXML(IActivity activity) {
-        String xml;
-        for (IActivityProvider provider : this.activityProviders) {
-            xml = provider.toXML(activity);
-
-            if (xml != null) {
-                return xml;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Singleton constructor
      */
     private ActivityRegistry() {

@@ -95,4 +95,12 @@ public class EditorActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
+
+    public void toXML(StringBuilder sb) {
+        sb.append("<editor ");
+        sb.append("path=\"").append(getPath()).append("\" ");
+        sb.append("type=\"").append(getType()).append("\" ");
+        sb.append("checksum=\"").append(getChecksum()).append("\" ");
+        sb.append("/>");
+    }
 }

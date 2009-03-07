@@ -81,4 +81,11 @@ public class RoleActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
+
+    public void toXML(StringBuilder sb) {
+        sb.append("<user ");
+        sb.append("id=\"").append(getUser()).append("\" ");
+        sb.append("role=\"").append(getRole()).append("\" ");
+        sb.append("/>");
+    }
 }

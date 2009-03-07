@@ -173,4 +173,15 @@ public class TextEditActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
+
+    public void toXML(StringBuilder sb) {
+
+        String result = String
+            .format(
+                "<edit path=\"%s\" offset=\"%d\" source=\"%s\"><text>%s</text><replace>%s</replace></edit>",
+                getEditor(), offset, getSource(), Util.escapeCDATA(text), Util
+                    .escapeCDATA(replacedText));
+
+        sb.append(result);
+    }
 }

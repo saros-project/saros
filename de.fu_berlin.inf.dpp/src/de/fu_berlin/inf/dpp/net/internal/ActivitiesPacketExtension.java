@@ -28,7 +28,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesPacketExtension implements PacketExtension {
 
@@ -86,7 +85,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
             return "";
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("<").append(getElementName());
         buf.append(" xmlns=\"").append(getNamespace()).append("\">");
 
@@ -95,10 +94,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
         int firstTimestamp = this.activities.get(0).getTimestamp();
         buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
 
-        ActivityRegistry activityRegistry = ActivityRegistry.getDefault();
         for (TimedActivity timedActivity : this.activities) {
             IActivity activity = timedActivity.getActivity();
-            buf.append(activityRegistry.toXML(activity));
+            activity.toXML(buf);
         }
 
         buf.append("</").append(getElementName()).append(">");

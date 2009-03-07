@@ -124,19 +124,4 @@ public class RoleManager implements IActivityProvider {
 
         return null;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityProvider
-     */
-    public String toXML(IActivity activity) {
-        if (activity instanceof RoleActivity) {
-            RoleActivity roleActivity = (RoleActivity) activity;
-            return "<user id=\"" + roleActivity.getUser() + "\" role=\""
-                + roleActivity.getRole() + "\" />";
-        }
-
-        return null;
-    }
 }

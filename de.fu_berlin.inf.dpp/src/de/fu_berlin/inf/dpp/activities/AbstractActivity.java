@@ -38,4 +38,10 @@ public abstract class AbstractActivity implements IActivity {
 
         return true;
     }
+
+    public String toXML() {
+        StringBuilder sb = new StringBuilder();
+        this.toXML(sb);
+        return sb.toString();
+    }
 }

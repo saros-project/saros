@@ -43,5 +43,17 @@ public interface IActivity {
      */
     public String getSource();
 
+    /**
+     * The activity will call the receive method of the given receiver with the
+     * actual type of this IActivity.
+     * 
+     */
     public boolean dispatch(IActivityReceiver receiver);
+
+    /**
+     * Implementors should append an XML representation of themselves on the
+     * given StringBuilder.
+     */
+    public void toXML(StringBuilder sb);
+
 }

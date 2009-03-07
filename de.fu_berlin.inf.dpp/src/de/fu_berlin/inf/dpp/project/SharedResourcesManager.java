@@ -292,26 +292,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityProvider
-     */
-    public String toXML(IActivity activity) {
-        if (activity instanceof FileActivity) {
-            FileActivity fileActivity = (FileActivity) activity;
-            return "<file " + "path=\"" + fileActivity.getPath() + "\" "
-                + "type=\"" + fileActivity.getType() + "\" />";
-
-        } else if (activity instanceof FolderActivity) {
-            FolderActivity folderActivity = (FolderActivity) activity;
-            return "<folder " + "path=\"" + folderActivity.getPath() + "\" "
-                + "type=\"" + folderActivity.getType() + "\" />";
-        }
-
-        return null;
-    }
-
     private void exec(FileActivity activity) throws CoreException {
         IProject project = this.sharedProject.getProject();
         IFile file = project.getFile(activity.getPath());

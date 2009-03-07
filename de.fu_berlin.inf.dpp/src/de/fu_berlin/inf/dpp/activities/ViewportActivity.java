@@ -60,4 +60,16 @@ public class ViewportActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
+
+    public void toXML(StringBuilder sb) {
+
+        assert getEditor() != null;
+
+        sb.append("<viewport ");
+        sb.append("top=\"").append(getTopIndex()).append("\" ");
+        sb.append("bottom=\"").append(getBottomIndex()).append("\" ");
+        sb.append("editor=\"").append(getEditor().toPortableString()).append(
+            "\"");
+        sb.append("/>");
+    }
 }

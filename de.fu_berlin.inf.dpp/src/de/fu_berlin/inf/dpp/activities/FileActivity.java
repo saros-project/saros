@@ -82,4 +82,11 @@ public class FileActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
+
+    public void toXML(StringBuilder sb) {
+        sb.append("<file ");
+        sb.append("path=\"").append(getPath()).append("\" ");
+        sb.append("type=\"").append(getType()).append("\" ");
+        sb.append("/>");
+    }
 }

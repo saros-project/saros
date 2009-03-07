@@ -69,4 +69,15 @@ public class TextSelectionActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
+
+    public void toXML(StringBuilder sb) {
+        assert getEditor() != null;
+
+        sb.append("<textSelection ");
+        sb.append("offset=\"").append(getOffset()).append("\" ");
+        sb.append("length=\"").append(getLength()).append("\" ");
+        sb.append("editor=\"").append(getEditor().toPortableString()).append(
+            "\"");
+        sb.append(" />");
+    }
 }
