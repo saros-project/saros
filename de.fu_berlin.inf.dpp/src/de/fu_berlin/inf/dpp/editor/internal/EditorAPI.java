@@ -172,9 +172,8 @@ public class EditorAPI implements IEditorAPI {
             try {
                 IWorkbenchPage page = window.getActivePage();
                 return IDE.openEditor(page, file);
-
             } catch (PartInitException e) {
-                e.printStackTrace();
+                log.error("Could not initialize part: ", e);
             }
         }
 
@@ -611,7 +610,7 @@ public class EditorAPI implements IEditorAPI {
                 viewer.revealRange(viewer.getDocument().getLineOffset(
                     top + ((bottom - top) / 2)), 0);
             } catch (BadLocationException e) {
-                e.printStackTrace();
+                log.error("Internal Error: BadLocationException - ", e);
             }
         }
     }
