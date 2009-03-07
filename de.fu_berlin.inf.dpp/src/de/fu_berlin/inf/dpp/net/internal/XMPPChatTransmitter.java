@@ -587,7 +587,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      * @param extension
      */
     protected void sendMessageToAll(ISharedProject sharedProject,
-        PacketExtension extension) { // HACK
+        PacketExtension extension) {
 
         JID myJID = Saros.getDefault().getMyJID();
 
