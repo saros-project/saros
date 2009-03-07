@@ -93,8 +93,8 @@ public class SarosUI implements ISessionListener {
             public void run() {
                 Shell shell = Display.getDefault().getActiveShell();
                 JoinSessionWizard jsw = new JoinSessionWizard(process);
-                WizardDialogAccessable wd = new WizardDialogAccessable(
-                    shell, jsw);
+                WizardDialogAccessable wd = new WizardDialogAccessable(shell,
+                    jsw);
                 wd.setHelpAvailable(false);
                 jsw.setWizardDlg(wd);
                 process.setInvitationUI(jsw.getInvitationUI());
@@ -109,7 +109,7 @@ public class SarosUI implements ISessionListener {
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
     public void sessionStarted(ISharedProject session) {
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 try {
                     // Create Session View

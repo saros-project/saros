@@ -1,7 +1,10 @@
 package de.fu_berlin.inf.dpp.ui;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
+
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Eclipse Dialog to show Exception Messages.
@@ -11,13 +14,16 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ErrorMessageDialog {
 
+    private static final Logger log = Logger.getLogger(ErrorMessageDialog.class
+        .getName());
+
     /**
      * show error message dialog.
      * 
      * @param exception
      */
     public static void showErrorMessage(final Exception exception) {
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog.openError(Display.getDefault().getActiveShell(),
                     exception.toString(), exception.getMessage());
@@ -31,7 +37,7 @@ public class ErrorMessageDialog {
      * @param exception
      */
     public static void showErrorMessage(final String exceptionMessage) {
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if ((exceptionMessage == null) || exceptionMessage.equals("")) {
                     MessageDialog.openError(Display.getDefault()
@@ -53,7 +59,7 @@ public class ErrorMessageDialog {
      */
     public static void showChecksumErrorMessage(final String fileName) {
 
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 actualChecksumerrorDialog = new MessageDialog(Display
                     .getDefault().getActiveShell(), "Consistency Problem!",
@@ -71,13 +77,12 @@ public class ErrorMessageDialog {
      * 
      */
     public static void closeChecksumErrorMessage() {
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 if (actualChecksumerrorDialog != null) {
                     actualChecksumerrorDialog.close();
                     actualChecksumerrorDialog = null;
                 }
-
             }
         });
     }

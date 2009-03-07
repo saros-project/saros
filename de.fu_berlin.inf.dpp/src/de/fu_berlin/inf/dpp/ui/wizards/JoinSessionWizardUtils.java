@@ -2,11 +2,10 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -18,11 +17,12 @@ import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class JoinSessionWizardUtils {
 
-    private static Logger log = Logger.getLogger(JoinSessionWizardUtils.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(JoinSessionWizardUtils.class.getName());
 
     public static class ScanRunner implements Runnable {
 
@@ -36,6 +36,7 @@ public class JoinSessionWizardUtils {
 
         public void run() {
 
+            // FIXME Incorrectly handled TargetInvocationException
             ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
             try {
@@ -52,11 +53,11 @@ public class JoinSessionWizardUtils {
 
                 });
             } catch (InvocationTargetException e) {
-                JoinSessionWizardUtils.log.log(Level.WARNING, "", e);
-                e.printStackTrace();
+                log.error("Internal Error:"
+                    + " InvocationTargetException not properly handeled!", e);
             } catch (InterruptedException e) {
-                JoinSessionWizardUtils.log.log(Level.WARNING, "", e);
-                e.printStackTrace();
+                log.error("Internal Error:"
+                    + " InterruptedException not properly handeled!", e);
             }
         }
     }
@@ -69,7 +70,7 @@ public class JoinSessionWizardUtils {
 
         ScanRunner runner = new ScanRunner(invitationProcess);
 
-        Display.getDefault().syncExec(runner);
+        Util.runSafeSWTSync(log, runner);
 
         return runner.project;
     }
@@ -78,8 +79,7 @@ public class JoinSessionWizardUtils {
         try {
             return remoteFileList.match(new FileList(project));
         } catch (CoreException e) {
-            JoinSessionWizardUtils.log.log(Level.FINE,
-                "Couldn't calculate match for project " + project, e);
+            log.debug("Couldn't calculate match for project " + project, e);
 
             return -1;
         }

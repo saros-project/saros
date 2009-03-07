@@ -7,7 +7,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -182,7 +181,7 @@ public class ConsistencyWatchdogHandler {
 
                     // save document -> will continue when done in
                     // finishConsistencyCheck()
-                    Display.getDefault().syncExec(new Runnable() {
+                    Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             Set<IEditorPart> editors = EditorManager
                                 .getDefault().getEditors(path);

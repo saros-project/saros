@@ -529,7 +529,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         refreshRosterTree(true);
 
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 updateStatusInformation(newState);
                 updateEnablement();

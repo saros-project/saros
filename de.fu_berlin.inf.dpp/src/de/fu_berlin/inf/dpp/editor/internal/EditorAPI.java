@@ -32,7 +32,6 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -59,6 +58,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
@@ -152,7 +152,7 @@ public class EditorAPI implements IEditorAPI {
     public void setEditorManager(EditorManager editorManager) {
         this.editorManager = editorManager;
 
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 IWorkbenchWindow window = EditorAPI.getActiveWindow();
                 window.getPartService().addPartListener(
@@ -535,7 +535,7 @@ public class EditorAPI implements IEditorAPI {
     public void setEditable(final IEditorPart editorPart,
         final boolean newIsEditable) {
 
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 ITextViewerExtension textViewer = (ITextViewerExtension) EditorAPI
                     .getViewer(editorPart);

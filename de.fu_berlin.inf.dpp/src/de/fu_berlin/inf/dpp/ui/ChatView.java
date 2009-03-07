@@ -13,7 +13,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
@@ -30,6 +29,7 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class ChatView extends ViewPart implements ISessionListener,
     IConnectionListener, IChatListener {
@@ -202,7 +202,8 @@ public class ChatView extends ViewPart implements ISessionListener,
 
     public void chatMessageAdded(final String sender, final String message) {
         ChatView.log.debug("Received Message from " + sender + ": " + message);
-        Display.getDefault().asyncExec(new Runnable() {
+
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 int prefixPos = sender.indexOf('/') + 1;
                 String m = message.startsWith("\n") ? message.substring(1)

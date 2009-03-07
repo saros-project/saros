@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
-import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -37,6 +36,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Decorates Shared Projects.
@@ -121,17 +121,13 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     }
 
     protected void updateDecoratorsAsync(final IProject project) {
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                try {
-                    LabelProviderChangedEvent event = new LabelProviderChangedEvent(
-                        SharedProjectDecorator.this, new Object[] { project });
+                LabelProviderChangedEvent event = new LabelProviderChangedEvent(
+                    SharedProjectDecorator.this, new Object[] { project });
 
-                    for (ILabelProviderListener listener : listeners) {
-                        listener.labelProviderChanged(event);
-                    }
-                } catch (RuntimeException e) {
-                    log.error("Internal Error in SharedProjectDecorator:", e);
+                for (ILabelProviderListener listener : listeners) {
+                    listener.labelProviderChanged(event);
                 }
             }
         });

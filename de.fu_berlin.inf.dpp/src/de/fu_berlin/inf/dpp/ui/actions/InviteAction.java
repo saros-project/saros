@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 
@@ -83,20 +82,10 @@ public class InviteAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                runInvite();
+                Saros.getDefault().getSessionManager().getSharedProject()
+                    .startInvitation(getSelected());
             }
         });
-    }
-
-    public void runInvite() {
-        try {
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
-
-            project.startInvitation(getSelected());
-        } catch (RuntimeException e) {
-            log.error("Internal Error in InviteAction:", e);
-        }
     }
 
     @Override
@@ -106,13 +95,9 @@ public class InviteAction extends SelectionProviderAction {
 
     public void updateEnablement() {
 
-        Display.getDefault().asyncExec(new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                try {
-                    setEnabled(canInviteSelected());
-                } catch (RuntimeException e) {
-                    log.error("Caught internal error in InvitationDialog:", e);
-                }
+                setEnabled(canInviteSelected());
             }
         });
 

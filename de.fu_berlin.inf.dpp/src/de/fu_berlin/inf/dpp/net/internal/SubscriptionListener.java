@@ -13,6 +13,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.ui.IRosterTree;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This Class implements a manual subscription. If a request for subscription is
@@ -27,7 +28,7 @@ import de.fu_berlin.inf.dpp.ui.IRosterTree;
  */
 public class SubscriptionListener implements PacketListener {
 
-    private static Logger logger = Logger.getLogger(SubscriptionListener.class);
+    private static Logger log = Logger.getLogger(SubscriptionListener.class);
 
     private final XMPPConnection connection;
 
@@ -40,7 +41,7 @@ public class SubscriptionListener implements PacketListener {
 
     public void processPacket(final Packet packet) {
 
-        SubscriptionListener.logger.debug("Packet called. " + packet.getFrom());
+        SubscriptionListener.log.debug("Packet called. " + packet.getFrom());
 
         if (!packet.getFrom().equals(this.connection.getUser())) {
 
@@ -49,19 +50,19 @@ public class SubscriptionListener implements PacketListener {
 
                 // subscribed
                 if (p.getType() == Presence.Type.subscribed) {
-                    SubscriptionListener.logger.debug("subcribed from "
+                    SubscriptionListener.log.debug("subcribed from "
                         + p.getFrom());
                 }
 
                 // unsubscribed
                 if (p.getType() == Presence.Type.unsubscribed) {
-                    SubscriptionListener.logger.debug("unsubcribed from "
+                    SubscriptionListener.log.debug("unsubcribed from "
                         + p.getFrom());
                 }
 
                 // Request of removal of subscription
                 else if (p.getType() == Presence.Type.unsubscribe) {
-                    SubscriptionListener.logger.debug("unsubcribe from "
+                    SubscriptionListener.log.debug("unsubcribe from "
                         + p.getFrom());
 
                     // if appropriate entry exists remove that
@@ -71,7 +72,7 @@ public class SubscriptionListener implements PacketListener {
                         try {
                             connection.getRoster().removeEntry(e);
                         } catch (XMPPException e1) {
-                            logger.error(e1);
+                            log.error(e1);
                         }
                     }
                     sendPresence(Presence.Type.unsubscribed, packet.getFrom());
@@ -80,7 +81,7 @@ public class SubscriptionListener implements PacketListener {
 
                 // request of subscription
                 else if (p.getType().equals(Presence.Type.subscribe)) {
-                    logger.debug("subscribe from " + p.getFrom());
+                    log.debug("subscribe from " + p.getFrom());
 
                     // ask user for confirmation of subscription
                     if (askUserForSubscriptionConfirmation(packet.getFrom())) {
@@ -97,7 +98,7 @@ public class SubscriptionListener implements PacketListener {
                                 connection.getRoster().createEntry(
                                     packet.getFrom(), packet.getFrom(), null);
                             } catch (XMPPException e1) {
-                                logger.error(e1);
+                                log.error(e1);
                             }
                         }
                     } else {
@@ -121,7 +122,7 @@ public class SubscriptionListener implements PacketListener {
 
     private static boolean askUserForSubscriptionConfirmation(final String from) {
         final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 result.set(MessageDialog.openConfirm(Display.getDefault()
                     .getActiveShell(), "Request of subscription received",
@@ -132,7 +133,7 @@ public class SubscriptionListener implements PacketListener {
     }
 
     private static void informUserAboutUnsubscription(final String from) {
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 MessageDialog
                     .openInformation(

@@ -25,7 +25,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.XMPPConnection;
 
@@ -74,14 +73,14 @@ public class ConnectDisconnectAction extends Action {
     }
 
     protected IStatusLineManager getStatusmanager() {
-        // TODO check for NPE
 
+        // TODO check better for NPE
         try {
             return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().getViewReferences()[0].getView(false)
                 .getViewSite().getActionBars().getStatusLineManager();
-
         } catch (RuntimeException e) {
+            log.warn("Could not get StatusLineManager!");
             return null;
         }
     }
@@ -89,7 +88,7 @@ public class ConnectDisconnectAction extends Action {
     public void setStatusBar(final String message, final boolean start) {
         // display task progress information (begin) in status
         // line
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 IStatusLineManager slm = getStatusmanager();
                 if (slm == null)

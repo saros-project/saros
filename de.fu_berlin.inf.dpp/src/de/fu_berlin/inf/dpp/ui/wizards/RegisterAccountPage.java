@@ -5,6 +5,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,8 +32,12 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
+
+    private static final Logger log = Logger
+        .getLogger(RegisterAccountPage.class.getName());
 
     private Text serverText;
 
@@ -125,7 +130,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 }
 
                 public void widgetSelected(SelectionEvent e) {
-                    Display.getDefault().syncExec(new Runnable() {
+                    Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             try {
                                 Shell shell = Display.getDefault()

@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -106,7 +105,7 @@ public class ConsistencyAction extends Action {
                     .getConcurrentDocumentManager()
                     .getPathsWithWrongChecksums());
 
-                Display.getDefault().asyncExec(new Runnable() {
+                Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
                         // Concatenate paths
@@ -312,11 +311,7 @@ public class ConsistencyAction extends Action {
         // save document
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                try {
-                    editor.doSave(monitor);
-                } catch (RuntimeException e) {
-                    log.error("Internal error: ", e);
-                }
+                editor.doSave(monitor);
             }
         });
 

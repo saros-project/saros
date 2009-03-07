@@ -159,7 +159,7 @@ public class SessionView extends ViewPart implements ISessionListener {
         }
 
         private void refreshTable() {
-            Display.getDefault().asyncExec(new Runnable() {
+            Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     SessionContentProvider.this.tableViewer.refresh();
                 }

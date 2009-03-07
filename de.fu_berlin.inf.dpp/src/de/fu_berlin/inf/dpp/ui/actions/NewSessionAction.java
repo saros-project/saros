@@ -73,7 +73,7 @@ public class NewSessionAction implements IObjectActionDelegate {
             ISessionManager sm = Saros.getDefault().getSessionManager();
             sm.startSession(this.selectedProject);
         } catch (final XMPPException e) {
-            Display.getDefault().syncExec(new Runnable() {
+            Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     ErrorDialog.openError(
                         Display.getDefault().getActiveShell(),

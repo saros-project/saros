@@ -355,7 +355,7 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, e.getMessage());
 
             if (!failSilently) {
-                Display.getDefault().syncExec(new Runnable() {
+                Util.runSafeSWTSync(logger, new Runnable() {
                     public void run() {
                         MessageDialog.openError(Display.getDefault()
                             .getActiveShell(), "Error Connecting",
@@ -583,7 +583,7 @@ public class Saros extends AbstractUIPlugin {
 
                 disconnect();
 
-                Display.getDefault().syncExec(new Runnable() {
+                Util.runSafeSWTSync(logger, new Runnable() {
                     public void run() {
                         MessageDialog
                             .openError(

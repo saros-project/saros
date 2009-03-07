@@ -786,15 +786,11 @@ public class ConcurrentDocumentManager {
     public void checkConsistency() {
 
         try {
-            executor.submit(new Runnable() {
+            executor.submit(Util.wrapSafe(logger, new Runnable() {
                 public void run() {
-                    try {
-                        performCheck(currentChecksums);
-                    } catch (RuntimeException e) {
-                        logger.error("Failed to check consistency", e);
-                    }
+                    performCheck(currentChecksums);
                 }
-            });
+            }));
         } catch (RejectedExecutionException e) {
             /*
              * Ignore Checksums that arrive before we are done processing the

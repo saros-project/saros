@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.PacketListener;
@@ -44,6 +43,7 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.ui.MessagingWindow;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * MessagingManager handles all instant messaging related communications.
@@ -144,7 +144,7 @@ public class MessagingManager implements PacketListener, MessageListener,
                 return;
             }
 
-            Display.getDefault().syncExec(new Runnable() {
+            Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     openWindow();
 

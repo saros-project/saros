@@ -2,11 +2,11 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.XMPPConnection;
@@ -22,18 +22,22 @@ import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class NetworkView extends ViewPart implements JingleTransportListener,
     IJingleFileTransferListener, IConnectionListener {
 
-    private Text log;
+    private static final Logger log = Logger.getLogger(NetworkView.class
+        .getName());
+
+    private Text loggingView;
 
     @Override
     public void createPartControl(Composite parent) {
         Composite rootComposite = new Composite(parent, SWT.NONE);
         rootComposite.setLayout(new FillLayout());
         SashForm sash = new SashForm(rootComposite, SWT.VERTICAL);
-        this.log = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
+        this.loggingView = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 
         // register as connection listener
         Saros.getDefault().addListener(this);
@@ -57,16 +61,16 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
 
     public void transportEstablished(TransportCandidate local,
         TransportCandidate remote) {
-        log.append("Jingle transport estabblished: " + local.getLocalIp()
-            + " <-> " + remote.getLocalIp());
+        loggingView.append("Jingle transport estabblished: "
+            + local.getLocalIp() + " <-> " + remote.getLocalIp());
 
     }
 
     public void connected(final String protocol, final String remote) {
-        Display.getDefault().syncExec(new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                log.append("P2P Connected with " + protocol + " to " + remote
-                    + "\n");
+                loggingView.append("P2P Connected with " + protocol + " to "
+                    + remote + "\n");
             }
         });
     }
@@ -78,7 +82,7 @@ public class NetworkView extends ViewPart implements JingleTransportListener,
 
     public void failedToSendFileListWithJingle(JID jid,
         TransferDescription transferList) {
-        log.append("Failed to send File with Jingle to " + jid);
+        loggingView.append("Failed to send File with Jingle to " + jid);
     }
 
     public void connectionStateChanged(XMPPConnection connection,

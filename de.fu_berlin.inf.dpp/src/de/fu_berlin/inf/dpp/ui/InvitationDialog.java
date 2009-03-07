@@ -66,6 +66,7 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public class InvitationDialog extends Dialog implements IInvitationUI,
     IConnectionListener {
@@ -198,7 +199,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
                 public void widgetSelected(SelectionEvent e) {
                     cancelInvite();
-                    Display.getDefault().syncExec(new Runnable() {
+                    Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             // Block until all SWT events have been processed
                         }
@@ -291,15 +292,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         if (this.display == null || this.display.isDisposed())
             return;
 
-        this.display.asyncExec(new Runnable() {
-            public void run() {
-                try {
-                    r.run();
-                } catch (RuntimeException e) {
-                    log.error("Internal error in InvitationDialog:", e);
-                }
-            }
-        });
+        this.display.asyncExec(Util.wrapSafe(log, r));
     }
 
     /*
