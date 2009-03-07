@@ -184,8 +184,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 return;
             }
 
-            HashSet<IEditorPart> editors = this.editorParts.get(path);
-
             EditorManager.this.editorAPI.addSharedEditorListener(editorPart);
             EditorManager.this.editorAPI.setEditable(editorPart,
                 EditorManager.this.isDriver);
@@ -198,11 +196,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             IDocument document = EditorManager.this.editorAPI
                 .getDocument(editorPart);
-
-            if (editors == null) {
-                editors = new HashSet<IEditorPart>();
-                this.editorParts.put(path, editors);
-            }
 
             // if line delimiters are not in unix style convert them
             if (document instanceof IDocumentExtension4) {
@@ -218,7 +211,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     .error("Can't discover line delimiter of document");
             }
             document.addDocumentListener(EditorManager.this.documentListener);
-            editors.add(editorPart);
+            getEditors(path).add(editorPart);
             lastEditTimes.put(path, System.currentTimeMillis());
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
         }
@@ -238,25 +231,24 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 return;
             }
 
-            HashSet<IEditorPart> editors = this.editorParts.get(path);
-            editors.remove(editorPart);
+            getEditors(path).remove(editorPart);
         }
 
         public Set<IEditorPart> getEditors(IPath path) {
-            HashSet<IEditorPart> set = this.editorParts.get(path);
-            return set == null ? new HashSet<IEditorPart>() : set; // HACK
+
+            if (!editorParts.containsKey(path)) {
+                return editorParts.put(path, new HashSet<IEditorPart>());
+            }
+            return editorParts.get(path);
         }
 
         public Set<IEditorPart> getAllEditors() {
-            Set<IEditorPart> all = new HashSet<IEditorPart>();
+            Set<IEditorPart> result = new HashSet<IEditorPart>();
 
             for (Set<IEditorPart> parts : this.editorParts.values()) {
-                for (IEditorPart part : parts) {
-                    all.add(part);
-                }
+                result.addAll(parts);
             }
-
-            return all;
+            return result;
         }
 
         public void removeAllEditors() {
@@ -340,7 +332,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void sessionStarted(ISharedProject session) {
         this.sharedProject = session;
-        assert (this.editorPool.editorParts.isEmpty());
+
+        assert this.editorPool.editorParts.isEmpty() : "EditorPool was not correctly reset!";
+
         this.isDriver = this.sharedProject.isDriver();
         this.sharedProject.addListener(this);
 
