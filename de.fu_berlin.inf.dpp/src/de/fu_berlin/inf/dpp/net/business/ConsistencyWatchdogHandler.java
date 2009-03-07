@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ui.IEditorPart;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
@@ -19,6 +18,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -44,51 +44,34 @@ public class ConsistencyWatchdogHandler {
 
     protected long lastReceivedActivityTime;
 
-    public class FinishMonitor extends NullProgressMonitor {
-
-        JID from;
-        IPath path;
-        boolean wasReadOnly;
-
-        public FinishMonitor(JID from, IPath path, boolean wasReadOnly) {
-            this.from = from;
-            this.path = path;
-            this.wasReadOnly = wasReadOnly;
-        }
-
-        boolean firstTime = true;
-
-        @Override
-        public void done() {
-
-            synchronized (this) {
-                if (!firstTime) {
-                    return;
-                }
-                firstTime = false;
-            }
-
-            if (isCanceled()) {
-                log.warn("Saving was canceled");
-            }
-
-            Util.runSafeAsync("ConsistencyWatchdog-Finish", log,
-                new Runnable() {
-                    public void run() {
-                        finishConsistencyCheck(from, path, wasReadOnly);
-                    }
-                });
-        }
-    }
-
     /**
      * @host This is only called on the host
      */
-    private void finishConsistencyCheck(JID from, IPath path,
-        boolean wasReadOnly) {
+    private void performConsistencyRecovery(JID from, IPath path) {
+
+        // wait until no more activities are received
+        while (System.currentTimeMillis() - lastReceivedActivityTime < 1500) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
+
+        // TODO Handle case, when file does not exist locally any
+        // more
+        final boolean wasReadOnly = FileUtil.setReadOnly(project.getProject()
+            .getFile(path), false);
+
+        Set<IEditorPart> editors = EditorManager.getDefault().getEditors(path);
+        if (editors != null && editors.size() > 0) {
+            if (!EditorAPI.saveEditor(editors.iterator().next())) {
+                log.warn("Saving was canceled");
+            }
+        }
 
         // Reset Read Only flag
         if (wasReadOnly) {
@@ -129,13 +112,6 @@ public class ConsistencyWatchdogHandler {
             log.error("Could not sent file for consistency resolution");
         }
 
-        // TODO Should we not rather send an Activity?
-        // transmitter.sendActivities(project.getVariable(),
-        // Collections.singletonList(new TimedActivity(
-        // new FileActivity(FileActivity.Type.Created,
-        // new Path(path)),
-        // ActivitySequencer.UNDEFINED_TIME)));
-
     }
 
     ChecksumErrorExtension checksumError = new ChecksumErrorExtension() {
@@ -154,49 +130,18 @@ public class ConsistencyWatchdogHandler {
 
             ErrorMessageDialog.showChecksumErrorMessage(path.toOSString());
 
-            if (!Saros.getDefault().getSessionManager().getSharedProject()
+            if (Saros.getDefault().getSessionManager().getSharedProject()
                 .isHost()) {
-                // Client only needs to showChecksumErrorMessage
-                return;
-            }
-
-            Util.runSafeAsync("ConsistencyWatchdog-Start", log, new Runnable() {
-                public void run() {
-
-                    // wait until no more activities are received
-                    while (System.currentTimeMillis()
-                        - lastReceivedActivityTime < 1500) {
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                        }
-                    }
-
-                    // TODO Handle case, when file does not exist locally any
-                    // more
-                    final boolean wasReadOnly = FileUtil.setReadOnly(Saros
-                        .getDefault().getSessionManager().getSharedProject()
-                        .getProject().getFile(path), false);
-
-                    // save document -> will continue when done in
-                    // finishConsistencyCheck()
-                    Util.runSafeSWTSync(log, new Runnable() {
+                Util.runSafeAsync("ConsistencyWatchdog-Start", log,
+                    new Runnable() {
                         public void run() {
-                            Set<IEditorPart> editors = EditorManager
-                                .getDefault().getEditors(path);
-                            if (editors != null && editors.size() > 0) {
-                                editors.iterator().next().doSave(
-                                    new FinishMonitor(from, path, wasReadOnly));
-                            }
-
+                            performConsistencyRecovery(from, path);
                         }
                     });
-                }
-            });
-
+            } else {
+                // Client only needs to showChecksumErrorMessage
+            }
         }
-
     };
 
     ChecksumExtension checksum = new ChecksumExtension() {

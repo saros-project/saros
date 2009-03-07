@@ -7,15 +7,12 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IEditorPart;
@@ -27,6 +24,7 @@ import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -282,7 +280,7 @@ public class ConsistencyAction extends Action {
             // Save document
             for (IEditorPart editor : EditorManager.getDefault().getEditors(
                 path)) {
-                if (!saveEditor(editor)) {
+                if (!EditorAPI.saveEditor(editor)) {
                     log
                         .info("Consistency Check canceled by user! Diff might be inaccurate");
                 }
@@ -292,38 +290,6 @@ public class ConsistencyAction extends Action {
             Saros.getDefault().getSessionManager().getTransmitter()
                 .sendFileChecksumErrorMessage(path, false);
         }
-    }
-
-    /**
-     * @return true when the editor was successfully saved
-     */
-    public static boolean saveEditor(final IEditorPart editor) {
-
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        final IProgressMonitor monitor = new NullProgressMonitor() {
-            @Override
-            public void done() {
-                latch.countDown();
-            }
-        };
-
-        // save document
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                editor.doSave(monitor);
-            }
-        });
-
-        // Wait for saving to be done
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        return !monitor.isCanceled();
-
     }
 
 }

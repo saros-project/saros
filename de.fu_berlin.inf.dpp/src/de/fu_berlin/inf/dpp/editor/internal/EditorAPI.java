@@ -7,10 +7,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -682,6 +685,39 @@ public class EditorAPI implements IEditorAPI {
             IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
             statusLine.setMessage(false, editable ? "" : "Not editable", null);
         }
+    }
+
+    /**
+     * @return true when the editor was successfully saved
+     * 
+     * @nonSWT This method may not be called from the SWT UI Thread!
+     */
+    public static boolean saveEditor(final IEditorPart editor) {
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final IProgressMonitor monitor = new NullProgressMonitor() {
+            @Override
+            public void done() {
+                latch.countDown();
+            }
+        };
+
+        // save document
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                editor.doSave(monitor);
+            }
+        });
+
+        // Wait for saving to be done
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        return !monitor.isCanceled();
     }
 
     /**
