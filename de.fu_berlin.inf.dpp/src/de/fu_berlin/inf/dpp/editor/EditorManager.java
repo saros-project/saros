@@ -389,7 +389,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public void sessionEnded(ISharedProject session) {
         setAllEditorsToEditable();
-        removeAllAnnotations(null, null);
+        removeAllAnnotations(new Predicate() {
+            public boolean check(SarosAnnotation annotation) {
+                return true;
+            }
+        });
 
         // FIXME remove this.dirtyStateListener from IDocumentProvider
 
@@ -620,7 +624,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         activateOpenEditors();
 
         // TODO Why remove all?
-        removeAllAnnotations(ContributionAnnotation.TYPE);
+        removeAllAnnotations(new Predicate() {
+            public boolean check(SarosAnnotation annotation) {
+                return annotation instanceof ContributionAnnotation;
+            }
+        });
 
         if (Saros.getDefault().getLocalUser().equals(user)) {
 
@@ -628,8 +636,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             IViewPart view = findView("de.fu_berlin.inf.dpp.ui.SessionView");
 
             if (isDriver) {
-
-                removeAllAnnotations(ViewportAnnotation.TYPE);
+                removeAllAnnotations(new Predicate() {
+                    public boolean check(SarosAnnotation annotation) {
+                        return annotation instanceof ViewportAnnotation;
+                    }
+                });
 
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
@@ -676,8 +687,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
      */
-    public void userLeft(JID user) {
-        removeAllAnnotations(user.toString(), null);
+    public void userLeft(final JID user) {
+        removeAllAnnotations(new Predicate() {
+            public boolean check(SarosAnnotation annotation) {
+                return annotation.getSource().equals(user.toString());
+            }
+        });
         driverTextSelections.remove(sharedProject.getParticipant(user));
     }
 
@@ -734,7 +749,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @swt This must be called from the SWT thread.
      * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
+     * @see IActivityProvider
      */
     public void exec(final IActivity activity) {
 
@@ -1306,68 +1321,18 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
+    private interface Predicate {
+        boolean check(SarosAnnotation annotation);
+    }
+
     /**
-     * Removes all annotations of a given type and for all users.
+     * Removes all annotations that fulfill given {@link Predicate}.
      * 
-     * @param annotationType
-     *            the annotation type that will be removed.
+     * @param predicate
      */
     @SuppressWarnings("unchecked")
-    private void removeAllAnnotations(String annotationType) {
+    private void removeAllAnnotations(Predicate predicate) {
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
-            IEditorInput input = editor.getEditorInput();
-            IDocumentProvider provider = this.editorAPI
-                .getDocumentProvider(input);
-            IAnnotationModel model = provider.getAnnotationModel(input);
-
-            if (model == null) {
-                return;
-            }
-
-            ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
-            for (Iterator<Annotation> it = model.getAnnotationIterator(); it
-                .hasNext();) {
-                Annotation annotation = it.next();
-                // TODO Use the type (in the sense of class) here instead of
-                // the string.
-                if (annotation.getType().startsWith(annotationType)) {
-                    annotations.add(annotation);
-                }
-            }
-
-            removeAnnotations(model, annotations);
-        }
-    }
-
-    private void removeAnnotations(IAnnotationModel model,
-        ArrayList<Annotation> annotations) {
-
-        if (model instanceof IAnnotationModelExtension) {
-            IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
-            extension.replaceAnnotations(annotations
-                .toArray(new Annotation[annotations.size()]), Collections
-                .emptyMap());
-        } else {
-            // TODO maybe warn once!
-            for (Annotation annotation : annotations) {
-                model.removeAnnotation(annotation);
-            }
-        }
-    }
-
-    /**
-     * Removes all annotations of given user and type.
-     * 
-     * @param forUserID
-     *            the id of the user whos annotations will be removed, if null
-     *            annotations of given type for all users are removed
-     * @param typeAnnotation
-     *            the type of the annotations to remove if null all annotations
-     *            are removed
-     */
-    private void removeAllAnnotations(String forUserID, String typeAnnotation) {
-
-        for (IEditorPart editor : editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
             IDocumentProvider provider = this.editorAPI
                 .getDocumentProvider(input);
@@ -1377,27 +1342,32 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 continue;
             }
 
+            // Collect annotations.
             ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
-            for (@SuppressWarnings("unchecked")
-            Iterator<Annotation> it = model.getAnnotationIterator(); it
+            for (Iterator<Annotation> it = model.getAnnotationIterator(); it
                 .hasNext();) {
                 Annotation annotation = it.next();
-                String type = annotation.getType();
 
-                if (typeAnnotation != null && !typeAnnotation.equals(type)) {
-                    continue;
-                }
-
-                if (!(annotation instanceof SarosAnnotation))
-                    continue;
-
-                SarosAnnotation sarosAnnotation = (SarosAnnotation) annotation;
-                if (forUserID == null
-                    || sarosAnnotation.getSource().equals(forUserID)) {
-                    annotations.add(annotation);
+                if (annotation instanceof SarosAnnotation) {
+                    SarosAnnotation sarosAnnontation = (SarosAnnotation) annotation;
+                    if (predicate.check(sarosAnnontation)) {
+                        annotations.add(annotation);
+                    }
                 }
             }
-            removeAnnotations(model, annotations);
+
+            // Remove collected annotations.
+            if (model instanceof IAnnotationModelExtension) {
+                IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
+                extension.replaceAnnotations(annotations
+                    .toArray(new Annotation[annotations.size()]), Collections
+                    .emptyMap());
+            } else {
+                // TODO maybe warn once!
+                for (Annotation annotation : annotations) {
+                    model.removeAnnotation(annotation);
+                }
+            }
         }
     }
 

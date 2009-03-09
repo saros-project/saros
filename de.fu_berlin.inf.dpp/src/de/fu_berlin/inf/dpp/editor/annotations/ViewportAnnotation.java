@@ -23,8 +23,7 @@ import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 public class ViewportAnnotation extends SarosAnnotation implements
     IAnnotationPresentation {
 
-    // TODO Make this field protected.
-    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
+    protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.viewport";
 
     public static final int LAYER = 6;
 

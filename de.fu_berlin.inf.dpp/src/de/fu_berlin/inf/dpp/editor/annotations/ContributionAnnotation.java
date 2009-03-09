@@ -10,8 +10,8 @@ import org.eclipse.jface.text.source.IAnnotationModel;
  * @author rdjemili
  */
 public class ContributionAnnotation extends SarosAnnotation {
-    // TODO Make this field protected.
-    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
+
+    protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.contribution";
 
     /** The model this annotation belongs to. */
     protected IAnnotationModel model;
