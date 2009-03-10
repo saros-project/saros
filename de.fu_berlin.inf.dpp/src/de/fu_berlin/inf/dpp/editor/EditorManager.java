@@ -62,9 +62,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
@@ -594,24 +592,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
-    public static IViewPart findView(String id) {
-        IWorkbench workbench = PlatformUI.getWorkbench();
-        if (workbench == null)
-            return null;
-
-        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        if (window == null)
-            return null;
-
-        IWorkbenchPage page = window.getActivePage();
-        if (page == null)
-            return null;
-
-        return page.findView(id);
-    }
-
-    /* ---------- ISharedProjectListener --------- */
-
     /*
      * (non-Javadoc)
      * 
@@ -633,7 +613,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (Saros.getDefault().getLocalUser().equals(user)) {
 
             // get the session view
-            IViewPart view = findView("de.fu_berlin.inf.dpp.ui.SessionView");
+            IViewPart view = Util.findView("de.fu_berlin.inf.dpp.ui.SessionView");
 
             if (isDriver) {
                 removeAllAnnotations(new Predicate() {

@@ -19,6 +19,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
@@ -404,6 +409,22 @@ public class Util {
             }
         }
         return null;
+    }
+
+    public static IViewPart findView(String id) {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        if (workbench == null)
+            return null;
+    
+        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+        if (window == null)
+            return null;
+    
+        IWorkbenchPage page = window.getActivePage();
+        if (page == null)
+            return null;
+    
+        return page.findView(id);
     }
 
 }
