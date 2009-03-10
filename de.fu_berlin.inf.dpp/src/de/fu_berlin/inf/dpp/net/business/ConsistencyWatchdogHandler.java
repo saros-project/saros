@@ -47,7 +47,7 @@ public class ConsistencyWatchdogHandler {
     /**
      * @host This is only called on the host
      */
-    private void performConsistencyRecovery(JID from, IPath path) {
+    private void performConsistencyRecovery(JID from, Set<IPath> paths) {
 
         // wait until no more activities are received
         while (System.currentTimeMillis() - lastReceivedActivityTime < 1500) {
@@ -61,55 +61,60 @@ public class ConsistencyWatchdogHandler {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 
-        // TODO Handle case, when file does not exist locally any
-        // more
-        final boolean wasReadOnly = FileUtil.setReadOnly(project.getProject()
-            .getFile(path), false);
+        for (IPath path : paths) {
 
-        Set<IEditorPart> editors = EditorManager.getDefault().getEditors(path);
-        if (editors != null && editors.size() > 0) {
-            if (!EditorAPI.saveEditor(editors.iterator().next())) {
-                log.warn("Saving was canceled");
+            // TODO Handle case, when file does not exist locally any
+            // more
+            final boolean wasReadOnly = FileUtil.setReadOnly(project
+                .getProject().getFile(path), false);
+
+            Set<IEditorPart> editors = EditorManager.getDefault().getEditors(
+                path);
+            if (editors != null && editors.size() > 0) {
+                if (!EditorAPI.saveEditor(editors.iterator().next())) {
+                    log.warn("Saving was canceled");
+                }
             }
-        }
 
-        // Reset Read Only flag
-        if (wasReadOnly) {
-            FileUtil.setReadOnly(project.getProject().getFile(path), true);
-        }
+            // Reset Read Only flag
+            if (wasReadOnly) {
+                FileUtil.setReadOnly(project.getProject().getFile(path), true);
+            }
 
-        // Reset jupiter
-        ConcurrentDocumentManager concurrentManager = project
-            .getConcurrentDocumentManager();
-        if (concurrentManager.isManagedByJupiterServer(from, path))
-            concurrentManager.resetJupiterServer(from, path);
+            // Reset jupiter
+            ConcurrentDocumentManager concurrentManager = project
+                .getConcurrentDocumentManager();
+            if (concurrentManager.isManagedByJupiterServer(from, path))
+                concurrentManager.resetJupiterServer(from, path);
 
-        // Send the file to client
-        try {
-            transmitter.sendFile(from, project.getProject(), path, -1,
-            /*
-             * TODO CO The Callback should be used to show progress to the user
-             */
-            new IFileTransferCallback() {
+            // Send the file to client
+            try {
+                transmitter.sendFile(from, project.getProject(), path, -1,
+                /*
+                 * TODO CO The Callback should be used to show progress to the
+                 * user
+                 */
+                new IFileTransferCallback() {
 
-                public void fileSent(IPath path) {
-                    // do nothing
-                }
+                    public void fileSent(IPath path) {
+                        // do nothing
+                    }
 
-                public void fileTransferFailed(IPath path, Exception e) {
-                    // do nothing
+                    public void fileTransferFailed(IPath path, Exception e) {
+                        // do nothing
 
-                }
+                    }
 
-                public void transferProgress(int transfered) {
-                    // do nothing
-                }
+                    public void transferProgress(int transfered) {
+                        // do nothing
+                    }
 
-            });
-        } catch (IOException e) {
-            // TODO This means we were really unable to send
-            // this file. No more falling back.
-            log.error("Could not sent file for consistency resolution");
+                });
+            } catch (IOException e) {
+                // TODO This means we were really unable to send
+                // this file. No more falling back.
+                log.error("Could not sent file for consistency resolution");
+            }
         }
 
     }
@@ -117,25 +122,38 @@ public class ConsistencyWatchdogHandler {
     ChecksumErrorExtension checksumError = new ChecksumErrorExtension() {
 
         @Override
-        public void checksumErrorReceived(final JID from, final IPath path,
-            boolean resolved) {
+        public void checksumErrorReceived(final JID from,
+            final Set<IPath> paths, boolean resolved) {
+
+            // Concatenate paths
+            StringBuilder sb = new StringBuilder();
+            for (IPath path : paths) {
+                if (sb.length() > 0)
+                    sb.append(", ");
+
+                sb.append(path.toOSString());
+            }
+            String pathsOfInconsistencies = sb.toString();
 
             if (resolved) {
                 log.info("Synchronisation completed, inconsistency resolved");
-                ErrorMessageDialog.closeChecksumErrorMessage();
+                ErrorMessageDialog.closeChecksumErrorMessage(
+                    pathsOfInconsistencies, from);
                 return;
             }
 
-            log.debug("Checksum Error for " + path);
+            log.debug("Checksum Error for " + pathsOfInconsistencies + "from "
+                + from.getBase());
 
-            ErrorMessageDialog.showChecksumErrorMessage(path.toOSString());
+            ErrorMessageDialog.showChecksumErrorMessage(pathsOfInconsistencies,
+                from);
 
             if (Saros.getDefault().getSessionManager().getSharedProject()
                 .isHost()) {
                 Util.runSafeAsync("ConsistencyWatchdog-Start", log,
                     new Runnable() {
                         public void run() {
-                            performConsistencyRecovery(from, path);
+                            performConsistencyRecovery(from, paths);
                         }
                     });
             } else {

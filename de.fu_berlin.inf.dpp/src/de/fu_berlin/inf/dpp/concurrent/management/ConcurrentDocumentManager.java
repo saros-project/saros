@@ -383,7 +383,7 @@ public class ConcurrentDocumentManager {
                     // .getProject().getFile(editor.getPath()));
                     // editor.setChecksum(checksum);
                     // ConcurrentDocumentManager.logger
-                    //.debug("Add checksumme to created editor save activity : "
+                    // .debug("Add checksumme to created editor save activity : "
                     // + checksum
                     // + " for path : "
                     // + editor.getPath().toOSString());
@@ -831,25 +831,25 @@ public class ConcurrentDocumentManager {
             "Received %d checksums for %d inconsistencies", checksums.size(),
             pathsWithWrongChecksums.size()));
 
+        ConcurrentDocumentManager.this.pathsWithWrongChecksums.clear();
+
         for (DocumentChecksum checksum : checksums) {
             if (isInconsistent(checksum)) {
 
                 ConcurrentDocumentManager.this.pathsWithWrongChecksums
                     .add(checksum.getPath());
-
-                if (!inconsistencyToResolve.getValue()) {
-                    inconsistencyToResolve.setValue(true);
-                }
-                return;
             }
         }
 
-        ConcurrentDocumentManager.this.pathsWithWrongChecksums.clear();
-
-        if (inconsistencyToResolve.getValue()) {
-            logger.debug("All Inconsistencies are resolved");
-            inconsistencyToResolve.setValue(false);
+        if (pathsWithWrongChecksums.isEmpty()) {
+            if (inconsistencyToResolve.getValue()) {
+                logger.debug("All Inconsistencies are resolved");
+                inconsistencyToResolve.setValue(false);
+            }
+        } else {
+            inconsistencyToResolve.setValue(true);
         }
+
     }
 
     private boolean isInconsistent(DocumentChecksum checksum) {

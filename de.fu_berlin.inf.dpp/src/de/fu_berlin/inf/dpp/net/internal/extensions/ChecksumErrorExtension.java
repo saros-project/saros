@@ -3,6 +3,9 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
@@ -17,16 +20,25 @@ public abstract class ChecksumErrorExtension extends
 
     public static final String FILE_PATH = "CE_FILE_PATH";
 
+    public static final String QUANTITY = "CE_QUANTITY";
+
     public static final String RESOLVED = "CE_RESOLVED";
 
     public ChecksumErrorExtension() {
         super("FileChecksumError");
     }
 
-    public PacketExtension create(IPath path, boolean resolved) {
+    public PacketExtension create(Set<IPath> paths, boolean resolved) {
         DefaultPacketExtension extension = create();
 
-        extension.setValue(FILE_PATH, path.toOSString());
+        extension.setValue(QUANTITY, paths.size() + "");
+
+        int i = 1;
+        for (IPath path : paths) {
+            extension.setValue(FILE_PATH + i, path.toOSString());
+            i++;
+        }
+
         extension.setValue(RESOLVED, String.valueOf(resolved));
 
         return extension;
@@ -42,14 +54,22 @@ public abstract class ChecksumErrorExtension extends
 
         DefaultPacketExtension checksumErrorExtension = getExtension(message);
 
-        final String path = checksumErrorExtension.getValue(FILE_PATH);
+        final int quantity = Integer.parseInt(checksumErrorExtension
+            .getValue(QUANTITY));
+
+        Set<IPath> paths = new CopyOnWriteArraySet<IPath>();
+
+        for (int i = 1; i <= quantity; i++) {
+            final String path = checksumErrorExtension.getValue(FILE_PATH + i);
+            paths.add(new Path(path));
+        }
 
         final boolean resolved = Boolean.parseBoolean(checksumErrorExtension
             .getValue(RESOLVED));
 
-        checksumErrorReceived(sender, new Path(path), resolved);
+        checksumErrorReceived(sender, paths, resolved);
     }
 
-    public abstract void checksumErrorReceived(JID sender, IPath path,
+    public abstract void checksumErrorReceived(JID sender, Set<IPath> paths,
         boolean resolved);
 }

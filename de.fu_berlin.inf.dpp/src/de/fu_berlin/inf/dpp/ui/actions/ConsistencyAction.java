@@ -42,7 +42,7 @@ public class ConsistencyAction extends Action {
 
     protected boolean executingChecksumErrorHandling;
 
-    protected Set<IPath> paths;
+    protected Set<IPath> pathsOfHandledFiles;
 
     public ConsistencyAction() {
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
@@ -64,7 +64,7 @@ public class ConsistencyAction extends Action {
                 @Override
                 public void sessionStarted(ISharedProject session) {
 
-                    paths = new CopyOnWriteArraySet<IPath>();
+                    pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>();
                     if (proxy != null) {
                         proxy.remove(listener);
                     }
@@ -77,8 +77,8 @@ public class ConsistencyAction extends Action {
                 @Override
                 public void sessionEnded(ISharedProject session) {
 
-                    if (paths != null) {
-                        paths.clear();
+                    if (pathsOfHandledFiles != null) {
+                        pathsOfHandledFiles.clear();
                     }
 
                     if (proxy != null) {
@@ -98,8 +98,8 @@ public class ConsistencyAction extends Action {
             ConsistencyAction.this.setEnabled(newValue);
 
             if (newValue) {
-                paths = new CopyOnWriteArraySet<IPath>(Saros.getDefault()
-                    .getSessionManager().getSharedProject()
+                final Set<IPath> paths = new CopyOnWriteArraySet<IPath>(Saros
+                    .getDefault().getSessionManager().getSharedProject()
                     .getConcurrentDocumentManager()
                     .getPathsWithWrongChecksums());
 
@@ -244,18 +244,36 @@ public class ConsistencyAction extends Action {
             executingChecksumErrorHandling = newState;
 
             if (newState) {
+
+                // add data receiver
                 Saros.getDefault().getContainer().getComponent(
                     DataTransferManager.class).addDataReceiver(receiver);
+
+                for (final IPath path : pathsOfHandledFiles) {
+                    // Save document
+                    for (IEditorPart editor : EditorManager.getDefault()
+                        .getEditors(path)) {
+                        if (!EditorAPI.saveEditor(editor)) {
+                            log
+                                .info("Consistency Check canceled by user! Diff might be inaccurate");
+                        }
+                    }
+                }
+
+                // Send checksumErrorMessage to Host
+                Saros.getDefault().getSessionManager().getTransmitter()
+                    .sendFileChecksumErrorMessage(pathsOfHandledFiles, false);
+
             } else {
 
-                for (IPath path : paths) {
-                    Saros.getDefault().getSessionManager().getTransmitter()
-                        .sendFileChecksumErrorMessage(path, true);
-                }
-                paths.clear();
-
+                // remove data receiver
                 Saros.getDefault().getContainer().getComponent(
                     DataTransferManager.class).removeDataReceiver(receiver);
+
+                // send message that all inconsistencies are resolved
+                Saros.getDefault().getSessionManager().getTransmitter()
+                    .sendFileChecksumErrorMessage(pathsOfHandledFiles, true);
+                pathsOfHandledFiles.clear();
             }
         }
     }
@@ -274,22 +292,11 @@ public class ConsistencyAction extends Action {
     }
 
     public void executeConsistencyHandling() {
+        this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(Saros
+            .getDefault().getSessionManager().getSharedProject()
+            .getConcurrentDocumentManager().getPathsWithWrongChecksums());
+
         setChecksumErrorHandling(true);
 
-        for (final IPath path : paths) {
-            // Save document
-            for (IEditorPart editor : EditorManager.getDefault().getEditors(
-                path)) {
-                if (!EditorAPI.saveEditor(editor)) {
-                    log
-                        .info("Consistency Check canceled by user! Diff might be inaccurate");
-                }
-            }
-
-            // Send checksumErrorMessage to Host
-            Saros.getDefault().getSessionManager().getTransmitter()
-                .sendFileChecksumErrorMessage(path, false);
-        }
     }
-
 }

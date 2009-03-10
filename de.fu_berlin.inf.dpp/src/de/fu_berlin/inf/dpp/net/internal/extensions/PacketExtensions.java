@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
 import org.jivesoftware.smack.PacketListener;
@@ -271,8 +272,8 @@ public class PacketExtensions {
                 new ChecksumErrorExtension() {
 
                     @Override
-                    public void checksumErrorReceived(JID sender, IPath path,
-                        boolean resolved) {
+                    public void checksumErrorReceived(JID sender,
+                        Set<IPath> paths, boolean resolved) {
                         // Default implementation does nothing
                     }
 

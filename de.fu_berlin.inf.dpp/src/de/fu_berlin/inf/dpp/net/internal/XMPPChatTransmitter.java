@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -497,17 +498,28 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessage(to, UserListExtension.getDefault().create(participants));
     }
 
-    public void sendFileChecksumErrorMessage(IPath path, boolean resolved) {
+    public void sendFileChecksumErrorMessage(Set<IPath> paths, boolean resolved) {
 
         Collection<User> participants = Saros.getDefault().getSessionManager()
             .getSharedProject().getParticipants();
 
+        // Concatenate paths
+        StringBuilder sb = new StringBuilder();
+        for (IPath path : paths) {
+            if (sb.length() > 0)
+                sb.append(", ");
+
+            sb.append(path.toOSString());
+        }
+        String pathsOfInconsistencies = sb.toString();
+
         XMPPChatTransmitter.log.debug("Sending checksum "
-            + (resolved ? "resolved" : "error") + " message of file "
-            + path.lastSegment() + " to all");
+            + (resolved ? "resolved" : "error") + " message of files "
+            + pathsOfInconsistencies + " to all");
+
         for (User user : participants) {
             sendMessage(user.getJID(), ChecksumErrorExtension.getDefault()
-                .create(path, resolved));
+                .create(paths, resolved));
         }
     }
 

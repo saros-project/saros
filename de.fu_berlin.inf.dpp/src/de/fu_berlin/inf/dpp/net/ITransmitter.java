@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -265,7 +266,7 @@ public interface ITransmitter {
      * @param resolved
      *            if true then the inconsistency is resolved
      */
-    public void sendFileChecksumErrorMessage(IPath path, boolean resolved);
+    public void sendFileChecksumErrorMessage(Set<IPath> paths, boolean resolved);
 
     /**
      * Sends the checksum of all concurrent documents to all clients.
