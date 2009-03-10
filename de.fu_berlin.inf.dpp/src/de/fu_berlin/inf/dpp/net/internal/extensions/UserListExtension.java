@@ -18,6 +18,11 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefa
 
 public abstract class UserListExtension extends SessionDefaultPacketExtension {
 
+    private static final String COUNT_KEY = "Count";
+    private static final String USER_KEY = "User";
+    private static final String USER_ROLE_KEY = "UserRole";
+    private static final String USER_COLOR_KEY = "UserColor";
+
     public UserListExtension() {
         super("userList");
     }
@@ -26,13 +31,12 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         DefaultPacketExtension extension = create();
 
         int count = 0;
-        extension.setValue("Count", String.valueOf(userList.size()));
+        extension.setValue(COUNT_KEY, String.valueOf(userList.size()));
         for (User participant : userList) {
-            JID jid = participant.getJID();
-            String id = "User" + count;
-            String role = "UserRole" + count;
-            String color = "UserColor" + count;
-            extension.setValue(id, jid.toString());
+            String id = USER_KEY + count;
+            String role = USER_ROLE_KEY + count;
+            String color = USER_COLOR_KEY + count;
+            extension.setValue(id, participant.getJID().toString());
             extension.setValue(role, participant.getUserRole().toString());
             extension.setValue(color, String.valueOf(participant.getColorID()));
             count++;
@@ -56,30 +60,24 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         DefaultPacketExtension userlistExtension = UserListExtension
             .getDefault().getExtension(message);
 
-        List<User> result = new LinkedList<User>();
+        List<User> users = new LinkedList<User>();
 
-        int n = Integer.parseInt(userlistExtension.getValue("Count"));
+        int n = Integer.parseInt(userlistExtension.getValue(COUNT_KEY));
 
         for (int i = 0; i < n; i++) {
-            String jidS = userlistExtension.getValue("User" + i);
-            if (jidS == null) {
-                break; // TODO We know the length (n) so this should not happen.
-            }
-            JID jid = new JID(jidS);
+            JID jid = new JID(userlistExtension.getValue(USER_KEY + i));
             int colorID = Integer.parseInt(userlistExtension
-                .getValue("UserColor" + i));
+                .getValue(USER_COLOR_KEY + i));
 
-            // This user is new, we have to send him a message later
-            // and add him to the project
             User user = new User(jid, colorID);
 
-            String userRole = userlistExtension.getValue("UserRole" + i);
+            String userRole = userlistExtension.getValue(USER_ROLE_KEY + i);
             user.setUserRole(UserRole.valueOf(userRole));
 
-            result.add(user);
+            users.add(user);
         }
 
-        userListReceived(sender, result);
+        userListReceived(sender, users);
     }
 
     public abstract void userListReceived(JID sender, List<User> userList);
