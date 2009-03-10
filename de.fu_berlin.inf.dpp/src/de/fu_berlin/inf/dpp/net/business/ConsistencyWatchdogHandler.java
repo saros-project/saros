@@ -7,6 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IViewPart;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -30,6 +31,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -157,7 +159,18 @@ public class ConsistencyWatchdogHandler {
                         }
                     });
             } else {
-                // Client only needs to showChecksumErrorMessage
+            // check if inconsistencies exists on this side too,
+            // then run ConsistencyAction to resolve these
+                Util.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
+                        // get the session view
+                        IViewPart view = Util
+                            .findView("de.fu_berlin.inf.dpp.ui.SessionView");
+                        if (view != null)
+                            ((SessionView) view)
+                                .runConsistencyActionIfEnabled();
+                    }
+                });
             }
         }
     };

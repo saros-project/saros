@@ -411,19 +411,24 @@ public class Util {
         return null;
     }
 
+    /**
+     * 
+     * @swt Needs to be called from the SWT-UI thread, otherwise null are
+     *      returned.
+     */
     public static IViewPart findView(String id) {
         IWorkbench workbench = PlatformUI.getWorkbench();
         if (workbench == null)
             return null;
-    
+
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         if (window == null)
             return null;
-    
+
         IWorkbenchPage page = window.getActivePage();
         if (page == null)
             return null;
-    
+
         return page.findView(id);
     }
 

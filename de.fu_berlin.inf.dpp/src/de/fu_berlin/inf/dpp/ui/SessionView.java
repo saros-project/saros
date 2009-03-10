@@ -470,4 +470,9 @@ public class SessionView extends ViewPart implements ISessionListener {
         return Saros.getDefault().getPreferenceStore().getBoolean(
             PreferenceConstants.MULTI_DRIVER);
     }
+
+    public void runConsistencyActionIfEnabled() {
+        if (this.consistencyAction.isEnabled())
+            consistencyAction.run();
+    }
 }
