@@ -237,6 +237,7 @@ public class ConsistencyAction extends Action {
         return input;
     }
 
+    // TODO: move this business logic into ConsistencyWatchdog
     public void setChecksumErrorHandling(boolean newState) {
 
         if (newState != executingChecksumErrorHandling) {
@@ -291,6 +292,7 @@ public class ConsistencyAction extends Action {
         });
     }
 
+    // TODO: move this business logic into new ConsistencyWatchdog class
     public void executeConsistencyHandling() {
         this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(Saros
             .getDefault().getSessionManager().getSharedProject()
