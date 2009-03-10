@@ -716,14 +716,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             .openEditor(this.sharedProject.getProject().getFile(path));
     }
 
-    public void setEnableFollowing(boolean enable) {
-        this.isFollowing = enable;
+    public void setFollowing(boolean isFollowing) {
+        // Driver can't be in follow mode.
+        this.isFollowing = isFollowing && !this.isDriver;
 
         for (ISharedEditorListener editorListener : this.editorListeners) {
-            editorListener.followModeChanged(enable);
+            editorListener.followModeChanged(this.isFollowing);
         }
 
-        if (enable)
+        if (this.isFollowing)
             openDriverEditor();
     }
 
@@ -912,7 +913,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (isFollowing && activeDriverEditor != null) {
 
             if (!isSharedEditor(editorPart)) {
-                setEnableFollowing(false);
+                setFollowing(false);
                 return;
             }
 
@@ -922,14 +923,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             if (resource == null) {
                 log.warn("Resource not found: " + editorPart.getTitle());
-                setEnableFollowing(false);
+                setFollowing(false);
                 return;
             }
 
             IPath path = resource.getProjectRelativePath();
 
             if (!activeDriverEditor.equals(path)) {
-                setEnableFollowing(false);
+                setFollowing(false);
             }
         }
     }
@@ -945,7 +946,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         // if closing the following editor, leave follow mode
         if (isFollowing && activeDriverEditor != null
             && activeDriverEditor.equals(path)) {
-            setEnableFollowing(false);
+            setFollowing(false);
         }
 
         this.editorPool.remove(editorPart);

@@ -39,7 +39,7 @@ public class FollowModeAction extends Action {
 
     ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
-        public void sessionStarted(ISharedProject session) {
+        public void sessionStarted(ISharedProject sharedProject) {
             /*
              * Automatically start follow mode at the beginning of a session if
              * Auto-Follow-Mode is enabled.
@@ -48,13 +48,13 @@ public class FollowModeAction extends Action {
                 PreferenceConstants.AUTO_FOLLOW_MODE)) {
                 setFollowing(true);
             }
-            session.addListener(roleChangeListener);
+            sharedProject.addListener(roleChangeListener);
             updateEnablement();
         }
 
         @Override
-        public void sessionEnded(ISharedProject session) {
-            session.removeListener(roleChangeListener);
+        public void sessionEnded(ISharedProject sharedProject) {
+            sharedProject.removeListener(roleChangeListener);
             updateEnablement();
         }
     };
@@ -91,29 +91,26 @@ public class FollowModeAction extends Action {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                log.info("setFollowing to " + !isFollowing());
-                setFollowing(!isFollowing());
+                boolean following = !isFollowing();
+                log.info("setFollowing to " + following);
+                setFollowing(following);
             }
         });
     }
 
-    public boolean isFollowing() {
+    protected boolean isFollowing() {
         return EditorManager.getDefault().isFollowing();
     }
 
-    public void setFollowing(boolean enable) {
-        EditorManager.getDefault().setEnableFollowing(enable);
+    protected void setFollowing(boolean isFollowing) {
+        EditorManager.getDefault().setFollowing(isFollowing);
     }
 
-    public void updateEnablement() {
+    protected void updateEnablement() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 
         boolean canFollow = project != null && !project.isDriver();
-
-        if (!canFollow && isFollowing()) {
-            setFollowing(false);
-        }
 
         if (isEnabled() != canFollow)
             setEnabled(canFollow);
