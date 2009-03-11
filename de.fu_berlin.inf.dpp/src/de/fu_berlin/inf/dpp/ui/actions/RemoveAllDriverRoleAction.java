@@ -89,42 +89,23 @@ public class RemoveAllDriverRoleAction extends Action implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
-        session.addListener(this.sharedProjectListener);
+    public void sessionStarted(ISharedProject sharedProject) {
+        sharedProject.addListener(this.sharedProjectListener);
         updateEnablement();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
-        session.removeListener(this.sharedProjectListener);
+    public void sessionEnded(ISharedProject sharedProject) {
+        sharedProject.removeListener(this.sharedProjectListener);
         updateEnablement();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
     public void invitationReceived(IIncomingInvitationProcess process) {
         // ignore
     }
 
     private void updateEnablement() {
-        ISharedProject project = getSharedProject();
-        boolean enabled = ((project != null) && project.isHost());
-        setEnabled(enabled);
-    }
-
-    private ISharedProject getSharedProject() {
-        return Saros.getDefault().getSessionManager().getSharedProject();
+        ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+        setEnabled((project != null && project.isHost()));
     }
 }

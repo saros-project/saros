@@ -108,7 +108,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * 
  * @author rdjemili
  * 
- *         TODO CO Since it was forgotton to reset the DriverEditors after a
+ *         TODO CO Since it was forgotten to reset the DriverEditors after a
  *         session closed, it is highly likely that this whole class needs to be
  *         reviewed for restarting issues
  * 
@@ -336,8 +336,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionStarted(ISharedProject session) {
-        this.sharedProject = session;
+    public void sessionStarted(ISharedProject project) {
+        this.sharedProject = project;
 
         assert this.editorPool.editorParts.isEmpty() : "EditorPool was not correctly reset!";
 
@@ -374,7 +374,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         this.sharedProject.getActivityManager().addProvider(this);
         this.contributionAnnotationManager = new ContributionAnnotationManager(
-            session);
+            project);
 
         // TODO Review Why?
         activateOpenEditors();
@@ -385,7 +385,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject project) {
+        assert this.sharedProject == project;
         setAllEditorsToEditable();
         removeAllAnnotations(new Predicate() {
             public boolean check(SarosAnnotation annotation) {
@@ -603,7 +604,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         // TODO Review, because this is causing problems with FollowMode
         activateOpenEditors();
 
-        // TODO Why remove all?
+        // TODO Why remove all and not just the ones of user and only if user is
+        // observer now?
         removeAllAnnotations(new Predicate() {
             public boolean check(SarosAnnotation annotation) {
                 return annotation instanceof ContributionAnnotation;
@@ -613,7 +615,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if (Saros.getDefault().getLocalUser().equals(user)) {
 
             // get the session view
-            IViewPart view = Util.findView("de.fu_berlin.inf.dpp.ui.SessionView");
+            IViewPart view = Util
+                .findView("de.fu_berlin.inf.dpp.ui.SessionView");
 
             if (isDriver) {
                 removeAllAnnotations(new Predicate() {
@@ -635,6 +638,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     });
                 }
             } else {
+                // User is not driver anymore, so remove the text selection.
+                this.driverTextSelections.remove(user);
+
                 // if session view is not open show the balloon notification in
                 // the control which has the keyboard focus
                 if (view == null) {
@@ -675,8 +681,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         });
         driverTextSelections.remove(sharedProject.getParticipant(user));
     }
-
-    /* ---------- etc --------- */
 
     /**
      * Opens the editor that is currently used by the driver. This method needs

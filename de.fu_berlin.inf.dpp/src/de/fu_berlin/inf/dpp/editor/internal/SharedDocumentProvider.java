@@ -30,14 +30,15 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
-        public void sessionStarted(ISharedProject session) {
-            sharedProject = session;
+        public void sessionStarted(ISharedProject project) {
+            sharedProject = project;
             isDriver = sharedProject.isDriver();
             sharedProject.addListener(sharedProjectListener);
         }
 
         @Override
-        public void sessionEnded(ISharedProject session) {
+        public void sessionEnded(ISharedProject project) {
+            assert sharedProject == project;
             sharedProject.removeListener(sharedProjectListener);
             sharedProject = null;
         }

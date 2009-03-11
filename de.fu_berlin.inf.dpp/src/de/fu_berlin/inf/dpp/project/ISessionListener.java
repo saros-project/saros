@@ -31,22 +31,22 @@ public interface ISessionListener {
     /**
      * Is fired when a new session started.
      * 
-     * @param session
+     * @param sharedProject
      *            the shared project that has been created. Is never
      *            <code>null</code>.
      * 
      */
-    public void sessionStarted(ISharedProject session);
+    public void sessionStarted(ISharedProject sharedProject);
 
     /**
      * Is fired when a session ended. Reasons for this can be that the session
      * was closed or that the user left by himself.
      * 
-     * @param session
+     * @param sharedProject
      *            the shared project that has just been left. Is never
      *            <code>null</code>.
      */
-    public void sessionEnded(ISharedProject session);
+    public void sessionEnded(ISharedProject sharedProject);
 
     /**
      * Is fired when the local user is invited to a session.

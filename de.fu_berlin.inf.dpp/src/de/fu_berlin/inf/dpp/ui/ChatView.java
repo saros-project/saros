@@ -180,12 +180,12 @@ public class ChatView extends ViewPart implements ISessionListener,
 
     }
 
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject sharedProject) {
         // TODO Auto-generated method stub
 
     }
 
-    public void sessionStarted(ISharedProject session) {
+    public void sessionStarted(ISharedProject sharedProject) {
         // TODO Auto-generated method stub
 
     }

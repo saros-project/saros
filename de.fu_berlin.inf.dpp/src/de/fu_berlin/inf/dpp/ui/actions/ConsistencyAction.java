@@ -89,6 +89,7 @@ public class ConsistencyAction extends Action {
             });
     }
 
+    // TODO Name is to genereric.
     ObservableValue<Boolean> proxy;
 
     ValueChangeListener<Boolean> listener = new ValueChangeListener<Boolean>() {

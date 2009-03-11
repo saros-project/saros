@@ -57,11 +57,11 @@ public class InviteAction extends SelectionProviderAction {
 
         Saros.getDefault().getSessionManager().addSessionListener(
             new ISessionListener() {
-                public void sessionStarted(ISharedProject session) {
+                public void sessionStarted(ISharedProject sharedProject) {
                     updateEnablement();
                 }
 
-                public void sessionEnded(ISharedProject session) {
+                public void sessionEnded(ISharedProject sharedProject) {
                     updateEnablement();
                 }
 

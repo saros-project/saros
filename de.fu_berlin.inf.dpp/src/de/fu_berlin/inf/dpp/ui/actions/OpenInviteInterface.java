@@ -23,11 +23,11 @@ public class OpenInviteInterface extends Action {
         Saros.getDefault().getSessionManager().addSessionListener(
             new ISessionListener() {
 
-                public void sessionStarted(ISharedProject session) {
-                    setEnabled(session.isHost());
+                public void sessionStarted(ISharedProject sharedProject) {
+                    setEnabled(sharedProject.isHost());
                 }
 
-                public void sessionEnded(ISharedProject session) {
+                public void sessionEnded(ISharedProject sharedProject) {
                     setEnabled(false);
                 }
 

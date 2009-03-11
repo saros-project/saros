@@ -120,8 +120,8 @@ public class SharedModelProvider extends ModelProvider implements
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionStarted(ISharedProject session) {
-        this.sharedProject = session;
+    public void sessionStarted(ISharedProject sharedProject) {
+        this.sharedProject = sharedProject;
     }
 
     /*
@@ -129,7 +129,8 @@ public class SharedModelProvider extends ModelProvider implements
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject sharedProject) {
+        assert this.sharedProject == sharedProject;
         this.sharedProject = null;
     }
 

@@ -37,21 +37,11 @@ public class JumpToDriverPositionAction extends Action implements
         });
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject session) {
+    public void sessionStarted(ISharedProject sharedProject) {
         updateEnablement();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject sharedProject) {
         updateEnablement();
     }
 

@@ -44,12 +44,12 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
                     // ignore
                 }
 
-                public void sessionEnded(ISharedProject session) {
-                    session.removeListener(projectListener);
+                public void sessionEnded(ISharedProject sharedProject) {
+                    sharedProject.removeListener(projectListener);
                 }
 
-                public void sessionStarted(ISharedProject session) {
-                    session.addListener(projectListener);
+                public void sessionStarted(ISharedProject sharedProject) {
+                    sharedProject.addListener(projectListener);
                 }
             });
 

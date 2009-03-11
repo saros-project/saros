@@ -348,15 +348,16 @@ public class SessionView extends ViewPart implements ISessionListener {
         super.dispose();
     }
 
-    public void sessionStarted(final ISharedProject session) {
+    public void sessionStarted(final ISharedProject sharedProject) {
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                SessionView.this.viewer.setInput(session);
+                SessionView.this.viewer.setInput(sharedProject);
             }
         });
     }
 
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject sharedProject) {
+        assert this.sharedProject == sharedProject;
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
                 SessionView.this.viewer.setInput(null);

@@ -185,8 +185,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionStarted(ISharedProject session) {
-        this.sharedProject = session;
+    public void sessionStarted(ISharedProject project) {
+        this.sharedProject = project;
         this.sharedProject.getActivityManager().addProvider(this);
         ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
     }
@@ -196,9 +196,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject project) {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        // TODO If the session was started this.sharedProject should never be
+        // null at this point. See this.sessionStarted().
         if (this.sharedProject != null) {
+            assert this.sharedProject == project;
             this.sharedProject.getActivityManager().removeProvider(this);
             this.sharedProject = null;
         }

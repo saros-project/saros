@@ -50,8 +50,8 @@ public class RoleManager implements IActivityProvider {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionStarted(ISharedProject session) {
-        this.sharedProject = session;
+    public void sessionStarted(ISharedProject project) {
+        this.sharedProject = project;
         this.sharedProject.addListener(this.sharedProjectListener);
         this.sharedProject.getActivityManager().addProvider(this);
     }
@@ -61,7 +61,8 @@ public class RoleManager implements IActivityProvider {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISessionListener
      */
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject project) {
+        assert this.sharedProject == project;
         this.sharedProject.removeListener(this.sharedProjectListener);
         this.sharedProject.getActivityManager().removeProvider(this);
         this.sharedProject = null;

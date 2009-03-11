@@ -79,7 +79,7 @@ public class SarosUI implements ISessionListener {
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
-    public void sessionEnded(ISharedProject session) {
+    public void sessionEnded(ISharedProject sharedProject) {
         // ignore
     }
 
@@ -108,7 +108,7 @@ public class SarosUI implements ISessionListener {
      * 
      * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
      */
-    public void sessionStarted(ISharedProject session) {
+    public void sessionStarted(ISharedProject sharedProject) {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 try {
