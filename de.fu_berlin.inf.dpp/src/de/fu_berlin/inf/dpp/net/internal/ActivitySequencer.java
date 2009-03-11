@@ -233,6 +233,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
             }
 
             TimedActivity timedActivity;
+            // TODO Here the world ends. Dragons, hellfire and stuff...
+            // We had a RoleActivity with time stamp 135 and a local time stamp
+            // of 63! This time stamp stuff is severely broken.
             while ((timedActivity = queue.poll()) != null
                 && timedActivity.getTimestamp() <= this.timestamp) {
 
