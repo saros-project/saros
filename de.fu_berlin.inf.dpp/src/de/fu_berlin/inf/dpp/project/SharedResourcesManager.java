@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +35,6 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -47,6 +45,7 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
@@ -119,9 +118,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
 
             fireActivity(activity);
-            closeRemovedEditors();
 
-            return delta.getKind() > 0;
+            return delta.getKind() > 0; // TODO Compare with enumeration value.
         }
 
         private IActivity handleFolderDelta(IPath path, int kind) {
@@ -299,34 +297,39 @@ public class SharedResourcesManager implements IResourceChangeListener,
         IProject project = this.sharedProject.getProject();
         IFile file = project.getFile(activity.getPath());
 
-        FileUtil.setReadOnly(file, false);
-
         if (activity.getType() == FileActivity.Type.Created) {
-            InputStream in = activity.getContents();
-            if (file.exists()) {
-                file.setContents(in, IResource.FORCE, null);
-            } else {
-                file.create(in, true, new NullProgressMonitor());
-            }
-
-            FileUtil.setReadOnly(file, !Saros.getDefault().getSessionManager()
-                .getSharedProject().isDriver());
-
+            FileUtil.writeFile(activity.getContents(), file);
         } else if (activity.getType() == FileActivity.Type.Removed) {
-            file.delete(false, new NullProgressMonitor());
+            FileUtil.setReadOnly(file, false);
+            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+            file.delete(false, monitor);
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
-
-        closeRemovedEditors();
     }
 
     private void exec(FolderActivity activity) throws CoreException {
         IProject project = this.sharedProject.getProject();
         IFolder folder = project.getFolder(activity.getPath());
 
+        BlockingProgressMonitor monitor = new BlockingProgressMonitor();
         if (activity.getType() == FolderActivity.Type.Created) {
-            folder.create(true, true, new NullProgressMonitor());
+            folder.create(true, true, monitor);
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         } else if (activity.getType() == FolderActivity.Type.Removed) {
-            folder.delete(true, new NullProgressMonitor());
+            folder.delete(true, monitor);
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -343,9 +346,5 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         return new FolderActivity(FolderActivity.Type.valueOf(parser
             .getAttributeValue(null, "type")), path);
-    }
-
-    private void closeRemovedEditors() {
-        // TODO
     }
 }

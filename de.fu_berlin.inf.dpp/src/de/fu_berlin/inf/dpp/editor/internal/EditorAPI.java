@@ -7,13 +7,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -61,6 +58,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
+import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -694,14 +692,7 @@ public class EditorAPI implements IEditorAPI {
      */
     public static boolean saveEditor(final IEditorPart editor) {
 
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        final IProgressMonitor monitor = new NullProgressMonitor() {
-            @Override
-            public void done() {
-                latch.countDown();
-            }
-        };
+        final BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
         // save document
         Util.runSafeSWTSync(log, new Runnable() {
@@ -712,7 +703,7 @@ public class EditorAPI implements IEditorAPI {
 
         // Wait for saving to be done
         try {
-            latch.await();
+            monitor.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

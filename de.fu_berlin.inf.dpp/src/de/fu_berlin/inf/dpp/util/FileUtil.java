@@ -12,7 +12,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.fu_berlin.inf.dpp.Saros;
 
@@ -98,10 +97,16 @@ public class FileUtil {
         setReadOnly(file, false);
 
         try {
+            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
             if (file.exists()) {
-                file.setContents(input, IResource.FORCE, null);
+                file.setContents(input, IResource.FORCE, monitor);
             } else {
-                file.create(input, true, new NullProgressMonitor());
+                file.create(input, true, monitor);
+            }
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         } catch (CoreException e) {
             log.error("Could not write file", e);

@@ -29,8 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -43,7 +41,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -94,6 +91,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -1199,14 +1197,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         dirtyStateListener.enabled = false;
 
-        final CountDownLatch latch = new CountDownLatch(1);
-
-        final IProgressMonitor monitor = new NullProgressMonitor() {
-            @Override
-            public void done() {
-                latch.countDown();
-            }
-        };
+        BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
         try {
             provider.saveDocument(monitor, input, doc, true);
@@ -1217,7 +1208,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // Wait for saving to be done
         try {
-            if (!latch.await(5, TimeUnit.SECONDS)) {
+            if (!monitor.await(5)) {
                 log.warn("Timeout expired on saving document: " + path);
             }
         } catch (InterruptedException e) {
