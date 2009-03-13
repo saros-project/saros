@@ -51,6 +51,8 @@ public class RequestForActivityHandler extends RequestActivityExtension {
             return;
         }
 
+        // TODO This should be a done in a method on ActivitySequencer instead
+        // of here.
         List<TimedActivity> tempActivities = ActivitySequencer
             .filterActivityHistory(Saros.getDefault().getSessionManager()
                 .getSharedProject().getSequencer().getActivityHistory(),

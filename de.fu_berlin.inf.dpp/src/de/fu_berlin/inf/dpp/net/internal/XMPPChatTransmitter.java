@@ -436,6 +436,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             } else {
                 // TODO is this correct? Storing files in the activity is
                 // probably not so cool, but holes in the history neither.
+                // HACK This gets a private field and adds something to that
+                // data structure.
                 sharedProject.getSequencer().getActivityHistory().add(
                     timedActivity);
 
