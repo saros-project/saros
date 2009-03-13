@@ -32,8 +32,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -71,9 +69,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
-    // TODO never used!
-    private final List<IActivity> flushedLog = new LinkedList<IActivity>();
-
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
     private final Queue<TimedActivity> queue = new PriorityQueue<TimedActivity>(
@@ -87,7 +82,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
     private int timestamp = ActivitySequencer.UNDEFINED_TIME;
 
-    private ConcurrentDocumentManager concurrentManager;
+    private ConcurrentDocumentManager concurrentDocumentManager;
 
     /**
      * outgoing queue for direct client sync messages for all driver.
@@ -111,10 +106,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
         try {
             if (activity instanceof EditorActivity) {
-                this.concurrentManager.execEditorActivity(activity);
+                this.concurrentDocumentManager.execEditorActivity(activity);
             }
             if (activity instanceof FileActivity) {
-                this.concurrentManager.execFileActivity(activity);
+                this.concurrentDocumentManager.execFileActivity(activity);
             }
             if (activity instanceof FolderActivity) {
                 // TODO
@@ -127,83 +122,20 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
             public void run() {
 
                 if (activity instanceof TextEditActivity) {
-                    if (concurrentManager.isHostSide())
+                    if (concurrentDocumentManager.isHostSide()
+                        || concurrentDocumentManager
+                            .isManagedByJupiter(activity)) {
                         return;
-
-                    if (concurrentManager.isManagedByJupiter(activity))
-                        return;
+                    }
                 }
 
                 // Execute all other activities
                 for (IActivityProvider executor : ActivitySequencer.this.providers) {
                     executor.exec(activity);
                 }
-
-                /*
-                 * TODO CO Checksums are not used at the moment, aren't they?
-                 */
-                // // Check for file checksum after incoming save file
-                // // activity.
-                // if ((activity instanceof EditorActivity)
-                // && (((EditorActivity) activity).getType() ==
-                // EditorActivity.Type.Saved)) {
-                // checkSavedFile((EditorActivity) activity);
-                // }
             }
         });
 
-    }
-
-    /**
-     * this class check the match of local and remote file checksum.
-     * 
-     * @param editor
-     *            incoming editor activity with type saved
-     */
-    private void checkSavedFile(EditorActivity editor) {
-        // /* 1. reset appropriate jupiter document. */
-        // if (isHostSide() || this.sharedProject.isDriver()) {
-        // ActivitySequencer.logger.debug("reset jupiter server for "
-        // + editor.getPath());
-        // this.concurrentManager.resetJupiterDocument(editor.getPath());
-        // }
-        //
-        // /* check match of file checksums. */
-        //
-        // if (!isHostSide() && (editor.getType() == Type.Saved)) {
-        // long checksum = FileUtil.checksum(this.sharedProject.getProject()
-        // .getFile(editor.getPath()));
-        // ActivitySequencer.logger
-        // .debug("Checksumme on client side : " + checksum
-        // + " for path : " + editor.getPath().toOSString());
-        // if (checksum != editor.getChecksum()) {
-        // ActivitySequencer.logger.error("Checksum error of file "
-        // + editor.getPath());
-        // }
-        // }
-        // if (isHostSide()) {
-        // /* create local checksum. */
-        // long checksum = FileUtil.checksum(this.sharedProject.getProject()
-        // .getFile(editor.getPath()));
-        //
-        // if (checksum != editor.getChecksum()) {
-        // /* send checksum error */
-        // ActivitySequencer.logger.error("Checksum error for file "
-        // + editor.getPath() + " of " + editor.getSource()
-        // + " ( " + checksum + " != " + editor.getChecksum()
-        // + " )");
-        //
-        // /* send checksum error */
-        // FileActivity fileError = new FileActivity(
-        // FileActivity.Type.Error, editor.getPath(), new JID(
-        // editor.getSource()));
-        // activityCreated(fileError);
-        // /* send sync file. */
-        // FileActivity file = new FileActivity(FileActivity.Type.Created,
-        // editor.getPath(), new JID(editor.getSource()));
-        // activityCreated(file);
-        // }
-        // }
     }
 
     /**
@@ -229,8 +161,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     public List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
-        out = optimizeCO(out);
-        this.flushedLog.addAll(out);
+        out = optimize(out);
         return out.size() > 0 ? out : null;
     }
 
@@ -259,56 +190,33 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         return timedActivities;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityManager
-     */
     public void addProvider(IActivityProvider provider) {
         this.providers.add(provider);
         provider.addActivityListener(this);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityManager
-     */
     public void removeProvider(IActivityProvider provider) {
         this.providers.remove(provider);
         provider.removeActivityListener(this);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivitySequencer
-     */
-    public List<IActivity> getLog() {
-        return this.flushedLog;
     }
 
     /**
      * All the ActivityProviders will call this method when new events occurred
      * in the UI.
      * 
-     * @see de.fu_berlin.inf.dpp.IActivityListener
+     * @see IActivityListener
      */
     public void activityCreated(IActivity activity) {
 
         /* Let ConcurrentDocumentManager have a look at the activities first */
-        boolean consumed = this.concurrentManager.activityCreated(activity);
+        boolean consumed = this.concurrentDocumentManager
+            .activityCreated(activity);
 
         if (!consumed) {
             this.activities.add(activity);
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.net.IActivitySequencer
-     */
     public int getTimestamp() {
         return this.timestamp;
     }
@@ -326,7 +234,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * removing activities that would overwrite each other and joining
      * activities that can be send as a single activity.
      */
-    private List<IActivity> optimizeCO(List<IActivity> toOptimize) {
+    private List<IActivity> optimize(List<IActivity> toOptimize) {
 
         List<IActivity> result = new ArrayList<IActivity>(toOptimize.size());
 
@@ -362,59 +270,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         return result;
     }
 
-    /**
-     * TODO extract this into the activities themselves
-     * 
-     * TODO CJ: review needed
-     * 
-     * TODO CO: I replaced this by a simpler optimizeCO
-     */
-    private List<IActivity> optimize(List<IActivity> activities) {
-        List<IActivity> result = new ArrayList<IActivity>(activities.size());
-
-        ITextSelection selection = null;
-        String source = null;
-        IPath path = null;
-
-        for (IActivity activity : activities) {
-            source = null;
-            path = null;
-            if (activity instanceof TextEditActivity) {
-                TextEditActivity textEdit = (TextEditActivity) activity;
-
-                textEdit = joinTextEdits(result, textEdit);
-
-                selection = new TextSelection(textEdit.offset
-                    + textEdit.text.length(), 0);
-                source = textEdit.getSource();
-                path = textEdit.getEditor();
-                result.add(textEdit);
-
-            } else if (activity instanceof TextSelectionActivity) {
-                TextSelectionActivity textSelection = (TextSelectionActivity) activity;
-
-                selection = new TextSelection(textSelection.getOffset(),
-                    textSelection.getLength());
-                source = textSelection.getSource();
-                path = textSelection.getEditor();
-
-            } else if (activity instanceof ViewportActivity) {
-                ViewportActivity viewport = (ViewportActivity) activity;
-                path = viewport.getEditor();
-                source = viewport.getSource();
-                selection = addSelection(result, selection, source, path);
-                result.add(activity);
-            } else {
-                selection = addSelection(result, selection, source, path);
-                result.add(activity);
-            }
-
-            selection = addSelection(result, selection, source, path);
-        }
-
-        return result;
-    }
-
     private TextEditActivity joinTextEdits(List<IActivity> result,
         TextEditActivity textEdit) {
         if (result.size() == 0) {
@@ -440,60 +295,17 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         return textEdit;
     }
 
-    private ITextSelection addSelection(List<IActivity> result,
-        ITextSelection selection, String source, IPath path) {
-        if (selection == null) {
-            return null;
-        }
-
-        if (result.size() > 0) {
-            IActivity lastActivity = result.get(result.size() - 1);
-            if (lastActivity instanceof TextEditActivity) {
-                TextEditActivity lastTextEdit = (TextEditActivity) lastActivity;
-
-                if ((selection.getOffset() == lastTextEdit.offset
-                    + lastTextEdit.text.length())
-                    && (selection.getLength() == 0)) {
-
-                    return selection;
-                }
-            }
-        }
-
-        // HACK TODO CJ: review
-        if (path != null) {
-            TextSelectionActivity newSel = new TextSelectionActivity(selection
-                .getOffset(), selection.getLength(), path);
-            newSel.setSource(source);
-            result.add(newSel);
-        }
-
-        return null;
-    }
-
     public void initConcurrentManager(Side side, User host, JID myJID,
         ISharedProject sharedProject) {
-        this.concurrentManager = new ConcurrentDocumentManager(side, host,
-            myJID, sharedProject, this);
+        this.concurrentDocumentManager = new ConcurrentDocumentManager(side,
+            host, myJID, sharedProject, this);
     }
 
-    public ConcurrentDocumentManager getConcurrentManager() {
-        return this.concurrentManager;
+    public ConcurrentDocumentManager getConcurrentDocumentManager() {
+        return this.concurrentDocumentManager;
     }
 
     public synchronized void forwardOutgoingRequest(JID to, Request req) {
-
-        // TODO FIXME RequestErrors are never sent
-        // /* check for errors. */
-        // if (req instanceof RequestError) {
-        // /* create save activity. */
-        // IActivity activity = new EditorActivity(Type.Saved, req
-        // .getEditorPath());
-        // /* execute save activity and start consistency check. */
-        // exec(activity);
-        // return;
-        // }
-
         /* put request into outgoing queue. */
         this.outgoingSyncActivities.add(new Pair<JID, Request>(to, req));
     }
@@ -522,7 +334,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
              */
 
             // send activity to everybody
-            if (this.concurrentManager.isHostSide()) {
+            if (this.concurrentDocumentManager.isHostSide()) {
                 logger.debug("send transformed activity: " + activity);
                 this.activities.add(activity);
             }

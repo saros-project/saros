@@ -580,7 +580,7 @@ public class SharedProject implements ISharedProject {
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
-        return this.activitySequencer.getConcurrentManager();
+        return this.activitySequencer.getConcurrentDocumentManager();
     }
 
     public int getFreeColor() {
