@@ -221,32 +221,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         assert nextActivity != null;
 
         synchronized (queue) {
-            queue.add(nextActivity);
-
-            // If this is our first activity, set out timestamp
-            if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
-                /*
-                 * TODO this might not be a good idea, since our first event
-                 * might be out of Sync
-                 */
-                this.timestamp = queue.peek().getTimestamp();
-            }
-
-            TimedActivity timedActivity;
-            // TODO Here the world ends. Dragons, hellfire and stuff...
-            // We had a RoleActivity with time stamp 135 and a local time stamp
-            // of 63! This time stamp stuff is severely broken.
-            while ((timedActivity = queue.poll()) != null
-                && timedActivity.getTimestamp() <= this.timestamp) {
-
-                if (this.timestamp < timedActivity.getTimestamp()) {
-                    logger.error("Received event with duplicate timestamp: "
-                        + timedActivity);
-                }
-
-                this.timestamp++;
-                exec(timedActivity.getActivity());
-            }
+            this.timestamp++;
+            exec(nextActivity.getActivity());
         }
     }
 
