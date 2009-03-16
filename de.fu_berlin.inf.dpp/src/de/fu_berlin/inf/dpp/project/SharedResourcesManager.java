@@ -300,6 +300,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (activity.getType() == FileActivity.Type.Created) {
             FileUtil.writeFile(activity.getContents(), file);
         } else if (activity.getType() == FileActivity.Type.Removed) {
+            // TODO Maybe move this to FileUtil.
             FileUtil.setReadOnly(file, false);
             BlockingProgressMonitor monitor = new BlockingProgressMonitor();
             file.delete(false, monitor);
