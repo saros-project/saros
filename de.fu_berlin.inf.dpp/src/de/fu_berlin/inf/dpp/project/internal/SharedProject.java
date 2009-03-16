@@ -354,7 +354,7 @@ public class SharedProject implements ISharedProject {
                 // TODO CO 2009-02-06 this is disabled internally. Why?
 
                 // missing activities? (can not execute all)
-                if (SharedProject.this.activitySequencer.getQueuedActivities() > 0) {
+                if (SharedProject.this.activitySequencer.getQueuedActivitiesSize() > 0) {
                     SharedProject.queuedsince++;
 
                     // if i am missing activities for REQUEST_ACTIVITY_ON_AGE

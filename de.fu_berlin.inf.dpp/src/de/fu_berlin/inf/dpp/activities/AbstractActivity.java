@@ -40,6 +40,7 @@ public abstract class AbstractActivity implements IActivity {
     }
 
     public String toXML() {
+        // TODO Escape data in XML in subclasses, for example paths.
         StringBuilder sb = new StringBuilder();
         this.toXML(sb);
         return sb.toString();

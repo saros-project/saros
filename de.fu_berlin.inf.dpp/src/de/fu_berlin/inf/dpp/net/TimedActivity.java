@@ -38,6 +38,13 @@ public class TimedActivity {
     }
 
     /**
+     * @return the source of the activity.
+     */
+    public String getSource() {
+        return this.activity.getSource();
+    }
+
+    /**
      * @return the timestamp of the activiy.
      */
     public int getTimestamp() {

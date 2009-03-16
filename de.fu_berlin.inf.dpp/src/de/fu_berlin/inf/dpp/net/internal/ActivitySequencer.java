@@ -21,12 +21,12 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -62,25 +62,125 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class ActivitySequencer implements IActivityListener, IActivityManager {
 
-    private static Logger logger = Logger.getLogger(ActivitySequencer.class
+    private static Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
-
-    public static final int UNDEFINED_TIME = -1;
 
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
-    private final Queue<TimedActivity> queue = new PriorityQueue<TimedActivity>(
-        128, new Comparator<TimedActivity>() {
-            public int compare(TimedActivity o1, TimedActivity o2) {
-                return Integer.signum(o2.getTimestamp() - o1.getTimestamp());
+    /**
+     * A priority queue for timed activities.
+     * 
+     * TODO "Timestamps" are treated more like consecutive sequence numbers, so
+     * may be all names and documentation should be changed to reflect this.
+     */
+    class ActivityQueue {
+
+        /** Timestamp expected from the next activity. */
+        private int expectedTimestamp;
+        private PriorityQueue<TimedActivity> queuedActivities;
+
+        public ActivityQueue(int expectedTimestamp) {
+            this.expectedTimestamp = expectedTimestamp;
+            this.queuedActivities = new PriorityQueue<TimedActivity>(128,
+                new Comparator<TimedActivity>() {
+                    public int compare(TimedActivity t1, TimedActivity t2) {
+                        return t1.getTimestamp() - t2.getTimestamp();
+                    }
+                });
+        }
+
+        public void add(TimedActivity activity) {
+            if (activity.getTimestamp() < expectedTimestamp) {
+                log.warn("Received activity more than once: " + activity);
+                return;
             }
-        });
+            int size = queuedActivities.size();
+            if (size > 0) {
+                log.debug("There are " + size + " activities queued for "
+                    + activity.getSource());
+                log.debug("first queued: " + queuedActivities.peek()
+                    + ", expected nr: " + expectedTimestamp);
+            }
+            queuedActivities.add(activity);
+        }
+
+        /**
+         * @return The next activity if there is one and it carries the expected
+         *         timestamp, otherwise <code>null</code>.
+         */
+        public TimedActivity getNext() {
+            if (queuedActivities.size() > 0
+                && queuedActivities.peek().getTimestamp() == expectedTimestamp) {
+                expectedTimestamp++;
+                return queuedActivities.remove();
+            }
+            return null;
+        }
+    }
+
+    /**
+     * This class manages a {@link ActivityQueue} for each other user of a
+     * session.
+     */
+    class ActivityQueuesManager {
+        protected Map<JID, ActivityQueue> jid2queue;
+
+        public ActivityQueuesManager() {
+            this.jid2queue = new HashMap<JID, ActivityQueue>();
+        }
+
+        /**
+         * Adds a {@link TimedActivity}. There must be a source set on the
+         * activity.
+         * 
+         * @param activity
+         *            to add to the qeues.
+         * 
+         * @throws IllegalArgumentException
+         *             if the source of the activity is <code>null</code>.
+         */
+        public void add(TimedActivity activity) {
+            String source = activity.getSource();
+            if (source == null) {
+                throw new IllegalArgumentException("Source must not be null");
+            }
+            JID jid = new JID(source);
+            ActivityQueue activityQueue = jid2queue.get(jid);
+            if (activityQueue == null) {
+                activityQueue = new ActivityQueue(activity.getTimestamp());
+                jid2queue.put(jid, activityQueue);
+            }
+            activityQueue.add(activity);
+        }
+
+        // TODO Invoke this method when a user leaves the session.
+        public void removeQueue(JID jid) {
+            jid2queue.remove(jid);
+        }
+
+        /**
+         * @return all activities that can be executed. If there are none, an
+         *         empty List is returned.
+         */
+        public List<TimedActivity> getActivities() {
+            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
+            for (ActivityQueue queue : jid2queue.values()) {
+                TimedActivity activity;
+                while ((activity = queue.getNext()) != null) {
+                    result.add(activity);
+                }
+            }
+            return result;
+        }
+    }
+
+    private final ActivityQueuesManager queues = new ActivityQueuesManager();
 
     private final List<TimedActivity> activityHistory = new LinkedList<TimedActivity>();
 
-    private int timestamp = ActivitySequencer.UNDEFINED_TIME;
+    private int timestamp = 0;
 
     private ConcurrentDocumentManager concurrentDocumentManager;
 
@@ -115,10 +215,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 // TODO
             }
         } catch (Exception e) {
-            logger.error("Error while executing activity.", e);
+            log.error("Error while executing activity.", e);
         }
 
-        Util.runSafeSWTSync(logger, new Runnable() {
+        Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
 
                 if (activity instanceof TextEditActivity) {
@@ -152,9 +252,26 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
         assert nextActivity != null;
 
-        synchronized (queue) {
-            this.timestamp++;
+        /*
+         * TODO Here we may get into trouble with asynchronously send file
+         * contents. The editor activated activity may arrive before the actual
+         * file data.
+         * 
+         * The "dead" code below doesn't work because the time stamps of
+         * activities gone through Jupiter don't match the source in the
+         * activity, with the exception of activities originally generated by
+         * the host.
+         */
+        if (true) {
             exec(nextActivity.getActivity());
+            return;
+        }
+
+        synchronized (queues) {
+            queues.add(nextActivity);
+            for (TimedActivity activity : queues.getActivities()) {
+                exec(activity.getActivity());
+            }
         }
     }
 
@@ -168,6 +285,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     /**
      * Gets all activities since last flush.
      * 
+     * TODO Change "special" return value <code>null</code> into an empty List.
+     * See also {@link #flush()}.
+     * 
      * @return the activities that have accumulated since the last flush or
      *         <code>null</code> if no activities are are available.
      */
@@ -176,10 +296,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
         if (activities == null) {
             return null;
-        }
-
-        if (this.timestamp == ActivitySequencer.UNDEFINED_TIME) {
-            this.timestamp = 0;
         }
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
@@ -221,8 +337,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         return this.timestamp;
     }
 
-    public int getQueuedActivities() {
-        return this.queue.size();
+    public int getQueuedActivitiesSize() {
+        // TODO Return the number of activities stored in this.queues here.
+        return 0;
     }
 
     public List<TimedActivity> getActivityHistory() {
@@ -322,7 +439,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      */
     public void execTransformedActivity(IActivity activity) {
         try {
-            logger.debug("execute transformed activity: " + activity);
+            log.debug("execute transformed activity: " + activity);
 
             for (IActivityProvider exec : this.providers) {
                 exec.exec(activity);
@@ -335,11 +452,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
             // send activity to everybody
             if (this.concurrentDocumentManager.isHostSide()) {
-                logger.debug("send transformed activity: " + activity);
+                log.debug("send transformed activity: " + activity);
                 this.activities.add(activity);
             }
         } catch (Exception e) {
-            logger.error("Error while executing activity.", e);
+            log.error("Error while executing activity.", e);
         }
     }
 

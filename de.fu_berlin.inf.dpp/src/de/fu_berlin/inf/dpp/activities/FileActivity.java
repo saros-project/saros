@@ -4,8 +4,6 @@ import java.io.InputStream;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.net.JID;
-
 public class FileActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
@@ -15,9 +13,6 @@ public class FileActivity extends AbstractActivity {
 
     private final IPath path;
 
-    /* exclusive file recipient for error file. */
-    private JID errorRecipient;
-
     private InputStream inputStream;
 
     public FileActivity(Type type, IPath path) {
@@ -26,19 +21,18 @@ public class FileActivity extends AbstractActivity {
     }
 
     /**
-     * construtor to send file activity to an exclusive recipient.
+     * Constructor for {@link FileActivity}s with incoming file data.
      * 
-     * @param type
+     * @param source
+     *            of the file data.
      * @param path
-     * @param to
+     *            where to save the data.
+     * @param in
+     *            data stream.
      */
-    public FileActivity(Type type, IPath path, JID to) {
-        this(type, path);
-        this.errorRecipient = to;
-    }
-
-    public FileActivity(Type type, IPath path, InputStream in) {
-        this(type, path);
+    public FileActivity(String source, IPath path, InputStream in) {
+        this(Type.Created, path);
+        setSource(source);
         this.inputStream = in;
     }
 
@@ -48,10 +42,6 @@ public class FileActivity extends AbstractActivity {
 
     public Type getType() {
         return this.type;
-    }
-
-    public JID getRecipient() {
-        return this.errorRecipient;
     }
 
     /**

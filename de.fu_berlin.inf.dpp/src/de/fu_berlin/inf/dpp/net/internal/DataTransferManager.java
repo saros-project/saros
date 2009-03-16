@@ -558,7 +558,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             // Otherwise
             TimedActivity timedActivity = new TimedActivity(new FileActivity(
-                FileActivity.Type.Created, path, input), time);
+                from.toString(), path, input), time);
 
             ISharedProject project = Saros.getDefault().getSessionManager()
                 .getSharedProject();
