@@ -278,27 +278,18 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     public List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
-        out = optimize(out);
-        return out.size() > 0 ? out : null;
+        return optimize(out);
     }
 
     /**
      * Gets all activities since last flush.
      * 
-     * TODO Change "special" return value <code>null</code> into an empty List.
-     * See also {@link #flush()}.
-     * 
-     * @return the activities that have accumulated since the last flush or
-     *         <code>null</code> if no activities are are available.
+     * @return the activities that have accumulated since the last flush.
      */
     public List<TimedActivity> flushTimed() {
         List<IActivity> activities = flush();
-
-        if (activities == null) {
-            return null;
-        }
-
-        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
+        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>(
+            activities.size());
         for (IActivity activity : activities) {
             timedActivities.add(new TimedActivity(activity, this.timestamp++));
         }

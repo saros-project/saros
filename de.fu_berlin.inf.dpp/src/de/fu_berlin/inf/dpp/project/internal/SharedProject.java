@@ -340,12 +340,14 @@ public class SharedProject implements ISharedProject {
             public void run() {
 
                 if (SharedProject.this.participants.size() <= 1) {
+                    // No other users than the host, so we can simply throw away
+                    // the activities.
                     SharedProject.this.activitySequencer.flush();
                 } else {
                     List<TimedActivity> activities = SharedProject.this.activitySequencer
                         .flushTimed();
 
-                    if (activities != null) {
+                    if (activities.size() > 0) {
                         SharedProject.this.transmitter.sendActivities(
                             SharedProject.this, activities);
                     }
@@ -354,7 +356,8 @@ public class SharedProject implements ISharedProject {
                 // TODO CO 2009-02-06 this is disabled internally. Why?
 
                 // missing activities? (can not execute all)
-                if (SharedProject.this.activitySequencer.getQueuedActivitiesSize() > 0) {
+                if (SharedProject.this.activitySequencer
+                    .getQueuedActivitiesSize() > 0) {
                     SharedProject.queuedsince++;
 
                     // if i am missing activities for REQUEST_ACTIVITY_ON_AGE
