@@ -6,7 +6,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
@@ -113,13 +112,14 @@ public class RequestPacketExtension implements PacketExtension {
 
     private String pathToXML() {
         return "<" + RequestPacketExtension.PATH + ">"
-            + this.request.getEditorPath() + "</" + RequestPacketExtension.PATH
-            + ">";
+            + Util.escapeCDATA(this.request.getEditorPath().toPortableString())
+            + "</" + RequestPacketExtension.PATH + ">";
     }
 
     private String jidToXML() {
-        return "<" + RequestPacketExtension.JID + ">" + this.request.getJID()
-            + "</" + RequestPacketExtension.JID + ">";
+        return "<" + RequestPacketExtension.JID + ">"
+            + Util.escapeCDATA(this.request.getJID().toString()) + "</"
+            + RequestPacketExtension.JID + ">";
     }
 
     private String sideIDToXML() {
@@ -129,12 +129,9 @@ public class RequestPacketExtension implements PacketExtension {
     }
 
     private String vectorTimeToXML() {
-        String xml = "";
-        Timestamp timestamp = this.request.getTimestamp();
-        xml += "<" + RequestPacketExtension.VECTOR_TIME + " local=\""
-            + timestamp.getComponents()[0] + "\" remote=\""
-            + timestamp.getComponents()[1] + "\"" + "/>";
-        return xml;
+        int[] components = this.request.getTimestamp().getComponents();
+        return "<" + RequestPacketExtension.VECTOR_TIME + " local=\""
+            + components[0] + "\" remote=\"" + components[1] + "\"" + "/>";
     }
 
     private void operationToXML(StringBuilder sb, Operation op) {

@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -42,6 +43,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
@@ -385,18 +387,18 @@ public class FileList {
         }
 
         sb.append('<').append(element).append('>');
-        for (Map.Entry<IPath, Long> entry : map.entrySet()) {
+        for (Entry<IPath, Long> entry : map.entrySet()) {
             IPath path = entry.getKey();
 
             if (path.hasTrailingSeparator()) {
-                sb.append("<folder path=\"").append(path).append("\"/>");
-
+                sb.append("<folder path=\"").append(
+                    Util.escapeCDATA(path.toPortableString())).append("\"/>");
             } else {
                 long checksum = entry.getValue();
-                sb.append("<file path=\"").append(path).append("\" ");
+                sb.append("<file path=\"").append(
+                    Util.escapeCDATA(path.toPortableString())).append("\" ");
                 sb.append("checksum=\"").append(checksum).append("\"/>");
             }
-
         }
         sb.append("</").append(element).append('>');
     }

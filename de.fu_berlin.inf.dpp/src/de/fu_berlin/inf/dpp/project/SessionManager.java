@@ -74,7 +74,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         saros.addListener(this);
     }
 
-    Random sessionRandom = new Random(System.currentTimeMillis());
+    protected static final Random sessionRandom = new Random(System
+        .currentTimeMillis());
 
     public void startSession(IProject project) throws XMPPException {
         if (!saros.isConnected()) {
