@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.activities;
 
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A role activity indicates that a user has a new Role in the Driver/Observer
@@ -84,7 +85,8 @@ public class RoleActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<user ");
-        sb.append("id=\"").append(getUser()).append("\" ");
+        sb.append("id=\"").append(Util.escapeCDATA(getUser().toString()))
+            .append("\" ");
         sb.append("role=\"").append(getRole()).append("\" ");
         sb.append("/>");
     }

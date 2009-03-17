@@ -4,6 +4,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 public class ViewportActivity extends AbstractActivity {
     public final int topIndex;
 
@@ -68,8 +70,8 @@ public class ViewportActivity extends AbstractActivity {
         sb.append("<viewport ");
         sb.append("top=\"").append(getTopIndex()).append("\" ");
         sb.append("bottom=\"").append(getBottomIndex()).append("\" ");
-        sb.append("editor=\"").append(getEditor().toPortableString()).append(
-            "\"");
+        sb.append("editor=\"").append(
+            Util.escapeCDATA(getEditor().toPortableString())).append("\"");
         sb.append("/>");
     }
 }

@@ -47,6 +47,8 @@ public interface IActivity {
      * The activity will call the receive method of the given receiver with the
      * actual type of this IActivity.
      * 
+     * @return <code>true</code> if the receiver consumed this activity,
+     *         otherwise <code>false</code>.
      */
     public boolean dispatch(IActivityReceiver receiver);
 

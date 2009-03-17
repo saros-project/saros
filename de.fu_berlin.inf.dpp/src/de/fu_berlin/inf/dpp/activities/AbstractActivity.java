@@ -16,10 +16,7 @@ public abstract class AbstractActivity implements IActivity {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((source == null) ? 0 : source.hashCode());
-        return result;
+        return (source == null) ? 0 : source.hashCode();
     }
 
     @Override
@@ -32,15 +29,10 @@ public abstract class AbstractActivity implements IActivity {
             return false;
 
         AbstractActivity other = (AbstractActivity) obj;
-
-        if (!ObjectUtils.equals(this.source, other.source))
-            return false;
-
-        return true;
+        return ObjectUtils.equals(this.source, other.source);
     }
 
     public String toXML() {
-        // TODO Escape data in XML in subclasses, for example paths.
         StringBuilder sb = new StringBuilder();
         this.toXML(sb);
         return sb.toString();

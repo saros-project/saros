@@ -21,6 +21,8 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 /**
  * A text load activity activates a new resource. If the path is
  * <code>null</code> no resouce is currently active.
@@ -98,7 +100,8 @@ public class EditorActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<editor ");
-        sb.append("path=\"").append(getPath()).append("\" ");
+        sb.append("path=\"").append(
+            Util.escapeCDATA(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");
         sb.append("checksum=\"").append(getChecksum()).append("\" ");
         sb.append("/>");

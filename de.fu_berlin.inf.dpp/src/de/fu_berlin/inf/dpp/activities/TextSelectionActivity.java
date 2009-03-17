@@ -21,6 +21,8 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 public class TextSelectionActivity extends AbstractActivity {
     private final int offset;
 
@@ -76,8 +78,8 @@ public class TextSelectionActivity extends AbstractActivity {
         sb.append("<textSelection ");
         sb.append("offset=\"").append(getOffset()).append("\" ");
         sb.append("length=\"").append(getLength()).append("\" ");
-        sb.append("editor=\"").append(getEditor().toPortableString()).append(
-            "\"");
+        sb.append("editor=\"").append(
+            Util.escapeCDATA(getEditor().toPortableString())).append("\"");
         sb.append(" />");
     }
 }

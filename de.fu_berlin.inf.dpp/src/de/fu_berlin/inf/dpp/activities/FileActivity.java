@@ -4,6 +4,8 @@ import java.io.InputStream;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 public class FileActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
@@ -75,7 +77,8 @@ public class FileActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<file ");
-        sb.append("path=\"").append(getPath()).append("\" ");
+        sb.append("path=\"").append(
+            Util.escapeCDATA(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");
         sb.append("/>");
     }

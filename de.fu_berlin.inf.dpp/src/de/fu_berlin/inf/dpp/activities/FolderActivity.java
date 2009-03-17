@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 public class FolderActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
@@ -35,7 +37,8 @@ public class FolderActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<folder ");
-        sb.append("path=\"").append(getPath()).append("\" ");
+        sb.append("path=\"").append(
+            Util.escapeCDATA(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");
         sb.append("/>");
     }
