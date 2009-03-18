@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
@@ -315,6 +316,40 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     public HashMap<IPath, Long> lastRemoteEditTimes = new HashMap<IPath, Long>();
 
     private ContributionAnnotationManager contributionAnnotationManager;
+
+    private final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+        @Override
+        public boolean receive(EditorActivity editorActivity) {
+            if (editorActivity.getType().equals(Type.Activated)) {
+                setActiveDriverEditor(editorActivity.getPath(), true);
+
+            } else if (editorActivity.getType().equals(Type.Closed)) {
+                removeDriverEditor(editorActivity.getPath(), true);
+
+            } else if (editorActivity.getType().equals(Type.Saved)) {
+                saveText(editorActivity.getPath());
+            }
+            return true;
+        }
+
+        @Override
+        public boolean receive(TextEditActivity textEditActivity) {
+            execTextEdit(textEditActivity);
+            return true;
+        }
+
+        @Override
+        public boolean receive(TextSelectionActivity textSelectionActivity) {
+            execTextSelection(textSelectionActivity);
+            return true;
+        }
+
+        @Override
+        public boolean receive(ViewportActivity viewportActivity) {
+            execViewport(viewportActivity);
+            return true;
+        }
+    };
 
     public static EditorManager getDefault() {
         if (EditorManager.instance == null) {
@@ -735,41 +770,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @see IActivityProvider
      */
     public void exec(final IActivity activity) {
-
-        activity.dispatch(new AbstractActivityReceiver() {
-
-            @Override
-            public boolean receive(EditorActivity editorActivity) {
-                if (editorActivity.getType().equals(Type.Activated)) {
-                    setActiveDriverEditor(editorActivity.getPath(), true);
-
-                } else if (editorActivity.getType().equals(Type.Closed)) {
-                    removeDriverEditor(editorActivity.getPath(), true);
-
-                } else if (editorActivity.getType().equals(Type.Saved)) {
-                    saveText(editorActivity.getPath());
-                }
-                return true;
-            }
-
-            @Override
-            public boolean receive(TextEditActivity textEditActivity) {
-                execTextEdit(textEditActivity);
-                return true;
-            }
-
-            @Override
-            public boolean receive(TextSelectionActivity textSelectionActivity) {
-                execTextSelection(textSelectionActivity);
-                return true;
-            }
-
-            @Override
-            public boolean receive(ViewportActivity viewportActivity) {
-                execViewport(viewportActivity);
-                return true;
-            }
-        });
+        activity.dispatch(activityReceiver);
     }
 
     private void execTextEdit(TextEditActivity textEdit) {

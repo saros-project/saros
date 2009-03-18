@@ -38,6 +38,7 @@ import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -95,6 +96,67 @@ public class ConcurrentDocumentManager {
     private final ISharedProject sharedProject;
 
     private final ISharedProjectListener projectListener;
+
+    private final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+        @Override
+        public boolean receive(EditorActivity editor) {
+
+            /*
+             * Host: start and stop jupiter server process depending on editor
+             * activities of remote clients. Client: start and stop local
+             * jupiter clients depending on editor activities.
+             */
+
+            // TODO Consistency Check?
+            if (editor.getType() == Type.Saved) {
+                // // calculate checksum for saved file
+                // long checksum = FileUtil.checksum(this.sharedProject
+                // .getProject().getFile(editor.getPath()));
+                // editor.setChecksum(checksum);
+                // ConcurrentDocumentManager.logger
+                // .debug("Add checksumme to created editor save activity : "
+                // + checksum
+                // + " for path : "
+                // + editor.getPath().toOSString());
+            }
+
+            // We did not handle it!
+            return false;
+        }
+
+        @Override
+        public boolean receive(TextEditActivity textEdit) {
+
+            Jupiter document = getClientDoc(textEdit.getEditor());
+            final Request request = document.generateRequest(textEdit
+                .toOperation());
+            request.setJID(myJID);
+            request.setEditorPath(textEdit.getEditor());
+
+            if (isHostSide()) {
+
+                // Skip network and apply directly but make sure that we use
+                // the same thread as the messages that really arrive via
+                // the network.
+                Saros.getDefault().getSessionManager().getTransmitter()
+                    .executeAsDispatch(new Runnable() {
+                        public void run() {
+                            receiveRequestHostSide(request);
+                        }
+                    });
+
+                /*
+                 * This activity still needs to be sent to all observers,
+                 * because they are not notified by receiveRequestHostSide(...).
+                 */
+                return false;
+            } else {
+                // Send to host
+                sequencer.forwardOutgoingRequest(host, request);
+                return true;
+            }
+        }
+    };
 
     /**
      * Returns the TextFileBuffer associated with this project relative path OR
@@ -365,68 +427,7 @@ public class ConcurrentDocumentManager {
      * otherwise.
      */
     public boolean activityCreated(IActivity activity) {
-
-        return activity.dispatch(new AbstractActivityReceiver() {
-            @Override
-            public boolean receive(EditorActivity editor) {
-
-                /*
-                 * Host: start and stop jupiter server process depending on
-                 * editor activities of remote clients. Client: start and stop
-                 * local jupiter clients depending on editor activities.
-                 */
-
-                // TODO Consistency Check?
-                if (editor.getType() == Type.Saved) {
-                    // // calculate checksum for saved file
-                    // long checksum = FileUtil.checksum(this.sharedProject
-                    // .getProject().getFile(editor.getPath()));
-                    // editor.setChecksum(checksum);
-                    // ConcurrentDocumentManager.logger
-                    // .debug("Add checksumme to created editor save activity : "
-                    // + checksum
-                    // + " for path : "
-                    // + editor.getPath().toOSString());
-                }
-
-                // We did not handle it!
-                return false;
-            }
-
-            @Override
-            public boolean receive(TextEditActivity textEdit) {
-
-                Jupiter document = getClientDoc(textEdit.getEditor());
-                final Request request = document.generateRequest(textEdit
-                    .toOperation());
-                request.setJID(myJID);
-                request.setEditorPath(textEdit.getEditor());
-
-                if (isHostSide()) {
-
-                    // Skip network and apply directly but make sure that we use
-                    // the same thread as the messages that really arrive via
-                    // the network.
-                    Saros.getDefault().getSessionManager().getTransmitter()
-                        .executeAsDispatch(new Runnable() {
-                            public void run() {
-                                receiveRequestHostSide(request);
-                            }
-                        });
-
-                    /*
-                     * This activity still needs to be sent to all observers,
-                     * because they are not notified by
-                     * receiveRequestHostSide(...).
-                     */
-                    return false;
-                } else {
-                    // Send to host
-                    sequencer.forwardOutgoingRequest(host, request);
-                    return true;
-                }
-            }
-        });
+        return activity.dispatch(activityReceiver);
     }
 
     public void execFileActivity(IActivity activity) {

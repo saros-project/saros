@@ -1,5 +1,5 @@
 package de.fu_berlin.inf.dpp.activities;
-
+ 
 import org.apache.commons.lang.ObjectUtils;
 
 public abstract class AbstractActivity implements IActivity {
