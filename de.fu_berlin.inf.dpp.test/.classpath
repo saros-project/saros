@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry exported="true" kind="lib" path="lib/easymock.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.15.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Saros/bin" sourcepath="/Saros/src"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/swing-worker-1.1.jar"/>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry kind="lib" path="lib/lw-rudp.jar"/>
-	<classpathentry kind="lib" path="lib/lw-collection.jar"/>
-	<classpathentry kind="lib" path="lib/lw-common.jar"/>
-	<classpathentry kind="lib" path="lib/lw-io.jar"/>
-	<classpathentry kind="lib" path="lib/lw-nio.jar"/>
 	<classpathentry kind="lib" path="lib/lw-test-util.jar"/>
-	<classpathentry kind="lib" path="lib/smack.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-debug.jar"/>
-	<classpathentry kind="lib" path="lib/smackx-jingle.jar"/>
-	<classpathentry kind="lib" path="lib/smackx.jar"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="lib" path="/Saros/lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="/Saros/lib/commons-io-1.4.jar" sourcepath="/Saros/lib/commons-io-1.4-sources.jar"/>
+	<classpathentry kind="lib" path="/Saros/lib/commons-lang-2.4.jar" sourcepath="/Saros/lib/commons-lang-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="/Saros/lib/commons-logging.jar" sourcepath="/Saros/dppsrc.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/easymock.jar"/>
+	<classpathentry kind="lib" path="/Saros/lib/junit.jar"/>
+	<classpathentry kind="lib" path="/Saros/lib/log4j-1.2.15.jar" sourcepath="/Saros/dppsrc.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/lw-collection.jar" sourcepath="/Saros/dppsrc.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/lw-common.jar" sourcepath="/Saros/dppsrc.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/lw-io.jar" sourcepath="/Saros/dppsrc.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/lw-nio.jar" sourcepath="C:/Documents and Settings/oezbek/Desktop/Temp/2008/2008-12/limewire/components/nio"/>
+	<classpathentry kind="lib" path="/Saros/lib/lw-rudp.jar" sourcepath="C:/Documents and Settings/oezbek/Desktop/Temp/2008/2008-12/limewire"/>
+	<classpathentry kind="lib" path="/Saros/lib/picocontainer-2.7.jar" sourcepath="/Saros/lib/picocontainer-2.7-sources.jar"/>
+	<classpathentry kind="lib" path="/Saros/lib/smack.jar" sourcepath="/Saros/lib/smack_src_3_1_0.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/smackx-jingle.jar" sourcepath="/Saros/lib/smack_src_3_1_0.zip"/>
+	<classpathentry kind="lib" path="/Saros/lib/smackx.jar" sourcepath="/Saros/lib/smack_src_3_1_0.zip"/>
+	<classpathentry kind="lib" path="/Saros/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

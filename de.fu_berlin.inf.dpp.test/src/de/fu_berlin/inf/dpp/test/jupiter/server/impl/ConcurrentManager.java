@@ -6,8 +6,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.NetworkRequest;
-import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
+import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
 public class ConcurrentManager implements NetworkEventHandler {
 
@@ -15,11 +15,11 @@ public class ConcurrentManager implements NetworkEventHandler {
 
     private JupiterDocumentServer server;
     private JID jid = new JID("ori78@jabber.cc");
-    private NetworkConnection connection;
+    private SimulateNetzwork connection;
 
     // private RequestForwarder outgoing;
 
-    public ConcurrentManager(NetworkConnection con, JID jid) {
+    public ConcurrentManager(SimulateNetzwork con, JID jid) {
 	this.connection = con;
 	this.jid = jid;
 	init();
@@ -28,7 +28,7 @@ public class ConcurrentManager implements NetworkEventHandler {
     private void init() {
 	// this.outgoing = new OutgoingMessageForwarder();
 	// server = new JupiterDocumentServer(outgoing);
-	server = new JupiterDocumentServer();
+	server = new JupiterDocumentServer(null);
 
 	new Thread(new Runnable() {
 
@@ -54,15 +54,11 @@ public class ConcurrentManager implements NetworkEventHandler {
 
     public void addProxyClient(JID jid) {
 	/* if client not in proxy list */
-	try {
 	    if (!server.getProxies().containsKey(jid)) {
 		logger.info("add new proxy client for " + jid);
 		server.addProxyClient(jid);
 	    }
-	} catch (InterruptedException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	}
+
     }
 
     /* test network methods. */

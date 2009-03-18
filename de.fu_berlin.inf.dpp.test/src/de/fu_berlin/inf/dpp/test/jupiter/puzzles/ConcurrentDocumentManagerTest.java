@@ -2,9 +2,13 @@ package de.fu_berlin.inf.dpp.test.jupiter.puzzles;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
@@ -18,12 +22,12 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.ServerSynchronizedDocument;
  * @author orieger
  * 
  */
-public class ConvergenceProblemTest extends JupiterTestCase {
+public class ConcurrentDocumentManagerTest extends JupiterTestCase {
 
-    public ConvergenceProblemTest(String method) {
+    public ConcurrentDocumentManagerTest(String method) {
 	super(method);
     }
-
+    
     /**
      * Scenario in fig. 3 described in 3.1 Scenarios violating convergence.
      */
@@ -31,7 +35,6 @@ public class ConvergenceProblemTest extends JupiterTestCase {
 	JID jid_c1 = new JID("ori79@jabber.cc");
 	JID jid_c2 = new JID("ori80@jabber.cc");
 	JID jid_c3 = new JID("ori81@jabber.cc");
-
 	JID jid_server = new JID("ori78@jabber.cc");
 
 	String initDocumentState = "core";
@@ -133,8 +136,8 @@ public class ConvergenceProblemTest extends JupiterTestCase {
     public static Test suite() {
 	TestSuite suite = new TestSuite("Convergence violating scenarios.");
 	// $JUnit-BEGIN$
-	suite.addTest(new ConvergenceProblemTest("testC2PuzzleP1"));
-	suite.addTest(new ConvergenceProblemTest("testC2PuzzleP2"));
+	suite.addTest(new ConcurrentDocumentManagerTest("testC2PuzzleP1"));
+	suite.addTest(new ConcurrentDocumentManagerTest("testC2PuzzleP2"));
 	// $JUnit-END$
 	return suite;
     }

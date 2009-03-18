@@ -42,160 +42,165 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesProvider;
 
 public class ActivitiesExtensionProviderTest extends TestCase {
-    private ArrayList<IActivity> activities;
-    private MXParser parser;
+	
+	private ArrayList<IActivity> activities;
+	private MXParser parser;
 
-    @Override
-    protected void setUp() throws Exception {
-        activities = new ArrayList<IActivity>();
-    }
+	@Override
+	protected void setUp() throws Exception {
+		activities = new ArrayList<IActivity>();
+	}
 
-    public void testParsingStopsOnActivitiesEndTag()
-            throws XmlPullParserException, IOException {
-        activities.add(new TextEditActivity(5, "abc", 1));
-        assertCreateAndParseActivities();
+	public void testParsingStopsOnActivitiesEndTag()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextEditActivity(5, "abc", "d", new Path(
+				"hello/world.file"), SarosTest.User1));
+		assertCreateAndParseActivities();
 
-        assertTrue(parser.next() == XmlPullParser.END_DOCUMENT);
-    }
+		assertTrue(parser.next() == XmlPullParser.END_DOCUMENT);
+	}
 
-    public void testCreateAndParseSingleTextEditActivity()
-            throws XmlPullParserException, IOException {
-        activities.add(new TextEditActivity(5, "abc", 1));
+	public void testCreateAndParseSingleTextEditActivity()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextEditActivity(5, "abc", "d", new Path(
+				"hello/world.file"), SarosTest.User1));
+		assertCreateAndParseActivities();
+	}
 
-        assertCreateAndParseActivities();
-    }
+	public void testCreateAndParseMultipleTextEditActivity()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextEditActivity(5, "abc", "d", new Path(
+				"hello/world.file"), SarosTest.User1));
+		activities.add(new TextEditActivity(15, "", "", new Path("world.file"),
+				SarosTest.User2));
+		activities.add(new TextEditActivity(50, "xy", "hello world", new Path(
+				"hello.file"), SarosTest.User1));
 
-    public void testCreateAndParseMultipleTextEditActivity()
-            throws XmlPullParserException, IOException {
-        activities.add(new TextEditActivity(5, "abc", 1));
-        activities.add(new TextEditActivity(15, "", 0));
-        activities.add(new TextEditActivity(50, "xy", 15));
+		assertCreateAndParseActivities();
+	}
 
-        assertCreateAndParseActivities();
-    }
+	public void testCreateAndParsePreservesNewLines()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextEditActivity(5, "\n  ab   \n \n\nc\n", "\n\n\n \n", new Path("world.file"),
+				SarosTest.User2));
 
-    public void testCreateAndParsePreservesNewLines()
-            throws XmlPullParserException, IOException {
-        activities.add(new TextEditActivity(5, "\nab\n\n\nc\n", 1));
+		assertCreateAndParseActivities();
+	}
 
-        assertCreateAndParseActivities();
-    }
+	public void testCDATA()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextEditActivity(5, "lorem]]>ipsum", "fox]]>jumps", new Path("world.file"),
+				SarosTest.User2));
 
-    // TODO
-    public void testCreateAndParseHandlesAngleBrackets()
-            throws XmlPullParserException, IOException {
-        activities.add(new TextEditActivity(5, "<<<>>>", 1));
+		assertCreateAndParseActivities();
+	}
 
-        assertCreateAndParseActivities();
-    }
+	public void testAngleBrackets()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextEditActivity(5, "<<<>>>", "<<<>>>>", new Path("world.file"),
+				SarosTest.User2));
 
-    //    
-    // // TODO
-    // public void testCreateAndParsePreservesNewLinesAndCarriageReturns()
-    // throws XmlPullParserException, IOException {
-    // activities.add(new TextEditActivity(5, "abc\r\n", 1));
-    //
-    // assertCreateAndParseActivities();
-    // }
+		assertCreateAndParseActivities();
+	}
 
-    public void testSingleEditorActivatedActivity()
-            throws XmlPullParserException, IOException {
+	public void testSingleEditorActivatedActivity()
+			throws XmlPullParserException, IOException {
 
-        activities.add(new EditorActivity(Type.Activated, new Path(
-                "/foo/text.txt")));
+		activities.add(new EditorActivity(Type.Activated, new Path(
+				"/foo/text.txt")));
 
-        assertCreateAndParseActivities();
-    }
+		assertCreateAndParseActivities();
+	}
 
-    public void testSingleTextSelectionActivity()
-            throws XmlPullParserException, IOException {
-        activities.add(new TextSelectionActivity(2, 23, new Path(
-                "/foo/text.txt")));
+	public void testSingleTextSelectionActivity()
+			throws XmlPullParserException, IOException {
+		activities.add(new TextSelectionActivity(2, 23, new Path(
+				"/foo/text.txt")));
 
-        assertCreateAndParseActivities();
-    }
+		assertCreateAndParseActivities();
+	}
 
-    // public void testResourceAddActivity()
-    // throws XmlPullParserException, IOException {
-    //        
-    // activities.add(new ResourceAddActivity(new Path("/saros/unittest.txt")));
-    //
-    // assertCreateAndParseActivities();
-    // }
+	// public void testResourceAddActivity()
+	// throws XmlPullParserException, IOException {
+	//        
+	// activities.add(new ResourceAddActivity(new Path("/saros/unittest.txt")));
+	//
+	// assertCreateAndParseActivities();
+	// }
 
-    // public void testResourceAddActivityWithContent()
-    // throws XmlPullParserException, IOException {
-    //        
-    // activities.add(new ResourceAddActivity(
-    // new Path("/saros/unittest.txt"), "test content"));
-    //
-    // assertCreateAndParseActivities();
-    // }
-    //    
-    // public void testResourceAddActivityWithContentAndAngledBrackets()
-    // throws XmlPullParserException, IOException {
-    //
-    // activities.add(new ResourceAddActivity(
-    // new Path("/saros/unittest.txt"), "test<<<>>>content"));
-    //
-    //
-    // assertCreateAndParseActivities();
-    // }
-    //    
-    // public void testResourceAddActivityWithContentAndPreserveNewLines()
-    // throws XmlPullParserException, IOException {
-    //    
-    // activities.add(new ResourceAddActivity(
-    // new Path("/saros/unittest.txt"), "test\ncontent"));
-    //    
-    // assertCreateAndParseActivities();
-    // }
-    //    
-    // public void
-    // testResourceAddActivityWithContentAndPreserveCarriageReturns()
-    // throws XmlPullParserException, IOException {
-    //
-    // activities.add(new ResourceAddActivity(
-    // new Path("/saros/unittest.txt"), "test\rcontent"));
-    //
-    // assertCreateAndParseActivities();
-    // }
+	// public void testResourceAddActivityWithContent()
+	// throws XmlPullParserException, IOException {
+	//        
+	// activities.add(new ResourceAddActivity(
+	// new Path("/saros/unittest.txt"), "test content"));
+	//
+	// assertCreateAndParseActivities();
+	// }
+	//    
+	// public void testResourceAddActivityWithContentAndAngledBrackets()
+	// throws XmlPullParserException, IOException {
+	//
+	// activities.add(new ResourceAddActivity(
+	// new Path("/saros/unittest.txt"), "test<<<>>>content"));
+	//
+	//
+	// assertCreateAndParseActivities();
+	// }
+	//    
+	// public void testResourceAddActivityWithContentAndPreserveNewLines()
+	// throws XmlPullParserException, IOException {
+	//    
+	// activities.add(new ResourceAddActivity(
+	// new Path("/saros/unittest.txt"), "test\ncontent"));
+	//    
+	// assertCreateAndParseActivities();
+	// }
+	//    
+	// public void
+	// testResourceAddActivityWithContentAndPreserveCarriageReturns()
+	// throws XmlPullParserException, IOException {
+	//
+	// activities.add(new ResourceAddActivity(
+	// new Path("/saros/unittest.txt"), "test\rcontent"));
+	//
+	// assertCreateAndParseActivities();
+	// }
 
-    public void testFileAddedActivity() throws XmlPullParserException,
-            IOException {
+	public void testFileAddedActivity() throws XmlPullParserException,
+			IOException {
 
-        activities.add(new FileActivity(FileActivity.Type.Created, new Path(
-                "/saros/unittest.txt")));
+		activities.add(new FileActivity(FileActivity.Type.Created, new Path(
+				"/saros/unittest.txt")));
 
-        assertCreateAndParseActivities();
-    }
+		assertCreateAndParseActivities();
+	}
 
-    /**
-     * Create a ActivitiesExtension from given parameter, convert it to XML,
-     * process it through the ActivitiesProvider back into an
-     * ActivitiesExtension and check if its activities equal the param given.
-     * 
-     * @throws IOException
-     */
-    private void assertCreateAndParseActivities()
-            throws XmlPullParserException, IOException {
+	/**
+	 * Create a ActivitiesExtension from given parameter, convert it to XML,
+	 * process it through the ActivitiesProvider back into an
+	 * ActivitiesExtension and check if its activities equal the param given.
+	 * 
+	 * @throws IOException
+	 */
+	private void assertCreateAndParseActivities()
+			throws XmlPullParserException, IOException {
 
-        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-        int time = 0;
-        for (IActivity activity : activities) {
-            timedActivities.add(new TimedActivity(activity, time++));
-        }
+		List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
+		int time = 0;
+		for (IActivity activity : activities) {
+			timedActivities.add(new TimedActivity(activity, time++));
+		}
 
-        ActivitiesPacketExtension activitiesPacket = new ActivitiesPacketExtension(
-                "1", timedActivities);
+		ActivitiesPacketExtension activitiesPacket = new ActivitiesPacketExtension(
+				"1", timedActivities);
 
-        ActivitiesProvider provider = new ActivitiesProvider();
+		ActivitiesProvider provider = new ActivitiesProvider();
 
-        parser = new MXParser();
-        parser.setInput(new StringReader(activitiesPacket.toXML()));
-        ActivitiesPacketExtension activitiesExtension = provider
-                .parseExtension(parser);
+		parser = new MXParser();
+		parser.setInput(new StringReader(activitiesPacket.toXML()));
+		ActivitiesPacketExtension activitiesExtension = provider
+				.parseExtension(parser);
 
-        assertEquals(timedActivities, activitiesExtension.getActivities());
-    }
+		assertEquals(timedActivities, activitiesExtension.getActivities());
+	}
 }

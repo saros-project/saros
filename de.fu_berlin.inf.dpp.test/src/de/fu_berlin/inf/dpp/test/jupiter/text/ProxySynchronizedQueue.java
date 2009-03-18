@@ -10,8 +10,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.SynchronizedQueue;
-import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
+import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
 /**
  * This proxy class on server represent the server side of the two-way jupiter
@@ -20,16 +19,16 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
  * @author troll
  * 
  */
-public class ProxySynchronizedQueue implements SynchronizedQueue {
+public class ProxySynchronizedQueue  {
 
     private static Logger logger = Logger
 	    .getLogger(ProxySynchronizedQueue.class);
 
     private Algorithm algorithm;
-    private NetworkConnection connection;
+    private SimulateNetzwork connection;
     private JID jid;
 
-    public ProxySynchronizedQueue(JID jid, NetworkConnection con) {
+    public ProxySynchronizedQueue(JID jid, SimulateNetzwork con) {
 	this.jid = jid;
 	this.algorithm = new Jupiter(false);
 	this.connection = con;

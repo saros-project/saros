@@ -11,12 +11,11 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.SynchronizedQueue;
-import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
+import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
 public class ServerSynchronizedDocument implements JupiterServer,
-	SynchronizedQueue, NetworkEventHandler, DocumentTestChecker {
+	NetworkEventHandler, DocumentTestChecker {
 
     private static Logger logger = Logger
 	    .getLogger(ServerSynchronizedDocument.class);
@@ -26,32 +25,32 @@ public class ServerSynchronizedDocument implements JupiterServer,
     private Algorithm algorithm;
 
     private JID jid;
-    private NetworkConnection connection;
+    private SimulateNetzwork connection;
 
     private boolean accessDenied = false;
 
     private HashMap<JID, ProxySynchronizedQueue> proxyQueues;
 
     @Deprecated
-    public ServerSynchronizedDocument(String content, NetworkConnection con) {
+    public ServerSynchronizedDocument(String content, SimulateNetzwork con) {
 	init(content, con);
     }
 
     @Deprecated
-    public ServerSynchronizedDocument(String content, NetworkConnection con,
+    public ServerSynchronizedDocument(String content, SimulateNetzwork con,
 	    JID jid) {
 	this.jid = jid;
 	init(content, con);
     }
 
-    public ServerSynchronizedDocument(NetworkConnection con, JID jid) {
+    public ServerSynchronizedDocument(SimulateNetzwork con, JID jid) {
 	this.jid = jid;
 	/* init network connection. */
 	init(con);
     }
 
     /* init proxy queue and all necessary objects. */
-    private void init(String content, NetworkConnection con) {
+    private void init(String content, SimulateNetzwork con) {
 	this.doc = new Document(content);
 	this.algorithm = new Jupiter(true);
 	this.connection = con;
@@ -63,7 +62,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
      * 
      * @param con
      */
-    private void init(NetworkConnection con) {
+    private void init(SimulateNetzwork con) {
 	this.connection = con;
 	this.proxyQueues = new HashMap<JID, ProxySynchronizedQueue>();
     }
@@ -213,7 +212,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
     public void addProxyClient(JID jid) {
 	ProxySynchronizedQueue queue = new ProxySynchronizedQueue(jid,
 		this.connection);
-	proxyQueues.put(jid, queue);
+	proxyQueues.put(jid, queue); 
     }
 
     public void removeProxyClient(JID jid) {

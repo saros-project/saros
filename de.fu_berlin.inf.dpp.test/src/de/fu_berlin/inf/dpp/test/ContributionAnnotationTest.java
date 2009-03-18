@@ -13,7 +13,7 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.AnnotationModel;
 
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
-import de.fu_berlin.inf.dpp.editor.internal.ContributionHelper;
+import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 
 /**
  * Unit tests for contribution annotation insertions.
@@ -61,7 +61,7 @@ public class ContributionAnnotationTest extends TestCase {
      */
     public void testInsertSimpleAnnotation() throws BadLocationException {
 	document.replace(5, 0, "abc");
-	ContributionHelper.insertAnnotation(annotationModel, 5, 3);
+	ContributionAnnotationManager.insertAnnotation(annotationModel, 5, 3);
 	assertPositions(annotationModel, new int[] { 5, 3 });
     }
 

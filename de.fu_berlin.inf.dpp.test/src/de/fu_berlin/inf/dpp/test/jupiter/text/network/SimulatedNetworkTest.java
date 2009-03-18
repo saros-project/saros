@@ -32,9 +32,8 @@ public class SimulatedNetworkTest extends TestCase {
      * simple test of a two-site communication.
      */
     public void testSimpleNetzworkMessage() throws Exception {
-	ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
-		network);
-	c1.setJID(new JID("ori79@jabber.cc"));
+	ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(new JID("ori78@jabber.cc"), "abc",
+		network, new JID("ori79@jabber.cc"));
 	ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abc",
 		network);
 	s1.setJID(new JID("ori78@jabber.cc"));
@@ -60,8 +59,7 @@ public class SimulatedNetworkTest extends TestCase {
 
     public void testNetworkMessagesWithDelay() throws Exception {
 	ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
-		network);
-	c1.setJID(new JID("ori79@jabber.cc"));
+		network, new JID("ori79@jabber.cc"));
 	ServerSynchronizedDocument s1 = new ServerSynchronizedDocument("abc",
 		network);
 	s1.setJID(new JID("ori78@jabber.cc"));

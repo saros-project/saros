@@ -1,18 +1,24 @@
 package de.fu_berlin.inf.dpp.test.jupiter.text;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.Path;
+
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 
 /**
  * this class represent a document object for testing.
  * 
  * @author troll
- * 
+ * @author oezbek
  */
 public class Document {
 
+	private static final Logger log = Logger
+			.getLogger(Document.class.getName());
+	
     /** document state. */
     private StringBuffer doc;
 
@@ -41,29 +47,21 @@ public class Document {
      * @param op
      */
     public void execOperation(Operation op) {
-	try {
-	    /* execute insert operation */
-	    if (op instanceof InsertOperation) {
-		InsertOperation iop = (InsertOperation) op;
-		doc.insert(iop.getPosition(), iop.getText());
-		return;
-	    }
-	    /* execute delete operation */
-	    if (op instanceof DeleteOperation) {
-		DeleteOperation dop = (DeleteOperation) op;
-		doc.delete(dop.getPosition(), dop.getPosition()
-			+ dop.getTextLength());
-		return;
-	    }
-	    /* execute split operations. */
-	    if (op instanceof SplitOperation) {
-		SplitOperation sop = (SplitOperation) op;
-		execOperation(sop.getSecond());
-		execOperation(sop.getFirst());
-	    }
-	} catch (Exception e) {
-	    System.out.println(e.getMessage() + " : " + " doc "
-		    + doc.toString() + " | op : " + op.toString());
-	}
+	
+    	List<TextEditActivity> activities = op.toTextEdit(new Path("dummy"), "dummy");
+    	
+    	for (TextEditActivity activity : activities){
+    		
+    		int start = activity.offset;
+    		int end = start + activity.replacedText.length();
+    		String is = doc.toString().substring(start, end); 
+    		
+    		if (!is.equals(activity.replacedText)){
+    			log.warn("Text should be '" + activity.replacedText + "' is '" + is + "'");
+    			throw new RuntimeException("Text should be '" + activity.replacedText + "' is '" + is + "'");
+    		}
+    		
+    		doc.replace(start, end, activity.text);
+    	}
     }
 }

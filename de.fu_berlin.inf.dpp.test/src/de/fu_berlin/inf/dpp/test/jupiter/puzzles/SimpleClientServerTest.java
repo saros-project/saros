@@ -36,8 +36,7 @@ public class SimpleClientServerTest extends JupiterTestCase {
      */
     public void test2WayProtocol() throws Exception {
 	ClientSynchronizedDocument c1 = new ClientSynchronizedDocument("abc",
-		network);
-	c1.setJID(new JID("ori79@jabber.cc"));
+		network, new JID("ori79@jabber.cc"));
 	TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument("abc",
 		network);
 	s1.setJID(new JID("ori78@jabber.cc"));
@@ -80,8 +79,7 @@ public class SimpleClientServerTest extends JupiterTestCase {
      */
     public void testDeleteStringWithConcurentInsert() throws Exception {
 	ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(
-		"abcdefg", network);
-	c1.setJID(new JID("ori79@jabber.cc"));
+		"abcdefg", network, new JID("ori79@jabber.cc"));
 	TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument(
 		"abcdefg", network);
 	s1.setJID(new JID("ori78@jabber.cc"));
@@ -108,8 +106,7 @@ public class SimpleClientServerTest extends JupiterTestCase {
      */
     public void testInsertStringWithConcurentDelete() throws Exception {
 	ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(
-		"abcdefg", network);
-	c1.setJID(new JID("ori79@jabber.cc"));
+		"abcdefg", network, new JID("ori79@jabber.cc"));
 	TwoWayJupiterServerDocument s1 = new TwoWayJupiterServerDocument(
 		"abcdefg", network);
 	s1.setJID(new JID("ori78@jabber.cc"));

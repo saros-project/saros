@@ -46,7 +46,7 @@ public class EditorManagerTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-	sessionManager.leaveSession();
+	sessionManager.stopSharedProject();
 	project.delete(true, null);
 	closeOpenEditors();
     }

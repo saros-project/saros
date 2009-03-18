@@ -1,8 +1,5 @@
 package de.fu_berlin.inf.dpp.test.jupiter.text;
 
-import java.util.List;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
@@ -12,12 +9,10 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.SynchronizedQueue;
-import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkConnection;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
+import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
-public class TwoWayJupiterServerDocument implements SynchronizedQueue,
-	NetworkEventHandler, DocumentTestChecker {
+public class TwoWayJupiterServerDocument implements	NetworkEventHandler, DocumentTestChecker {
 
     private static Logger logger = Logger
 	    .getLogger(TwoWayJupiterServerDocument.class);
@@ -28,26 +23,23 @@ public class TwoWayJupiterServerDocument implements SynchronizedQueue,
 
     private JID jid = new JID("ori78@jabber.cc");
     private JID jid_client = new JID("ori79@jabber.cc");
-    private NetworkConnection connection;
+    private SimulateNetzwork connection;
 
-    private List<SynchronizedQueue> proxyQueues;
-
-    public TwoWayJupiterServerDocument(String content, NetworkConnection con) {
+    public TwoWayJupiterServerDocument(String content, SimulateNetzwork con) {
 	init(content, con);
     }
 
-    public TwoWayJupiterServerDocument(String content, NetworkConnection con,
+    public TwoWayJupiterServerDocument(String content, SimulateNetzwork con,
 	    JID jid) {
 	this.jid = jid;
 	init(content, con);
     }
 
     /* init proxy queue and all necessary objects. */
-    private void init(String content, NetworkConnection con) {
+    private void init(String content, SimulateNetzwork con) {
 	this.doc = new Document(content);
 	this.algorithm = new Jupiter(false);
 	this.connection = con;
-	this.proxyQueues = new Vector<SynchronizedQueue>();
     }
 
     public void setJID(JID jid) {
@@ -78,11 +70,6 @@ public class TwoWayJupiterServerDocument implements SynchronizedQueue,
 	    e.printStackTrace();
 	}
 	return op;
-    }
-
-    @Deprecated
-    public void sendOperation(Operation op) {
-
     }
 
     /**

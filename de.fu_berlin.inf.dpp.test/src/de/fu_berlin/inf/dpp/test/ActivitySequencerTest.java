@@ -28,6 +28,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.User;
@@ -35,7 +36,7 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.concurrent.ConcurrentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
@@ -50,22 +51,27 @@ public class ActivitySequencerTest extends TestCase {
     private TextEditActivity textEditActivity2;
     private TextEditActivity textEditActivity3;
 
+    private static final IPath p1 = new Path("p1.txt");
+    private static final IPath p2 = new Path("p1.txt");
+    
+    private static final String s1 = "user1";
+    
     @Override
     protected void setUp() throws Exception {
 	sequencer = new ActivitySequencer();
 	sequencer
-		.initConcurrentManager(ConcurrentManager.Side.CLIENT_SIDE,
-			new User(new JID("host@jabber.com")), new JID(
+		.initConcurrentManager(ConcurrentDocumentManager.Side.CLIENT_SIDE,
+			new User(new JID("host@jabber.com"), 0), new JID(
 				"user@jabber.com"), new SharedProject(null,
-				null, null));
+				null, new JID("user@jabber.com")));
 
 	providerMock = createMock(IActivityProvider.class);
 	sequencer.addProvider(providerMock);
 	reset(providerMock);
 
-	textEditActivity1 = new TextEditActivity(0, "a", 0);
-	textEditActivity2 = new TextEditActivity(5, "b", 0);
-	textEditActivity3 = new TextEditActivity(8, "c", 0);
+	textEditActivity1 = new TextEditActivity(0, "a", "", p1, s1);
+	textEditActivity2 = new TextEditActivity(5, "b", "", p1, s1);
+	textEditActivity3 = new TextEditActivity(8, "c", "", p1, s1);
     }
 
     public void testTwoConsecutive() {
@@ -117,45 +123,43 @@ public class ActivitySequencerTest extends TestCase {
     }
 
     public void testHasSimpleTextChange() {
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
+	sequencer.activityCreated(new TextEditActivity(5, "a", "", p1, s1));
 
-	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
+	assertFlush(new IActivity[] { new TextEditActivity(5, "a", "", p1, s1) });
     }
 
     public void testJoinConsecutiveTextChanges() {
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
-	sequencer.activityCreated(new TextEditActivity(6, "bc", 0));
-	sequencer.activityCreated(new TextEditActivity(8, "de", 0));
+	sequencer.activityCreated(new TextEditActivity(5, "a", "", p1, s1));
+	sequencer.activityCreated(new TextEditActivity(6, "bc", "", p1, s1));
+	sequencer.activityCreated(new TextEditActivity(8, "de", "", p1, s1));
 
-	assertFlush(new IActivity[] { new TextEditActivity(5, "abcde", 0) });
+	assertFlush(new IActivity[] { new TextEditActivity(5, "abcde", "", p1, s1) });
     }
 
     public void testDontJoinConsecutiveTextChangesInDifferentFiles() {
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
+	sequencer.activityCreated(new TextEditActivity(5, "a", "", p1, s1));
 	sequencer.activityCreated(new EditorActivity(
-		EditorActivity.Type.Activated, new Path("/bla")));
-	sequencer.activityCreated(new TextEditActivity(8, "de", 0));
+		EditorActivity.Type.Activated, p2));
+	sequencer.activityCreated(new TextEditActivity(8, "de", "", p2, s1));
 
 	assertFlush(new IActivity[] {
-		new TextEditActivity(5, "a", 0),
+		new TextEditActivity(5, "a", "", p1, s1),
 		new EditorActivity(EditorActivity.Type.Activated, new Path(
-			"/bla")), new TextEditActivity(8, "de", 0) });
+			"/bla")), new TextEditActivity(8, "de", "", p2, s1) });
     }
 
     public void testSimpleStripRedundantTextOffsets() {
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
-	sequencer.activityCreated(new TextSelectionActivity(6, 0, new Path(
-		"/foo/text.txt")));
+	sequencer.activityCreated(new TextEditActivity(5, "a", "", p1, s1));
+	sequencer.activityCreated(new TextSelectionActivity(6, 0, p1));
 
-	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
+	assertFlush(new IActivity[] { new TextEditActivity(5, "a", "", p1, s1)});
     }
 
     public void testStripReverseRedundantTextOffsets() {
-	sequencer.activityCreated(new TextSelectionActivity(5, 0, new Path(
-		"/foo/text.txt")));
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0));
+	sequencer.activityCreated(new TextSelectionActivity(5, 0, p1));
+	sequencer.activityCreated(new TextEditActivity(5, "a", "", p1, s1));
 
-	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
+	assertFlush(new IActivity[] { new TextEditActivity(5, "a", "", p1, s1) });
     }
 
     public void testStripTextOffsetsWhenNoOtherActivitiesInBetween() {
@@ -171,14 +175,11 @@ public class ActivitySequencerTest extends TestCase {
     }
 
     public void testStripRedundantTextOffsetsAndConsiderStartOffset() {
-	sequencer.activityCreated(new TextSelectionActivity(3, 2, new Path(
-		"/foo/text.txt")));
-	sequencer.activityCreated(new TextEditActivity(5, "a", 0, new Path(
-		"/foo/text.txt")));
-	sequencer.activityCreated(new TextSelectionActivity(6, 0, new Path(
-		"/foo/text.txt")));
+	sequencer.activityCreated(new TextSelectionActivity(3, 2, p1));
+	sequencer.activityCreated(new TextEditActivity(5, "a", "", p1, s1));
+	sequencer.activityCreated(new TextSelectionActivity(6, 0, p1));
 
-	assertFlush(new IActivity[] { new TextEditActivity(5, "a", 0) });
+	assertFlush(new IActivity[] { new TextEditActivity(5, "a", "", p1, s1) });
     }
 
     private void assertFlush(IActivity[] expected) {

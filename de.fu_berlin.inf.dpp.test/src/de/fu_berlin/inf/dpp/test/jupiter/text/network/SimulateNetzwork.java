@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.text.NetworkRequest;
 
@@ -14,73 +13,53 @@ import de.fu_berlin.inf.dpp.test.jupiter.text.NetworkRequest;
  * @author troll
  * 
  */
-public class SimulateNetzwork implements NetworkConnection {
+public class SimulateNetzwork {
 
-    private static Logger logger = Logger.getLogger(SimulateNetzwork.class);
+	private static Logger logger = Logger.getLogger(SimulateNetzwork.class);
 
-    private HashMap<JID, NetworkEventHandler> clients;
+	private HashMap<JID, NetworkEventHandler> clients;
 
-    public SimulateNetzwork() {
-	clients = new HashMap<JID, NetworkEventHandler>();
+	private RuntimeException error;
 
-    }
-
-    private void sendOperation(NetworkRequest req) {
-	if (clients.containsKey(req.getTo())) {
-	    logger.debug("send message to " + req.getTo());
-	    clients.get(req.getTo()).receiveNetworkEvent(req);
+	public SimulateNetzwork() {
+		clients = new HashMap<JID, NetworkEventHandler>();
 	}
-    }
-
-    public void sendOperation(final NetworkRequest req, final int delay) {
-	new Thread(new Runnable() {
-	    public void run() {
-		logger.debug("Delay in send operation "
-			+ req.getRequest().getOperation().toString() + " of "
-			+ delay + " millis");
-		try {
-		    Thread.sleep(delay);
-		    sendOperation(req);
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
+ 
+	private void sendOperation(NetworkRequest req) {
+		if (clients.containsKey(req.getTo())) {
+			logger.debug("send message to " + req.getTo());
+			clients.get(req.getTo()).receiveNetworkEvent(req);
 		}
-	    }
-	}).start();
-    }
-
-    private void sendOperation(JID jid, Request req) {
-	if (clients.containsKey(jid)) {
-	    clients.get(jid).receiveNetworkEvent(req);
 	}
-    }
 
-    @Deprecated
-    public void sendOperation(final JID jid, final Request req, final int delay) {
+	public void sendOperation(final NetworkRequest req, final int delay) {
+		new Thread(new Runnable() {
+			public void run() {
+				logger.debug("Delay in send operation "
+						+ req.getRequest().getOperation().toString() + " of "
+						+ delay + " millis");
+				try {
+					Thread.sleep(delay);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				sendOperation(req);
+			}
+		}).start();
+	}
 
-	new Thread(new Runnable() {
-	    public void run() {
-		logger.debug("Delay in send operation "
-			+ req.getOperation().toString() + " of " + delay
-			+ " millis to " + jid);
-		try {
-		    Thread.sleep(delay);
-		    sendOperation(jid, req);
-		} catch (InterruptedException e) {
-		    e.printStackTrace();
+	public void addClient(NetworkEventHandler remote) {
+		if (!clients.containsKey(remote.getJID())) {
+			clients.put(remote.getJID(), remote);
 		}
-	    }
-	}).start();
-
-    }
-
-    public void addClient(NetworkEventHandler remote) {
-	if (!clients.containsKey(remote.getJID())) {
-	    clients.put(remote.getJID(), remote);
 	}
-    }
 
-    public void removeClient(NetworkEventHandler remote) {
-	clients.remove(remote.getJID());
-    }
+	public void removeClient(NetworkEventHandler remote) {
+		clients.remove(remote.getJID());
+	}
+
+	public RuntimeException getLastError() {
+		return error;
+	}
 
 }

@@ -1,9 +1,8 @@
 package de.fu_berlin.inf.dpp.test.jupiter.puzzles;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 import de.fu_berlin.inf.dpp.test.jupiter.text.TwoWayJupiterClientDocument;
 import de.fu_berlin.inf.dpp.test.jupiter.text.TwoWayJupiterServerDocument;
@@ -20,8 +19,9 @@ public class InclusionTransformationTest extends JupiterTestCase {
     TwoWayJupiterClientDocument client;
     TwoWayJupiterServerDocument server;
 
-    public InclusionTransformationTest(String method) {
-	super(method);
+    public InclusionTransformationTest() {
+    	super();
+    	setName("Test of inclusion transformations");
     }
 
     @Override
@@ -90,14 +90,14 @@ public class InclusionTransformationTest extends JupiterTestCase {
 	client.sendOperation(new InsertOperation(1, "x"), 100);
 	server.sendOperation(new DeleteOperation(2, "c"), 200);
 
-	Thread.sleep(300);
+	Thread.sleep(400);
 
 	assertEquals(client.getDocument(), server.getDocument());
 
 	client.sendOperation(new InsertOperation(0, "y"), 100);
 	server.sendOperation(new DeleteOperation(0, "a"), 200);
 
-	Thread.sleep(300);
+	Thread.sleep(400);
 
 	assertEquals(client.getDocument(), server.getDocument());
 	assertEquals(client.getDocument(), "yxbdefg");
@@ -127,7 +127,7 @@ public class InclusionTransformationTest extends JupiterTestCase {
 	client.sendOperation(new InsertOperation(1, "x"), 100);
 	server.sendOperation(new DeleteOperation(0, "abc"), 200);
 
-	Thread.sleep(300);
+	Thread.sleep(400);
 
 	assertEquals(client.getDocument(), server.getDocument());
 	assertEquals(client.getDocument(), "xdefg");
@@ -254,25 +254,15 @@ public class InclusionTransformationTest extends JupiterTestCase {
 	assertEquals(client.getDocument(), "defg");
 
     }
+    
+    public void testOverlappingSplitOperations() throws Exception {
+    	client.sendOperation(new SplitOperation(new DeleteOperation(1, "bcd"), new InsertOperation(0, "xyz")), 100);
+    	server.sendOperation(new SplitOperation(new DeleteOperation(0, "abc"), new InsertOperation(0, "uvw")), 200);
 
-    public static Test suite() {
-	TestSuite suite = new TestSuite("Test of inclusion transformations.");
-	// $JUnit-BEGIN$
-	suite.addTest(new InclusionTransformationTest("testCase1"));
-	suite.addTest(new InclusionTransformationTest("testCase2"));
-	suite.addTest(new InclusionTransformationTest("testCase3"));
-	suite.addTest(new InclusionTransformationTest("testCase4"));
-	suite.addTest(new InclusionTransformationTest("testCase5"));
-	suite.addTest(new InclusionTransformationTest("testCase5"));
-	suite.addTest(new InclusionTransformationTest("testCase6"));
-	suite.addTest(new InclusionTransformationTest("testCase7"));
-	suite.addTest(new InclusionTransformationTest("testCase8"));
-	suite.addTest(new InclusionTransformationTest("testCase9"));
-	suite.addTest(new InclusionTransformationTest("testCase10"));
-	suite.addTest(new InclusionTransformationTest("testCase11"));
-	suite.addTest(new InclusionTransformationTest("testCase12"));
-	suite.addTest(new InclusionTransformationTest("testCase13"));
-	// $JUnit-END$
-	return suite;
-    }
+    	Thread.sleep(300);
+
+    	assertEquals(client.getDocument(), server.getDocument());
+    	assertEquals("uvwxyzefg", client.getDocument());
+
+        }
 }
