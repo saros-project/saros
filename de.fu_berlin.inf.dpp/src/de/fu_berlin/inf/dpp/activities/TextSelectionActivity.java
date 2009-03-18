@@ -28,7 +28,7 @@ public class TextSelectionActivity extends AbstractActivity {
 
     private final int length;
 
-    private IPath editor;
+    private final IPath editor;
 
     public TextSelectionActivity(int offset, int length, IPath path) {
         this.offset = offset;

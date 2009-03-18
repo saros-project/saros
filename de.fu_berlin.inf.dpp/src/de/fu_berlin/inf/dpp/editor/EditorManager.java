@@ -1023,22 +1023,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private IActivity parseEditorActivity(XmlPullParser parser) {
         String pathString = parser.getAttributeValue(null, "path");
-        String checksumString = parser.getAttributeValue(null, "checksum");
 
         // TODO handle cases where the file is really named "null"
         Path path = pathString.equals("null") ? null : new Path(pathString);
 
         Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null,
             "type"));
-        EditorActivity edit = new EditorActivity(type, path);
-        try {
-            long checksum = Long.parseLong(checksumString);
-            edit.setChecksum(checksum);
-        } catch (Exception e) {
-            /* exception during parse process */
-        }
-
-        return edit;
+        return new EditorActivity(type, path);
     }
 
     private TextSelectionActivity parseTextSelection(XmlPullParser parser) {

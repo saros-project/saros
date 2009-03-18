@@ -102,23 +102,10 @@ public class ConcurrentDocumentManager {
         public boolean receive(EditorActivity editor) {
 
             /*
-             * Host: start and stop jupiter server process depending on editor
-             * activities of remote clients. Client: start and stop local
+             * TODO Host: start and stop jupiter server process depending on
+             * editor activities of remote clients. Client: start and stop local
              * jupiter clients depending on editor activities.
              */
-
-            // TODO Consistency Check?
-            if (editor.getType() == Type.Saved) {
-                // // calculate checksum for saved file
-                // long checksum = FileUtil.checksum(this.sharedProject
-                // .getProject().getFile(editor.getPath()));
-                // editor.setChecksum(checksum);
-                // ConcurrentDocumentManager.logger
-                // .debug("Add checksumme to created editor save activity : "
-                // + checksum
-                // + " for path : "
-                // + editor.getPath().toOSString());
-            }
 
             // We did not handle it!
             return false;

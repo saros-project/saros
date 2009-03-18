@@ -11,7 +11,7 @@ public class ViewportActivity extends AbstractActivity {
 
     public final int bottomIndex;
 
-    private IPath editor;
+    private final IPath editor;
 
     public ViewportActivity(int topIndex, int bottomIndex, IPath editor) {
 

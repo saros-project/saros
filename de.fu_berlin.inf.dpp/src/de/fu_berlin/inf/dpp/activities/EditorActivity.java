@@ -39,8 +39,6 @@ public class EditorActivity extends AbstractActivity {
 
     private final IPath path;
 
-    private long checksum = -1;
-
     /**
      * @param path
      *            a valid project-relative path or <code>null</code> if former
@@ -86,14 +84,6 @@ public class EditorActivity extends AbstractActivity {
             + (this.path != null ? this.path.lastSegment() : "no path") + ")";
     }
 
-    public long getChecksum() {
-        return this.checksum;
-    }
-
-    public void setChecksum(long checksum) {
-        this.checksum = checksum;
-    }
-
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
@@ -103,7 +93,6 @@ public class EditorActivity extends AbstractActivity {
         sb.append("path=\"").append(
             Util.escapeCDATA(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");
-        sb.append("checksum=\"").append(getChecksum()).append("\" ");
         sb.append("/>");
     }
 }
