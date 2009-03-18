@@ -162,7 +162,7 @@ public class SplitOperation implements Operation {
             result.addAll(first);
             result.addAll(second);
 
-            // FIXME: is this really necessary?
+            // FIXME is this really necessary?
             if (result.size() <= 1)
                 return result;
 
