@@ -88,7 +88,8 @@ public class DeleteContactAction extends SelectionProviderAction {
             try {
                 Saros.getDefault().removeContact(this.rosterEntry);
             } catch (XMPPException e) {
-                e.printStackTrace();
+                log.error("Could not delete contact "
+                    + toString(this.rosterEntry) + ":", e);
             }
         }
     }

@@ -49,6 +49,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * MessagingManager handles all instant messaging related communications.
  * 
  * @author rdjemili
+ * 
+ *         TODO Needs Review and Clean-up
  */
 public class MessagingManager implements PacketListener, MessageListener,
     IConnectionListener, InvitationListener {

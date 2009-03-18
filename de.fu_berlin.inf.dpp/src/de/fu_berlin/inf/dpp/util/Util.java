@@ -36,6 +36,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class Util {
 
+    private static final Logger log = Logger.getLogger(Util.class.getName());
+
     public static String escapeBase64(String toEscape) {
 
         byte[] toEncode;
@@ -112,7 +114,7 @@ public class Util {
                 ss.close();
                 return freePort;
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Error while trying to find a free port:", e);
             }
         }
         try {
@@ -120,7 +122,7 @@ public class Util {
             freePort = ss.getLocalPort();
             ss.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error while trying to find a free port:", e);
         }
         return freePort;
     }

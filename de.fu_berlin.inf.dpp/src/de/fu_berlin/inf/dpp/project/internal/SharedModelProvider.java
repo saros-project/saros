@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.project.internal;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -25,6 +26,9 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  */
 public class SharedModelProvider extends ModelProvider implements
     ISessionListener {
+
+    private static final Logger log = Logger
+        .getLogger(SharedModelProvider.class.getName());
 
     private static final String ERROR_TEXT = "Only the driver should edit the resources of this shared project.";
     private static final String EXCLUSIVE_ERROR_TEXT = "The project host should be the exclusive driver to edit resources of this shared project.";
@@ -102,7 +106,7 @@ public class SharedModelProvider extends ModelProvider implements
         try {
             delta.accept(visitor);
         } catch (CoreException e) {
-            e.printStackTrace();
+            log.error("Could not run visitor: ", e);
         }
 
         if (!sharedProject.isDriver() && visitor.isAffectingSharedProjectFiles) {
