@@ -76,8 +76,10 @@ public class Util {
         if (toEscape == null || toEscape.length() == 0) {
             return "";
         } else {
-            // HACK otherwise there are problems with XMLPullParser which I
-            // don't understand...
+            /*
+             * HACK otherwise there are problems with XMLPullParser which I
+             * don't understand...
+             */
             if (toEscape.endsWith("]")) {
                 return escapeCDATA(toEscape.substring(0, toEscape.length() - 1))
                     + "]";

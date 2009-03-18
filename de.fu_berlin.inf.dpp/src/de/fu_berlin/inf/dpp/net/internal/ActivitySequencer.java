@@ -438,7 +438,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
             /*
              * FIXME The following will send the activities to everybody, so all
-             * drivers will receive the message twice!
+             * drivers will receive the message twice (once through Jupiter once
+             * as a Activity)
              */
 
             // send activity to everybody

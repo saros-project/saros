@@ -756,7 +756,7 @@ public class EditorAPI implements IEditorAPI {
      * IFile file = (IFile) resources[i];
      * 
      * try { file.setResourceAttributes(attributes); } catch (CoreException e) {
-     * // TODO Auto-generated catch block e.printStackTrace(); } } } } catch
-     * (CoreException e) { e.printStackTrace(); } }
+     * // e.printStackTrace(); } } } } catch (CoreException e) {
+     * e.printStackTrace(); } }
      */
 }

@@ -528,8 +528,10 @@ public class SharedProject implements ISharedProject {
 
     public void setProjectReadonly(final boolean readonly) {
 
-        // FIXME InvocationTargetException and Interrupted Exceptions are
-        // incorrectly handeled
+        /*
+         * FIXME InvocationTargetException and Interrupted Exceptions are
+         * incorrectly handled
+         */
 
         /* run project read only settings in progress monitor thread. */
         Util.runSafeSWTSync(log, new Runnable() {
