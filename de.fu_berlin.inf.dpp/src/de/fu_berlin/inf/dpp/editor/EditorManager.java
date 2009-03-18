@@ -874,8 +874,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         this.editorPool.add(editorPart);
-        sharedEditorActivated(editorPart); // HACK: Why does this not work via
-        // partActivated?
+        // HACK 6 Why does this not work via partActivated? Causes duplicate
+        // activate events
+        sharedEditorActivated(editorPart);
     }
 
     public void partActivated(IEditorPart editorPart) {
