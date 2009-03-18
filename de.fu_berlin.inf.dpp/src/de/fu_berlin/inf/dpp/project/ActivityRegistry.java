@@ -69,7 +69,7 @@ public class ActivityRegistry {
 
     private void loadExtensionPoints() {
         /*
-         * TODO [NEW FEATURE] load activity providers from the extension-point
+         * TODO 1 [NEW FEATURE] load activity providers from the extension-point
          * for Saros
          */
     }
