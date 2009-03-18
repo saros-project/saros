@@ -362,7 +362,7 @@ public class DiffPrint {
             if (label != null)
                 outfile.println(mark + ' ' + label);
             else if (inf.lastModified() > 0)
-                // FIXME: use DateFormat to get precise format needed.
+                // FIX ME use DateFormat to get precise format needed.
                 outfile.println(mark + ' ' + inf.getPath() + '\t'
                     + new Date(inf.lastModified()));
             else
