@@ -210,7 +210,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         sendDriverEditors();
 
-        this.transmitter.removeInvitationProcess(this); // HACK
+        // TODO Find a more reliable way to remove InvitationProcess
+        this.transmitter.removeInvitationProcess(this);
 
         this.transmitter.sendUserListTo(from, this.sharedProject
             .getParticipants());
