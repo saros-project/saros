@@ -19,11 +19,13 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class TextSelectionActivity extends AbstractActivity {
+
     private final int offset;
 
     private final int length;
@@ -49,16 +51,28 @@ public class TextSelectionActivity extends AbstractActivity {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof TextSelectionActivity) {
-            TextSelectionActivity activity = (TextSelectionActivity) obj;
-            return (this.offset == activity.offset)
-                && (this.length == activity.length)
-                && (this.source.equals(activity.source))
-                && (this.editor == activity.editor);
-        }
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
+        result = prime * result + length;
+        result = prime * result + offset;
+        return result;
+    }
 
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof TextSelectionActivity))
+            return false;
+
+        TextSelectionActivity activity = (TextSelectionActivity) obj;
+        return (this.offset == activity.offset)
+            && (this.length == activity.length)
+            && (ObjectUtils.equals(this.editor, activity.editor));
     }
 
     @Override
