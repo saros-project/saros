@@ -13,9 +13,10 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * TODO [CO] Document and review this class
+ * The JupiterDocumentServer is the host side component managing all server
+ * Jupiter instances.
  * 
- * FIXME JupiterDocumentServer is never stopped
+ * TODO [CO] Document and review this class
  */
 public class JupiterDocumentServer {
 
