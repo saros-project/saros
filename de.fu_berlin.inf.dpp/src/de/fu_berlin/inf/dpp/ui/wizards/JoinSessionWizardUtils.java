@@ -36,7 +36,10 @@ public class JoinSessionWizardUtils {
 
         public void run() {
 
-            // FIXME Incorrectly handled TargetInvocationException
+            /*
+             * FIXME InvocationTargetException and Interrupted Exceptions are
+             * incorrectly handled
+             */
             ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
                 .getDefault().getActiveShell());
             try {
