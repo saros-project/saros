@@ -14,7 +14,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.cdt.ui;resolution:=optional,
  org.eclipse.cdt.core;resolution:=optional,
  org.eclipse.jdt.core;resolution:=optional,
- org.eclipse.jdt.ui;resolution:=optional
+ org.eclipse.jdt.ui;resolution:=optional,
+ org.junit
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: bin/,
  lib/log4j-1.2.15.jar,
@@ -32,7 +33,8 @@ Bundle-ClassPath: bin/,
  lib/picocontainer-2.7.jar,
  lib/commons-codec-1.3.jar,
  lib/commons-io-1.4.jar,
- lib/commons-lang-2.4.jar
+ lib/commons-lang-2.4.jar,
+ lib/junit.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
