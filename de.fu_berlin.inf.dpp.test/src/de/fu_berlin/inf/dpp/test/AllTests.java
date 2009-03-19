@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.test;
 
+import de.fu_berlin.inf.dpp.test.jupiter.puzzles.de;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
@@ -28,12 +29,12 @@ public class AllTests {
 	TestSuite suite = new TestSuite("Test for de.fu_berlin.inf.dpp.test");
 
 	suite.addTest(de.fu_berlin.inf.dpp.test.actions.AllTests.suite());
-	suite.addTest(de.fu_berlin.inf.dpp.test.jupiter.puzzles.AllTests
+	suite.addTest(de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles.AllTests
 		.suite());
 	suite
 		.addTest(de.fu_berlin.inf.dpp.test.jupiter.server.AllTests
 			.suite());
-	suite.addTest(de.fu_berlin.inf.dpp.test.jupiter.text.network.AllTests
+	suite.addTest(de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.network.AllTests
 		.suite());
 
 	// $JUnit-BEGIN$

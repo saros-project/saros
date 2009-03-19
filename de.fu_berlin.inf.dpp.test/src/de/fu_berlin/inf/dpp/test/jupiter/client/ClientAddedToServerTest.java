@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.test.jupiter.client;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.RequestForwarder;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.server.impl.ConcurrentManager;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
-import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterTestCase;
 
 public class ClientAddedToServerTest extends JupiterTestCase implements
 	RequestForwarder {

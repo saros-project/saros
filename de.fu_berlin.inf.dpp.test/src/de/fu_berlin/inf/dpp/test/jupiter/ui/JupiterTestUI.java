@@ -11,11 +11,11 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.SimulateNetzwork;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.test.jupiter.server.impl.ConcurrentManager;
-import de.fu_berlin.inf.dpp.test.jupiter.text.ClientSynchronizedDocument;
-import de.fu_berlin.inf.dpp.test.jupiter.text.JupiterDocumentListener;
-import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
 /**
  * 

@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.NetworkRequest;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.test.jupiter.text.NetworkRequest;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.NetworkEventHandler;
 import de.fu_berlin.inf.dpp.test.jupiter.text.network.SimulateNetzwork;
 
