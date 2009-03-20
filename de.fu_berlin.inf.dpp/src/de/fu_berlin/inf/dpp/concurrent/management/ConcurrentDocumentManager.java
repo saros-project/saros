@@ -429,8 +429,6 @@ public class ConcurrentDocumentManager {
                     /* remove jupiter document server */
                     this.concurrentDocuments.remove(file.getPath());
                 }
-
-                // Client Side
                 this.clientDocs.remove(file.getPath());
             }
         }
