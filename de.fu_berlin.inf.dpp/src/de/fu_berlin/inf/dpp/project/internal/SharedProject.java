@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
@@ -59,7 +60,6 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -339,25 +339,17 @@ public class SharedProject implements ISharedProject {
             @Override
             public void run() {
 
-                if (SharedProject.this.participants.size() <= 1) {
-                    // No other users than the host, so we can simply throw away
-                    // the activities.
-                    SharedProject.this.activitySequencer.flush();
-                } else {
-                    List<TimedActivity> activities = SharedProject.this.activitySequencer
-                        .flushTimed();
+                List<IActivity> activities = activitySequencer.flush();
 
-                    if (activities.size() > 0) {
-                        SharedProject.this.transmitter.sendActivities(
-                            SharedProject.this, activities);
-                    }
+                if (activities.size() > 0 && participants.size() > 1) {
+                    transmitter.sendActivities(SharedProject.this,
+                        activitySequencer, activities);
                 }
 
                 // TODO CO 2009-02-06 this is disabled internally. Why?
 
                 // missing activities? (can not execute all)
-                if (SharedProject.this.activitySequencer
-                    .getQueuedActivitiesSize() > 0) {
+                if (activitySequencer.getQueuedActivitiesSize() > 0) {
                     SharedProject.queuedsince++;
 
                     // if i am missing activities for REQUEST_ACTIVITY_ON_AGE

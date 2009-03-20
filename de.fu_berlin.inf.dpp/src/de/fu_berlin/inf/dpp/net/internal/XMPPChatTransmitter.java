@@ -380,75 +380,96 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessageToAll(sharedProject, LeaveExtension.getDefault().create());
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ITransmitter
-     */
     public void sendActivities(ISharedProject sharedProject,
-        List<TimedActivity> timedActivities) {
+        ActivitySequencer sequencer, List<IActivity> activities) {
 
-        for (TimedActivity timedActivity : timedActivities) {
-            IActivity activity = timedActivity.getActivity();
+        // TODO Add sent activities to histories.
 
+        // Set sender of TextEditActivity's and source if it is not set yet.
+        for (IActivity activity : activities) {
             if (activity instanceof TextEditActivity) {
                 TextEditActivity textEditActivity = (TextEditActivity) activity;
 
+                String sender = Saros.getDefault().getMyJID().toString();
+                textEditActivity.setSender(sender);
+
                 if (textEditActivity.getSource() == null) {
+                    // TODO Warning or error?
                     log.warn("TextEditActivities does not have a source: "
                         + textEditActivity);
-                    textEditActivity.setSource(Saros.getDefault().getMyJID()
-                        .toString());
+                    textEditActivity.setSource(sender);
                 }
-            }
-
-            if (activity instanceof FileActivity) {
-                FileActivity fileAdd = (FileActivity) activity;
-
-                if (fileAdd.getType().equals(FileActivity.Type.Created)) {
-                    JID myJID = Saros.getDefault().getMyJID();
-
-                    for (User participant : sharedProject.getParticipants()) {
-                        JID jid = participant.getJID();
-                        if (jid.equals(myJID)) {
-                            continue;
-                        }
-
-                        // TODO use callback
-                        int time = timedActivity.getTimestamp();
-                        try {
-                            IFileTransferCallback callback = new AbstractFileTransferCallback() {
-                                @Override
-                                public void fileTransferFailed(IPath path,
-                                    Exception e) {
-                                    log.error("File could not be send:", e);
-                                }
-                            };
-                            sendFileAsync(jid, sharedProject.getProject(),
-                                fileAdd.getPath(), time, callback);
-                        } catch (IOException e) {
-                            log.error("File could not be send:", e);
-                            // TODO This means we were really unable to send
-                            // this file. No more falling back.
-                        }
-                    }
-                }
-            } else {
-                // TODO is this correct? Storing files in the activity is
-                // probably not so cool, but holes in the history neither.
-                // HACK This gets a private field and adds something to that
-                // data structure.
-                sharedProject.getSequencer().getActivityHistory().add(
-                    timedActivity);
-
-                // TODO: removed very old entries
             }
         }
 
-        XMPPChatTransmitter.log.info("Sent Activities: " + timedActivities);
+        // Send the activities to each user.
+        JID myJID = Saros.getDefault().getMyJID();
+        for (User user : sharedProject.getParticipants()) {
 
-        sendMessageToAll(sharedProject, new ActivitiesPacketExtension(Saros
-            .getDefault().getSessionManager().getSessionID(), timedActivities));
+            JID recipientJID = user.getJID();
+            if (recipientJID.equals(myJID)) {
+                continue;
+            }
+
+            ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
+                activities.size());
+            for (TimedActivity timedActivity : sequencer.createTimedActivities(
+                recipientJID, activities)) {
+
+                // Check each activity if it is a file creation which will be
+                // send asynchronous, and collect all others in stillToSend.
+                if (!ifFileCreateSendAsync(recipientJID, sharedProject,
+                    timedActivity)) {
+                    stillToSend.add(timedActivity);
+                }
+            }
+
+            if (stillToSend.size() > 0) {
+                sendMessage(recipientJID, new ActivitiesPacketExtension(Saros
+                    .getDefault().getSessionManager().getSessionID(),
+                    stillToSend));
+            }
+        }
+        XMPPChatTransmitter.log.info("Sent Activities: " + activities);
+    }
+
+    /**
+     * If given {@link TimedActivity} is a file creation, send it asynchronous
+     * to given recipient.
+     * 
+     * @param recipientJID
+     * @param sharedProject
+     * @param timedActivity
+     * 
+     * @return <code>true</code> if timedActivity was a file creation, otherwise
+     *         <code>false</code>.
+     */
+    private boolean ifFileCreateSendAsync(JID recipientJID,
+        ISharedProject sharedProject, TimedActivity timedActivity) {
+
+        IActivity activity = timedActivity.getActivity();
+        if (activity instanceof FileActivity) {
+            FileActivity fileActivity = (FileActivity) activity;
+            if (fileActivity.getType().equals(FileActivity.Type.Created)) {
+                try {
+                    sendFileAsync(recipientJID, sharedProject.getProject(),
+                        fileActivity.getPath(), timedActivity.getTimestamp(),
+                        new AbstractFileTransferCallback() {
+                            @Override
+                            public void fileTransferFailed(IPath path,
+                                Exception e) {
+                                log.error("File could not be send:", e);
+                            }
+                        });
+                } catch (IOException e) {
+                    log.error("File could not be send:", e);
+                    // TODO This means we were really unable to send
+                    // this file. No more falling back.
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void sendFileList(JID recipient, FileList fileList,
@@ -611,6 +632,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 continue;
             }
 
+            // TODO Why is this here and not in sendMessage()!?
             if (participant.getPresence() == UserConnectionState.OFFLINE) {
 
                 /*

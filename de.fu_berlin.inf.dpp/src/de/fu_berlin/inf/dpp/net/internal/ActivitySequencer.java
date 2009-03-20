@@ -76,13 +76,19 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * may be all names and documentation should be changed to reflect this.
      */
     public static class ActivityQueue {
+        private static final int UNKNOWN_NUMBER = -1;
 
-        /** Timestamp expected from the next activity. */
-        private int expectedTimestamp;
+        /** Sequence number this user sends next. */
+        private int nextSequenceNumber;
+
+        /** Sequence number expected from the next activity. */
+        private int expectedSequenceNumber;
+
         private PriorityQueue<TimedActivity> queuedActivities;
 
-        public ActivityQueue(int expectedTimestamp) {
-            this.expectedTimestamp = expectedTimestamp;
+        public ActivityQueue() {
+            this.nextSequenceNumber = 0;
+            this.expectedSequenceNumber = UNKNOWN_NUMBER;
             this.queuedActivities = new PriorityQueue<TimedActivity>(128,
                 new Comparator<TimedActivity>() {
                     public int compare(TimedActivity t1, TimedActivity t2) {
@@ -91,29 +97,41 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 });
         }
 
+        public int nextSequenceNumber() {
+            return this.nextSequenceNumber++;
+        }
+
         public void add(TimedActivity activity) {
-            if (activity.getTimestamp() < expectedTimestamp) {
+            if (expectedSequenceNumber == UNKNOWN_NUMBER) {
+                expectedSequenceNumber = activity.getTimestamp();
+            }
+
+            // Ignore activities with sequence numbers we have already seen.
+            if (activity.getTimestamp() < expectedSequenceNumber) {
                 log.warn("Received activity more than once: " + activity);
                 return;
             }
+
+            // Log debug message if there are queued activities.
             int size = queuedActivities.size();
             if (size > 0) {
                 log.debug("There are " + size + " activities queued for "
                     + activity.getSource());
                 log.debug("first queued: " + queuedActivities.peek()
-                    + ", expected nr: " + expectedTimestamp);
+                    + ", expected nr: " + expectedSequenceNumber);
             }
+
             queuedActivities.add(activity);
         }
 
         /**
          * @return The next activity if there is one and it carries the expected
-         *         timestamp, otherwise <code>null</code>.
+         *         sequence number, otherwise <code>null</code>.
          */
-        public TimedActivity getNext() {
+        public TimedActivity removeNext() {
             if (queuedActivities.size() > 0
-                && queuedActivities.peek().getTimestamp() == expectedTimestamp) {
-                expectedTimestamp++;
+                && queuedActivities.peek().getTimestamp() == expectedSequenceNumber) {
+                expectedSequenceNumber++;
                 return queuedActivities.remove();
             }
             return null;
@@ -132,27 +150,70 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
 
         /**
+         * Get the {@link ActivityQueue} for the given {@link JID}.
+         * 
+         * If there is no queue for the {@link JID}, a new one is created.
+         * 
+         * @param jid
+         *            {@link JID} to get the queue for.
+         * @return the {@link ActivityQueue} for the given {@link JID}.
+         */
+        protected ActivityQueue getActivityQueue(JID jid) {
+            ActivityQueue queue = jid2queue.get(jid);
+            if (queue == null) {
+                queue = new ActivityQueue();
+                jid2queue.put(jid, queue);
+            }
+            return queue;
+        }
+
+        /**
+         * @param recipient
+         * @param activities
+         * @return {@link TimedActivity}s for given recipient and activities.
+         */
+        public List<TimedActivity> createTimedActivities(JID recipient,
+            List<IActivity> activities) {
+
+            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
+                activities.size());
+            ActivityQueue queue = getActivityQueue(recipient);
+            for (IActivity activity : activities) {
+                result.add(new TimedActivity(activity, queue
+                    .nextSequenceNumber()));
+            }
+            return result;
+        }
+
+        /**
          * Adds a {@link TimedActivity}. There must be a source set on the
          * activity.
          * 
-         * @param activity
+         * @param timedActivity
          *            to add to the qeues.
          * 
          * @throws IllegalArgumentException
          *             if the source of the activity is <code>null</code>.
          */
-        public void add(TimedActivity activity) {
-            String source = activity.getSource();
+        public void add(TimedActivity timedActivity) {
+            String source;
+
+            // HACK In TextEditActivities the source and the sender differ if
+            // they are gone through Jupiter on the host side.
+            IActivity activity = timedActivity.getActivity();
+            if (activity instanceof TextEditActivity) {
+                TextEditActivity textEditActivity = (TextEditActivity) activity;
+                source = textEditActivity.getSender();
+            } else {
+                source = timedActivity.getSource();
+            }
+
             if (source == null) {
-                throw new IllegalArgumentException("Source must not be null");
+                throw new IllegalArgumentException(
+                    "Source of activity must not be null");
             }
-            JID jid = new JID(source);
-            ActivityQueue activityQueue = jid2queue.get(jid);
-            if (activityQueue == null) {
-                activityQueue = new ActivityQueue(activity.getTimestamp());
-                jid2queue.put(jid, activityQueue);
-            }
-            activityQueue.add(activity);
+
+            getActivityQueue(new JID(source)).add(timedActivity);
         }
 
         // TODO Invoke this method when a user leaves the session.
@@ -164,11 +225,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          * @return all activities that can be executed. If there are none, an
          *         empty List is returned.
          */
-        public List<TimedActivity> getActivities() {
+        public List<TimedActivity> removeActivities() {
             ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
             for (ActivityQueue queue : jid2queue.values()) {
                 TimedActivity activity;
-                while ((activity = queue.getNext()) != null) {
+                while ((activity = queue.removeNext()) != null) {
                     result.add(activity);
                 }
             }
@@ -178,6 +239,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
     private final ActivityQueuesManager queues = new ActivityQueuesManager();
 
+    // TODO Record one history per receiver.
     private final List<TimedActivity> activityHistory = new LinkedList<TimedActivity>();
 
     private int timestamp = 0;
@@ -269,32 +331,20 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
         synchronized (queues) {
             queues.add(nextActivity);
-            for (TimedActivity activity : queues.getActivities()) {
+            for (TimedActivity activity : queues.removeActivities()) {
                 exec(activity.getActivity());
             }
         }
     }
 
+    /**
+     * @return List of activities that can be executed. The list is empty if
+     *         there are no activities to execute.
+     */
     public List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
         return optimize(out);
-    }
-
-    /**
-     * Gets all activities since last flush.
-     * 
-     * @return the activities that have accumulated since the last flush.
-     */
-    public List<TimedActivity> flushTimed() {
-        List<IActivity> activities = flush();
-        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>(
-            activities.size());
-        for (IActivity activity : activities) {
-            timedActivities.add(new TimedActivity(activity, this.timestamp++));
-        }
-
-        return timedActivities;
     }
 
     public void addProvider(IActivityProvider provider) {
@@ -324,6 +374,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
     }
 
+    List<TimedActivity> createTimedActivities(JID recipient,
+        List<IActivity> activities) {
+        return queues.createTimedActivities(recipient, activities);
+    }
+
     public int getTimestamp() {
         return this.timestamp;
     }
@@ -333,6 +388,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         return 0;
     }
 
+    // TODO Do not let this internal field leave the instance but add methods to
+    // add activities and query the history.
     public List<TimedActivity> getActivityHistory() {
         return this.activityHistory;
     }

@@ -30,9 +30,11 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
+import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -234,16 +236,19 @@ public interface ITransmitter {
     public void sendLeaveMessage(ISharedProject sharedProject);
 
     /**
-     * Sends given list of activities with given timestamp to the participants
-     * of given shared project.
+     * Sends given list of activities to the participants of given shared
+     * project. The {@link ActivitySequencer} is used to create the sequence
+     * numbers for the activities to send.
      * 
      * @param sharedProject
      *            the shared project the activities refer to.
+     * @param sequencer
+     *            to generate sequence numbers.
      * @param activities
-     *            a list of timed activities.
+     *            a list of activities.
      */
     public void sendActivities(ISharedProject sharedProject,
-        List<TimedActivity> activities);
+        ActivitySequencer sequencer, List<IActivity> activities);
 
     /**
      * Sends given request to given participant of given shared project.

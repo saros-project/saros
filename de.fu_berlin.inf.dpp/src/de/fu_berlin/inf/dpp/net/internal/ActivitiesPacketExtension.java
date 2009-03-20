@@ -49,6 +49,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     public ActivitiesPacketExtension(String sessionID,
         List<TimedActivity> activities) {
+        if (activities.size() == 0) {
+            throw new IllegalArgumentException("activities are empty");
+        }
         this.sessionID = sessionID;
         this.activities = activities;
     }
@@ -81,10 +84,6 @@ public class ActivitiesPacketExtension implements PacketExtension {
      * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
      */
     public String toXML() {
-        if (this.activities.size() == 0) {
-            return "";
-        }
-
         StringBuilder buf = new StringBuilder();
         buf.append("<").append(getElementName());
         buf.append(" xmlns=\"").append(getNamespace()).append("\">");
