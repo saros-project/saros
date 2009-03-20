@@ -45,10 +45,20 @@ public class TextEditActivity extends AbstractActivity {
 
     public final String replacedText;
 
-    public final IPath editor;
+    protected final IPath editor;
+
+    protected String sender;
 
     public IPath getEditor() {
         return this.editor;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
+    }
+
+    public String getSender() {
+        return this.sender;
     }
 
     /**
@@ -178,10 +188,11 @@ public class TextEditActivity extends AbstractActivity {
 
         String result = String
             .format(
-                "<edit path=\"%s\" offset=\"%d\" source=\"%s\"><text>%s</text><replace>%s</replace></edit>",
-                Util.escapeCDATA(getEditor().toPortableString()), offset, Util
-                    .escapeCDATA(getSource()), Util.escapeCDATA(text), Util
-                    .escapeCDATA(replacedText));
+                "<edit path=\"%s\" offset=\"%d\" source=\"%s\" sender=\"%s\"><text>%s</text><replace>%s</replace></edit>",
+                Util.urlEscape(getEditor().toPortableString()), offset, Util
+                    .urlEscape(getSource().toString()), Util
+                    .urlEscape(getSender().toString()), Util.escapeCDATA(text),
+                Util.escapeCDATA(replacedText));
 
         sb.append(result);
     }

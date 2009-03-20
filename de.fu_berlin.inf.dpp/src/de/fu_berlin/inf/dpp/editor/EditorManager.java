@@ -1001,9 +1001,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         assert pathString != null;
 
-        Path path = new Path(pathString);
+        IPath path = Path.fromPortableString(Util.urlUnescape(pathString));
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-        String source = parser.getAttributeValue(null, "source");
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
+        String sender = Util.urlUnescape(parser.getAttributeValue(null,
+            "sender"));
+
         String text = "";
         if (parser.next() == XmlPullParser.START_TAG) {
             if (parser.next() == XmlPullParser.TEXT) {
@@ -1019,14 +1023,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 parser.next(); // close tag
             }
         }
-        return new TextEditActivity(offset, text, replace, path, source);
+
+        TextEditActivity result = new TextEditActivity(offset, text, replace,
+            path, source);
+        result.setSender(sender);
+        return result;
     }
 
     private IActivity parseEditorActivity(XmlPullParser parser) {
-        String pathString = parser.getAttributeValue(null, "path");
+        String pathString = Util.urlUnescape(parser.getAttributeValue(null,
+            "path"));
 
         // TODO handle cases where the file is really named "null"
-        Path path = pathString.equals("null") ? null : new Path(pathString);
+        IPath path = pathString.equals("null") ? null : Path
+            .fromPortableString(pathString);
 
         Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null,
             "type"));
@@ -1037,7 +1047,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         // TODO extract constants
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
         int length = Integer.parseInt(parser.getAttributeValue(null, "length"));
-        String path = parser.getAttributeValue(null, "editor");
+        String path = Util
+            .urlUnescape(parser.getAttributeValue(null, "editor"));
         return new TextSelectionActivity(offset, length, Path
             .fromPortableString(path));
     }
@@ -1045,7 +1056,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private ViewportActivity parseViewport(XmlPullParser parser) {
         int top = Integer.parseInt(parser.getAttributeValue(null, "top"));
         int bottom = Integer.parseInt(parser.getAttributeValue(null, "bottom"));
-        String path = parser.getAttributeValue(null, "editor");
+        String path = Util
+            .urlUnescape(parser.getAttributeValue(null, "editor"));
         return new ViewportActivity(top, bottom, Path.fromPortableString(path));
     }
 

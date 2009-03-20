@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This manager is responsible for handling driver changes.
@@ -117,7 +118,8 @@ public class RoleManager implements IActivityProvider {
      */
     public IActivity fromXML(XmlPullParser parser) {
         if (parser.getName().equals("user")) {
-            JID user = new JID(parser.getAttributeValue(null, "id"));
+            JID user = new JID(Util.urlUnescape(parser.getAttributeValue(null,
+                "id")));
             UserRole role = UserRole.valueOf(parser.getAttributeValue(null,
                 "role"));
             return new RoleActivity(user, role);

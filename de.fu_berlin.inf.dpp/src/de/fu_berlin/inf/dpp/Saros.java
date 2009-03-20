@@ -495,7 +495,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * @return an error string that contains the error message for the current
-     *         connection error if the state is {@link ConnectionState.ERROR} or
+     *         connection error if the state is {@link ConnectionState#ERROR} or
      *         <code>null</code> if there is another state set.
      */
     public String getConnectionError() {

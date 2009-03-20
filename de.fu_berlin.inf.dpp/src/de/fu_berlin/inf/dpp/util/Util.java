@@ -14,7 +14,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.codec.BinaryDecoder;
+import org.apache.commons.codec.BinaryEncoder;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
@@ -38,7 +43,10 @@ public class Util {
 
     private static final Logger log = Logger.getLogger(Util.class.getName());
 
-    public static String escapeBase64(String toEscape) {
+    protected static final Base64 base64Codec = new Base64();
+    protected static final URLCodec urlCodec = new URLCodec();
+
+    protected static String escape(String toEscape, BinaryEncoder encoder) {
 
         byte[] toEncode;
         try {
@@ -47,7 +55,12 @@ public class Util {
             toEncode = toEscape.getBytes();
         }
 
-        byte[] encoded = Base64.encodeBase64(toEncode);
+        byte[] encoded = {};
+        try {
+            encoded = encoder.encode(toEncode);
+        } catch (EncoderException e) {
+            log.error("can not escape", e);
+        }
 
         try {
             return new String(encoded, "UTF-8");
@@ -56,7 +69,7 @@ public class Util {
         }
     }
 
-    public static String unescapeBase64(String toUnescape) {
+    protected static String unescape(String toUnescape, BinaryDecoder decoder) {
 
         byte[] toDecode;
         try {
@@ -65,13 +78,34 @@ public class Util {
             toDecode = toUnescape.getBytes();
         }
 
-        byte[] decoded = Base64.decodeBase64(toDecode);
+        byte[] decoded = {};
+        try {
+            decoded = decoder.decode(toDecode);
+        } catch (DecoderException e) {
+            log.error("can not unescape", e);
+        }
 
         try {
             return new String(decoded, "UTF-8");
         } catch (UnsupportedEncodingException e1) {
             return new String(decoded);
         }
+    }
+
+    public static String escapeBase64(String toEscape) {
+        return escape(toEscape, base64Codec);
+    }
+
+    public static String unescapeBase64(String toUnescape) {
+        return unescape(toUnescape, base64Codec);
+    }
+
+    public static String urlEscape(String toEscape) {
+        return escape(toEscape, urlCodec);
+    }
+
+    public static String urlUnescape(String toUnescape) {
+        return unescape(toUnescape, urlCodec);
     }
 
     public static String escapeCDATA(String toEscape) {

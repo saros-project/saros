@@ -173,8 +173,8 @@ public class FileList {
                     context = this.unaltered;
 
                 } else if (parser.getName().equals("file")) {
-                    IPath path = new Path(parser
-                        .getAttributeValue(null, "path"));
+                    IPath path = Path.fromPortableString(Util
+                        .urlUnescape(parser.getAttributeValue(null, "path")));
                     Long checksum = Long.parseLong(parser.getAttributeValue(
                         null, "checksum"));
 
@@ -185,8 +185,8 @@ public class FileList {
                     }
 
                 } else if (parser.getName().equals("folder")) {
-                    IPath path = new Path(parser
-                        .getAttributeValue(null, "path"));
+                    IPath path = Path.fromPortableString(Util
+                        .urlUnescape(parser.getAttributeValue(null, "path")));
 
                     context.put(path, null);
 
@@ -392,11 +392,11 @@ public class FileList {
 
             if (path.hasTrailingSeparator()) {
                 sb.append("<folder path=\"").append(
-                    Util.escapeCDATA(path.toPortableString())).append("\"/>");
+                    Util.urlEscape(path.toPortableString())).append("\"/>");
             } else {
                 long checksum = entry.getValue();
                 sb.append("<file path=\"").append(
-                    Util.escapeCDATA(path.toPortableString())).append("\" ");
+                    Util.urlEscape(path.toPortableString())).append("\" ");
                 sb.append("checksum=\"").append(checksum).append("\"/>");
             }
         }

@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -337,13 +338,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
     private FileActivity parseFile(XmlPullParser parser)
         throws XmlPullParserException, IOException {
 
-        IPath path = new Path(parser.getAttributeValue(null, "path"));
+        IPath path = Path.fromPortableString(Util.urlUnescape(parser
+            .getAttributeValue(null, "path")));
         return new FileActivity(FileActivity.Type.valueOf(parser
             .getAttributeValue(null, "type")), path);
     }
 
     private FolderActivity parseFolder(XmlPullParser parser) {
-        Path path = new Path(parser.getAttributeValue(null, "path"));
+        IPath path = Path.fromPortableString(Util.urlUnescape(parser
+            .getAttributeValue(null, "path")));
 
         return new FolderActivity(FolderActivity.Type.valueOf(parser
             .getAttributeValue(null, "type")), path);

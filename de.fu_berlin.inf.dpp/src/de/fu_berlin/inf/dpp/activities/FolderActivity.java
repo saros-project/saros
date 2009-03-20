@@ -38,7 +38,7 @@ public class FolderActivity extends AbstractActivity {
     public void toXML(StringBuilder sb) {
         sb.append("<folder ");
         sb.append("path=\"").append(
-            Util.escapeCDATA(getPath().toPortableString())).append("\" ");
+            Util.urlEscape(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");
         sb.append("/>");
     }

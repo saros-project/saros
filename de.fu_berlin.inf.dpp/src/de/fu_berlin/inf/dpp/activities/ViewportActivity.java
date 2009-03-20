@@ -89,7 +89,7 @@ public class ViewportActivity extends AbstractActivity {
         sb.append("top=\"").append(getTopIndex()).append("\" ");
         sb.append("bottom=\"").append(getBottomIndex()).append("\" ");
         sb.append("editor=\"").append(
-            Util.escapeCDATA(getEditor().toPortableString())).append("\"");
+            Util.urlEscape(getEditor().toPortableString())).append("\"");
         sb.append("/>");
     }
 }

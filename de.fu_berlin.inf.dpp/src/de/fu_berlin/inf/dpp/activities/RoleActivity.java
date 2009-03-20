@@ -85,8 +85,8 @@ public class RoleActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<user ");
-        sb.append("id=\"").append(Util.escapeCDATA(getUser().toString()))
-            .append("\" ");
+        sb.append("id=\"").append(Util.urlEscape(getUser().toString())).append(
+            "\" ");
         sb.append("role=\"").append(getRole()).append("\" ");
         sb.append("/>");
     }

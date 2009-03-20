@@ -93,7 +93,7 @@ public class TextSelectionActivity extends AbstractActivity {
         sb.append("offset=\"").append(getOffset()).append("\" ");
         sb.append("length=\"").append(getLength()).append("\" ");
         sb.append("editor=\"").append(
-            Util.escapeCDATA(getEditor().toPortableString())).append("\"");
+            Util.urlEscape(getEditor().toPortableString())).append("\"");
         sb.append(" />");
     }
 }
