@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class FileStub implements IFile {
+
     private IPath path;
     private String content;
 
@@ -43,368 +44,506 @@ public class FileStub implements IFile {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((content == null) ? 0 : content.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-
-        if (!(obj instanceof IFile))
+        if (obj == null)
             return false;
-
-        IFile other = (IFile) obj;
-        return path.equals(other.getProjectRelativePath());
-    }
-
-    public void appendContents(InputStream source, boolean force,
-        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void appendContents(InputStream source, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void create(InputStream source, boolean force,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void create(InputStream source, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void createLink(IPath localLocation, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void createLink(URI location, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void delete(boolean force, boolean keepHistory,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public String getCharset() throws CoreException {
-        return null;
-    }
-
-    public String getCharset(boolean checkImplicit) throws CoreException {
-        return null;
-    }
-
-    public String getCharsetFor(Reader reader) throws CoreException {
-        return null;
-    }
-
-    public IContentDescription getContentDescription() throws CoreException {
-        return null;
-    }
-
-    public InputStream getContents(boolean force) throws CoreException {
-        return null;
-    }
-
-    public int getEncoding() throws CoreException {
-        return 0;
-    }
-
-    public IPath getFullPath() {
-        return null;
-    }
-
-    public IFileState[] getHistory(IProgressMonitor monitor)
-        throws CoreException {
-        return null;
-    }
-
-    public String getName() {
-        return null;
+        if (!(obj instanceof FileStub))
+            return false;
+        FileStub other = (FileStub) obj;
+        if (path == null) {
+            if (other.path != null)
+                return false;
+        } else if (!path.equals(other.path))
+            return false;
+        return true;
     }
 
     public boolean isReadOnly() {
         return false;
     }
 
-    public void move(IPath destination, boolean force, boolean keepHistory,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void setCharset(String newCharset) throws CoreException {
-    }
-
-    public void setCharset(String newCharset, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public void setContents(InputStream source, boolean force,
-        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void setContents(IFileState source, boolean force,
-        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void setContents(InputStream source, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void setContents(IFileState source, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void accept(IResourceProxyVisitor visitor, int memberFlags)
-        throws CoreException {
-    }
-
-    public void accept(IResourceVisitor visitor) throws CoreException {
-    }
-
-    public void accept(IResourceVisitor visitor, int depth,
-        boolean includePhantoms) throws CoreException {
-    }
-
-    public void accept(IResourceVisitor visitor, int depth, int memberFlags)
-        throws CoreException {
-    }
-
-    public void clearHistory(IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void copy(IPath destination, boolean force, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public void copy(IPath destination, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void copy(IProjectDescription description, boolean force,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void copy(IProjectDescription description, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public IMarker createMarker(String type) throws CoreException {
-        return null;
-    }
-
-    public IResourceProxy createProxy() {
-        return null;
-    }
-
-    public void delete(boolean force, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public void delete(int updateFlags, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public void deleteMarkers(String type, boolean includeSubtypes, int depth)
-        throws CoreException {
-    }
-
     public boolean exists() {
         return true;
     }
 
+    public void appendContents(InputStream source, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void appendContents(InputStream source, boolean force,
+        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void create(InputStream source, boolean force,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void create(InputStream source, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void createLink(IPath localLocation, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void createLink(URI location, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void delete(boolean force, boolean keepHistory,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public String getCharset() throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public String getCharset(boolean checkImplicit) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public String getCharsetFor(Reader reader) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IContentDescription getContentDescription() throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public InputStream getContents(boolean force) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public int getEncoding() throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IPath getFullPath() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IFileState[] getHistory(IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public String getName() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void move(IPath destination, boolean force, boolean keepHistory,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setCharset(String newCharset) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setCharset(String newCharset, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setContents(InputStream source, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setContents(IFileState source, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setContents(InputStream source, boolean force,
+        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setContents(IFileState source, boolean force,
+        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void accept(IResourceVisitor visitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void accept(IResourceProxyVisitor visitor, int memberFlags)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void accept(IResourceVisitor visitor, int depth,
+        boolean includePhantoms) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void accept(IResourceVisitor visitor, int depth, int memberFlags)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void clearHistory(IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void copy(IPath destination, boolean force, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void copy(IPath destination, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void copy(IProjectDescription description, boolean force,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void copy(IProjectDescription description, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IMarker createMarker(String type) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IResourceProxy createProxy() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void delete(boolean force, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void delete(int updateFlags, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void deleteMarkers(String type, boolean includeSubtypes, int depth)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
     public IMarker findMarker(long id) throws CoreException {
-        return null;
+        throw new RuntimeException("Unexpected call to Stub");
+
     }
 
     public IMarker[] findMarkers(String type, boolean includeSubtypes, int depth)
         throws CoreException {
-        return null;
-    }
+        throw new RuntimeException("Unexpected call to Stub");
 
-    public String getFileExtension() {
-        return null;
-    }
-
-    public long getLocalTimeStamp() {
-        return 0;
-    }
-
-    public IPath getLocation() {
-        return null;
-    }
-
-    public URI getLocationURI() {
-        return null;
-    }
-
-    public IMarker getMarker(long id) {
-        return null;
-    }
-
-    public long getModificationStamp() {
-        return 0;
-    }
-
-    public IContainer getParent() {
-        return null;
-    }
-
-    public String getPersistentProperty(QualifiedName key) throws CoreException {
-        return null;
-    }
-
-    public IProject getProject() {
-        return null;
-    }
-
-    public IPath getRawLocation() {
-        return null;
-    }
-
-    public URI getRawLocationURI() {
-        return null;
-    }
-
-    public ResourceAttributes getResourceAttributes() {
-        return null;
-    }
-
-    public Object getSessionProperty(QualifiedName key) throws CoreException {
-        return null;
-    }
-
-    public int getType() {
-        return 0;
-    }
-
-    public IWorkspace getWorkspace() {
-        return null;
-    }
-
-    public boolean isAccessible() {
-        return false;
-    }
-
-    public boolean isDerived() {
-        return false;
-    }
-
-    public boolean isLocal(int depth) {
-        return false;
-    }
-
-    public boolean isLinked() {
-        return false;
-    }
-
-    public boolean isLinked(int options) {
-        return false;
-    }
-
-    public boolean isPhantom() {
-        return false;
-    }
-
-    public boolean isSynchronized(int depth) {
-        return false;
-    }
-
-    public boolean isTeamPrivateMember() {
-        return false;
-    }
-
-    public void move(IPath destination, boolean force, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public void move(IPath destination, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void move(IProjectDescription description, boolean force,
-        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void move(IProjectDescription description, int updateFlags,
-        IProgressMonitor monitor) throws CoreException {
-    }
-
-    public void refreshLocal(int depth, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public void revertModificationStamp(long value) throws CoreException {
-    }
-
-    public void setDerived(boolean isDerived) throws CoreException {
-    }
-
-    public void setLocal(boolean flag, int depth, IProgressMonitor monitor)
-        throws CoreException {
-    }
-
-    public long setLocalTimeStamp(long value) throws CoreException {
-        return 0;
-    }
-
-    public void setPersistentProperty(QualifiedName key, String value)
-        throws CoreException {
-    }
-
-    public void setReadOnly(boolean readOnly) {
-    }
-
-    public void setResourceAttributes(ResourceAttributes attributes)
-        throws CoreException {
-    }
-
-    public void setSessionProperty(QualifiedName key, Object value)
-        throws CoreException {
-    }
-
-    public void setTeamPrivateMember(boolean isTeamPrivate)
-        throws CoreException {
-    }
-
-    public void touch(IProgressMonitor monitor) throws CoreException {
-    }
-
-    public Object getAdapter(Class adapter) {
-        return null;
-    }
-
-    public boolean contains(ISchedulingRule rule) {
-        return false;
-    }
-
-    public boolean isConflicting(ISchedulingRule rule) {
-        return false;
     }
 
     public int findMaxProblemSeverity(String type, boolean includeSubtypes,
         int depth) throws CoreException {
-        // TODO Auto-generated method stub
-        return 0;
+        throw new RuntimeException("Unexpected call to Stub");
+
     }
 
+    public String getFileExtension() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public long getLocalTimeStamp() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IPath getLocation() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public URI getLocationURI() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IMarker getMarker(long id) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public long getModificationStamp() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IContainer getParent() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    @SuppressWarnings("unchecked")
     public Map getPersistentProperties() throws CoreException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("Unexpected call to Stub");
+
     }
 
+    public String getPersistentProperty(QualifiedName key) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IProject getProject() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IPath getRawLocation() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public URI getRawLocationURI() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public ResourceAttributes getResourceAttributes() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    @SuppressWarnings("unchecked")
     public Map getSessionProperties() throws CoreException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public Object getSessionProperty(QualifiedName key) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public int getType() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public IWorkspace getWorkspace() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isAccessible() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isDerived() {
+        throw new RuntimeException("Unexpected call to Stub");
+
     }
 
     public boolean isDerived(int options) {
-        // TODO Auto-generated method stub
-        return false;
+        throw new RuntimeException("Unexpected call to Stub");
+
     }
 
     public boolean isHidden() {
-        // TODO Auto-generated method stub
-        return false;
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isLinked() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isLinked(int options) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isLocal(int depth) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isPhantom() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isSynchronized(int depth) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isTeamPrivateMember() {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void move(IPath destination, boolean force, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void move(IPath destination, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void move(IProjectDescription description, int updateFlags,
+        IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void move(IProjectDescription description, boolean force,
+        boolean keepHistory, IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void refreshLocal(int depth, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void revertModificationStamp(long value) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setDerived(boolean isDerived) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
     }
 
     public void setHidden(boolean isHidden) throws CoreException {
-        // TODO Auto-generated method stub
+        throw new RuntimeException("Unexpected call to Stub");
 
     }
+
+    public void setLocal(boolean flag, int depth, IProgressMonitor monitor)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public long setLocalTimeStamp(long value) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setPersistentProperty(QualifiedName key, String value)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setResourceAttributes(ResourceAttributes attributes)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setSessionProperty(QualifiedName key, Object value)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void setTeamPrivateMember(boolean isTeamPrivate)
+        throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public void touch(IProgressMonitor monitor) throws CoreException {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public Object getAdapter(Class adapter) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean contains(ISchedulingRule rule) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
+    public boolean isConflicting(ISchedulingRule rule) {
+        throw new RuntimeException("Unexpected call to Stub");
+
+    }
+
 }

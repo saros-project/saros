@@ -84,6 +84,7 @@ public class Jupiter implements Algorithm {
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateRequest(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation)
      */
     public Request generateRequest(Operation op) {
+
         // send(op, myMsgs, otherMsgs);
         Request req = new RequestImpl(getSiteId(), (Timestamp) this.vectorTime
             .clone(), op);

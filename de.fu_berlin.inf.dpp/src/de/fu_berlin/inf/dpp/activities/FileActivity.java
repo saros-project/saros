@@ -60,15 +60,34 @@ public class FileActivity extends AbstractActivity {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    @Override
     public boolean equals(Object obj) {
-        if (obj instanceof FileActivity) {
-            FileActivity activity = (FileActivity) obj;
-
-            return (getPath().equals(activity.getPath()) && getType().equals(
-                activity.getType()));
-        }
-
-        return false;
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof FileActivity))
+            return false;
+        FileActivity other = (FileActivity) obj;
+        if (path == null) {
+            if (other.path != null)
+                return false;
+        } else if (!path.equals(other.path))
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
+        return true;
     }
 
     public boolean dispatch(IActivityReceiver receiver) {

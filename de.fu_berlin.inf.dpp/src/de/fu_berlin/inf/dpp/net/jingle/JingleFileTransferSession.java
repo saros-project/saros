@@ -81,6 +81,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     try {
                         data = (TransferDescription) input.readObject();
                     } catch (IOException e) {
+                        logger.error("JingleFileTransferSession crashed", e);
                         return;
                     } catch (ClassNotFoundException e) {
                         logger.error(
@@ -91,6 +92,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     try {
                         content = (byte[]) input.readObject();
                     } catch (IOException e) {
+                        logger.error("JingleFileTransferSession crashed", e);
                         return;
                     } catch (ClassNotFoundException e) {
                         logger.error(

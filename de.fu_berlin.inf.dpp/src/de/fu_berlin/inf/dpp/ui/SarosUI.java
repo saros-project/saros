@@ -60,9 +60,9 @@ public class SarosUI implements ISessionListener {
     public SarosUI(ISessionManager sessionManager, JDTFacade jdtFacade,
         CDTFacade cdtFacade) {
 
-        // TODO: [CO] We don't know what this actually is for.
         // It would be nice to eliminiate these, because they cause dependencies
-        // to the JDT and CDT
+        // to the JDT and CDT, but they are necessary to prevent Observers
+        // from editing the documents
         if (jdtFacade.isJDTAvailable()) {
             jdtFacade.installSharedDocumentProvider();
         }

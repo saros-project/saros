@@ -22,9 +22,10 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
     ClientSynchronizedDocument alice, c1;
     ClientSynchronizedDocument bob, c2;
-    ServerSynchronizedDocument server, s1;
+    ServerSynchronizedDocument server;
 
     public void setUp(String text) {
+        super.setUp();
 
         // 01234567890123456789012345
         // abcdefghijklmnopqrstuvwxyz
@@ -33,7 +34,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
             jidAlice);
         c2 = bob = new ClientSynchronizedDocument(jidServer, text, network,
             jidBob);
-        s1 = server = new ServerSynchronizedDocument(network, jidServer);
+        server = new ServerSynchronizedDocument(network, jidServer);
 
         network.addClient(alice);
         network.addClient(bob);
@@ -55,7 +56,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
         c1.sendOperation(new InsertOperation(0, "a"), 100);
         c2.sendOperation(new InsertOperation(1, "b"), 200);
-        Thread.sleep(300);
+        Thread.sleep(400);
 
         assertEquals("aXb", c1.getDocument());
         assertEquals("aXb", c2.getDocument());

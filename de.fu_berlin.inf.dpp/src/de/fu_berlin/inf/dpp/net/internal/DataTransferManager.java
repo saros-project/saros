@@ -349,6 +349,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             FileTransferProgressMonitor monitor = new FileTransferProgressMonitor(
                 transfer, callback, content.length);
+            monitor.start();
 
             // The file path is irrelevant
             transfer.sendStream(new ByteArrayInputStream(content),

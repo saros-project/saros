@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.activities;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 
@@ -42,15 +41,34 @@ public class ViewportActivity extends AbstractActivity {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ViewportActivity) {
-            ViewportActivity other = (ViewportActivity) obj;
-            return (this.topIndex == other.topIndex)
-                && (this.bottomIndex == other.bottomIndex)
-                && ObjectUtils.equals(this.editor, other.editor);
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + bottomIndex;
+        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
+        result = prime * result + topIndex;
+        return result;
+    }
 
-        }
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof ViewportActivity))
+            return false;
+        ViewportActivity other = (ViewportActivity) obj;
+        if (bottomIndex != other.bottomIndex)
+            return false;
+        if (editor == null) {
+            if (other.editor != null)
+                return false;
+        } else if (!editor.equals(other.editor))
+            return false;
+        if (topIndex != other.topIndex)
+            return false;
+        return true;
     }
 
     @Override

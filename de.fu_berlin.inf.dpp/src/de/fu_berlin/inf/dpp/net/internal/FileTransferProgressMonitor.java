@@ -32,7 +32,6 @@ public class FileTransferProgressMonitor extends Thread {
         this.transfer = transfer;
         this.callback = callback;
         this.filesize = filesize;
-        start();
     }
 
     public boolean isRunning() {

@@ -4,7 +4,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.SimulateNetzwork;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.TwoWayJupiterClientDocument;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.TwoWayJupiterServerDocument;
 
@@ -21,11 +20,12 @@ public class InclusionTransformationTest extends JupiterTestCase {
 
     @Override
     public void setUp() {
+        super.setUp();
         setUp("abcdefg");
     }
 
     public void setUp(String initialText) {
-        network = new SimulateNetzwork();
+        super.setUp();
 
         client = new TwoWayJupiterClientDocument(initialText, network);
         server = new TwoWayJupiterServerDocument(initialText, network);

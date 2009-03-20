@@ -313,7 +313,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         } catch (Exception e) {
             failed(e);
         } finally {
-            archive.delete();
+            if (!archive.delete()) {
+                log.warn("Could not delete archive: "
+                    + archive.getAbsolutePath());
+            }
         }
     }
 

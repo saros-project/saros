@@ -75,7 +75,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * TODO "Timestamps" are treated more like consecutive sequence numbers, so
      * may be all names and documentation should be changed to reflect this.
      */
-    class ActivityQueue {
+    public static class ActivityQueue {
 
         /** Timestamp expected from the next activity. */
         private int expectedTimestamp;

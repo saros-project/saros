@@ -180,8 +180,8 @@ public class TextEditActivity extends AbstractActivity {
             .format(
                 "<edit path=\"%s\" offset=\"%d\" source=\"%s\"><text>%s</text><replace>%s</replace></edit>",
                 Util.escapeCDATA(getEditor().toPortableString()), offset, Util
-                    .escapeCDATA(getSource().toString()), Util
-                    .escapeCDATA(text), Util.escapeCDATA(replacedText));
+                    .escapeCDATA(getSource()), Util.escapeCDATA(text), Util
+                    .escapeCDATA(replacedText));
 
         sb.append(result);
     }

@@ -67,15 +67,34 @@ public class EditorActivity extends AbstractActivity {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof EditorActivity)) {
-            return false;
-        }
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (!(obj instanceof EditorActivity))
+            return false;
         EditorActivity other = (EditorActivity) obj;
-        return (((this.path == null) && (other.path == null)) || this.path
-            .equals(other.path))
-            && this.type.equals(other.type);
+        if (path == null) {
+            if (other.path != null)
+                return false;
+        } else if (!path.equals(other.path))
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
+        return true;
     }
 
     @Override

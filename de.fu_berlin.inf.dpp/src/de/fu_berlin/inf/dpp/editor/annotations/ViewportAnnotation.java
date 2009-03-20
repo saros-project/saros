@@ -33,9 +33,9 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     private static final double FILL_SCALE = 0.9;
 
-    private static Color strokeColor;
+    private Color strokeColor;
 
-    private static Color fillColor;
+    private Color fillColor;
 
     public ViewportAnnotation(String source) {
         super(ViewportAnnotation.TYPE, false, createLabel("Visible scope of",
@@ -44,12 +44,14 @@ public class ViewportAnnotation extends SarosAnnotation implements
         String annotationType = ViewportAnnotation.TYPE + "."
             + (getColorIdForUser(source) + 1);
         setType(annotationType);
+
         AnnotationPreferenceLookup lookup = EditorsUI
             .getAnnotationPreferenceLookup();
         AnnotationPreference annotationPreference = lookup
             .getAnnotationPreference(annotationType);
         RGB rgb = PreferenceConverter.getColor(EditorsUI.getPreferenceStore(),
             annotationPreference.getColorPreferenceKey());
+
         Display display = Display.getDefault();
         strokeColor = new Color(display, scaleColor(rgb, STROKE_SCALE));
         fillColor = new Color(display, scaleColor(rgb, FILL_SCALE));
@@ -58,8 +60,8 @@ public class ViewportAnnotation extends SarosAnnotation implements
     public void paint(GC gc, Canvas canvas, Rectangle bounds) {
         Point canvasSize = canvas.getSize();
 
-        gc.setBackground(ViewportAnnotation.fillColor);
-        gc.setForeground(ViewportAnnotation.strokeColor);
+        gc.setBackground(fillColor);
+        gc.setForeground(strokeColor);
         gc.setLineWidth(1);
 
         int x = ViewportAnnotation.INSET;

@@ -77,16 +77,19 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void sendOperation(Operation op, int delay) {
-        logger.info("" + jid + " send: " + op.toString());
+        logger.info(jid + " send: " + op.toString());
         sendOperation(server_jid, op, delay);
     }
 
     public void sendOperation(JID remoteJid, Operation op, int delay) {
+
         /* 1. execute locally */
         doc.execOperation(op);
+
         /* 2. transform operation. */
         Request req = algorithm.generateRequest(op);
         req.setJID(this.jid);
+
         /* 3. send operation. */
         connection.sendOperation(new NetworkRequest(this.jid, remoteJid, req),
             delay);
@@ -103,12 +106,6 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
 
     public String getDocument() {
         return doc.getDocument();
-    }
-
-    @Deprecated
-    public void sendTransformedOperation(Operation op, JID toJID) {
-        // TODO Auto-generated method stub
-
     }
 
     public void receiveNetworkEvent(NetworkRequest req) {
@@ -129,20 +126,11 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
         }
     }
 
-    public void addJupiterDocumentListener(JupiterDocumentListener jdl) {
-        documentListener.put(jdl.getID(), jdl);
-    }
-
-    public void removeJupiterDocumentListener(String id) {
-        documentListener.remove(id);
-    }
-
     public void updateVectorTime(Timestamp timestamp) {
         try {
             getAlgorithm().updateVectorTime(timestamp);
         } catch (TransformationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
