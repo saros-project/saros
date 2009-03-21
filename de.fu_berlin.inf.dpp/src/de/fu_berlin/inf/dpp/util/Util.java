@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.codec.BinaryDecoder;
@@ -23,6 +24,7 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -39,6 +41,9 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * Static Utility functions
+ */
 public class Util {
 
     private static final Logger log = Logger.getLogger(Util.class.getName());
@@ -468,6 +473,21 @@ public class Util {
             return null;
 
         return page.findView(id);
+    }
+
+    /**
+     * Return a string representation of the given paths suitable for debugging
+     * by joining their OS dependent representation by ', '
+     */
+    public static String toOSString(final Set<IPath> paths) {
+        StringBuilder sb = new StringBuilder();
+        for (IPath path : paths) {
+            if (sb.length() > 0)
+                sb.append(", ");
+
+            sb.append(path.toOSString());
+        }
+        return sb.toString();
     }
 
 }
