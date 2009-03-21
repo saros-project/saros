@@ -32,7 +32,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
+import org.eclipse.core.filebuffers.ITextFileBuffer;
 import org.eclipse.core.filebuffers.ITextFileBufferManager;
+import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.filebuffers.manipulation.ConvertLineDelimitersOperation;
 import org.eclipse.core.filebuffers.manipulation.FileBufferOperationRunner;
 import org.eclipse.core.filebuffers.manipulation.TextFileBufferOperation;
@@ -50,6 +52,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -58,12 +61,13 @@ import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
+import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IElementStateListener;
 import org.xmlpull.v1.XmlPullParser;
@@ -87,6 +91,8 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
+import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -94,6 +100,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -169,51 +176,48 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     private class EditorPool {
 
-        private final Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
+        protected Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
         public void add(IEditorPart editorPart) {
 
             IResource resource = EditorManager.this.editorAPI
                 .getEditorResource(editorPart);
-
             if (resource == null) {
                 log.warn("Resource not found: " + editorPart.getTitle());
                 return;
             }
 
             IPath path = resource.getProjectRelativePath();
-
             if (path == null) {
+                log.warn("Resource is a project or workspace: " + resource);
                 return;
             }
 
-            EditorManager.this.editorAPI.addSharedEditorListener(editorPart);
-            EditorManager.this.editorAPI.setEditable(editorPart,
-                EditorManager.this.isDriver);
-
-            IDocumentProvider documentProvider = EditorManager.this.editorAPI
-                .getDocumentProvider(editorPart.getEditorInput());
-
-            documentProvider
-                .addElementStateListener(EditorManager.this.dirtyStateListener);
-
-            IDocument document = EditorManager.this.editorAPI
-                .getDocument(editorPart);
-
-            // if line delimiters are not in unix style convert them
-            if (document instanceof IDocumentExtension4) {
-
-                if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
-                    .equals("\n")) {
-                    // FIXME #2671663: Converting Line Delimiters causes Save
-                    convertLineDelimiters(editorPart);
-                }
-                ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
-            } else {
-                EditorManager.log
-                    .error("Can't discover line delimiter of document");
+            ITextViewer viewer = EditorAPI.getViewer(editorPart);
+            if (viewer == null) {
+                log.warn("This editor is not a ITextViewer: "
+                    + editorPart.getTitle());
+                return;
             }
-            document.addDocumentListener(EditorManager.this.documentListener);
+
+            IEditorInput input = editorPart.getEditorInput();
+            if (!(input instanceof IFileEditorInput)) {
+                log.warn("This editor does not use IFiles as input");
+                return;
+            }
+
+            editorAPI.addSharedEditorListener(editorPart);
+            editorAPI.setEditable(editorPart, EditorManager.this.isDriver);
+
+            IDocumentProvider documentProvider = getDocumentProvider(input);
+            documentProvider.addElementStateListener(dirtyStateListener);
+
+            IDocument document = getDocument(editorPart);
+
+            IFile file = ((IFileEditorInput) input).getFile();
+            connect(file);
+
+            document.addDocumentListener(documentListener);
             getEditors(path).add(editorPart);
             lastEditTimes.put(path, System.currentTimeMillis());
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
@@ -359,6 +363,37 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return EditorManager.instance;
     }
 
+    public void connect(IFile file) {
+        if (!connectedFiles.contains(file)) {
+            FileEditorInput input = new FileEditorInput(file);
+            IDocumentProvider documentProvider = getDocumentProvider(input);
+            try {
+                documentProvider.connect(input);
+            } catch (CoreException e) {
+                log.error("Error connecting to a document provider on file '"
+                    + file.toString() + "':", e);
+                e.printStackTrace();
+            }
+            connectedFiles.add(file);
+
+            IDocument document = documentProvider.getDocument(input);
+
+            // if line delimiters are not in unix style convert them
+            if (document instanceof IDocumentExtension4) {
+
+                if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
+                    .equals("\n")) {
+                    // TODO fails if editorPart is not using a IFileEditorInput
+                    convertLineDelimiters(file);
+                }
+                ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
+            } else {
+                EditorManager.log
+                    .error("Can't discover line delimiter of document");
+            }
+        }
+    }
+
     public void setEditorAPI(IEditorAPI editorAPI) {
         this.editorAPI = editorAPI;
         editorAPI.setEditorManager(this);
@@ -489,12 +524,31 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *         editor with this file is open
      */
     public IDocument getDocument(IPath path) {
+
+        IDocument result = null;
+
         Set<IEditorPart> editors = getEditors(path);
-        if (editors.isEmpty())
-            return null;
-        AbstractTextEditor editor = (AbstractTextEditor) editors.toArray()[0];
-        IEditorInput input = editor.getEditorInput();
-        return editor.getDocumentProvider().getDocument(input);
+
+        if (!editors.isEmpty()) {
+            result = getDocument(editors.iterator().next());
+        }
+
+        // if result == null there is no editor with this resource open
+        if (result == null) {
+
+            IFile file = sharedProject.getProject().getFile(path);
+
+            if (file == null) {
+                log.error("No file in project for path " + path,
+                    new StackTrace());
+            } else {
+                connect(file);
+            }
+
+            // get Document from FileBuffer
+            result = getTextFileBuffer(file).getDocument();
+        }
+        return result;
     }
 
     /**
@@ -579,7 +633,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // search editor which changed
         for (IEditorPart editor : editorPool.getAllEditors()) {
-            if (editorAPI.getDocument(editor) == document) {
+            if (getDocument(editor) == document) {
                 changedEditor = editor;
                 break;
             }
@@ -616,8 +670,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
              */
             {
                 IEditorInput input = changedEditor.getEditorInput();
-                IDocumentProvider provider = this.editorAPI
-                    .getDocumentProvider(input);
+                IDocumentProvider provider = getDocumentProvider(input);
                 IAnnotationModel model = provider.getAnnotationModel(input);
                 contributionAnnotationManager.splitAnnotation(model, offset);
             }
@@ -783,7 +836,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IFile file = sharedProject.getProject().getFile(path);
 
         /*
-         * Disable documentListner temporarily to avoid being notified of the
+         * Disable documentListener temporarily to avoid being notified of the
          * change
          */
         documentListener.enabled = false;
@@ -1031,12 +1084,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     private IActivity parseEditorActivity(XmlPullParser parser) {
-        String pathString = Util.urlUnescape(parser.getAttributeValue(null,
-            "path"));
 
-        // TODO handle cases where the file is really named "null"
-        IPath path = pathString.equals("null") ? null : Path
-            .fromPortableString(pathString);
+        String pathString = parser.getAttributeValue(null, "path");
+
+        IPath path;
+        if (pathString == null) {
+            path = null;
+        } else {
+            path = Path.fromPortableString(Util.urlUnescape(pathString));
+        }
 
         Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null,
             "type"));
@@ -1075,63 +1131,51 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
     private void replaceText(IFile file, int offset, String replacedText,
         String text, String source) {
+
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = getDocumentProvider(input);
 
-        try {
-            if (!this.connectedFiles.contains(file)) {
-                provider.connect(input);
-                this.connectedFiles.add(file);
-            }
+        connect(file);
 
-            IDocument doc = provider.getDocument(input);
+        IDocument doc = provider.getDocument(input);
 
-            // Check if the replaced text is really there.
-            if (log.isDebugEnabled()) {
+        // Check if the replaced text is really there.
+        if (log.isDebugEnabled()) {
 
-                String is;
-                try {
-                    is = doc.get(offset, replacedText.length());
-                    if (!is.equals(replacedText)) {
-                        log.error("replaceText should be '" + replacedText
-                            + "' is '" + is + "'");
-                    }
-                } catch (BadLocationException e) {
-                    // Ignore, because this is going to fail again just below
-                }
-            }
-            // Try to replace
+            String is;
             try {
-                doc.replace(offset, replacedText.length(), text);
+                is = doc.get(offset, replacedText.length());
+                if (!is.equals(replacedText)) {
+                    log.error("replaceText should be '" + replacedText
+                        + "' is '" + is + "'");
+                }
             } catch (BadLocationException e) {
-                log
-                    .error(String
-                        .format(
-                            "Could not apply TextEdit at %d-%d of document with length %d.\nWas supposed to replace '%s' with '%s'.",
-                            offset, offset + replacedText.length(), doc
-                                .getLength(), replacedText, text));
-                throw e;
+                // Ignore, because this is going to fail again just below
             }
-            EditorManager.this.lastRemoteEditTimes.put(file
-                .getProjectRelativePath(), System.currentTimeMillis());
-
-            IAnnotationModel model = provider.getAnnotationModel(input);
-            contributionAnnotationManager.insertAnnotation(model, offset, text
-                .length(), source);
-
-            // Don't disconnect from provider yet, because otherwise the text
-            // changes would be lost. We only disconnect when the document is
-            // reset or saved.
-
-        } catch (BadLocationException e) {
-            // TODO If this happens a resend of the original text should be
-            // initiated.
-            log
-                .error("Couldn't insert driver text because of bad location.",
-                    e);
-        } catch (CoreException e) {
-            log.error("Couldn't insert driver text.", e);
         }
+
+        // Try to replace
+        try {
+            doc.replace(offset, replacedText.length(), text);
+        } catch (BadLocationException e) {
+            log
+                .error(String
+                    .format(
+                        "Could not apply TextEdit at %d-%d of document with length %d.\nWas supposed to replace '%s' with '%s'.",
+                        offset, offset + replacedText.length(),
+                        doc.getLength(), replacedText, text));
+            return;
+        }
+        lastRemoteEditTimes.put(file.getProjectRelativePath(), System
+            .currentTimeMillis());
+
+        IAnnotationModel model = provider.getAnnotationModel(input);
+        contributionAnnotationManager.insertAnnotation(model, offset, text
+            .length(), source);
+
+        // Don't disconnect from provider yet, because otherwise the text
+        // changes would be lost. We only disconnect when the document is
+        // reset or saved.
     }
 
     /**
@@ -1145,7 +1189,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = getDocumentProvider(input);
 
         if (this.connectedFiles.contains(file)) {
             provider.disconnect(input);
@@ -1175,7 +1219,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IFile file = this.sharedProject.getProject().getFile(path);
 
         if (!file.exists()) {
-            log.warn("Cannot save file that does not exist:" + path.toString());
+            log.error(
+                "Cannot save file that does not exist:" + path.toString(),
+                new StackTrace());
             return;
         }
 
@@ -1185,7 +1231,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         FileEditorInput input = new FileEditorInput(file);
 
-        IDocumentProvider provider = this.editorAPI.getDocumentProvider(input);
+        IDocumentProvider provider = getDocumentProvider(input);
 
         if (!this.connectedFiles.contains(file)) {
             // Save not necessary, if we have no modified document
@@ -1315,8 +1361,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private void removeAllAnnotations(Predicate predicate) {
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
-            IDocumentProvider provider = this.editorAPI
-                .getDocumentProvider(input);
+            IDocumentProvider provider = getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
             if (model == null) {
@@ -1502,14 +1547,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return null;
     }
 
-    public static void convertLineDelimiters(IEditorPart editorPart) {
+    public static void convertLineDelimiters(IFile file) {
 
         EditorManager.log.debug("Converting line delimiters...");
-
-        // get path of file
-        IFile file = ((FileEditorInput) editorPart.getEditorInput()).getFile();
-        IPath[] paths = new IPath[1];
-        paths[0] = file.getFullPath();
 
         boolean makeReadable = false;
 
@@ -1524,6 +1564,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     "Error making file readable for delimiter conversion:", e);
             }
         }
+        // Now run the conversion operation
+        IPath[] paths = new IPath[] { file.getFullPath() };
 
         ITextFileBufferManager buffManager = FileBuffers
             .getTextFileBufferManager();
@@ -1538,6 +1580,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // execute convert operation in runner
         try {
+            // FIXME #2671663: Converting Line Delimiters causes Save
             runner.execute(paths, convertOperation, new NullProgressMonitor());
         } catch (OperationCanceledException e) {
             EditorManager.log.error("Can't convert line delimiters:", e);
@@ -1558,4 +1601,80 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
+    /**
+     * Returns the TextFileBuffer associated with this project relative path OR
+     * null if the path could not be traced to a Buffer.
+     * 
+     * @param docPath
+     *            A project relative path
+     * @return
+     */
+    protected ITextFileBuffer getTextFileBuffer(IResource resource) {
+
+        IPath fullPath = resource.getFullPath();
+
+        ITextFileBufferManager tfbm = FileBuffers.getTextFileBufferManager();
+
+        ITextFileBuffer fileBuff = tfbm.getTextFileBuffer(fullPath,
+            LocationKind.IFILE);
+        if (fileBuff != null)
+            return fileBuff;
+        else {
+            try {
+                tfbm.connect(fullPath, LocationKind.IFILE,
+                    new NullProgressMonitor());
+            } catch (CoreException e) {
+                log.error("Could not connect to file " + fullPath);
+                return null;
+            }
+            return tfbm.getTextFileBuffer(fullPath, LocationKind.IFILE);
+        }
+    }
+
+    public static IDocument getDocument(IEditorPart editorPart) {
+        IEditorInput input = editorPart.getEditorInput();
+
+        return getDocumentProvider(input).getDocument(input);
+    }
+
+    public static IDocumentProvider getDocumentProvider(IEditorInput input) {
+
+        Object adapter = input.getAdapter(IFile.class);
+        if (adapter != null) {
+            IFile file = (IFile) adapter;
+
+            String fileExtension = file.getFileExtension();
+
+            if (fileExtension != null) {
+                if (fileExtension.equals("java")) {
+                    // TODO: Rather this dependency should be injected when the
+                    // EditorAPI is created itself.
+                    JDTFacade facade = Saros.getDefault().getContainer()
+                        .getComponent(JDTFacade.class);
+
+                    if (facade.isJDTAvailable()) {
+                        return facade.getDocumentProvider();
+                    }
+
+                } else if (fileExtension.equals("c")
+                    || fileExtension.equals("h") || fileExtension.equals("cpp")
+                    || fileExtension.equals("cxx")
+                    || fileExtension.equals("hxx")) {
+
+                    // TODO: Rather this dependency should be injected when the
+                    // EditorAPI is created itself.
+                    CDTFacade facade = Saros.getDefault().getContainer()
+                        .getComponent(CDTFacade.class);
+
+                    if (facade.isCDTAvailable()) {
+                        return facade.getDocumentProvider();
+                    }
+                }
+            }
+        }
+
+        DocumentProviderRegistry registry = DocumentProviderRegistry
+            .getDefault();
+        return registry.getDocumentProvider(input);
+    }
 }

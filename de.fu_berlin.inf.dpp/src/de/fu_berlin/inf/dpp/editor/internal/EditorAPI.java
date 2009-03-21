@@ -45,19 +45,14 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.texteditor.AbstractTextEditor;
-import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
-import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -192,47 +187,6 @@ public class EditorAPI implements IEditorAPI {
             IWorkbenchPage page = window.getActivePage();
             page.closeEditor(part, false);
         }
-    }
-
-    public IDocumentProvider getDocumentProvider(IEditorInput input) {
-
-        Object adapter = input.getAdapter(IFile.class);
-        if (adapter != null) {
-            IFile file = (IFile) adapter;
-
-            String fileExtension = file.getFileExtension();
-
-            if (fileExtension != null) {
-                if (fileExtension.equals("java")) {
-                    // TODO: Rather this dependency should be injected when the
-                    // EditorAPI is created itself.
-                    JDTFacade facade = Saros.getDefault().getContainer()
-                        .getComponent(JDTFacade.class);
-
-                    if (facade.isJDTAvailable()) {
-                        return facade.getDocumentProvider();
-                    }
-
-                } else if (fileExtension.equals("c")
-                    || fileExtension.equals("h") || fileExtension.equals("cpp")
-                    || fileExtension.equals("cxx")
-                    || fileExtension.equals("hxx")) {
-
-                    // TODO: Rather this dependency should be injected when the
-                    // EditorAPI is created itself.
-                    CDTFacade facade = Saros.getDefault().getContainer()
-                        .getComponent(CDTFacade.class);
-
-                    if (facade.isCDTAvailable()) {
-                        return facade.getDocumentProvider();
-                    }
-                }
-            }
-        }
-
-        DocumentProviderRegistry registry = DocumentProviderRegistry
-            .getDefault();
-        return registry.getDocumentProvider(input);
     }
 
     /*
@@ -586,18 +540,6 @@ public class EditorAPI implements IEditorAPI {
         new EditorListener(editorPart, editorManager);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
-     */
-    public IDocument getDocument(IEditorPart editorPart) {
-        AbstractTextEditor textEditor = (AbstractTextEditor) editorPart;
-        IEditorInput input = textEditor.getEditorInput();
-
-        return textEditor.getDocumentProvider().getDocument(input);
-    }
-
     public void setViewport(IEditorPart editorPart, int top, int bottom,
         String source, boolean following) {
 
@@ -742,21 +684,4 @@ public class EditorAPI implements IEditorAPI {
     private static IWorkbenchWindow[] getWindows() {
         return PlatformUI.getWorkbench().getWorkbenchWindows();
     }
-
-    /*
-     * private void makeAllProjectResourcesReadOnly(ISharedProject
-     * sharedProject) {
-     * 
-     * try { ResourceAttributes attributes = new ResourceAttributes();
-     * attributes.setReadOnly(!sharedProject.isDriver());
-     * attributes.setArchive(!sharedProject.isDriver());
-     * 
-     * IResource[] resources = sharedProject.getProject().members(); for (int i
-     * = 0; i < resources.length; i++) { if (resources[i] instanceof IFile) {
-     * IFile file = (IFile) resources[i];
-     * 
-     * try { file.setResourceAttributes(attributes); } catch (CoreException e) {
-     * // e.printStackTrace(); } } } } catch (CoreException e) {
-     * e.printStackTrace(); } }
-     */
 }

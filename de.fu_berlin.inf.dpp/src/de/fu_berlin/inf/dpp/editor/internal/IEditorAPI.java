@@ -4,13 +4,10 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.LineRange;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
@@ -102,8 +99,4 @@ public interface IEditorAPI {
      * @swt Needs to be called from the SWT-UI thread.
      */
     public void addSharedEditorListener(IEditorPart editorPart);
-
-    public IDocument getDocument(IEditorPart editorPart);
-
-    public IDocumentProvider getDocumentProvider(IEditorInput editorInput);
 }

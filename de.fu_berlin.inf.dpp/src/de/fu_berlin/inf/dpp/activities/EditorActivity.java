@@ -109,8 +109,10 @@ public class EditorActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<editor ");
-        sb.append("path=\"").append(
-            Util.urlEscape(getPath().toPortableString())).append("\" ");
+        if (getPath() != null) {
+            sb.append("path=\"").append(
+                Util.urlEscape(getPath().toPortableString())).append("\" ");
+        }
         sb.append("type=\"").append(getType()).append("\" ");
         sb.append("/>");
     }

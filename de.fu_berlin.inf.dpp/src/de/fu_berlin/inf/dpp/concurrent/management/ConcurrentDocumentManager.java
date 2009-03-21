@@ -14,17 +14,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.filebuffers.FileBuffers;
-import org.eclipse.core.filebuffers.ITextFileBuffer;
-import org.eclipse.core.filebuffers.ITextFileBufferManager;
-import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.DocumentEvent;
@@ -146,38 +139,6 @@ public class ConcurrentDocumentManager {
     };
 
     /**
-     * Returns the TextFileBuffer associated with this project relative path OR
-     * null if the path could not be traced to a Buffer.
-     */
-    public ITextFileBuffer getTextFileBuffer(IPath docPath) {
-
-        if (sharedProject == null)
-            return null;
-
-        IResource resource = sharedProject.getProject().findMember(docPath);
-        if (resource == null)
-            return null;
-
-        IPath fullPath = resource.getFullPath();
-
-        ITextFileBufferManager tfbm = FileBuffers.getTextFileBufferManager();
-
-        ITextFileBuffer fileBuff = tfbm.getTextFileBuffer(fullPath,
-            LocationKind.IFILE);
-        if (fileBuff != null)
-            return fileBuff;
-        else {
-            try {
-                tfbm.connect(fullPath, LocationKind.IFILE,
-                    new NullProgressMonitor());
-            } catch (CoreException e) {
-                return null;
-            }
-            return tfbm.getTextFileBuffer(fullPath, LocationKind.IFILE);
-        }
-    }
-
-    /**
      * This class is an eclipse job run on the host side ONLY.
      * 
      * The job computes checksums for all files currently managed by Jupiter
@@ -219,15 +180,14 @@ public class ConcurrentDocumentManager {
             for (IPath docPath : clientDocs.keySet()) {
 
                 // Get document
-                ITextFileBuffer fileBuff = getTextFileBuffer(docPath);
+                IDocument doc = EditorManager.getDefault().getDocument(docPath);
 
                 // TODO CO Handle missing files correctly
-                if (fileBuff == null) {
-                    logger.error("Can't get File Buffer");
+                if (doc == null) {
+                    logger.error("Can't get Document");
                     docsChecksums.remove(docPath);
                     continue;
                 }
-                IDocument doc = fileBuff.getDocument();
 
                 // Update listener management
                 missingDocuments.remove(doc);
@@ -847,12 +807,6 @@ public class ConcurrentDocumentManager {
         }
 
         IDocument doc = EditorManager.getDefault().getDocument(path);
-
-        // if doc == null there is no editor with this resource open
-        if (doc == null) {
-            // get Document from FileBuffer
-            doc = getTextFileBuffer(path).getDocument();
-        }
 
         // if doc is still null give up
         if (doc == null) {
