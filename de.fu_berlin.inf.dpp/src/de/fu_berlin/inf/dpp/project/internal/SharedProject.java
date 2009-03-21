@@ -342,6 +342,8 @@ public class SharedProject implements ISharedProject {
                 List<IActivity> activities = activitySequencer.flush();
 
                 if (activities.size() > 0 && participants.size() > 1) {
+                    // TODO Rather create a method in the activitySequencer to
+                    // wrap and then send.
                     transmitter.sendActivities(SharedProject.this,
                         activitySequencer, activities);
                 }
