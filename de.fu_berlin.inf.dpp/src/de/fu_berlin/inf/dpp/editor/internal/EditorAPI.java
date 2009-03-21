@@ -563,6 +563,8 @@ public class EditorAPI implements IEditorAPI {
         int bottom = viewer.getBottomIndex();
 
         if (bottom < top) {
+            // FIXME This warning occurs when the document is shorter than the
+            // viewport
             log.warn("Viewport Range Problem Bottom == " + bottom
                 + " < Top == " + top);
             bottom = top;
