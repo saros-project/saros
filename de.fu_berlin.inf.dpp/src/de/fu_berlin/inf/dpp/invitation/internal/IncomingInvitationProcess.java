@@ -296,7 +296,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      */
     private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
 
-        // TODO: deadlock abfangen.
         while (this.filesLeftToSynchronize > 0) {
 
             // Operation canceled by the local user

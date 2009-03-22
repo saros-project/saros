@@ -274,7 +274,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 this.concurrentDocumentManager.execFileActivity(activity);
             }
             if (activity instanceof FolderActivity) {
-                // TODO
+                // TODO [FileOps] Does not handle FolderActivity
             }
         } catch (Exception e) {
             log.error("Error while executing activity.", e);

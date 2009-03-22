@@ -191,20 +191,7 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public boolean isDriver() {
-        // TODO: change driver status request to userrole request of
-        // participient list.
-
-        // HOST
-        /* TODO: change to driver document manager. */
-        // if (activitySequencer.getConcurrentManager() != null
-        // && activitySequencer.getConcurrentManager().isHostSide()) {
-        // return
-        // activitySequencer.getConcurrentManager().isDriver(driver.getJid());
-        // }
-        // CLIENT
         return getParticipant(this.myID).isDriver();
-        // return driver.getJid().equals(myID);
-
     }
 
     /*
@@ -366,7 +353,8 @@ public class SharedProject implements ISharedProject {
 
                         SharedProject.queuedsince = 0;
 
-                        // TODO: forever?
+                        // TODO: What if Request for Activity fails again and
+                        // again?
                     }
 
                 } else {
