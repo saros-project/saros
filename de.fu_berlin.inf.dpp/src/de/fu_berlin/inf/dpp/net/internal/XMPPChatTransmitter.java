@@ -247,52 +247,37 @@ public class XMPPChatTransmitter implements ITransmitter,
         private void processActivitiesExtension(final Message message,
             JID fromJID) {
 
-            final ISharedProject project = Saros.getDefault()
-                .getSessionManager().getSharedProject();
-
             ActivitiesPacketExtension activitiesPacket = PacketExtensions
                 .getActvitiesExtension(message);
 
             List<TimedActivity> timedActivities = activitiesPacket
                 .getActivities();
 
-            String source = fromJID.toString();
+            // FileActivities of type Create are sent via file transfer
+            assert containsNoFileCreationActivities(timedActivities);
 
-            if ((project == null) || (project.getParticipant(fromJID) == null)) {
-                XMPPChatTransmitter.log.info("Recevied activities from "
-                    + source + " but User is no participant!");
-                return;
-            } else {
-                XMPPChatTransmitter.log.debug("Received activities from "
-                    + source + ": " + timedActivities);
-            }
+            receiveActivities(fromJID, timedActivities);
+        }
+    }
 
-            for (TimedActivity timedActivity : timedActivities) {
+    /**
+     * Used for asserting that the given list contains no FileActivities which
+     * create files
+     */
+    public static boolean containsNoFileCreationActivities(
+        List<TimedActivity> timedActivities) {
 
-                IActivity activity = timedActivity.getActivity();
+        for (TimedActivity timedActivity : timedActivities) {
 
-                /*
-                 * Some activities save space in the message by not setting the
-                 * source
-                 */
-                if (activity.getSource() == null) {
-                    activity.setSource(source);
-                }
+            IActivity activity = timedActivity.getActivity();
 
-                /*
-                 * incoming fileActivities that add files are only used as
-                 * placeholder to bump the timestamp. the real fileActivity will
-                 * be processed by using a file transfer.
-                 */
-                if (activity instanceof FileActivity
-                    && ((FileActivity) activity).getType().equals(
-                        FileActivity.Type.Created)) {
-                    continue;
-                }
-
-                project.getSequencer().exec(timedActivity);
+            if (activity instanceof FileActivity
+                && ((FileActivity) activity).getType().equals(
+                    FileActivity.Type.Created)) {
+                return false;
             }
         }
+        return true;
     }
 
     /**
@@ -394,8 +379,11 @@ public class XMPPChatTransmitter implements ITransmitter,
                 textEditActivity.setSender(sender);
 
                 if (textEditActivity.getSource() == null) {
-                    // TODO Warning or error?
-                    log.warn("TextEditActivities does not have a source: "
+                    /*
+                     * Missing source means, we handled the creation of new
+                     * TextEditActivities incorrectly
+                     */
+                    log.error("TextEditActivities does not have a source: "
                         + textEditActivity);
                     textEditActivity.setSource(sender);
                 }
@@ -418,6 +406,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                 // Check each activity if it is a file creation which will be
                 // send asynchronous, and collect all others in stillToSend.
+                // TODO boolean methods with side effects are bad style
                 if (!ifFileCreateSendAsync(recipientJID, sharedProject,
                     timedActivity)) {
                     stillToSend.add(timedActivity);
@@ -425,12 +414,15 @@ public class XMPPChatTransmitter implements ITransmitter,
             }
 
             if (stillToSend.size() > 0) {
+
+                assert containsNoFileCreationActivities(stillToSend);
+
                 sendMessage(recipientJID, new ActivitiesPacketExtension(Saros
                     .getDefault().getSessionManager().getSessionID(),
                     stillToSend));
             }
         }
-        XMPPChatTransmitter.log.info("Sent Activities: " + activities);
+        XMPPChatTransmitter.log.info("Sent Activities to all: " + activities);
     }
 
     /**
@@ -756,6 +748,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         executor.execute(new Runnable() {
             public void run() {
                 try {
+                    // To test if asynchronously arriving file transfers work:
+                    // Thread.sleep(10000);
                     dataManager.sendData(transfer, content, callback);
                     callback.fileSent(path);
                 } catch (Exception e) {
@@ -798,6 +792,50 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void stop() {
         // TODO stop sending, but queue rather
+    }
+
+    /**
+     * This method is called from all the different transfer methods, when an
+     * activity arrives. This method puts the activity into the
+     * ActivitySequencer which will execute it.
+     * 
+     * @param fromJID
+     *            The JID which sent these activities (the source in the
+     *            activities might be different!)
+     * @param timedActivities
+     *            The received activities including timestamps.
+     */
+    protected void receiveActivities(JID fromJID,
+        List<TimedActivity> timedActivities) {
+        String source = fromJID.toString();
+
+        final ISharedProject project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+
+        if ((project == null) || (project.getParticipant(fromJID) == null)) {
+            XMPPChatTransmitter.log.info("Recevied activities from " + source
+                + " but User is no participant!");
+            return;
+        } else {
+            XMPPChatTransmitter.log.debug("Received activities from " + source
+                + ": " + timedActivities);
+        }
+
+        for (TimedActivity timedActivity : timedActivities) {
+
+            IActivity activity = timedActivity.getActivity();
+
+            /*
+             * Some activities save space in the message by not setting the
+             * source
+             */
+            if (activity.getSource() == null) {
+                activity.setSource(source);
+            }
+
+            // Ask sequencer to execute or queue until missing activities arrive
+            project.getSequencer().exec(timedActivity);
+        }
     }
 
 }

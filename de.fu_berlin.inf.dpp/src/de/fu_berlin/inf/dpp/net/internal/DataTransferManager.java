@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -561,11 +560,9 @@ public class DataTransferManager implements ConnectionSessionListener {
             TimedActivity timedActivity = new TimedActivity(new FileActivity(
                 from.toString(), path, input), time);
 
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            chatTransmitter.receiveActivities(from, Collections
+                .singletonList(timedActivity));
 
-            if (project != null)
-                project.getSequencer().exec(timedActivity);
             return true;
         }
 
