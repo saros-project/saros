@@ -54,6 +54,11 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
  * etc.
+ * 
+ * TODO Extract ConsistencyWatchdog into a class on its own
+ * 
+ * TODO Split into a Server (run only on the host) and Client (run on the host
+ * and client) component
  */
 public class ConcurrentDocumentManager {
 
@@ -64,10 +69,18 @@ public class ConcurrentDocumentManager {
     private static Logger logger = Logger
         .getLogger(ConcurrentDocumentManager.class);
 
-    /** Jupiter server instance documents */
+    /**
+     * Jupiter server instance documents
+     * 
+     * @host
+     */
     private HashMap<IPath, JupiterDocumentServer> concurrentDocuments;
 
-    /** current open editor at client side. */
+    /**
+     * Jupiter instances for each local editor.
+     * 
+     * @host and @client
+     */
     private final HashMap<IPath, Jupiter> clientDocs = new HashMap<IPath, Jupiter>();
 
     private final JID host;
@@ -368,13 +381,46 @@ public class ConcurrentDocumentManager {
     }
 
     /**
-     * Called from the ActivitySequencer when a local activity has occurred.
+     * This is called (only) from the ActivitySequencer when a local activity
+     * has been caused by User activity.
      * 
      * If the event is handled by Jupiter then true should be returned, false
      * otherwise.
+     * 
+     * @host and @client
      */
     public boolean activityCreated(IActivity activity) {
         return activity.dispatch(activityReceiver);
+    }
+
+    /**
+     * This is called (only) from the JupiterHandler (the network layer) when a
+     * remote activity has been received.
+     * 
+     * Synchronizes the given request with the jupiter server document (if host)
+     * and local clients (if host or client) and applies the request locally.
+     * 
+     * @host and @client
+     */
+    public void receiveRequest(Request request) {
+        if (isHostSide()) {
+            receiveRequestHostSide(request);
+        } else {
+            receiveRequestClientSide(request);
+        }
+    }
+
+    public boolean shouldBeManagedByJupiter(JID jid) {
+        return sharedProject.getHost().getJID().equals(jid)
+            || sharedProject.getParticipant(jid).isDriver();
+    }
+
+    public boolean isHostSide() {
+        return this.side == Side.HOST_SIDE;
+    }
+
+    public boolean isHost(JID jid) {
+        return jid != null && jid.equals(this.host);
     }
 
     public void execFileActivity(IActivity activity) {
@@ -394,7 +440,14 @@ public class ConcurrentDocumentManager {
         }
     }
 
-    // TODO CJ: review
+    /**
+     * This method is called when a given Request should be executed locally.
+     * 
+     * It will be transformed and executed in the SWT thread to ensure that no
+     * user activity occurs in between.
+     * 
+     * @host and @client
+     */
     private void execTextEditActivity(final Request request) {
 
         final Jupiter jupiterClient = getClientDoc(request.getEditorPath());
@@ -425,25 +478,9 @@ public class ConcurrentDocumentManager {
         });
     }
 
-    public boolean shouldBeManagedByJupiter(JID jid) {
-        return sharedProject.getHost().getJID().equals(jid)
-            || sharedProject.getParticipant(jid).isDriver();
-    }
-
-    public boolean isHostSide() {
-        return this.side == Side.HOST_SIDE;
-    }
-
-    public boolean isHost(JID jid) {
-        return jid != null && jid.equals(this.host);
-    }
-
     /**
      * Create or remove proxies on the JupiterDocumentServer depending on the
      * activity.
-     * 
-     * 
-     * 
      * 
      * @host
      */
@@ -479,65 +516,39 @@ public class ConcurrentDocumentManager {
         } else {
             // remove proxy for this combination of editor and client
             if (editorActivity.getType() == Type.Closed) {
+                /*
+                 * TODO Currently we still keep this ProxyClient, because
+                 * creating ProxyClients is asynchronous to the edit operations
+                 */
                 // server.removeProxyClient(sourceJID);
             }
         }
-
-        // TODO We don't understand
-        // /* update vector time for new proxy. */
-        // // TODO: stop serializer and after this update
-        // // vector time.
-        // server.updateVectorTime(this.myJID, sourceJID);
-        // // TODO: forward vector time method.
-        //
-        // /* get vector time of host for this editor path. */
-        // try {
-        //
-        // Jupiter jupC = this.clientDocs.get(editorActivity
-        // .getPath());
-        // if (jupC != null) {
-        // Timestamp ts = jupC.getTimestamp();
-        //
-        // /* create update vector time request. */
-        // Request updateRequest = new RequestImpl(0,
-        // new JupiterVectorTime(ts.getComponents()[1], ts
-        // .getComponents()[0]),
-        // new TimestampOperation());
-        // updateRequest.setEditorPath(editorActivity
-        // .getPath());
-        // updateRequest.setJID(sourceJID);
-        //
-        // this.sequencer.forwardOutgoingRequest(sourceJID,
-        // updateRequest);
-        // }
-        // } catch (Exception e) {
-        //
-        // ConcurrentDocumentManager.logger.error(
-        // "Error during get timestamp of host proxy for "
-        // + editorActivity.getPath(), e);
-        // }
-        // }
-
-        // else {
-        // /* create new jupiter proxy client. */
-        // if (editorActivity.getType() == Type.Activated) {
-        // Request createRequest = new RequestImpl(0,
-        // new JupiterVectorTime(0, 0), new TimestampOperation());
-        // createRequest.setEditorPath(editorActivity.getPath());
-        // createRequest.setJID(sourceJID);
-        //
-        // }
-        // }
-
     }
 
-    private JupiterDocumentServer initDocumentServer(IPath path) {
+    public Jupiter getClientDoc(IPath path) {
 
-        /* create new document server. */
-        JupiterDocumentServer docServer = new JupiterDocumentServer(path);
+        Jupiter clientDoc = this.clientDocs.get(path);
 
-        /* create new local host document client. */
-        docServer.addProxyClient(this.host);
+        if (clientDoc == null) {
+            clientDoc = new Jupiter(true);
+            this.clientDocs.put(path, clientDoc);
+        }
+        return clientDoc;
+    }
+
+    private JupiterDocumentServer getJupiterServer(IPath path) {
+
+        JupiterDocumentServer docServer = this.concurrentDocuments.get(path);
+
+        if (docServer == null) {
+            /* create new document server. */
+            docServer = new JupiterDocumentServer(path);
+
+            /* create new local host document client. */
+            docServer.addProxyClient(this.host);
+
+            this.concurrentDocuments.put(path, docServer);
+        }
         return docServer;
     }
 
@@ -551,6 +562,8 @@ public class ConcurrentDocumentManager {
     protected synchronized void receiveRequestHostSide(Request request) {
 
         assert isHostSide() : "receiveRequestHostSide called on the Client";
+
+        // TODO assert isSWT() : "receiveRequestHostSide called from SWT";
 
         // Get JupiterServer
         JupiterDocumentServer docServer = getJupiterServer(request
@@ -585,47 +598,17 @@ public class ConcurrentDocumentManager {
         }
     }
 
-    private JupiterDocumentServer getJupiterServer(IPath path) {
-        JupiterDocumentServer docServer;
-        /**
-         * if no jupiter document server exists.
-         */
-        if (!this.concurrentDocuments.containsKey(path)) {
-            docServer = initDocumentServer(path);
-            this.concurrentDocuments.put(path, docServer);
-        }
-        docServer = this.concurrentDocuments.get(path);
-        return docServer;
-    }
-
     /**
-     * Synchronizes the given request with the jupiter server document (if host)
-     * and local clients (if host or client).
-     * 
-     * This is called only from the JupiterHandler (the network layer).
+     * @client
      */
-    public void receiveRequest(Request request) {
-        if (isHostSide()) {
-            receiveRequestHostSide(request);
-        } else {
-            receiveRequestClientSide(request);
-        }
-    }
-
-    public Jupiter getClientDoc(IPath path) {
-
-        if (this.clientDocs.containsKey(path)) {
-            return this.clientDocs.get(path);
-        } else {
-            Jupiter client = new Jupiter(true);
-            this.clientDocs.put(path, client);
-            return client;
-        }
-    }
-
     protected void receiveRequestClientSide(Request request) {
 
+        assert !isHostSide() : "receiveRequestClientSide called on the Host";
+
         if (request.getOperation() instanceof TimestampOperation) {
+
+            // TODO Use timestamps correctly or discard this code
+            logger.warn("Timestamp operations are not tested at the moment");
 
             Jupiter jupClient = getClientDoc(request.getEditorPath());
 
@@ -677,25 +660,6 @@ public class ConcurrentDocumentManager {
     }
 
     /**
-     * Returns true if a JupiterServer exists for the given path and a proxy
-     * document for the given user exists.
-     */
-    public boolean isManagedByJupiterServer(JID jid, IPath path) {
-        JupiterDocumentServer server = this.concurrentDocuments.get(path);
-        if (server == null)
-            return false;
-        else
-            return server.isExist(jid);
-    }
-
-    /**
-     * Returns true if a JupiterClient exists for the given path.
-     */
-    public boolean isManagedByJupiter(IPath path) {
-        return this.clientDocs.containsKey(path);
-    }
-
-    /**
      * Resets the JupiterClient for the given path.
      * 
      * When this is called on the client (or on the host for one of his
@@ -716,6 +680,25 @@ public class ConcurrentDocumentManager {
             logger.warn("No Jupiter document exists for path: "
                 + path.toOSString());
         }
+    }
+
+    /**
+     * Returns true if a JupiterServer exists for the given path and a proxy
+     * document for the given user exists.
+     */
+    public boolean isManagedByJupiterServer(JID jid, IPath path) {
+        JupiterDocumentServer server = this.concurrentDocuments.get(path);
+        if (server == null)
+            return false;
+        else
+            return server.isExist(jid);
+    }
+
+    /**
+     * Returns true if a JupiterClient exists for the given path.
+     */
+    public boolean isManagedByJupiter(IPath path) {
+        return this.clientDocs.containsKey(path);
     }
 
     ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
@@ -858,6 +841,10 @@ public class ConcurrentDocumentManager {
      * 
      * If the given activity is not a TextEditActivity or if there is no
      * JupiterClient for the path, then false is returned.
+     * 
+     * @sugar This method is syntactic sugar for checking whether this is a
+     *        TextEditActivity and calling isManagedByJupiter(Path) using the
+     *        path of the TextEditActivity.
      */
     public boolean isManagedByJupiter(IActivity activity) {
 
