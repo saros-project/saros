@@ -1234,10 +1234,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         IDocumentProvider provider = getDocumentProvider(input);
 
         if (!this.connectedFiles.contains(file)) {
-            // Save not necessary, if we have no modified document
-            // If this warning is printed we must suspect an
-            // inconsistency...
-            log.warn("Saving not necessary (not connected)!");
+            /*
+             * Save not necessary, if we have no modified document If this
+             * warning is printed we must suspect an inconsistency...
+             * 
+             * This can occur when the ConvertLineDelimitersOperation is run
+             */
+            log
+                .warn("Saving not necessary (not connected): "
+                    + file.toString());
             return;
         }
         boolean wasReadonly = FileUtil.setReadOnly(file, false);
