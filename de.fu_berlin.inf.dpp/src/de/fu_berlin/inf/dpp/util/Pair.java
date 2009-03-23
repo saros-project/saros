@@ -191,7 +191,7 @@ public class Pair<P, V> {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Pair))
+        if (!(o instanceof Pair<?, ?>))
             return false;
 
         Pair<?, ?> other = (Pair<?, ?>) o;
