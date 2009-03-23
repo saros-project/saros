@@ -1201,7 +1201,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * Programmatically saves the given editor.
      * 
      * Calling this method will trigger a call to all registered
-     * SharedEditorListeners (independent of the success of this method).
+     * SharedEditorListeners (independent of the success of this method) BEFORE
+     * the file is actually saved.
      * 
      * Calling this method will NOT trigger a {@link EditorActivity} of type
      * Save to be sent to the other clients.
