@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
-import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -275,8 +274,7 @@ class EnterProjectNamePage extends WizardPage {
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor) {
-                    EnterProjectNamePage.this.joinSessionWizard.process
-                        .requestRemoteFileList(monitor);
+                    joinSessionWizard.process.requestRemoteFileList(monitor);
                 }
             });
         } catch (InvocationTargetException e) {
