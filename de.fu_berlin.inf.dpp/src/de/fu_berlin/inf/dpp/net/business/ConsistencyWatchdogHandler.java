@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net.business;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -9,8 +10,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IViewPart;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -22,7 +21,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -33,8 +31,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.ui.SessionView;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -51,6 +47,8 @@ public class ConsistencyWatchdogHandler {
 
     /**
      * @host This is only called on the host
+     * 
+     * @nonSWT This method should not be called from the SWT Thread!
      */
     private void performConsistencyRecovery(JID from, Set<IPath> paths) {
 
@@ -66,28 +64,16 @@ public class ConsistencyWatchdogHandler {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 
-        for (IPath path : paths) {
+        for (final IPath path : paths) {
 
-            // TODO Handle case, when file does not exist locally any
-            // more
-            final boolean wasReadOnly = FileUtil.setReadOnly(project
-                .getProject().getFile(path), false);
-
-            /*
-             * TODO This only checks for the file being opened in an editor, but
-             * it might be open in the background with changes!
-             */
-            Set<IEditorPart> editors = EditorManager.getDefault().getEditors(
-                path);
-            if (editors != null && editors.size() > 0) {
-                if (!EditorAPI.saveEditor(editors.iterator().next())) {
-                    log.warn("Saving was canceled");
-                }
-            }
-
-            // Reset Read Only flag
-            if (wasReadOnly) {
-                FileUtil.setReadOnly(project.getProject().getFile(path), true);
+            // Save document before sending to clients
+            try {
+                EditorManager.getDefault().saveLazy(path);
+            } catch (FileNotFoundException e) {
+                // TODO Handle case, when file does not exist locally any
+                // more
+                log.error("Currently we cannot deal with the situation"
+                    + " of files being deleted on the host: ", e);
             }
 
             // Reset jupiter
@@ -122,7 +108,7 @@ public class ConsistencyWatchdogHandler {
             } catch (IOException e) {
                 // TODO This means we were really unable to send
                 // this file. No more falling back.
-                log.error("Could not sent file for consistency resolution");
+                log.error("Could not sent file for consistency resolution", e);
             }
         }
 
@@ -156,19 +142,6 @@ public class ConsistencyWatchdogHandler {
                             performConsistencyRecovery(from, paths);
                         }
                     });
-            } else {
-                // check if inconsistencies exists on this side too,
-                // then run ConsistencyAction to resolve these
-                Util.runSafeSWTAsync(log, new Runnable() {
-                    public void run() {
-                        // get the session view
-                        IViewPart view = Util
-                            .findView("de.fu_berlin.inf.dpp.ui.SessionView");
-                        if (view != null)
-                            ((SessionView) view)
-                                .runConsistencyActionIfEnabled();
-                    }
-                });
             }
         }
 

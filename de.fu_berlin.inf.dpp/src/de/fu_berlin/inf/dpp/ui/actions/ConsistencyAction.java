@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -15,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Inject;
@@ -25,7 +25,6 @@ import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -187,13 +186,18 @@ public class ConsistencyAction extends Action {
             if (project == null)
                 return false;
 
-            IFile file = project.getProject().getFile(path);
+            final IFile file = project.getProject().getFile(path);
 
             if (log.isDebugEnabled()) {
                 input = logDiff(log, from, path, input, file);
             }
 
-            FileUtil.writeFile(input, file);
+            final InputStream toWrite = input;
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    FileUtil.writeFile(toWrite, file);
+                }
+            });
 
             ConcurrentDocumentManager concurrentManager = project
                 .getConcurrentDocumentManager();
@@ -264,35 +268,30 @@ public class ConsistencyAction extends Action {
 
             if (newState) {
 
-                // add data receiver
+                // Register as a receiver of incoming files...
                 dataTransferManager.addDataReceiver(receiver);
 
                 for (final IPath path : pathsOfHandledFiles) {
 
-                    /*
-                     * TODO Saving editors is not enough, might restore files
-                     * which are changed in the background!
-                     */
-                    // Save document
-                    for (IEditorPart editor : EditorManager.getDefault()
-                        .getEditors(path)) {
-                        if (!EditorAPI.saveEditor(editor)) {
-                            log
-                                .info("Consistency Check canceled by user! Diff might be inaccurate");
-                        }
+                    // Save document before asking host to resend
+                    try {
+                        EditorManager.getDefault().saveLazy(path);
+                    } catch (FileNotFoundException e) {
+                        // Sending the checksum error message should recreate
+                        // this file
                     }
                 }
 
-                // Send checksumErrorMessage to Host
+                // Send checksumErrorMessage to host
                 transmitter.sendFileChecksumErrorMessage(pathsOfHandledFiles,
                     false);
 
             } else {
 
-                // remove data receiver
+                // Unregister from dataTransferManager
                 dataTransferManager.removeDataReceiver(receiver);
 
-                // send message that all inconsistencies are resolved
+                // Send message to host that all inconsistencies are resolved
                 transmitter.sendFileChecksumErrorMessage(pathsOfHandledFiles,
                     true);
                 pathsOfHandledFiles.clear();
@@ -308,18 +307,24 @@ public class ConsistencyAction extends Action {
 
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
-                executeConsistencyHandling();
+                // TODO: move this business logic into new ConsistencyWatchdog
+                // class
+                pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(
+                    sessionManager.getSharedProject()
+                        .getConcurrentDocumentManager()
+                        .getPathsWithWrongChecksums());
+
+                if (executingChecksumErrorHandling) {
+                    log.warn("Restarting Checksum Error Handling"
+                        + " while another operation is running");
+                    // HACK If we programmed correctly this should not happen
+                    executingChecksumErrorHandling = false;
+                }
+
+                setChecksumErrorHandling(true);
+
             }
         });
     }
 
-    // TODO: move this business logic into new ConsistencyWatchdog class
-    public void executeConsistencyHandling() {
-        this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(
-            sessionManager.getSharedProject().getConcurrentDocumentManager()
-                .getPathsWithWrongChecksums());
-
-        setChecksumErrorHandling(true);
-
-    }
 }

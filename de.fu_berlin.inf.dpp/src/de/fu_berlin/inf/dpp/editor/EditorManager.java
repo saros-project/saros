@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.editor;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.filebuffers.FileBuffers;
@@ -142,8 +144,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             FileEditorInput fileEditorInput = (FileEditorInput) element;
             IFile file = fileEditorInput.getFile();
 
-            if (file.getProject() != EditorManager.this.sharedProject
-                .getProject()) {
+            if (file.getProject() != sharedProject.getProject()) {
                 return;
             }
 
@@ -180,8 +181,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         public void add(IEditorPart editorPart) {
 
-            IResource resource = EditorManager.this.editorAPI
-                .getEditorResource(editorPart);
+            IResource resource = editorAPI.getEditorResource(editorPart);
             if (resource == null) {
                 log.warn("Resource not found: " + editorPart.getTitle());
                 return;
@@ -207,7 +207,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             editorAPI.addSharedEditorListener(editorPart);
-            editorAPI.setEditable(editorPart, EditorManager.this.isDriver);
+            editorAPI.setEditable(editorPart, isDriver);
 
             IDocumentProvider documentProvider = getDocumentProvider(input);
             documentProvider.addElementStateListener(dirtyStateListener);
@@ -224,8 +224,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         public void remove(IEditorPart editorPart) {
-            IResource resource = EditorManager.this.editorAPI
-                .getEditorResource(editorPart);
+            IResource resource = editorAPI.getEditorResource(editorPart);
 
             if (resource == null) {
                 log.warn("Resource not found: " + editorPart.getTitle());
@@ -1198,6 +1197,56 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
+     * Save file denoted by the given project relative path if necessary
+     * according to isDirty(IPath) and call saveText(IPath) if necessary in the
+     * SWT thead.
+     * 
+     * @blocking This method returns after the file has been saved in the SWT
+     *           Thread.
+     * 
+     * @nonSWT This method is not intended to be called from SWT (but it should
+     *         be okay)
+     */
+    public void saveLazy(final IPath path) throws FileNotFoundException {
+        if (!isDirty(path)) {
+            return;
+        }
+
+        try {
+            Util.runSWTSync(log, new Callable<Object>() {
+                public Object call() throws Exception {
+                    saveText(path);
+                    return null;
+                }
+            });
+        } catch (Exception e) {
+            log.error("Unexpected exception: " + e);
+        }
+    }
+
+    /**
+     * Returns whether according to the DocumentProvider of this file, it has
+     * been modified.
+     * 
+     * @throws FileNotFoundException
+     *             if the file denoted by the path does not exist on disk.
+     * 
+     * 
+     */
+    public boolean isDirty(IPath path) throws FileNotFoundException {
+
+        IFile file = this.sharedProject.getProject().getFile(path);
+
+        if (file == null || !file.exists()) {
+            throw new FileNotFoundException("File not found: " + path);
+        }
+
+        FileEditorInput input = new FileEditorInput(file);
+
+        return getDocumentProvider(input).canSaveDocument(input);
+    }
+
+    /**
      * Programmatically saves the given editor IF and only if the file is
      * registered as a connected file.
      * 
@@ -1235,21 +1284,36 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         IDocumentProvider provider = getDocumentProvider(input);
 
-        if (!this.connectedFiles.contains(file)) {
-            /*
-             * Save not necessary, if we have no modified document If this
-             * warning is printed we must suspect an inconsistency...
-             * 
-             * This can occur when the ConvertLineDelimitersOperation is run
-             */
-            log
-                .warn("Saving not necessary (not connected): "
+        if (this.connectedFiles.contains(file)) {
+            if (provider.canSaveDocument(input)) {
+                // Everything okay! Provider and EditorManager agree
+            } else {
+                log.warn("File is not modified, but "
+                    + "EditorManager thinks it is: " + file.toString());
+            }
+        } else {
+            if (provider.canSaveDocument(input)) {
+                log.warn("File is modified, but "
+                    + "EditorManager does not know about it: "
                     + file.toString());
-            return;
+
+                connect(file);
+            } else {
+                /*
+                 * Saving is not necessary if we have no modified document. If
+                 * this warning is printed we must suspect an inconsistency...
+                 * 
+                 * This can occur when the ConvertLineDelimitersOperation is run
+                 */
+                log.warn("Saving not necessary (not connected): "
+                    + file.toString(), new StackTrace());
+                return;
+            }
         }
         boolean wasReadonly = FileUtil.setReadOnly(file, false);
 
         IDocument doc = provider.getDocument(input);
+
         IAnnotationModel model = provider.getAnnotationModel(input);
         model.connect(doc);
 
@@ -1280,8 +1344,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         dirtyStateListener.enabled = true;
 
         model.disconnect(doc);
-        provider.disconnect(input);
-        this.connectedFiles.remove(file);
+
+        if (this.connectedFiles.contains(file)) {
+            provider.disconnect(input);
+            this.connectedFiles.remove(file);
+        }
 
         // Reset readonly state
         if (wasReadonly)
@@ -1413,6 +1480,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         if ((Saros.getDefault() != null)
             && (Saros.getDefault().getSessionManager() != null)) {
             Saros.getDefault().getSessionManager().addSessionListener(this);
+        } else {
+            log.error("EditorManager could not be started!", new StackTrace());
         }
     }
 
