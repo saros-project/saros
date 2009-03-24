@@ -242,7 +242,35 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     public void resourceChanged(IResourceChangeEvent event) {
         try {
-            event.getDelta().accept(this.visitor);
+
+            switch (event.getType()) {
+
+            case IResourceChangeEvent.PRE_BUILD:
+            case IResourceChangeEvent.POST_BUILD:
+            case IResourceChangeEvent.POST_CHANGE:
+
+                IResourceDelta delta = event.getDelta();
+                if (delta != null)
+                    delta.accept(this.visitor);
+                else
+                    log
+                        .error("Unexpected empty delta in SharedResourcesManager: "
+                            + event);
+                break;
+            case IResourceChangeEvent.PRE_CLOSE:
+            case IResourceChangeEvent.PRE_DELETE:
+            case IResourceChangeEvent.PRE_REFRESH:
+
+                // TODO We should handle these as well (at least if the user
+                // deletes / refreshes our shared project)
+                break;
+
+            default:
+                // Because additional events might be added in the future
+                log.error("Unhandled case in in SharedResourcesManager: "
+                    + event);
+            }
+
         } catch (CoreException e) {
             log.error("Couldn't handle resource change.", e);
         }
