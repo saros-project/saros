@@ -55,24 +55,18 @@ public class RequestForActivityHandler extends RequestActivityExtension {
         List<TimedActivity> activities = sharedProject.getSequencer()
             .getActivityHistory(fromJID, timeStamp, andUp);
 
+        log.info(String.format(
+            "Received request for resending of timestamp%s %d%s.", andUp ? "s"
+                : "", timeStamp, andUp ? " (andup)" : ""));
+
         if (activities.size() > 0) {
             PacketExtension extension = new ActivitiesPacketExtension(
                 sessionManager.getSessionID(), activities);
 
             transmitter.sendMessage(fromJID, extension);
-        }
-
-        String info = String.format(
-            "Received request for resending of timestamp%s %d%s.", andUp ? "s"
-                : "", timeStamp, andUp ? " (andup)" : "");
-
-        if (activities.size() > 0) {
-            info += String.format(" I sent back %s activities.", activities
-                .size());
+            log.info("I sent back " + activities.size() + " activities.");
         } else {
-            info += String.format(" I did not find any matching activities.");
+            log.error("No matching activities found");
         }
-
-        log.info(info);
     }
 }
