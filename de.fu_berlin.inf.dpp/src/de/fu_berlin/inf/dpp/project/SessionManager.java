@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -192,7 +193,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
     }
 
-    public void onReconnect(int oldtimestamp) {
+    public void onReconnect(Map<JID, Integer> expectedSequenceNumbers) {
 
         SharedProject project = currentlySharedProject.getValue();
 
@@ -203,11 +204,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.transmitter.sendRemainingFiles();
         this.transmitter.sendRemainingMessages();
 
-        // ask for next expected timestamp activities (in case I missed
-        // something while being not available)
+        // ask for next expected activities (in case I missed something while
+        // being not available)
 
         // TODO this is currently disabled
-        this.transmitter.sendRequestForActivity(project, oldtimestamp, true);
+        this.transmitter.sendRequestForActivity(project,
+            expectedSequenceNumbers, true);
     }
 
     public void cancelIncomingInvitation() {

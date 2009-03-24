@@ -348,12 +348,16 @@ public class SharedProject implements ISharedProject {
                     // if i am missing activities for REQUEST_ACTIVITY_ON_AGE
                     // seconds, ask all (because I do not know the origin)
                     // to send it to me again.
+                    /*
+                     * TODO SharedProject.queuedsince is a "global" counter for
+                     * all other users but there is a queue for each user now.
+                     */
                     if (SharedProject.queuedsince >= SharedProject.REQUEST_ACTIVITY_ON_AGE) {
 
-                        SharedProject.this.transmitter
-                            .sendRequestForActivity(SharedProject.this,
-                                SharedProject.this.activitySequencer
-                                    .getTimestamp(), false);
+                        SharedProject.this.transmitter.sendRequestForActivity(
+                            SharedProject.this,
+                            SharedProject.this.activitySequencer
+                                .getExpectedSequenceNumbers(), false);
 
                         SharedProject.queuedsince = 0;
 

@@ -20,7 +20,9 @@
 package de.fu_berlin.inf.dpp;
 
 import java.awt.Toolkit;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
@@ -609,11 +611,11 @@ public class Saros extends AbstractUIPlugin {
                 Util.runSafeAsync(logger, new Runnable() {
                     public void run() {
 
-                        int inErrorSince = 0;
+                        Map<JID, Integer> expectedSequenceNumbers = Collections.EMPTY_MAP;
                         if (getSessionManager().getSharedProject() != null) {
-                            inErrorSince = getSessionManager()
+                            expectedSequenceNumbers = getSessionManager()
                                 .getSharedProject().getSequencer()
-                                .getTimestamp();
+                                .getExpectedSequenceNumbers();
                         }
 
                         while (!isConnected()) {
@@ -631,7 +633,8 @@ public class Saros extends AbstractUIPlugin {
                             }
                         }
 
-                        getSessionManager().onReconnect(inErrorSince);
+                        getSessionManager()
+                            .onReconnect(expectedSequenceNumbers);
                         setConnectionState(ConnectionState.CONNECTED, null);
                         logger.debug("XMPP reconnected");
                     }

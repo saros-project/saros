@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -101,7 +103,7 @@ public interface ISessionManager {
     public void connectionStateChanged(XMPPConnection connection,
         ConnectionState newState);
 
-    public void onReconnect(int oldtimestamp);
+    public void onReconnect(Map<JID, Integer> expectedSequenceNumbers);
 
     /**
      * Get the transmitter of the session.

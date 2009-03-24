@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Map.Entry;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -171,8 +172,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
 
         /**
-         * Create {@link TimedActivity}s for the given recipient and activities
-         * and add them to the history of activities for the recipient.
+         * @see ActivitySequencer#createTimedActivities(JID, List)
          */
         public List<TimedActivity> createTimedActivities(JID recipient,
             List<IActivity> activities) {
@@ -258,13 +258,34 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
             }
             return result;
         }
+
+        /**
+         * @see ActivitySequencer#getExpectedSequenceNumbers()
+         */
+        public Map<JID, Integer> getExpectedSequenceNumbers() {
+            HashMap<JID, Integer> result = new HashMap<JID, Integer>();
+            for (Entry<JID, ActivityQueue> entry : jid2queue.entrySet()) {
+                ActivityQueue queue = entry.getValue();
+                if (queue.queuedActivities.size() > 0) {
+                    result.put(entry.getKey(), queue.expectedSequenceNumber);
+                }
+            }
+            return result;
+        }
+
+        /**
+         * @see ActivitySequencer#getQueuedActivitiesSize()
+         */
+        public int size() {
+            int result = 0;
+            for (ActivityQueue queue : jid2queue.values()) {
+                result += queue.queuedActivities.size();
+            }
+            return result;
+        }
     }
 
     private final ActivityQueuesManager queues = new ActivityQueuesManager();
-
-    // TODO This value is not updated/maintained anymore. There is a timestamp
-    // per other user in this.queues instead.
-    private int timestamp = 0;
 
     private ConcurrentDocumentManager concurrentDocumentManager;
 
@@ -386,18 +407,22 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
     }
 
+    /**
+     * Create {@link TimedActivity}s for the given recipient and activities and
+     * add them to the history of activities for the recipient.
+     */
     List<TimedActivity> createTimedActivities(JID recipient,
         List<IActivity> activities) {
         return queues.createTimedActivities(recipient, activities);
     }
 
-    public int getTimestamp() {
-        return this.timestamp;
-    }
-
+    /**
+     * Return the total number of currently queued activities.
+     */
     public int getQueuedActivitiesSize() {
-        // TODO Return the number of activities stored in this.queues here.
-        return 0;
+        synchronized (queues) {
+            return queues.size();
+        }
     }
 
     /**
@@ -412,6 +437,14 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     public List<TimedActivity> getActivityHistory(JID user, int fromTimestamp,
         boolean andUp) {
         return queues.getHistory(user, fromTimestamp, andUp);
+    }
+
+    /**
+     * Get a {@link Map} that maps the {@link JID} of users with queued
+     * activities to the first missing sequence number.
+     */
+    public Map<JID, Integer> getExpectedSequenceNumbers() {
+        return queues.getExpectedSequenceNumbers();
     }
 
     /**

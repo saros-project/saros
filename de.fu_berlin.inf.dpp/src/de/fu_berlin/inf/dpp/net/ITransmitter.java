@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -211,7 +212,7 @@ public interface ITransmitter {
      *            requested too
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
-        int timestamp, boolean andup);
+        Map<JID, Integer> expectedSequenceNumbers, boolean andup);
 
     /* ---------- etc --------- */
 

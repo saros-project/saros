@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -318,10 +319,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendRequestForActivity(ISharedProject sharedProject,
-        int timestamp, boolean andup) {
-
-        log.info("Requesting old activity (timestamp=" + timestamp + ", "
-            + andup + ") from all...");
+        Map<JID, Integer> expectedSequenceNumbers, boolean andup) {
 
         // TODO this method is currently not used. Probably they interfere with
         // Jupiter
@@ -333,9 +331,14 @@ public class XMPPChatTransmitter implements ITransmitter,
             return;
         }
 
-        sendMessageToAll(sharedProject, RequestActivityExtension.getDefault()
-            .create(timestamp, andup));
-
+        for (Entry<JID, Integer> entry : expectedSequenceNumbers.entrySet()) {
+            JID recipient = entry.getKey();
+            int expectedSequenceNumber = entry.getValue();
+            log.info("Requesting old activity (sequence number="
+                + expectedSequenceNumber + "," + andup + ") from " + recipient);
+            sendMessage(recipient, RequestActivityExtension.getDefault()
+                .create(expectedSequenceNumber, andup));
+        }
     }
 
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
