@@ -403,7 +403,6 @@ public class SharedProject implements ISharedProject {
         this.flushTimer.cancel();
         this.requestTransmitter.interrupt();
         stopped = true;
-        this.activitySequencer.clearQueues();
     }
 
     /*

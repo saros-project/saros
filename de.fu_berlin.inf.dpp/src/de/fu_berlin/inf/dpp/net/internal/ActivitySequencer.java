@@ -78,23 +78,32 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         private static final int UNKNOWN_NUMBER = -1;
 
         /** Sequence number this user sends next. */
-        private int nextSequenceNumber;
+        private int nextSequenceNumber = 0;
 
         /** Sequence number expected from the next activity. */
-        private int expectedSequenceNumber;
+        private int expectedSequenceNumber = UNKNOWN_NUMBER;
 
-        private PriorityQueue<TimedActivity> queuedActivities;
+        /** Queue of activities received. */
+        private PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
 
-        public ActivityQueue() {
-            this.nextSequenceNumber = 0;
-            this.expectedSequenceNumber = UNKNOWN_NUMBER;
-            this.queuedActivities = new PriorityQueue<TimedActivity>();
+        /** History of activities sent */
+        private List<TimedActivity> history = new LinkedList<TimedActivity>();
+
+        /**
+         * Create a {@link TimedActivity} and add it to the history of created
+         * activities.
+         */
+        public TimedActivity createTimedActivity(IActivity activity) {
+
+            TimedActivity result = new TimedActivity(activity,
+                nextSequenceNumber++);
+            history.add(result);
+            return result;
         }
 
-        public int nextSequenceNumber() {
-            return this.nextSequenceNumber++;
-        }
-
+        /**
+         * Add a received activity to the priority queue.
+         */
         public void add(TimedActivity activity) {
             if (expectedSequenceNumber == UNKNOWN_NUMBER) {
                 expectedSequenceNumber = activity.getTimestamp();
@@ -162,9 +171,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
 
         /**
-         * @param recipient
-         * @param activities
-         * @return {@link TimedActivity}s for given recipient and activities.
+         * Create {@link TimedActivity}s for the given recipient and activities
+         * and add them to the history of activities for the recipient.
          */
         public List<TimedActivity> createTimedActivities(JID recipient,
             List<IActivity> activities) {
@@ -173,15 +181,14 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 activities.size());
             ActivityQueue queue = getActivityQueue(recipient);
             for (IActivity activity : activities) {
-                result.add(new TimedActivity(activity, queue
-                    .nextSequenceNumber()));
+                result.add(queue.createTimedActivity(activity));
             }
             return result;
         }
 
         /**
-         * Adds a {@link TimedActivity}. There must be a source set on the
-         * activity.
+         * Adds a received {@link TimedActivity}. There must be a source set on
+         * the activity.
          * 
          * @param timedActivity
          *            to add to the qeues.
@@ -221,13 +228,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
 
         /**
-         * Clear all queues.
-         */
-        public void clear() {
-            jid2queue.clear();
-        }
-
-        /**
          * @return all activities that can be executed. If there are none, an
          *         empty List is returned.
          */
@@ -241,12 +241,26 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
             }
             return result;
         }
+
+        /**
+         * @see ActivitySequencer#getActivityHistory(JID, int, boolean)
+         */
+        public List<TimedActivity> getHistory(JID user, int fromTimestamp,
+            boolean andUp) {
+            LinkedList<TimedActivity> result = new LinkedList<TimedActivity>();
+            for (TimedActivity activity : getActivityQueue(user).history) {
+                if (activity.getTimestamp() >= fromTimestamp) {
+                    result.add(activity);
+                    if (!andUp) {
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
     }
 
     private final ActivityQueuesManager queues = new ActivityQueuesManager();
-
-    // TODO Record one history per receiver.
-    private final List<TimedActivity> activityHistory = new LinkedList<TimedActivity>();
 
     // TODO This value is not updated/maintained anymore. There is a timestamp
     // per other user in this.queues instead.
@@ -381,10 +395,18 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         return 0;
     }
 
-    // TODO Do not let this internal field leave the instance but add methods to
-    // add activities and query the history.
-    public List<TimedActivity> getActivityHistory() {
-        return this.activityHistory;
+    /**
+     * Get the activity history for given user and given timestamp.
+     * 
+     * If andUp is <code>true</code> all activities that are equal or greater
+     * than the timestamp are returned, otherwise just the activity that matches
+     * the timestamp exactly.
+     * 
+     * If no activity matches the criteria an empty list is returned.
+     */
+    public List<TimedActivity> getActivityHistory(JID user, int fromTimestamp,
+        boolean andUp) {
+        return queues.getHistory(user, fromTimestamp, andUp);
     }
 
     /**
@@ -503,37 +525,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     }
 
     /**
-     * Given a List of TimedActivities it will either return the Activity for
-     * the given timestamp (andup == false) or all activities that have a
-     * timestamp < than the given (andup == true).
-     * 
-     * If not Activities can be found an empty list is returned.
-     */
-    public static List<TimedActivity> filterActivityHistory(
-        List<TimedActivity> toFilter, int timestamp, boolean andup) {
-
-        List<TimedActivity> result = new LinkedList<TimedActivity>();
-
-        if (andup) {
-            for (TimedActivity tact : toFilter) {
-                if (tact.getTimestamp() >= timestamp) {
-                    result.add(tact);
-                }
-            }
-        } else {
-            for (TimedActivity tact : toFilter) {
-                if (tact.getTimestamp() == timestamp) {
-                    result.add(tact);
-                    // Found the one we were looking for
-                    return result;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    /**
      * Removes queued activities from given user.
      * 
      * @param jid
@@ -541,12 +532,5 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      */
     public void userLeft(JID jid) {
         queues.removeQueue(jid);
-    }
-
-    /**
-     * Clears all queued activities.
-     */
-    public void clearQueues() {
-        queues.clear();
     }
 }

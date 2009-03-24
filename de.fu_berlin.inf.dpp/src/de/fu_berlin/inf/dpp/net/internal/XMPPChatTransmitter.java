@@ -368,8 +368,6 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendActivities(ISharedProject sharedProject,
         ActivitySequencer sequencer, List<IActivity> activities) {
 
-        // TODO Add sent activities to histories.
-
         // Set sender of TextEditActivity's and source if it is not set yet.
         for (IActivity activity : activities) {
             if (activity instanceof TextEditActivity) {

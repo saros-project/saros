@@ -15,11 +15,11 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
+import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 public class RequestForActivityHandler extends RequestActivityExtension {
@@ -44,24 +44,20 @@ public class RequestForActivityHandler extends RequestActivityExtension {
     public void requestForResendingActivitiesReceived(JID fromJID,
         int timeStamp, boolean andUp) {
 
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+        ISharedProject sharedProject = sessionManager.getSharedProject();
 
-        if (project == null || project.getParticipant(fromJID) == null) {
+        if (sharedProject == null
+            || sharedProject.getParticipant(fromJID) == null) {
             return;
         }
 
-        // TODO This should be a done in a method on ActivitySequencer instead
-        // of here.
-        List<TimedActivity> tempActivities = ActivitySequencer
-            .filterActivityHistory(Saros.getDefault().getSessionManager()
-                .getSharedProject().getSequencer().getActivityHistory(),
-                timeStamp, andUp);
+        List<TimedActivity> activities = sharedProject.getSequencer()
+            .getActivityHistory(fromJID, timeStamp, andUp);
 
-        if (tempActivities.size() > 0) {
-            PacketExtension extension = new ActivitiesPacketExtension(Saros
-                .getDefault().getSessionManager().getSessionID(),
-                tempActivities);
+        if (activities.size() > 0) {
+            PacketExtension extension = new ActivitiesPacketExtension(
+                sessionManager.getSessionID(), activities);
 
             transmitter.sendMessage(fromJID, extension);
         }
@@ -70,8 +66,8 @@ public class RequestForActivityHandler extends RequestActivityExtension {
             "Received request for resending of timestamp%s %d%s.", andUp ? "s"
                 : "", timeStamp, andUp ? " (andup)" : "");
 
-        if (tempActivities.size() > 0) {
-            info += String.format(" I sent back %s activities.", tempActivities
+        if (activities.size() > 0) {
+            info += String.format(" I sent back %s activities.", activities
                 .size());
         } else {
             info += String.format(" I did not find any matching activities.");
