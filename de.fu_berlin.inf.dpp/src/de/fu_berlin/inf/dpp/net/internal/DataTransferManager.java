@@ -472,8 +472,13 @@ public class DataTransferManager implements ConnectionSessionListener {
      * The receiver should return true if it has consumed the given data.
      * 
      * @param dataReceiver
+     *            If the given receiver already exists, it is removed and put to
+     *            the front of the receivers list.
      */
     public void addDataReceiver(IDataReceiver receiver) {
+        if (receivers.contains(receiver))
+            receivers.remove(receiver);
+
         receivers.add(0, receiver);
     }
 
