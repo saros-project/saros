@@ -36,6 +36,10 @@ import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
+/**
+ * TODO This UI Class knows too much about the business logic of running a
+ * consistency check
+ */
 public class ConsistencyAction extends Action {
 
     private static Logger log = Logger.getLogger(ConsistencyAction.class);
@@ -89,7 +93,7 @@ public class ConsistencyAction extends Action {
             });
     }
 
-    // TODO Name is to genereric.
+    // TODO Name is to generic
     ObservableValue<Boolean> proxy;
 
     ValueChangeListener<Boolean> listener = new ValueChangeListener<Boolean>() {
@@ -252,6 +256,11 @@ public class ConsistencyAction extends Action {
                     DataTransferManager.class).addDataReceiver(receiver);
 
                 for (final IPath path : pathsOfHandledFiles) {
+
+                    /*
+                     * TODO Saving editors is not enough, might restore files
+                     * which are changed in the background!
+                     */
                     // Save document
                     for (IEditorPart editor : EditorManager.getDefault()
                         .getEditors(path)) {

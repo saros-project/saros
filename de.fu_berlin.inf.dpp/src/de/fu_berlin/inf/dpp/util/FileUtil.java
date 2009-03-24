@@ -73,6 +73,8 @@ public class FileUtil {
         ResourceAttributes attributes = file.getResourceAttributes();
         if (attributes == null) {
             // TODO: Throw an FileNotFoundException and deal with it everywhere!
+            log.warn("File does not exist for setting readonly == " + readonly
+                + ": " + file);
             return false;
         }
         boolean result = attributes.isReadOnly();
@@ -81,6 +83,8 @@ public class FileUtil {
             file.setResourceAttributes(attributes);
         } catch (CoreException e) {
             // failure is not an option
+            log.warn("Failed to set resource readonly == " + readonly + ": "
+                + file);
         }
         return result;
     }

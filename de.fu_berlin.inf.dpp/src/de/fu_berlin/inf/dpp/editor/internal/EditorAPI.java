@@ -645,7 +645,7 @@ public class EditorAPI implements IEditorAPI {
             }
         });
 
-        // Wait for saving to be done
+        // Wait for saving or canceling to be done
         try {
             monitor.await();
         } catch (InterruptedException e) {

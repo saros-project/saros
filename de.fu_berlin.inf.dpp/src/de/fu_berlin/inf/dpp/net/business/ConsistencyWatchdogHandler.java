@@ -73,6 +73,10 @@ public class ConsistencyWatchdogHandler {
             final boolean wasReadOnly = FileUtil.setReadOnly(project
                 .getProject().getFile(path), false);
 
+            /*
+             * TODO This only checks for the file being opened in an editor, but
+             * it might be open in the background with changes!
+             */
             Set<IEditorPart> editors = EditorManager.getDefault().getEditors(
                 path);
             if (editors != null && editors.size() > 0) {
