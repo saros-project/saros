@@ -1198,7 +1198,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * Programmatically saves the given editor.
+     * Programmatically saves the given editor IF and only if the file is
+     * registered as a connected file.
      * 
      * Calling this method will trigger a call to all registered
      * SharedEditorListeners (independent of the success of this method) BEFORE
@@ -1265,11 +1266,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // Wait for saving to be done
         try {
-            if (!monitor.await(5)) {
+            if (!monitor.await(10)) {
                 log.warn("Timeout expired on saving document: " + path);
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+
+        if (monitor.isCanceled()) {
+            log.warn("Saving was canceled by user: " + path);
         }
 
         dirtyStateListener.enabled = true;

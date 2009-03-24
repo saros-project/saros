@@ -310,6 +310,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+
+            if (monitor.isCanceled()) {
+                log.warn("Removing file failed: " + file);
+            }
         }
     }
 
@@ -325,6 +329,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            if (monitor.isCanceled()) {
+                log.warn("Creating folder failed: " + folder);
+            }
         } else if (activity.getType() == FolderActivity.Type.Removed) {
             folder.delete(true, monitor);
             try {
@@ -332,7 +339,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
+            if (monitor.isCanceled()) {
+                log.warn("Deleting folder failed: " + folder);
+            }
         }
+
     }
 
     private FileActivity parseFile(XmlPullParser parser)
