@@ -244,22 +244,26 @@ public class SharedProject implements ISharedProject {
     }
 
     public void removeUser(User user) {
-        if (this.participants.remove(user.getJID()) == null) {
-            log.warn("Tried to remove user who was not in participants: "
-                + user.getJID());
+        JID jid = user.getJID();
+        if (this.participants.remove(jid) == null) {
+            log
+                .warn("Tried to remove user who was not in participants: "
+                    + jid);
             return;
         }
         if (isHost()) {
             returnColor(user.getColorID());
         }
 
+        this.activitySequencer.userLeft(jid);
+
         // TODO what is to do here if no driver exists anymore?
 
         for (ISharedProjectListener listener : this.listeners) {
-            listener.userLeft(user.getJID());
+            listener.userLeft(jid);
         }
 
-        SharedProject.log.info("User " + user.getJID() + " left session");
+        SharedProject.log.info("User " + jid + " left session");
     }
 
     /*
@@ -399,6 +403,7 @@ public class SharedProject implements ISharedProject {
         this.flushTimer.cancel();
         this.requestTransmitter.interrupt();
         stopped = true;
+        this.activitySequencer.clearQueues();
     }
 
     /*

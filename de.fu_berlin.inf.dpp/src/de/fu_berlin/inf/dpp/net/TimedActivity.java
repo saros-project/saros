@@ -7,7 +7,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  * 
  * @author rdjemili
  */
-public class TimedActivity {
+public class TimedActivity implements Comparable<TimedActivity> {
 
     private final IActivity activity;
 
@@ -80,5 +80,12 @@ public class TimedActivity {
         TimedActivity other = (TimedActivity) obj;
         return other.activity.equals(this.activity)
             && (other.timestamp == this.timestamp);
+    }
+
+    public int compareTo(TimedActivity other) {
+        if (other == null) {
+            throw new NullPointerException();
+        }
+        return this.timestamp - other.timestamp;
     }
 }
