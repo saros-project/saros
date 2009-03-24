@@ -18,6 +18,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.picocontainer.annotations.Inject;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
@@ -26,11 +27,13 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -48,49 +51,60 @@ public class ConsistencyAction extends Action {
 
     protected Set<IPath> pathsOfHandledFiles;
 
+    @Inject
+    SessionManager sessionManager;
+
+    @Inject
+    DataTransferManager dataTransferManager;
+
+    @Inject
+    ITransmitter transmitter;
+
+    ISharedProject sharedProject;
+
     public ConsistencyAction() {
         setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setToolTipText("No inconsistencies");
 
-        // add ConsistencyListener if already in a session
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
-        if (project != null) {
-            this.proxy = project.getConcurrentDocumentManager()
+        Saros.getDefault().reinject(this);
+
+        sessionManager.addSessionListener(new AbstractSessionListener() {
+            @Override
+            public void sessionStarted(ISharedProject session) {
+                setSharedProject(session);
+            }
+
+            @Override
+            public void sessionEnded(ISharedProject session) {
+                setSharedProject(null);
+            }
+        });
+
+        setSharedProject(sessionManager.getSharedProject());
+    }
+
+    private void setSharedProject(ISharedProject newSharedProject) {
+
+        // Unregister from previous project
+        if (sharedProject != null) {
+            this.pathsOfHandledFiles.clear();
+            this.proxy.remove(listener);
+            this.proxy = null;
+        }
+
+        sharedProject = newSharedProject;
+
+        // Register to new project
+        if (sharedProject != null) {
+            this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>();
+            this.proxy = sharedProject.getConcurrentDocumentManager()
                 .getConsistencyToResolve();
             proxy.addAndNotify(listener);
-        } else
+        } else {
             setEnabled(false);
+        }
 
-        Saros.getDefault().getSessionManager().addSessionListener(
-            new AbstractSessionListener() {
-                @Override
-                public void sessionStarted(ISharedProject session) {
-
-                    pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>();
-                    if (proxy != null) {
-                        proxy.remove(listener);
-                    }
-
-                    proxy = session.getConcurrentDocumentManager()
-                        .getConsistencyToResolve();
-                    proxy.add(listener);
-                }
-
-                @Override
-                public void sessionEnded(ISharedProject session) {
-
-                    if (pathsOfHandledFiles != null) {
-                        pathsOfHandledFiles.clear();
-                    }
-
-                    if (proxy != null) {
-                        proxy.remove(listener);
-                        proxy = null;
-                    }
-                }
-            });
     }
 
     // TODO Name is to generic
@@ -167,8 +181,7 @@ public class ConsistencyAction extends Action {
             log.debug("Received consistency file [" + from.getName() + "] "
                 + path.toString());
 
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
+            ISharedProject project = sessionManager.getSharedProject();
 
             // Project might have ended in between
             if (project == null)
@@ -252,8 +265,7 @@ public class ConsistencyAction extends Action {
             if (newState) {
 
                 // add data receiver
-                Saros.getDefault().getContainer().getComponent(
-                    DataTransferManager.class).addDataReceiver(receiver);
+                dataTransferManager.addDataReceiver(receiver);
 
                 for (final IPath path : pathsOfHandledFiles) {
 
@@ -272,18 +284,17 @@ public class ConsistencyAction extends Action {
                 }
 
                 // Send checksumErrorMessage to Host
-                Saros.getDefault().getSessionManager().getTransmitter()
-                    .sendFileChecksumErrorMessage(pathsOfHandledFiles, false);
+                transmitter.sendFileChecksumErrorMessage(pathsOfHandledFiles,
+                    false);
 
             } else {
 
                 // remove data receiver
-                Saros.getDefault().getContainer().getComponent(
-                    DataTransferManager.class).removeDataReceiver(receiver);
+                dataTransferManager.removeDataReceiver(receiver);
 
                 // send message that all inconsistencies are resolved
-                Saros.getDefault().getSessionManager().getTransmitter()
-                    .sendFileChecksumErrorMessage(pathsOfHandledFiles, true);
+                transmitter.sendFileChecksumErrorMessage(pathsOfHandledFiles,
+                    true);
                 pathsOfHandledFiles.clear();
             }
         }
@@ -304,9 +315,9 @@ public class ConsistencyAction extends Action {
 
     // TODO: move this business logic into new ConsistencyWatchdog class
     public void executeConsistencyHandling() {
-        this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(Saros
-            .getDefault().getSessionManager().getSharedProject()
-            .getConcurrentDocumentManager().getPathsWithWrongChecksums());
+        this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(
+            sessionManager.getSharedProject().getConcurrentDocumentManager()
+                .getPathsWithWrongChecksums());
 
         setChecksumErrorHandling(true);
 
