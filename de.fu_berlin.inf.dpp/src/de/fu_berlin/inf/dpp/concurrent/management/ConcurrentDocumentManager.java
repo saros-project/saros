@@ -831,6 +831,10 @@ public class ConcurrentDocumentManager {
         return this.inconsistencyToResolve;
     }
 
+    /**
+     * Returns the set of files for which the ConsistencyWatchdog has identified
+     * an inconsistency (this is a subset of the files managed by Jupiter)
+     */
     public Set<IPath> getPathsWithWrongChecksums() {
         return this.pathsWithWrongChecksums;
     }
