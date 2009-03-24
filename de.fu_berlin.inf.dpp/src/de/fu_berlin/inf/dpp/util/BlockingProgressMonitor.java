@@ -18,6 +18,14 @@ public class BlockingProgressMonitor extends NullProgressMonitor {
         this.latch.countDown();
     }
 
+    @Override
+    public void setCanceled(boolean cancelled) {
+        super.setCanceled(cancelled);
+        if (cancelled) {
+            this.latch.countDown();
+        }
+    }
+
     public void await() throws InterruptedException {
         this.latch.await();
     }
