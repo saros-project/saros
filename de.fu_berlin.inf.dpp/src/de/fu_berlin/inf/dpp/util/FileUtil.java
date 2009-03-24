@@ -13,8 +13,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 
-import de.fu_berlin.inf.dpp.Saros;
-
 /**
  * This class contains static utility methods for file handling.
  * 
@@ -92,13 +90,21 @@ public class FileUtil {
     /**
      * Writes the given input stream to the given file.
      * 
+     * This operation will unset a possible readOnly flag and reset if after the
+     * operation.
+     * 
      * @param input
      *            the input stream
      * @param file
      *            the file to create/overwrite
      */
     public static void writeFile(InputStream input, IFile file) {
-        setReadOnly(file, false);
+
+        boolean wasReadOnly = false;
+        if (file.isReadOnly()) {
+            wasReadOnly = true;
+            setReadOnly(file, false);
+        }
 
         try {
             BlockingProgressMonitor monitor = new BlockingProgressMonitor();
@@ -116,8 +122,8 @@ public class FileUtil {
             log.error("Could not write file", e);
         }
 
-        setReadOnly(file, !Saros.getDefault().getSessionManager()
-            .getSharedProject().isDriver());
+        if (wasReadOnly)
+            setReadOnly(file, wasReadOnly);
     }
 
 }
