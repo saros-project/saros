@@ -34,17 +34,11 @@ import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -55,6 +49,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -429,26 +424,21 @@ public class SharedProject implements ISharedProject {
 
     public void startInvitation(final @Nullable List<JID> toInvite) {
 
-        Shell shell = Display.getDefault().getActiveShell();
-
-        if (searchUnsavedChangesInProject(getProject(), false)) {
-            if (MessageDialog
-                .openQuestion(
-                    shell,
-                    "Unsaved file modifications",
-                    "Before inviting users and therefore synchronizing files, "
-                        + "this project needs to be saved to disk. "
-                        + "Do you want to save all unsaved files of this project now?")) {
-
-                searchUnsavedChangesInProject(getProject(), true);
-            } else {
-                return;
-            }
-        }
-
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                Shell shell = Display.getDefault().getActiveShell();
+
+                /*
+                 * TODO Since we are going to invite people, we need to stop
+                 * changing the project
+                 */
+                if (!EditorAPI.saveProject(getProject())) {
+                    log.info("User canceled starting an invitation (as host)");
+                    return;
+                }
+
+                // Open InvitationDialog centered on the ActiveWorkbenchWindow
+                Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
+
                 // TODO check if anybody is online, empty dialog feels
                 // strange
                 Window iw = new InvitationDialog(shell, toInvite);
@@ -456,64 +446,6 @@ public class SharedProject implements ISharedProject {
             }
         });
 
-    }
-
-    public static boolean searchUnsavedChangesInProject(IProject project,
-        boolean save) {
-
-        /*
-         * FIXME Computing a FileList is too expensive because of checksums!
-         * 
-         * https://sourceforge.net/tracker2/?func=detail&aid=2668025&group_id
-         * =167540&atid=843359
-         */
-
-        FileList flist = null;
-        try {
-            flist = new FileList(project);
-        } catch (CoreException e) {
-            log.error("Could not create filelist: ", e);
-            return false;
-        }
-
-        try {
-            IWorkbenchWindow[] wbWindows = PlatformUI.getWorkbench()
-                .getWorkbenchWindows();
-            for (IWorkbenchWindow window : wbWindows) {
-                IWorkbenchPage activePage = window.getActivePage();
-                IEditorReference[] editorRefs = activePage
-                    .getEditorReferences();
-                for (IEditorReference editorRef : editorRefs) {
-                    if (editorRef.isDirty()
-                        && (editorRef.getEditorInput() instanceof IFileEditorInput)) {
-
-                        IPath fp = ((IFileEditorInput) editorRef
-                            .getEditorInput()).getFile()
-                            .getProjectRelativePath();
-
-                        // is that dirty file in my project?
-                        if (flist.getPaths().contains(fp)) {
-                            if (save) {
-                                /*
-                                 * FIXME doSave is a non-blocking method, we
-                                 * might get a race condition here.
-                                 * 
-                                 * Have a look at ConsistencyWatchDog how it
-                                 * needs to be done!
-                                 */
-                                editorRef.getEditor(false).doSave(null);
-                            } else {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (CoreException e) {
-            log.error("Could not save/check for files to save: ", e);
-        }
-
-        return false;
     }
 
     public void setProjectReadonly(final boolean readonly) {

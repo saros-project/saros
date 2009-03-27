@@ -42,10 +42,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -153,6 +153,14 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         try {
             assertState(State.HOST_FILELIST_SENT);
 
+            // If a base project is given, save it
+            if (baseProject != null) {
+                if (!EditorAPI.saveProject(baseProject)) {
+                    // User canceled saving the source project
+                    cancel(null, false);
+                    return;
+                }
+            }
             if (newProjectName != null) {
 
                 try {
@@ -340,6 +348,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
         final IProject project = workspaceRoot.getProject(newProjectName);
 
+        // TODO Why do some string magic here?
         final File projectDir = new File(workspaceRoot.getLocation().toString()
             + File.separator + newProjectName);
 
@@ -348,14 +357,15 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 "Project " + newProjectName + " already exists!"));
         }
 
-        ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
+            .getAWorkbenchWindow().getShell());
 
         try {
             dialog.run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
+
                         SubMonitor subMonitor = SubMonitor.convert(monitor,
                             "Copy local resources ... ", 200);
 

@@ -9,7 +9,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -21,6 +20,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -170,7 +170,7 @@ public class ConsistencyWatchdogHandler {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     MessageDialog md = new MessageDialog(
-                        Display.getDefault().getActiveShell(),
+                        EditorAPI.getAWorkbenchWindow().getShell(),
                         "Consistency Problem!",
                         null,
                         "Inconsitent file state has detected. File "
