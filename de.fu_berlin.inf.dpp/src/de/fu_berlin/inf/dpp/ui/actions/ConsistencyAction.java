@@ -116,10 +116,10 @@ public class ConsistencyAction extends Action {
             ConsistencyAction.this.setEnabled(newValue);
 
             if (newValue) {
-                final Set<IPath> paths = new CopyOnWriteArraySet<IPath>(Saros
-                    .getDefault().getSessionManager().getSharedProject()
-                    .getConcurrentDocumentManager()
-                    .getPathsWithWrongChecksums());
+                final Set<IPath> paths = new CopyOnWriteArraySet<IPath>(
+                    sessionManager.getSharedProject()
+                        .getConcurrentDocumentManager()
+                        .getPathsWithWrongChecksums());
 
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {

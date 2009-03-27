@@ -70,8 +70,8 @@ public class NewSessionAction implements IObjectActionDelegate {
 
     public void runNewSession() {
         try {
-            ISessionManager sm = Saros.getDefault().getSessionManager();
-            sm.startSession(this.selectedProject);
+            Saros.getDefault().getSessionManager().startSession(
+                this.selectedProject);
         } catch (final XMPPException e) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {

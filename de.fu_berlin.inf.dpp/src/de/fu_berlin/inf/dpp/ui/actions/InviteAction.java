@@ -30,9 +30,8 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -56,19 +55,13 @@ public class InviteAction extends SelectionProviderAction {
             .getImageDescriptor("icons/transmit_blue.png"));
 
         Saros.getDefault().getSessionManager().addSessionListener(
-            new ISessionListener() {
+            new AbstractSessionListener() {
                 public void sessionStarted(ISharedProject sharedProject) {
                     updateEnablement();
                 }
 
                 public void sessionEnded(ISharedProject sharedProject) {
                     updateEnablement();
-                }
-
-                public void invitationReceived(
-                    IIncomingInvitationProcess process) {
-                    // does not affect us (because we are not host if we receive
-                    // an invitation)
                 }
             });
 
