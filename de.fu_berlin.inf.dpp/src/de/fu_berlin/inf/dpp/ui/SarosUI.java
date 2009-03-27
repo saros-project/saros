@@ -39,6 +39,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
@@ -91,7 +92,8 @@ public class SarosUI implements ISessionListener {
     public void invitationReceived(final IIncomingInvitationProcess process) {
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                Shell shell = Display.getDefault().getActiveShell();
+
+                Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
                 JoinSessionWizard jsw = new JoinSessionWizard(process);
                 WizardDialogAccessable wd = new WizardDialogAccessable(shell,
                     jsw);
