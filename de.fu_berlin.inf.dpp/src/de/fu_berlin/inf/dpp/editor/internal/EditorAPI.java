@@ -7,9 +7,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -636,6 +638,9 @@ public class EditorAPI implements IEditorAPI {
      */
     public static boolean saveEditor(final IEditorPart editor) {
 
+        if (editor == null)
+            return true;
+
         final BlockingProgressMonitor monitor = new BlockingProgressMonitor();
 
         // save document
@@ -685,5 +690,47 @@ public class EditorAPI implements IEditorAPI {
 
     private static IWorkbenchWindow[] getWindows() {
         return PlatformUI.getWorkbench().getWorkbenchWindows();
+    }
+
+    /**
+     * Saves the given project and returns true if the operation was successful
+     * or false if the user canceled.
+     * 
+     * TODO Tell the user why we do want to save!
+     */
+    public static boolean saveProject(final IProject projectToSave) {
+        try {
+            return Util.runSWTSync(log, new Callable<Boolean>() {
+                public Boolean call() throws Exception {
+                    /**
+                     * TODO saveAllEditors does not save the Documents that we
+                     * are modifying in the background
+                     */
+                    return IDE.saveAllEditors(
+                        new IResource[] { projectToSave }, true);
+                }
+            });
+        } catch (Exception e) {
+            // The operation does not throw an exception, thus this is an error.
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static IWorkbenchWindow getAWorkbenchWindow() {
+
+        IWorkbenchWindow w = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+
+        if (w != null) {
+            return w;
+        }
+
+        IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
+            .getWorkbenchWindows();
+        if (windows.length > 0) {
+            return windows[0];
+        } else {
+            return null;
+        }
     }
 }
