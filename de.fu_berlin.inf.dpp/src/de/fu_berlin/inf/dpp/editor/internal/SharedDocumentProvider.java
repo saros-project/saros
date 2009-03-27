@@ -83,6 +83,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     @Override
     public boolean canSaveDocument(Object element) {
+        // TODO this is probably wrong
         if (!isInSharedProject(element)) {
             return super.canSaveDocument(element);
         }
@@ -92,6 +93,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     @Override
     public boolean mustSaveDocument(Object element) {
+        // TODO this is probably wrong
         if (!isInSharedProject(element)) {
             return super.mustSaveDocument(element);
         }
