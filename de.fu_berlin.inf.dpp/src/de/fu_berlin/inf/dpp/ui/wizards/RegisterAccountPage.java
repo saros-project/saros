@@ -24,7 +24,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -32,6 +31,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
@@ -133,8 +133,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             try {
-                                Shell shell = Display.getDefault()
-                                    .getActiveShell();
+                                Shell shell = EditorAPI.getShell();
 
                                 CreateAccountWizard wizard = new CreateAccountWizard(
                                     true, false, false);

@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
@@ -32,6 +31,7 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class DeleteContactAction extends SelectionProviderAction {
@@ -76,7 +76,7 @@ public class DeleteContactAction extends SelectionProviderAction {
 
     public void runDeleteAction() {
 
-        Shell shell = Display.getDefault().getActiveShell();
+        Shell shell = EditorAPI.getShell();
         if ((shell == null) || (this.rosterEntry == null)) {
             return;
         }

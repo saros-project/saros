@@ -4,7 +4,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
@@ -12,6 +11,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.ui.IRosterTree;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -124,9 +124,9 @@ public class SubscriptionListener implements PacketListener {
         final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                result.set(MessageDialog.openConfirm(Display.getDefault()
-                    .getActiveShell(), "Request of subscription received",
-                    "The User " + from + " has requested subscription."));
+                result.set(MessageDialog.openConfirm(EditorAPI.getShell(),
+                    "Request of subscription received", "The User " + from
+                        + " has requested subscription."));
             }
         });
         return result.get();
@@ -137,7 +137,7 @@ public class SubscriptionListener implements PacketListener {
             public void run() {
                 MessageDialog
                     .openInformation(
-                        Display.getDefault().getActiveShell(),
+                        EditorAPI.getShell(),
                         "Removal of subscription",
                         "User "
                             + from

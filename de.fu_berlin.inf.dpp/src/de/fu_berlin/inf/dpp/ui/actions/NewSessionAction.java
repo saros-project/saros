@@ -28,12 +28,12 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -75,8 +75,7 @@ public class NewSessionAction implements IObjectActionDelegate {
         } catch (final XMPPException e) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    ErrorDialog.openError(
-                        Display.getDefault().getActiveShell(),
+                    ErrorDialog.openError(EditorAPI.getShell(),
                         "Error Starting Session",
                         "Session could not be started", new Status(
                             IStatus.ERROR, "de.fu_berlin.inf.dpp",

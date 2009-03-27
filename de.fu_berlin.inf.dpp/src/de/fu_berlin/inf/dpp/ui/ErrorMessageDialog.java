@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.ui;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.widgets.Display;
 
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -26,8 +26,8 @@ public class ErrorMessageDialog {
     public static void showErrorMessage(final Exception exception) {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                MessageDialog.openError(Display.getDefault().getActiveShell(),
-                    exception.toString(), exception.getMessage());
+                MessageDialog.openError(EditorAPI.getShell(), exception
+                    .toString(), exception.getMessage());
             }
         });
     }
@@ -41,11 +41,11 @@ public class ErrorMessageDialog {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 if ((exceptionMessage == null) || exceptionMessage.equals("")) {
-                    MessageDialog.openError(Display.getDefault()
-                        .getActiveShell(), "Exception", "Error occured.");
+                    MessageDialog.openError(EditorAPI.getShell(), "Exception",
+                        "Error occured.");
                 } else {
-                    MessageDialog.openError(Display.getDefault()
-                        .getActiveShell(), "Exception", exceptionMessage);
+                    MessageDialog.openError(EditorAPI.getShell(), "Exception",
+                        exceptionMessage);
                 }
             }
 

@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -40,8 +40,8 @@ public class JoinSessionWizardUtils {
              * FIXME InvocationTargetException and Interrupted Exceptions are
              * incorrectly handled
              */
-            ProgressMonitorDialog dialog = new ProgressMonitorDialog(Display
-                .getDefault().getActiveShell());
+            ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
+                .getShell());
             try {
                 dialog.run(true, false, new IRunnableWithProgress() {
                     public void run(IProgressMonitor monitor) {

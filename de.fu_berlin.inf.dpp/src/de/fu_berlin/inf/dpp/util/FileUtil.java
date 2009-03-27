@@ -67,7 +67,7 @@ public class FileUtil {
      *            to unset
      * @return The state before setting read-only to the given value.
      */
-    public static boolean setReadOnly(IFile file, boolean readonly) {
+    public static boolean setReadOnly(IResource file, boolean readonly) {
         ResourceAttributes attributes = file.getResourceAttributes();
         if (attributes == null) {
             // TODO: Throw an FileNotFoundException and deal with it everywhere!

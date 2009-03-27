@@ -28,17 +28,14 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourceAttributes;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -60,6 +57,7 @@ import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -436,12 +434,9 @@ public class SharedProject implements ISharedProject {
                     return;
                 }
 
-                // Open InvitationDialog centered on the ActiveWorkbenchWindow
-                Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
-
                 // TODO check if anybody is online, empty dialog feels
                 // strange
-                Window iw = new InvitationDialog(shell, toInvite);
+                Window iw = new InvitationDialog(EditorAPI.getShell(), toInvite);
                 iw.open();
             }
         });
@@ -459,38 +454,28 @@ public class SharedProject implements ISharedProject {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                    Display.getDefault().getActiveShell());
+                    EditorAPI.getShell());
                 try {
                     dialog.run(true, false, new IRunnableWithProgress() {
-                        public void run(IProgressMonitor monitor) {
+                        public void run(final IProgressMonitor monitor) {
+                            monitor.beginTask("Project settings ... ",
+                                IProgressMonitor.UNKNOWN);
+
                             try {
+                                getProject().accept(new IResourceVisitor() {
+                                    public boolean visit(IResource resource)
+                                        throws CoreException {
 
-                                Collection<IPath> paths = new FileList(
-                                    SharedProject.this.project).getPaths();
+                                        FileUtil
+                                            .setReadOnly(resource, readonly);
+                                        monitor.worked(1);
 
-                                monitor.beginTask("Project settings ... ",
-                                    paths.size());
-
-                                ResourceAttributes attributes = new ResourceAttributes();
-                                attributes.setReadOnly(readonly);
-
-                                /*
-                                 * TODO Make sure this is necessary! We don't
-                                 * remove this flag, when switching into driver
-                                 * mode, thus it might cause problems.
-                                 */
-                                attributes.setArchive(readonly);
-
-                                for (IPath path : paths) {
-                                    IFile file = getProject().getFile(
-                                        path.makeAbsolute());
-                                    if ((file != null) && file.exists()) {
-                                        file.setResourceAttributes(attributes);
+                                        return true;
                                     }
-                                    monitor.worked(1);
-                                }
+                                });
                             } catch (CoreException e) {
-                                SharedProject.log.warn("", e);
+                                log.warn("Failure to set readonly to "
+                                    + readonly + ":", e);
                             } finally {
                                 monitor.done();
                             }

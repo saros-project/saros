@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
@@ -54,6 +53,7 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.Reinjector;
 
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
@@ -359,10 +359,9 @@ public class Saros extends AbstractUIPlugin {
             if (!failSilently) {
                 Util.runSafeSWTSync(logger, new Runnable() {
                     public void run() {
-                        MessageDialog.openError(Display.getDefault()
-                            .getActiveShell(), "Error Connecting",
-                            "Could not connect to server '" + server
-                                + "' as user '" + username
+                        MessageDialog.openError(EditorAPI.getShell(),
+                            "Error Connecting", "Could not connect to server '"
+                                + server + "' as user '" + username
                                 + "'.\nErrorMessage was:\n" + e.getMessage());
                     }
                 });
@@ -589,7 +588,7 @@ public class Saros extends AbstractUIPlugin {
                     public void run() {
                         MessageDialog
                             .openError(
-                                Display.getDefault().getActiveShell(),
+                                EditorAPI.getShell(),
                                 "Connection error",
                                 "There is a conflict with the jabber connection."
                                     + "The reason for this is mostly that another saros "

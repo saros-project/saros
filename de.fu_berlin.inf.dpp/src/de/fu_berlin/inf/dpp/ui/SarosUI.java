@@ -29,7 +29,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -78,12 +77,9 @@ public class SarosUI {
                 final IIncomingInvitationProcess process) {
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-
-                        Shell shell = EditorAPI.getAWorkbenchWindow()
-                            .getShell();
                         JoinSessionWizard jsw = new JoinSessionWizard(process);
                         WizardDialogAccessable wd = new WizardDialogAccessable(
-                            shell, jsw);
+                            EditorAPI.getShell(), jsw);
                         wd.setHelpAvailable(false);
                         jsw.setWizardDlg(wd);
                         process.setInvitationUI(jsw.getInvitationUI());

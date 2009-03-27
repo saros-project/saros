@@ -28,7 +28,6 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -63,12 +62,8 @@ public class JoinSessionWizard extends Wizard {
 
     IIncomingInvitationProcess process;
 
-    Display current;
-
     public JoinSessionWizard(IIncomingInvitationProcess process) {
         this.process = process;
-
-        this.current = Display.getCurrent();
 
         setWindowTitle("Session Invitation");
         setHelpAvailable(false);
@@ -80,7 +75,7 @@ public class JoinSessionWizard extends Wizard {
 
             public void cancel(final JID jid, final String errorMsg,
                 final boolean replicated) {
-                JoinSessionWizard.this.current.asyncExec(new Runnable() {
+                Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
                         if (errorMsg != null) {

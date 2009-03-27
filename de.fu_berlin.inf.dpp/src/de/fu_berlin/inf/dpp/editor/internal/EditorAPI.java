@@ -34,6 +34,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -732,5 +733,13 @@ public class EditorAPI implements IEditorAPI {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Tries to get a shell that is centered on the shells of the application.
+     * Use instead of Display.getDefault().getActiveShell()!
+     */
+    public static Shell getShell() {
+        return getAWorkbenchWindow().getShell();
     }
 }

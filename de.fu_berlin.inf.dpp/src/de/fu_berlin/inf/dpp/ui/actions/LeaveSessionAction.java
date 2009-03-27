@@ -30,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -90,7 +91,7 @@ public class LeaveSessionAction extends Action {
 
     public void runLeaveSession() {
 
-        Shell shell = Display.getDefault().getActiveShell();
+        Shell shell = EditorAPI.getShell();
         if (shell == null) {
             return;
         }
