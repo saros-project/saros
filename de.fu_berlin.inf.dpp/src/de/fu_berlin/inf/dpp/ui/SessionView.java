@@ -56,8 +56,8 @@ import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -72,7 +72,7 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class SessionView extends ViewPart implements ISessionListener {
+public class SessionView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
@@ -345,29 +345,10 @@ public class SessionView extends ViewPart implements ISessionListener {
         // FIXME All actions need to be properly disposed, because they use
         // Listeners
 
+        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+        sessionManager.removeSessionListener(sessionListener);
+
         super.dispose();
-    }
-
-    public void sessionStarted(final ISharedProject sharedProject) {
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                SessionView.this.viewer.setInput(sharedProject);
-            }
-        });
-    }
-
-    public void sessionEnded(ISharedProject sharedProject) {
-        assert this.sharedProject == sharedProject;
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                SessionView.this.viewer.setInput(null);
-            }
-        });
-        this.sharedProject = null;
-    }
-
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
     }
 
     /**
@@ -418,10 +399,33 @@ public class SessionView extends ViewPart implements ISessionListener {
         this.viewer.getControl().setEnabled(this.sharedProject != null);
     }
 
+    public final ISessionListener sessionListener = new AbstractSessionListener() {
+
+        @Override
+        public void sessionStarted(final ISharedProject project) {
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    SessionView.this.viewer.setInput(project);
+                }
+            });
+        }
+
+        @Override
+        public void sessionEnded(ISharedProject project) {
+            assert sharedProject == project;
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    SessionView.this.viewer.setInput(null);
+                }
+            });
+            sharedProject = null;
+        }
+    };
+
     private void attachSessionListener() {
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
 
-        sessionManager.addSessionListener(this);
+        sessionManager.addSessionListener(sessionListener);
         if (sessionManager.getSharedProject() != null) {
             this.viewer.setInput(sessionManager.getSharedProject());
         }

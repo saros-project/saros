@@ -44,7 +44,6 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -176,44 +175,32 @@ public class SharedResourcesManager implements IResourceChangeListener,
     }
 
     public SharedResourcesManager() {
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+            sessionListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionStarted(ISharedProject project) {
-        this.sharedProject = project;
-        this.sharedProject.getActivityManager().addProvider(this);
-        ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-    }
+    public ISessionListener sessionListener = new AbstractSessionListener() {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionEnded(ISharedProject project) {
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-        // TODO If the session was started this.sharedProject should never be
-        // null at this point. See this.sessionStarted().
-        if (this.sharedProject != null) {
-            assert this.sharedProject == project;
-            this.sharedProject.getActivityManager().removeProvider(this);
-            this.sharedProject = null;
+        @Override
+        public void sessionStarted(ISharedProject project) {
+            sharedProject = project;
+            sharedProject.getActivityManager().addProvider(
+                SharedResourcesManager.this);
+            ResourcesPlugin.getWorkspace().addResourceChangeListener(
+                SharedResourcesManager.this);
         }
-    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // ignore
-    }
+        @Override
+        public void sessionEnded(ISharedProject project) {
+            ResourcesPlugin.getWorkspace().removeResourceChangeListener(
+                SharedResourcesManager.this);
+
+            assert sharedProject == project;
+            sharedProject.getActivityManager().removeProvider(
+                SharedResourcesManager.this);
+            sharedProject = null;
+        }
+    };
 
     /*
      * (non-Javadoc)

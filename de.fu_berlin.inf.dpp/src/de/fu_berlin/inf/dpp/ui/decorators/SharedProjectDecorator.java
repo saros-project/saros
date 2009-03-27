@@ -31,7 +31,7 @@ import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -57,7 +57,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
     protected List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
-    protected ISessionListener sessionListener = new ISessionListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
@@ -69,11 +69,6 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
             updateDecoratorsAsync(project.getProject());
             sharedProject = null;
         }
-
-        public void invitationReceived(IIncomingInvitationProcess process) {
-            // ignore
-        }
-
     };
 
     public SharedProjectDecorator() {

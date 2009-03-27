@@ -10,11 +10,12 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -25,6 +26,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  */
 public class RoleManager implements IActivityProvider {
+
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
     private ISharedProject sharedProject;
@@ -43,40 +45,27 @@ public class RoleManager implements IActivityProvider {
     };
 
     public RoleManager() {
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+            sessionListener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionStarted(ISharedProject project) {
-        this.sharedProject = project;
-        this.sharedProject.addListener(this.sharedProjectListener);
-        this.sharedProject.getActivityManager().addProvider(this);
-    }
+    public final ISessionListener sessionListener = new AbstractSessionListener() {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionEnded(ISharedProject project) {
-        assert this.sharedProject == project;
-        this.sharedProject.removeListener(this.sharedProjectListener);
-        this.sharedProject.getActivityManager().removeProvider(this);
-        this.sharedProject = null;
-    }
+        @Override
+        public void sessionStarted(ISharedProject project) {
+            sharedProject = project;
+            sharedProject.addListener(sharedProjectListener);
+            sharedProject.getActivityManager().addProvider(RoleManager.this);
+        }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // ignore
-    }
+        @Override
+        public void sessionEnded(ISharedProject project) {
+            assert sharedProject == project;
+            sharedProject.removeListener(sharedProjectListener);
+            sharedProject.getActivityManager().removeProvider(RoleManager.this);
+            sharedProject = null;
+        }
+    };
 
     /*
      * (non-Javadoc)

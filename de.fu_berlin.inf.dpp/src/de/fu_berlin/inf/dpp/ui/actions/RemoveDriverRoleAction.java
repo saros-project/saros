@@ -8,9 +8,8 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -37,12 +36,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         setToolTipText("Remove the driver role from this user.");
 
         Saros.getDefault().getSessionManager().addSessionListener(
-            new ISessionListener() {
-
-                public void invitationReceived(
-                    IIncomingInvitationProcess invitation) {
-                    // ignore
-                }
+            new AbstractSessionListener() {
 
                 public void sessionEnded(ISharedProject sharedProject) {
                     sharedProject.removeListener(projectListener);

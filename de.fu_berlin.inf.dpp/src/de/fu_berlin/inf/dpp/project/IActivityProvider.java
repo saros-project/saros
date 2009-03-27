@@ -5,16 +5,13 @@ import org.xmlpull.v1.XmlPullParser;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 
 /**
- * Every activity provider is responsible for one or more activities. It handles
- * creating and executing the activity.
- * 
- * TODO Why does it extend {@link ISessionListener}? Just because every
- * {@link IActivityProvider} needs the methods from {@link ISessionListener}? I
- * think there is no semantic reason.
+ * Every activity provider is responsible for one or more activity types. It
+ * handles creating (fromXML) and executing (exec) the activities of some type
+ * and notifies listeners.
  * 
  * @author rdjemili
  */
-public interface IActivityProvider extends ISessionListener {
+public interface IActivityProvider {
 
     public void exec(IActivity activity);
 

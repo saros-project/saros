@@ -4,8 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -21,7 +20,7 @@ public class OpenInviteInterface extends Action {
         setToolTipText("Open invitation interface");
 
         Saros.getDefault().getSessionManager().addSessionListener(
-            new ISessionListener() {
+            new AbstractSessionListener() {
 
                 public void sessionStarted(ISharedProject sharedProject) {
                     setEnabled(sharedProject.isHost());
@@ -29,11 +28,6 @@ public class OpenInviteInterface extends Action {
 
                 public void sessionEnded(ISharedProject sharedProject) {
                     setEnabled(false);
-                }
-
-                public void invitationReceived(
-                    IIncomingInvitationProcess process) {
-                    // ignore
                 }
             });
 

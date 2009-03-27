@@ -13,8 +13,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -24,8 +23,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * 
  * @author rdjemili
  */
-public class SharedModelProvider extends ModelProvider implements
-    ISessionListener {
+public class SharedModelProvider extends ModelProvider {
 
     private static final Logger log = Logger
         .getLogger(SharedModelProvider.class.getName());
@@ -86,7 +84,19 @@ public class SharedModelProvider extends ModelProvider implements
     protected void initialize() {
         ISessionManager sm = Saros.getDefault().getSessionManager();
 
-        sm.addSessionListener(this);
+        sm.addSessionListener(new AbstractSessionListener() {
+            @Override
+            public void sessionStarted(ISharedProject project) {
+                sharedProject = project;
+            }
+
+            @Override
+            public void sessionEnded(ISharedProject project) {
+                assert sharedProject == project;
+                sharedProject = null;
+            }
+
+        });
         this.sharedProject = sm.getSharedProject();
     }
 
@@ -117,33 +127,5 @@ public class SharedModelProvider extends ModelProvider implements
             return SharedModelProvider.EXCLUSIVE_ERROR_STATUS;
         }
         return Status.OK_STATUS;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionStarted(ISharedProject sharedProject) {
-        this.sharedProject = sharedProject;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionEnded(ISharedProject sharedProject) {
-        assert this.sharedProject == sharedProject;
-        this.sharedProject = null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // ignore
     }
 }

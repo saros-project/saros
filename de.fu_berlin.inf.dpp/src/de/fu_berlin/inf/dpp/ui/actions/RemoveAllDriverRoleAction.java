@@ -25,9 +25,8 @@ import org.eclipse.jface.action.Action;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -40,8 +39,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author orieger
  * 
  */
-public class RemoveAllDriverRoleAction extends Action implements
-    ISessionListener {
+public class RemoveAllDriverRoleAction extends Action {
 
     public static final String ACTION_ID = RemoveAllDriverRoleAction.class
         .getName();
@@ -62,7 +60,21 @@ public class RemoveAllDriverRoleAction extends Action implements
         setToolTipText("Remove all driver roles");
         setId(ACTION_ID);
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+            new AbstractSessionListener() {
+
+                @Override
+                public void sessionStarted(ISharedProject sharedProject) {
+                    sharedProject.addListener(sharedProjectListener);
+                    updateEnablement();
+                }
+
+                @Override
+                public void sessionEnded(ISharedProject sharedProject) {
+                    sharedProject.removeListener(sharedProjectListener);
+                    updateEnablement();
+                }
+            });
         updateEnablement();
     }
 
@@ -87,20 +99,6 @@ public class RemoveAllDriverRoleAction extends Action implements
                 project.setUserRole(user, UserRole.OBSERVER, false);
             }
         }
-    }
-
-    public void sessionStarted(ISharedProject sharedProject) {
-        sharedProject.addListener(this.sharedProjectListener);
-        updateEnablement();
-    }
-
-    public void sessionEnded(ISharedProject sharedProject) {
-        sharedProject.removeListener(this.sharedProjectListener);
-        updateEnablement();
-    }
-
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
     }
 
     private void updateEnablement() {

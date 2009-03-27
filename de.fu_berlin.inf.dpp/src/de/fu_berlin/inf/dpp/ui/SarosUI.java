@@ -43,14 +43,14 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class SarosUI implements ISessionListener {
+public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());
 
@@ -72,74 +72,69 @@ public class SarosUI implements ISessionListener {
             cdtFacade.installSharedDocumentProvider();
         }
 
-        sessionManager.addSessionListener(this);
-    }
+        sessionManager.addSessionListener(new AbstractSessionListener() {
+            @Override
+            public void invitationReceived(
+                final IIncomingInvitationProcess process) {
+                Util.runSafeSWTAsync(log, new Runnable() {
+                    public void run() {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionEnded(ISharedProject sharedProject) {
-        // ignore
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void invitationReceived(final IIncomingInvitationProcess process) {
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-
-                Shell shell = EditorAPI.getAWorkbenchWindow().getShell();
-                JoinSessionWizard jsw = new JoinSessionWizard(process);
-                WizardDialogAccessable wd = new WizardDialogAccessable(shell,
-                    jsw);
-                wd.setHelpAvailable(false);
-                jsw.setWizardDlg(wd);
-                process.setInvitationUI(jsw.getInvitationUI());
-                wd.open();
+                        Shell shell = EditorAPI.getAWorkbenchWindow()
+                            .getShell();
+                        JoinSessionWizard jsw = new JoinSessionWizard(process);
+                        WizardDialogAccessable wd = new WizardDialogAccessable(
+                            shell, jsw);
+                        wd.setHelpAvailable(false);
+                        jsw.setWizardDlg(wd);
+                        process.setInvitationUI(jsw.getInvitationUI());
+                        wd.open();
+                    }
+                });
             }
-        });
-    }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void sessionStarted(ISharedProject sharedProject) {
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                try {
-                    // Create Session View
-                    IWorkbench workbench = PlatformUI.getWorkbench();
-                    IWorkbenchWindow window = workbench
-                        .getActiveWorkbenchWindow();
-                    window.getActivePage().showView(SarosUI.SESSION_VIEW, null,
-                        IWorkbenchPage.VIEW_CREATE);
-                } catch (PartInitException e) {
-                    Saros.getDefault().getLog().log(
-                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                            "Could not create Session View", e));
-                }
+            /*
+             * (non-Javadoc)
+             * 
+             * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
+             */
+            @Override
+            public void sessionStarted(ISharedProject sharedProject) {
+                Util.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        try {
+                            // Create Session View
+                            IWorkbench workbench = PlatformUI.getWorkbench();
+                            IWorkbenchWindow window = workbench
+                                .getActiveWorkbenchWindow();
+                            window.getActivePage().showView(
+                                SarosUI.SESSION_VIEW, null,
+                                IWorkbenchPage.VIEW_CREATE);
+                        } catch (PartInitException e) {
+                            Saros.getDefault().getLog().log(
+                                new Status(IStatus.ERROR, Saros.SAROS,
+                                    IStatus.ERROR,
+                                    "Could not create Session View", e));
+                        }
 
-                try {
-                    // Open Roster so that a participant can be invited
-                    IWorkbench workbench = PlatformUI.getWorkbench();
-                    IWorkbenchWindow window = workbench
-                        .getActiveWorkbenchWindow();
-                    window.getActivePage().showView(SarosUI.ROSTER_VIEW, null,
-                        IWorkbenchPage.VIEW_ACTIVATE);
-                } catch (PartInitException e) {
-                    Saros.getDefault().getLog().log(
-                        new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                            "Could not activate Roster View", e));
-                }
+                        try {
+                            // Open Roster so that a participant can be invited
+                            IWorkbench workbench = PlatformUI.getWorkbench();
+                            IWorkbenchWindow window = workbench
+                                .getActiveWorkbenchWindow();
+                            window.getActivePage().showView(
+                                SarosUI.ROSTER_VIEW, null,
+                                IWorkbenchPage.VIEW_ACTIVATE);
+                        } catch (PartInitException e) {
+                            Saros.getDefault().getLog().log(
+                                new Status(IStatus.ERROR, Saros.SAROS,
+                                    IStatus.ERROR,
+                                    "Could not activate Roster View", e));
+                        }
 
+                    }
+                });
             }
+
         });
     }
 

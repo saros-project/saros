@@ -91,12 +91,13 @@ import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
@@ -398,91 +399,83 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         editorAPI.setEditorManager(this);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionStarted(ISharedProject project) {
-        this.sharedProject = project;
+    public final ISessionListener sessionListener = new AbstractSessionListener() {
 
-        assert this.editorPool.editorParts.isEmpty() : "EditorPool was not correctly reset!";
+        @Override
+        public void sessionStarted(ISharedProject project) {
+            sharedProject = project;
 
-        this.isDriver = this.sharedProject.isDriver();
-        this.sharedProject.addListener(this);
+            assert editorPool.editorParts.isEmpty() : "EditorPool was not correctly reset!";
 
-        // Add ConsistencyListener
-        Saros.getDefault().getSessionManager().getSharedProject()
-            .getConcurrentDocumentManager().getConsistencyToResolve().add(
-                new ValueChangeListener<Boolean>() {
-                    public void setValue(Boolean inconsistency) {
-                        if (inconsistency) {
-                            Util.runSafeSWTSync(log, new Runnable() {
-                                public void run() {
-                                    try {
-                                        // Open Session view
-                                        PlatformUI
-                                            .getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage()
-                                            .showView(
-                                                "de.fu_berlin.inf.dpp.ui.SessionView",
-                                                null,
-                                                IWorkbenchPage.VIEW_ACTIVATE);
-                                    } catch (PartInitException e) {
-                                        log
-                                            .error("Could not open session view!");
+            isDriver = sharedProject.isDriver();
+            sharedProject.addListener(EditorManager.this);
+
+            // Add ConsistencyListener
+            Saros.getDefault().getSessionManager().getSharedProject()
+                .getConcurrentDocumentManager().getConsistencyToResolve().add(
+                    new ValueChangeListener<Boolean>() {
+                        public void setValue(Boolean inconsistency) {
+                            if (inconsistency) {
+                                Util.runSafeSWTSync(log, new Runnable() {
+                                    public void run() {
+                                        try {
+                                            // Open Session view
+                                            PlatformUI
+                                                .getWorkbench()
+                                                .getActiveWorkbenchWindow()
+                                                .getActivePage()
+                                                .showView(
+                                                    "de.fu_berlin.inf.dpp.ui.SessionView",
+                                                    null,
+                                                    IWorkbenchPage.VIEW_ACTIVATE);
+                                        } catch (PartInitException e) {
+                                            log
+                                                .error("Could not open session view!");
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
-                    }
-                });
+                    });
 
-        this.sharedProject.getActivityManager().addProvider(this);
-        this.contributionAnnotationManager = new ContributionAnnotationManager(
-            project);
+            sharedProject.getActivityManager().addProvider(EditorManager.this);
+            contributionAnnotationManager = new ContributionAnnotationManager(
+                project);
 
-        // TODO Review Why?
-        activateOpenEditors();
-    }
+            // TODO Review Why?
+            activateOpenEditors();
+        }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void sessionEnded(ISharedProject project) {
-        assert this.sharedProject == project;
-        setAllEditorsToEditable();
-        removeAllAnnotations(new Predicate() {
-            public boolean check(SarosAnnotation annotation) {
-                return true;
-            }
-        });
+        /*
+         * (non-Javadoc)
+         * 
+         * @see de.fu_berlin.inf.dpp.project.ISessionListener
+         */
+        @Override
+        public void sessionEnded(ISharedProject project) {
+            assert sharedProject == project;
+            setAllEditorsToEditable();
+            removeAllAnnotations(new Predicate() {
+                public boolean check(SarosAnnotation annotation) {
+                    return true;
+                }
+            });
 
-        // FIXME remove this.dirtyStateListener from IDocumentProvider
+            // FIXME remove this.dirtyStateListener from IDocumentProvider
 
-        this.sharedProject.removeListener(this);
-        this.sharedProject.getActivityManager().removeProvider(this);
-        this.sharedProject = null;
-        this.editorPool.removeAllEditors();
-        this.lastEditTimes.clear();
-        this.lastRemoteEditTimes.clear();
-        this.contributionAnnotationManager.dispose();
-        this.contributionAnnotationManager = null;
-        this.activeDriverEditor = null;
-        this.driverEditors.clear();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
-        // ignore
-    }
+            sharedProject.removeListener(EditorManager.this);
+            sharedProject.getActivityManager().removeProvider(
+                EditorManager.this);
+            sharedProject = null;
+            editorPool.removeAllEditors();
+            lastEditTimes.clear();
+            lastRemoteEditTimes.clear();
+            contributionAnnotationManager.dispose();
+            contributionAnnotationManager = null;
+            activeDriverEditor = null;
+            driverEditors.clear();
+        }
+    };
 
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
         if (!this.editorListeners.contains(editorListener)) {
@@ -1485,7 +1478,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         setEditorAPI(new EditorAPI());
         if ((Saros.getDefault() != null)
             && (Saros.getDefault().getSessionManager() != null)) {
-            Saros.getDefault().getSessionManager().addSessionListener(this);
+            Saros.getDefault().getSessionManager().addSessionListener(
+                this.sessionListener);
         } else {
             log.error("EditorManager could not be started!", new StackTrace());
         }

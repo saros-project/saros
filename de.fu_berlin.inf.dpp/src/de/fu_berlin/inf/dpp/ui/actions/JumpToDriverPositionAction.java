@@ -5,14 +5,12 @@ import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class JumpToDriverPositionAction extends Action implements
-    ISessionListener {
+public class JumpToDriverPositionAction extends Action {
 
     private static final Logger log = Logger
         .getLogger(JumpToDriverPositionAction.class.getName());
@@ -21,7 +19,19 @@ public class JumpToDriverPositionAction extends Action implements
         setToolTipText("Jump to position of driver.");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
 
-        Saros.getDefault().getSessionManager().addSessionListener(this);
+        Saros.getDefault().getSessionManager().addSessionListener(
+
+        new AbstractSessionListener() {
+            @Override
+            public void sessionStarted(ISharedProject sharedProject) {
+                updateEnablement();
+            }
+
+            @Override
+            public void sessionEnded(ISharedProject sharedProject) {
+                updateEnablement();
+            }
+        });
         updateEnablement();
     }
 
@@ -37,28 +47,7 @@ public class JumpToDriverPositionAction extends Action implements
         });
     }
 
-    public void sessionStarted(ISharedProject sharedProject) {
-        updateEnablement();
-    }
-
-    public void sessionEnded(ISharedProject sharedProject) {
-        updateEnablement();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-     */
-    public void invitationReceived(IIncomingInvitationProcess process) {
-        // ignore
-    }
-
     private void updateEnablement() {
-        setEnabled(getSharedProject() != null);
-    }
-
-    private ISharedProject getSharedProject() {
-        return Saros.getDefault().getSessionManager().getSharedProject();
+        setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
     }
 }
