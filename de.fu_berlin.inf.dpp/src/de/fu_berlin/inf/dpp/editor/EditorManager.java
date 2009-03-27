@@ -566,6 +566,12 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
      */
     public void viewportChanged(IEditorPart part, ILineRange viewport) {
+
+        if (this.sharedProject == null) {
+            log.warn("SharedEditorListener not correctly unregistered!");
+            return;
+        }
+
         if (!this.sharedProject.isDriver()) {
             return;
         }
