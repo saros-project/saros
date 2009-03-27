@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
+import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -319,7 +320,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                 }
             } catch (Exception e) {
-                throw new IOException("Sending failed", e);
+                throw new CausedIOException("Sending failed", e);
             }
             return NetTransferMode.HANDMADE;
         }
@@ -365,8 +366,9 @@ public class DataTransferManager implements ConnectionSessionListener {
             }
 
             if (monitor.getMonitoringException() != null) {
-                throw new IOException("RuntimeError in IBB-FileTransfer: ",
-                    monitor.getMonitoringException());
+                throw new CausedIOException(
+                    "RuntimeError in IBB-FileTransfer: ", monitor
+                        .getMonitoringException());
             }
 
             if (transfer.getStatus() == Status.error) {
@@ -402,7 +404,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                 return jftm.send(data, content);
             } catch (JingleSessionException e) {
-                throw new IOException(e);
+                throw new CausedIOException(e);
             }
         }
 

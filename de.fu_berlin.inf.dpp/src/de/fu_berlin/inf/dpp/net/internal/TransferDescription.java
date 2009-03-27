@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 /**
  * A TransferDescription contains all necessary information for dealing with
@@ -144,7 +145,7 @@ public class TransferDescription implements Serializable {
             try {
                 return (TransferDescription) os.readObject();
             } catch (ClassNotFoundException e) {
-                throw new IOException("Invalid Object sent", e);
+                throw new CausedIOException("Invalid Object sent", e);
             }
         } finally {
             IOUtils.closeQuietly(os);

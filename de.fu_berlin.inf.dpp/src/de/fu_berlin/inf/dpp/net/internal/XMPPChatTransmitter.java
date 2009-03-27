@@ -76,6 +76,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -697,7 +698,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             message.addExtension(extension);
             chat.sendMessage(message);
         } catch (XMPPException e) {
-            throw new IOException("Failed to send message", e);
+            throw new CausedIOException("Failed to send message", e);
         }
     }
 
