@@ -58,6 +58,30 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class DataTransferManager implements ConnectionSessionListener {
 
+    protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();
+
+    protected Map<JID, NetTransferMode> incomingTransferModes = Collections
+        .synchronizedMap(new HashMap<JID, NetTransferMode>());
+    protected Map<JID, NetTransferMode> outgoingTransferModes = Collections
+        .synchronizedMap(new HashMap<JID, NetTransferMode>());
+
+    protected ITransferModeListener trackingTransferModeListener = new ITransferModeListener() {
+
+        public void clear() {
+            incomingTransferModes.clear();
+            outgoingTransferModes.clear();
+        }
+
+        public void setTransferMode(JID jid, NetTransferMode newMode,
+            boolean incoming) {
+            if (incoming) {
+                incomingTransferModes.put(jid, newMode);
+            } else {
+                outgoingTransferModes.put(jid, newMode);
+            }
+        }
+    };
+
     private DataTransferExtension handmadeDataTransferExtension = new DataTransferExtension() {
 
         /**
@@ -95,6 +119,8 @@ public class DataTransferManager implements ConnectionSessionListener {
                      * this is the first received chunk->create incoming file
                      * object
                      */
+                    addIncomingFileTransfer(transferDescription);
+
                     ifile = new IncomingFile();
                     ifile.receivedChunks++;
                     ifile.chunkCount = maxIndex;
@@ -120,6 +146,8 @@ public class DataTransferManager implements ConnectionSessionListener {
                             sData += ifile.messageBuffer.get(i);
                         }
                         incomingFiles.remove(ifile.name);
+
+                        removeIncomingFileTransfer(transferDescription);
                     }
                 }
             }
@@ -192,11 +220,25 @@ public class DataTransferManager implements ConnectionSessionListener {
     private final class JingleTransferListener implements
         IJingleFileTransferListener {
 
+        public void incomingDescription(TransferDescription data,
+            NetTransferMode connectionType) {
+
+            addIncomingFileTransfer(data);
+        }
+
         public void incomingData(TransferDescription data, InputStream input,
             NetTransferMode mode) {
 
+            removeIncomingFileTransfer(data);
             setTransferMode(data.getSender(), mode, true);
             receiveData(data, input);
+
+        }
+
+        public void transferFailed(TransferDescription data,
+            NetTransferMode connectionType) {
+
+            removeIncomingFileTransfer(data);
         }
     }
 
@@ -206,42 +248,62 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             Util.runSafeAsync("IBBTransferListener-fileTransferRequest-", log,
                 new Runnable() {
-
                     public void run() {
-                        try {
-                            TransferDescription data = TransferDescription
-                                .fromBase64(request.getDescription());
-
-                            log.debug("Incoming file transfer via IBB: "
-                                + data.toString());
-
-                            IncomingFileTransfer accept = request.accept();
-
-                            InputStream in = accept.recieveFile();
-
-                            byte[] content;
-                            try {
-                                content = IOUtils.toByteArray(in);
-                            } finally {
-                                IOUtils.closeQuietly(in);
-                            }
-                            setTransferMode(data.getSender(),
-                                NetTransferMode.IBB, true);
-                            receiveData(data, new ByteArrayInputStream(content));
-                        } catch (Exception e) {
-                            log.error(
-                                "Incoming File Transfer via IBB failed: ", e);
-
-                            IInvitationProcess process = chatTransmitter
-                                .getInvitationProcess(new JID(request
-                                    .getRequestor()));
-                            if (process != null) {
-                                process.cancel(e.getMessage(), false);
-                            }
-                        }
+                        receiveIBB(request);
                     }
                 });
         }
+
+        protected void receiveIBB(FileTransferRequest request) {
+
+            TransferDescription data;
+            try {
+                data = TransferDescription.fromBase64(request.getDescription());
+            } catch (IOException e) {
+                log.error("Incoming File Transfer via IBB failed: ", e);
+
+                IInvitationProcess process = chatTransmitter
+                    .getInvitationProcess(new JID(request.getRequestor()));
+                if (process != null) {
+                    process.cancel(e.getMessage(), false);
+                }
+                return;
+            }
+
+            log.debug("Incoming file transfer via IBB: " + data.toString());
+
+            addIncomingFileTransfer(data);
+
+            byte[] content;
+
+            try {
+                IncomingFileTransfer accept = request.accept();
+
+                InputStream in = accept.recieveFile();
+
+                try {
+                    content = IOUtils.toByteArray(in);
+                } finally {
+                    IOUtils.closeQuietly(in);
+                }
+
+            } catch (Exception e) {
+                log.error("Incoming File Transfer via IBB failed: ", e);
+
+                IInvitationProcess process = chatTransmitter
+                    .getInvitationProcess(new JID(request.getRequestor()));
+                if (process != null) {
+                    process.cancel(e.getMessage(), false);
+                }
+                return;
+            } finally {
+                removeIncomingFileTransfer(data);
+            }
+
+            setTransferMode(data.getSender(), NetTransferMode.IBB, true);
+            receiveData(data, new ByteArrayInputStream(content));
+        }
+
     }
 
     private static final Logger log = Logger
@@ -711,28 +773,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
-    Map<JID, NetTransferMode> incomingTransferModes = Collections
-        .synchronizedMap(new HashMap<JID, NetTransferMode>());
-    Map<JID, NetTransferMode> outgoingTransferModes = Collections
-        .synchronizedMap(new HashMap<JID, NetTransferMode>());
-
-    ITransferModeListener trackingTransferModeListener = new ITransferModeListener() {
-
-        public void clear() {
-            incomingTransferModes.clear();
-            outgoingTransferModes.clear();
-        }
-
-        public void setTransferMode(JID jid, NetTransferMode newMode,
-            boolean incoming) {
-            if (incoming) {
-                incomingTransferModes.put(jid, newMode);
-            } else {
-                outgoingTransferModes.put(jid, newMode);
-            }
-        }
-    };
-
     /**
      * @return the last TransferMode used when receiving a file from the given
      *         user or UNKNOWN if no file was received since the last
@@ -802,7 +842,62 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     public void stop() {
         // TODO Auto-generated method stub
+    }
 
+    /**
+     * ------------------------------------------------------------------------
+     * Support for monitoring ongoing transfers
+     * ------------------------------------------------------------------------
+     */
+
+    /**
+     * Returns just whether there is currently a file transfer being received
+     * from the given user.
+     */
+    public boolean isReceiving(JID from) {
+        return getIncomingTransfers(from).size() > 0;
+    }
+
+    /**
+     * Returns a snapshot copy of the file-transfers currently being received
+     */
+    public List<TransferDescription> getIncomingTransfers(JID from) {
+        synchronized (incomingTransfers) {
+            return new LinkedList<TransferDescription>(incomingTransfers
+                .get(from));
+        }
+    }
+
+    protected void removeIncomingFileTransfer(
+        TransferDescription transferDescription) {
+
+        synchronized (incomingTransfers) {
+
+            JID from = transferDescription.sender;
+
+            List<TransferDescription> transfers = incomingTransfers.get(from);
+            if (transfers == null || !transfers.remove(transferDescription)) {
+                log
+                    .warn("Removing incoming transfer description that was never added!:"
+                        + transferDescription);
+            }
+        }
+    }
+
+    protected void addIncomingFileTransfer(
+        TransferDescription transferDescription) {
+
+        synchronized (incomingTransfers) {
+
+            JID from = transferDescription.sender;
+
+            List<TransferDescription> transfers = incomingTransfers.get(from);
+            if (transfers == null) {
+                transfers = new ArrayList<TransferDescription>();
+                incomingTransfers.put(from, transfers);
+            }
+            transfers.add(transferDescription);
+        }
     }
 
 }

@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.jingle.listeners.JingleTransportListener;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -20,12 +19,10 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
-import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class NetworkView extends ViewPart implements JingleTransportListener,
-    IJingleFileTransferListener, IConnectionListener {
+public class NetworkView extends ViewPart implements IConnectionListener {
 
     private static final Logger log = Logger.getLogger(NetworkView.class
         .getName());

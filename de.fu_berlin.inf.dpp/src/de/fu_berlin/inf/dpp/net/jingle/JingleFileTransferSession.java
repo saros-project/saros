@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -88,22 +89,37 @@ public class JingleFileTransferSession extends JingleMediaSession {
                             "Received unexpected object in ReceiveThread", e);
                         continue;
                     }
+
+                    for (IJingleFileTransferListener listener : listeners) {
+                        listener.incomingDescription(data, connectionType);
+                    }
+
                     byte[] content;
+
                     try {
                         content = (byte[]) input.readObject();
                     } catch (IOException e) {
                         logger.error("JingleFileTransferSession crashed", e);
+                        for (IJingleFileTransferListener listener : listeners) {
+                            listener.transferFailed(data,
+                                connectionType);
+                        }
                         return;
                     } catch (ClassNotFoundException e) {
                         logger.error(
                             "Received unexpected object in ReceiveThread", e);
+                        for (IJingleFileTransferListener listener : listeners) {
+                            listener.transferFailed(data,
+                                connectionType);
+                        }
                         continue;
                     }
 
                     for (IJingleFileTransferListener listener : listeners) {
-                        listener.incomingData(data, new ByteArrayInputStream(
-                            content), connectionType);
+                        listener.incomingData(data,
+                            new ByteArrayInputStream(content), connectionType);
                     }
+
                 }
             } catch (RuntimeException e) {
                 logger.error("Internal Error in Receive Thread: ", e);
