@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
@@ -101,23 +100,21 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     } catch (IOException e) {
                         logger.error("JingleFileTransferSession crashed", e);
                         for (IJingleFileTransferListener listener : listeners) {
-                            listener.transferFailed(data,
-                                connectionType);
+                            listener.transferFailed(data, connectionType);
                         }
                         return;
                     } catch (ClassNotFoundException e) {
                         logger.error(
                             "Received unexpected object in ReceiveThread", e);
                         for (IJingleFileTransferListener listener : listeners) {
-                            listener.transferFailed(data,
-                                connectionType);
+                            listener.transferFailed(data, connectionType);
                         }
                         continue;
                     }
 
                     for (IJingleFileTransferListener listener : listeners) {
-                        listener.incomingData(data,
-                            new ByteArrayInputStream(content), connectionType);
+                        listener.incomingData(data, new ByteArrayInputStream(
+                            content), connectionType);
                     }
 
                 }
