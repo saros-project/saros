@@ -610,7 +610,8 @@ public class Saros extends AbstractUIPlugin {
                 Util.runSafeAsync(logger, new Runnable() {
                     public void run() {
 
-                        Map<JID, Integer> expectedSequenceNumbers = Collections.EMPTY_MAP;
+                        Map<JID, Integer> expectedSequenceNumbers = Collections
+                            .emptyMap();
                         if (getSessionManager().getSharedProject() != null) {
                             expectedSequenceNumbers = getSessionManager()
                                 .getSharedProject().getSequencer()
