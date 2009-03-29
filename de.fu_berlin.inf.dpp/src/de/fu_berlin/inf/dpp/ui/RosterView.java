@@ -19,12 +19,12 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -59,6 +59,7 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.Presence.Type;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -94,14 +95,18 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     private TreeViewer viewer;
 
+    private Composite composite;
+
+    private Label label;
+
     private Roster roster;
 
     private XMPPConnection connection;
 
-    // actions
-    // private Action messagingAction;
-
-    private Action inviteAction;
+    /*
+     * Actions
+     */
+    private InviteAction inviteAction;
 
     private RenameContactAction renameContactAction;
 
@@ -109,9 +114,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     private SkypeAction skypeAction;
 
-    private Composite composite;
-
-    private Label label;
+    protected List<Disposable> disposables = new ArrayList<Disposable>();
 
     @Inject
     protected JingleFileTransferManagerObservable jingleManager;
@@ -499,6 +502,10 @@ public class RosterView extends ViewPart implements IConnectionListener,
     public void dispose() {
         super.dispose();
 
+        for (Disposable disposable : disposables) {
+            disposable.dispose();
+        }
+
         Saros.getDefault().removeListener(this);
     }
 
@@ -545,12 +552,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     /**
-     * Needs to called from an UI thread.
+     * @swt Needs to called from UI thread.
      */
     private void updateStatusInformation(final ConnectionState newState) {
-        // IStatusLineManager statusLine = getViewSite().getActionBars()
-        // .getStatusLineManager();
-        // statusLine.setMessage(SarosUI.getDescription(newState));
         label.setText(SarosUI.getDescription(newState));
         composite.layout();
     }
@@ -663,11 +667,13 @@ public class RosterView extends ViewPart implements IConnectionListener,
         IMenuManager menuManager = bars.getMenuManager();
         // menuManager.add(this.messagingAction);
         menuManager.add(this.inviteAction);
-        // menuManager.add(new TestJoinWizardAction());
         menuManager.add(new Separator());
 
         IToolBarManager toolBarManager = bars.getToolBarManager();
-        toolBarManager.add(new ConnectDisconnectAction());
+        ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
+            bars.getStatusLineManager());
+        disposables.add(connectAction);
+        toolBarManager.add(connectAction);
         toolBarManager.add(new NewContactAction());
     }
 

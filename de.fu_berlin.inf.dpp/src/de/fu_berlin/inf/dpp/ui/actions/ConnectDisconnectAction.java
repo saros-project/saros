@@ -25,8 +25,8 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.XMPPConnection;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -35,31 +35,42 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class ConnectDisconnectAction extends Action {
+public class ConnectDisconnectAction extends Action implements Disposable {
 
     private static final Logger log = Logger
         .getLogger(ConnectDisconnectAction.class.getName());
 
-    public ConnectDisconnectAction() {
-        updateStatus();
+    protected IStatusLineManager statusLineManager;
 
-        Saros.getDefault().addListener(new IConnectionListener() {
-            public void connectionStateChanged(XMPPConnection connection,
-                ConnectionState newState) {
+    protected IConnectionListener connectionListener = new IConnectionListener() {
+        public void connectionStateChanged(XMPPConnection connection,
+            ConnectionState newState) {
+            updateStatus();
+        }
+    };
+
+    protected IPropertyChangeListener propertyChangeListener = new IPropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(PreferenceConstants.USERNAME)) {
                 updateStatus();
             }
-        });
+        }
+    };
 
+    public ConnectDisconnectAction(IStatusLineManager statusLineManager) {
+        this.statusLineManager = statusLineManager;
+
+        updateStatus();
+
+        Saros.getDefault().addListener(connectionListener);
         Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
-            new IPropertyChangeListener() {
-                public void propertyChange(PropertyChangeEvent event) {
-                    if (event.getProperty()
-                        .equals(PreferenceConstants.USERNAME)) {
-                        updateStatus();
-                    }
-                }
-            });
+            propertyChangeListener);
+    }
 
+    public void dispose() {
+        Saros.getDefault().removeListener(connectionListener);
+        Saros.getDefault().getPreferenceStore().removePropertyChangeListener(
+            propertyChangeListener);
     }
 
     @Override
@@ -72,30 +83,29 @@ public class ConnectDisconnectAction extends Action {
         });
     }
 
-    protected IStatusLineManager getStatusmanager() {
-
-        // TODO check better for NPE
+    protected void runConnectDisconnect() {
         try {
-            return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                .getActivePage().getViewReferences()[0].getView(false)
-                .getViewSite().getActionBars().getStatusLineManager();
+            Saros saros = Saros.getDefault();
+
+            if (saros.isConnected()) {
+                saros.disconnect();
+            } else {
+                saros.connect(false);
+            }
         } catch (RuntimeException e) {
-            log.warn("Could not get StatusLineManager!");
-            return null;
+            log.error("Internal error in ConnectDisconnectAction:", e);
         }
     }
 
-    public void setStatusBar(final String message, final boolean start) {
-        // display task progress information (begin) in status
-        // line
+    protected void setStatusBar(final String message, final boolean start) {
+
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                IStatusLineManager slm = getStatusmanager();
-                if (slm == null)
-                    return;
-                IProgressMonitor monitor = slm.getProgressMonitor();
-                slm.setMessage(message);
 
+                statusLineManager.setMessage(message);
+
+                IProgressMonitor monitor = statusLineManager
+                    .getProgressMonitor();
                 if (start)
                     monitor.beginTask(message, IProgressMonitor.UNKNOWN);
                 else
@@ -105,7 +115,7 @@ public class ConnectDisconnectAction extends Action {
 
     }
 
-    public void updateStatus() {
+    protected void updateStatus() {
         try {
             ConnectionState state = Saros.getDefault().getConnectionState();
 
@@ -163,17 +173,4 @@ public class ConnectDisconnectAction extends Action {
         }
     }
 
-    protected void runConnectDisconnect() {
-        try {
-            Saros saros = Saros.getDefault();
-
-            if (saros.isConnected()) {
-                saros.disconnect();
-            } else {
-                saros.connect(false);
-            }
-        } catch (RuntimeException e) {
-            log.error("Internal error in ConnectDisconnectAction:", e);
-        }
-    }
 }
