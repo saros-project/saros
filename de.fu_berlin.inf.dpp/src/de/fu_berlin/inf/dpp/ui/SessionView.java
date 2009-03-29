@@ -25,11 +25,13 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.IColorProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -39,11 +41,17 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -79,6 +87,9 @@ public class SessionView extends ViewPart {
 
     protected TableViewer viewer;
 
+    protected String[] columnProperties = new String[] { "ICON", "COLOR",
+        "USER" };
+
     protected ISharedProject sharedProject;
 
     protected GiveDriverRoleAction giveDriverRoleAction;
@@ -103,6 +114,7 @@ public class SessionView extends ViewPart {
         private TableViewer tableViewer;
 
         public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+
             if (oldInput != null) {
                 ISharedProject oldProject = (ISharedProject) oldInput;
                 oldProject.removeListener(this);
@@ -168,7 +180,7 @@ public class SessionView extends ViewPart {
     }
 
     protected class SessionLabelProvider extends LabelProvider implements
-        ITableLabelProvider, IColorProvider, ITableFontProvider {
+        ITableLabelProvider, ITableColorProvider, ITableFontProvider {
 
         private final Image userImage = SarosUI.getImage("icons/user.png");
         private final Image driverImage = SarosUI
@@ -193,22 +205,20 @@ public class SessionView extends ViewPart {
         }
 
         // TODO getting current color does not work if default was changed.
-        public Color getBackground(Object element) {
+        public Color getBackground(Object element, int columnIndex) {
             User user = (User) element;
-
-            if (user.equals(Saros.getDefault().getLocalUser())) {
-                return null;
-            } else {
-                return getUserColor(user);
-            }
+            // if (user.equals(Saros.getDefault().getLocalUser())) {
+            // return null;
+            // }
+            return getUserColor(user);
         }
 
-        public Color getForeground(Object element) {
-            User user = (User) element;
+        public Color getForeground(Object element, int columnIndex) {
 
-            if (user.equals(Saros.getDefault().getLocalUser())) {
-                return getUserColor(user);
-            }
+            // User user = (User) element;
+            // if (user.equals(Saros.getDefault().getLocalUser())) {
+            // return getUserColor(user);
+            // }
             return null;
         }
 
@@ -362,7 +372,38 @@ public class SessionView extends ViewPart {
         this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
             | SWT.V_SCROLL);
         this.viewer.setContentProvider(new SessionContentProvider());
-        this.viewer.setLabelProvider(new SessionLabelProvider());
+
+        final SessionLabelProvider labelProvider = new SessionLabelProvider();
+        this.viewer.setLabelProvider(labelProvider);
+
+        // Make sure one column we got fills the whole table
+        final Table table = this.viewer.getTable();
+        TableColumnLayout ad = new TableColumnLayout();
+        table.getParent().setLayout(ad);
+        TableColumn column = new TableColumn(table, SWT.NONE);
+        ad.setColumnData(column, new ColumnWeightData(100));
+
+        /**
+         * Make sure that background color fills the whole row
+         * 
+         * Adapted from
+         * http://dev.eclipse.org/viewcvs/index.cgi/org.eclipse.swt.snippets
+         * /src/org/eclipse/swt/snippets/Snippet229.java?view=co
+         */
+        table.addListener(SWT.EraseItem, new Listener() {
+            public void handleEvent(Event event) {
+
+                GC gc = event.gc;
+                Color background = gc.getBackground();
+                gc.setBackground(labelProvider.getBackground(
+                    ((TableItem) event.item).getData(), event.index));
+                gc.fillRectangle(((TableItem) event.item)
+                    .getBounds(event.index));
+                // restore colors for subsequent drawing
+                gc.setBackground(background);
+            }
+        });
+
         this.viewer.setInput(null);
 
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
