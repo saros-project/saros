@@ -34,6 +34,7 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -719,9 +720,12 @@ public class EditorAPI implements IEditorAPI {
 
     public static IWorkbenchWindow getAWorkbenchWindow() {
 
+        if (PlatformUI.getWorkbench().getDisplay().isDisposed()) {
+            return null;
+        }
+
         IWorkbenchWindow w = PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow();
-
         if (w != null) {
             return w;
         }
@@ -740,6 +744,22 @@ public class EditorAPI implements IEditorAPI {
      * Use instead of Display.getDefault().getActiveShell()!
      */
     public static Shell getShell() {
-        return getAWorkbenchWindow().getShell();
+
+        IWorkbenchWindow window = getAWorkbenchWindow();
+
+        if (window != null) {
+            Shell shell = window.getShell();
+            if (!shell.isDisposed()) {
+                return shell;
+            }
+        }
+
+        // Window was null or shell disposed
+        Display display = PlatformUI.getWorkbench().getDisplay();
+        if (!display.isDisposed())
+            return display.getActiveShell();
+
+        // Give up:
+        return null;
     }
 }
