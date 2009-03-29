@@ -200,16 +200,20 @@ public class JingleFileTransferManager {
         final int stunServerPort = Integer.parseInt(prefStore
             .getString(PreferenceConstants.STUN_PORT));
 
-        ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
-            stunServer, stunServerPort);
-
         // ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
         // "stunserver.org", 3478);
         // STUNTransportManager stun = new STUNTransportManager();
 
+        ICETransportManager icetm0 = new ICETransportManager(xmppConnection,
+            stunServer, stunServerPort);
+
         mediaManager = new FileMediaManager(icetm0);
 
-        // TODO Do not proceed if the connection is closed in the meantime
+        if (!xmppConnection.isConnected()) {
+            throw new RuntimeException(
+                "Jingle Manager could not be started because connection was closed in the meantime");
+        }
+
         jm = new JingleManager(xmppConnection, Collections
             .singletonList((JingleMediaManager) mediaManager));
 
@@ -251,7 +255,6 @@ public class JingleFileTransferManager {
                 }
             }
         });
-
     }
 
     public static boolean isInitiator(JingleSession session) {
