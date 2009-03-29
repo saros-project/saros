@@ -466,6 +466,10 @@ public class SharedProject implements ISharedProject {
                                     public boolean visit(IResource resource)
                                         throws CoreException {
 
+                                        // Don't set the project read-only
+                                        if (resource instanceof IProject)
+                                            return true;
+
                                         FileUtil
                                             .setReadOnly(resource, readonly);
                                         monitor.worked(1);
