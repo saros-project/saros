@@ -13,6 +13,9 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
     private final int timestamp;
 
+    /** A "real" wall clock timestamp for this activity. */
+    private long localTimestamp = 0;
+
     /**
      * Constructs a new TimedActivity.
      * 
@@ -87,5 +90,13 @@ public class TimedActivity implements Comparable<TimedActivity> {
             throw new NullPointerException();
         }
         return this.timestamp - other.timestamp;
+    }
+
+    public void setLocalTimestamp(long localTimestamp) {
+        this.localTimestamp = localTimestamp;
+    }
+
+    public long getLocalTimestamp() {
+        return localTimestamp;
     }
 }

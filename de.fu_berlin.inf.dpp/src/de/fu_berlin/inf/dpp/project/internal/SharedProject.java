@@ -23,8 +23,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -42,7 +40,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
@@ -64,9 +61,6 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class SharedProject implements ISharedProject {
     private static Logger log = Logger.getLogger(SharedProject.class.getName());
 
-    private static final int REQUEST_ACTIVITY_ON_AGE = 5;
-    protected static final int MILLIS_UPDATE = 1000;
-
     protected JID myID;
 
     protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
@@ -79,18 +73,25 @@ public class SharedProject implements ISharedProject {
 
     private final ITransmitter transmitter;
 
-    private final ActivitySequencer activitySequencer = new ActivitySequencer();
+    private final ActivitySequencer activitySequencer;
 
     private static final int MAX_USERCOLORS = 5;
     private FreeColors freeColors = null;
+
+    private SharedProject(ITransmitter transmitter, IProject project) {
+        assert (transmitter != null);
+
+        this.transmitter = transmitter;
+        this.project = project;
+        this.activitySequencer = new ActivitySequencer(this, transmitter);
+    }
 
     /**
      * Constructor called for SharedProject of the host
      */
     public SharedProject(ITransmitter transmitter, IProject project, JID myID) {
-        assert (transmitter != null && myID != null);
-
-        this.transmitter = transmitter;
+        this(transmitter, project);
+        assert (myID != null);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
@@ -105,7 +106,6 @@ public class SharedProject implements ISharedProject {
         this.activitySequencer.initConcurrentManager(Side.HOST_SIDE, this.host,
             myID, this);
 
-        this.project = project;
         setProjectReadonly(false);
     }
 
@@ -115,7 +115,7 @@ public class SharedProject implements ISharedProject {
     public SharedProject(ITransmitter transmitter, IProject project, JID myID,
         JID hostID, int myColorID) {
 
-        this.transmitter = transmitter;
+        this(transmitter, project);
 
         this.myID = myID;
 
@@ -128,8 +128,6 @@ public class SharedProject implements ISharedProject {
 
         this.activitySequencer.initConcurrentManager(Side.CLIENT_SIDE,
             this.host, myID, this);
-
-        this.project = project;
     }
 
     /*
@@ -139,6 +137,10 @@ public class SharedProject implements ISharedProject {
      */
     public Collection<User> getParticipants() {
         return this.participants.values();
+    }
+
+    public int getParticipantCount() {
+        return this.participants.size();
     }
 
     /*
@@ -308,65 +310,13 @@ public class SharedProject implements ISharedProject {
         return new FileList(this.project);
     }
 
-    public Timer flushTimer = new Timer(true);
     public Thread requestTransmitter = null;
-    private static int queuedsince = 0;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public void start() {
-
-        this.flushTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-
-                List<IActivity> activities = activitySequencer.flush();
-
-                if (activities.size() > 0 && participants.size() > 1) {
-                    // TODO Rather create a method in the activitySequencer to
-                    // wrap and then send.
-                    transmitter.sendActivities(SharedProject.this,
-                        activitySequencer, activities);
-                }
-
-                // TODO CO 2009-02-06 this is disabled internally. Why?
-
-                // missing activities? (can not execute all)
-                if (activitySequencer.getQueuedActivitiesSize() > 0) {
-                    SharedProject.queuedsince++;
-
-                    // if i am missing activities for REQUEST_ACTIVITY_ON_AGE
-                    // seconds, ask all (because I do not know the origin)
-                    // to send it to me again.
-                    /*
-                     * TODO SharedProject.queuedsince is a "global" counter for
-                     * all other users but there is a queue for each user now.
-                     */
-                    if (SharedProject.queuedsince >= SharedProject.REQUEST_ACTIVITY_ON_AGE) {
-
-                        SharedProject.this.transmitter.sendRequestForActivity(
-                            SharedProject.this,
-                            SharedProject.this.activitySequencer
-                                .getExpectedSequenceNumbers(), false);
-
-                        SharedProject.queuedsince = 0;
-
-                        // TODO: What if Request for Activity fails again and
-                        // again?
-                    }
-
-                } else {
-                    SharedProject.queuedsince = 0;
-                }
-            }
-        }, 0, SharedProject.MILLIS_UPDATE);
-
         stopped = false;
+        activitySequencer.start();
 
-        /* 2. start thread for sending jupiter requests. */
+        /* Start thread for sending jupiter requests. */
         this.requestTransmitter = new Thread(Util.wrapSafe(log, new Runnable() {
             /**
              * @review runSafe OK
@@ -391,13 +341,8 @@ public class SharedProject implements ISharedProject {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public void stop() {
-        this.flushTimer.cancel();
+        activitySequencer.stop();
         this.requestTransmitter.interrupt();
         stopped = true;
     }

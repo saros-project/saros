@@ -26,13 +26,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -44,6 +46,7 @@ import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -65,6 +68,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     private static Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
 
+    protected static final int MILLIS_UPDATE = 1000;
+
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
@@ -78,17 +83,33 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     protected static class ActivityQueue {
         private static final int UNKNOWN_NUMBER = -1;
 
+        /** How long to wait until ignore missing activities in milliseconds. */
+        private static final long ACTIVITY_TIMEOUT = 30 * 1000;
+
+        /** This {@link ActivityQueue} is for this user. */
+        private final JID jid;
+
         /** Sequence number this user sends next. */
         private int nextSequenceNumber = 0;
 
         /** Sequence number expected from the next activity. */
         private int expectedSequenceNumber = UNKNOWN_NUMBER;
 
+        /**
+         * Oldest local timestamp for the queued activities or 0 if there are no
+         * activities queued.
+         */
+        private long oldestLocalTimestamp = 0;
+
         /** Queue of activities received. */
-        private PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
+        private final PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
 
         /** History of activities sent */
-        private List<TimedActivity> history = new LinkedList<TimedActivity>();
+        private final List<TimedActivity> history = new LinkedList<TimedActivity>();
+
+        public ActivityQueue(JID jid) {
+            this.jid = jid;
+        }
 
         /**
          * Create a {@link TimedActivity} and add it to the history of created
@@ -110,22 +131,49 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 expectedSequenceNumber = activity.getTimestamp();
             }
 
-            // Ignore activities with sequence numbers we have already seen.
+            // Ignore activities with sequence numbers we have already seen or
+            // don't expect anymore.
             if (activity.getTimestamp() < expectedSequenceNumber) {
-                log.warn("Received activity more than once: " + activity);
+                log.warn("Unexpected activity: " + activity);
                 return;
+            }
+
+            long now = System.currentTimeMillis();
+            activity.setLocalTimestamp(now);
+            if (oldestLocalTimestamp == 0) {
+                oldestLocalTimestamp = now;
             }
 
             // Log debug message if there are queued activities.
             int size = queuedActivities.size();
             if (size > 0) {
-                log.debug("There are " + size + " activities queued for "
-                    + activity.getSource());
+                log
+                    .debug("There are " + size + " activities queued for "
+                        + jid);
                 log.debug("first queued: " + queuedActivities.peek()
                     + ", expected nr: " + expectedSequenceNumber);
             }
 
             queuedActivities.add(activity);
+        }
+
+        /**
+         * Set {@link ActivityQueue#oldestLocalTimestamp} to the oldest local
+         * timestamp of the queued activities or 0 if the queue is empty.
+         */
+        protected void updateOldestLocalTimestamp() {
+            if (queuedActivities.size() == 0) {
+                oldestLocalTimestamp = 0;
+            } else {
+                oldestLocalTimestamp = queuedActivities.peek()
+                    .getLocalTimestamp();
+                for (TimedActivity timedActivity : queuedActivities) {
+                    long localTimestamp = timedActivity.getLocalTimestamp();
+                    if (localTimestamp < oldestLocalTimestamp) {
+                        oldestLocalTimestamp = localTimestamp;
+                    }
+                }
+            }
         }
 
         /**
@@ -135,10 +183,41 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         public TimedActivity removeNext() {
             if (queuedActivities.size() > 0
                 && queuedActivities.peek().getTimestamp() == expectedSequenceNumber) {
+
                 expectedSequenceNumber++;
-                return queuedActivities.remove();
+                TimedActivity result = queuedActivities.remove();
+                updateOldestLocalTimestamp();
+                return result;
             }
             return null;
+        }
+
+        /**
+         * Check for activities that are missing for more than
+         * {@link ActivityQueue#ACTIVITY_TIMEOUT} milliseconds or twice as long
+         * if there is a file transfer for the JID of this queue, and skip an
+         * expected sequence number.
+         */
+        public void checkForMissingActivities() {
+            if (queuedActivities.size() == 0) {
+                return;
+            }
+            long age = System.currentTimeMillis() - oldestLocalTimestamp;
+            if (age > ACTIVITY_TIMEOUT) {
+                if (age < ACTIVITY_TIMEOUT * 2) {
+                    // Early exit if there is a file transfer running.
+                    DataTransferManager transferManager = Saros.getDefault()
+                        .getContainer().getComponent(DataTransferManager.class);
+                    if (transferManager.isReceiving(jid)) {
+                        return;
+                    }
+                }
+
+                log.warn("Gave up waiting for activity nr. "
+                    + expectedSequenceNumber + " for " + jid);
+                expectedSequenceNumber++;
+                updateOldestLocalTimestamp();
+            }
         }
     }
 
@@ -147,11 +226,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * session.
      */
     protected static class ActivityQueuesManager {
-        protected Map<JID, ActivityQueue> jid2queue;
-
-        public ActivityQueuesManager() {
-            this.jid2queue = new HashMap<JID, ActivityQueue>();
-        }
+        protected final Map<JID, ActivityQueue> jid2queue = new HashMap<JID, ActivityQueue>();
 
         /**
          * Get the {@link ActivityQueue} for the given {@link JID}.
@@ -165,7 +240,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         protected ActivityQueue getActivityQueue(JID jid) {
             ActivityQueue queue = jid2queue.get(jid);
             if (queue == null) {
-                queue = new ActivityQueue();
+                queue = new ActivityQueue(jid);
                 jid2queue.put(jid, queue);
             }
             return queue;
@@ -264,24 +339,22 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          */
         public Map<JID, Integer> getExpectedSequenceNumbers() {
             HashMap<JID, Integer> result = new HashMap<JID, Integer>();
-            for (Entry<JID, ActivityQueue> entry : jid2queue.entrySet()) {
-                ActivityQueue queue = entry.getValue();
+            for (ActivityQueue queue : jid2queue.values()) {
                 if (queue.queuedActivities.size() > 0) {
-                    result.put(entry.getKey(), queue.expectedSequenceNumber);
+                    result.put(queue.jid, queue.expectedSequenceNumber);
                 }
             }
             return result;
         }
 
         /**
-         * @see ActivitySequencer#getQueuedActivitiesSize()
+         * Check each queue for activities that are too old and eventually skip
+         * missing activities.
          */
-        public int size() {
-            int result = 0;
+        public void checkForMissingActivities() {
             for (ActivityQueue queue : jid2queue.values()) {
-                result += queue.queuedActivities.size();
+                queue.checkForMissingActivities();
             }
-            return result;
         }
     }
 
@@ -293,6 +366,55 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * outgoing queue for direct client sync messages for all driver.
      */
     private final BlockingQueue<Pair<JID, Request>> outgoingSyncActivities = new LinkedBlockingQueue<Pair<JID, Request>>();
+
+    private final Timer flushTimer = new Timer(true);
+
+    private final ISharedProject sharedProject;
+
+    private final ITransmitter transmitter;
+
+    public ActivitySequencer(ISharedProject sharedProject,
+        ITransmitter transmitter) {
+
+        this.sharedProject = sharedProject;
+        this.transmitter = transmitter;
+    }
+
+    /**
+     * Start periodical flushing and sending of outgoing activities and checking
+     * for received activities that are queued for too long.
+     * 
+     * @see #stop()
+     */
+    public void start() {
+        this.flushTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+
+                List<IActivity> activities = flush();
+
+                if (activities.size() > 0
+                    && sharedProject.getParticipantCount() > 1) {
+                    transmitter.sendActivities(sharedProject,
+                        ActivitySequencer.this, activities);
+                }
+
+                synchronized (queues) {
+                    queues.checkForMissingActivities();
+                }
+            }
+        }, 0, MILLIS_UPDATE);
+    }
+
+    /**
+     * Stop periodical flushing and sending of outgoing activities and checking
+     * for received activities that are queued for too long.
+     * 
+     * @see #start()
+     */
+    public void stop() {
+        this.flushTimer.cancel();
+    }
 
     /**
      * TODO Refactor like this:
@@ -414,15 +536,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     List<TimedActivity> createTimedActivities(JID recipient,
         List<IActivity> activities) {
         return queues.createTimedActivities(recipient, activities);
-    }
-
-    /**
-     * Return the total number of currently queued activities.
-     */
-    public int getQueuedActivitiesSize() {
-        synchronized (queues) {
-            return queues.size();
-        }
     }
 
     /**

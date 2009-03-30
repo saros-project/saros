@@ -235,7 +235,7 @@ public class Saros extends AbstractUIPlugin {
 
     /**
      * Return the PicoContainer that can be asked for all Singleton objects
-     * relative to this Saros instance (see the constructor for a complete liste
+     * relative to this Saros instance (see the constructor for a complete list
      * of components in this container):
      * 
      * @return The PicoContainer containing all Singleton objects of this Saros

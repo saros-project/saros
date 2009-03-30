@@ -51,6 +51,11 @@ public interface ISharedProject {
     public Collection<User> getParticipants();
 
     /**
+     * @return the number of participants of this shared project.
+     */
+    public int getParticipantCount();
+
+    /**
      * Set the role of the given user.
      * 
      * @param user
