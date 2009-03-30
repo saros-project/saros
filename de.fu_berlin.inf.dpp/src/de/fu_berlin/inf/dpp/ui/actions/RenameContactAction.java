@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -29,6 +28,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -41,13 +41,6 @@ public class RenameContactAction extends SelectionProviderAction {
 
     private static final Logger log = Logger
         .getLogger(RenameContactAction.class.getName());
-
-    protected static class InputValidator implements IInputValidator {
-        public String isValid(String newText) {
-            // TODO Review this
-            return null;
-        }
-    }
 
     private RosterEntry rosterEntry;
 
@@ -71,36 +64,57 @@ public class RenameContactAction extends SelectionProviderAction {
     }
 
     public void runRename() {
+
+        assert this.rosterEntry != null : "Action should only be run if a rosterEntry is selected";
+
         Shell shell = EditorAPI.getShell();
-        if ((shell == null) || (this.rosterEntry == null)) {
-            return;
+
+        assert shell != null : "Action should not be run if the display is disposed";
+
+        String message;
+        if (this.rosterEntry.getName() == null) {
+            message = "Enter the new nickname of this contact '"
+                + this.rosterEntry.getUser() + "':";
+        } else {
+            message = "Enter the new nickname of this contact '"
+                + this.rosterEntry.getUser() + "' with current nickname '"
+                + this.rosterEntry.getName() + "':";
         }
 
         InputDialog dialog = new InputDialog(shell, "Set new nickname",
-            "Enter the new nickname of this contact '"
-                + this.rosterEntry.getName() + "' ('"
-                + this.rosterEntry.getUser() + "'):", this.rosterEntry
-                .getName(), new InputValidator());
+            message, this.rosterEntry.getName(), null);
 
         if (dialog.open() == Window.OK) {
-            String name = (dialog.getValue().length() == 0) ? "" : dialog
-                .getValue();
-            this.rosterEntry.setName(name);
+            String newName = dialog.getValue();
+            if (newName.length() == 0) {
+                this.rosterEntry.setName(null);
+            } else {
+                this.rosterEntry.setName(newName);
+            }
         }
+    }
+
+    public RosterEntry getSelectedForRename(IStructuredSelection selection) {
+
+        if (selection.size() != 1)
+            return null;
+
+        Object selected = selection.getFirstElement();
+
+        if (selected instanceof RosterEntry) {
+            RosterEntry result = (RosterEntry) selected;
+
+            if (!result.getUser().equals(Saros.getDefault().getMyJID())) {
+                return result;
+            }
+        }
+        return null;
+
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-        Object selected = selection.getFirstElement();
-
-        if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-            this.rosterEntry = (RosterEntry) selected;
-            setEnabled(true);
-        } else {
-            this.rosterEntry = null;
-            setEnabled(false);
-        }
-
-        // TODO disable if user == self
+        this.rosterEntry = getSelectedForRename(selection);
+        setEnabled(this.rosterEntry != null);
     }
 }
