@@ -68,8 +68,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     private static Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
 
+    /**
+     * Number of milliseconds between each flushing and sending of outgoing
+     * activities, and testing for too old queued incoming activities.
+     */
     protected static final int MILLIS_UPDATE = 1000;
 
+    /** Buffer for outgoing activities. */
     private final List<IActivity> activities = new LinkedList<IActivity>();
 
     private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
@@ -401,6 +406,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
                 synchronized (queues) {
                     queues.checkForMissingActivities();
+                    // Maybe the check above has unblocked queued activities
+                    // that can be executed now.
+                    for (TimedActivity activity : queues.removeActivities()) {
+                        exec(activity.getActivity());
+                    }
                 }
             }
         }, 0, MILLIS_UPDATE);
