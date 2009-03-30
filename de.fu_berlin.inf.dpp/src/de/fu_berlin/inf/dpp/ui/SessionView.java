@@ -87,9 +87,6 @@ public class SessionView extends ViewPart {
 
     protected TableViewer viewer;
 
-    protected String[] columnProperties = new String[] { "ICON", "COLOR",
-        "USER" };
-
     protected ISharedProject sharedProject;
 
     protected GiveDriverRoleAction giveDriverRoleAction;
