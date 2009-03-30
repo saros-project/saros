@@ -399,30 +399,26 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         // the driver's editors.
         final ActivitySequencer sequencer = this.sharedProject.getSequencer();
         for (final IPath path : driverEditors) {
-            // HACK Why do we need to check whether the file really belongs to
-            // project? See else branch.
-            if (this.sharedProject.getProject().findMember(path) != null) {
 
-                sequencer.activityCreated(new EditorActivity(
-                    EditorActivity.Type.Activated, path));
-
-                Util.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        ILineRange range = editorManager
-                            .getCurrentViewport(path);
-
-                        if (range != null) {
-                            // TODO Investigate whether it is okay to dispatch
-                            // directly
-                            sequencer.activityCreated(new ViewportActivity(
-                                range, path));
-                        }
-                    }
-                });
-
-            } else {
+            if (this.sharedProject.getProject().findMember(path) == null) {
                 log.warn("Editor " + path + " is not a driver's editor!");
+                return;
             }
+            sequencer.activityCreated(new EditorActivity(
+                EditorActivity.Type.Activated, path));
+
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    ILineRange range = editorManager.getCurrentViewport(path);
+
+                    if (range != null) {
+                        // TODO Investigate whether it is okay to dispatch
+                        // directly
+                        sequencer.activityCreated(new ViewportActivity(range,
+                            path));
+                    }
+                }
+            });
         }
     }
 
