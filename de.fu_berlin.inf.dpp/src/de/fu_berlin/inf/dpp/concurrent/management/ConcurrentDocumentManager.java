@@ -756,7 +756,7 @@ public class ConcurrentDocumentManager {
             return;
         }
 
-        logger.debug(String.format(
+        logger.trace(String.format(
             "Received %d checksums for %d inconsistencies", checksums.size(),
             pathsWithWrongChecksums.size()));
 
@@ -772,7 +772,7 @@ public class ConcurrentDocumentManager {
 
         if (pathsWithWrongChecksums.isEmpty()) {
             if (inconsistencyToResolve.getValue()) {
-                logger.debug("All Inconsistencies are resolved");
+                logger.info("All Inconsistencies are resolved");
                 inconsistencyToResolve.setValue(false);
             }
         } else {
