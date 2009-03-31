@@ -42,7 +42,7 @@ public class RequestForActivityHandler extends RequestActivityExtension {
 
     @Override
     public void requestForResendingActivitiesReceived(JID fromJID,
-        int timeStamp, boolean andUp) {
+        int sequenceNumber, boolean andUp) {
 
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.getSharedProject();
@@ -53,11 +53,11 @@ public class RequestForActivityHandler extends RequestActivityExtension {
         }
 
         List<TimedActivity> activities = sharedProject.getSequencer()
-            .getActivityHistory(fromJID, timeStamp, andUp);
+            .getActivityHistory(fromJID, sequenceNumber, andUp);
 
         log.info(String.format(
             "Received request for resending of timestamp%s %d%s.", andUp ? "s"
-                : "", timeStamp, andUp ? " (andup)" : ""));
+                : "", sequenceNumber, andUp ? " (andup)" : ""));
 
         if (activities.size() > 0) {
             PacketExtension extension = new ActivitiesPacketExtension(

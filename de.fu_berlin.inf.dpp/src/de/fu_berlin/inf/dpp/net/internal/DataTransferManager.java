@@ -577,7 +577,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                 for (IDataReceiver receiver : receivers) {
                     boolean consumed = receiver
                         .receivedResource(data.sender, new Path(
-                            data.file_project_path), input, data.timestamp);
+                            data.file_project_path), input, data.sequenceNumber);
                     if (consumed)
                         return;
                 }
@@ -613,7 +613,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected IDataReceiver defaultReceiver = new IDataReceiver() {
 
         public boolean receivedResource(JID from, Path path, InputStream input,
-            int time) {
+            int sequenceNumber) {
 
             log.info("Incoming resource from " + from.toString() + ": " + path);
 
@@ -627,7 +627,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             // Otherwise
             TimedActivity timedActivity = new TimedActivity(new FileActivity(
-                from.toString(), path, input), time);
+                from.toString(), path, input), sequenceNumber);
 
             chatTransmitter.receiveActivities(from, Collections
                 .singletonList(timedActivity));
@@ -688,7 +688,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                                 // don't close the ZipInputStream, we close the
                                 // entry ourselves...
                             }
-                        }, data.timestamp);
+                        }, data.sequenceNumber);
 
                     zip.closeEntry();
                 }

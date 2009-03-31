@@ -24,6 +24,7 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
@@ -84,27 +85,28 @@ public class ConsistencyWatchdogHandler {
 
             // Send the file to client
             try {
-                transmitter.sendFile(from, project.getProject(), path, -1,
-                /*
-                 * TODO CO The Callback should be used to show progress to the
-                 * user
-                 */
-                new IFileTransferCallback() {
+                transmitter.sendFile(from, project.getProject(), path,
+                    TimedActivity.NO_SEQUENCE_NR,
+                    /*
+                     * TODO CO The Callback should be used to show progress to
+                     * the user
+                     */
+                    new IFileTransferCallback() {
 
-                    public void fileSent(IPath path) {
-                        // do nothing
-                    }
+                        public void fileSent(IPath path) {
+                            // do nothing
+                        }
 
-                    public void fileTransferFailed(IPath path, Exception e) {
-                        // do nothing
+                        public void fileTransferFailed(IPath path, Exception e) {
+                            // do nothing
 
-                    }
+                        }
 
-                    public void transferProgress(int transfered) {
-                        // do nothing
-                    }
+                        public void transferProgress(int transfered) {
+                            // do nothing
+                        }
 
-                });
+                    });
             } catch (IOException e) {
                 // TODO This means we were really unable to send
                 // this file. No more falling back.

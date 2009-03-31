@@ -3,6 +3,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -12,6 +13,9 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefa
 
 public abstract class RequestActivityExtension extends
     SessionDefaultPacketExtension {
+
+    private static Logger log = Logger.getLogger(RequestActivityExtension.class
+        .getName());
 
     public RequestActivityExtension() {
         super("requestActivity");
@@ -41,18 +45,19 @@ public abstract class RequestActivityExtension extends
 
     @Override
     public void processMessage(JID sender, Message message) {
-        DefaultPacketExtension rae = RequestActivityExtension.getDefault()
-            .getExtension(message);
+        DefaultPacketExtension extension = RequestActivityExtension
+            .getDefault().getExtension(message);
 
-        String sID = rae.getValue("ID");
-        boolean andUp = rae.getValue("ANDUP") != null;
+        String tmp = extension.getValue("ID");
+        boolean andUp = extension.getValue("ANDUP") != null;
 
-        if (sID == null)
+        if (tmp == null) {
+            log.error("No sequence number in request.");
             return;
+        }
 
-        int timeStamp = (new Integer(sID)).intValue();
-
-        requestForResendingActivitiesReceived(sender, timeStamp, andUp);
+        int sequenceNumber = Integer.parseInt(tmp);
+        requestForResendingActivitiesReceived(sender, sequenceNumber, andUp);
 
     }
 

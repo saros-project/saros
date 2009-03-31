@@ -175,7 +175,7 @@ public class ConsistencyAction extends Action {
         }
 
         public boolean receivedResource(JID from, Path path, InputStream input,
-            int time) {
+            int sequenceNumber) {
 
             log.debug("Received consistency file [" + from.getName() + "] "
                 + path.toString());

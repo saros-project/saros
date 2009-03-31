@@ -38,9 +38,12 @@ public class ActivitiesProvider implements PacketExtensionProvider {
         throws XmlPullParserException, IOException {
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-        int time = -1;
         String sessionID = null;
-
+        /*
+         * There is only one sequence number in the message, so all activities
+         * get increasing numbers based on that sequence number.
+         */
+        int sequenceNumber = TimedActivity.UNKNOWN_SEQUENCE_NR;
         boolean done = false;
         while (!done) {
             int eventType = parser.next();
@@ -51,15 +54,17 @@ public class ActivitiesProvider implements PacketExtensionProvider {
                     sessionID = parseSessionId(parser);
                 }
                 if (parser.getName().equals("timestamp")) {
-                    time = parseTime(parser);
+                    sequenceNumber = parseSequenceNumber(parser);
                 }
 
                 ActivityRegistry activityRegistry = ActivityRegistry
                     .getDefault();
                 IActivity activity = activityRegistry.parseActivity(parser);
                 if (activity != null) {
-                    timedActivities.add(new TimedActivity(activity, time));
-                    time++;
+                    assert sequenceNumber != TimedActivity.UNKNOWN_SEQUENCE_NR;
+                    timedActivities.add(new TimedActivity(activity,
+                        sequenceNumber));
+                    sequenceNumber++;
                 }
 
             } else if (eventType == XmlPullParser.END_TAG) {
@@ -81,12 +86,13 @@ public class ActivitiesProvider implements PacketExtensionProvider {
         return sessionID;
     }
 
-    private int parseTime(XmlPullParser parser) throws XmlPullParserException,
-        IOException {
+    private int parseSequenceNumber(XmlPullParser parser)
+        throws XmlPullParserException, IOException {
+
         parser.next(); // read text
-        int time = Integer.parseInt(parser.getText());
+        int result = Integer.parseInt(parser.getText());
         parser.next(); // read end tag
 
-        return time;
+        return result;
     }
 }

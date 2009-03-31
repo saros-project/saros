@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -30,6 +31,9 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 
 public class ActivitiesPacketExtension implements PacketExtension {
+
+    private static final Logger log = Logger
+        .getLogger(ActivitiesPacketExtension.class.getName());
 
     public static PacketFilter getFilter() {
         return new PacketExtensionFilter(ELEMENT, NAMESPACE);
@@ -40,8 +44,6 @@ public class ActivitiesPacketExtension implements PacketExtension {
     public static final String SESSION_ID = "sessionID";
 
     public static final String ELEMENT = "activities";
-
-    public static final String TEXT_CHANGE_TAG = "edit";
 
     private List<TimedActivity> activities;
 
@@ -89,11 +91,22 @@ public class ActivitiesPacketExtension implements PacketExtension {
         buf.append(" xmlns=\"").append(getNamespace()).append("\">");
 
         buf.append(sessionIdToXML());
-
-        int firstTimestamp = this.activities.get(0).getTimestamp();
-        buf.append("<timestamp>").append(firstTimestamp).append("</timestamp>");
+        /*
+         * Only the first sequence number is put into the message, which means
+         * all given activities must have consecutive, increasing sequence
+         * numbers.
+         */
+        int sequenceNumber = this.activities.get(0).getSequenceNumber();
+        buf.append("<timestamp>").append(sequenceNumber).append("</timestamp>");
 
         for (TimedActivity timedActivity : this.activities) {
+            if (timedActivity.getSequenceNumber() != sequenceNumber) {
+                log.error("Sequence number in activity ("
+                    + timedActivity.getSequenceNumber()
+                    + ") does not match expected number: " + sequenceNumber);
+            }
+            sequenceNumber++;
+
             IActivity activity = timedActivity.getActivity();
             activity.toXML(buf);
         }

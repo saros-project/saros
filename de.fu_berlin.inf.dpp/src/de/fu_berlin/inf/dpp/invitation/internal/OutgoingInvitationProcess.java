@@ -39,6 +39,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
@@ -126,6 +127,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
             List<IPath> added = diff.getAddedPaths();
             List<IPath> altered = diff.getAlteredPaths();
+            // TODO A linked list might be more efficient. See #sendNext().
             this.toSend = new ArrayList<IPath>(added.size() + altered.size());
             this.toSend.addAll(added);
             this.toSend.addAll(altered);
@@ -267,7 +269,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         try {
             this.transmitter.sendFileAsync(this.peer, this.sharedProject
-                .getProject(), path, -1, this);
+                .getProject(), path, TimedActivity.NO_SEQUENCE_NR, this);
         } catch (IOException e) {
             this.fileTransferFailed(path, e);
         }
@@ -287,6 +289,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             return;
         }
 
+        // TODO The "./" prefix should be unnecessary and is not cross platform.
+        // TODO Use a $TEMP directory here.
         File archive = new File("./" + getPeer().getName() + "_Project.zip");
 
         try {

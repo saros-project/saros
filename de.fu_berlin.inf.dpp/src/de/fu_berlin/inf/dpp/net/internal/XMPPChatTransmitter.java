@@ -403,8 +403,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
             ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
                 activities.size());
-            for (TimedActivity timedActivity : sequencer.createTimedActivities(
-                recipientJID, activities)) {
+            List<TimedActivity> timedActivities = sequencer
+                .createTimedActivities(recipientJID, activities);
+            for (TimedActivity timedActivity : timedActivities) {
 
                 // Check each activity if it is a file creation which will be
                 // send asynchronous, and collect all others in stillToSend.
@@ -423,8 +424,9 @@ public class XMPPChatTransmitter implements ITransmitter,
                     .getDefault().getSessionManager().getSessionID(),
                     stillToSend));
             }
+            XMPPChatTransmitter.log.info("Sent Activities to " + recipientJID
+                + ": " + timedActivities);
         }
-        XMPPChatTransmitter.log.info("Sent Activities to all: " + activities);
     }
 
     /**
@@ -447,7 +449,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             if (fileActivity.getType().equals(FileActivity.Type.Created)) {
                 try {
                     sendFileAsync(recipientJID, sharedProject.getProject(),
-                        fileActivity.getPath(), timedActivity.getTimestamp(),
+                        fileActivity.getPath(), timedActivity
+                            .getSequenceNumber(),
                         new AbstractFileTransferCallback() {
                             @Override
                             public void fileTransferFailed(IPath path,
@@ -476,12 +479,12 @@ public class XMPPChatTransmitter implements ITransmitter,
         dataManager.sendData(data, fileList.toXML().getBytes(), callback);
     }
 
-    public void sendFile(JID to, IProject project, IPath path, int timestamp,
-        IFileTransferCallback callback) throws IOException {
+    public void sendFile(JID to, IProject project, IPath path,
+        int sequenceNumber, IFileTransferCallback callback) throws IOException {
 
         TransferDescription transfer = TransferDescription
             .createFileTransferDescription(to, new JID(connection.getUser()),
-                path, timestamp);
+                path, sequenceNumber);
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
@@ -733,15 +736,15 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected ExecutorService executor;
 
     public void sendFileAsync(JID recipient, IProject project,
-        final IPath path, int timestamp, final IFileTransferCallback callback)
-        throws IOException {
+        final IPath path, int sequenceNumber,
+        final IFileTransferCallback callback) throws IOException {
 
         if (callback == null)
             throw new IllegalArgumentException();
 
         final TransferDescription transfer = TransferDescription
             .createFileTransferDescription(recipient, new JID(connection
-                .getUser()), path, timestamp);
+                .getUser()), path, sequenceNumber);
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 

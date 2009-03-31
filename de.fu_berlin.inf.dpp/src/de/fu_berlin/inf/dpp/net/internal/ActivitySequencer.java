@@ -133,12 +133,12 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          */
         public void add(TimedActivity activity) {
             if (expectedSequenceNumber == UNKNOWN_NUMBER) {
-                expectedSequenceNumber = activity.getTimestamp();
+                expectedSequenceNumber = activity.getSequenceNumber();
             }
 
             // Ignore activities with sequence numbers we have already seen or
             // don't expect anymore.
-            if (activity.getTimestamp() < expectedSequenceNumber) {
+            if (activity.getSequenceNumber() < expectedSequenceNumber) {
                 log.warn("Unexpected activity: " + activity);
                 return;
             }
@@ -187,7 +187,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          */
         public TimedActivity removeNext() {
             if (queuedActivities.size() > 0
-                && queuedActivities.peek().getTimestamp() == expectedSequenceNumber) {
+                && queuedActivities.peek().getSequenceNumber() == expectedSequenceNumber) {
 
                 expectedSequenceNumber++;
                 TimedActivity result = queuedActivities.remove();
@@ -325,11 +325,12 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         /**
          * @see ActivitySequencer#getActivityHistory(JID, int, boolean)
          */
-        public List<TimedActivity> getHistory(JID user, int fromTimestamp,
+        public List<TimedActivity> getHistory(JID user, int fromSequenceNumber,
             boolean andUp) {
+
             LinkedList<TimedActivity> result = new LinkedList<TimedActivity>();
             for (TimedActivity activity : getActivityQueue(user).history) {
-                if (activity.getTimestamp() >= fromTimestamp) {
+                if (activity.getSequenceNumber() >= fromSequenceNumber) {
                     result.add(activity);
                     if (!andUp) {
                         break;
@@ -557,9 +558,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * 
      * If no activity matches the criteria an empty list is returned.
      */
-    public List<TimedActivity> getActivityHistory(JID user, int fromTimestamp,
-        boolean andUp) {
-        return queues.getHistory(user, fromTimestamp, andUp);
+    public List<TimedActivity> getActivityHistory(JID user,
+        int fromSequenceNumber, boolean andUp) {
+
+        return queues.getHistory(user, fromSequenceNumber, andUp);
     }
 
     /**

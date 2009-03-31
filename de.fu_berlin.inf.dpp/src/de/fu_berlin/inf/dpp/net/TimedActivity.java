@@ -9,9 +9,17 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  */
 public class TimedActivity implements Comparable<TimedActivity> {
 
+    /** Sequence number for Activities that don't have to wait. */
+    public static final int NO_SEQUENCE_NR = -1;
+    /**
+     * Unknown sequence number. It is illegal to use it in {@link TimedActivity}
+     * instances.
+     */
+    public static final int UNKNOWN_SEQUENCE_NR = -2;
+
     private final IActivity activity;
 
-    private final int timestamp;
+    private final int sequenceNumber;
 
     /** A "real" wall clock timestamp for this activity. */
     private long localTimestamp = 0;
@@ -21,16 +29,25 @@ public class TimedActivity implements Comparable<TimedActivity> {
      * 
      * @param activity
      *            the activity.
-     * @param timestamp
-     *            the timestamp that belongs to the activity.
+     * @param sequenceNumber
+     *            the sequence number that belongs to the activity.
+     * 
+     * @throws IllegalArgumentException
+     *             if activity is <code>null</code> or the sequence number is
+     *             {@link TimedActivity#UNKNOWN_SEQUENCE_NR}.
      */
-    public TimedActivity(IActivity activity, int timestamp) {
+    public TimedActivity(IActivity activity, int sequenceNumber) {
 
-        if (activity == null)
+        if (activity == null) {
             throw new IllegalArgumentException("Activity cannot be null");
+        }
+        if (sequenceNumber == UNKNOWN_SEQUENCE_NR) {
+            throw new IllegalArgumentException(
+                "sequenceNumber must not be TimedActicity.UNKNOWN_SEQUENCE_NR");
+        }
 
         this.activity = activity;
-        this.timestamp = timestamp;
+        this.sequenceNumber = sequenceNumber;
     }
 
     /**
@@ -48,15 +65,15 @@ public class TimedActivity implements Comparable<TimedActivity> {
     }
 
     /**
-     * @return the timestamp of the activiy.
+     * @return the sequence number of the activiy.
      */
-    public int getTimestamp() {
-        return this.timestamp;
+    public int getSequenceNumber() {
+        return this.sequenceNumber;
     }
 
     @Override
     public String toString() {
-        return "[" + this.timestamp + ":" + this.activity + "]";
+        return "[" + this.sequenceNumber + ":" + this.activity + "]";
     }
 
     @Override
@@ -65,7 +82,7 @@ public class TimedActivity implements Comparable<TimedActivity> {
         int result = 1;
         result = prime * result
             + ((activity == null) ? 0 : activity.hashCode());
-        result = prime * result + timestamp;
+        result = prime * result + sequenceNumber;
         return result;
     }
 
@@ -82,14 +99,14 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
         TimedActivity other = (TimedActivity) obj;
         return other.activity.equals(this.activity)
-            && (other.timestamp == this.timestamp);
+            && (other.sequenceNumber == this.sequenceNumber);
     }
 
     public int compareTo(TimedActivity other) {
         if (other == null) {
             throw new NullPointerException();
         }
-        return this.timestamp - other.timestamp;
+        return this.sequenceNumber - other.sequenceNumber;
     }
 
     public void setLocalTimestamp(long localTimestamp) {

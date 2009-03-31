@@ -22,7 +22,8 @@ public interface IDataReceiver {
     /**
      * @return true if the input stream has been consumed by the receiver
      */
-    boolean receivedResource(JID from, Path path, InputStream input, int time);
+    boolean receivedResource(JID from, Path path, InputStream input,
+        int sequenceNumber);
 
     /**
      * @return true if the input stream has been consumed by the receiver

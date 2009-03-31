@@ -47,7 +47,7 @@ public class TransferDescription implements Serializable {
 
     public JID sender;
 
-    public int timestamp;
+    public int sequenceNumber;
 
     public String file_project_path;
 
@@ -76,14 +76,14 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createFileTransferDescription(
-        JID recipient, JID sender, IPath path, int timestamp) {
+        JID recipient, JID sender, IPath path, int sequenceNumber) {
 
         TransferDescription result = new TransferDescription();
         result.recipient = recipient;
         result.sender = sender;
         result.type = FileTransferType.RESOURCE_TRANSFER;
         result.file_project_path = path.toPortableString();
-        result.timestamp = timestamp;
+        result.sequenceNumber = sequenceNumber;
         return result;
     }
 
