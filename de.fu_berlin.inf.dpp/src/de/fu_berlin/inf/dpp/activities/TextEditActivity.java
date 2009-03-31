@@ -73,22 +73,20 @@ public class TextEditActivity extends AbstractActivity {
      * @param source
      *            JID as String of the user that caused this activity
      */
-    public TextEditActivity(int offset, String text, String replacedText,
-        IPath editor, String source) {
+    public TextEditActivity(String source, int offset, String text,
+        String replacedText, IPath editor) {
+        super(source);
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
         if (replacedText == null)
             throw new IllegalArgumentException("ReplacedText cannot be null");
         if (editor == null)
             throw new IllegalArgumentException("Editor cannot be null");
-        if (source == null)
-            throw new IllegalArgumentException("Source cannot be null");
 
         this.offset = offset;
         this.text = text;
         this.replacedText = replacedText;
         this.editor = editor;
-        this.source = source;
     }
 
     @Override

@@ -85,6 +85,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
@@ -123,6 +124,8 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * 
  */
 public class EditorManager implements IActivityProvider, ISharedProjectListener {
+
+    protected RemoteEditorManager remoteEditorManager;
 
     private class DirtyStateListener implements IElementStateListener {
 
@@ -441,6 +444,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             sharedProject.getActivityManager().addProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
                 project);
+            remoteEditorManager = new RemoteEditorManager();
 
             // TODO Review Why?
             activateOpenEditors();
@@ -472,6 +476,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             lastRemoteEditTimes.clear();
             contributionAnnotationManager.dispose();
             contributionAnnotationManager = null;
+            remoteEditorManager = null;
             activeDriverEditor = null;
             driverEditors.clear();
         }
@@ -565,26 +570,34 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             return;
         }
 
-        if (!this.sharedProject.isDriver()) {
+        if (!this.isDriver)
             return;
-        }
 
         IPath path = editorAPI.getEditorResource(part).getProjectRelativePath();
 
-        fireActivity(new ViewportActivity(viewport, path));
+        fireActivity(new ViewportActivity(Saros.getDefault().getMyJID()
+            .toString(), viewport, path));
     }
 
     public void selectionChanged(IEditorPart part, ITextSelection newSelection) {
 
-        IPath path = editorAPI.getEditorResource(part).getProjectRelativePath();
+        IResource resource = editorAPI.getEditorResource(part);
+
+        if (resource == null)
+            return;
+
+        IPath path = resource.getProjectRelativePath();
+
+        if (path == null) {
+            log.error("Couldn't get editor for part: " + part);
+            return;
+        }
 
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
 
-        if (path == null) {
-            log.error("Couldn't get editor!");
-        } else
-            fireActivity(new TextSelectionActivity(offset, length, path));
+        fireActivity(new TextSelectionActivity(Saros.getDefault().getMyJID()
+            .toString(), offset, length, path));
     }
 
     /**
@@ -655,8 +668,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 replacedText = sb.toString();
             }
 
-            TextEditActivity activity = new TextEditActivity(offset, text,
-                replacedText, path, Saros.getDefault().getMyJID().toString());
+            TextEditActivity activity = new TextEditActivity(Saros.getDefault()
+                .getMyJID().toString(), offset, text, replacedText, path);
 
             EditorManager.this.lastEditTimes.put(path, System
                 .currentTimeMillis());
@@ -821,6 +834,9 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @see IActivityProvider
      */
     public void exec(final IActivity activity) {
+
+        remoteEditorManager.exec(activity);
+
         activity.dispatch(activityReceiver);
     }
 
@@ -896,6 +912,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
          * be a bit inaccurate.
          */
         User user = sharedProject.getParticipant(new JID(source));
+        // Only display for drivers
+        if (user.isObserver())
+            return;
+
         ITextSelection driverSelection = getDriverTextSelection(user);
         // Check needed when viewport activity came before the first
         // text selection activity.
@@ -908,8 +928,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         Set<IEditorPart> editors = this.editorPool.getEditors(path);
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setViewport(editorPart, top, bottom, source,
-                following);
+            this.editorAPI.setViewport(editorPart, viewport.getLineRange(),
+                source, following);
         }
     }
 
@@ -1047,15 +1067,16 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     private IActivity parseTextEditActivity(XmlPullParser parser)
         throws XmlPullParserException, IOException {
 
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
+
         // extract current editor for text edit.
         String pathString = parser.getAttributeValue(null, "path");
-
         assert pathString != null;
 
         IPath path = Path.fromPortableString(Util.urlUnescape(pathString));
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
+
         String sender = Util.urlUnescape(parser.getAttributeValue(null,
             "sender"));
 
@@ -1075,14 +1096,16 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
         }
 
-        TextEditActivity result = new TextEditActivity(offset, text, replace,
-            path, source);
+        TextEditActivity result = new TextEditActivity(source, offset, text,
+            replace, path);
         result.setSender(sender);
         return result;
     }
 
     private IActivity parseEditorActivity(XmlPullParser parser) {
 
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
         String pathString = parser.getAttributeValue(null, "path");
 
         IPath path;
@@ -1094,25 +1117,32 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null,
             "type"));
-        return new EditorActivity(type, path);
+        return new EditorActivity(source, type, path);
     }
 
     private TextSelectionActivity parseTextSelection(XmlPullParser parser) {
+
         // TODO extract constants
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
         int length = Integer.parseInt(parser.getAttributeValue(null, "length"));
         String path = Util
             .urlUnescape(parser.getAttributeValue(null, "editor"));
-        return new TextSelectionActivity(offset, length, Path
+        return new TextSelectionActivity(source, offset, length, Path
             .fromPortableString(path));
     }
 
     private ViewportActivity parseViewport(XmlPullParser parser) {
+
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
         int top = Integer.parseInt(parser.getAttributeValue(null, "top"));
         int bottom = Integer.parseInt(parser.getAttributeValue(null, "bottom"));
         String path = Util
             .urlUnescape(parser.getAttributeValue(null, "editor"));
-        return new ViewportActivity(top, bottom, Path.fromPortableString(path));
+        return new ViewportActivity(source, top, bottom, Path
+            .fromPortableString(path));
     }
 
     private boolean isSharedEditor(IEditorPart editorPart) {
@@ -1367,7 +1397,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             listener.driverEditorSaved(path, false);
         }
 
-        fireActivity(new EditorActivity(Type.Saved, path));
+        fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+            .toString(), Type.Saved, path));
     }
 
     /**
@@ -1514,7 +1545,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 });
             }
         } else {
-            fireActivity(new EditorActivity(Type.Activated, path));
+            fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+                .toString(), Type.Activated, path));
         }
     }
 
@@ -1555,7 +1587,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 }
             });
         } else {
-            fireActivity(new EditorActivity(Type.Closed, path));
+            fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+                .toString(), Type.Closed, path));
         }
     }
 
@@ -1756,5 +1789,34 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         DocumentProviderRegistry registry = DocumentProviderRegistry
             .getDefault();
         return registry.getDocumentProvider(input);
+    }
+
+    public void jumpToUser(User jumpTo) {
+
+        RemoteEditor activeEditor = remoteEditorManager.getEditorState(jumpTo)
+            .getActiveEditor();
+
+        if (activeEditor == null) {
+            log.info("User[" + jumpTo + "] has no editor open");
+            return;
+        }
+
+        IEditorPart newEditor = this.editorAPI.openEditor(this.sharedProject
+            .getProject().getFile(activeEditor.getPath()));
+
+        if (newEditor == null) {
+            return;
+        }
+
+        ILineRange viewport = activeEditor.getViewport();
+
+        if (viewport == null) {
+            log.warn("User[" + jumpTo + "] has not viewport in editor: "
+                + activeEditor.getPath());
+            return;
+        }
+
+        this.editorAPI.setViewport(newEditor, viewport, jumpTo.getJID()
+            .toString(), true);
     }
 }

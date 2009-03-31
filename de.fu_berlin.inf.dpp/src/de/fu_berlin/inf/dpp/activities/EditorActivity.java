@@ -44,7 +44,8 @@ public class EditorActivity extends AbstractActivity {
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivity(Type type, IPath path) {
+    public EditorActivity(String source, Type type, IPath path) {
+        super(source);
         if ((type != Type.Activated) && (path == null)) {
             throw new IllegalArgumentException(
                 "Null path for non-activation type editor activity given.");
@@ -100,7 +101,7 @@ public class EditorActivity extends AbstractActivity {
     @Override
     public String toString() {
         return "EditorActivity(type:" + this.type + ",path:"
-            + (this.path != null ? this.path.lastSegment() : "no path") + ")";
+            + (this.path != null ? this.path : "no path") + ")";
     }
 
     public boolean dispatch(IActivityReceiver receiver) {
@@ -109,6 +110,7 @@ public class EditorActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<editor ");
+        sourceToXML(sb);
         if (getPath() != null) {
             sb.append("path=\"").append(
                 Util.urlEscape(getPath().toPortableString())).append("\" ");

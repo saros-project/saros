@@ -29,35 +29,26 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class RoleActivity extends AbstractActivity {
 
-    private final JID user;
-    private final UserRole role;
+    protected final UserRole role;
+
+    protected final String id;
 
     /**
      * Creates a new RoleActivity which indicates that the given user should
      * change into the given role.
-     * 
-     * @param user
-     * @param role
      */
-    public RoleActivity(JID user, UserRole role) {
-        this.user = user;
+    public RoleActivity(String source, String affectedUser, UserRole role) {
+        super(source);
+        this.id = affectedUser;
         this.role = role;
-    }
-
-    public JID getUser() {
-        return this.user;
-    }
-
-    public UserRole getRole() {
-        return role;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = 1;
-        result = prime * result + role.hashCode();
-        result = prime * result + user.hashCode();
+        int result = super.hashCode();
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((role == null) ? 0 : role.hashCode());
         return result;
     }
 
@@ -65,18 +56,36 @@ public class RoleActivity extends AbstractActivity {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
+        if (!super.equals(obj))
             return false;
         if (!(obj instanceof RoleActivity))
             return false;
         RoleActivity other = (RoleActivity) obj;
-        return this.role.equals(other.role) && this.source.equals(other.source);
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (role == null) {
+            if (other.role != null)
+                return false;
+        } else if (!role.equals(other.role))
+            return false;
+        return true;
+    }
+
+    public JID getAffectedUser() {
+        return new JID(id);
+    }
+
+    public UserRole getRole() {
+        return role;
     }
 
     @Override
     public String toString() {
-        return "RoleActivity(user:" + this.user + ",new role:" + this.getRole()
-            + ")";
+        return "RoleActivity(user:" + this.getAffectedUser() + ",new role:"
+            + this.getRole() + ")";
     }
 
     public boolean dispatch(IActivityReceiver receiver) {
@@ -85,8 +94,8 @@ public class RoleActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<user ");
-        sb.append("id=\"").append(Util.urlEscape(getUser().toString())).append(
-            "\" ");
+        sourceToXML(sb);
+        sb.append("id=\"").append(Util.urlEscape(id)).append("\" ");
         sb.append("role=\"").append(getRole()).append("\" ");
         sb.append("/>");
     }

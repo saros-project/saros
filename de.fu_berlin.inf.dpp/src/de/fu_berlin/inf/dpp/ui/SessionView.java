@@ -30,6 +30,8 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
@@ -74,6 +76,7 @@ import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.JumpToDriverPositionAction;
 import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
@@ -324,6 +327,8 @@ public class SessionView extends ViewPart {
         }
     };
 
+    private JumpToDriverPositionAction jumpToAction;
+
     public SessionView() {
 
         /**
@@ -412,6 +417,8 @@ public class SessionView extends ViewPart {
         this.removeAllDriverRoleAction = new RemoveAllDriverRoleAction();
         this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
             "Give driver role");
+        this.jumpToAction = new JumpToDriverPositionAction(this.viewer);
+
         this.removeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
 
         contributeToActionBars();
@@ -494,6 +501,15 @@ public class SessionView extends ViewPart {
         Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
         this.viewer.getControl().setMenu(menu);
         getSite().registerContextMenu(menuMgr, this.viewer);
+
+        this.viewer.addDoubleClickListener(new IDoubleClickListener() {
+            public void doubleClick(DoubleClickEvent event) {
+                if (jumpToAction.isEnabled()) {
+                    jumpToAction.run();
+                }
+            }
+        });
+
     }
 
     private void fillContextMenu(IMenuManager manager) {
@@ -504,6 +520,7 @@ public class SessionView extends ViewPart {
             manager.add(this.giveDriverRoleAction);
             manager.add(this.removeDriverRoleAction);
         }
+        manager.add(this.jumpToAction);
 
         // Other plug-ins can contribute there actions here
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

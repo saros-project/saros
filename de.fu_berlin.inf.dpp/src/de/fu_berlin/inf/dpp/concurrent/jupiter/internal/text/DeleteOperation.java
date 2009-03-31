@@ -173,7 +173,7 @@ public class DeleteOperation implements Operation {
     }
 
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
-        return Collections.singletonList(new TextEditActivity(getPosition(),
-            "", getText(), path, source));
+        return Collections.singletonList(new TextEditActivity(source,
+            getPosition(), "", getText(), path));
     }
 }

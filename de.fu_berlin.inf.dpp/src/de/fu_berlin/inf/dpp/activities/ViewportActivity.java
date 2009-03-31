@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
+import org.eclipse.jface.text.source.LineRange;
 
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -12,7 +13,9 @@ public class ViewportActivity extends AbstractActivity {
 
     private final IPath editor;
 
-    public ViewportActivity(int topIndex, int bottomIndex, IPath editor) {
+    public ViewportActivity(String source, int topIndex, int bottomIndex,
+        IPath editor) {
+        super(source);
 
         assert topIndex <= bottomIndex : "Top == " + topIndex + ", Bottom == "
             + bottomIndex;
@@ -22,10 +25,14 @@ public class ViewportActivity extends AbstractActivity {
         this.editor = editor;
     }
 
-    public ViewportActivity(ILineRange viewport, IPath editor2) {
-        this(Math.max(0, viewport.getStartLine()), Math.max(0, viewport
+    public ViewportActivity(String source, ILineRange viewport, IPath editor2) {
+        this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor2);
+    }
+
+    public ILineRange getLineRange() {
+        return new LineRange(topIndex, bottomIndex - topIndex);
     }
 
     public int getBottomIndex() {
@@ -73,8 +80,8 @@ public class ViewportActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "ViewportActivity(top:" + this.topIndex + ",bottom:"
-            + this.bottomIndex + ")";
+        return "ViewportActivity(path:" + this.editor + ",range:("
+            + this.topIndex + "," + this.bottomIndex + "))";
     }
 
     public boolean dispatch(IActivityReceiver receiver) {
@@ -86,6 +93,7 @@ public class ViewportActivity extends AbstractActivity {
         assert getEditor() != null;
 
         sb.append("<viewport ");
+        sourceToXML(sb);
         sb.append("top=\"").append(getTopIndex()).append("\" ");
         sb.append("bottom=\"").append(getBottomIndex()).append("\" ");
         sb.append("editor=\"").append(

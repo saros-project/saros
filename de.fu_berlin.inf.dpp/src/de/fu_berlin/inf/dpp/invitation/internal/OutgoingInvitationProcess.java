@@ -28,19 +28,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.text.source.ILineRange;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
@@ -388,42 +383,45 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
          * where we are
          */
 
-        final EditorManager editorManager = EditorManager.getDefault();
-        ArrayList<IPath> driverEditors = new ArrayList<IPath>(editorManager
-            .getDriverEditors());
-
-        // Make sure the active editor is the last in this list.
-        IPath activeDriverEditor = editorManager.getActiveDriverEditor();
-        if (activeDriverEditor != null) {
-            driverEditors.remove(activeDriverEditor);
-            driverEditors.add(activeDriverEditor);
-        }
-
-        // Create editor activated activities and viewport information for all
-        // the driver's editors.
-        final ActivitySequencer sequencer = this.sharedProject.getSequencer();
-        for (final IPath path : driverEditors) {
-
-            if (this.sharedProject.getProject().findMember(path) == null) {
-                log.warn("Editor " + path + " is not a driver's editor!");
-                return;
-            }
-            sequencer.activityCreated(new EditorActivity(
-                EditorActivity.Type.Activated, path));
-
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    ILineRange range = editorManager.getCurrentViewport(path);
-
-                    if (range != null) {
-                        // TODO Investigate whether it is okay to dispatch
-                        // directly
-                        sequencer.activityCreated(new ViewportActivity(range,
-                            path));
-                    }
-                }
-            });
-        }
+        // TODO The following code is broken!
+        // final EditorManager editorManager = EditorManager.getDefault();
+        // ArrayList<IPath> driverEditors = new ArrayList<IPath>(editorManager
+        // .getDriverEditors());
+        //
+        // // Make sure the active editor is the last in this list.
+        // IPath activeDriverEditor = editorManager.getActiveDriverEditor();
+        // if (activeDriverEditor != null) {
+        // driverEditors.remove(activeDriverEditor);
+        // driverEditors.add(activeDriverEditor);
+        // }
+        //
+        // // Create editor activated activities and viewport information for
+        // all
+        // // the driver's editors.
+        // final ActivitySequencer sequencer =
+        // this.sharedProject.getSequencer();
+        // for (final IPath path : driverEditors) {
+        //
+        // if (this.sharedProject.getProject().findMember(path) == null) {
+        // log.warn("Editor " + path + " is not a driver's editor!");
+        // return;
+        // }
+        // sequencer.activityCreated(new EditorActivity(
+        // EditorActivity.Type.Activated, path));
+        //
+        // Util.runSafeSWTSync(log, new Runnable() {
+        // public void run() {
+        // ILineRange range = editorManager.getCurrentViewport(path);
+        //
+        // if (range != null) {
+        // // TODO Investigate whether it is okay to dispatch
+        // // directly
+        // sequencer.activityCreated(new ViewportActivity(range,
+        // path));
+        // }
+        // }
+        // });
+        // }
     }
 
     public String getProjectName() {

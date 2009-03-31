@@ -184,9 +184,10 @@ public class SplitOperation implements Operation {
                             "Split operation shifts second delete operation:"
                                 + this, new StackTrace()));
 
-                    result.set(1, new TextEditActivity(op2.offset
-                        - op1.replacedText.length(), "", op2.replacedText,
-                        path, source));
+                    result.set(1,
+                        new TextEditActivity(source, op2.offset
+                            - op1.replacedText.length(), "", op2.replacedText,
+                            path));
                 }
                 return result;
             }

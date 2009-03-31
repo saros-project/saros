@@ -21,6 +21,8 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
 
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -32,7 +34,9 @@ public class TextSelectionActivity extends AbstractActivity {
 
     private final IPath editor;
 
-    public TextSelectionActivity(int offset, int length, IPath path) {
+    public TextSelectionActivity(String source, int offset, int length,
+        IPath path) {
+        super(source);
         this.offset = offset;
         this.length = length;
         this.editor = path;
@@ -48,6 +52,10 @@ public class TextSelectionActivity extends AbstractActivity {
 
     public IPath getEditor() {
         return this.editor;
+    }
+
+    public ITextSelection getSelection() {
+        return new TextSelection(this.offset, this.length);
     }
 
     @Override
@@ -90,6 +98,7 @@ public class TextSelectionActivity extends AbstractActivity {
         assert getEditor() != null;
 
         sb.append("<textSelection ");
+        sourceToXML(sb);
         sb.append("offset=\"").append(getOffset()).append("\" ");
         sb.append("length=\"").append(getLength()).append("\" ");
         sb.append("editor=\"").append(

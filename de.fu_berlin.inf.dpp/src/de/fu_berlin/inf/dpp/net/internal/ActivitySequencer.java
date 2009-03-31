@@ -628,10 +628,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 && (textEdit.offset == lastTextEdit.offset
                     + lastTextEdit.text.length())) {
                 result.remove(lastTextEdit);
-                textEdit = new TextEditActivity(lastTextEdit.offset,
-                    lastTextEdit.text + textEdit.text,
+                textEdit = new TextEditActivity(lastTextEdit.getSource(),
+                    lastTextEdit.offset, lastTextEdit.text + textEdit.text,
                     lastTextEdit.replacedText + textEdit.replacedText,
-                    lastTextEdit.getEditor(), lastTextEdit.getSource());
+                    lastTextEdit.getEditor());
             }
         }
 

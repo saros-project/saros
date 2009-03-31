@@ -1,14 +1,21 @@
 package de.fu_berlin.inf.dpp.activities;
- 
+
 import org.apache.commons.lang.ObjectUtils;
+
+import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.Util;
 
 public abstract class AbstractActivity implements IActivity {
 
-    protected String source = null;
-
-    public void setSource(String source) {
+    public AbstractActivity(String source) {
+        if (source == null)
+            throw new IllegalArgumentException("Source cannot be null");
         this.source = source;
     }
+
+    protected final String source;
 
     public String getSource() {
         return this.source;
@@ -32,9 +39,18 @@ public abstract class AbstractActivity implements IActivity {
         return ObjectUtils.equals(this.source, other.source);
     }
 
+    public void sourceToXML(StringBuilder sb) {
+        sb.append("source=\"" + Util.urlEscape(this.source) + "\" ");
+    }
+
     public String toXML() {
         StringBuilder sb = new StringBuilder();
         this.toXML(sb);
         return sb.toString();
+    }
+
+    public User getUser() {
+        return Saros.getDefault().getSessionManager().getSharedProject()
+            .getParticipant(new JID(source));
     }
 }

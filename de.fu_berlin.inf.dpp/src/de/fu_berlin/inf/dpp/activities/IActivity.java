@@ -29,14 +29,6 @@ package de.fu_berlin.inf.dpp.activities;
 public interface IActivity {
 
     /**
-     * Set source jabber_id of producer of this IActivity.
-     * 
-     * @param source
-     *            jabber_id string
-     */
-    public void setSource(String source);
-
-    /**
      * Get jabber_id of remote producer
      * 
      * @return jabber_id

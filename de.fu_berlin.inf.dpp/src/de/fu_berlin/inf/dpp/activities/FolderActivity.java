@@ -13,7 +13,8 @@ public class FolderActivity extends AbstractActivity {
 
     private final IPath path;
 
-    public FolderActivity(Type type, IPath path) {
+    public FolderActivity(String source, Type type, IPath path) {
+        super(source);
         this.type = type;
         this.path = path;
     }
@@ -37,6 +38,7 @@ public class FolderActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<folder ");
+        sourceToXML(sb);
         sb.append("path=\"").append(
             Util.urlEscape(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");

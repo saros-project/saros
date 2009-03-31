@@ -28,6 +28,7 @@ import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
+import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.text.source.SourceViewer;
@@ -544,8 +545,11 @@ public class EditorAPI implements IEditorAPI {
         new EditorListener(editorPart, editorManager);
     }
 
-    public void setViewport(IEditorPart editorPart, int top, int bottom,
+    public void setViewport(IEditorPart editorPart, ILineRange viewport,
         String source, boolean following) {
+
+        int top = viewport.getStartLine();
+        int bottom = top + viewport.getNumberOfLines();
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         updateViewportAnnotation(viewer, top, bottom, source);

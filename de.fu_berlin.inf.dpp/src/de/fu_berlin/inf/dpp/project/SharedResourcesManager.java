@@ -125,10 +125,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
         private IActivity handleFolderDelta(IPath path, int kind) {
             switch (kind) {
             case IResourceDelta.ADDED:
-                return new FolderActivity(FolderActivity.Type.Created, path);
+                return new FolderActivity(Saros.getDefault().getMyJID()
+                    .toString(), FolderActivity.Type.Created, path);
 
             case IResourceDelta.REMOVED:
-                return new FolderActivity(FolderActivity.Type.Removed, path);
+                return new FolderActivity(Saros.getDefault().getMyJID()
+                    .toString(), FolderActivity.Type.Removed, path);
 
             default:
                 return null;
@@ -153,10 +155,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     // TODO Think about if this is needed...
                     return null;
                 }
-                return new FileActivity(FileActivity.Type.Created, path);
+                return new FileActivity(Saros.getDefault().getMyJID()
+                    .toString(), FileActivity.Type.Created, path);
 
             case IResourceDelta.REMOVED:
-                return new FileActivity(FileActivity.Type.Removed, path);
+                return new FileActivity(Saros.getDefault().getMyJID()
+                    .toString(), FileActivity.Type.Removed, path);
 
             default:
                 return null;
@@ -364,17 +368,22 @@ public class SharedResourcesManager implements IResourceChangeListener,
     private FileActivity parseFile(XmlPullParser parser)
         throws XmlPullParserException, IOException {
 
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
         IPath path = Path.fromPortableString(Util.urlUnescape(parser
             .getAttributeValue(null, "path")));
-        return new FileActivity(FileActivity.Type.valueOf(parser
+        return new FileActivity(source, FileActivity.Type.valueOf(parser
             .getAttributeValue(null, "type")), path);
     }
 
     private FolderActivity parseFolder(XmlPullParser parser) {
+
+        String source = Util.urlUnescape(parser.getAttributeValue(null,
+            "source"));
         IPath path = Path.fromPortableString(Util.urlUnescape(parser
             .getAttributeValue(null, "path")));
 
-        return new FolderActivity(FolderActivity.Type.valueOf(parser
+        return new FolderActivity(source, FolderActivity.Type.valueOf(parser
             .getAttributeValue(null, "type")), path);
     }
 }

@@ -1,38 +1,43 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.action.Action;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.actions.SelectionProviderAction;
+import org.picocontainer.Disposable;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class JumpToDriverPositionAction extends Action {
+public class JumpToDriverPositionAction extends SelectionProviderAction
+    implements Disposable {
 
     private static final Logger log = Logger
         .getLogger(JumpToDriverPositionAction.class.getName());
 
-    public JumpToDriverPositionAction() {
-        setToolTipText("Jump to position of driver.");
+    @Inject
+    SessionManager sessionManager;
+
+    public JumpToDriverPositionAction(ISelectionProvider provider) {
+        super(provider, "Jump to position of selected user");
+
+        setToolTipText("Jump to position of selected user");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
 
-        Saros.getDefault().getSessionManager().addSessionListener(
+        Saros.getDefault().reinject(this);
 
-        new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISharedProject sharedProject) {
-                updateEnablement();
-            }
+        selectionChanged(getStructuredSelection());
+    }
 
-            @Override
-            public void sessionEnded(ISharedProject sharedProject) {
-                updateEnablement();
-            }
-        });
-        updateEnablement();
+    @Override
+    public void selectionChanged(IStructuredSelection selection) {
+        setEnabled(sessionManager.getSharedProject() != null
+            && getSelectedUser() != null);
     }
 
     /**
@@ -42,12 +47,24 @@ public class JumpToDriverPositionAction extends Action {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                EditorManager.getDefault().openDriverEditor();
+                User jumpTo = getSelectedUser();
+                assert jumpTo != null;
+                EditorManager.getDefault().jumpToUser(jumpTo);
             }
         });
     }
 
-    private void updateEnablement() {
-        setEnabled(Saros.getDefault().getSessionManager().getSharedProject() != null);
+    public User getSelectedUser() {
+        Object selected = getStructuredSelection().getFirstElement();
+
+        if (!(selected instanceof User))
+            return null;
+
+        User selectedUser = (User) selected;
+
+        if (selectedUser.equals(Saros.getDefault().getLocalUser()))
+            return null;
+
+        return selectedUser;
     }
 }

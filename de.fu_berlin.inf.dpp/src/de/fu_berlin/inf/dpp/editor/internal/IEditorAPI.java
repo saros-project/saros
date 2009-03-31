@@ -6,6 +6,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.ui.IEditorPart;
 
@@ -74,7 +75,7 @@ public interface IEditorAPI {
      */
     public IResource getEditorResource(IEditorPart editorPart);
 
-    public void setViewport(IEditorPart editorPart, int top, int bottom,
+    public void setViewport(IEditorPart editorPart, ILineRange viewport,
         String source, boolean following);
 
     /**

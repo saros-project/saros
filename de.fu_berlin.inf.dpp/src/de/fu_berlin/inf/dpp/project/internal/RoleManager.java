@@ -10,7 +10,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -35,7 +34,8 @@ public class RoleManager implements IActivityProvider {
         @Override
         public void roleChanged(User user, boolean replicated) {
             if (!replicated) {
-                IActivity activity = new RoleActivity(user.getJID(), user
+                IActivity activity = new RoleActivity(Saros.getDefault()
+                    .getMyJID().toString(), user.getJID().toString(), user
                     .getUserRole());
                 for (IActivityListener listener : RoleManager.this.activityListeners) {
                     listener.activityCreated(activity);
@@ -94,7 +94,7 @@ public class RoleManager implements IActivityProvider {
         if (activity instanceof RoleActivity) {
             RoleActivity roleActivity = (RoleActivity) activity;
             User user = this.sharedProject.getParticipant(roleActivity
-                .getUser());
+                .getAffectedUser());
             UserRole role = roleActivity.getRole();
             this.sharedProject.setUserRole(user, role, true);
         }
@@ -107,11 +107,14 @@ public class RoleManager implements IActivityProvider {
      */
     public IActivity fromXML(XmlPullParser parser) {
         if (parser.getName().equals("user")) {
-            JID user = new JID(Util.urlUnescape(parser.getAttributeValue(null,
-                "id")));
+
+            String source = Util.urlUnescape(parser.getAttributeValue(null,
+                "source"));
+            String affectedUser = Util.urlUnescape(parser.getAttributeValue(
+                null, "id"));
             UserRole role = UserRole.valueOf(parser.getAttributeValue(null,
                 "role"));
-            return new RoleActivity(user, role);
+            return new RoleActivity(source, affectedUser, role);
         }
 
         return null;

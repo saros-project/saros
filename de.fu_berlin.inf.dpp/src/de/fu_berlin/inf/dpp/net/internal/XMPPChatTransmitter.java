@@ -380,15 +380,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 String sender = Saros.getDefault().getMyJID().toString();
                 textEditActivity.setSender(sender);
 
-                if (textEditActivity.getSource() == null) {
-                    /*
-                     * Missing source means, we handled the creation of new
-                     * TextEditActivities incorrectly
-                     */
-                    log.error("TextEditActivities does not have a source: "
-                        + textEditActivity);
-                    textEditActivity.setSource(sender);
-                }
+                assert textEditActivity.getSource() != null;
             }
         }
 
@@ -832,11 +824,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 
             /*
              * Some activities save space in the message by not setting the
-             * source
+             * source and the XML parser needs to provide the source
              */
-            if (activity.getSource() == null) {
-                activity.setSource(source);
-            }
+            assert activity.getSource() != null : "Received activity without source:"
+                + activity;
 
             // Ask sequencer to execute or queue until missing activities arrive
             project.getSequencer().exec(timedActivity);

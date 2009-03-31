@@ -17,7 +17,8 @@ public class FileActivity extends AbstractActivity {
 
     private InputStream inputStream;
 
-    public FileActivity(Type type, IPath path) {
+    public FileActivity(String source, Type type, IPath path) {
+        super(source);
         this.type = type;
         this.path = path;
     }
@@ -33,8 +34,7 @@ public class FileActivity extends AbstractActivity {
      *            data stream.
      */
     public FileActivity(String source, IPath path, InputStream in) {
-        this(Type.Created, path);
-        setSource(source);
+        this(source, Type.Created, path);
         this.inputStream = in;
     }
 
@@ -96,6 +96,7 @@ public class FileActivity extends AbstractActivity {
 
     public void toXML(StringBuilder sb) {
         sb.append("<file ");
+        sourceToXML(sb);
         sb.append("path=\"").append(
             Util.urlEscape(getPath().toPortableString())).append("\" ");
         sb.append("type=\"").append(getType()).append("\" ");
