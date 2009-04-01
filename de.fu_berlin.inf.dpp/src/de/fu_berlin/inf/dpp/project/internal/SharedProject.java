@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project.internal;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,12 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.window.Window;
 import org.picocontainer.annotations.Nullable;
 
@@ -59,7 +53,7 @@ import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class SharedProject implements ISharedProject {
-    private static Logger log = Logger.getLogger(SharedProject.class.getName());
+    public static Logger log = Logger.getLogger(SharedProject.class.getName());
 
     protected JID myID;
 
@@ -389,52 +383,10 @@ public class SharedProject implements ISharedProject {
     }
 
     public void setProjectReadonly(final boolean readonly) {
-
-        /*
-         * FIXME InvocationTargetException and Interrupted Exceptions are
-         * incorrectly handled
-         */
-
         /* run project read only settings in progress monitor thread. */
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                ProgressMonitorDialog dialog = new ProgressMonitorDialog(
-                    EditorAPI.getShell());
-                try {
-                    dialog.run(true, false, new IRunnableWithProgress() {
-                        public void run(final IProgressMonitor monitor) {
-                            monitor.beginTask("Project settings ... ",
-                                IProgressMonitor.UNKNOWN);
-
-                            try {
-                                getProject().accept(new IResourceVisitor() {
-                                    public boolean visit(IResource resource)
-                                        throws CoreException {
-
-                                        // Don't set the project read-only
-                                        if (resource instanceof IProject)
-                                            return true;
-
-                                        FileUtil
-                                            .setReadOnly(resource, readonly);
-                                        monitor.worked(1);
-
-                                        return true;
-                                    }
-                                });
-                            } catch (CoreException e) {
-                                log.warn("Failure to set readonly to "
-                                    + readonly + ":", e);
-                            } finally {
-                                monitor.done();
-                            }
-                        }
-                    });
-                } catch (InvocationTargetException e) {
-                    SharedProject.log.warn("", e);
-                } catch (InterruptedException e) {
-                    SharedProject.log.warn("", e);
-                }
+                FileUtil.setReadOnly(getProject(), readonly);
             }
         });
 

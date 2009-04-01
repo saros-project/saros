@@ -3,15 +3,23 @@ package de.fu_berlin.inf.dpp.util;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 
 /**
  * This class contains static utility methods for file handling.
@@ -124,6 +132,56 @@ public class FileUtil {
 
         if (wasReadOnly)
             setReadOnly(file, wasReadOnly);
+    }
+
+    /**
+     * @swt Must be called from the SWT thread
+     */
+    public static void setReadOnly(final IProject project,
+        final boolean readonly) {
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
+            .getShell());
+        try {
+            dialog.run(true, false, new IRunnableWithProgress() {
+                public void run(final IProgressMonitor monitor) {
+                    FileUtil.setReadOnly(project, readonly, monitor);
+                }
+            });
+        } catch (InvocationTargetException e) {
+            /*
+             * FIXME InvocationTargetException and Interrupted Exceptions are
+             * incorrectly handled
+             */
+            log.warn("", e);
+        } catch (InterruptedException e) {
+            log.warn("", e);
+        }
+    }
+
+    public static void setReadOnly(IProject project, final boolean readonly,
+        final IProgressMonitor monitor) {
+        monitor.beginTask("Project settings ... ", IProgressMonitor.UNKNOWN);
+
+        try {
+            project.accept(new IResourceVisitor() {
+                public boolean visit(IResource resource) throws CoreException {
+
+                    // Don't set the project and derived
+                    // files read-only
+                    if (resource instanceof IProject || resource.isDerived())
+                        return true;
+
+                    setReadOnly(resource, readonly);
+                    monitor.worked(1);
+
+                    return true;
+                }
+            });
+        } catch (CoreException e) {
+            log.warn("Failure to set readonly to " + readonly + ":", e);
+        } finally {
+            monitor.done();
+        }
     }
 
 }
