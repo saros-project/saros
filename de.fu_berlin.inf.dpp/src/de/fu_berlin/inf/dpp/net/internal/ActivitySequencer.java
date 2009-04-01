@@ -104,7 +104,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          * Oldest local timestamp for the queued activities or 0 if there are no
          * activities queued.
          */
-        private long oldestLocalTimestamp = 0;
+        private long oldestLocalTimestamp = Long.MAX_VALUE;
 
         /** Queue of activities received. */
         private final PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
@@ -145,7 +145,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
             long now = System.currentTimeMillis();
             activity.setLocalTimestamp(now);
-            if (oldestLocalTimestamp == 0) {
+            if (oldestLocalTimestamp == Long.MAX_VALUE) {
                 oldestLocalTimestamp = now;
             }
 
@@ -167,16 +167,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          * timestamp of the queued activities or 0 if the queue is empty.
          */
         protected void updateOldestLocalTimestamp() {
-            if (queuedActivities.size() == 0) {
-                oldestLocalTimestamp = 0;
-            } else {
-                oldestLocalTimestamp = queuedActivities.peek()
-                    .getLocalTimestamp();
-                for (TimedActivity timedActivity : queuedActivities) {
-                    long localTimestamp = timedActivity.getLocalTimestamp();
-                    if (localTimestamp < oldestLocalTimestamp) {
-                        oldestLocalTimestamp = localTimestamp;
-                    }
+            oldestLocalTimestamp = Long.MAX_VALUE;
+            for (TimedActivity timedActivity : queuedActivities) {
+                long localTimestamp = timedActivity.getLocalTimestamp();
+                if (localTimestamp < oldestLocalTimestamp) {
+                    oldestLocalTimestamp = localTimestamp;
                 }
             }
         }
@@ -205,6 +200,14 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          */
         public void checkForMissingActivities() {
             if (queuedActivities.size() == 0) {
+                return;
+            }
+            if (expectedSequenceNumber >= queuedActivities.peek()
+                .getSequenceNumber()) {
+
+                log.error("Expected sequence number: " + expectedSequenceNumber
+                    + " > first queued: "
+                    + queuedActivities.peek().getSequenceNumber());
                 return;
             }
             long age = System.currentTimeMillis() - oldestLocalTimestamp;
