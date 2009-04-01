@@ -448,14 +448,11 @@ public class JingleFileTransferManager {
                 logger.info("JingleSession Terminated [" + jid.getBase() + "]");
             } catch (XMPPException e1) {
                 logger.error(
-                    "Error during terminate outgoing jingle session with JID : "
+                    "Error during terminating outgoing jingle session with JID : "
                         + jid, e1);
             } finally {
                 outgoing.session = null;
                 outgoing.fileTransfer = null;
-
-                logger.debug("Terminate outgoing jingle session with JID : "
-                    + jid);
             }
         }
     }
