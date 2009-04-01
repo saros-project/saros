@@ -106,6 +106,12 @@ public class User {
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+
+        if (obj == null)
+            return false;
+
         JID otherJID = null;
 
         if (obj instanceof String) {
