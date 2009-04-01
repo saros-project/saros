@@ -29,8 +29,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
-import de.fu_berlin.inf.dpp.PreferenceConstants;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
@@ -175,11 +173,6 @@ public class JoinSessionWizard extends Wizard {
 
     public void setWizardDlg(WizardDialogAccessable wd) {
         this.wizardDialog = wd;
-    }
-
-    public boolean isAutoAcceptInvitation() {
-        return Saros.getDefault().getPreferenceStore().getBoolean(
-            PreferenceConstants.AUTO_ACCEPT_INVITATION);
     }
 
     public void pressWizardButton(final int buttonID) {

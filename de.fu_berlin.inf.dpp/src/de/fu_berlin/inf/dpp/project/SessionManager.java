@@ -30,6 +30,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -97,7 +98,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             listener.sessionStarted(sharedProject);
         }
 
-        sharedProject.startInvitation(null);
+        sharedProject.startInvitation(PreferenceUtils.getAutoInviteUsers());
 
         SessionManager.log.info("Session started");
     }

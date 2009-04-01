@@ -186,4 +186,17 @@ public class JoinSessionWizardUtils {
         }
     }
 
+    public static boolean existsProjects(String projectName) {
+        // Start with the projects name
+        File proposedName = new File(projectName);
+
+        // Then check with all the projects
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        for (IProject project : workspace.getRoot().getProjects()) {
+            if (new File(project.getName()).equals(proposedName))
+                return true;
+        }
+        return false;
+    }
+
 }

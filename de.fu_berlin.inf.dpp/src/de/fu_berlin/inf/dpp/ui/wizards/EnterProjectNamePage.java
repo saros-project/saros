@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +24,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
+import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -154,7 +156,8 @@ class EnterProjectNamePage extends WizardPage {
      * @param workArea
      *            composite of appropriate wizard
      */
-    private void createUpdateProjectGroup(Composite workArea) {
+    private void createUpdateProjectGroup(Composite workArea,
+        String updateProject) {
 
         Composite projectGroup = new Composite(workArea, SWT.NONE);
 
@@ -177,7 +180,7 @@ class EnterProjectNamePage extends WizardPage {
             GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
         this.updateProjectText.setFocus();
         this.updateProjectText.setEnabled(false);
-        this.updateProjectText.setText("");
+        this.updateProjectText.setText(updateProject);
 
         this.browseUpdateProjectButton = new Button(projectGroup, SWT.PUSH);
         this.browseUpdateProjectButton.setText("Browse");
@@ -297,6 +300,18 @@ class EnterProjectNamePage extends WizardPage {
             getShell().close();
         }
 
+        String updateProjectName;
+        boolean updateSelected;
+        if (PreferenceUtils.isAutoReuseExisting()
+            && JoinSessionWizardUtils.existsProjects(joinSessionWizard.process
+                .getProjectName())) {
+            updateSelected = true;
+            updateProjectName = this.joinSessionWizard.process.getProjectName();
+        } else {
+            updateSelected = false;
+            updateProjectName = "";
+        }
+
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout());
         GridData gridData = new GridData(GridData.FILL_VERTICAL);
@@ -305,14 +320,15 @@ class EnterProjectNamePage extends WizardPage {
 
         this.projCopy = new Button(composite, SWT.RADIO);
         this.projCopy.setText("Create new project");
-        this.projCopy.setSelection(true);
+        this.projCopy.setSelection(!updateSelected);
 
         createNewProjectGroup(composite);
 
         this.projUpd = new Button(composite, SWT.RADIO);
         this.projUpd.setText("Use existing project");
+        this.projUpd.setSelection(updateSelected);
 
-        createUpdateProjectGroup(composite);
+        createUpdateProjectGroup(composite, updateProjectName);
 
         attachListeners();
         setControl(composite);
@@ -320,7 +336,7 @@ class EnterProjectNamePage extends WizardPage {
         updateConnectionStatus();
         updateEnabled();
 
-        if (joinSessionWizard.isAutoAcceptInvitation()) {
+        if (PreferenceUtils.isAutoAcceptInvitation()) {
             joinSessionWizard.pressWizardButton(IDialogConstants.FINISH_ID);
         }
     }

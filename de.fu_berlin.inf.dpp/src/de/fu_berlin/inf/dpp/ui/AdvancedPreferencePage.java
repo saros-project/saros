@@ -60,6 +60,16 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             PreferenceConstants.AUTO_ACCEPT_INVITATION,
             "Automatically accept incoming invitation (for debugging)",
             getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.AUTO_REUSE_PROJECT,
+            "When automatically accepting invitation reuse existing project (for debugging)",
+            getFieldEditorParent()));
+
+        addField(new StringFieldEditor(
+            PreferenceConstants.AUTO_INVITE,
+            "Automatically invite the following comma separated users (for debugging)",
+            getFieldEditorParent()));
     }
 
     /*

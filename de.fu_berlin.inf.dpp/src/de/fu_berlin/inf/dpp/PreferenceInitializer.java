@@ -49,5 +49,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.STUN, "stunserver.org");
         store.setDefault(PreferenceConstants.STUN_PORT, 3478);
         store.setDefault(PreferenceConstants.MULTI_DRIVER, false);
+        store.setDefault(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
+        store.setDefault(PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, true);
     }
 }

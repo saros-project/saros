@@ -48,10 +48,17 @@ public class PreferenceConstants {
     public static final String CHATFILETRANSFER_CHUNKSIZE = "chatfiletransfer_chunksize";
 
     public static final String STUN = "stun_server";
+
     public static final String STUN_PORT = "stun_server_port";
 
     public static final String MULTI_DRIVER = "multidriver";
 
     public static final String AUTO_ACCEPT_INVITATION = "AUTO_ACCEPT_INVITATION";
+
+    public static final String FOLLOW_EXCLUSIVE_DRIVER = "FOLLOW_EXCLUSIVE_DRIVER";
+
+    public static final String AUTO_INVITE = "AUTO_INVITE";
+
+    public static final String AUTO_REUSE_PROJECT = "AUTO_REUSE_PROJECT";
 
 }

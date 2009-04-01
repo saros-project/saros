@@ -60,6 +60,11 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
             "Start in Follow Mode.", getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER,
+            "On role changes follow exclusive driver automatically.",
+            getFieldEditorParent()));
     }
 
     /*
