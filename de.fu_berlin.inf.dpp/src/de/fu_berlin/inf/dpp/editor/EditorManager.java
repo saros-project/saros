@@ -33,26 +33,14 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.filebuffers.FileBuffers;
-import org.eclipse.core.filebuffers.ITextFileBuffer;
-import org.eclipse.core.filebuffers.ITextFileBufferManager;
-import org.eclipse.core.filebuffers.LocationKind;
-import org.eclipse.core.filebuffers.manipulation.ConvertLineDelimitersOperation;
-import org.eclipse.core.filebuffers.manipulation.FileBufferOperationRunner;
-import org.eclipse.core.filebuffers.manipulation.TextFileBufferOperation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
-import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
@@ -69,12 +57,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.IElementStateListener;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
@@ -86,16 +73,14 @@ import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
-import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -104,6 +89,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -114,7 +100,8 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * locking the editors of the observer.
  * 
  * The EditorManager contains the testable logic. All untestable logic should
- * only appear in an class of the {@link IEditorAPI} type.
+ * only appear in an class of the {@link IEditorAPI} type. (CO: This is the
+ * theory at least)
  * 
  * @author rdjemili
  * 
@@ -122,78 +109,23 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  *         session closed, it is highly likely that this whole class needs to be
  *         reviewed for restarting issues
  * 
+ *         TODO CO This class contains too many different concerns: TextEdits,
+ *         Editor opening and closing, Parsing of activities, executing of
+ *         activities, dirty state management,
+ * 
  */
-public class EditorManager implements IActivityProvider, ISharedProjectListener {
+public class EditorManager implements IActivityProvider {
 
-    protected RemoteEditorManager remoteEditorManager;
-
-    private class DirtyStateListener implements IElementStateListener {
-
-        public boolean enabled = true;
-
-        public void elementDirtyStateChanged(Object element, boolean isDirty) {
-
-            if (!enabled)
-                return;
-
-            if (isDirty)
-                return;
-
-            if (!isDriver)
-                return;
-
-            if (!(element instanceof FileEditorInput))
-                return;
-
-            FileEditorInput fileEditorInput = (FileEditorInput) element;
-            IFile file = fileEditorInput.getFile();
-
-            if (file.getProject() != sharedProject.getProject()) {
-                return;
-            }
-
-            log.debug("Dirty state reset for: " + file.toString());
-
-            IPath path = file.getProjectRelativePath();
-            sendEditorActivitySaved(path);
-        }
-
-        public void elementContentAboutToBeReplaced(Object element) {
-            // ignore
-        }
-
-        public void elementContentReplaced(Object element) {
-            // ignore
-        }
-
-        public void elementDeleted(Object element) {
-            // ignore
-        }
-
-        public void elementMoved(Object originalElement, Object movedElement) {
-            // ignore
-        }
-    }
-
-    /**
-     * @author rdjemili
-     * 
-     */
-    private class EditorPool {
+    protected class EditorPool {
 
         protected Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
         public void add(IEditorPart editorPart) {
 
-            IResource resource = editorAPI.getEditorResource(editorPart);
-            if (resource == null) {
-                log.warn("Resource not found: " + editorPart.getTitle());
-                return;
-            }
-
-            IPath path = resource.getProjectRelativePath();
+            IPath path = editorAPI.getEditorPath(editorPart);
             if (path == null) {
-                log.warn("Resource is a project or workspace: " + resource);
+                log.warn("Could not find path for editor "
+                    + editorPart.getTitle());
                 return;
             }
 
@@ -213,10 +145,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             editorAPI.addSharedEditorListener(editorPart);
             editorAPI.setEditable(editorPart, isDriver);
 
-            IDocumentProvider documentProvider = getDocumentProvider(input);
+            IDocumentProvider documentProvider = EditorUtils
+                .getDocumentProvider(input);
             documentProvider.addElementStateListener(dirtyStateListener);
 
-            IDocument document = getDocument(editorPart);
+            IDocument document = EditorUtils.getDocument(editorPart);
 
             IFile file = ((IFileEditorInput) input).getFile();
             connect(file);
@@ -228,16 +161,10 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         public void remove(IEditorPart editorPart) {
-            IResource resource = editorAPI.getEditorResource(editorPart);
-
-            if (resource == null) {
-                log.warn("Resource not found: " + editorPart.getTitle());
-                return;
-            }
-
-            IPath path = resource.getProjectRelativePath();
-
+            IPath path = editorAPI.getEditorPath(editorPart);
             if (path == null) {
+                log.warn("Could not find path for editor "
+                    + editorPart.getTitle());
                 return;
             }
 
@@ -268,70 +195,59 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     }
 
-    private static Logger log = Logger.getLogger(EditorManager.class.getName());
+    protected static Logger log = Logger.getLogger(EditorManager.class
+        .getName());
 
-    private static EditorManager instance;
+    protected static EditorManager instance;
 
-    private IEditorAPI editorAPI;
+    protected IEditorAPI editorAPI;
 
-    private ISharedProject sharedProject;
+    protected RemoteEditorManager remoteEditorManager;
 
-    private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
+    protected ISharedProject sharedProject;
 
-    private boolean isFollowing = false;
+    protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-    private boolean isDriver;
+    protected User isFollowing = null;
 
-    private final EditorPool editorPool = new EditorPool();
+    protected boolean isDriver;
 
-    private final DirtyStateListener dirtyStateListener = new DirtyStateListener();
+    protected final EditorPool editorPool = new EditorPool();
 
-    public class StoppableDocumentListener implements IDocumentListener {
+    protected final DirtyStateListener dirtyStateListener = new DirtyStateListener(
+        this);
 
-        boolean enabled = true;
+    protected final StoppableDocumentListener documentListener = new StoppableDocumentListener(
+        this);
 
-        public void documentAboutToBeChanged(final DocumentEvent event) {
+    protected IPath locallyActiveEditor;
 
-            if (enabled) {
-                String text = event.getText() == null ? "" : event.getText();
-                textAboutToBeChanged(event.getOffset(), text,
-                    event.getLength(), event.getDocument());
-            }
-        }
+    protected Set<IPath> locallyOpenEditors = new HashSet<IPath>();
 
-        public void documentChanged(final DocumentEvent event) {
-            // do nothing. We handeled everything in documentAboutToBeChanged
-        }
-    }
+    protected ITextSelection localSelection;
 
-    private final StoppableDocumentListener documentListener = new StoppableDocumentListener();
-
-    // TODO save only the editor of the followed driver
-    private IPath activeDriverEditor;
-
-    private final Set<IPath> driverEditors = new HashSet<IPath>();
-
-    private HashMap<User, ITextSelection> driverTextSelections = new HashMap<User, ITextSelection>();
+    protected ILineRange localViewport;
 
     /** all files that have connected document providers */
-    private final Set<IFile> connectedFiles = new HashSet<IFile>();
+    protected final Set<IFile> connectedFiles = new HashSet<IFile>();
 
-    private final List<ISharedEditorListener> editorListeners = new ArrayList<ISharedEditorListener>();
+    protected final List<ISharedEditorListener> editorListeners = new ArrayList<ISharedEditorListener>();
 
-    public HashMap<IPath, Long> lastEditTimes = new HashMap<IPath, Long>();
+    protected HashMap<IPath, Long> lastEditTimes = new HashMap<IPath, Long>();
 
-    public HashMap<IPath, Long> lastRemoteEditTimes = new HashMap<IPath, Long>();
+    protected HashMap<IPath, Long> lastRemoteEditTimes = new HashMap<IPath, Long>();
 
-    private ContributionAnnotationManager contributionAnnotationManager;
+    protected ContributionAnnotationManager contributionAnnotationManager;
 
-    private final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public boolean receive(EditorActivity editorActivity) {
             if (editorActivity.getType().equals(Type.Activated)) {
-                setActiveDriverEditor(editorActivity.getPath(), true);
+                execActivated(editorActivity.getUser(), editorActivity
+                    .getPath());
 
             } else if (editorActivity.getType().equals(Type.Closed)) {
-                removeDriverEditor(editorActivity.getPath(), true);
+                execClosed(editorActivity.getUser(), editorActivity.getPath());
 
             } else if (editorActivity.getType().equals(Type.Saved)) {
                 saveText(editorActivity.getPath());
@@ -358,51 +274,116 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
     };
 
-    public static EditorManager getDefault() {
-        if (EditorManager.instance == null) {
-            EditorManager.instance = new EditorManager();
-        }
+    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
-        return EditorManager.instance;
-    }
+        @Override
+        public void roleChanged(final User user, boolean replicated) {
 
-    public void connect(IFile file) {
-        if (!connectedFiles.contains(file)) {
-            FileEditorInput input = new FileEditorInput(file);
-            IDocumentProvider documentProvider = getDocumentProvider(input);
-            try {
-                documentProvider.connect(input);
-            } catch (CoreException e) {
-                log.error("Error connecting to a document provider on file '"
-                    + file.toString() + "':", e);
-                e.printStackTrace();
-            }
-            connectedFiles.add(file);
+            User localUser = Saros.getDefault().getLocalUser();
 
-            IDocument document = documentProvider.getDocument(input);
+            // Make sure we have the up-to-date facts about ourself
+            isDriver = sharedProject.isDriver();
 
-            // if line delimiters are not in unix style convert them
-            if (document instanceof IDocumentExtension4) {
-
-                if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
-                    .equals("\n")) {
-                    // TODO fails if editorPart is not using a IFileEditorInput
-                    convertLineDelimiters(file);
+            if (isFollowing != null) {
+                if (Saros.getDefault().getPreferenceStore().getBoolean(
+                    PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
+                    if (isFollowing.isObserver() && user.isDriver()
+                        && !user.equals(localUser)) {
+                        setFollowing(user);
+                    }
                 }
-                ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
-            } else {
-                EditorManager.log
-                    .error("Can't discover line delimiter of document");
             }
+
+            // TODO Does it make sense to remove other Annotations on a role
+            // change?
+            if (user.isObserver() && !user.equals(isFollowing)) {
+                removeAllAnnotations(new Predicate<SarosAnnotation>() {
+                    public boolean evaluate(SarosAnnotation annotation) {
+                        return annotation instanceof ViewportAnnotation
+                            && user.getJID().equals(
+                                new JID(((ViewportAnnotation) annotation)
+                                    .getSource()));
+
+                    }
+                });
+            }
+
+            /*
+             * If local user is affected and no session view is open then show
+             * the balloon notification in the control which has the keyboard
+             * focus
+             */
+            if (localUser.equals(user)) {
+
+                IViewPart view = Util
+                    .findView("de.fu_berlin.inf.dpp.ui.SessionView");
+
+                if (view == null) {
+                    Util.runSafeSWTAsync(log, new Runnable() {
+                        public void run() {
+                            BalloonNotification.showNotification(Display
+                                .getDefault().getFocusControl(),
+                                "Role changed", "You are now a "
+                                    + (user.isDriver() ? "driver" : "observer")
+                                    + " of this session.", 5000);
+                        }
+                    });
+                }
+            }
+
         }
-    }
 
-    public void setEditorAPI(IEditorAPI editorAPI) {
-        this.editorAPI = editorAPI;
-        editorAPI.setEditorManager(this);
-    }
+        @Override
+        public void userJoined(JID user) {
 
-    public final ISessionListener sessionListener = new AbstractSessionListener() {
+            // TODO This should only be sent to this user
+
+            // TODO The user should be able to ask us for this state
+
+            // TODO The user does not know our history but just our current
+            // position
+
+            // Let the new user know where we are
+            fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+                .toString(), Type.Activated, locallyActiveEditor));
+
+            if (locallyActiveEditor == null) {
+                return;
+            }
+
+            if (localViewport != null) {
+                fireActivity(new ViewportActivity(Saros.getDefault().getMyJID()
+                    .toString(), localViewport, locallyActiveEditor));
+            } else {
+                log.warn("No viewport for locallyActivateEditor: "
+                    + locallyActiveEditor);
+            }
+
+            if (localSelection != null) {
+                int offset = localSelection.getOffset();
+                int length = localSelection.getLength();
+
+                fireActivity(new TextSelectionActivity(Saros.getDefault()
+                    .getMyJID().toString(), offset, length, locallyActiveEditor));
+            } else {
+                log.warn("No select for locallyActivateEditor: "
+                    + locallyActiveEditor);
+            }
+
+        }
+
+        @Override
+        public void userLeft(final JID user) {
+            removeAllAnnotations(new Predicate<SarosAnnotation>() {
+                public boolean evaluate(SarosAnnotation annotation) {
+                    return annotation.getSource().equals(user.toString());
+                }
+            });
+            remoteEditorManager.removeUser(sharedProject.getParticipant(user));
+        }
+    };
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
         public void sessionStarted(ISharedProject project) {
@@ -411,7 +392,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             assert editorPool.editorParts.isEmpty() : "EditorPool was not correctly reset!";
 
             isDriver = sharedProject.isDriver();
-            sharedProject.addListener(EditorManager.this);
+            sharedProject.addListener(sharedProjectListener);
 
             // Add ConsistencyListener
             Saros.getDefault().getSessionManager().getSharedProject()
@@ -446,8 +427,20 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 project);
             remoteEditorManager = new RemoteEditorManager();
 
-            // TODO Review Why?
-            activateOpenEditors();
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    for (IEditorPart editorPart : EditorManager.this.editorAPI
+                        .getOpenEditors()) {
+                        partOpened(editorPart);
+                    }
+
+                    IEditorPart activeEditor = EditorManager.this.editorAPI
+                        .getActiveEditor();
+                    if (activeEditor != null) {
+                        partActivated(activeEditor);
+                    }
+                }
+            });
         }
 
         /*
@@ -459,15 +452,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
             setAllEditorsToEditable();
-            removeAllAnnotations(new Predicate() {
-                public boolean check(SarosAnnotation annotation) {
+            removeAllAnnotations(new Predicate<SarosAnnotation>() {
+                public boolean evaluate(SarosAnnotation annotation) {
                     return true;
                 }
             });
 
             // FIXME remove this.dirtyStateListener from IDocumentProvider
 
-            sharedProject.removeListener(EditorManager.this);
+            sharedProject.removeListener(sharedProjectListener);
             sharedProject.getActivityManager().removeProvider(
                 EditorManager.this);
             sharedProject = null;
@@ -477,10 +470,66 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             contributionAnnotationManager.dispose();
             contributionAnnotationManager = null;
             remoteEditorManager = null;
-            activeDriverEditor = null;
-            driverEditors.clear();
+            locallyActiveEditor = null;
+            locallyOpenEditors.clear();
         }
     };
+
+    protected EditorManager() {
+        setEditorAPI(new EditorAPI());
+        if ((Saros.getDefault() != null)
+            && (Saros.getDefault().getSessionManager() != null)) {
+            Saros.getDefault().getSessionManager().addSessionListener(
+                this.sessionListener);
+        } else {
+            log.error("EditorManager could not be started!", new StackTrace());
+        }
+    }
+
+    public static EditorManager getDefault() {
+        if (EditorManager.instance == null) {
+            EditorManager.instance = new EditorManager();
+        }
+
+        return EditorManager.instance;
+    }
+
+    public void connect(IFile file) {
+        if (!connectedFiles.contains(file)) {
+            FileEditorInput input = new FileEditorInput(file);
+            IDocumentProvider documentProvider = EditorUtils
+                .getDocumentProvider(input);
+            try {
+                documentProvider.connect(input);
+            } catch (CoreException e) {
+                log.error("Error connecting to a document provider on file '"
+                    + file.toString() + "':", e);
+                e.printStackTrace();
+            }
+            connectedFiles.add(file);
+
+            IDocument document = documentProvider.getDocument(input);
+
+            // if line delimiters are not in unix style convert them
+            if (document instanceof IDocumentExtension4) {
+
+                if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
+                    .equals("\n")) {
+                    // TODO fails if editorPart is not using a IFileEditorInput
+                    EditorUtils.convertLineDelimiters(file);
+                }
+                ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
+            } else {
+                EditorManager.log
+                    .error("Can't discover line delimiter of document");
+            }
+        }
+    }
+
+    public void setEditorAPI(IEditorAPI editorAPI) {
+        this.editorAPI = editorAPI;
+        editorAPI.setEditorManager(this);
+    }
 
     public void addSharedEditorListener(ISharedEditorListener editorListener) {
         if (!this.editorListeners.contains(editorListener)) {
@@ -493,14 +542,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * @return the path to the resource that the driver is currently editting.
-     *         Can be <code>null</code>.
-     */
-    public IPath getActiveDriverEditor() {
-        return this.activeDriverEditor;
-    }
-
-    /**
      * Returns the resource paths of editors that the driver is currently using.
      * 
      * @return all paths (in project-relative format) of files that the driver
@@ -509,7 +550,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *         currently opened editors.
      */
     public Set<IPath> getDriverEditors() {
-        return this.driverEditors;
+        return this.locallyOpenEditors;
     }
 
     /**
@@ -527,7 +568,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         Set<IEditorPart> editors = getEditors(path);
 
         if (!editors.isEmpty()) {
-            result = getDocument(editors.iterator().next());
+            result = EditorUtils.getDocument(editors.iterator().next());
         }
 
         // if result == null there is no editor with this resource open
@@ -543,55 +584,60 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             }
 
             // get Document from FileBuffer
-            result = getTextFileBuffer(file).getDocument();
+            result = EditorUtils.getTextFileBuffer(file).getDocument();
         }
         return result;
     }
 
     /**
-     * @param user
-     *            User for who's text selection will be returned.
-     * @return the text selection of given user or <code>null</code> if that
-     *         user is not a driver.
+     * Sets the currently active driver editor.
+     * 
+     * @param path
+     *            the project-relative path to the resource that the editor is
+     *            currently editting.
      */
-    public ITextSelection getDriverTextSelection(User user) {
-        return this.driverTextSelections.get(user);
+    public void generateEditorActivated(IPath path) {
+        this.locallyActiveEditor = path;
+        this.locallyOpenEditors.add(path);
+
+        for (ISharedEditorListener listener : this.editorListeners) {
+            listener.activeDriverEditorChanged(this.locallyActiveEditor, false);
+        }
+
+        fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+            .toString(), Type.Activated, path));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
-     */
-    public void viewportChanged(IEditorPart part, ILineRange viewport) {
+    public void generateViewport(IEditorPart part, ILineRange viewport) {
 
         if (this.sharedProject == null) {
             log.warn("SharedEditorListener not correctly unregistered!");
             return;
         }
 
-        if (!this.isDriver)
+        IPath path = editorAPI.getEditorPath(part);
+        if (path == null) {
+            log.warn("Could not find path for editor " + part.getTitle());
             return;
+        }
 
-        IPath path = editorAPI.getEditorResource(part).getProjectRelativePath();
+        if (path.equals(locallyActiveEditor))
+            this.localViewport = viewport;
 
         fireActivity(new ViewportActivity(Saros.getDefault().getMyJID()
             .toString(), viewport, path));
     }
 
-    public void selectionChanged(IEditorPart part, ITextSelection newSelection) {
+    public void generateSelection(IEditorPart part, ITextSelection newSelection) {
 
-        IResource resource = editorAPI.getEditorResource(part);
-
-        if (resource == null)
-            return;
-
-        IPath path = resource.getProjectRelativePath();
-
+        IPath path = editorAPI.getEditorPath(part);
         if (path == null) {
-            log.error("Couldn't get editor for part: " + part);
+            log.warn("Could not find path for editor " + part.getTitle());
             return;
         }
+
+        if (path.equals(locallyActiveEditor))
+            localSelection = newSelection;
 
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
@@ -604,7 +650,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * Asks the ConcurrentDocumentManager if there are currently any
      * inconsistencies to resolve.
      */
-    public boolean isConsistencyToResolve() {
+    public static boolean isConsistencyToResolve() {
         ISharedProject project = Saros.getDefault().getSessionManager()
             .getSharedProject();
 
@@ -613,14 +659,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         return project.getConcurrentDocumentManager().getConsistencyToResolve()
             .getValue();
-
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.ISharedEditorListener
-     */
     public void textAboutToBeChanged(int offset, String text, int replace,
         IDocument document) {
 
@@ -644,185 +684,54 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         // search editor which changed
         for (IEditorPart editor : editorPool.getAllEditors()) {
-            if (getDocument(editor) == document) {
+            if (EditorUtils.getDocument(editor) == document) {
                 changedEditor = editor;
                 break;
             }
         }
         assert changedEditor != null;
 
-        IPath path = editorAPI.getEditorResource(changedEditor)
-            .getProjectRelativePath();
-
-        if (path != null) {
-
-            String replacedText;
-            try {
-                replacedText = document.get(offset, replace);
-            } catch (BadLocationException e) {
-                log.error("Offset and/or replace invalid", e);
-
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < replace; i++)
-                    sb.append("?");
-                replacedText = sb.toString();
-            }
-
-            TextEditActivity activity = new TextEditActivity(Saros.getDefault()
-                .getMyJID().toString(), offset, text, replacedText, path);
-
-            EditorManager.this.lastEditTimes.put(path, System
-                .currentTimeMillis());
-
-            fireActivity(activity);
-
-            /*
-             * TODO Investigate if this is really needed here
-             */
-            {
-                IEditorInput input = changedEditor.getEditorInput();
-                IDocumentProvider provider = getDocumentProvider(input);
-                IAnnotationModel model = provider.getAnnotationModel(input);
-                contributionAnnotationManager.splitAnnotation(model, offset);
-            }
-        } else {
-            log.error("Can't get editor path");
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void roleChanged(User user, boolean replicated) {
-        this.isDriver = this.sharedProject.isDriver();
-
-        // TODO Review, because this is causing problems with FollowMode
-        activateOpenEditors();
-
-        // TODO Why remove all and not just the ones of user and only if user is
-        // observer now?
-        removeAllAnnotations(new Predicate() {
-            public boolean check(SarosAnnotation annotation) {
-                return annotation instanceof ContributionAnnotation;
-            }
-        });
-
-        if (Saros.getDefault().getLocalUser().equals(user)) {
-
-            // get the session view
-            IViewPart view = Util
-                .findView("de.fu_berlin.inf.dpp.ui.SessionView");
-
-            if (isDriver) {
-                removeAllAnnotations(new Predicate() {
-                    public boolean check(SarosAnnotation annotation) {
-                        return annotation instanceof ViewportAnnotation;
-                    }
-                });
-
-                // if session view is not open show the balloon notification in
-                // the control which has the keyboard focus
-                if (view == null) {
-                    Util.runSafeSWTAsync(log, new Runnable() {
-                        public void run() {
-                            BalloonNotification.showNotification(Display
-                                .getDefault().getFocusControl(),
-                                "Role changed",
-                                "You are now a driver of this session.", 5000);
-                        }
-                    });
-                }
-            } else {
-                // User is not driver anymore, so remove the text selection.
-                this.driverTextSelections.remove(user);
-
-                // if session view is not open show the balloon notification in
-                // the control which has the keyboard focus
-                if (view == null) {
-                    Util.runSafeSWTAsync(log, new Runnable() {
-                        public void run() {
-                            BalloonNotification.showNotification(Display
-                                .getDefault().getFocusControl(),
-                                "Role changed",
-                                "You are now an observer of this session.",
-                                5000);
-                        }
-                    });
-                }
-            }
-        }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void userJoined(JID user) {
-        // ignore
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.ISharedProjectListener
-     */
-    public void userLeft(final JID user) {
-        removeAllAnnotations(new Predicate() {
-            public boolean check(SarosAnnotation annotation) {
-                return annotation.getSource().equals(user.toString());
-            }
-        });
-        driverTextSelections.remove(sharedProject.getParticipant(user));
-    }
-
-    /**
-     * Opens the editor that is currently used by the driver. This method needs
-     * to be called from an UI thread. Is ignored if caller is already driver.
-     */
-    public void openDriverEditor() {
-        if (this.isDriver) {
-            return;
-        }
-
-        IPath path = getActiveDriverEditor();
+        IPath path = editorAPI.getEditorPath(changedEditor);
         if (path == null) {
+            log.warn("Could not find path for editor "
+                + changedEditor.getTitle());
             return;
         }
 
-        this.editorAPI
-            .openEditor(this.sharedProject.getProject().getFile(path));
-    }
+        String replacedText;
+        try {
+            replacedText = document.get(offset, replace);
+        } catch (BadLocationException e) {
+            log.error("Offset and/or replace invalid", e);
 
-    public void setFollowing(boolean isFollowing) {
-        // Driver can't be in follow mode.
-        this.isFollowing = isFollowing && !this.isDriver;
-
-        for (ISharedEditorListener editorListener : this.editorListeners) {
-            editorListener.followModeChanged(this.isFollowing);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < replace; i++)
+                sb.append("?");
+            replacedText = sb.toString();
         }
 
-        if (this.isFollowing)
-            openDriverEditor();
+        TextEditActivity activity = new TextEditActivity(Saros.getDefault()
+            .getMyJID().toString(), offset, text, replacedText, path);
+
+        EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
+
+        fireActivity(activity);
+
+        /*
+         * TODO Investigate if this is really needed here
+         */
+        {
+            IEditorInput input = changedEditor.getEditorInput();
+            IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+            IAnnotationModel model = provider.getAnnotationModel(input);
+            contributionAnnotationManager.splitAnnotation(model, offset);
+        }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
     public void addActivityListener(IActivityListener listener) {
         this.activityListeners.add(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
-     */
     public void removeActivityListener(IActivityListener listener) {
         this.activityListeners.remove(listener);
     }
@@ -840,7 +749,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         activity.dispatch(activityReceiver);
     }
 
-    private void execTextEdit(TextEditActivity textEdit) {
+    protected void execTextEdit(TextEditActivity textEdit) {
 
         String source = textEdit.getSource();
         User user = Saros.getDefault().getSessionManager().getSharedProject()
@@ -862,22 +771,18 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         for (IEditorPart editorPart : editorPool.getEditors(path)) {
             editorAPI.setSelection(editorPart, new TextSelection(
-                textEdit.offset + textEdit.text.length(), 0), source,
-                shouldIFollow(user));
+                textEdit.offset + textEdit.text.length(), 0), source, user
+                .equals(getFollowedUser()));
         }
     }
 
-    private void execTextSelection(TextSelectionActivity selection) {
+    protected void execTextSelection(TextSelectionActivity selection) {
         IPath path = selection.getEditor();
         TextSelection textSelection = new TextSelection(selection.getOffset(),
             selection.getLength());
 
         User user = sharedProject
             .getParticipant(new JID(selection.getSource()));
-
-        if (user.isDriver()) {
-            setDriverTextSelection(user, textSelection);
-        }
 
         if (path == null) {
             EditorManager.log
@@ -889,126 +794,186 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
             this.editorAPI.setSelection(editorPart, textSelection, selection
-                .getSource(), shouldIFollow(user));
+                .getSource(), user.equals(getFollowedUser()));
         }
     }
 
-    // TODO selectable driver to follow
-    protected boolean shouldIFollow(User user) {
-        return isFollowing && user.isDriver();
-    }
+    protected void execViewport(ViewportActivity viewport) {
 
-    private void execViewport(ViewportActivity viewport) {
-        if (isDriver)
-            return;
-
-        int top = viewport.getTopIndex();
-        int bottom = viewport.getBottomIndex();
-        IPath path = viewport.getEditor();
         String source = viewport.getSource();
-        /*
-         * Check if source is an observed driver and his cursor is outside the
-         * viewport. Taking the last line of the driver's last selection might
-         * be a bit inaccurate.
-         */
         User user = sharedProject.getParticipant(new JID(source));
-        // Only display for drivers
-        if (user.isObserver())
-            return;
+        boolean following = user.equals(getFollowedUser());
 
-        ITextSelection driverSelection = getDriverTextSelection(user);
-        // Check needed when viewport activity came before the first
-        // text selection activity.
-        boolean following = shouldIFollow(user);
-        if (driverSelection != null) {
-            int driverCursor = driverSelection.getEndLine();
-            following = following
-                && (driverCursor < top || driverCursor > bottom);
+        {
+            /*
+             * Check if source is an observed driver and his cursor is outside
+             * the viewport.
+             */
+            ITextSelection driverSelection = remoteEditorManager
+                .getSelection(user);
+            /*
+             * driverSelection can be null if viewport activity came before the
+             * first text selection activity.
+             */
+            if (driverSelection != null) {
+                /*
+                 * TODO MR Taking the last line of the driver's last selection
+                 * might be a bit inaccurate.
+                 */
+                int driverCursor = driverSelection.getEndLine();
+                int top = viewport.getTopIndex();
+                int bottom = viewport.getBottomIndex();
+                following = following
+                    && (driverCursor < top || driverCursor > bottom);
+            }
         }
 
-        Set<IEditorPart> editors = this.editorPool.getEditors(path);
+        Set<IEditorPart> editors = this.editorPool.getEditors(viewport
+            .getEditor());
+        ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setViewport(editorPart, viewport.getLineRange(),
-                source, following);
+            if (following || user.isDriver())
+                this.editorAPI.setViewportAnnotation(editorPart, lineRange, source);
+            if (following)
+                this.editorAPI.reveal(editorPart, lineRange);
         }
     }
 
-    // TODO unify partActivated and partOpened
-    public void partOpened(IEditorPart editorPart) {
+    protected void execActivated(final User user, final IPath path) {
+        if (user.equals(getFollowedUser())) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
 
-        // if in follow mode and the opened editor is not the followed one,
-        // exit Follow Mode
-        checkFollowMode(editorPart);
+                    // Path null means this driver has no active editor any more
+                    if (path == null)
+                        return;
+
+                    editorAPI.openEditor(sharedProject.getProject().getFile(
+                        path));
+                }
+            });
+        }
+    }
+
+    protected void execClosed(final User user, final IPath path) {
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                // TODO Review for disconnection of document providers.
+                /*
+                 * IFile file = EditorManager.this.sharedProject.getProject()
+                 * .getFile(path); resetText(file);
+                 */
+
+                if (user.equals(getFollowedUser())) {
+                    for (IEditorPart part : editorPool.getEditors(path)) {
+                        editorAPI.closeEditor(part);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Called when the local user opened an editor part.
+     */
+    public void partOpened(IEditorPart editorPart) {
 
         if (!isSharedEditor(editorPart)) {
             return;
         }
 
         this.editorPool.add(editorPart);
+
         // HACK 6 Why does this not work via partActivated? Causes duplicate
         // activate events
-        sharedEditorActivated(editorPart);
+        partActivated(editorPart);
     }
 
+    /**
+     * Called when the local user activated an shared editor
+     */
     public void partActivated(IEditorPart editorPart) {
 
-        // if in follow mode and the activated editor is not the followed one,
-        // leave Follow Mode
-        checkFollowMode(editorPart);
-
-        if (!isSharedEditor(editorPart)) {
+        // First check for last editor being closed (which a null editorPart)
+        if (editorPart == null) {
+            generateEditorActivated(null);
             return;
         }
 
-        sharedEditorActivated(editorPart);
-    }
-
-    protected void checkFollowMode(IEditorPart editorPart) {
-
-        if (isFollowing && activeDriverEditor != null) {
-
-            if (!isSharedEditor(editorPart)) {
-                setFollowing(false);
-                return;
+        // Is the new editor part supported by Saros (and inside the project?)
+        if (!isSharedEditor(editorPart)) {
+            if (getFollowedUser() != null) {
+                setFollowing(null);
             }
+            return;
+        }
 
-            // if the opened editor is not the followed one, leave following
-            // mode
-            IResource resource = this.editorAPI.getEditorResource(editorPart);
+        /*
+         * If the opened editor is not the active editor of the user being
+         * followed, then leave follow mode
+         */
+        if (getFollowedUser() != null) {
+            RemoteEditor activeEditor = remoteEditorManager.getEditorState(
+                getFollowedUser()).getActiveEditor();
 
-            if (resource == null) {
-                log.warn("Resource not found: " + editorPart.getTitle());
-                setFollowing(false);
-                return;
+            if (activeEditor == null
+                || !activeEditor.getPath().equals(
+                    editorAPI.getEditorPath(editorPart))) {
+                setFollowing(null);
             }
+        }
 
-            IPath path = resource.getProjectRelativePath();
+        IPath editorPath = this.editorAPI.getEditorPath(editorPart);
+        ILineRange viewport = this.editorAPI.getViewport(editorPart);
+        ITextSelection selection = this.editorAPI.getSelection(editorPart);
 
-            if (!activeDriverEditor.equals(path)) {
-                setFollowing(false);
-            }
+        // Set (and thus send) in this order:
+        generateEditorActivated(editorPath);
+        generateSelection(editorPart, selection);
+        if (viewport == null) {
+            log.warn("Shared Editor does not have a Viewport: " + editorPart);
+        } else {
+            generateViewport(editorPart, viewport);
         }
     }
 
+    /**
+     * Called if the local user closed a part
+     */
     public void partClosed(IEditorPart editorPart) {
+
         if (!isSharedEditor(editorPart)) {
             return;
         }
 
-        IResource resource = this.editorAPI.getEditorResource(editorPart);
-        IPath path = resource.getProjectRelativePath();
+        IPath path = editorAPI.getEditorPath(editorPart);
 
-        // if closing the following editor, leave follow mode
-        if (isFollowing && activeDriverEditor != null
-            && activeDriverEditor.equals(path)) {
-            setFollowing(false);
+        // if closing the followed editor, leave follow mode
+        if (getFollowedUser() != null) {
+            RemoteEditor activeEditor = remoteEditorManager.getEditorState(
+                getFollowedUser()).getActiveEditor();
+
+            if (activeEditor == null || activeEditor.getPath().equals(path)) {
+                setFollowing(null);
+            }
         }
 
         this.editorPool.remove(editorPart);
 
-        if (this.isDriver) {
-            removeDriverEditor(path, false);
+        // Check if the currently active editor is closed
+        boolean newActiveEditor = path.equals(this.locallyActiveEditor);
+
+        this.locallyOpenEditors.remove(path);
+
+        for (ISharedEditorListener listener : this.editorListeners) {
+            listener.driverEditorRemoved(path, false);
         }
+
+        fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+            .toString(), Type.Closed, path));
+
+        if (newActiveEditor)
+            generateEditorActivated(editorAPI.getActiveEditorPath());
     }
 
     /**
@@ -1030,7 +995,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            the project-relative path to the resource.
      * @return the set of editors
      */
-    public Set<IEditorPart> getEditors(IPath path) {
+    protected Set<IEditorPart> getEditors(IPath path) {
         return this.editorPool.getEditors(path);
     }
 
@@ -1064,7 +1029,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return null;
     }
 
-    private IActivity parseTextEditActivity(XmlPullParser parser)
+    protected IActivity parseTextEditActivity(XmlPullParser parser)
         throws XmlPullParserException, IOException {
 
         String source = Util.urlUnescape(parser.getAttributeValue(null,
@@ -1102,7 +1067,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return result;
     }
 
-    private IActivity parseEditorActivity(XmlPullParser parser) {
+    protected IActivity parseEditorActivity(XmlPullParser parser) {
 
         String source = Util.urlUnescape(parser.getAttributeValue(null,
             "source"));
@@ -1120,9 +1085,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return new EditorActivity(source, type, path);
     }
 
-    private TextSelectionActivity parseTextSelection(XmlPullParser parser) {
+    protected TextSelectionActivity parseTextSelection(XmlPullParser parser) {
 
-        // TODO extract constants
         String source = Util.urlUnescape(parser.getAttributeValue(null,
             "source"));
         int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
@@ -1133,7 +1097,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             .fromPortableString(path));
     }
 
-    private ViewportActivity parseViewport(XmlPullParser parser) {
+    protected ViewportActivity parseViewport(XmlPullParser parser) {
 
         String source = Util.urlUnescape(parser.getAttributeValue(null,
             "source"));
@@ -1145,7 +1109,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
             .fromPortableString(path));
     }
 
-    private boolean isSharedEditor(IEditorPart editorPart) {
+    protected boolean isSharedEditor(IEditorPart editorPart) {
         if (sharedProject == null)
             return false;
 
@@ -1157,11 +1121,11 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         return (resource.getProject() == this.sharedProject.getProject());
     }
 
-    private void replaceText(IFile file, int offset, String replacedText,
+    protected void replaceText(IFile file, int offset, String replacedText,
         String text, String source) {
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = getDocumentProvider(input);
+        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
 
         connect(file);
 
@@ -1207,7 +1171,8 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     }
 
     /**
-     * TODO document what this does
+     * TODO document what this does and start thinking about what really needs
+     * to be done if a user resets (closes without saving) a file.
      * 
      * @swt Needs to be called from a UI thread.
      */
@@ -1217,7 +1182,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         }
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = getDocumentProvider(input);
+        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
 
         if (this.connectedFiles.contains(file)) {
             provider.disconnect(input);
@@ -1272,7 +1237,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         FileEditorInput input = new FileEditorInput(file);
 
-        return getDocumentProvider(input).canSaveDocument(input);
+        return EditorUtils.getDocumentProvider(input).canSaveDocument(input);
     }
 
     /**
@@ -1311,7 +1276,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
         FileEditorInput input = new FileEditorInput(file);
 
-        IDocumentProvider provider = getDocumentProvider(input);
+        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
 
         if (this.connectedFiles.contains(file)) {
             if (provider.canSaveDocument(input)) {
@@ -1391,11 +1356,13 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      *            the project relative path to the resource that the driver was
      *            editing.
      */
-    protected void sendEditorActivitySaved(IPath path) {
-
+    public void sendEditorActivitySaved(IPath path) {
         for (ISharedEditorListener listener : this.editorListeners) {
             listener.driverEditorSaved(path, false);
         }
+
+        // TODO technically we can should mark the file as saved in the
+        // editorPool, or?
 
         fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
             .toString(), Type.Saved, path));
@@ -1404,72 +1371,34 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
     /**
      * Sends given activity to all registered activity listeners (most
      * importantly the ActivitySequencer).
-     * 
      */
-    private void fireActivity(IActivity activity) {
+    protected void fireActivity(IActivity activity) {
         for (IActivityListener listener : this.activityListeners) {
             listener.activityCreated(activity);
         }
     }
 
-    // TODO CJ: review needed
-    private void activateOpenEditors() {
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                for (IEditorPart editorPart : EditorManager.this.editorAPI
-                    .getOpenEditors()) {
-                    partOpened(editorPart);
-                }
-
-                IEditorPart activeEditor = EditorManager.this.editorAPI
-                    .getActiveEditor();
-                if (activeEditor != null) {
-                    sharedEditorActivated(activeEditor);
-                }
-            }
-        });
-    }
-
-    private void sharedEditorActivated(IEditorPart editorPart) {
-        if (!this.sharedProject.isDriver()) {
-            return;
-        }
-
-        IResource resource = this.editorAPI.getEditorResource(editorPart);
-        IPath editorPath = resource.getProjectRelativePath();
-        setActiveDriverEditor(editorPath, false);
-
-        ITextSelection selection = this.editorAPI.getSelection(editorPart);
-        setDriverTextSelection(Saros.getDefault().getLocalUser(), selection);
-
-        ILineRange viewport = this.editorAPI.getViewport(editorPart);
-        if (viewport == null) {
-            log.warn("Shared Editor does not have a Viewport: " + editorPart);
-        } else {
-            viewportChanged(editorPart, viewport);
-        }
-    }
-
-    private void setAllEditorsToEditable() {
+    protected void setAllEditorsToEditable() {
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
             this.editorAPI.setEditable(editor, true);
         }
     }
 
-    private interface Predicate {
-        boolean check(SarosAnnotation annotation);
-    }
+    /**
+     * This is only used in the following implementation of removeAllAnnotations
+     * so that an error is only printed once.
+     */
+    private boolean errorPrinted = false;
 
     /**
      * Removes all annotations that fulfill given {@link Predicate}.
      * 
      * @param predicate
      */
-    @SuppressWarnings("unchecked")
-    private void removeAllAnnotations(Predicate predicate) {
+    protected void removeAllAnnotations(Predicate<SarosAnnotation> predicate) {
         for (IEditorPart editor : this.editorPool.getAllEditors()) {
             IEditorInput input = editor.getEditorInput();
-            IDocumentProvider provider = getDocumentProvider(input);
+            IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
 
             if (model == null) {
@@ -1478,13 +1407,14 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
 
             // Collect annotations.
             ArrayList<Annotation> annotations = new ArrayList<Annotation>(128);
-            for (Iterator<Annotation> it = model.getAnnotationIterator(); it
+            for (@SuppressWarnings("unchecked")
+            Iterator<Annotation> it = model.getAnnotationIterator(); it
                 .hasNext();) {
                 Annotation annotation = it.next();
 
                 if (annotation instanceof SarosAnnotation) {
                     SarosAnnotation sarosAnnontation = (SarosAnnotation) annotation;
-                    if (predicate.check(sarosAnnontation)) {
+                    if (predicate.evaluate(sarosAnnontation)) {
                         annotations.add(annotation);
                     }
                 }
@@ -1497,108 +1427,15 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                     .toArray(new Annotation[annotations.size()]), Collections
                     .emptyMap());
             } else {
-                // TODO maybe warn once!
+                if (!errorPrinted) {
+                    log.error("AnnotationModel does not "
+                        + "support IAnnoationModelExtension: " + model);
+                    errorPrinted = true;
+                }
                 for (Annotation annotation : annotations) {
                     model.removeAnnotation(annotation);
                 }
             }
-        }
-    }
-
-    private EditorManager() {
-        setEditorAPI(new EditorAPI());
-        if ((Saros.getDefault() != null)
-            && (Saros.getDefault().getSessionManager() != null)) {
-            Saros.getDefault().getSessionManager().addSessionListener(
-                this.sessionListener);
-        } else {
-            log.error("EditorManager could not be started!", new StackTrace());
-        }
-    }
-
-    /**
-     * Sets the currently active driver editor.
-     * 
-     * @param path
-     *            the project-relative path to the resource that the editor is
-     *            currently editting.
-     * @param replicated
-     *            <code>false</code> if this action originates on this client.
-     *            <code>false</code> if it is an replication of an action from
-     *            another participant of the shared project.
-     */
-    private void setActiveDriverEditor(IPath path, boolean replicated) {
-        this.activeDriverEditor = path;
-        this.driverEditors.add(path);
-
-        for (ISharedEditorListener listener : this.editorListeners) {
-            listener.activeDriverEditorChanged(this.activeDriverEditor,
-                replicated);
-        }
-
-        if (replicated) {
-            if (this.isFollowing) {
-                Util.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        openDriverEditor();
-                    }
-                });
-            }
-        } else {
-            fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
-                .toString(), Type.Activated, path));
-        }
-    }
-
-    /**
-     * Removes the given editor from the list of editors that the driver is
-     * currently using.
-     * 
-     * @param path
-     *            the path to the resource that the driver was editting.
-     * @param replicated
-     *            <code>false</code> if this action originates on this client.
-     *            <code>true</code> if it is an replication of an action from
-     *            another participant of the shared project.
-     */
-    private void removeDriverEditor(final IPath path, boolean replicated) {
-        if (path.equals(this.activeDriverEditor)) {
-            setActiveDriverEditor(null, replicated);
-        }
-
-        this.driverEditors.remove(path);
-
-        for (ISharedEditorListener listener : this.editorListeners) {
-            listener.driverEditorRemoved(path, replicated);
-        }
-
-        if (replicated) {
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    IFile file = EditorManager.this.sharedProject.getProject()
-                        .getFile(path);
-                    resetText(file);
-
-                    if (EditorManager.this.isFollowing) {
-                        for (IEditorPart part : editorPool.getEditors(path)) {
-                            editorAPI.closeEditor(part);
-                        }
-                    }
-                }
-            });
-        } else {
-            fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
-                .toString(), Type.Closed, path));
-        }
-    }
-
-    /**
-     * @param selection
-     *            sets the current text selection that is used by the driver.
-     */
-    private void setDriverTextSelection(User user, ITextSelection selection) {
-        if (user.isDriver()) {
-            this.driverTextSelections.put(user, selection);
         }
     }
 
@@ -1639,8 +1476,22 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      * @return <code>true</code> when in following mode, otherwise
      *         <code>false</code>
      */
-    public boolean isFollowing() {
+    public User getFollowedUser() {
         return isFollowing;
+    }
+
+    public void setFollowing(User userToFollow) {
+
+        assert !Saros.getDefault().getLocalUser().equals(userToFollow) : "Local user cannot follow himself!";
+
+        this.isFollowing = userToFollow;
+
+        for (ISharedEditorListener editorListener : this.editorListeners) {
+            editorListener.followModeChanged(this.isFollowing != null);
+        }
+
+        if (this.isFollowing != null)
+            this.jumpToUser(this.isFollowing);
     }
 
     /**
@@ -1649,7 +1500,7 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
      */
     public ILineRange getCurrentViewport(IPath path) {
 
-        // TODO We need to find a way to identify individual editor on the
+        // TODO We need to find a way to identify individual editors on the
         // client and not only paths.
 
         for (IEditorPart editorPart : getEditors(path)) {
@@ -1658,137 +1509,6 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
                 return viewport;
         }
         return null;
-    }
-
-    public static void convertLineDelimiters(IFile file) {
-
-        EditorManager.log.debug("Converting line delimiters...");
-
-        boolean makeReadable = false;
-
-        ResourceAttributes resourceAttributes = file.getResourceAttributes();
-        if (resourceAttributes.isReadOnly()) {
-            resourceAttributes.setReadOnly(false);
-            try {
-                file.setResourceAttributes(resourceAttributes);
-                makeReadable = true;
-            } catch (CoreException e) {
-                log.error(
-                    "Error making file readable for delimiter conversion:", e);
-            }
-        }
-        // Now run the conversion operation
-        IPath[] paths = new IPath[] { file.getFullPath() };
-
-        ITextFileBufferManager buffManager = FileBuffers
-            .getTextFileBufferManager();
-
-        // convert operation to change line delimiters
-        TextFileBufferOperation convertOperation = new ConvertLineDelimitersOperation(
-            "\n");
-
-        // operation runner for the convert operation
-        FileBufferOperationRunner runner = new FileBufferOperationRunner(
-            buffManager, null);
-
-        // execute convert operation in runner
-        try {
-            // FIXME #2671663: Converting Line Delimiters causes Save
-            runner.execute(paths, convertOperation, new NullProgressMonitor());
-        } catch (OperationCanceledException e) {
-            EditorManager.log.error("Can't convert line delimiters:", e);
-        } catch (CoreException e) {
-            EditorManager.log.error("Can't convert line delimiters:", e);
-        }
-
-        if (makeReadable) {
-            resourceAttributes.setReadOnly(true);
-            try {
-                file.setResourceAttributes(resourceAttributes);
-            } catch (CoreException e) {
-                EditorManager.log
-                    .error(
-                        "Error restoring readable state to false after delimiter conversion:",
-                        e);
-            }
-        }
-    }
-
-    /**
-     * Returns the TextFileBuffer associated with this project relative path OR
-     * null if the path could not be traced to a Buffer.
-     * 
-     * @param docPath
-     *            A project relative path
-     * @return
-     */
-    protected ITextFileBuffer getTextFileBuffer(IResource resource) {
-
-        IPath fullPath = resource.getFullPath();
-
-        ITextFileBufferManager tfbm = FileBuffers.getTextFileBufferManager();
-
-        ITextFileBuffer fileBuff = tfbm.getTextFileBuffer(fullPath,
-            LocationKind.IFILE);
-        if (fileBuff != null)
-            return fileBuff;
-        else {
-            try {
-                tfbm.connect(fullPath, LocationKind.IFILE,
-                    new NullProgressMonitor());
-            } catch (CoreException e) {
-                log.error("Could not connect to file " + fullPath);
-                return null;
-            }
-            return tfbm.getTextFileBuffer(fullPath, LocationKind.IFILE);
-        }
-    }
-
-    public static IDocument getDocument(IEditorPart editorPart) {
-        IEditorInput input = editorPart.getEditorInput();
-
-        return getDocumentProvider(input).getDocument(input);
-    }
-
-    public static IDocumentProvider getDocumentProvider(IEditorInput input) {
-
-        Object adapter = input.getAdapter(IFile.class);
-        if (adapter != null) {
-            IFile file = (IFile) adapter;
-
-            String fileExtension = file.getFileExtension();
-
-            if (fileExtension != null) {
-                if (fileExtension.equals("java")) {
-                    // TODO: Rather this dependency should be injected when the
-                    // EditorAPI is created itself.
-                    JDTFacade facade = Saros.getDefault().getContainer()
-                        .getComponent(JDTFacade.class);
-
-                    if (facade.isJDTAvailable()) {
-                        return facade.getDocumentProvider();
-                    }
-
-                } else if (fileExtension.equals("c")
-                    || fileExtension.equals("h") || fileExtension.equals("cpp")
-                    || fileExtension.equals("cxx")
-                    || fileExtension.equals("hxx")) {
-
-                    // TODO: Rather this dependency should be injected when the
-                    // EditorAPI is created itself.
-                    CDTFacade facade = Saros.getDefault().getContainer()
-                        .getComponent(CDTFacade.class);
-
-                    if (facade.isCDTAvailable()) {
-                        return facade.getDocumentProvider();
-                    }
-                }
-            }
-        }
-
-        DocumentProviderRegistry registry = DocumentProviderRegistry
-            .getDefault();
-        return registry.getDocumentProvider(input);
     }
 
     public void jumpToUser(User jumpTo) {
@@ -1811,12 +1531,19 @@ public class EditorManager implements IActivityProvider, ISharedProjectListener 
         ILineRange viewport = activeEditor.getViewport();
 
         if (viewport == null) {
-            log.warn("User[" + jumpTo + "] has not viewport in editor: "
+            log.warn("User[" + jumpTo + "] has no viewport in editor: "
                 + activeEditor.getPath());
             return;
         }
 
-        this.editorAPI.setViewport(newEditor, viewport, jumpTo.getJID()
-            .toString(), true);
+        this.editorAPI.reveal(newEditor, viewport);
+    }
+
+    public boolean isRemoteOpenEditor(IPath path) {
+        return remoteEditorManager.isRemoteOpenEditor(path);
+    }
+
+    public boolean isRemoteActiveEditor(IPath path) {
+        return remoteEditorManager.isRemoteActiveEditor(path);
     }
 }

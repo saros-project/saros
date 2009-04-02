@@ -19,6 +19,9 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -61,10 +64,14 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -83,6 +90,11 @@ import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 import de.fu_berlin.inf.dpp.util.Util;
 
+/**
+ * View responsible for showing who is in a SharedProject session using which
+ * color, who is being followed, and provide actions for changing roles and
+ * follow mode.
+ */
 public class SessionView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(SessionView.class
@@ -206,19 +218,10 @@ public class SessionView extends ViewPart {
 
         // TODO getting current color does not work if default was changed.
         public Color getBackground(Object element, int columnIndex) {
-            User user = (User) element;
-            // if (user.equals(Saros.getDefault().getLocalUser())) {
-            // return null;
-            // }
-            return getUserColor(user);
+            return getUserColor((User) element);
         }
 
         public Color getForeground(Object element, int columnIndex) {
-
-            // User user = (User) element;
-            // if (user.equals(Saros.getDefault().getLocalUser())) {
-            // return getUserColor(user);
-            // }
             return null;
         }
 
@@ -260,7 +263,7 @@ public class SessionView extends ViewPart {
             }
 
             User user = (User) element;
-            if (user.getJID().equals(Saros.getDefault().getMyJID())) {
+            if (user.equals(EditorManager.getDefault().getFollowedUser())) {
                 return this.boldFont;
             }
             return null;
@@ -329,6 +332,15 @@ public class SessionView extends ViewPart {
 
     private JumpToDriverPositionAction jumpToAction;
 
+    private List<Disposable> disposables = new ArrayList<Disposable>();
+
+    private ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+        @Override
+        public void followModeChanged(boolean enabled) {
+            viewer.refresh();
+        }
+    };
+
     public SessionView() {
 
         /**
@@ -345,6 +357,13 @@ public class SessionView extends ViewPart {
         Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
             multiDriverPrefsListener);
 
+        /**
+         * Listener responsible for refreshing the viewer if the follow mode
+         * changed (because the followed user is shown in bold)
+         */
+        EditorManager.getDefault()
+            .addSharedEditorListener(sharedEditorListener);
+
     }
 
     @Override
@@ -353,9 +372,14 @@ public class SessionView extends ViewPart {
             editorPrefsListener);
         Saros.getDefault().getPreferenceStore().removePropertyChangeListener(
             multiDriverPrefsListener);
+        EditorManager.getDefault().removeSharedEditorListener(
+            sharedEditorListener);
 
         // FIXME All actions need to be properly disposed, because they use
         // Listeners
+        for (Disposable toDispose : disposables) {
+            toDispose.dispose();
+        }
 
         ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         sessionManager.removeSessionListener(sessionListener);
@@ -411,6 +435,7 @@ public class SessionView extends ViewPart {
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
             this.viewer, "Give exclusive driver role");
         this.followModeAction = new FollowModeAction();
+        this.disposables.add(followModeAction);
         this.leaveSessionAction = new LeaveSessionAction();
         this.consistencyAction = new ConsistencyAction();
         this.openInvitationInterfaceAction = new OpenInviteInterface();
@@ -418,7 +443,6 @@ public class SessionView extends ViewPart {
         this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
             "Give driver role");
         this.jumpToAction = new JumpToDriverPositionAction(this.viewer);
-
         this.removeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
 
         contributeToActionBars();

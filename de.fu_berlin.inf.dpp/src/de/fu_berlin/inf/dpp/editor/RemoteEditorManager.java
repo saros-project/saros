@@ -69,6 +69,9 @@ public class RemoteEditorManager {
         }
     };
 
+    /**
+     * One editor of one user
+     */
     public static class RemoteEditor {
 
         IPath path;
@@ -96,6 +99,10 @@ public class RemoteEditorManager {
         public void setSelection(ITextSelection selection) {
             this.selection = selection;
         }
+
+        public ITextSelection getSelection() {
+            return this.selection;
+        }
     }
 
     /**
@@ -111,7 +118,8 @@ public class RemoteEditorManager {
         public void setSelection(IPath path, ITextSelection selection) {
 
             if (!openEditors.containsKey(path)) {
-                log.warn("Viewport for editor which was never activated!");
+                log.warn("Selection for editor which was never activated: "
+                    + path);
                 return;
             }
 
@@ -122,7 +130,8 @@ public class RemoteEditorManager {
         public void setViewport(IPath path, ILineRange viewport) {
 
             if (!openEditors.containsKey(path)) {
-                log.warn("Viewport for editor which was never activated!");
+                log.warn("Viewport for editor which was never activated: "
+                    + path);
                 return;
             }
 
@@ -170,7 +179,8 @@ public class RemoteEditorManager {
             RemoteEditor remoteEditor = openEditors.remove(path);
 
             if (remoteEditor == null) {
-                log.warn("Removing an editor which has never been added");
+                log.warn("Removing an editor which has never been added: "
+                    + path);
                 return;
             }
 
@@ -193,6 +203,16 @@ public class RemoteEditorManager {
             return this.activeEditor;
         }
 
+        public boolean isRemoteActiveEditor(IPath path) {
+            if (activeEditor != null && activeEditor.getPath().equals(path))
+                return true;
+            return false;
+        }
+
+        public boolean isRemoteOpenEditor(IPath path) {
+            return openEditors.containsKey(path);
+        }
+
     }
 
     public RemoteEditorState getEditorState(User user) {
@@ -207,6 +227,46 @@ public class RemoteEditorManager {
 
     public void exec(IActivity activity) {
         activity.dispatch(activityReceiver);
+    }
+
+    /**
+     * Returns the selection of the given user in the currently active editor or
+     * null if the user has no active editor or no selection in the active
+     * editor.
+     */
+    public ITextSelection getSelection(User user) {
+
+        RemoteEditor activeEditor = getEditorState(user).getActiveEditor();
+
+        if (activeEditor == null)
+            return null;
+
+        return activeEditor.getSelection();
+    }
+
+    /**
+     * Clears all state information associated with the given user.
+     */
+    public void removeUser(User participant) {
+        editorStates.remove(participant);
+    }
+
+    public boolean isRemoteOpenEditor(IPath path) {
+        for (RemoteEditorState state : editorStates.values()) {
+            if (state.isRemoteOpenEditor(path))
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isRemoteActiveEditor(IPath path) {
+
+        for (RemoteEditorState state : editorStates.values()) {
+            if (state.isRemoteActiveEditor(path)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

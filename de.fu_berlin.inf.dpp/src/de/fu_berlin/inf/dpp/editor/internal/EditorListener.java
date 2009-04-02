@@ -14,10 +14,11 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
-public class EditorListener {
+public class EditorListener implements Disposable {
 
     private final EditorManager manager;
 
@@ -68,7 +69,7 @@ public class EditorListener {
     protected IViewportListener viewportListener = new IViewportListener() {
         // TODO why doesn't this react to window resizes?
         public void viewportChanged(int verticalOffset) {
-            manager.viewportChanged(part, EditorAPI.getViewport(viewer));
+            manager.generateViewport(part, EditorAPI.getViewport(viewer));
         }
     };
 
@@ -85,7 +86,17 @@ public class EditorListener {
 
         if (!this.lastSelection.equals(selection)) {
             this.lastSelection = selection;
-            this.manager.selectionChanged(this.part, selection);
+            this.manager.generateSelection(this.part, selection);
         }
+    }
+    
+    /** TODO This is not called */
+    public void dispose() {
+        viewer.getTextWidget().removeMouseListener(mouseListener);
+        viewer.getTextWidget().removeKeyListener(keyListener);
+        viewer.getSelectionProvider().removeSelectionChangedListener(
+            selectionChangedListener);
+        viewer.removeViewportListener(viewportListener);
+
     }
 }

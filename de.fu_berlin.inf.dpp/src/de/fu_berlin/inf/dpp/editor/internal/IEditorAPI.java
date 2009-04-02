@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.ILineRange;
@@ -71,12 +72,23 @@ public interface IEditorAPI {
     public ITextSelection getSelection(IEditorPart editorPart);
 
     /**
-     * @return the file path that given editor is displaying.
+     * @return the path of the file the given editor is displaying or null if
+     *         the given editor is not showing a file or the file is not
+     *         referenced via a path in the project.
      */
-    public IResource getEditorResource(IEditorPart editorPart);
+    public IPath getEditorPath(IEditorPart editorPart);
 
-    public void setViewport(IEditorPart editorPart, ILineRange viewport,
-        String source, boolean following);
+    /**
+     * Show an viewport annotation in the given editorPart at the given viewport
+     * for the given user.
+     */
+    public void setViewportAnnotation(IEditorPart editorPart, ILineRange viewport,
+        String user);
+
+    /**
+     * Try to make sure the given viewport is visible in the given editor
+     */
+    public void reveal(IEditorPart editorPart, ILineRange viewport);
 
     /**
      * @return Return the viewport for given editor or null, if this editorPart
@@ -100,4 +112,17 @@ public interface IEditorAPI {
      * @swt Needs to be called from the SWT-UI thread.
      */
     public void addSharedEditorListener(IEditorPart editorPart);
+
+    /**
+     * Syntactic sugar for getting the path of the IEditorPart returned by
+     * getActiveEditor()
+     */
+    public IPath getActiveEditorPath();
+
+    /**
+     * Returns the file currently displayed in the given editorPart, this maybe
+     * null if the given editor is not operating on a file or has several files
+     * (TeamEditor for instance).
+     */
+    public IResource getEditorResource(IEditorPart editorPart);
 }

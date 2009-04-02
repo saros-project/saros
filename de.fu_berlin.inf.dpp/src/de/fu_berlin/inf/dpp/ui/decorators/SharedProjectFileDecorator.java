@@ -49,7 +49,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * Decorates Shared Project files.
  * 
  * TODO CO EditorManager does not support multiple drivers correctly, thus the
- * LabelDecorator is often wrong.
+ * LabelDecorator is VERY often wrong.
  * 
  * @see ILightweightLabelDecorator
  * 
@@ -79,12 +79,14 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
+        @Override
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
             project.addListener(projectListener);
             updateDecoratorsAsync(null);
         }
 
+        @Override
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
             sharedProject.removeListener(projectListener);
@@ -177,10 +179,10 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 return;
 
             EditorManager editorManager = EditorManager.getDefault();
-            if (path.equals(editorManager.getActiveDriverEditor())) {
+            if (editorManager.isRemoteActiveEditor(path)) {
                 log.trace("Active Deco: " + element);
                 decoration.addOverlay(activeDescriptor, IDecoration.TOP_LEFT);
-            } else if (editorManager.getDriverEditors().contains(path)) {
+            } else if (editorManager.isRemoteOpenEditor(path)) {
                 log.trace("Passive Deco: " + element);
                 decoration.addOverlay(passiveDescriptor, IDecoration.TOP_LEFT);
             } else {

@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -172,6 +173,17 @@ public class EditorAPI implements IEditorAPI {
         if (window != null) {
             try {
                 IWorkbenchPage page = window.getActivePage();
+
+                /*
+                 * TODO Use
+                 * 
+                 * IWorkbenchPage.openEditor(IEditorInput input, String
+                 * editorId, boolean activate)
+                 * 
+                 * to open an editor and set activate to false! So that we can
+                 * separate opening from activating, which save us duplicate
+                 * sending of activated events.
+                 */
                 return IDE.openEditor(page, file);
             } catch (PartInitException e) {
                 log.error("Could not initialize part: ", e);
@@ -257,7 +269,7 @@ public class EditorAPI implements IEditorAPI {
             }
 
             if (resource == null) {
-                log.warn("Could not get resource from EditorInput");
+                log.warn("Could not get resource from EditorInput " + input);
             }
 
             return resource;
@@ -545,25 +557,32 @@ public class EditorAPI implements IEditorAPI {
         new EditorListener(editorPart, editorManager);
     }
 
-    public void setViewport(IEditorPart editorPart, ILineRange viewport,
-        String source, boolean following) {
+    public void reveal(IEditorPart editorPart, ILineRange viewport) {
 
         int top = viewport.getStartLine();
         int bottom = top + viewport.getNumberOfLines();
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
-        updateViewportAnnotation(viewer, top, bottom, source);
 
-        if (following) {
-            try {
-                // Show the middle of the driver's viewport.
-                // TODO FIX BadLocationException
-                viewer.revealRange(viewer.getDocument().getLineOffset(
-                    top + ((bottom - top) / 2)), 0);
-            } catch (BadLocationException e) {
-                log.error("Internal Error: BadLocationException - ", e);
-            }
+        try {
+            // Show the middle of the driver's viewport.
+            viewer.revealRange(viewer.getDocument().getLineOffset(
+                top + ((bottom - top) / 2)), 0);
+        } catch (BadLocationException e) {
+            log.error("Internal Error: BadLocationException - ", e);
         }
+
+    }
+
+    public void setViewportAnnotation(IEditorPart editorPart,
+        ILineRange viewport, String user) {
+
+        int top = viewport.getStartLine();
+        int bottom = top + viewport.getNumberOfLines();
+
+        ITextViewer viewer = EditorAPI.getViewer(editorPart);
+
+        updateViewportAnnotation(viewer, top, bottom, user);
     }
 
     public static LineRange getViewport(ITextViewer viewer) {
@@ -596,18 +615,19 @@ public class EditorAPI implements IEditorAPI {
             return;
         }
 
-        ISourceViewer sourceViewer = (ISourceViewer) viewer;
-        IAnnotationModel model = sourceViewer.getAnnotationModel();
+        IAnnotationModel model = ((ISourceViewer) viewer).getAnnotationModel();
 
-        IDocument document = viewer.getDocument();
         for (@SuppressWarnings("unchecked")
         Iterator<Annotation> it = model.getAnnotationIterator(); it.hasNext();) {
             Annotation annotation = it.next();
             if (annotation instanceof ViewportAnnotation) {
-                model.removeAnnotation(annotation);
+                if (((ViewportAnnotation) annotation).getSource()
+                    .equals(source))
+                    model.removeAnnotation(annotation);
             }
         }
 
+        IDocument document = viewer.getDocument();
         try {
             top = Math.max(0, Math.min(document.getLength() - 1, top));
             bottom = Math.max(0, Math.min(document.getLength() - 1, bottom));
@@ -765,5 +785,35 @@ public class EditorAPI implements IEditorAPI {
 
         // Give up:
         return null;
+    }
+
+    /**
+     * Syntactic sugar for getting the path of the IEditorPart returned by
+     * getActiveEditor()
+     */
+    public IPath getActiveEditorPath() {
+        IEditorPart newActiveEditor = getActiveEditor();
+        if (newActiveEditor == null)
+            return null;
+
+        return getEditorPath(newActiveEditor);
+    }
+
+    /**
+     * Syntactic sugar for getting the path of the given editor part.
+     */
+    public IPath getEditorPath(IEditorPart editorPart) {
+
+        IResource resource = getEditorResource(editorPart);
+        if (resource == null) {
+            return null;
+        }
+        IPath path = resource.getProjectRelativePath();
+
+        if (path == null) {
+            log.warn("Could not get path from resource " + resource);
+        }
+
+        return path;
     }
 }
