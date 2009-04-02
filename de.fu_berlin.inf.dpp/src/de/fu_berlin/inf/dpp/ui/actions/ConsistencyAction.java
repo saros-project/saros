@@ -34,7 +34,6 @@ import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -88,8 +87,9 @@ public class ConsistencyAction extends Action {
         // Unregister from previous project
         if (sharedProject != null) {
             this.pathsOfHandledFiles.clear();
-            this.proxy.remove(listener);
-            this.proxy = null;
+            sharedProject.getConcurrentDocumentManager()
+                .getConsistencyToResolve().remove(isConsistencyListener);
+
         }
 
         sharedProject = newSharedProject;
@@ -97,19 +97,14 @@ public class ConsistencyAction extends Action {
         // Register to new project
         if (sharedProject != null) {
             this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>();
-            this.proxy = sharedProject.getConcurrentDocumentManager()
-                .getConsistencyToResolve();
-            proxy.addAndNotify(listener);
+            sharedProject.getConcurrentDocumentManager()
+                .getConsistencyToResolve().addAndNotify(isConsistencyListener);
         } else {
             setEnabled(false);
         }
-
     }
 
-    // TODO Name is to generic
-    ObservableValue<Boolean> proxy;
-
-    ValueChangeListener<Boolean> listener = new ValueChangeListener<Boolean>() {
+    ValueChangeListener<Boolean> isConsistencyListener = new ValueChangeListener<Boolean>() {
 
         public void setValue(Boolean newValue) {
 
@@ -259,7 +254,7 @@ public class ConsistencyAction extends Action {
         return input;
     }
 
-    // TODO: move this business logic into ConsistencyWatchdog
+    // TODO move this into ConsistencyWatchdog
     public void setChecksumErrorHandling(boolean newState) {
 
         if (newState != executingChecksumErrorHandling) {
@@ -307,8 +302,7 @@ public class ConsistencyAction extends Action {
 
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
-                // TODO: move this business logic into new ConsistencyWatchdog
-                // class
+                // TODO move this into ConsistencyWatchdog
                 pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(
                     sessionManager.getSharedProject()
                         .getConcurrentDocumentManager()

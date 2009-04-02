@@ -563,7 +563,7 @@ public class ConcurrentDocumentManager {
 
         assert isHostSide() : "receiveRequestHostSide called on the Client";
 
-        // TODO assert isSWT() : "receiveRequestHostSide called from SWT";
+        assert !Util.isSWT() : "receiveRequestHostSide called from SWT";
 
         // Get JupiterServer
         JupiterDocumentServer docServer = getJupiterServer(request

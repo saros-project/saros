@@ -156,7 +156,7 @@ public class MessagingManager implements PacketListener, MessageListener,
         }
 
         public void processMessage(Chat chat, Message message) {
-            // TODO: new Method for messagelistener
+            // TODO new Method for messagelistener
 
             this.logCH.debug("processMessage called.");
             processPacket(message);
@@ -412,7 +412,7 @@ public class MessagingManager implements PacketListener, MessageListener,
                 this.multitrans.initMUC(conn, conn.getUser());
             }
             // muc.addMessageListener(mucl);
-            // TODO: check if still connected
+            // TODO Check if still connected
             if ((this.multiSession == null)
                 && (this.multitrans.getMUC() != null)) {
                 // muc.removeMessageListener(mucl);
@@ -421,7 +421,7 @@ public class MessagingManager implements PacketListener, MessageListener,
                 this.multiSession = session;
             }
         } catch (XMPPException e) {
-            // TODO Auto-generated catch block
+            // TODO SS Handle exception correctly
             e.printStackTrace();
         }
     }

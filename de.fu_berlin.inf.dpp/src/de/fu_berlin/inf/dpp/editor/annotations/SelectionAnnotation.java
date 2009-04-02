@@ -9,8 +9,7 @@ package de.fu_berlin.inf.dpp.editor.annotations;
  */
 public class SelectionAnnotation extends SarosAnnotation {
 
-    // TODO Make this field protected.
-    public static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
+    protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 
     public SelectionAnnotation(String source, boolean isCursor) {
         super(SelectionAnnotation.TYPE, true, createLabel(source, isCursor),

@@ -119,7 +119,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
             fireActivity(activity);
 
-            return delta.getKind() > 0; // TODO Compare with enumeration value.
+            return delta.getKind() != IResourceDelta.NO_CHANGE;
         }
 
         private IActivity handleFolderDelta(IPath path, int kind) {
@@ -320,19 +320,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (activity.getType() == FileActivity.Type.Created) {
             FileUtil.writeFile(activity.getContents(), file);
         } else if (activity.getType() == FileActivity.Type.Removed) {
-            // TODO Maybe move this to FileUtil.
-            FileUtil.setReadOnly(file, false);
-            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
-            file.delete(false, monitor);
-            try {
-                monitor.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            if (monitor.isCanceled()) {
-                log.warn("Removing file failed: " + file);
-            }
+            FileUtil.deleteFile(file);
         }
     }
 

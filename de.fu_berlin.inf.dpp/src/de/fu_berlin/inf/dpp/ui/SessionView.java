@@ -29,7 +29,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -48,7 +47,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -62,8 +60,6 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.AnnotationPreference;
-import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
@@ -72,7 +68,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
-import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
+import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -218,37 +214,11 @@ public class SessionView extends ViewPart {
 
         // TODO getting current color does not work if default was changed.
         public Color getBackground(Object element, int columnIndex) {
-            return getUserColor((User) element);
+            return SarosAnnotation.getUserColor((User) element);
         }
 
         public Color getForeground(Object element, int columnIndex) {
             return null;
-        }
-
-        private Color getUserColor(User user) {
-
-            int colorID = user.getColorID();
-
-            String annotationType = SelectionAnnotation.TYPE + "."
-                + String.valueOf(colorID + 1);
-
-            AnnotationPreferenceLookup lookup = EditorsUI
-                .getAnnotationPreferenceLookup();
-            AnnotationPreference ap = lookup
-                .getAnnotationPreference(annotationType);
-            if (ap == null) {
-                return null;
-            }
-
-            RGB rgb;
-            try {
-                rgb = PreferenceConverter.getColor(EditorsUI
-                    .getPreferenceStore(), ap.getColorPreferenceKey());
-            } catch (RuntimeException e) {
-                return null;
-            }
-
-            return new Color(Display.getDefault(), rgb);
         }
 
         public Font getFont(Object element, int columnIndex) {

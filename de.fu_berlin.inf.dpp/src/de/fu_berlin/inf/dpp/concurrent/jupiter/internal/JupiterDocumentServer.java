@@ -43,10 +43,7 @@ public class JupiterDocumentServer {
     }
 
     /**
-     * TODO: sync with serializer.
-     * 
-     * 1. save current action count 2. stop serializer after this count and
-     * remove client.
+     * TODO SZ Removing a proxy client needs to be synced probably
      */
     public void removeProxyClient(JID jid) {
         this.proxies.remove(jid);

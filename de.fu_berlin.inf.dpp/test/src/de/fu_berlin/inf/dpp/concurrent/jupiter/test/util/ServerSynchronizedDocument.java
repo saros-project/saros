@@ -69,7 +69,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
             /* 2. execution on server document */
             doc.execOperation(op);
         } catch (TransformationException e) {
-            // TODO Auto-generated catch block
+            // TODO Raise an error
             e.printStackTrace();
         }
         return op;
@@ -127,7 +127,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
             }
 
         } catch (TransformationException e) {
-            // TODO Auto-generated catch block
+            // TODO SZ Auto-generated catch block
             e.printStackTrace();
 
         } finally {

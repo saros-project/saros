@@ -8,7 +8,11 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.Saros;
 
-// TODO CJ: review needed
+/**
+ * This class is not used!
+ * 
+ * TODO CJ Review needed
+ */
 public class PacketProtokollLogger {
 
     private static Logger logger;

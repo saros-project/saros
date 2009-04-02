@@ -439,7 +439,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     private void removeUnneededResources(IProject localProject, FileList diff)
         throws CoreException {
 
-        // TODO dont throw CoreException
+        // TODO don't throw CoreException
         // TODO check if this triggers the resource listener
         for (IPath path : diff.getRemovedPaths()) {
             if (path.hasTrailingSeparator()) {

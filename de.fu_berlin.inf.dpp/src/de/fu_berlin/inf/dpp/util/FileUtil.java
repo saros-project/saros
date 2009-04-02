@@ -78,7 +78,7 @@ public class FileUtil {
     public static boolean setReadOnly(IResource file, boolean readonly) {
         ResourceAttributes attributes = file.getResourceAttributes();
         if (attributes == null) {
-            // TODO: Throw an FileNotFoundException and deal with it everywhere!
+            // TODO Throw an FileNotFoundException and deal with it everywhere!
             log.warn("File does not exist for setting readonly == " + readonly
                 + ": " + file);
             return false;
@@ -181,6 +181,21 @@ public class FileUtil {
             log.warn("Failure to set readonly to " + readonly + ":", e);
         } finally {
             monitor.done();
+        }
+    }
+
+    public static void deleteFile(IFile file) throws CoreException {
+        setReadOnly(file, false);
+        BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+        file.delete(false, monitor);
+        try {
+            monitor.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        if (monitor.isCanceled()) {
+            log.warn("Removing file failed: " + file);
         }
     }
 

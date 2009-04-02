@@ -23,7 +23,7 @@ public class MultiUserChatManager {
     private static Logger log = Logger.getLogger(MultiUserChatManager.class
         .getName());
 
-    // TODO: Room name should be configured by settings.
+    // TODO Room name should be configured by settings.
     /* name of multi user chat room */
     private String room = "saros";
 
@@ -38,10 +38,6 @@ public class MultiUserChatManager {
 
     public MultiUserChatManager(String roomName) {
         this.room = roomName;
-    }
-
-    public MultiUserChatManager() {
-        // TODO Auto-generated constructor stub
     }
 
     public void initMUC(XMPPConnection connection, String user, String room)

@@ -80,7 +80,6 @@ public class ChatView extends ViewPart implements IConnectionListener,
                             Saros.getDefault().getMessagingManager()
                                 .getSession().sendMessage(text);
                         }
-                        /* append("ID-TODO", text); */
                     }
                     break;
                 }

@@ -39,7 +39,7 @@ public class EditorUtils {
 
             if (fileExtension != null) {
                 if (fileExtension.equals("java")) {
-                    // TODO: Rather this dependency should be injected when the
+                    // TODO Rather this dependency should be injected when the
                     // EditorAPI is created itself.
                     JDTFacade facade = Saros.getDefault().getContainer()
                         .getComponent(JDTFacade.class);
@@ -53,7 +53,7 @@ public class EditorUtils {
                     || fileExtension.equals("cxx")
                     || fileExtension.equals("hxx")) {
 
-                    // TODO: Rather this dependency should be injected when the
+                    // TODO Rather this dependency should be injected when the
                     // EditorAPI is created itself.
                     CDTFacade facade = Saros.getDefault().getContainer()
                         .getComponent(CDTFacade.class);

@@ -73,7 +73,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     protected long transferedFileSize = 0;
 
     public int getProgressCurrent() {
-        // TODO CJ: Jingle File Transfer progress information
+        // TODO SS Jingle File Transfer progress information
         if (isP2P) {
             return this.progress_done + 1;
         } else {

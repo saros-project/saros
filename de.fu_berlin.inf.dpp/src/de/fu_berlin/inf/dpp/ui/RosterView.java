@@ -260,7 +260,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
          * @see org.eclipse.jface.viewers.ITreeContentProvider
          */
         public Object getParent(Object child) {
-            return null; // TODO
+            return null; // TODO Is this always a good idea
         }
 
         /*

@@ -262,7 +262,7 @@ public class Saros extends AbstractUIPlugin {
      *         messaging. Is never <code>null</code>.
      */
     public MessagingManager getMessagingManager() {
-        // TODO: [PICO] Rather everybody should get their own instance
+        // TODO [PICO] Rather everybody should get their own instance
         return getContainer().getComponent(MessagingManager.class);
     }
 
@@ -278,7 +278,7 @@ public class Saros extends AbstractUIPlugin {
      * @return the SessionManager. Is never <code>null</code>.
      */
     public ISessionManager getSessionManager() {
-        // TODO: [PICO] Rather everybody should get their own instance
+        // TODO [PICO] Rather everybody should get their own instance
         return getContainer().getComponent(SessionManager.class);
     }
 
@@ -339,7 +339,7 @@ public class Saros extends AbstractUIPlugin {
             // have to put this line to use new smack 3.1
             // without this line a NullPointerException happens but after a
             // longer time it connects anyway, with this line it connects fast
-            // TODO: security issue?
+            // TODO security issue?
             SASLAuthentication.supportSASLMechanism("PLAIN", 0);
 
             this.connection.login(username, password);

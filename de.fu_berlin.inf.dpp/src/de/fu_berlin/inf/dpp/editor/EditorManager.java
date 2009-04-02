@@ -673,7 +673,7 @@ public class EditorManager implements IActivityProvider {
         if (!this.isDriver || isConsistencyToResolve()) {
 
             /**
-             * TODO: If we are not a driver, then receiving this event might
+             * TODO If we are not a driver, then receiving this event might
              * indicate that the user somehow achieved to change his document.
              * We should run a consistency check.
              * 
