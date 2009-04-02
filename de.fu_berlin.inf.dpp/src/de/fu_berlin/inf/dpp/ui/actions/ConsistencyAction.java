@@ -14,7 +14,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
@@ -119,19 +118,9 @@ public class ConsistencyAction extends Action {
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
 
-                        // Concatenate paths
-                        StringBuilder sb = new StringBuilder();
-                        for (IPath path : paths) {
-                            if (sb.length() > 0)
-                                sb.append(", ");
-
-                            sb.append(path.toOSString());
-                        }
-                        String pathsOfInconsistencies = sb.toString();
-
                         // set tooltip
                         setToolTipText("Inconsistency Detected in file/s "
-                            + pathsOfInconsistencies);
+                            + Util.toOSString(paths));
 
                         // TODO Balloon is too aggressive at the moment, when
                         // the host is slow in sending changes (for instance
@@ -169,8 +158,8 @@ public class ConsistencyAction extends Action {
             return false;
         }
 
-        public boolean receivedResource(JID from, Path path, InputStream input,
-            int sequenceNumber) {
+        public boolean receivedResource(JID from, IPath path,
+            InputStream input, int sequenceNumber) {
 
             log.debug("Received consistency file [" + from.getName() + "] "
                 + path.toString());
@@ -210,7 +199,7 @@ public class ConsistencyAction extends Action {
 
     };
 
-    public static InputStream logDiff(Logger log, JID from, Path path,
+    public static InputStream logDiff(Logger log, JID from, IPath path,
         InputStream input, IFile file) {
         try {
             // save input in a byte[] for later

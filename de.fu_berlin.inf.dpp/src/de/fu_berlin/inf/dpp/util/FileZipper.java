@@ -56,7 +56,7 @@ public class FileZipper {
 
             File file = project.getFile(path).getLocation().toFile();
             if (file.exists()) {
-                zipStream.putNextEntry(new ZipEntry(path.toString()));
+                zipStream.putNextEntry(new ZipEntry(path.toPortableString()));
 
                 IOUtils.copy(new FileInputStream(file), zipStream);
 

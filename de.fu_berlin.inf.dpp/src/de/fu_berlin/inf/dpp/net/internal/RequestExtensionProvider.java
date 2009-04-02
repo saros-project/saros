@@ -63,7 +63,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
                 }
 
                 request = parseRequest(parser);
-                request.setEditorPath(new Path(path));
+                request.setEditorPath(Path.fromPortableString(path));
                 request.setJID(new JID(jid));
             }
         } catch (Exception e) {

@@ -18,6 +18,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
@@ -575,9 +576,9 @@ public class DataTransferManager implements ConnectionSessionListener {
                 break;
             case RESOURCE_TRANSFER:
                 for (IDataReceiver receiver : receivers) {
-                    boolean consumed = receiver
-                        .receivedResource(data.sender, new Path(
-                            data.file_project_path), input, data.sequenceNumber);
+                    boolean consumed = receiver.receivedResource(data.sender,
+                        Path.fromPortableString(data.file_project_path), input,
+                        data.sequenceNumber);
                     if (consumed)
                         return;
                 }
@@ -612,8 +613,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected IDataReceiver defaultReceiver = new IDataReceiver() {
 
-        public boolean receivedResource(JID from, Path path, InputStream input,
-            int sequenceNumber) {
+        public boolean receivedResource(JID from, IPath path,
+            InputStream input, int sequenceNumber) {
 
             log.info("Incoming resource from " + from.toString() + ": " + path);
 
@@ -681,8 +682,9 @@ public class DataTransferManager implements ConnectionSessionListener {
             try {
                 ZipEntry entry;
                 while ((entry = zip.getNextEntry()) != null) {
-                    receivedResource(data.getSender(),
-                        new Path(entry.getName()), new FilterInputStream(zip) {
+                    receivedResource(data.getSender(), Path
+                        .fromPortableString(entry.getName()),
+                        new FilterInputStream(zip) {
                             @Override
                             public void close() throws IOException {
                                 // don't close the ZipInputStream, we close the

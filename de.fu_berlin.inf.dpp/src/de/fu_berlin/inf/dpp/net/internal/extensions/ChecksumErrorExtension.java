@@ -35,7 +35,7 @@ public abstract class ChecksumErrorExtension extends
 
         int i = 1;
         for (IPath path : paths) {
-            extension.setValue(FILE_PATH + i, path.toOSString());
+            extension.setValue(FILE_PATH + i, path.toPortableString());
             i++;
         }
 
@@ -60,8 +60,8 @@ public abstract class ChecksumErrorExtension extends
         Set<IPath> paths = new CopyOnWriteArraySet<IPath>();
 
         for (int i = 1; i <= quantity; i++) {
-            final String path = checksumErrorExtension.getValue(FILE_PATH + i);
-            paths.add(new Path(path));
+            paths.add(Path.fromPortableString(checksumErrorExtension
+                .getValue(FILE_PATH + i)));
         }
 
         final boolean resolved = Boolean.parseBoolean(checksumErrorExtension

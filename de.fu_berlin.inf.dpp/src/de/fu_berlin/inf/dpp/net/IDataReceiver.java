@@ -2,7 +2,7 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.io.InputStream;
 
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 
@@ -22,7 +22,7 @@ public interface IDataReceiver {
     /**
      * @return true if the input stream has been consumed by the receiver
      */
-    boolean receivedResource(JID from, Path path, InputStream input,
+    boolean receivedResource(JID from, IPath path, InputStream input,
         int sequenceNumber);
 
     /**

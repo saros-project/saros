@@ -495,8 +495,11 @@ public class XMPPChatTransmitter implements ITransmitter,
         try {
             dataManager.sendData(transfer, FileUtils
                 .readFileToByteArray(archive), callback);
-            if (callback != null)
+            if (callback != null) {
+                // TODO make sure that the callback passes a path the callee
+                // expects
                 callback.fileSent(new Path(archive.getName()));
+            }
 
         } catch (IOException e) {
             if (callback != null)
@@ -515,19 +518,9 @@ public class XMPPChatTransmitter implements ITransmitter,
         Collection<User> participants = Saros.getDefault().getSessionManager()
             .getSharedProject().getParticipants();
 
-        // Concatenate paths
-        StringBuilder sb = new StringBuilder();
-        for (IPath path : paths) {
-            if (sb.length() > 0)
-                sb.append(", ");
-
-            sb.append(path.toOSString());
-        }
-        String pathsOfInconsistencies = sb.toString();
-
         XMPPChatTransmitter.log.debug("Sending checksum "
             + (resolved ? "resolved" : "error") + " message of files "
-            + pathsOfInconsistencies + " to all");
+            + Util.toOSString(paths) + " to all");
 
         for (User user : participants) {
             sendMessage(user.getJID(), ChecksumErrorExtension.getDefault()
