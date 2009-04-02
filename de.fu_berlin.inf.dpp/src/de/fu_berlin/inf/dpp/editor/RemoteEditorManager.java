@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -213,6 +215,10 @@ public class RemoteEditorManager {
             return openEditors.containsKey(path);
         }
 
+        public User getUser() {
+            return this.user;
+        }
+
     }
 
     public RemoteEditorState getEditorState(User user) {
@@ -251,22 +257,25 @@ public class RemoteEditorManager {
         editorStates.remove(participant);
     }
 
-    public boolean isRemoteOpenEditor(IPath path) {
+    public List<User> getRemoteOpenEditorUsers(IPath path) {
+        ArrayList<User> result = new ArrayList<User>();
         for (RemoteEditorState state : editorStates.values()) {
             if (state.isRemoteOpenEditor(path))
-                return true;
+                result.add(state.getUser());
         }
-        return false;
+        return result;
     }
 
-    public boolean isRemoteActiveEditor(IPath path) {
+    public List<User> getRemoteActiveEditorUsers(IPath path) {
+
+        ArrayList<User> result = new ArrayList<User>();
 
         for (RemoteEditorState state : editorStates.values()) {
             if (state.isRemoteActiveEditor(path)) {
-                return true;
+                result.add(state.getUser());
             }
         }
-        return false;
+        return result;
     }
 
 }

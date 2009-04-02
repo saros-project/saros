@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -488,6 +489,18 @@ public class Util {
             sb.append(path.toOSString());
         }
         return sb.toString();
+    }
+
+    /**
+     * Crude check whether we are on the SWT thread
+     */
+    public static boolean isSWT() {
+        try {
+            PlatformUI.getWorkbench().getDisplay().getActiveShell();
+        } catch (SWTException e) {
+            return false;
+        }
+        return true;
     }
 
 }

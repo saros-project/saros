@@ -665,8 +665,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * Execute activity after jupiter transforming process.
      * 
      * @param activity
+     * 
+     * @swt Must be called from the SWT Thread
      */
     public void execTransformedActivity(IActivity activity) {
+
+        assert Util.isSWT();
+
         try {
             log.debug("execute transformed activity: " + activity);
 

@@ -66,8 +66,9 @@ public class FollowModeAction extends Action implements Disposable {
 
     ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(boolean enabled) {
-            setChecked(enabled);
+        public void followModeChanged(User user) {
+
+            setChecked(user != null);
             updateEnablement();
 
             // should not be disabled but checked

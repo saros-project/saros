@@ -319,6 +319,7 @@ public class EditorManager implements IActivityProvider {
                     .findView("de.fu_berlin.inf.dpp.ui.SessionView");
 
                 if (view == null) {
+                    // TODO This should not be necessary
                     Util.runSafeSWTAsync(log, new Runnable() {
                         public void run() {
                             BalloonNotification.showNotification(Display
@@ -601,7 +602,8 @@ public class EditorManager implements IActivityProvider {
         this.locallyOpenEditors.add(path);
 
         for (ISharedEditorListener listener : this.editorListeners) {
-            listener.activeDriverEditorChanged(this.locallyActiveEditor, false);
+            listener.activeEditorChanged(Saros.getDefault().getLocalUser(),
+                this.locallyActiveEditor);
         }
 
         fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
@@ -737,12 +739,13 @@ public class EditorManager implements IActivityProvider {
     }
 
     /**
+     * @see IActivityProvider
      * 
      * @swt This must be called from the SWT thread.
-     * 
-     * @see IActivityProvider
      */
     public void exec(final IActivity activity) {
+
+        assert Util.isSWT();
 
         remoteEditorManager.exec(activity);
 
@@ -833,44 +836,42 @@ public class EditorManager implements IActivityProvider {
         ILineRange lineRange = viewport.getLineRange();
         for (IEditorPart editorPart : editors) {
             if (following || user.isDriver())
-                this.editorAPI.setViewportAnnotation(editorPart, lineRange, source);
+                this.editorAPI.setViewportAnnotation(editorPart, lineRange,
+                    source);
             if (following)
                 this.editorAPI.reveal(editorPart, lineRange);
         }
     }
 
     protected void execActivated(final User user, final IPath path) {
-        if (user.equals(getFollowedUser())) {
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
 
-                    // Path null means this driver has no active editor any more
-                    if (path == null)
-                        return;
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.activeEditorChanged(user, path);
+        }
 
-                    editorAPI.openEditor(sharedProject.getProject().getFile(
-                        path));
-                }
-            });
+        // Path null means this driver has no active editor any more
+        if (user.equals(getFollowedUser()) && path != null) {
+            editorAPI.openEditor(sharedProject.getProject().getFile(path));
         }
     }
 
     protected void execClosed(final User user, final IPath path) {
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                // TODO Review for disconnection of document providers.
-                /*
-                 * IFile file = EditorManager.this.sharedProject.getProject()
-                 * .getFile(path); resetText(file);
-                 */
 
-                if (user.equals(getFollowedUser())) {
-                    for (IEditorPart part : editorPool.getEditors(path)) {
-                        editorAPI.closeEditor(part);
-                    }
-                }
+        for (ISharedEditorListener listener : editorListeners) {
+            listener.editorRemoved(user, path);
+        }
+
+        // TODO Review for disconnection of document providers.
+        /*
+         * IFile file = EditorManager.this.sharedProject.getProject()
+         * .getFile(path); resetText(file);
+         */
+
+        if (user.equals(getFollowedUser())) {
+            for (IEditorPart part : editorPool.getEditors(path)) {
+                editorAPI.closeEditor(part);
             }
-        });
+        }
     }
 
     /**
@@ -966,7 +967,7 @@ public class EditorManager implements IActivityProvider {
         this.locallyOpenEditors.remove(path);
 
         for (ISharedEditorListener listener : this.editorListeners) {
-            listener.driverEditorRemoved(path, false);
+            listener.editorRemoved(Saros.getDefault().getLocalUser(), path);
         }
 
         fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
@@ -1487,7 +1488,7 @@ public class EditorManager implements IActivityProvider {
         this.isFollowing = userToFollow;
 
         for (ISharedEditorListener editorListener : this.editorListeners) {
-            editorListener.followModeChanged(this.isFollowing != null);
+            editorListener.followModeChanged(this.isFollowing);
         }
 
         if (this.isFollowing != null)
@@ -1539,11 +1540,11 @@ public class EditorManager implements IActivityProvider {
         this.editorAPI.reveal(newEditor, viewport);
     }
 
-    public boolean isRemoteOpenEditor(IPath path) {
-        return remoteEditorManager.isRemoteOpenEditor(path);
+    public List<User> getRemoteOpenEditorUsers(IPath path) {
+        return remoteEditorManager.getRemoteOpenEditorUsers(path);
     }
 
-    public boolean isRemoteActiveEditor(IPath path) {
-        return remoteEditorManager.isRemoteActiveEditor(path);
+    public List<User> getRemoteActiveEditorUsers(IPath path) {
+        return remoteEditorManager.getRemoteActiveEditorUsers(path);
     }
 }

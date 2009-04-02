@@ -336,7 +336,7 @@ public class SessionView extends ViewPart {
 
     private ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
-        public void followModeChanged(boolean enabled) {
+        public void followModeChanged(User user) {
             viewer.refresh();
         }
     };

@@ -20,8 +20,10 @@
 package de.fu_berlin.inf.dpp.ui.decorators;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -48,8 +50,9 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * Decorates Shared Project files.
  * 
- * TODO CO EditorManager does not support multiple drivers correctly, thus the
- * LabelDecorator is VERY often wrong.
+ * TODO CO SharedProjectFileDecorator does support multiple users but the
+ * awareness shows all drivers and the person followed which is kind of
+ * confusing.
  * 
  * @see ILightweightLabelDecorator
  * 
@@ -98,54 +101,54 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected ISharedEditorListener editorListener = new ISharedEditorListener() {
 
-        IFile oldActiveDriverEditor = null;
+        Map<User, IFile> oldActiveEditors = new HashMap<User, IFile>();
 
-        public void activeDriverEditorChanged(IPath path, boolean replicated) {
+        public void activeEditorChanged(User user, IPath path) {
             try {
                 List<IFile> paths = new LinkedList<IFile>();
 
-                if (oldActiveDriverEditor != null) {
-                    paths.add(oldActiveDriverEditor);
+                IFile oldActiveEditor = oldActiveEditors.get(user);
+                if (oldActiveEditor != null) {
+                    paths.add(oldActiveEditor);
                 }
+
+                IFile newFile = null;
                 if (path != null && sharedProject != null) {
-                    IFile newFile = sharedProject.getProject().getFile(path);
-                    if (newFile != null
-                        && !newFile.equals(oldActiveDriverEditor)) {
+                    newFile = sharedProject.getProject().getFile(path);
+                    if (newFile != null && !newFile.equals(oldActiveEditor)) {
                         paths.add(newFile);
                     }
-                    oldActiveDriverEditor = newFile;
                 }
+                oldActiveEditors.put(user, newFile);
                 updateDecoratorsAsync(paths.toArray());
 
             } catch (RuntimeException e) {
                 log.error("Internal Error in SharedProjectFileDecorator:", e);
             }
-
         }
 
-        public void driverEditorRemoved(IPath path, boolean replicated) {
+        public void editorRemoved(User user, IPath path) {
             try {
                 if (path != null && sharedProject != null) {
                     IFile newFile = sharedProject.getProject().getFile(path);
-                    if (newFile != null
-                        && newFile.equals(oldActiveDriverEditor)) {
-                        oldActiveDriverEditor = null;
-                    }
+                    IFile oldActiveEditor = oldActiveEditors.get(user);
                     if (newFile != null) {
+                        if (newFile.equals(oldActiveEditor)) {
+                            oldActiveEditors.put(user, null);
+                        }
                         updateDecoratorsAsync(new Object[] { newFile });
                     }
                 }
             } catch (RuntimeException e) {
                 log.error("Internal Error in SharedProjectFileDecorator:", e);
             }
-
         }
 
         public void driverEditorSaved(IPath path, boolean replicated) {
             // ignore
         }
 
-        public void followModeChanged(boolean enabled) {
+        public void followModeChanged(User user) {
             // ignore
         }
     };
@@ -179,10 +182,13 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 return;
 
             EditorManager editorManager = EditorManager.getDefault();
-            if (editorManager.isRemoteActiveEditor(path)) {
+
+            if (containsUserToDisplay(editorManager
+                .getRemoteActiveEditorUsers(path))) {
                 log.trace("Active Deco: " + element);
                 decoration.addOverlay(activeDescriptor, IDecoration.TOP_LEFT);
-            } else if (editorManager.isRemoteOpenEditor(path)) {
+            } else if (containsUserToDisplay(editorManager
+                .getRemoteOpenEditorUsers(path))) {
                 log.trace("Passive Deco: " + element);
                 decoration.addOverlay(passiveDescriptor, IDecoration.TOP_LEFT);
             } else {
@@ -192,6 +198,17 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         } catch (RuntimeException e) {
             log.error("Internal Error in SharedProjectFileDecorator:", e);
         }
+    }
+
+    private boolean containsUserToDisplay(List<User> activeUsers) {
+
+        EditorManager editorManager = EditorManager.getDefault();
+        for (User user : activeUsers) {
+            if (user.isDriver() || user.equals(editorManager.getFollowedUser())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addListener(ILabelProviderListener listener) {

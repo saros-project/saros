@@ -137,7 +137,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 .getJingleManager();
 
             // If fast p2p connection send individual files, otherwise archive
-            if (jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
+            if (jingleManager != null
+                && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
                 isP2P = true;
                 sendNext();
             } else {
@@ -204,8 +205,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         this.sharedProject.addUser(new User(from, colorID));
         setState(State.DONE);
-
-        sendDriverEditors();
 
         // TODO Find a more reliable way to remove InvitationProcess
         this.transmitter.removeInvitationProcess(this);
@@ -370,58 +369,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.setProgressInfo("");
 
         return true;
-    }
-
-    /**
-     * Send activities which set the active editors and their viewports.
-     */
-    private void sendDriverEditors() {
-
-        /*
-         * TODO Instead of sending this information to everybody, we should
-         * rather use a subscription mechanism so that everybody can ask us
-         * where we are
-         */
-
-        // TODO The following code is broken!
-        // final EditorManager editorManager = EditorManager.getDefault();
-        // ArrayList<IPath> driverEditors = new ArrayList<IPath>(editorManager
-        // .getDriverEditors());
-        //
-        // // Make sure the active editor is the last in this list.
-        // IPath activeDriverEditor = editorManager.getActiveDriverEditor();
-        // if (activeDriverEditor != null) {
-        // driverEditors.remove(activeDriverEditor);
-        // driverEditors.add(activeDriverEditor);
-        // }
-        //
-        // // Create editor activated activities and viewport information for
-        // all
-        // // the driver's editors.
-        // final ActivitySequencer sequencer =
-        // this.sharedProject.getSequencer();
-        // for (final IPath path : driverEditors) {
-        //
-        // if (this.sharedProject.getProject().findMember(path) == null) {
-        // log.warn("Editor " + path + " is not a driver's editor!");
-        // return;
-        // }
-        // sequencer.activityCreated(new EditorActivity(
-        // EditorActivity.Type.Activated, path));
-        //
-        // Util.runSafeSWTSync(log, new Runnable() {
-        // public void run() {
-        // ILineRange range = editorManager.getCurrentViewport(path);
-        //
-        // if (range != null) {
-        // // TODO Investigate whether it is okay to dispatch
-        // // directly
-        // sequencer.activityCreated(new ViewportActivity(range,
-        // path));
-        // }
-        // }
-        // });
-        // }
     }
 
     public String getProjectName() {
