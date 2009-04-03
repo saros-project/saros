@@ -155,7 +155,11 @@ public class EditorManager implements IActivityProvider {
             connect(file);
 
             document.addDocumentListener(documentListener);
-            getEditors(path).add(editorPart);
+
+            if (!getEditors(path).add(editorPart)) {
+                log.warn("EditorPart was added twice to the EditorPool: "
+                    + editorPart.getTitle());
+            }
             lastEditTimes.put(path, System.currentTimeMillis());
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
         }
@@ -168,7 +172,31 @@ public class EditorManager implements IActivityProvider {
                 return;
             }
 
-            getEditors(path).remove(editorPart);
+            if (!getEditors(path).remove(editorPart)) {
+                log.warn("EditorPart was never added to the EditorPool: "
+                    + editorPart.getTitle());
+                return;
+            }
+
+            // Unregister and unhook
+            editorAPI.setEditable(editorPart, true);
+            editorAPI.removeSharedEditorListener(editorPart);
+
+            IEditorInput input = editorPart.getEditorInput();
+            if (!(input instanceof IFileEditorInput)) {
+                log.error("This editor does not use IFiles as input");
+            }
+
+            IDocumentProvider documentProvider = EditorUtils
+                .getDocumentProvider(input);
+            documentProvider.removeElementStateListener(dirtyStateListener);
+
+            IFile file = ((IFileEditorInput) input).getFile();
+            resetText(file);
+
+            IDocument document = documentProvider.getDocument(input);
+            document.removeDocumentListener(documentListener);
+
         }
 
         public Set<IEditorPart> getEditors(IPath path) {
@@ -191,7 +219,19 @@ public class EditorManager implements IActivityProvider {
         }
 
         public void removeAllEditors() {
-            editorParts.clear();
+
+            for (IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) {
+                remove(part);
+            }
+
+            assert getAllEditors().size() == 0;
+        }
+
+        public void setDriverEnabled(boolean isDriver) {
+
+            for (IEditorPart editorPart : getAllEditors()) {
+                editorAPI.setEditable(editorPart, isDriver);
+            }
         }
     }
 
@@ -283,6 +323,11 @@ public class EditorManager implements IActivityProvider {
 
             // Make sure we have the up-to-date facts about ourself
             isDriver = sharedProject.isDriver();
+
+            // Lock / unlock editors
+            if (user.equals(localUser)) {
+                editorPool.setDriverEnabled(isDriver);
+            }
 
             if (isFollowing != null) {
                 if (Saros.getDefault().getPreferenceStore().getBoolean(
@@ -452,20 +497,19 @@ public class EditorManager implements IActivityProvider {
         @Override
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
-            setAllEditorsToEditable();
+
+            editorPool.removeAllEditors();
+
             removeAllAnnotations(new Predicate<SarosAnnotation>() {
                 public boolean evaluate(SarosAnnotation annotation) {
                     return true;
                 }
             });
 
-            // FIXME remove this.dirtyStateListener from IDocumentProvider
-
             sharedProject.removeListener(sharedProjectListener);
             sharedProject.getActivityManager().removeProvider(
                 EditorManager.this);
             sharedProject = null;
-            editorPool.removeAllEditors();
             lastEditTimes.clear();
             lastRemoteEditTimes.clear();
             contributionAnnotationManager.dispose();
@@ -1340,10 +1384,7 @@ public class EditorManager implements IActivityProvider {
 
         model.disconnect(doc);
 
-        if (this.connectedFiles.contains(file)) {
-            provider.disconnect(input);
-            this.connectedFiles.remove(file);
-        }
+        resetText(file);
 
         // Reset readonly state
         if (wasReadonly)
@@ -1376,12 +1417,6 @@ public class EditorManager implements IActivityProvider {
     protected void fireActivity(IActivity activity) {
         for (IActivityListener listener : this.activityListeners) {
             listener.activityCreated(activity);
-        }
-    }
-
-    protected void setAllEditorsToEditable() {
-        for (IEditorPart editor : this.editorPool.getAllEditors()) {
-            this.editorAPI.setEditable(editor, true);
         }
     }
 
