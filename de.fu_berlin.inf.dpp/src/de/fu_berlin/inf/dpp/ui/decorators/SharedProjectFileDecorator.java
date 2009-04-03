@@ -76,7 +76,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         @Override
         public void roleChanged(User user, boolean replicated) {
-            updateDecoratorsAsync(null);
+            updateDecoratorsAsync(new Object[] { sharedProject.getProject() });
         }
     };
 
@@ -86,16 +86,18 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
             project.addListener(projectListener);
-            updateDecoratorsAsync(null);
+            // Update all
+            updateDecoratorsAsync(new Object[] { project.getProject() });
         }
 
         @Override
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
-            sharedProject.removeListener(projectListener);
-            // Update all
-            updateDecoratorsAsync(null);
             sharedProject = null;
+            project.removeListener(projectListener);
+            // Update all
+            updateDecoratorsAsync(new Object[] { project.getProject() });
+
         }
     };
 
@@ -223,6 +225,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         Saros.getDefault().getSessionManager().removeSessionListener(
             sessionListener);
         EditorManager.getDefault().removeSharedEditorListener(editorListener);
+        // TODO clean up better
         this.sharedProject = null;
     }
 

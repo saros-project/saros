@@ -59,15 +59,17 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
+        @Override
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
             updateDecoratorsAsync(project.getProject());
         }
 
+        @Override
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
-            updateDecoratorsAsync(project.getProject());
             sharedProject = null;
+            updateDecoratorsAsync(project.getProject());
         }
     };
 
