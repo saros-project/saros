@@ -172,6 +172,7 @@ public class EditorManager implements IActivityProvider {
                 return;
             }
 
+            // TODO Remove should remove empty HashSets
             if (!getEditors(path).remove(editorPart)) {
                 log.warn("EditorPart was never added to the EditorPool: "
                     + editorPart.getTitle());
@@ -435,7 +436,7 @@ public class EditorManager implements IActivityProvider {
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
 
-            assert editorPool.editorParts.isEmpty() : "EditorPool was not correctly reset!";
+            assert editorPool.getAllEditors().size() == 0 : "EditorPool was not correctly reset!";
 
             isDriver = sharedProject.isDriver();
             sharedProject.addListener(sharedProjectListener);
@@ -540,6 +541,9 @@ public class EditorManager implements IActivityProvider {
     }
 
     public void connect(IFile file) {
+
+        // TODO Check that file exists...
+
         if (!connectedFiles.contains(file)) {
             FileEditorInput input = new FileEditorInput(file);
             IDocumentProvider documentProvider = EditorUtils
