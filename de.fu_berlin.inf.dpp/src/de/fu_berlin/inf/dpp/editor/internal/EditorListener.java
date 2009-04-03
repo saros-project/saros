@@ -14,25 +14,36 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.ui.IEditorPart;
-import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
-public class EditorListener implements Disposable {
+public class EditorListener {
 
-    private final EditorManager manager;
+    protected EditorManager manager;
 
-    private final ITextViewer viewer;
+    protected ITextViewer viewer;
 
-    private final IEditorPart part;
+    protected IEditorPart part;
 
-    private ITextSelection lastSelection = new TextSelection(-1, -1);
+    protected ITextSelection lastSelection = new TextSelection(-1, -1);
 
-    public EditorListener(IEditorPart part, EditorManager manager) {
+    public EditorListener(EditorManager manager) {
+        this.manager = manager;
+    }
+
+    public void bind(IEditorPart part) {
+
+        if (this.part != null) {
+            unbind();
+        }
 
         this.part = part;
-        this.manager = manager;
         this.viewer = EditorAPI.getViewer(part);
+
+        if (viewer == null) {
+            throw new IllegalArgumentException(
+                "EditorPart does not provide an ITextViewer!");
+        }
 
         viewer.getTextWidget().addMouseListener(mouseListener);
         viewer.getTextWidget().addKeyListener(keyListener);
@@ -89,14 +100,21 @@ public class EditorListener implements Disposable {
             this.manager.generateSelection(this.part, selection);
         }
     }
-    
-    /** TODO This is not called */
-    public void dispose() {
+
+    public void unbind() {
+
+        if (part == null) {
+            throw new IllegalStateException();
+        }
+
         viewer.getTextWidget().removeMouseListener(mouseListener);
         viewer.getTextWidget().removeKeyListener(keyListener);
         viewer.getSelectionProvider().removeSelectionChangedListener(
             selectionChangedListener);
         viewer.removeViewportListener(viewportListener);
+
+        viewer = null;
+        part = null;
 
     }
 }

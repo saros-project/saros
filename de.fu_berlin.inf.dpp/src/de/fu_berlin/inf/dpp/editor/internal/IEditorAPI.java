@@ -82,8 +82,8 @@ public interface IEditorAPI {
      * Show an viewport annotation in the given editorPart at the given viewport
      * for the given user.
      */
-    public void setViewportAnnotation(IEditorPart editorPart, ILineRange viewport,
-        String user);
+    public void setViewportAnnotation(IEditorPart editorPart,
+        ILineRange viewport, String user);
 
     /**
      * Try to make sure the given viewport is visible in the given editor
@@ -106,12 +106,28 @@ public interface IEditorAPI {
      * {@link IEditorListener} methods on the editor manager set with
      * {@link #setEditorManager(EditorManager)}.
      * 
-     * Connecting to an editorPart multiple times, will result in multiple
-     * events. The caller is responsible for organizing connections.
+     * Connecting to an editorPart multiple times, will automatically remove
+     * previous listeners via removeSharedEditorListener(IEditorPart
+     * editorPart).
      * 
      * @swt Needs to be called from the SWT-UI thread.
+     * 
+     * @throws IllegalArgumentException
+     *             if the given editorPart does not have an ITextViewer
      */
     public void addSharedEditorListener(IEditorPart editorPart);
+
+    /**
+     * Removes listeners to the given editor previously added via
+     * {@link #addSharedEditorListener(IEditorPart)}.
+     * 
+     * @swt Needs to be called from the SWT-UI thread.
+     * 
+     * @throws IllegalArgumentException
+     *             if the given editorPart has never been registered via
+     *             {@link #addSharedEditorListener(IEditorPart)}.
+     */
+    public void removeSharedEditorListener(IEditorPart editorPart);
 
     /**
      * Syntactic sugar for getting the path of the IEditorPart returned by

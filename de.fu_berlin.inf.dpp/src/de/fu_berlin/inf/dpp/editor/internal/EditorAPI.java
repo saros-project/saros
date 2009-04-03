@@ -3,9 +3,11 @@ package de.fu_berlin.inf.dpp.editor.internal;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
@@ -550,11 +552,26 @@ public class EditorAPI implements IEditorAPI {
         });
     }
 
+    protected Map<IEditorPart, EditorListener> editorListeners = new HashMap<IEditorPart, EditorListener>();
+
     public void addSharedEditorListener(IEditorPart editorPart) {
-        // HACK 1: It is ugly that the EditorListener is added in the
-        // constructor
-        // HACK 2: The EditorListener is never removed from the EditorPart!
-        new EditorListener(editorPart, editorManager);
+
+        if (editorListeners.containsKey(editorPart)) {
+            removeSharedEditorListener(editorPart);
+        }
+        EditorListener listener = new EditorListener(editorManager);
+        listener.bind(editorPart);
+        editorListeners.put(editorPart, listener);
+    }
+
+    public void removeSharedEditorListener(IEditorPart editorPart) {
+
+        EditorListener listener = editorListeners.remove(editorPart);
+        if (listener == null)
+            throw new IllegalArgumentException(
+                "The given editorPart has no EditorListener");
+
+        listener.unbind();
     }
 
     public void reveal(IEditorPart editorPart, ILineRange viewport) {
