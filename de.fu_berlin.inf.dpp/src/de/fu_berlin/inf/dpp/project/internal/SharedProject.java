@@ -368,6 +368,10 @@ public class SharedProject implements ISharedProject {
                  * TODO Since we are going to invite people, we need to stop
                  * changing the project
                  */
+                if (!isDriver()) {
+                    setProjectReadonly(false);
+                }
+
                 if (!EditorAPI.saveProject(getProject())) {
                     log.info("User canceled starting an invitation (as host)");
                     return;
@@ -377,6 +381,10 @@ public class SharedProject implements ISharedProject {
                 // strange
                 Window iw = new InvitationDialog(EditorAPI.getShell(), toInvite);
                 iw.open();
+
+                if (!isDriver()) {
+                    setProjectReadonly(true);
+                }
             }
         });
 
