@@ -9,7 +9,6 @@ import org.eclipse.core.filebuffers.manipulation.FileBufferOperationRunner;
 import org.eclipse.core.filebuffers.manipulation.TextFileBufferOperation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -23,6 +22,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
  * Static utility methods for working with Eclipse Editors
@@ -114,19 +114,8 @@ public class EditorUtils {
 
         EditorManager.log.debug("Converting line delimiters...");
 
-        boolean makeReadable = false;
+        boolean makeReadable = FileUtil.setReadOnly(file, false);
 
-        ResourceAttributes resourceAttributes = file.getResourceAttributes();
-        if (resourceAttributes.isReadOnly()) {
-            resourceAttributes.setReadOnly(false);
-            try {
-                file.setResourceAttributes(resourceAttributes);
-                makeReadable = true;
-            } catch (CoreException e) {
-                EditorManager.log.error(
-                    "Error making file readable for delimiter conversion:", e);
-            }
-        }
         // Now run the conversion operation
         IPath[] paths = new IPath[] { file.getFullPath() };
 
@@ -152,15 +141,7 @@ public class EditorUtils {
         }
 
         if (makeReadable) {
-            resourceAttributes.setReadOnly(true);
-            try {
-                file.setResourceAttributes(resourceAttributes);
-            } catch (CoreException e) {
-                EditorManager.log
-                    .error(
-                        "Error restoring readable state to false after delimiter conversion:",
-                        e);
-            }
+            FileUtil.setReadOnly(file, true);
         }
     }
 
