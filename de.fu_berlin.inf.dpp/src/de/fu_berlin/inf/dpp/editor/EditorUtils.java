@@ -29,6 +29,9 @@ import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
  */
 public class EditorUtils {
 
+    /**
+     * TODO Review and document the purpose of this
+     */
     public static IDocumentProvider getDocumentProvider(IEditorInput input) {
 
         Object adapter = input.getAdapter(IFile.class);
