@@ -623,15 +623,15 @@ public class RosterView extends ViewPart implements IConnectionListener,
      *            <code>false</code> otherwise.
      */
     public void refreshRosterTree(final boolean updateLabels) {
-        if (this.viewer == null || this.viewer.getControl().isDisposed()) {
-            return;
-        }
-
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                RosterView.this.viewer.refresh(updateLabels);
-                RosterView.this.viewer.expandAll();
-                RosterView.this.composite.layout();
+                if (viewer == null || viewer.getControl().isDisposed()) {
+                    return;
+                }
+
+                viewer.refresh(updateLabels);
+                viewer.expandAll();
+                composite.layout();
             }
         });
     }
