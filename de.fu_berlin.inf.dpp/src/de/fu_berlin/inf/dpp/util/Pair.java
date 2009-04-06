@@ -28,8 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
-
 /**
  * Utility class that holds a value of Type P and one of Type V.
  * 
@@ -47,6 +45,9 @@ public class Pair<P, V> {
         this.v = v;
     }
 
+    /**
+     * Returns a comparator for pairs based on the Ps in the Pairs only.
+     */
     public static <P extends Comparable<P>, V> Comparator<Pair<P, V>> pCompare() {
         return new Comparator<Pair<P, V>>() {
             public int compare(Pair<P, V> arg0, Pair<P, V> arg1) {
@@ -68,6 +69,9 @@ public class Pair<P, V> {
         return new Pair<V, P>(v, p);
     }
 
+    /**
+     * Will return a list that has P and V switched.
+     */
     public static <P, V> List<Pair<V, P>> flipList(List<Pair<P, V>> list) {
         LinkedList<Pair<V, P>> result = new LinkedList<Pair<V, P>>();
         for (Pair<P, V> pair : list)
@@ -80,7 +84,7 @@ public class Pair<P, V> {
      * P will be merged together to form a pair with this P and a list of all
      * the Vs associated with this P.
      * 
-     * This operation is garantueed to be stable (the ordering of pairs with the
+     * This operation is guaranteed to be stable (the ordering of pairs with the
      * same P is unaltered).
      * 
      * @param <P>
@@ -140,6 +144,10 @@ public class Pair<P, V> {
         };
     }
 
+    /**
+     * Given a list of Ps and a list of Vs will return a list of Pairs. If the
+     * list are of different length null values used to fill.
+     */
     public static <P, V> List<Pair<P, V>> zip(List<P> ps, List<V> vs) {
 
         List<Pair<P, V>> result = new LinkedList<Pair<P, V>>();
@@ -157,6 +165,9 @@ public class Pair<P, V> {
         return result;
     }
 
+    /**
+     * From a list of pairs, returns a list of the P elements in the list.
+     */
     public static <P, V> List<P> pList(List<Pair<P, V>> list) {
 
         List<P> result = new LinkedList<P>();
@@ -185,17 +196,33 @@ public class Pair<P, V> {
 
     @Override
     public int hashCode() {
-        return (this.p == null ? 0 : this.p.hashCode())
-            | (this.v == null ? 0 : this.v.hashCode());
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((p == null) ? 0 : p.hashCode());
+        result = prime * result + ((v == null) ? 0 : v.hashCode());
+        return result;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Pair<?, ?>))
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
             return false;
-
-        Pair<?, ?> other = (Pair<?, ?>) o;
-        return ObjectUtils.equals(this.p, other.p)
-            && ObjectUtils.equals(this.v, other.v);
+        if (!(obj instanceof Pair))
+            return false;
+        Pair<?, ?> other = (Pair<?, ?>) obj;
+        if (p == null) {
+            if (other.p != null)
+                return false;
+        } else if (!p.equals(other.p))
+            return false;
+        if (v == null) {
+            if (other.v != null)
+                return false;
+        } else if (!v.equals(other.v))
+            return false;
+        return true;
     }
+
 }
