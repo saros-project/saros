@@ -188,18 +188,42 @@ public class Util {
         }
     }
 
+    /**
+     * Returns a runnable that upon being run will wait the given time in
+     * milliseconds and then run the given runnable.
+     * 
+     * The returned runnable supports being interrupted upon which the runnable
+     * returns with the interrupted flag being raised.
+     * 
+     */
+    public static Runnable delay(final int milliseconds, final Runnable runnable) {
+        return new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(milliseconds);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                runnable.run();
+            }
+        };
+    }
+
+    /**
+     * Returns a callable that upon being called will wait the given time in
+     * milliseconds and then call the given callable.
+     * 
+     * The returned callable supports being interrupted upon which an
+     * InterruptedException is being thrown.
+     * 
+     */
     public static <T> Callable<T> delay(final int milliseconds,
         final Callable<T> callable) {
         return new Callable<T>() {
             public T call() throws Exception {
 
-                try {
-                    Thread.sleep(milliseconds);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    return null;
-                }
-
+                Thread.sleep(milliseconds);
                 return callable.call();
             }
         };
@@ -310,6 +334,12 @@ public class Util {
      * This method does NOT actually run the given runnable, but only wraps it.
      */
     public static Runnable wrapSafe(final Logger log, final Runnable runnable) {
+
+        /*
+         * TODO Use the stack frame from the call to wrapSafe to provide better
+         * information who created this runnable
+         */
+
         return new Runnable() {
             public void run() {
                 try {
