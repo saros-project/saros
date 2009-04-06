@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * @author rdjemili
@@ -106,9 +107,9 @@ public abstract class InvitationProcess implements IInvitationProcess {
         setState(State.CANCELED);
 
         if (errorMsg != null) {
-            InvitationProcess.logger
-                .error("Invitation was canceled because of an error: "
-                    + errorMsg);
+            InvitationProcess.logger.error(
+                "Invitation was canceled because of an error: " + errorMsg,
+                new StackTrace());
         } else {
             InvitationProcess.logger.info("Invitation was canceled.");
         }
