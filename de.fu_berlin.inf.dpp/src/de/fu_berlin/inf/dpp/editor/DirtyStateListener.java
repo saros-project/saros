@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.editor;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.ui.part.FileEditorInput;
@@ -32,10 +33,15 @@ public class DirtyStateListener implements IElementStateListener {
         if (!(element instanceof FileEditorInput))
             return;
 
-        FileEditorInput fileEditorInput = (FileEditorInput) element;
-        IFile file = fileEditorInput.getFile();
+        IFile file = ((FileEditorInput) element).getFile();
 
-        if (file.getProject() != this.editorManager.sharedProject.getProject()) {
+        if (!ObjectUtils.equals(file.getProject(), editorManager.sharedProject
+            .getProject())) {
+            return;
+        }
+
+        // Only trigger save events for files managed in the editor pool
+        if (!editorManager.isConnected(file)) {
             return;
         }
 

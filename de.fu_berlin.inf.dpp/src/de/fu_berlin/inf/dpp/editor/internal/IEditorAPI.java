@@ -22,11 +22,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
  * @author rdjemili
  */
 public interface IEditorAPI {
-    /**
-     * Sets the editor manager that uses this IEditorAPI. The given editor
-     * manager will receive the callbacks.
-     */
-    public void setEditorManager(EditorManager editorManager);
 
     /**
      * Opens the editor with given file. Needs to be called from an UI thread.
@@ -49,7 +44,13 @@ public interface IEditorAPI {
     public IEditorPart getActiveEditor();
 
     /**
-     * @return all editors that are currently opened.
+     * This method will return all editors open in all IWorkbenchWindows.
+     * 
+     * This method will ask Eclipse to restore editors which have not been
+     * loaded yet (if Eclipse is started editors are loaded lazily). So calling
+     * this method might cause partOpen events to be sent.
+     * 
+     * @return all editors that are currently opened
      */
     public Set<IEditorPart> getOpenEditors();
 
@@ -103,31 +104,37 @@ public interface IEditorAPI {
 
     /**
      * Attaches listeners to the given editor that will fire the
-     * {@link IEditorListener} methods on the editor manager set with
-     * {@link #setEditorManager(EditorManager)}.
+     * {@link IEditorListener} methods on the given editor manager
      * 
      * Connecting to an editorPart multiple times, will automatically remove
-     * previous listeners via removeSharedEditorListener(IEditorPart
-     * editorPart).
+     * previous listeners via removeSharedEditorListener(IEditorPart editorPart)
+     * (but will print a warning!)
      * 
      * @swt Needs to be called from the SWT-UI thread.
      * 
      * @throws IllegalArgumentException
-     *             if the given editorPart does not have an ITextViewer
+     *             if the given editorPart does not have an ITextViewer or if
+     *             the EditorManager or EditorPart are null
+     * 
      */
-    public void addSharedEditorListener(IEditorPart editorPart);
+    public void addSharedEditorListener(EditorManager editorManager,
+        IEditorPart editorPart);
 
     /**
-     * Removes listeners to the given editor previously added via
-     * {@link #addSharedEditorListener(IEditorPart)}.
+     * Removes the listener to the given editor for the given manager previously
+     * added via {@link #addSharedEditorListener(EditorManager, IEditorPart)}.
      * 
      * @swt Needs to be called from the SWT-UI thread.
      * 
      * @throws IllegalArgumentException
+     *             if the EditorManager or EditorPart are null
+     * 
+     * @throws IllegalStateException
      *             if the given editorPart has never been registered via
-     *             {@link #addSharedEditorListener(IEditorPart)}.
+     *             {@link #addSharedEditorListener(EditorManager, IEditorPart)}.
      */
-    public void removeSharedEditorListener(IEditorPart editorPart);
+    public void removeSharedEditorListener(EditorManager editorManager,
+        IEditorPart editorPart);
 
     /**
      * Syntactic sugar for getting the path of the IEditorPart returned by
@@ -141,4 +148,34 @@ public interface IEditorAPI {
      * (TeamEditor for instance).
      */
     public IResource getEditorResource(IEditorPart editorPart);
+
+    /**
+     * Removes a previously registered PartListener added via {@link
+     * addEditorPartListener(EditorManager)}.
+     * 
+     * @swt Needs to be called from the SWT-UI thread.
+     * 
+     * @throws IllegalArgumentException
+     *             if the EditorManager is null
+     * 
+     * @throws IllegalStateException
+     *             if the given EditorManager has never been registered via
+     *             {@link addEditorPartListener(EditorManager)}
+     */
+    public void removeEditorPartListener(EditorManager editorManager);
+
+    /**
+     * Register a PartListener on the currently active WorkbenchWindow using the
+     * given EditorManager as callback.
+     * 
+     * If a part listener is already registered for the given editorManager it
+     * is removed before adding a new listener (but a warning will be printed!)
+     * 
+     * @swt Needs to be called from the SWT-UI thread.
+     * 
+     * @throws IllegalArgumentException
+     *             if the EditorManager is null
+     */
+    public void addEditorPartListener(EditorManager editorManager);
+
 }

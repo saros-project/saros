@@ -62,24 +62,35 @@ import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
+import de.fu_berlin.inf.dpp.util.Pair;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The central implementation of the IEditorAPI which basically encapsulates the
  * interaction with the TextEditor.
  * 
+ * @swt Pretty much all methods in this class need to be called from SWT
+ * 
  * @author rdjemili
  * 
  */
 public class EditorAPI implements IEditorAPI {
 
-    private class SharedProjectPartListener implements IPartListener2 {
+    public static class EditorPartListener implements IPartListener2 {
+
+        protected EditorManager editorManager;
+
+        public EditorPartListener(EditorManager editorManager) {
+            this.editorManager = editorManager;
+        }
+
         public void partActivated(IWorkbenchPartReference partRef) {
             IWorkbenchPart part = partRef.getPart(false);
 
             if ((part != null) && (part instanceof IEditorPart)) {
                 IEditorPart editor = (IEditorPart) part;
-                EditorAPI.this.editorManager.partActivated(editor);
+                editorManager.partActivated(editor);
             }
         }
 
@@ -88,7 +99,7 @@ public class EditorAPI implements IEditorAPI {
 
             if ((part != null) && (part instanceof IEditorPart)) {
                 IEditorPart editor = (IEditorPart) part;
-                EditorAPI.this.editorManager.partOpened(editor);
+                editorManager.partOpened(editor);
             }
         }
 
@@ -97,7 +108,7 @@ public class EditorAPI implements IEditorAPI {
 
             if ((part != null) && (part instanceof IEditorPart)) {
                 IEditorPart editor = (IEditorPart) part;
-                EditorAPI.this.editorManager.partClosed(editor);
+                editorManager.partClosed(editor);
             }
         }
 
@@ -148,21 +159,54 @@ public class EditorAPI implements IEditorAPI {
         }
     };
 
-    EditorManager editorManager;
+    /**
+     * Editors where the user isn't allowed to write
+     */
+    protected List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
 
-    /** Editors where the user isn't allowed to write */
-    private final List<IEditorPart> lockedEditors = new ArrayList<IEditorPart>();
+    /**
+     * Currently managed shared project part listeners for removal by
+     * removePartListener
+     */
+    protected Map<EditorManager, IPartListener2> partListeners = new HashMap<EditorManager, IPartListener2>();
 
-    public void setEditorManager(EditorManager editorManager) {
-        this.editorManager = editorManager;
+    public void addEditorPartListener(EditorManager editorManager) {
 
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                IWorkbenchWindow window = EditorAPI.getActiveWindow();
-                window.getPartService().addPartListener(
-                    new SharedProjectPartListener());
-            }
-        });
+        assert Util.isSWT();
+
+        if (editorManager == null)
+            throw new IllegalArgumentException();
+
+        if (partListeners.containsKey(editorManager)) {
+            log.error("EditorPartListener was added twice: ", new StackTrace());
+            removeEditorPartListener(editorManager);
+        }
+
+        IPartListener2 partListener = new EditorPartListener(editorManager);
+
+        partListeners.put(editorManager, partListener);
+
+        // TODO This can fail if a shared project is started when no
+        // Eclipse Window is open!
+        EditorAPI.getActiveWindow().getPartService().addPartListener(
+            partListener);
+    }
+
+    public void removeEditorPartListener(EditorManager editorManager) {
+
+        assert Util.isSWT();
+
+        if (editorManager == null)
+            throw new IllegalArgumentException();
+
+        if (!partListeners.containsKey(editorManager)) {
+            throw new IllegalStateException();
+        }
+
+        // TODO This can fail if a shared project is started when no
+        // Eclipse Window is open!
+        EditorAPI.getActiveWindow().getPartService().removePartListener(
+            partListeners.remove(editorManager));
     }
 
     /*
@@ -208,10 +252,8 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+    /**
+     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI#getOpenEditors()
      */
     public Set<IEditorPart> getOpenEditors() {
         Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
@@ -224,10 +266,23 @@ public class EditorAPI implements IEditorAPI {
                 IEditorReference[] editorRefs = page.getEditorReferences();
 
                 for (IEditorReference reference : editorRefs) {
-                    IEditorPart editorPart = reference.getEditor(true);
+
+                    IEditorPart editorPart = reference.getEditor(false);
+                    if (editorPart == null) {
+                        log
+                            .debug("IWorkbenchPage."
+                                + "getEditorReferences()"
+                                + " returned IEditorPart which needs to be restored: "
+                                + reference.getTitle());
+                        // Making this call might cause partOpen events
+                        editorPart = reference.getEditor(true);
+                    }
 
                     if (editorPart != null) {
                         editorParts.add(editorPart);
+                    } else {
+                        log.warn("Internal Error: IEditorPart could "
+                            + "not be restored: " + reference);
                     }
                 }
             }
@@ -552,21 +607,45 @@ public class EditorAPI implements IEditorAPI {
         });
     }
 
-    protected Map<IEditorPart, EditorListener> editorListeners = new HashMap<IEditorPart, EditorListener>();
+    /**
+     * Map of currently registered EditorListeners for removal via
+     * removeSharedEditorListener
+     */
+    protected Map<Pair<EditorManager, IEditorPart>, EditorListener> editorListeners = new HashMap<Pair<EditorManager, IEditorPart>, EditorListener>();
 
-    public void addSharedEditorListener(IEditorPart editorPart) {
+    public void addSharedEditorListener(EditorManager editorManager,
+        IEditorPart editorPart) {
 
-        if (editorListeners.containsKey(editorPart)) {
-            removeSharedEditorListener(editorPart);
+        assert Util.isSWT();
+
+        if (editorManager == null || editorPart == null)
+            throw new IllegalArgumentException();
+
+        Pair<EditorManager, IEditorPart> key = new Pair<EditorManager, IEditorPart>(
+            editorManager, editorPart);
+
+        if (editorListeners.containsKey(key)) {
+            log.error("SharedEditorListener was added twice: "
+                + editorPart.getTitle(), new StackTrace());
+            removeSharedEditorListener(editorManager, editorPart);
         }
         EditorListener listener = new EditorListener(editorManager);
         listener.bind(editorPart);
-        editorListeners.put(editorPart, listener);
+        editorListeners.put(key, listener);
     }
 
-    public void removeSharedEditorListener(IEditorPart editorPart) {
+    public void removeSharedEditorListener(EditorManager editorManager,
+        IEditorPart editorPart) {
 
-        EditorListener listener = editorListeners.remove(editorPart);
+        assert Util.isSWT();
+
+        if (editorManager == null || editorPart == null)
+            throw new IllegalArgumentException();
+
+        Pair<EditorManager, IEditorPart> key = new Pair<EditorManager, IEditorPart>(
+            editorManager, editorPart);
+
+        EditorListener listener = editorListeners.remove(key);
         if (listener == null)
             throw new IllegalArgumentException(
                 "The given editorPart has no EditorListener");
@@ -609,8 +688,8 @@ public class EditorAPI implements IEditorAPI {
         if (bottom < top) {
             // FIXME This warning occurs when the document is shorter than the
             // viewport
-            log.warn("Viewport Range Problem Bottom == " + bottom
-                + " < Top == " + top);
+            log.warn("Viewport Range Problem in " + viewer + ": Bottom == "
+                + bottom + " < Top == " + top);
             bottom = top;
         }
 
