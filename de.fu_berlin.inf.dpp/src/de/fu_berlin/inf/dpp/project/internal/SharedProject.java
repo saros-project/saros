@@ -307,7 +307,10 @@ public class SharedProject implements ISharedProject {
     public Thread requestTransmitter = null;
 
     public void start() {
-        stopped = false;
+        if (!stopped) {
+            throw new IllegalStateException();
+        }
+
         activitySequencer.start();
 
         /* Start thread for sending jupiter requests. */
@@ -329,15 +332,23 @@ public class SharedProject implements ISharedProject {
                 }
             }
         }));
+
+        stopped = false;
+
         this.requestTransmitter.start();
     }
 
     // TODO Review sendRequest for InterruptedException and remove this flag.
-    boolean stopped;
+    boolean stopped = true;
 
     public void stop() {
+        if (stopped) {
+            throw new IllegalStateException();
+        }
+
         activitySequencer.stop();
         this.requestTransmitter.interrupt();
+
         stopped = true;
     }
 
