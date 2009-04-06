@@ -350,7 +350,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendJoinMessage(ISharedProject sharedProject) {
         try {
-            /* sleep process for 1000 millis to ensure invitation state process. */
+            /*
+             * sleep process for 1000 millis to ensure invitation state process
+             * on host.
+             */
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -803,8 +806,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             .getSharedProject();
 
         if ((project == null) || (project.getParticipant(fromJID) == null)) {
-            XMPPChatTransmitter.log.info("Recevied activities from " + source
-                + " but User is no participant!");
+            XMPPChatTransmitter.log.warn("Received activities from " + source
+                + " but User is no participant: " + timedActivities);
             return;
         } else {
             XMPPChatTransmitter.log.debug("Received activities from " + source
