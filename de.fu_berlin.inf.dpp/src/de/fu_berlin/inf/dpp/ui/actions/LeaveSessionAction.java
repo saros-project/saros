@@ -78,19 +78,6 @@ public class LeaveSessionAction extends Action {
      */
     @Override
     public void run() {
-        Util.runSafeSync(log, new Runnable() {
-            public void run() {
-                runLeaveSession();
-            }
-        });
-    }
-
-    protected void updateEnablement() {
-        setEnabled(sessionManager.getSharedProject() != null);
-    }
-
-    public void runLeaveSession() {
-
         Shell shell = EditorAPI.getShell();
         if (shell == null) {
             return;
@@ -122,13 +109,33 @@ public class LeaveSessionAction extends Action {
         if (!reallyLeave)
             return;
 
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                runLeaveSession();
+            }
+        });
+    }
+
+    protected void runLeaveSession() {
+
         try {
             sessionManager.stopSharedProject();
-        } catch (Exception e) {
-            ErrorDialog.openError(Display.getDefault().getActiveShell(),
-                "Internal Error Leaving Session", "Session could not be left",
-                new Status(IStatus.ERROR, "de.fu_berlin.inf.dpp",
-                    IStatus.ERROR, e.getMessage(), e));
+        } catch (final Exception e) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    ErrorDialog.openError(
+                        Display.getDefault().getActiveShell(),
+                        "Internal Error Leaving Session",
+                        "Session could not be left", new Status(IStatus.ERROR,
+                            "de.fu_berlin.inf.dpp", IStatus.ERROR, e
+                                .getMessage(), e));
+                }
+            });
         }
     }
+
+    protected void updateEnablement() {
+        setEnabled(sessionManager.getSharedProject() != null);
+    }
+
 }
