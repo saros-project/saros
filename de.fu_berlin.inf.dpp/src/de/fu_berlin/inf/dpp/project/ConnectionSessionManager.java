@@ -57,6 +57,11 @@ public class ConnectionSessionManager {
 
                     for (ConnectionSessionListener listener : Util
                         .reverse(listeners)) {
+                        /*
+                         * TODO SS This ConnectionSessionManager violates the
+                         * contract of the ConnectionSessionListener (dispose
+                         * was called twice!)
+                         */
                         listener.dispose();
                     }
                     break;
