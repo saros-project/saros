@@ -33,7 +33,8 @@ public interface ISessionManager {
     public String getSessionID();
 
     /**
-     * Joins an remotely already running shared project.
+     * Creates a shared project for a session hosted remotely. The returned
+     * project is NOT started!
      * 
      * @param project
      *            the local Eclipse project which should be used to replicate
@@ -119,4 +120,5 @@ public interface ISessionManager {
      * Set the SessionID to none, so that new Sessions can be begun.
      */
     public void cancelIncomingInvitation();
+
 }

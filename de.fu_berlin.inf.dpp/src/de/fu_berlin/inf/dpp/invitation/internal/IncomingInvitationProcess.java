@@ -490,11 +490,19 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         ISharedProject sharedProject = sessionManager.joinSession(
             this.localProject, host, colorID);
 
+        // TODO joining the session will already send events, which will be
+        // rejected by our peers, because they don't know us yet (JoinMessage is
+        // send only later)
+
         // TODO Will block 1000 ms to ensure something...
         this.transmitter.sendJoinMessage(sharedProject);
         this.transmitter.removeInvitationProcess(this);
 
-        sharedProject.setProjectReadonly(true);
+        sharedProject.setProjectReadonly(!sharedProject.isDriver());
+
+        // Starting the project here is a HACK to workaround the first todo
+        // above
+        sharedProject.start();
 
         setState(State.DONE);
     }

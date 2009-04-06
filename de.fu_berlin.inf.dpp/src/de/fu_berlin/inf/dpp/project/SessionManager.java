@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -112,24 +113,30 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         return sessionID;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
             project, saros.getMyJID(), host, colorID);
         this.currentlySharedProject.setValue(sharedProject);
 
-        sharedProject.start();
-
         for (ISessionListener listener : this.listeners) {
             listener.sessionStarted(sharedProject);
         }
 
-        SessionManager.log.info("Session joined");
+        log.info("Shared project joined");
 
         return sharedProject;
     }
 
+    /**
+     * @nonSWT
+     */
     public void stopSharedProject() {
+
+        assert !Util.isSWT();
 
         SharedProject project = currentlySharedProject.getValue();
 
@@ -147,7 +154,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.currentlySharedProject.setValue(null);
 
         for (ISessionListener listener : this.listeners) {
-            listener.sessionEnded(project);
+            try {
+                listener.sessionEnded(project);
+            } catch (RuntimeException e) {
+                log.error("Internal error in notifying listener"
+                    + " of SharedProject end: ", e);
+            }
         }
 
         sessionID = NOT_IN_SESSION;
