@@ -120,8 +120,8 @@ public class RemoteEditorManager {
         public void setSelection(IPath path, ITextSelection selection) {
 
             if (!openEditors.containsKey(path)) {
-                log.warn("Selection for editor which was never activated: "
-                    + path);
+                log.warn("Received selection from user [" + this.user
+                    + "] for editor which was never activated: " + path);
                 return;
             }
 
@@ -158,7 +158,16 @@ public class RemoteEditorManager {
             }
         }
 
-        private RemoteEditor getRemoteEditor(IPath path) {
+        /**
+         * Returns a RemoteEditor representing the given path for the given
+         * user.
+         * 
+         * This method never returns null but creates a new RemoteEditor lazily.
+         * 
+         * To query whether the user of this RemoteEditorState has the editor of
+         * the given path open use isRemoteOpenEditor().
+         */
+        public RemoteEditor getRemoteEditor(IPath path) {
             RemoteEditor result = openEditors.get(path);
             if (result == null) {
                 result = new RemoteEditor(path);
@@ -277,5 +286,4 @@ public class RemoteEditorManager {
         }
         return result;
     }
-
 }
