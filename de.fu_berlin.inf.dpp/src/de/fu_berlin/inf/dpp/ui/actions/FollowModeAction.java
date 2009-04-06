@@ -53,7 +53,34 @@ public class FollowModeAction extends Action implements Disposable {
             if (isEnabled()
                 && Saros.getDefault().getPreferenceStore().getBoolean(
                     PreferenceConstants.AUTO_FOLLOW_MODE)) {
-                run();
+
+                /*
+                 * TODO Running this action too early might cause warnings if
+                 * the viewport information have not yet arrived!
+                 * 
+                 * In the worst case, this might be called before the
+                 * EditorManager has been initialized, which would probably
+                 * cause undefined behavior.
+                 * 
+                 * Suggested Solution: 1.) We should make sure that
+                 * ISessionListeners are sorted in a sane order.
+                 * 
+                 * 2.) We should think about making initial state information
+                 * part of the Invitation process.
+                 * 
+                 * As a HACK, we run this action 1s after the listener was
+                 * called.
+                 */
+                Util.runSafeAsync(log, Util.delay(1000, new Runnable() {
+                    public void run() {
+                        Util.runSafeSWTAsync(log, new Runnable() {
+                            public void run() {
+                                FollowModeAction.this.run();
+                            }
+                        });
+                    }
+                }));
+
             }
         }
 
@@ -100,7 +127,7 @@ public class FollowModeAction extends Action implements Disposable {
      */
     @Override
     public void run() {
-        Util.runSafeSWTSync(log, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
 
                 User toFollow = getNewToFollow();
