@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -117,6 +118,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         setState(State.SYNCHRONIZING);
 
         try {
+            // TODO Filelist is created again (also in invitationAccepted)
             FileList local = new FileList(this.sharedProject.getProject());
             FileList diff = this.remoteFileList.diff(local);
 
@@ -186,6 +188,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         assertState(State.HOST_FILELIST_SENT);
 
         this.remoteFileList = fileList;
+
         setState(State.GUEST_FILELIST_SENT);
 
         // Run asynchronously
@@ -201,6 +204,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.InvitationProcess
      */
     public void joinReceived(JID from) {
+
+        // HACK Necessary because an empty list of files
+        // to send causes a Race condition otherwise...
+        blockUntil(State.SYNCHRONIZING_DONE, EnumSet.of(
+            State.GUEST_FILELIST_SENT, State.SYNCHRONIZING));
+
         assertState(State.SYNCHRONIZING_DONE);
 
         this.sharedProject.addUser(new User(from, colorID));
@@ -211,6 +220,30 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         this.transmitter.sendUserListTo(from, this.sharedProject
             .getParticipants());
+    }
+
+    protected boolean blockUntil(State until, EnumSet<State> validStates) {
+
+        while (this.state != until) {
+
+            if (!validStates.contains(this.state)) {
+                cancel("Unexpected state(" + this.state + ")", false);
+                return false;
+            }
+
+            if (getState() == State.CANCELED) {
+                return false;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /*
@@ -231,10 +264,11 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public void fileSent(IPath path) {
 
-        if (isP2P) {
+        if (isP2P && this.toSend.size() > 0) {
             progress_done++;
             sendNext();
         } else {
+            // Archive was sent
             setState(State.SYNCHRONIZING_DONE);
         }
     }
@@ -260,6 +294,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         IPath path = this.toSend.remove(0);
         this.setProgressInfo(path.toFile().getName());
+
+        if (this.toSend.size() == 0) {
+            // Set before sending the last file, because a race condition might
+            // otherwise occur
+            setState(State.SYNCHRONIZING_DONE);
+        }
 
         try {
             this.transmitter.sendFileAsync(this.peer, this.sharedProject
@@ -364,8 +404,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                return false;
             }
         }
+
         this.setProgressInfo("");
 
         return true;
