@@ -60,6 +60,11 @@ import de.fu_berlin.inf.dpp.util.Util;
  * The ActivitySequencer is responsible for making sure that activities are sent
  * and received in the right order.
  * 
+ * TODO Remove the dependency of this class on the ConcurrentDocumentManager,
+ * push all responsibility up a layer into the SharedProject
+ * 
+ * TODO This class violates the visibility requirements from the SE.CodeRules
+ * 
  * @author rdjemili
  * @author coezbek
  */
@@ -372,11 +377,16 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     private ConcurrentDocumentManager concurrentDocumentManager;
 
     /**
+     * Whether this AS currently sends or receives events
+     */
+    protected boolean started = false;
+
+    /**
      * outgoing queue for direct client sync messages for all driver.
      */
     private final BlockingQueue<Pair<JID, Request>> outgoingSyncActivities = new LinkedBlockingQueue<Pair<JID, Request>>();
 
-    private final Timer flushTimer = new Timer(true);
+    private Timer flushTimer;
 
     private final ISharedProject sharedProject;
 
@@ -396,9 +406,19 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * @see #stop()
      */
     public void start() {
+
+        if (started) {
+            throw new IllegalStateException();
+        }
+
+        this.flushTimer = new Timer(true);
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+
+                // Just to assert that after stop() no task is executed anymore
+                if (!started)
+                    return;
 
                 List<IActivity> activities = flush();
 
@@ -418,6 +438,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 }
             }
         }, 0, MILLIS_UPDATE);
+
+        started = true;
     }
 
     /**
@@ -427,21 +449,18 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * @see #start()
      */
     public void stop() {
+        if (!started) {
+            throw new IllegalStateException();
+        }
+
         this.flushTimer.cancel();
+        this.flushTimer = null;
+
+        started = false;
     }
 
     /**
-     * TODO Refactor like this:
-     * 
-     * <code>
-     * concurrentManager.exec(activity); 
-     * editorManager.exec(activity);
-     * roleManager.exec(activity); 
-     * sharedResourceManager.exec(activity);
-     * </code>
-     * 
-     * Is easier to read and debug :-) But watch out for interdependencies
-     * between these.
+     * TODO This should be pushed up into the SharedProject
      */
     public void exec(final IActivity activity) {
 
@@ -500,6 +519,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
          */
         synchronized (queues) {
             queues.add(nextActivity);
+
+            if (!started)
+                return;
+
             for (TimedActivity activity : queues.removeActivities()) {
                 exec(activity.getActivity());
             }
@@ -529,6 +552,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
     /**
      * All the ActivityProviders will call this method when new events occurred
      * in the UI.
+     * 
+     * TODO This method should be pushed up into SharedProject
      * 
      * @see IActivityListener
      */
@@ -665,6 +690,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      * Execute activity after jupiter transforming process.
      * 
      * @param activity
+     * 
+     *            TODO Push this method into SharedProject
      * 
      * @swt Must be called from the SWT Thread
      */
