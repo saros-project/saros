@@ -20,8 +20,6 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -47,6 +45,7 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
+import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class SarosUI {
@@ -77,61 +76,64 @@ public class SarosUI {
                 final IIncomingInvitationProcess process) {
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        JoinSessionWizard jsw = new JoinSessionWizard(process);
-                        WizardDialogAccessable wd = new WizardDialogAccessable(
-                            EditorAPI.getShell(), jsw);
-                        wd.setHelpAvailable(false);
-                        jsw.setWizardDlg(wd);
-                        process.setInvitationUI(jsw.getInvitationUI());
-                        wd.open();
+                        showIncomingInvitationUI(process);
                     }
                 });
             }
 
-            /*
-             * (non-Javadoc)
-             * 
-             * @see de.fu_berlin.inf.dpp.listeners.ISessionListener
-             */
             @Override
             public void sessionStarted(ISharedProject sharedProject) {
                 Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
-                        try {
-                            // Create Session View
-                            IWorkbench workbench = PlatformUI.getWorkbench();
-                            IWorkbenchWindow window = workbench
-                                .getActiveWorkbenchWindow();
-                            window.getActivePage().showView(
-                                SarosUI.SESSION_VIEW, null,
-                                IWorkbenchPage.VIEW_CREATE);
-                        } catch (PartInitException e) {
-                            Saros.getDefault().getLog().log(
-                                new Status(IStatus.ERROR, Saros.SAROS,
-                                    IStatus.ERROR,
-                                    "Could not create Session View", e));
-                        }
-
-                        try {
-                            // Open Roster so that a participant can be invited
-                            IWorkbench workbench = PlatformUI.getWorkbench();
-                            IWorkbenchWindow window = workbench
-                                .getActiveWorkbenchWindow();
-                            window.getActivePage().showView(
-                                SarosUI.ROSTER_VIEW, null,
-                                IWorkbenchPage.VIEW_ACTIVATE);
-                        } catch (PartInitException e) {
-                            Saros.getDefault().getLog().log(
-                                new Status(IStatus.ERROR, Saros.SAROS,
-                                    IStatus.ERROR,
-                                    "Could not activate Roster View", e));
-                        }
-
+                        openSarosViews();
                     }
                 });
             }
 
         });
+    }
+
+    protected void showIncomingInvitationUI(IIncomingInvitationProcess process) {
+
+        JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
+        WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
+            EditorAPI.getShell(), sessionWizard);
+
+        // TODO Provide help :-)
+        wizardDialog.setHelpAvailable(false);
+        sessionWizard.setWizardDlg(wizardDialog);
+        process.setInvitationUI(sessionWizard.getInvitationUI());
+
+        // Fixes #2727848: InvitationDialog is opened in the
+        // background
+        EclipseUtils.openWindow(wizardDialog);
+    }
+
+    /**
+     * TODO What to do if no Views are active?
+     * 
+     * @swt
+     */
+    public void openSarosViews() {
+        try {
+            // Create Session View
+            IWorkbench workbench = PlatformUI.getWorkbench();
+            IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            window.getActivePage().showView(SarosUI.SESSION_VIEW, null,
+                IWorkbenchPage.VIEW_CREATE);
+        } catch (PartInitException e) {
+            log.error("Could not create Session View", e);
+        }
+
+        try {
+            // Open Roster so that a participant can be invited
+            IWorkbench workbench = PlatformUI.getWorkbench();
+            IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            window.getActivePage().showView(SarosUI.ROSTER_VIEW, null,
+                IWorkbenchPage.VIEW_ACTIVATE);
+        } catch (PartInitException e) {
+            log.error("Could not create Session View", e);
+        }
     }
 
     /**
