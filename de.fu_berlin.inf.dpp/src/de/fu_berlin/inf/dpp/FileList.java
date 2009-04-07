@@ -111,26 +111,6 @@ public class FileList {
     }
 
     /**
-     * Creates a new file list from the file tree in given container.
-     * 
-     * @param container
-     *            the resource container that should be represented by the new
-     *            file list.
-     * @param ignoreDerived
-     *            <code>true</code> if derived resources should be ignored.
-     * @throws CoreException
-     *             exception that might happen while fetching the files from the
-     *             given container.
-     */
-    public FileList(IContainer container, boolean ignoreDerived)
-        throws CoreException {
-
-        container.refreshLocal(IResource.DEPTH_INFINITE, null);
-        addMembers(container.members(), this.all, ignoreDerived);
-        this.unaltered.putAll(this.all);
-    }
-
-    /**
      * Creates a new file list from given resources.
      * 
      * @param resources
@@ -235,7 +215,6 @@ public class FileList {
 
                 if (path.hasTrailingSeparator()) {
                     fileList.unaltered.put(path, null);
-
                 } else {
                     long checksum = entry.getValue();
                     long otherChecksum = other.all.get(path);

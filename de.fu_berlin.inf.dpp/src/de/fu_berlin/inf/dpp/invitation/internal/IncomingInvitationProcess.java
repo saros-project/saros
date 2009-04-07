@@ -100,8 +100,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         if (fileList == null) {
             cancel("Failed to receive remote file list.", false);
         } else {
-            this.remoteFileList = fileList;
             setState(State.HOST_FILELIST_SENT);
+            this.remoteFileList = fileList;
         }
     }
 
@@ -110,31 +110,55 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * 
      * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
      */
-    public FileList requestRemoteFileList(IProgressMonitor monitor) {
+    public void requestRemoteFileList(IProgressMonitor monitor)
+        throws InterruptedException {
         assertState(State.INVITATION_SENT);
 
         monitor.beginTask("Requesting remote file list",
             IProgressMonitor.UNKNOWN);
 
-        this.transmitter.sendRequestForFileListMessage(this.peer);
-        setState(State.HOST_FILELIST_REQUESTED);
+        try {
+            monitor.subTask("Initializing Jingle");
 
-        while ((this.remoteFileList == null) && (this.state != State.CANCELED)) {
+            this.transmitter.awaitJingleManager(this.peer);
+
             if (monitor.isCanceled()) {
                 cancel(null, false);
+                throw new InterruptedException();
+            }
+            if (this.state == State.CANCELED) {
+                return;
             }
 
-            try {
-                Thread.sleep(500);
+            monitor.subTask("Sending request for remote file list");
+
+            setState(State.HOST_FILELIST_REQUESTED);
+
+            this.transmitter.sendRequestForFileListMessage(this.peer);
+
+            monitor.subTask("Waiting for remote file list");
+
+            while (this.remoteFileList == null) {
+
+                if (monitor.isCanceled()) {
+                    cancel(null, false);
+                    throw new InterruptedException();
+                }
+                if (this.state == State.CANCELED) {
+                    return;
+                }
+
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    cancel(null, false);
+                    throw e;
+                }
                 monitor.worked(1);
-            } catch (InterruptedException e) {
-                cancel(null, false);
             }
+        } finally {
+            monitor.done();
         }
-
-        monitor.done();
-
-        return this.remoteFileList;
     }
 
     /*
@@ -252,7 +276,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      */
     public void resourceReceived(JID from, IPath path, InputStream in) {
         IncomingInvitationProcess.logger.debug("new file received: " + path);
-        if (this.localProject == null) {
+        if (this.localProject == null || this.progressMonitor.isCanceled()) {
             return; // we do not have started the new project yet, so received
             // resources are not welcomed
         }
@@ -276,6 +300,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         } catch (Exception e) {
             failed(e);
         }
+
+        // Could have been canceled in the meantime
+        if (this.progressMonitor.isCanceled())
+            return;
 
         this.progressMonitor.worked(1);
         this.progressMonitor.subTask("Files left: "
@@ -304,8 +332,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      */
     private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
 
-        while (this.filesLeftToSynchronize > 0) {
-
+        // Make sure that cancelation by the user is at least checked once
+        do {
             // Operation canceled by the local user
             if (monitor.isCanceled()) {
                 return false;
@@ -321,7 +349,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             } catch (InterruptedException e) {
                 return false;
             }
-        }
+
+        } while (this.filesLeftToSynchronize > 0);
 
         return true;
     }

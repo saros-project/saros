@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -116,10 +115,13 @@ public interface ISharedProject {
      * @param inviteUI
      *            user interface of the invitation for feedback calls.
      * 
+     * @param fileList
+     *            a list of all files currently present in the project
+     * 
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-        boolean inactive, IInvitationUI inviteUI);
+        boolean inactive, IInvitationUI inviteUI, FileList fileList);
 
     /**
      * Adds the given shared project listener. This call is ignored if the
@@ -144,17 +146,6 @@ public interface ISharedProject {
      *         never returns <code>null</code>.
      */
     public IProject getProject();
-
-    /**
-     * @return the file list representation of the Eclipse project that is
-     *         associated with this shared project.
-     * @throws CoreException
-     *             if there are problems while reading file tree of the Eclipse
-     *             project.
-     */
-    public FileList getFileList() throws CoreException;
-
-    // TODO remove direct uses of FileList
 
     /**
      * @return the sequencer that is responsible for sending and receiving
@@ -226,12 +217,4 @@ public interface ISharedProject {
      */
     public void returnColor(int colorID);
 
-    /**
-     * Gets a driver. If there is more than one, there is no guarantee which one
-     * of them is returned.
-     * 
-     * @return a {@link User} with the driver role, or <code>null</code> if
-     *         there is no driver at all.
-     */
-    public User getADriver();
 }

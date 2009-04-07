@@ -100,11 +100,13 @@ public abstract class InvitationProcess implements IInvitationProcess {
      *            true if the message originated remotely, false if locally.
      */
     public void cancel(String errorMsg, boolean replicated) {
-        if (this.state == State.CANCELED) {
-            return;
-        }
 
-        setState(State.CANCELED);
+        synchronized (this) {
+            if (this.state == State.CANCELED) {
+                return;
+            }
+            setState(State.CANCELED);
+        }
 
         if (errorMsg != null) {
             InvitationProcess.logger.error(

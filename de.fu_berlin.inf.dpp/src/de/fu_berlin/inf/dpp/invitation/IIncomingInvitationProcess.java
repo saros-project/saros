@@ -17,9 +17,17 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      * Requests the file list of the remotely shared project. This methods
      * blocks until the file list is retrieved.
      * 
-     * This method can be called while in INVITATION_SENT state.
+     * This method can only be called while in INVITATION_SENT state.
+     * 
+     * If the local user canceled via the monitor the Invitation process is
+     * canceled.
+     * 
+     * @throws InterruptedException
+     *             If the local user canceled waiting for the operation user
+     *             isCanceled of the monitor.
      */
-    public FileList requestRemoteFileList(IProgressMonitor monitor);
+    public void requestRemoteFileList(IProgressMonitor monitor)
+        throws InterruptedException;
 
     /**
      * @return the file list of the remotely shared project or <code>null</code>

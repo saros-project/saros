@@ -299,4 +299,11 @@ public interface ITransmitter {
      */
     public void executeAsDispatch(Runnable runnable);
 
+    /**
+     * Make sure that Jingle has sufficiently initialized so that a remote
+     * client trying to connect to us, will not fail because we are not ready to
+     * handle his Jingle negotiation attempts.
+     */
+    public void awaitJingleManager(JID peer);
+
 }

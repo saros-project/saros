@@ -303,19 +303,23 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
+        XMPPChatTransmitter.log
+            .debug("Send request to cancel Invititation to [" + user.getBase()
+                + "] with error msg: " + errorMsg);
         sendMessage(user, CancelInviteExtension.getDefault().create(
             Saros.getDefault().getSessionManager().getSessionID(), errorMsg));
     }
 
     public void sendRequestForFileListMessage(JID toJID) {
-
         XMPPChatTransmitter.log.debug("Send request for FileList to " + toJID);
 
+        sendMessage(toJID, RequestForFileListExtension.getDefault().create());
+    }
+
+    public void awaitJingleManager(JID peer) {
         // If other user supports Jingle, make sure that we are done starting
         // the JingleManager
-        dataManager.awaitJingleManager(toJID);
-
-        sendMessage(toJID, RequestForFileListExtension.getDefault().create());
+        dataManager.awaitJingleManager(peer);
 
     }
 
@@ -344,6 +348,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
         String description, int colorID) {
+        XMPPChatTransmitter.log.debug("Send invitation to [" + guest.getBase()
+            + "] with description: " + description);
         sendMessage(guest, InviteExtension.getDefault().create(
             sharedProject.getProject().getName(), description, colorID));
     }

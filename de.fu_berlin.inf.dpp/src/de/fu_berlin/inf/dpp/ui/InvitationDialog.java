@@ -19,14 +19,19 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -56,6 +61,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
@@ -240,6 +246,27 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         return c;
     }
 
+    protected ISharedProject project;
+
+    protected FileList localFileList;
+
+    protected CoreException fileListCreationError = null;
+
+    @Override
+    public int open() {
+
+        this.project = Saros.getDefault().getSessionManager()
+            .getSharedProject();
+
+        if (project == null) {
+            throw new IllegalStateException();
+        }
+
+        startFileListCreationAsync();
+
+        return super.open();
+    }
+
     protected void setInviteable(boolean b) {
         getButton(IDialogConstants.OK_ID).setEnabled(b);
     }
@@ -252,14 +279,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     public void performInvitation() {
 
+        makeSureFileListIsAvailable();
+
         this.cancelSelectedInvitationButton.setEnabled(true);
         getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
         try {
             TableItem[] cursel = this.table.getSelection();
 
-            ISharedProject project = Saros.getDefault().getSessionManager()
-                .getSharedProject();
             String name = project.getProject().getName();
 
             for (TableItem ti : cursel) {
@@ -267,12 +294,51 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
                 InviterData invdat = (InviterData) o;
                 invdat.outgoingProcess = project.invite(invdat.jid, name, true,
-                    this);
+                    this, localFileList);
             }
 
         } catch (RuntimeException e) {
             log.error("Failed to perform invitation:", e);
         }
+    }
+
+    protected void startFileListCreationAsync() {
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                try {
+                    localFileList = new FileList(project.getProject());
+                } catch (CoreException e) {
+                    fileListCreationError = e;
+                }
+            }
+        });
+    }
+
+    protected void makeSureFileListIsAvailable() {
+        if (localFileList == null) {
+
+            ProgressMonitorDialog dialog = new ProgressMonitorDialog(this
+                .getShell());
+            try {
+                dialog.run(true, false, new IRunnableWithProgress() {
+                    public void run(final IProgressMonitor monitor)
+                        throws InterruptedException, InvocationTargetException {
+                        while (localFileList == null
+                            && fileListCreationError == null) {
+                            Thread.sleep(100);
+                        }
+                        if (fileListCreationError != null)
+                            throw new InvocationTargetException(
+                                fileListCreationError);
+                    }
+                });
+            } catch (InvocationTargetException e) {
+                return;
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+        assert localFileList != null;
     }
 
     // Triggers the update of the table in a GUI thread.
@@ -391,8 +457,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         for (TableItem item : selection) {
             InviterData invdat = (InviterData) item.getData();
             if (invdat.outgoingProcess != null) {
-                invdat.outgoingProcess.cancel("Invitation canceled by host",
-                    false);
+                // Null means the host canceled locally
+                invdat.outgoingProcess.cancel(null, false);
             }
         }
 
@@ -496,8 +562,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             if (presence == null || !presence.isAvailable())
                 continue;
 
-            User user = Saros.getDefault().getSessionManager()
-                .getSharedProject().getParticipant(new JID(entry.getUser()));
+            User user = project.getParticipant(new JID(entry.getUser()));
             if (user != null)
                 continue;
 

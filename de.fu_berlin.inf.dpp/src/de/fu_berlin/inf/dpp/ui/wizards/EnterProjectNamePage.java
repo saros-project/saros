@@ -1,15 +1,11 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -26,7 +22,6 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
@@ -36,27 +31,28 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
  */
 class EnterProjectNamePage extends WizardPage {
 
+    @SuppressWarnings("unused")
     private static final Logger log = Logger
         .getLogger(EnterProjectNamePage.class.getName());
 
-    private final JoinSessionWizard joinSessionWizard;
+    protected final JoinSessionWizard joinSessionWizard;
 
-    private Label newProjectNameLabel;
-    private Button projCopy;
-    private Text newProjectNameText;
-    private Button copyCheckbox;
-    private Text copyToBeforeUpdateText;
+    protected Label newProjectNameLabel;
+    protected Button projCopy;
+    protected Text newProjectNameText;
+    protected Button copyCheckbox;
+    protected Text copyToBeforeUpdateText;
 
-    private Button projUpd;
-    private Text updateProjectText;
-    private Button browseUpdateProjectButton;
+    protected Button projUpd;
+    protected Text updateProjectText;
+    protected Button browseUpdateProjectButton;
 
-    private Label updateProjectStatusResult;
-    private Label updateProjectNameLabel;
-    private Button scanWorkspaceProjectsButton;
+    protected Label updateProjectStatusResult;
+    protected Label updateProjectNameLabel;
+    protected Button scanWorkspaceProjectsButton;
 
     /* project for update or base project for copy into new project */
-    private IProject similarProject;
+    protected IProject similarProject;
 
     protected EnterProjectNamePage(JoinSessionWizard joinSessionWizard) {
         super("namePage");
@@ -94,7 +90,7 @@ class EnterProjectNamePage extends WizardPage {
     /**
      * get transfer mode and set header information of the wizard.
      */
-    private void updateConnectionStatus() {
+    protected void updateConnectionStatus() {
 
         DataTransferManager manager = Saros.getDefault().getContainer()
             .getComponent(DataTransferManager.class);
@@ -120,12 +116,9 @@ class EnterProjectNamePage extends WizardPage {
     }
 
     /**
-     * create components of create new project area for enternamepage wizard.
-     * 
-     * @param workArea
-     *            composite of appropriate wizard
+     * Create components of create new project area for EnterProjectNamePage
      */
-    private void createNewProjectGroup(Composite workArea) {
+    protected void createNewProjectGroup(Composite workArea) {
 
         Composite projectGroup = new Composite(workArea, SWT.NONE);
         GridLayout layout = new GridLayout();
@@ -151,12 +144,9 @@ class EnterProjectNamePage extends WizardPage {
     }
 
     /**
-     * create components of update area for enternamepage wizard.
-     * 
-     * @param workArea
-     *            composite of appropriate wizard
+     * Create components of update area for EnterProjectNamePage wizard.
      */
-    private void createUpdateProjectGroup(Composite workArea,
+    protected void createUpdateProjectGroup(Composite workArea,
         String updateProject) {
 
         Composite projectGroup = new Composite(workArea, SWT.NONE);
@@ -273,46 +263,12 @@ class EnterProjectNamePage extends WizardPage {
             (Path) result[0]).getProject().getName();
     }
 
-    protected void requestRemoteFileList() {
-        try {
-            getContainer().run(true, true, new IRunnableWithProgress() {
-                public void run(IProgressMonitor monitor) {
-                    joinSessionWizard.process.requestRemoteFileList(monitor);
-                }
-            });
-        } catch (InvocationTargetException e) {
-            log.warn("Exception while requesting remote file list", e);
-        } catch (InterruptedException e) {
-            log.debug("Request of remote file list canceled/interrupted", e);
-        }
-    }
-
     public void createControl(Composite parent) {
 
-        if (this.joinSessionWizard.process.getState() == State.CANCELED) {
-            return;
-        }
-
-        /* wait for getting project file list. */
-        requestRemoteFileList();
-
-        if (this.joinSessionWizard.process.getRemoteFileList() == null) {
-            getShell().close();
-        }
-
-        String updateProjectName;
-        boolean updateSelected;
-        if (PreferenceUtils.isAutoReuseExisting()
-            && JoinSessionWizardUtils.existsProjects(joinSessionWizard.process
-                .getProjectName())) {
-            updateSelected = true;
-            updateProjectName = this.joinSessionWizard.process.getProjectName();
-        } else {
-            updateSelected = false;
-            updateProjectName = "";
-        }
-
+        // Create the root control
         Composite composite = new Composite(parent, SWT.NONE);
+        setControl(composite);
+
         composite.setLayout(new GridLayout());
         GridData gridData = new GridData(GridData.FILL_VERTICAL);
         gridData.verticalIndent = 20;
@@ -320,18 +276,18 @@ class EnterProjectNamePage extends WizardPage {
 
         this.projCopy = new Button(composite, SWT.RADIO);
         this.projCopy.setText("Create new project");
-        this.projCopy.setSelection(!updateSelected);
+        this.projCopy.setSelection(!joinSessionWizard.isUpdateSelected());
 
         createNewProjectGroup(composite);
 
         this.projUpd = new Button(composite, SWT.RADIO);
         this.projUpd.setText("Use existing project");
-        this.projUpd.setSelection(updateSelected);
+        this.projUpd.setSelection(joinSessionWizard.isUpdateSelected());
 
-        createUpdateProjectGroup(composite, updateProjectName);
+        createUpdateProjectGroup(composite, joinSessionWizard
+            .getUpdateProject());
 
         attachListeners();
-        setControl(composite);
 
         updateConnectionStatus();
         updateEnabled();
@@ -345,7 +301,7 @@ class EnterProjectNamePage extends WizardPage {
         return this.projUpd.getSelection();
     }
 
-    private void attachListeners() {
+    protected void attachListeners() {
 
         ModifyListener m = new ModifyListener() {
             public void modifyText(ModifyEvent e) {

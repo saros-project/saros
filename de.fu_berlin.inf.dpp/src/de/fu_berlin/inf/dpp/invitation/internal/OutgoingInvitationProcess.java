@@ -27,7 +27,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -47,6 +46,10 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * An outgoing invitation process.
  * 
+ * TODO FIXME The whole invitation procedure needs to be completely redone,
+ * because it can cause race conditions. In particular cancelation is not
+ * possible at arbitrary times (something like an CANCEL_ACK is needed)
+ * 
  * @author rdjemili
  */
 public class OutgoingInvitationProcess extends InvitationProcess implements
@@ -64,6 +67,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     protected boolean isP2P = false;
 
     protected FileList remoteFileList;
+
+    protected FileList localFileList;
 
     protected List<IPath> toSend;
 
@@ -96,10 +101,11 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
         ISharedProject sharedProject, String description, boolean startNow,
-        IInvitationUI inviteUI, int colorID) {
+        IInvitationUI inviteUI, int colorID, FileList localFileList) {
 
         super(transmitter, to, description, colorID);
 
+        this.localFileList = localFileList;
         this.invitationUI = inviteUI;
         this.sharedProject = sharedProject;
 
@@ -117,43 +123,35 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         setState(State.SYNCHRONIZING);
 
-        try {
-            // TODO Filelist is created again (also in invitationAccepted)
-            FileList local = new FileList(this.sharedProject.getProject());
-            FileList diff = this.remoteFileList.diff(local);
+        FileList diff = this.remoteFileList.diff(localFileList);
 
-            List<IPath> added = diff.getAddedPaths();
-            List<IPath> altered = diff.getAlteredPaths();
-            // TODO A linked list might be more efficient. See #sendNext().
-            this.toSend = new ArrayList<IPath>(added.size() + altered.size());
-            this.toSend.addAll(added);
-            this.toSend.addAll(altered);
+        List<IPath> added = diff.getAddedPaths();
+        List<IPath> altered = diff.getAlteredPaths();
+        // TODO A linked list might be more efficient. See #sendNext().
+        this.toSend = new ArrayList<IPath>(added.size() + altered.size());
+        this.toSend.addAll(added);
+        this.toSend.addAll(altered);
 
-            this.progress_max = this.toSend.size();
-            this.progress_done = 0;
+        this.progress_max = this.toSend.size();
+        this.progress_done = 0;
 
-            DataTransferManager manager = Saros.getDefault().getContainer()
-                .getComponent(DataTransferManager.class);
+        DataTransferManager manager = Saros.getDefault().getContainer()
+            .getComponent(DataTransferManager.class);
 
-            JingleFileTransferManager jingleManager = manager
-                .getJingleManager();
+        JingleFileTransferManager jingleManager = manager.getJingleManager();
 
-            // If fast p2p connection send individual files, otherwise archive
-            if (jingleManager != null
-                && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
-                isP2P = true;
-                sendNext();
-            } else {
-                isP2P = false;
-                sendArchive();
-            }
+        // If fast p2p connection send individual files, otherwise archive
+        if (jingleManager != null
+            && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
+            isP2P = true;
+            sendNext();
+        } else {
+            isP2P = false;
+            sendArchive();
+        }
 
-            if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
-                cancel(null, false);
-            }
-
-        } catch (CoreException e) {
-            failed(e);
+        if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
+            cancel(null, false);
         }
 
     }
@@ -172,8 +170,19 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         }
 
         try {
-            this.transmitter.sendFileList(this.peer, this.sharedProject
-                .getFileList(), this);
+            // Wait for Jingle before we send the file list...
+            this.transmitter.awaitJingleManager(this.peer);
+
+            // Could have been canceled in between:
+            if (this.state == State.CANCELED)
+                return;
+
+            this.transmitter.sendFileList(this.peer, this.localFileList, this);
+
+            // Could have been canceled in between:
+            if (this.state == State.CANCELED)
+                return;
+
             setState(State.HOST_FILELIST_SENT);
         } catch (Exception e) {
             failed(e);

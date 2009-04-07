@@ -26,9 +26,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
+import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
@@ -60,6 +62,12 @@ public class JoinSessionWizard extends Wizard {
 
     IIncomingInvitationProcess process;
 
+    boolean requested = false;
+
+    String updateProjectName;
+
+    boolean updateSelected;
+
     public JoinSessionWizard(IIncomingInvitationProcess process) {
         this.process = process;
 
@@ -68,53 +76,108 @@ public class JoinSessionWizard extends Wizard {
         setNeedsProgressMonitor(true);
     }
 
+    @Override
+    public IWizardPage getNextPage(IWizardPage page) {
+
+        if (page.equals(descriptionPage) && !requested) {
+            if (!requestHostFileList()) {
+                return null;
+            }
+        }
+        return super.getNextPage(page);
+    }
+
+    public boolean requestHostFileList() {
+        requested = true;
+
+        /* wait for getting project file list. */
+        try {
+            getContainer().run(true, true, new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor)
+                    throws InterruptedException {
+                    process.requestRemoteFileList(monitor);
+                }
+            });
+        } catch (InvocationTargetException e) {
+            log.warn("Exception while requesting remote file list", e);
+        } catch (InterruptedException e) {
+            log.debug("Request of remote file list canceled/interrupted", e);
+            // User canceled...
+            getShell().close();
+            return false;
+        }
+
+        if (process.getRemoteFileList() == null) {
+            // Remote side canceled...
+            getShell().close();
+            return false;
+        }
+
+        if (PreferenceUtils.isAutoReuseExisting()
+            && JoinSessionWizardUtils.existsProjects(process.getProjectName())) {
+            updateSelected = true;
+            updateProjectName = process.getProjectName();
+        } else {
+            updateSelected = false;
+            updateProjectName = "";
+        }
+
+        if (process.getState() == State.CANCELED) {
+            return false;
+        }
+        return true;
+    }
+
+    public void showCancelMessage(JID jid, String errorMsg, boolean replicated) {
+
+        if (errorMsg != null) {
+            MessageDialog.openError(getShell(), "Invitation aborted",
+                "Could not complete invitation with " + jid.getBase()
+                    + " because an error occurred:\n\n" + errorMsg);
+        } else {
+            // errorMsg == null means canceled either by us or peer
+            if (replicated) {
+                MessageDialog.openInformation(getShell(),
+                    "Invitation cancelled",
+                    "Invitation was cancelled by inviter (" + jid.getBase()
+                        + ").");
+            }
+        }
+
+        if (replicated) {
+            /*
+             * TODO The entanglement between UI and process is too complicated
+             * to sort out, how to close this dialog when it is currently
+             * executing the finishing synchronization
+             */
+            wizardDialog.close();
+        }
+
+    }
+
+    IInvitationUI ui = new IInvitationUI() {
+        public void cancel(final JID jid, final String errorMsg,
+            final boolean replicated) {
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    showCancelMessage(jid, errorMsg, replicated);
+                }
+            });
+        }
+
+        public void runGUIAsynch(Runnable runnable) {
+            // TODO this cannot be ignored an InvitationUI like the
+            // JoinSessionWizard need to implement this
+            assert false;
+        }
+
+        public void updateInvitationProgress(JID jid) {
+            // ignored, not needed atm
+        }
+    };
+
     public IInvitationUI getInvitationUI() {
-        return new IInvitationUI() {
-
-            public void cancel(final JID jid, final String errorMsg,
-                final boolean replicated) {
-                Util.runSafeSWTAsync(log, new Runnable() {
-                    public void run() {
-
-                        if (errorMsg != null) {
-                            MessageDialog.openError(getShell(),
-                                "Invitation aborted",
-                                "Could not complete invitation with "
-                                    + jid.getBase()
-                                    + " because an error occurred (" + errorMsg
-                                    + ")");
-                        } else {
-                            // errorMsg == null means canceled either by us or
-                            // peer
-                            if (replicated) {
-                                MessageDialog.openInformation(getShell(),
-                                    "Invitation cancelled",
-                                    "Invitation was cancelled by peer.");
-                            }
-                        }
-
-                        if (replicated) {
-                            /*
-                             * TODO The entanglement between UI and process is
-                             * too complicated to sort out, how to close this
-                             * dialog when it is currently executing the
-                             * finishing synchronization
-                             */
-                            wizardDialog.close();
-                        }
-                    }
-                });
-            }
-
-            public void runGUIAsynch(Runnable runnable) {
-                // TODO this cannot be ignored an InvitationUI like the
-                // JoinSessionWizard need to implement this
-            }
-
-            public void updateInvitationProgress(JID jid) {
-                // ignored, not needed atm
-            }
-        };
+        return ui;
     }
 
     @Override
@@ -136,7 +199,7 @@ public class JoinSessionWizard extends Wizard {
     public boolean performFinish() {
 
         if (this.process.getState() == State.CANCELED) {
-            return true;
+            return false;
         }
 
         final IProject source = this.namePage.getSourceProject();
@@ -153,8 +216,10 @@ public class JoinSessionWizard extends Wizard {
             });
         } catch (InvocationTargetException e) {
             log.warn("Exception while requesting remote file list", e);
+            return false;
         } catch (InterruptedException e) {
             log.debug("Request of remote file list canceled/interrupted", e);
+            return false;
         }
 
         return true;
@@ -191,5 +256,13 @@ public class JoinSessionWizard extends Wizard {
                 });
             }
         });
+    }
+
+    public String getUpdateProject() {
+        return updateProjectName;
+    }
+
+    public boolean isUpdateSelected() {
+        return updateSelected;
     }
 }

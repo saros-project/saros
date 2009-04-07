@@ -31,6 +31,12 @@ class ShowDescriptionPage extends WizardPage {
             .getImageDescriptor("icons/start_invitation.png"));
     }
 
+    @Override
+    public boolean canFlipToNextPage() {
+        // Important! otherwise getNextPage() is called
+        return true;
+    }
+
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setLayout(new GridLayout(2, false));

@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.window.Window;
 import org.picocontainer.annotations.Nullable;
 
@@ -261,9 +260,10 @@ public class SharedProject implements ISharedProject {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-        boolean inactive, IInvitationUI inviteUI) {
+        boolean inactive, IInvitationUI inviteUI, FileList filelist) {
+
         return new OutgoingInvitationProcess(this.transmitter, jid, this,
-            description, inactive, inviteUI, getFreeColor());
+            description, inactive, inviteUI, getFreeColor(), filelist);
     }
 
     /*
@@ -293,15 +293,6 @@ public class SharedProject implements ISharedProject {
      */
     public IProject getProject() {
         return this.project;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
-    public FileList getFileList() throws CoreException {
-        return new FileList(this.project);
     }
 
     public Thread requestTransmitter = null;
@@ -359,15 +350,6 @@ public class SharedProject implements ISharedProject {
      */
     public User getParticipant(JID jid) {
         return this.participants.get(jid);
-    }
-
-    public User getADriver() {
-        for (User user : getParticipants()) {
-            if (user.isDriver()) {
-                return user;
-            }
-        }
-        return null;
     }
 
     public void startInvitation(final @Nullable List<JID> toInvite) {
