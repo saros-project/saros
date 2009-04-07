@@ -36,6 +36,7 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.swt.SWTException;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
@@ -135,7 +136,7 @@ public class EditorAPI implements IEditorAPI {
 
     private static Logger log = Logger.getLogger(EditorAPI.class.getName());
 
-    private final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
+    protected final VerifyKeyListener keyVerifier = new VerifyKeyListener() {
         public void verifyKey(VerifyEvent event) {
 
             // log.debug(((int) event.character) + " - " + event.keyCode + " - "
@@ -194,8 +195,6 @@ public class EditorAPI implements IEditorAPI {
 
     public void removeEditorPartListener(EditorManager editorManager) {
 
-        assert Util.isSWT();
-
         if (editorManager == null)
             throw new IllegalArgumentException();
 
@@ -205,7 +204,11 @@ public class EditorAPI implements IEditorAPI {
 
         // TODO This can fail if a shared project is started when no
         // Eclipse Window is open!
-        EditorAPI.getActiveWindow().getPartService().removePartListener(
+        IWorkbenchWindow window = EditorAPI.getActiveWindow();
+        if (window == null)
+            return;
+
+        window.getPartService().removePartListener(
             partListeners.remove(editorManager));
     }
 
@@ -704,7 +707,7 @@ public class EditorAPI implements IEditorAPI {
         return getViewport(textViewer);
     }
 
-    private void updateViewportAnnotation(ITextViewer viewer, int top,
+    protected void updateViewportAnnotation(ITextViewer viewer, int top,
         int bottom, String source) {
 
         if (!(viewer instanceof ISourceViewer)) {
@@ -745,7 +748,7 @@ public class EditorAPI implements IEditorAPI {
     /**
      * Needs UI-thread.
      */
-    private void updateStatusLine(IEditorPart editorPart, boolean editable) {
+    protected void updateStatusLine(IEditorPart editorPart, boolean editable) {
         Object adapter = editorPart.getAdapter(IEditorStatusLine.class);
         if (adapter != null) {
             IEditorStatusLine statusLine = (IEditorStatusLine) adapter;
@@ -803,14 +806,19 @@ public class EditorAPI implements IEditorAPI {
      * Returns the active workbench window. Needs to be called from UI thread.
      * 
      * @return the active workbench window or <code>null</code> if there is no
-     *         window or method is called from non-UI thread.
+     *         window or method is called from non-UI thread or the
+     *         activeWorkbenchWindow is disposed.
      * @see IWorkbench#getActiveWorkbenchWindow()
      */
-    private static IWorkbenchWindow getActiveWindow() {
-        return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+    protected static IWorkbenchWindow getActiveWindow() {
+        try {
+            return PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        } catch (SWTException e) {
+            return null;
+        }
     }
 
-    private static IWorkbenchWindow[] getWindows() {
+    protected static IWorkbenchWindow[] getWindows() {
         return PlatformUI.getWorkbench().getWorkbenchWindows();
     }
 
