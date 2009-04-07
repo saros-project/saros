@@ -211,7 +211,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
                 .getSequenceNumber()) {
 
                 log.error("Expected sequence number: " + expectedSequenceNumber
-                    + " > first queued: "
+                    + " >= first queued: "
                     + queuedActivities.peek().getSequenceNumber());
                 return;
             }
@@ -412,6 +412,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
         }
 
         this.flushTimer = new Timer(true);
+
+        started = true;
+
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -439,7 +442,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
             }
         }, 0, MILLIS_UPDATE);
 
-        started = true;
+        // Exec activities received when the project was stopped
+        for (TimedActivity activity : queues.removeActivities()) {
+            exec(activity.getActivity());
+        }
     }
 
     /**
