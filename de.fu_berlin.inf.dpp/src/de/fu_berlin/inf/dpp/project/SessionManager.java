@@ -193,7 +193,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             listener.invitationReceived(process);
         }
 
-        SessionManager.log.info("Received invitation");
+        SessionManager.log.info("Received invitation from [" + from.getBase()
+            + "]");
 
         return process;
     }
