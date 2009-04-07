@@ -526,11 +526,11 @@ public class Util {
      */
     public static boolean isSWT() {
         try {
-            PlatformUI.getWorkbench().getDisplay().getActiveShell();
+            return PlatformUI.getWorkbench().getDisplay().getThread() == Thread
+                .currentThread();
         } catch (SWTException e) {
             return false;
         }
-        return true;
     }
 
 }
