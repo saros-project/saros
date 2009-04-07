@@ -130,7 +130,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 IJingleStateListener stateListener = new IJingleStateListener() {
                     public void setState(JID jid, JingleConnectionState state) {
 
-                        log.info("JingleManager sent state update");
+                        log.debug("JingleManager sent state update");
 
                         refreshRosterTree(jid);
                     }
