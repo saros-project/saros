@@ -25,6 +25,6 @@ public class IPathConverter extends AbstractSingleValueConverter {
 
     @Override
     public String toString(Object obj) {
-        return Util.urlEscape(((Path) obj).toPortableString());
+        return Util.urlEscape(((IPath) obj).toPortableString());
     }
 }
