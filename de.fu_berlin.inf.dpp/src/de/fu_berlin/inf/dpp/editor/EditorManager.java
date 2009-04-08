@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.editor;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
@@ -60,11 +58,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -96,6 +94,7 @@ import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
+import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -1085,114 +1084,25 @@ public class EditorManager implements IActivityProvider {
         return this.editorPool.getEditors(path);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityProvider
-     */
     public IActivity fromXML(XmlPullParser parser) {
-
-        try {
-            if (parser.getName().equals("editor")) {
-                return parseEditorActivity(parser);
-
-            } else if (parser.getName().equals("edit")) {
-                return parseTextEditActivity(parser);
-
-            } else if (parser.getName().equals("textSelection")) {
-                return parseTextSelection(parser);
-
-            } else if (parser.getName().equals("viewport")) {
-                return parseViewport(parser);
-            }
-
-        } catch (XmlPullParserException e) {
-            EditorManager.log.error("Couldn't parse message");
-        } catch (IOException e) {
-            EditorManager.log.error("Couldn't parse message");
-        }
-
-        return null;
-    }
-
-    protected IActivity parseTextEditActivity(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
-
-        // extract current editor for text edit.
-        String pathString = parser.getAttributeValue(null, "path");
-        assert pathString != null;
-
-        IPath path = Path.fromPortableString(Util.urlUnescape(pathString));
-        int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-
-        String sender = Util.urlUnescape(parser.getAttributeValue(null,
-            "sender"));
-
-        String text = "";
-        if (parser.next() == XmlPullParser.START_TAG) {
-            if (parser.next() == XmlPullParser.TEXT) {
-                text = parser.getText();
-                parser.next(); // close tag
+        /*
+         * TODO When all activities are switched to XStream, this method can be
+         * deleted and parsing can be handled in the caller of this method.
+         */
+        boolean canParse = false;
+        for (String tagName : new String[] { "editor", "edit", "textSelection",
+            "viewport" }) {
+            if (parser.getName().equals(tagName)) {
+                canParse = true;
+                break;
             }
         }
-
-        String replace = "";
-        if (parser.next() == XmlPullParser.START_TAG) {
-            if (parser.next() == XmlPullParser.TEXT) {
-                replace = parser.getText();
-                parser.next(); // close tag
-            }
-        }
-
-        TextEditActivity result = new TextEditActivity(source, offset, text,
-            replace, path);
-        result.setSender(sender);
-        return result;
-    }
-
-    protected IActivity parseEditorActivity(XmlPullParser parser) {
-
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
-        String pathString = parser.getAttributeValue(null, "path");
-
-        IPath path;
-        if (pathString == null) {
-            path = null;
+        if (canParse) {
+            return (IActivity) AbstractActivity.xstream
+                .unmarshal(new XppReader(parser));
         } else {
-            path = Path.fromPortableString(Util.urlUnescape(pathString));
+            return null;
         }
-
-        Type type = EditorActivity.Type.valueOf(parser.getAttributeValue(null,
-            "type"));
-        return new EditorActivity(source, type, path);
-    }
-
-    protected TextSelectionActivity parseTextSelection(XmlPullParser parser) {
-
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
-        int offset = Integer.parseInt(parser.getAttributeValue(null, "offset"));
-        int length = Integer.parseInt(parser.getAttributeValue(null, "length"));
-        String path = Util
-            .urlUnescape(parser.getAttributeValue(null, "editor"));
-        return new TextSelectionActivity(source, offset, length, Path
-            .fromPortableString(path));
-    }
-
-    protected ViewportActivity parseViewport(XmlPullParser parser) {
-
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
-        int top = Integer.parseInt(parser.getAttributeValue(null, "top"));
-        int bottom = Integer.parseInt(parser.getAttributeValue(null, "bottom"));
-        String path = Util
-            .urlUnescape(parser.getAttributeValue(null, "editor"));
-        return new ViewportActivity(source, top, bottom, Path
-            .fromPortableString(path));
     }
 
     protected boolean isSharedEditor(IEditorPart editorPart) {

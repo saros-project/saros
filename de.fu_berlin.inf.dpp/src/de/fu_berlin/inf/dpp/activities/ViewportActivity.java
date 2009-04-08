@@ -4,14 +4,21 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("viewport")
 public class ViewportActivity extends AbstractActivity {
-    public final int topIndex;
+    @XStreamAsAttribute
+    @XStreamAlias("top")
+    protected final int topIndex;
 
-    public final int bottomIndex;
+    @XStreamAsAttribute
+    @XStreamAlias("bottom")
+    protected final int bottomIndex;
 
-    private final IPath editor;
+    @XStreamAsAttribute
+    protected final IPath editor;
 
     public ViewportActivity(String source, int topIndex, int bottomIndex,
         IPath editor) {
@@ -25,10 +32,10 @@ public class ViewportActivity extends AbstractActivity {
         this.editor = editor;
     }
 
-    public ViewportActivity(String source, ILineRange viewport, IPath editor2) {
+    public ViewportActivity(String source, ILineRange viewport, IPath editor) {
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
-            + Math.max(0, viewport.getNumberOfLines()), editor2);
+            + Math.max(0, viewport.getNumberOfLines()), editor);
     }
 
     public ILineRange getLineRange() {
@@ -92,12 +99,6 @@ public class ViewportActivity extends AbstractActivity {
 
         assert getEditor() != null;
 
-        sb.append("<viewport ");
-        sourceToXML(sb);
-        sb.append("top=\"").append(getTopIndex()).append("\" ");
-        sb.append("bottom=\"").append(getBottomIndex()).append("\" ");
-        sb.append("editor=\"").append(
-            Util.urlEscape(getEditor().toPortableString())).append("\"");
-        sb.append("/>");
+        sb.append(xstream.toXML(this));
     }
 }

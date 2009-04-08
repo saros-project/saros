@@ -21,23 +21,28 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * A text load activity activates a new resource. If the path is
- * <code>null</code> no resouce is currently active.
+ * <code>null</code> no resource is currently active.
  * 
  * @author rdjemili
  */
+@XStreamAlias("editor")
 public class EditorActivity extends AbstractActivity {
 
     public static enum Type {
         Activated, Closed, Saved
     }
 
-    private final Type type;
+    @XStreamAsAttribute
+    protected final Type type;
 
-    private final IPath path;
+    @XStreamAlias("editor")
+    @XStreamAsAttribute
+    protected final IPath path;
 
     /**
      * @param path
@@ -109,13 +114,6 @@ public class EditorActivity extends AbstractActivity {
     }
 
     public void toXML(StringBuilder sb) {
-        sb.append("<editor ");
-        sourceToXML(sb);
-        if (getPath() != null) {
-            sb.append("path=\"").append(
-                Util.urlEscape(getPath().toPortableString())).append("\" ");
-        }
-        sb.append("type=\"").append(getType()).append("\" ");
-        sb.append("/>");
+        sb.append(xstream.toXML(this));
     }
 }

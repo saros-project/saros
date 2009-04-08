@@ -24,14 +24,19 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("textSelection")
 public class TextSelectionActivity extends AbstractActivity {
 
+    @XStreamAsAttribute
     private final int offset;
 
+    @XStreamAsAttribute
     private final int length;
 
+    @XStreamAsAttribute
     private final IPath editor;
 
     public TextSelectionActivity(String source, int offset, int length,
@@ -97,12 +102,6 @@ public class TextSelectionActivity extends AbstractActivity {
     public void toXML(StringBuilder sb) {
         assert getEditor() != null;
 
-        sb.append("<textSelection ");
-        sourceToXML(sb);
-        sb.append("offset=\"").append(getOffset()).append("\" ");
-        sb.append("length=\"").append(getLength()).append("\" ");
-        sb.append("editor=\"").append(
-            Util.urlEscape(getEditor().toPortableString())).append("\"");
-        sb.append(" />");
+        sb.append(xstream.toXML(this));
     }
 }

@@ -41,6 +41,10 @@ public class ActivityRegistry {
      * Converts given XML data into an activity.
      */
     public IActivity parseActivity(XmlPullParser parser) {
+        /*
+         * TODO When all activities are (de)serialized with XStream the
+         * providers won't be necessary here anymore.
+         */
         IActivity activity = null;
         for (IActivityProvider provider : this.activityProviders) {
             activity = provider.fromXML(parser);

@@ -22,19 +22,26 @@ package de.fu_berlin.inf.dpp.activities;
 import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * An immutable text activity.
  * 
  * @author rdjemili
  */
+@XStreamAlias("edit")
 public class TextEditActivity extends AbstractActivity {
 
+    @XStreamAsAttribute
     public final int offset;
 
     /**
@@ -43,10 +50,14 @@ public class TextEditActivity extends AbstractActivity {
      */
     public final String text;
 
+    @XStreamAlias("replaced")
     public final String replacedText;
 
+    @XStreamAsAttribute
     protected final IPath editor;
 
+    @XStreamAsAttribute
+    @XStreamConverter(UrlEncodingStringConverter.class)
     protected String sender;
 
     public IPath getEditor() {
@@ -183,15 +194,6 @@ public class TextEditActivity extends AbstractActivity {
     }
 
     public void toXML(StringBuilder sb) {
-
-        String result = String
-            .format(
-                "<edit path=\"%s\" offset=\"%d\" source=\"%s\" sender=\"%s\"><text>%s</text><replace>%s</replace></edit>",
-                Util.urlEscape(getEditor().toPortableString()), offset, Util
-                    .urlEscape(getSource().toString()), Util
-                    .urlEscape(getSender().toString()), Util.escapeCDATA(text),
-                Util.escapeCDATA(replacedText));
-
-        sb.append(result);
+        sb.append(xstream.toXML(this));
     }
 }
