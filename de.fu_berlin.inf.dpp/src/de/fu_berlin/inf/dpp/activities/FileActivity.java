@@ -4,17 +4,23 @@ import java.io.InputStream;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
+@XStreamAlias("file")
 public class FileActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
     }
 
+    @XStreamAsAttribute
     private final Type type;
 
+    @XStreamAsAttribute
     private final IPath path;
 
+    @XStreamOmitField
     private InputStream inputStream;
 
     public FileActivity(String source, Type type, IPath path) {
@@ -95,11 +101,6 @@ public class FileActivity extends AbstractActivity {
     }
 
     public void toXML(StringBuilder sb) {
-        sb.append("<file ");
-        sourceToXML(sb);
-        sb.append("path=\"").append(
-            Util.urlEscape(getPath().toPortableString())).append("\" ");
-        sb.append("type=\"").append(getType()).append("\" ");
-        sb.append("/>");
+        sb.append(xstream.toXML(this));
     }
 }

@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,18 +34,17 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -296,21 +294,13 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.project.IActivityProvider
      */
     public IActivity fromXML(XmlPullParser parser) {
-        try {
-            if (parser.getName().equals("file")) {
-                return parseFile(parser);
-
-            } else if (parser.getName().equals("folder")) {
-                return parseFolder(parser);
-            }
-
-        } catch (IOException e) {
-            log.error("Couldn't parse message");
-        } catch (XmlPullParserException e) {
-            log.error("Couldn't parse message");
+        String name = parser.getName();
+        if (name.equals("file") || name.equals("folder")) {
+            return (IActivity) AbstractActivity.xstream
+                .unmarshal(new XppReader(parser));
+        } else {
+            return null;
         }
-
-        return null;
     }
 
     private void exec(FileActivity activity) throws CoreException {
@@ -351,27 +341,5 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
         }
 
-    }
-
-    private FileActivity parseFile(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
-        IPath path = Path.fromPortableString(Util.urlUnescape(parser
-            .getAttributeValue(null, "path")));
-        return new FileActivity(source, FileActivity.Type.valueOf(parser
-            .getAttributeValue(null, "type")), path);
-    }
-
-    private FolderActivity parseFolder(XmlPullParser parser) {
-
-        String source = Util.urlUnescape(parser.getAttributeValue(null,
-            "source"));
-        IPath path = Path.fromPortableString(Util.urlUnescape(parser
-            .getAttributeValue(null, "path")));
-
-        return new FolderActivity(source, FolderActivity.Type.valueOf(parser
-            .getAttributeValue(null, "type")), path);
     }
 }

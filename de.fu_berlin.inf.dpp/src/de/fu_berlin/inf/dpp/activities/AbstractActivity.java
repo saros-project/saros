@@ -35,7 +35,8 @@ public abstract class AbstractActivity implements IActivity {
          */
         xstream.registerConverter(new IPathConverter());
         xstream.processAnnotations(new Class[] { AbstractActivity.class,
-            EditorActivity.class, TextEditActivity.class,
+            EditorActivity.class, FileActivity.class, FolderActivity.class,
+            RoleActivity.class, TextEditActivity.class,
             TextSelectionActivity.class, ViewportActivity.class });
     }
 

@@ -8,6 +8,7 @@ import org.xmlpull.v1.XmlPullParser;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -17,7 +18,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
  * This manager is responsible for handling driver changes.
@@ -107,16 +108,10 @@ public class RoleManager implements IActivityProvider {
      */
     public IActivity fromXML(XmlPullParser parser) {
         if (parser.getName().equals("user")) {
-
-            String source = Util.urlUnescape(parser.getAttributeValue(null,
-                "source"));
-            String affectedUser = Util.urlUnescape(parser.getAttributeValue(
-                null, "id"));
-            UserRole role = UserRole.valueOf(parser.getAttributeValue(null,
-                "role"));
-            return new RoleActivity(source, affectedUser, role);
+            return (IActivity) AbstractActivity.xstream
+                .unmarshal(new XppReader(parser));
+        } else {
+            return null;
         }
-
-        return null;
     }
 }

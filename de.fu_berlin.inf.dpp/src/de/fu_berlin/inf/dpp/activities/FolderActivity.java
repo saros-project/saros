@@ -2,15 +2,19 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.util.Util;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+@XStreamAlias("folder")
 public class FolderActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed
     }
 
+    @XStreamAsAttribute
     private final Type type;
 
+    @XStreamAsAttribute
     private final IPath path;
 
     public FolderActivity(String source, Type type, IPath path) {
@@ -37,11 +41,6 @@ public class FolderActivity extends AbstractActivity {
     }
 
     public void toXML(StringBuilder sb) {
-        sb.append("<folder ");
-        sourceToXML(sb);
-        sb.append("path=\"").append(
-            Util.urlEscape(getPath().toPortableString())).append("\" ");
-        sb.append("type=\"").append(getType()).append("\" ");
-        sb.append("/>");
+        sb.append(xstream.toXML(this));
     }
 }

@@ -19,18 +19,26 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
+
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * A role activity indicates that a user has a new Role in the Driver/Observer
  * schemes of things.
  */
+@XStreamAlias("user")
 public class RoleActivity extends AbstractActivity {
 
+    @XStreamAsAttribute
     protected final UserRole role;
 
+    @XStreamAsAttribute
+    @XStreamConverter(UrlEncodingStringConverter.class)
     protected final String id;
 
     /**
@@ -93,10 +101,6 @@ public class RoleActivity extends AbstractActivity {
     }
 
     public void toXML(StringBuilder sb) {
-        sb.append("<user ");
-        sourceToXML(sb);
-        sb.append("id=\"").append(Util.urlEscape(id)).append("\" ");
-        sb.append("role=\"").append(getRole()).append("\" ");
-        sb.append("/>");
+        sb.append(xstream.toXML(this));
     }
 }
