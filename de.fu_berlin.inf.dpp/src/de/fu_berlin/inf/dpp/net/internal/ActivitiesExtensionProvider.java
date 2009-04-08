@@ -31,8 +31,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
-// TODO rename to ActivitiesExtensionProvider
-public class ActivitiesProvider implements PacketExtensionProvider {
+public class ActivitiesExtensionProvider implements PacketExtensionProvider {
 
     public ActivitiesPacketExtension parseExtension(XmlPullParser parser)
         throws XmlPullParserException, IOException {
@@ -79,6 +78,7 @@ public class ActivitiesProvider implements PacketExtensionProvider {
 
     private String parseSessionId(XmlPullParser parser)
         throws XmlPullParserException, IOException {
+
         parser.next(); // read text
         String sessionID = parser.getText();
         parser.next(); // read end tag

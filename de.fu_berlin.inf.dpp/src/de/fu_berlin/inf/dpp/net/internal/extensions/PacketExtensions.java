@@ -45,7 +45,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesProvider;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -155,7 +155,7 @@ public class PacketExtensions {
 
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-            PacketExtensions.NAMESPACE, new ActivitiesProvider());
+            PacketExtensions.NAMESPACE, new ActivitiesExtensionProvider());
         providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
             RequestPacketExtension.NAMESPACE, new RequestExtensionProvider());
     }
