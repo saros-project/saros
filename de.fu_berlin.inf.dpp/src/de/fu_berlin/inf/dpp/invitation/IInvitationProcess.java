@@ -103,10 +103,6 @@ public interface IInvitationProcess extends IFileTransferCallback {
      */
     public void cancel(String errorMsg, boolean replicated);
 
-    /**
-     * @return <code>true</code> if this invitation process has consumed the
-     *         input stream. <code>false</code> otherwise.
-     */
     public void resourceReceived(JID from, IPath path, InputStream input);
 
     public void fileListReceived(JID from, FileList fileList);

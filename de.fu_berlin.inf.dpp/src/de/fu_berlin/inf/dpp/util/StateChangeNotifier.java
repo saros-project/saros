@@ -24,9 +24,7 @@ public class StateChangeNotifier<T> extends HashSet<StateChangeListener<T>> {
     /**
      * Forward all notification of the sender to this notifier.
      * 
-     * @param <S>
      * @param sender
-     * @param toSender
      */
     public void chain(StateChangeNotifier<T> sender) {
         sender.add(new StateChangeListener<T>() {

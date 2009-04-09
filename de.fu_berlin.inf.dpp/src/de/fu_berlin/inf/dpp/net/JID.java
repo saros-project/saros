@@ -52,7 +52,7 @@ public class JID implements Serializable {
 
     /**
      * @return the name segment of this Jabber ID.
-     * @see StringUtils#parseName(String))
+     * @see StringUtils#parseName(String)
      */
     public String getName() {
         return StringUtils.parseName(this.jid);

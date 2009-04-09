@@ -75,9 +75,6 @@ public class ServerSynchronizedDocument implements JupiterServer,
         return op;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private synchronized Operation receiveOperation(Request req, JID jid) {
         while (accessDenied) {
             try {

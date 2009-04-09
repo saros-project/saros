@@ -150,8 +150,8 @@ public interface IEditorAPI {
     public IResource getEditorResource(IEditorPart editorPart);
 
     /**
-     * Removes a previously registered PartListener added via {@link
-     * addEditorPartListener(EditorManager)}.
+     * Removes a previously registered PartListener added via
+     * {@link #addEditorPartListener(EditorManager)}.
      * 
      * @swt Needs to be called from the SWT-UI thread.
      * 
@@ -160,7 +160,7 @@ public interface IEditorAPI {
      * 
      * @throws IllegalStateException
      *             if the given EditorManager has never been registered via
-     *             {@link addEditorPartListener(EditorManager)}
+     *             {@link #addEditorPartListener(EditorManager)}
      */
     public void removeEditorPartListener(EditorManager editorManager);
 

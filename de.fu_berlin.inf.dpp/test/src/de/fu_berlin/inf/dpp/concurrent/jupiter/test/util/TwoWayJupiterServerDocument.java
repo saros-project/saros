@@ -40,9 +40,6 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         return jidServer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public Operation receiveOperation(Request req) {
         Operation op = null;
         try {
