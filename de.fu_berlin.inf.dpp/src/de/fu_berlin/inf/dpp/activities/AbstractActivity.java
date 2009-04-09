@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 // TODO Add some information what needs to be done to add a new activity.
 public abstract class AbstractActivity implements IActivity {
 
+    @SuppressWarnings("unused")
     private static final Logger log = Logger.getLogger(AbstractActivity.class
         .getName());
 
