@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class IPathConverter extends AbstractSingleValueConverter {
 
+    @SuppressWarnings("unchecked")
     @Override
     public boolean canConvert(Class clazz) {
         return clazz.equals(IPath.class);
