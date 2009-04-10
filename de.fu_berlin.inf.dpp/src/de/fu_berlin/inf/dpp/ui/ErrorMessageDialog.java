@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -33,22 +34,25 @@ public class ErrorMessageDialog {
     }
 
     /**
-     * show error message dialog.
+     * Opens a modal dialog which displays the given error message to the user.
      * 
-     * @param exception
+     * @param exceptionMessage
+     *            The message to show the user or null (in which case
+     *            "An unspecified error occurred" is printed, which is not very
+     *            desirable)
      */
-    public static void showErrorMessage(final String exceptionMessage) {
+    public static void showErrorMessage(@Nullable String exceptionMessage) {
+
+        if ((exceptionMessage == null) || exceptionMessage.trim().length() == 0) {
+            exceptionMessage = "An unspecified error occurred.";
+        }
+        final String error = exceptionMessage;
+
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                if ((exceptionMessage == null) || exceptionMessage.equals("")) {
-                    MessageDialog.openError(EditorAPI.getShell(), "Exception",
-                        "Error occured.");
-                } else {
-                    MessageDialog.openError(EditorAPI.getShell(), "Exception",
-                        exceptionMessage);
-                }
+                MessageDialog.openError(EditorAPI.getShell(),
+                    "Error in Saros-Plugin", error);
             }
-
         });
     }
 }

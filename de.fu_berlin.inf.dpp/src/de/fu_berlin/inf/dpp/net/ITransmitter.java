@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
@@ -103,10 +102,6 @@ public interface ITransmitter {
      *            sent.
      * @param fileList
      *            the file list that is to be sent.
-     * @throws XMPPException
-     *             is thrown if there is some problem with the XMPP file
-     *             transfer.
-     * @throws IOException
      */
     public void sendFileList(JID jid, FileList fileList,
         IFileTransferCallback callback) throws IOException;
@@ -145,7 +140,7 @@ public interface ITransmitter {
      * 
      * This methods thus block until the file has been sent or it failed.
      * 
-     * @param recipient
+     * @param to
      *            the Jabber ID of the recipient.
      * @param project
      *            the project of which the given path contains the file to be
@@ -203,16 +198,21 @@ public interface ITransmitter {
     /**
      * Sends a request for activities to all users.
      * 
+     * TODO SS MR Dependency Violation - ITransmitter should not need a shared
+     * project
+     * 
      * @param sharedProject
      *            the shared project
-     * @param timestamp
-     *            the timestamp of the requested activity
-     * @param andup
-     *            boolean, if all activities after the requested one are
-     *            requested too
+     * @param requestedSequenceNumbers
+     *            a map containing the sequence number to be requested as a
+     *            value and the user to request them from as key
+     * @param andUp
+     *            true if all activities after the requested one are requested
+     *            too, false if only the activity with the
+     *            requestedSequenceNumber is requested
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
-        Map<JID, Integer> expectedSequenceNumbers, boolean andup);
+        Map<JID, Integer> requestedSequenceNumbers, boolean andUp);
 
     /* ---------- etc --------- */
 
@@ -265,29 +265,27 @@ public interface ITransmitter {
         Request request, JID jid);
 
     /**
-     * Sends error message of checksum error to all clients.
+     * Sends a FileChecksumErrorMessage with the given path to all clients.
      * 
-     * @param path
-     *            appropriate file for checksum error
+     * @param paths
+     *            The project relative path of files which are affected. This
+     *            information can be shown to the user.
      * @param resolved
-     *            if true then the inconsistency is resolved
+     *            if true then the inconsistency is resolved and clients can
+     *            stop blocking all user operations. if false then a
+     *            inconsistency has been detected and clients should block all
+     *            further user operation.
      */
     public void sendFileChecksumErrorMessage(Set<IPath> paths, boolean resolved);
 
     /**
-     * Sends the checksum of all concurrent documents to all clients.
+     * Sends the given DocumentChecksums to all clients.
      * 
      * If the XMPP connection is closed this method will fail silently.
      * 
-     * @param to
-     *            the recipient
-     * @param collection
-     *            the checksums
-     * 
      * @host This method should only be called on the host.
      */
-    public void sendDocChecksumsToClients(
-        Collection<DocumentChecksum> collection);
+    public void sendDocChecksumsToClients(Collection<DocumentChecksum> checksums);
 
     /**
      * Execute the given runnable as if it was received via the network

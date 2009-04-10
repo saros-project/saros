@@ -80,12 +80,8 @@ public class EditorUtils {
     }
 
     /**
-     * Returns the TextFileBuffer associated with this project relative path OR
-     * null if the path could not be traced to a Buffer.
-     * 
-     * @param docPath
-     *            A project relative path
-     * @return
+     * Returns the TextFileBuffer associated with the given resource OR null if
+     * the resource could not be traced to a Buffer.
      */
     protected static ITextFileBuffer getTextFileBuffer(IResource resource) {
 

@@ -315,7 +315,7 @@ public class Jupiter implements Algorithm {
      * Throws a CannotUndoException because undo is not supported by this
      * implementation.
      * 
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#undo()
+     * This method used to be part of the {@link Algorithm} interface
      */
     public Request undo() {
         throw new CannotUndoException();
@@ -325,7 +325,7 @@ public class Jupiter implements Algorithm {
      * Throws a CannotRedoException because undo is not supported by this
      * implementation.
      * 
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#redo()
+     * This method used to be part of the {@link Algorithm} interface
      */
     public Request redo() {
         throw new CannotRedoException();

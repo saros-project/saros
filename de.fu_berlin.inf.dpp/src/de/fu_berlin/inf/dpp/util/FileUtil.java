@@ -66,30 +66,31 @@ public class FileUtil {
     }
 
     /**
-     * Sets or unsets the given resource as read-only in the file system.
+     * Makes the given file read-only (</code>readOnly == true</code>) or
+     * writable (<code>readOnly == false</code>).
      * 
      * @param file
-     *            the resource which readonly attribute are set/unset
+     *            the resource whose read-only attribute is to be set or removed
      * @param readOnly
-     *            <code>true</code> to set it to read-only, <code>false</code>
-     *            to unset
+     *            <code>true</code> to set the given file to be read-only,
+     *            <code>false</code> to make writable
      * @return The state before setting read-only to the given value.
      */
-    public static boolean setReadOnly(IResource file, boolean readonly) {
+    public static boolean setReadOnly(IResource file, boolean readOnly) {
         ResourceAttributes attributes = file.getResourceAttributes();
         if (attributes == null) {
             // TODO Throw an FileNotFoundException and deal with it everywhere!
-            log.warn("File does not exist for setting readonly == " + readonly
+            log.warn("File does not exist for setting readonly == " + readOnly
                 + ": " + file);
             return false;
         }
         boolean result = attributes.isReadOnly();
-        attributes.setReadOnly(readonly);
+        attributes.setReadOnly(readOnly);
         try {
             file.setResourceAttributes(attributes);
         } catch (CoreException e) {
             // failure is not an option
-            log.warn("Failed to set resource readonly == " + readonly + ": "
+            log.warn("Failed to set resource readonly == " + readOnly + ": "
                 + file);
         }
         return result;

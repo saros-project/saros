@@ -41,10 +41,8 @@ public interface ISessionManager {
      *            the remote shared project.
      * @param host
      *            the host of the remotely shared project.
-     * @param driver
-     *            the driver of the shared project.
      * @param myColorID
-     *            Color ID of the user.
+     *            Color ID of the local user
      * 
      * @return the shared project.
      */

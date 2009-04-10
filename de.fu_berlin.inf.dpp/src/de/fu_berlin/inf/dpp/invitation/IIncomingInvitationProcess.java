@@ -46,17 +46,21 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      * @param baseProject
      *            the local project that is used as file base for the following
      *            replication. If this is <code>null</code> no project will be
-     *            used as file base.
+     *            used to start the replication from and a new, empty project
+     *            will be created.
      * @param newProjectName
      *            the project name of the new project that is to be generated.
      *            If this is <code>null</code> the <code>baseProject</code> will
      *            be overwritten.
      * @param monitor
-     *            a progressmonitor that monitors the whole process. Can not be
+     *            a {@link IProgressMonitor} to report progress to and to check
+     *            whether the user canceled via
+     *            {@link IProgressMonitor#isCanceled()}. Can not be
      *            <code>null</code>.
      * 
-     * @throws InvitationException
-     *             -
+     * @throws InterruptedException
+     *             if the user canceled the invitation via
+     *             {@link IProgressMonitor#isCanceled()}
      */
     public void accept(IProject baseProject, String newProjectName,
         IProgressMonitor monitor) throws InterruptedException;

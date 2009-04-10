@@ -255,25 +255,14 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
     }
 
-    /**
-     * @see de.fu_berlin.inf.dpp.InvitationProcess
-     */
     public void invitationAccepted(JID from) {
         failState();
     }
 
-    /**
-     * @see de.fu_berlin.inf.dpp.InvitationProcess
-     */
     public void joinReceived(JID from) {
         failState();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.InvitationProcess
-     */
     public void resourceReceived(JID from, IPath path, InputStream in) {
         IncomingInvitationProcess.logger.debug("new file received: " + path);
         if (this.localProject == null || this.progressMonitor.isCanceled()) {

@@ -80,13 +80,6 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
 
     }
 
-    /**
-     * send operation to twowayjupiterclient
-     * 
-     * @param jid
-     * @param op
-     * @param delay
-     */
     public void sendOperation(Operation op, int delay) {
         sendOperation(TwoWayJupiterClientDocument.jidClient, op, delay);
     }

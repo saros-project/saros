@@ -342,11 +342,11 @@ public class JingleFileTransferManager {
     }
 
     /**
-     * Send via jingle. Will create a jingle session on demand.
+     * Send the given binary content via jingle using the given transfer
+     * settings. Will create a jingle session on demand and block until the data
+     * has been send.
      * 
-     * @param toJID
-     * @param transferDescription
-     * @throws JingleSessionException
+     * Note that only one JingleSession can be created at the same time.
      */
     public NetTransferMode send(final TransferDescription transferDescription,
         final byte[] content) throws JingleSessionException {

@@ -190,9 +190,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     }
 
-    /**
-     * @see de.fu_berlin.inf.dpp.InvitationProcess
-     */
     public void fileListReceived(JID from, FileList fileList) {
         assertState(State.HOST_FILELIST_SENT);
 
@@ -210,7 +207,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.InvitationProcess
+     * {@inheritDoc}
      */
     public void joinReceived(JID from) {
 
@@ -371,8 +368,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * Blocks until all files have been sent or the operation was canceled by
      * the user.
      * 
-     * @param monitor
-     *            the progress monitor for the file synchronization.
      * @return <code>true</code> if all files have been synchronized.
      *         <code>false</code> if the user chose to cancel.
      */

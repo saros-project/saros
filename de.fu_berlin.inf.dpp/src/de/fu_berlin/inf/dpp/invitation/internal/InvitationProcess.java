@@ -58,14 +58,14 @@ public abstract class InvitationProcess implements IInvitationProcess {
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
+     * {@inheritDoc}
      */
     public Exception getException() {
         return this.exception;
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
+     * {@inheritDoc}
      */
     public State getState() {
         return this.state;
@@ -80,14 +80,14 @@ public abstract class InvitationProcess implements IInvitationProcess {
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
+     * {@inheritDoc}
      */
     public JID getPeer() {
         return this.peer;
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.IInvitationProcess
+     * {@inheritDoc}
      */
     public String getDescription() {
         return this.description;

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.VectorTime;
 
 /**
@@ -41,7 +42,7 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
     }
 
     /**
-     * @see ch.iserver.ace.algorithm.VectorTime#getAt(int)
+     * @see VectorTime#getAt(int)
      */
     public int getAt(int index) {
         if (index == 0) {
@@ -54,7 +55,7 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
     }
 
     /**
-     * @see ch.iserver.ace.algorithm.VectorTime#getLength()
+     * @see VectorTime#getLength()
      */
     public int getLength() {
         return 2;

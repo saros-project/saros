@@ -206,7 +206,7 @@ public class ConsistencyWatchdogHandler {
          * 
          * @param from
          *            JID of user who had the inconsistencies
-         * @param pathsOfInconsistencies
+         * @param paths
          *            a string representation of the paths of handled files
          * 
          */

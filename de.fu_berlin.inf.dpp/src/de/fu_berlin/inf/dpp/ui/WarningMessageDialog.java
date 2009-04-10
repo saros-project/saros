@@ -12,9 +12,8 @@ public class WarningMessageDialog {
         .getLogger(WarningMessageDialog.class.getName());
 
     /**
-     * show error message dialog.
-     * 
-     * @param exception
+     * Opens a modal dialog (with the given title) which displays the given
+     * warning message to the user.
      */
     public static void showWarningMessage(final String title,
         final String message) {

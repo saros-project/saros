@@ -80,7 +80,7 @@ public class ContributionAnnotationManager {
 
             ContributionAnnotation annotation = new ContributionAnnotation(
                 source, model);
-            addToHistory(annotation, new Position(offset, length));
+            addContributionAnnotation(annotation, new Position(offset, length));
         }
     }
 
@@ -117,10 +117,10 @@ public class ContributionAnnotationManager {
                     String source = oldAnnotation.getSource();
 
                     newAnnotation = new ContributionAnnotation(source, model);
-                    addToHistory(newAnnotation, beforeOffset);
+                    addContributionAnnotation(newAnnotation, beforeOffset);
 
                     newAnnotation = new ContributionAnnotation(source, model);
-                    addToHistory(newAnnotation, afterOffset);
+                    addContributionAnnotation(newAnnotation, afterOffset);
                 }
             }
         }
@@ -148,15 +148,11 @@ public class ContributionAnnotationManager {
     }
 
     /**
-     * Add a contribution annotation to the given user's history. Old entries
-     * are removed from the history and the annotation model.
-     * 
-     * @param source
-     *            user who's history should be used for the operation.
-     * @param annotation
-     *            the annotation to add.
+     * Add a contribution annotation to the annotation model and store it into
+     * the history of the associated user. Old entries are removed from the
+     * history and the annotation model.
      */
-    protected void addToHistory(ContributionAnnotation annotation,
+    protected void addContributionAnnotation(ContributionAnnotation annotation,
         Position position) {
 
         annotation.getModel().addAnnotation(annotation, position);

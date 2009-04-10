@@ -157,12 +157,14 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * @param mediaLocator
      *            MediaLocator to pass to super()
      * @param jingleSession
-     *            maybenull, the existing JingleSession.
-     * @param transferData
-     *            The data to transfer once the setTransmit method is called.
+     *            may be null, the existing JingleSession which we are a part
+     *            of.
      * @param listeners
      *            We will notify these listeners if we receive files from the
      *            remote side.
+     * @param connectTo
+     *            The JID of the user we are connecting to via this transfer
+     *            session.
      */
     public JingleFileTransferSession(PayloadType payloadType,
         TransportCandidate remote, TransportCandidate local,

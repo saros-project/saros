@@ -37,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * The SplitOperation contains two operations. It is used when an operation
  * needs to be split up under certain transformation conditions.
  * 
- * @see ch.iserver.ace.algorithm.Operation
+ * @see Operation
  */
 public class SplitOperation implements Operation {
 

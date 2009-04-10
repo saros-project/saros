@@ -536,7 +536,7 @@ public class DataTransferManager implements ConnectionSessionListener {
      * 
      * The receiver should return true if it has consumed the given data.
      * 
-     * @param dataReceiver
+     * @param receiver
      *            If the given receiver already exists, it is removed and put to
      *            the front of the receivers list.
      */
