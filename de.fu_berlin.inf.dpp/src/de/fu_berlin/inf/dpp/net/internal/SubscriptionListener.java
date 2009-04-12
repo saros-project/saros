@@ -16,12 +16,16 @@ import de.fu_berlin.inf.dpp.ui.IRosterTree;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * This Class implements a manual subscription. If a request for subscription is
- * received (when a remote user added the local user) the user is asked about
- * confirmation. If he accepts the request a new entry in the roster will be
- * created and a subscribed-message sent. If a request of removal are received
- * (when a remote user deleted the local user from his or her roster or rejected
- * a request of subscription) the appropriate entry are removed from the roster.
+ * This is class is responsible for handling XMPP subscriptions requests.
+ * 
+ * If a request for subscription is received (when a remote user added the local
+ * user) a dialog is shown to the user asking him/her to confirm the request. If
+ * he accepts the request a new entry in the roster will be created and a
+ * subscribed-message sent.
+ * 
+ * If a request for removal is received (when a remote user deleted the local
+ * user from his or her roster or rejected a request of subscription) the
+ * corresponding entry is removed from the roster.
  * 
  * @author chjacob
  * 
@@ -30,9 +34,9 @@ public class SubscriptionListener implements PacketListener {
 
     private static Logger log = Logger.getLogger(SubscriptionListener.class);
 
-    private final XMPPConnection connection;
+    protected XMPPConnection connection;
 
-    private final IRosterTree rtree;
+    protected IRosterTree rtree;
 
     public SubscriptionListener(XMPPConnection conn, IRosterTree rtree) {
         this.connection = conn;
@@ -41,28 +45,26 @@ public class SubscriptionListener implements PacketListener {
 
     public void processPacket(final Packet packet) {
 
-        SubscriptionListener.log.debug("Packet called. " + packet.getFrom());
-
         if (!packet.getFrom().equals(this.connection.getUser())) {
+
+            log.debug("Received presence packet from " + packet.getFrom());
 
             if (packet instanceof Presence) {
                 final Presence p = (Presence) packet;
 
-                // subscribed
+                // Somebody subscribed to us
                 if (p.getType() == Presence.Type.subscribed) {
-                    SubscriptionListener.log.debug("subcribed from "
-                        + p.getFrom());
+                    log.debug("User subscribed to us: " + p.getFrom());
                 }
 
-                // unsubscribed
+                // Received information that somebody unsubscribed from us
                 if (p.getType() == Presence.Type.unsubscribed) {
-                    SubscriptionListener.log.debug("unsubcribed from "
-                        + p.getFrom());
+                    log.debug("User unsubscribed from us: " + p.getFrom());
                 }
 
                 // Request of removal of subscription
                 else if (p.getType() == Presence.Type.unsubscribe) {
-                    SubscriptionListener.log.debug("unsubcribe from "
+                    log.debug("User requests to unsubscribe from us: "
                         + p.getFrom());
 
                     // if appropriate entry exists remove that
@@ -79,14 +81,16 @@ public class SubscriptionListener implements PacketListener {
                     informUserAboutUnsubscription(packet.getFrom());
                 }
 
-                // request of subscription
+                // Request for subscription
                 else if (p.getType().equals(Presence.Type.subscribe)) {
-                    log.debug("subscribe from " + p.getFrom());
+                    log.debug("User requests to subscribe to us: "
+                        + p.getFrom());
 
                     // ask user for confirmation of subscription
                     if (askUserForSubscriptionConfirmation(packet.getFrom())) {
 
-                        // send subscribed presence packet
+                        // send message that we accept the request for
+                        // subscription
                         sendPresence(Presence.Type.subscribed, packet.getFrom());
 
                         // if no appropriate entry for request exists
@@ -113,14 +117,15 @@ public class SubscriptionListener implements PacketListener {
         }
     }
 
-    private void sendPresence(Presence.Type type, String to) {
+    protected void sendPresence(Presence.Type type, String to) {
         Presence presence = new Presence(type);
         presence.setTo(to);
         presence.setFrom(connection.getUser());
         connection.sendPacket(presence);
     }
 
-    private static boolean askUserForSubscriptionConfirmation(final String from) {
+    protected static boolean askUserForSubscriptionConfirmation(
+        final String from) {
         final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -132,16 +137,14 @@ public class SubscriptionListener implements PacketListener {
         return result.get();
     }
 
-    private static void informUserAboutUnsubscription(final String from) {
+    protected static void informUserAboutUnsubscription(final String from) {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                MessageDialog
-                    .openInformation(
-                        EditorAPI.getShell(),
-                        "Removal of subscription",
-                        "User "
-                            + from
-                            + " has rejected your request of subsription or has removed you from her or his roster.");
+                MessageDialog.openInformation(EditorAPI.getShell(),
+                    "Removal of subscription", "User " + from
+                        + " has rejected your request"
+                        + " of subsription or has removed"
+                        + " you from her or his roster.");
             }
         });
     }
