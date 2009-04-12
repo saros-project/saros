@@ -329,27 +329,38 @@ public class Util {
      * Return a new Runnable which runs the given runnable but catches all
      * RuntimeExceptions and logs them to the given logger.
      * 
-     * Errors are logged and rethrown.
+     * Errors are logged and re-thrown.
      * 
      * This method does NOT actually run the given runnable, but only wraps it.
+     * 
+     * @param log
+     *            The log to print any exception messages thrown which occur
+     *            when running the given runnable. If null, the {@link Util#log}
+     *            is used.
+     * 
      */
-    public static Runnable wrapSafe(final Logger log, final Runnable runnable) {
+    public static Runnable wrapSafe(@Nullable Logger log,
+        final Runnable runnable) {
+
+        if (log == null) {
+            log = Util.log;
+        }
+        final Logger logToUse = log;
 
         /*
          * TODO Use the stack frame from the call to wrapSafe to provide better
          * information who created this runnable
          */
-
         return new Runnable() {
             public void run() {
                 try {
                     runnable.run();
                 } catch (RuntimeException e) {
-                    log.error("Internal Error:", e);
+                    logToUse.error("Internal Error:", e);
                 } catch (Error e) {
-                    log.error("Internal Fatal Error:", e);
+                    logToUse.error("Internal Fatal Error:", e);
 
-                    // Rethrow errors (such as an OutOfMemoryError)
+                    // Re-throw errors (such as an OutOfMemoryError)
                     throw e;
                 }
             }
