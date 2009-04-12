@@ -69,6 +69,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
+import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
@@ -155,6 +156,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(UserListHandler.class);
         this.container.addComponent(DataTransferManager.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
+        this.container.addComponent(PreferenceManager.class);
 
         reinjector = new Reinjector(this.container);
     }
