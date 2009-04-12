@@ -45,76 +45,79 @@ public class SubscriptionListener implements PacketListener {
 
     public void processPacket(final Packet packet) {
 
-        if (!packet.getFrom().equals(this.connection.getUser())) {
+        if (!(packet instanceof Presence)) {
+            // Only care for presence packages
+            return;
+        }
 
-            log.debug("Received presence packet from " + packet.getFrom());
+        if (packet.getFrom().equals(this.connection.getUser())) {
+            // Don't care for presence packages from ourself
+            return;
+        }
 
-            if (packet instanceof Presence) {
-                final Presence p = (Presence) packet;
+        final Presence p = (Presence) packet;
 
-                // Somebody subscribed to us
-                if (p.getType() == Presence.Type.subscribed) {
-                    log.debug("User subscribed to us: " + p.getFrom());
-                }
+        log.debug("Received presence packet from " + packet.getFrom());
 
-                // Received information that somebody unsubscribed from us
-                if (p.getType() == Presence.Type.unsubscribed) {
-                    log.debug("User unsubscribed from us: " + p.getFrom());
-                }
+        // Somebody subscribed to us
+        if (p.getType() == Presence.Type.subscribed) {
+            log.debug("User subscribed to us: " + p.getFrom());
+        }
 
-                // Request of removal of subscription
-                else if (p.getType() == Presence.Type.unsubscribe) {
-                    log.debug("User requests to unsubscribe from us: "
-                        + p.getFrom());
+        // Received information that somebody unsubscribed from us
+        if (p.getType() == Presence.Type.unsubscribed) {
+            log.debug("User unsubscribed from us: " + p.getFrom());
+        }
 
-                    // if appropriate entry exists remove that
-                    RosterEntry e = connection.getRoster().getEntry(
-                        packet.getFrom());
-                    if (e != null) {
-                        try {
-                            connection.getRoster().removeEntry(e);
-                        } catch (XMPPException e1) {
-                            log.error(e1);
-                        }
-                    }
-                    sendPresence(Presence.Type.unsubscribed, packet.getFrom());
-                    informUserAboutUnsubscription(packet.getFrom());
-                }
+        // Request of removal of subscription
+        else if (p.getType() == Presence.Type.unsubscribe) {
+            log.debug("User requests to unsubscribe from us: " + p.getFrom());
 
-                // Request for subscription
-                else if (p.getType().equals(Presence.Type.subscribe)) {
-                    log.debug("User requests to subscribe to us: "
-                        + p.getFrom());
-
-                    // ask user for confirmation of subscription
-                    if (askUserForSubscriptionConfirmation(packet.getFrom())) {
-
-                        // send message that we accept the request for
-                        // subscription
-                        sendPresence(Presence.Type.subscribed, packet.getFrom());
-
-                        // if no appropriate entry for request exists
-                        // create one
-                        RosterEntry e = connection.getRoster().getEntry(
-                            packet.getFrom());
-                        if (e == null) {
-                            try {
-                                connection.getRoster().createEntry(
-                                    packet.getFrom(), packet.getFrom(), null);
-                            } catch (XMPPException e1) {
-                                log.error(e1);
-                            }
-                        }
-                    } else {
-                        // user has rejected request
-                        sendPresence(Presence.Type.unsubscribe, packet
-                            .getFrom());
-                    }
+            // if appropriate entry exists remove that
+            RosterEntry e = connection.getRoster().getEntry(packet.getFrom());
+            if (e != null) {
+                try {
+                    connection.getRoster().removeEntry(e);
+                } catch (XMPPException e1) {
+                    log.error(e1);
                 }
             }
-            connection.getRoster().reload();
-            this.rtree.refreshRosterTree(true);
+            sendPresence(Presence.Type.unsubscribed, packet.getFrom());
+            informUserAboutUnsubscription(packet.getFrom());
         }
+
+        // Request for subscription
+        else if (p.getType().equals(Presence.Type.subscribe)) {
+            log.debug("User requests to subscribe to us: " + p.getFrom());
+
+            // ask user for confirmation of subscription
+            if (askUserForSubscriptionConfirmation(packet.getFrom())) {
+
+                // send message that we accept the request for
+                // subscription
+                sendPresence(Presence.Type.subscribed, packet.getFrom());
+
+                // if no appropriate entry for request exists
+                // create one
+                RosterEntry e = connection.getRoster().getEntry(
+                    packet.getFrom());
+                if (e == null) {
+                    try {
+                        connection.getRoster().createEntry(packet.getFrom(),
+                            packet.getFrom(), null);
+                    } catch (XMPPException e1) {
+                        log.error(e1);
+                    }
+                }
+            } else {
+                // user has rejected request
+                sendPresence(Presence.Type.unsubscribe, packet.getFrom());
+            }
+        }
+
+        connection.getRoster().reload();
+        this.rtree.refreshRosterTree(true);
+
     }
 
     protected void sendPresence(Presence.Type type, String to) {
