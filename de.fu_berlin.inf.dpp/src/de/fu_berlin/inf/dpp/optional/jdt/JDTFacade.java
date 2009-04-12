@@ -1,21 +1,28 @@
 package de.fu_berlin.inf.dpp.optional.jdt;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
+
 /**
  * 
- * Class which hides access to the JDT Plugin functionality, so that Saros only
- * optionally dependes on JDT.
+ * Class which hides access to the JDT plug-in functionality, so that Saros only
+ * optionally depends on JDT.
  * 
  * To achieve this, JDTFacade implements the IJDTSupport interface but only
  * forwards calls. The interface is implemented using the JDT in JDTSupport to
  * which the calls are forwarded if the JDT is available.
  * 
- * To make this work, no static dependencies to JDTSupport may exist.
+ * To make this work, no static dependencies to JDTSupport may exist but rather
+ * reflection is being used.
  * 
  * @author oezbek
+ * 
+ * @component Instances of this class are created via PicoContainer
  */
 public class JDTFacade implements IJDTSupport {
 
@@ -61,5 +68,13 @@ public class JDTFacade implements IJDTSupport {
             throw new IllegalStateException("JDT Plugin is not available");
 
         return jdtSupport.getDocumentProvider();
+    }
+
+    public List<IPreferenceManipulator> getPreferenceManipulators() {
+
+        if (!isJDTAvailable())
+            throw new IllegalStateException("JDT Plugin is not available");
+
+        return jdtSupport.getPreferenceManipulators();
     }
 }

@@ -12,14 +12,17 @@ import org.eclipse.jdt.internal.ui.javaeditor.saveparticipant.AbstractSavePartic
 import org.eclipse.jdt.internal.ui.javaeditor.saveparticipant.SaveParticipantRegistry;
 import org.eclipse.jdt.ui.JavaUI;
 
+import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
+import de.fu_berlin.inf.dpp.util.StateChangeNotifier;
+
 /**
  * The responsibility of the SaveActionConfigurator is to provide methods for:
  * 
  * - Checking whether SaveActions are enabled
  * 
- * - Methods for disabling SaveActions
+ * - Methods for disabling SaveActions and restoring them.
  * 
- * - Warning the user about Enabled SaveActions
+ * - TODO Provide method for montoring SaveActions enabled state.
  * 
  * Important classes for this are:
  * 
@@ -37,20 +40,14 @@ import org.eclipse.jdt.ui.JavaUI;
  * 
  * {@link CleanUpSaveParticipantPreferenceConfiguration } - This is the actual
  * Save Action Preference Page
- * 
- * TODO Include this class into the process of starting a shared project, but
- * make sure that it creates no dependencies on the JDT
- * 
- * TODO Proper warnings need to be shown to the user.
- * 
  */
 @SuppressWarnings( { "restriction" })
-public class SaveActionConfigurator {
+public class SaveActionConfigurator implements IPreferenceManipulator {
 
     private static final Logger log = Logger
         .getLogger(SaveActionConfigurator.class.getName());
 
-    public boolean isSaveActionEnabled(IProject project) {
+    public boolean isEnabled(IProject project) {
 
         // We could access the preferences directly as in {@link
         // AbstractSaveParticipantPreferenceConfiguration
@@ -71,7 +68,7 @@ public class SaveActionConfigurator {
         return EDITOR_SAVE_PARTICIPANT_PREFIX + POSTSAVELISTENER_ID;
     }
 
-    public String disableSaveActions(IProject project) {
+    public IRestorePoint disable(final IProject project) {
 
         IEclipsePreferences prefs = new ProjectScope(project)
             .getNode(JavaUI.ID_PLUGIN);
@@ -81,21 +78,37 @@ public class SaveActionConfigurator {
             return null;
         }
 
-        String oldValue = prefs.get(getSaveActionPreferenceKey(), null);
+        final String oldValue = prefs.get(getSaveActionPreferenceKey(), null);
 
         prefs.putBoolean(getSaveActionPreferenceKey(), false);
-        return oldValue;
+
+        return new IRestorePoint() {
+
+            public void restore() {
+                IEclipsePreferences prefs = new ProjectScope(project)
+                    .getNode(JavaUI.ID_PLUGIN);
+
+                if (oldValue == null) {
+                    prefs.remove(getSaveActionPreferenceKey());
+                } else {
+                    prefs.put(getSaveActionPreferenceKey(), oldValue);
+                }
+
+            }
+
+        };
     }
 
-    public void restoreSaveAction(IProject project, String oldValue) {
-        IEclipsePreferences prefs = new ProjectScope(project)
-            .getNode(JavaUI.ID_PLUGIN);
-
-        if (oldValue == null) {
-            prefs.remove(getSaveActionPreferenceKey());
-        } else {
-            prefs.put(getSaveActionPreferenceKey(), oldValue);
-        }
+    public StateChangeNotifier<IPreferenceManipulator> getPreferenceStateChangeNotifier(
+        IProject project) {
+        return null;
     }
 
+    public boolean isDangerousForClient() {
+        return true;
+    }
+
+    public boolean isDangerousForHost() {
+        return false;
+    }
 }
