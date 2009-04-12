@@ -135,20 +135,25 @@ public class Saros extends AbstractUIPlugin {
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().build();
 
-        this.container.addComponent(Saros.class, this).addComponent(
-            CDTFacade.class).addComponent(JDTFacade.class).addComponent(
-            MessagingManager.class).addComponent(SessionManager.class)
-            .addComponent(SarosUI.class)
-            .addComponent(CurrentProjectProxy.class).addComponent(
-                XMPPChatTransmitter.class).addComponent(JupiterHandler.class)
-            .addComponent(ConnectionSessionManager.class).addComponent(
-                SarosRosterListener.class).addComponent(
-                ConsistencyWatchdogHandler.class).addComponent(
-                XMPPChatReceiver.class).addComponent(InvitationHandler.class)
-            .addComponent(LeaveHandler.class).addComponent(
-                RequestForActivityHandler.class).addComponent(
-                UserListHandler.class).addComponent(DataTransferManager.class)
-            .addComponent(JingleFileTransferManagerObservable.class);
+        this.container.addComponent(Saros.class, this);
+        this.container.addComponent(CDTFacade.class);
+        this.container.addComponent(JDTFacade.class);
+        this.container.addComponent(MessagingManager.class);
+        this.container.addComponent(SessionManager.class);
+        this.container.addComponent(SarosUI.class);
+        this.container.addComponent(CurrentProjectProxy.class);
+        this.container.addComponent(XMPPChatTransmitter.class);
+        this.container.addComponent(JupiterHandler.class);
+        this.container.addComponent(ConnectionSessionManager.class);
+        this.container.addComponent(SarosRosterListener.class);
+        this.container.addComponent(ConsistencyWatchdogHandler.class);
+        this.container.addComponent(XMPPChatReceiver.class);
+        this.container.addComponent(InvitationHandler.class);
+        this.container.addComponent(LeaveHandler.class);
+        this.container.addComponent(RequestForActivityHandler.class);
+        this.container.addComponent(UserListHandler.class);
+        this.container.addComponent(DataTransferManager.class);
+        this.container.addComponent(JingleFileTransferManagerObservable.class);
 
         reinjector = new Reinjector(this.container);
     }
