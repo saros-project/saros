@@ -73,6 +73,7 @@ import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
@@ -116,7 +117,7 @@ public class Saros extends AbstractUIPlugin {
     private final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
     // Smack (XMPP) connection listener
-    private final ConnectionListener smackConnectionListener = new XMPPConnectionListener();
+    private ConnectionListener smackConnectionListener;
 
     private Logger logger;
 
@@ -163,8 +164,7 @@ public class Saros extends AbstractUIPlugin {
      */
     public synchronized void reinject(Object toInjectInto) {
         try {
-            // Remove the component, in case an instance of it was already
-            // registered
+            // Remove the component if an instance of it was already registered
             this.container.removeComponent(toInjectInto.getClass());
 
             // Add the given instance to the container
@@ -186,7 +186,9 @@ public class Saros extends AbstractUIPlugin {
      */
     @Override
     public void start(BundleContext context) throws Exception {
+
         super.start(context);
+
         xmppFeatureID = plugin.toString()
             + "_"
             + (String) getBundle().getHeaders().get(
@@ -201,7 +203,8 @@ public class Saros extends AbstractUIPlugin {
         ActivityRegistry.getDefault();
         SkypeManager.getDefault();
 
-        // Make sure that all components in the container are instantiated
+        // Make sure that all components in the container are
+        // instantiated
         container.getComponents(Object.class);
 
         boolean hasUserName = getPreferenceStore().getString(
@@ -218,10 +221,11 @@ public class Saros extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
-        super.stop(context);
-
-        disconnect();
-
+        try {
+            disconnect();
+        } finally {
+            super.stop(context);
+        }
         setDefault(null);
     }
 
@@ -319,13 +323,12 @@ public class Saros extends AbstractUIPlugin {
                 disconnect();
             }
 
-            setConnectionState(ConnectionState.CONNECTING, null);
-
             ConnectionConfiguration conConfig = new ConnectionConfiguration(
                 server);
             conConfig.setReconnectionAllowed(false);
-
             this.connection = new XMPPConnection(conConfig);
+            setConnectionState(ConnectionState.CONNECTING, null);
+
             this.connection.connect();
 
             ServiceDiscoveryManager sdm = ServiceDiscoveryManager
@@ -351,6 +354,11 @@ public class Saros extends AbstractUIPlugin {
 
             this.connection.getRoster().setSubscriptionMode(
                 SubscriptionMode.manual);
+
+            if (this.smackConnectionListener == null) {
+                this.smackConnectionListener = new SafeConnectionListener(
+                    logger, new XMPPConnectionListener());
+            }
 
             this.connection.addConnectionListener(this.smackConnectionListener);
             setConnectionState(ConnectionState.CONNECTED, null);
@@ -535,18 +543,21 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Sets a new connection state and notifies all connection listeners.
      */
-    private void setConnectionState(ConnectionState state, String error) {
+    protected void setConnectionState(ConnectionState state, String error) {
         this.connectionState = state;
         this.connectionError = error;
 
         for (IConnectionListener listener : this.listeners) {
-            listener.connectionStateChanged(this.connection, state);
+            try {
+                listener.connectionStateChanged(this.connection, state);
+            } catch (RuntimeException e) {
+                logger.error("Internal error in setConnectionState:", e);
+            }
         }
     }
 
     private void setupLoggers() {
         try {
-
             PropertyConfigurator.configureAndWatch("log4j.properties",
                 60 * 1000);
             logger = Logger.getLogger("de.fu_berlin.inf.dpp");
@@ -670,14 +681,18 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * @return the local user or null if not connected with a jabber server
+     * @return the local user or null if not connected with a XMPP server or if
+     *         not in a shared session
      */
     public User getLocalUser() {
         if (!isConnected())
             return null;
 
-        return getSessionManager().getSharedProject().getParticipant(
-            Saros.getDefault().getMyJID());
+        ISharedProject project = getSessionManager().getSharedProject();
+        if (project == null)
+            return null;
+
+        return project.getParticipant(getMyJID());
     }
 
     public static boolean getFileTransferModeViaChat() {
