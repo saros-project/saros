@@ -8,11 +8,12 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.ui.IRosterTree;
+import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -30,51 +31,96 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author chjacob
  * 
  */
-public class SubscriptionListener implements PacketListener {
+public class SubscriptionListener implements ConnectionSessionListener {
 
     private static Logger log = Logger.getLogger(SubscriptionListener.class);
 
-    protected XMPPConnection connection;
+    protected XMPPConnection connection = null;
 
-    protected IRosterTree rtree;
+    protected PacketListener packetListener = new SafePacketListener(log,
+        new PacketListener() {
 
-    public SubscriptionListener(XMPPConnection conn, IRosterTree rtree) {
-        this.connection = conn;
-        this.rtree = rtree;
-    }
+            public void processPacket(Packet packet) {
 
-    public void processPacket(final Packet packet) {
+                if (!(packet instanceof Presence)) {
+                    // Only care for presence packages
+                    return;
+                }
 
-        if (!(packet instanceof Presence)) {
-            // Only care for presence packages
+                if (packet.getFrom().equals(connection.getUser())) {
+                    // If we receive a presence package from ourself, then we
+                    // are too lazy to manage subscription events by ourself.
+                    connection.getRoster().reload();
+                    return;
+                }
+
+                final Presence presence = (Presence) packet;
+
+                log.debug("Received presence packet from: "
+                    + presence.getFrom() + " " + presence);
+
+                switch (presence.getType()) {
+                case available:
+                case unavailable:
+                    // Don't care for these presence infos
+                    return;
+                }
+
+                processPresence(presence);
+            }
+        });
+
+    public void processPresence(Presence presence) {
+
+        switch (presence.getType()) {
+        case error:
+            log.warn("Received error presence package - condition: "
+                + presence.getError().getCondition() + " message: "
+                + presence.getError().getMessage());
             return;
-        }
 
-        if (packet.getFrom().equals(this.connection.getUser())) {
-            // Don't care for presence packages from ourself
-            return;
-        }
+        case subscribed:
+            log.debug("User subscribed to us: " + presence.getFrom());
+            break;
 
-        final Presence p = (Presence) packet;
+        case unsubscribed:
+            log.debug("User unsubscribed from us: " + presence.getFrom());
+            break;
 
-        log.debug("Received presence packet from " + packet.getFrom());
+        case subscribe:
+            log.debug("User requests to subscribe to" + " us: "
+                + presence.getFrom());
 
-        // Somebody subscribed to us
-        if (p.getType() == Presence.Type.subscribed) {
-            log.debug("User subscribed to us: " + p.getFrom());
-        }
+            // ask user for confirmation of subscription
+            if (askUserForSubscriptionConfirmation(presence.getFrom())) {
 
-        // Received information that somebody unsubscribed from us
-        if (p.getType() == Presence.Type.unsubscribed) {
-            log.debug("User unsubscribed from us: " + p.getFrom());
-        }
+                // send message that we accept the request for
+                // subscription
+                sendPresence(Presence.Type.subscribed, presence.getFrom());
 
-        // Request of removal of subscription
-        else if (p.getType() == Presence.Type.unsubscribe) {
-            log.debug("User requests to unsubscribe from us: " + p.getFrom());
+                // if no appropriate entry for request exists
+                // create one
+                RosterEntry e = connection.getRoster().getEntry(
+                    presence.getFrom());
+                if (e == null) {
+                    try {
+                        connection.getRoster().createEntry(presence.getFrom(),
+                            presence.getFrom(), null);
+                    } catch (XMPPException e1) {
+                        log.error(e1);
+                    }
+                }
+            } else {
+                // user has rejected request
+                sendPresence(Presence.Type.unsubscribe, presence.getFrom());
+            }
+            break;
 
+        case unsubscribe:
+            log.debug("User requests to unsubscribe from us: "
+                + presence.getFrom());
             // if appropriate entry exists remove that
-            RosterEntry e = connection.getRoster().getEntry(packet.getFrom());
+            RosterEntry e = connection.getRoster().getEntry(presence.getFrom());
             if (e != null) {
                 try {
                     connection.getRoster().removeEntry(e);
@@ -82,42 +128,12 @@ public class SubscriptionListener implements PacketListener {
                     log.error(e1);
                 }
             }
-            sendPresence(Presence.Type.unsubscribed, packet.getFrom());
-            informUserAboutUnsubscription(packet.getFrom());
-        }
-
-        // Request for subscription
-        else if (p.getType().equals(Presence.Type.subscribe)) {
-            log.debug("User requests to subscribe to us: " + p.getFrom());
-
-            // ask user for confirmation of subscription
-            if (askUserForSubscriptionConfirmation(packet.getFrom())) {
-
-                // send message that we accept the request for
-                // subscription
-                sendPresence(Presence.Type.subscribed, packet.getFrom());
-
-                // if no appropriate entry for request exists
-                // create one
-                RosterEntry e = connection.getRoster().getEntry(
-                    packet.getFrom());
-                if (e == null) {
-                    try {
-                        connection.getRoster().createEntry(packet.getFrom(),
-                            packet.getFrom(), null);
-                    } catch (XMPPException e1) {
-                        log.error(e1);
-                    }
-                }
-            } else {
-                // user has rejected request
-                sendPresence(Presence.Type.unsubscribe, packet.getFrom());
-            }
+            sendPresence(Presence.Type.unsubscribed, presence.getFrom());
+            informUserAboutUnsubscription(presence.getFrom());
+            break;
         }
 
         connection.getRoster().reload();
-        this.rtree.refreshRosterTree(true);
-
     }
 
     protected void sendPresence(Presence.Type type, String to) {
@@ -132,6 +148,7 @@ public class SubscriptionListener implements PacketListener {
         final AtomicReference<Boolean> result = new AtomicReference<Boolean>();
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
+                // TODO Should flash dialog
                 result.set(MessageDialog.openConfirm(EditorAPI.getShell(),
                     "Request of subscription received", "The User " + from
                         + " has requested subscription."));
@@ -150,5 +167,26 @@ public class SubscriptionListener implements PacketListener {
                         + " you from her or his roster.");
             }
         });
+    }
+
+    public void dispose() {
+        if (connection != null) {
+            connection.removePacketListener(packetListener);
+            connection = null;
+        }
+    }
+
+    public void prepare(XMPPConnection connection) {
+        this.connection = connection;
+        connection.addPacketListener(packetListener, new PacketTypeFilter(
+            Presence.class));
+    }
+
+    public void start() {
+        // ignore
+    }
+
+    public void stop() {
+        // ignore
     }
 }

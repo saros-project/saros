@@ -55,7 +55,6 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
 import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
 import org.jivesoftware.smack.packet.Presence.Type;
@@ -66,7 +65,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
@@ -524,8 +522,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
      */
     public void connectionStateChanged(XMPPConnection connection,
         final ConnectionState newState) {
+
         if (newState == ConnectionState.CONNECTED) {
-            // roster = Saros.getDefault().getRoster();
             this.roster = connection.getRoster();
             this.connection = connection;
             attachRosterListener();
@@ -560,9 +558,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     private void attachRosterListener() {
-
-        this.connection.addPacketListener(new SubscriptionListener(
-            this.connection, this), new PacketTypeFilter(Presence.class));
 
         this.connection.getRoster().addRosterListener(new RosterListener() {
             public void entriesAdded(Collection<String> addresses) {
