@@ -356,6 +356,12 @@ public class Saros extends AbstractUIPlugin {
 
             this.connection.login(username, password);
 
+            /*
+             * TODO SS Possible race condition, as our packet listeners are
+             * registered only after the login, so we might for instance receive
+             * subscription requests even though we do not have a packet
+             * listener running yet!
+             */
             this.connection.getRoster().setSubscriptionMode(
                 SubscriptionMode.manual);
 
