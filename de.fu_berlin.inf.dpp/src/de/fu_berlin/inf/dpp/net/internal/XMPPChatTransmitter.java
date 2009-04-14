@@ -476,7 +476,10 @@ public class XMPPChatTransmitter implements ITransmitter,
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(connection
                 .getUser()));
-
+        /*
+         * TODO Not portable because String#getBytes() uses the platform's
+         * default encoding.
+         */
         dataManager.sendData(data, fileList.toXML().getBytes(), callback);
     }
 

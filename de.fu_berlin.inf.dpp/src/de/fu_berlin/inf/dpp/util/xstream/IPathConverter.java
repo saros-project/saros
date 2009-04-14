@@ -8,15 +8,17 @@ import com.thoughtworks.xstream.converters.basic.AbstractSingleValueConverter;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * Converter for {@link IPath} objects to strings and back. Uses the portable
- * representation of {@link IPath} objects.
+ * Converter for {@link IPath} objects (and {@link Path} objects too) to strings
+ * and back. Uses the portable representation of {@link IPath} objects.
+ * 
+ * The string representation is usable as XML attribute value.
  */
 public class IPathConverter extends AbstractSingleValueConverter {
 
     @SuppressWarnings("unchecked")
     @Override
     public boolean canConvert(Class clazz) {
-        return clazz.equals(IPath.class);
+        return clazz.equals(IPath.class) || clazz.equals(Path.class);
     }
 
     @Override

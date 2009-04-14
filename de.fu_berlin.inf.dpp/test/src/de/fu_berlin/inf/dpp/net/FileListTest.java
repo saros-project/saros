@@ -1,6 +1,6 @@
 /*
  * DPP - Serious Distributed Pair Programming
- * (c) Freie Universität Berlin - Fachbereich Mathematik und Informatik - 2006
+ * (c) Freie Universitï¿½t Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -150,7 +150,8 @@ public class FileListTest extends TestCase {
 
     public void testRoundtripSerialization() throws XmlPullParserException,
         IOException {
-        FileList replicated = new FileList(fileList.toXML());
+
+        FileList replicated = FileList.fromXML(fileList.toXML());
         assertEquals(fileList, replicated);
     }
 

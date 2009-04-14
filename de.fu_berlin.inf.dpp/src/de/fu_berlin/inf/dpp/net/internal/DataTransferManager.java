@@ -659,7 +659,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             if (fileListAsString != null) {
                 try {
-                    fileList = new FileList(fileListAsString);
+                    fileList = FileList.fromXML(fileListAsString);
                 } catch (Exception e) {
                     process.cancel("Could not parse your FileList", false);
                     log.error("Could not parse FileList", e);

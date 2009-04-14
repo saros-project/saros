@@ -19,9 +19,7 @@
  */
 package de.fu_berlin.inf.dpp;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,12 +36,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.xmlpull.mxp1.MXParser;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 /**
  * A FileList is a list of resources - files and folders - which can be compared
@@ -51,7 +51,22 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  */
+@XStreamAlias("fileList")
 public class FileList {
+
+    /**
+     * {@link XStream} instance to serialize {@link FileList} objects to and
+     * from XML.
+     */
+    public static final XStream xstream = new XStream();
+
+    /**
+     * @invariant Contains all entries from this.added, this.altered, and
+     *            this.unaltered.
+     * 
+     * @see #readResolve()
+     */
+    @XStreamOmitField
     private Map<IPath, Long> all = new HashMap<IPath, Long>();
 
     private final Map<IPath, Long> added = new HashMap<IPath, Long>();
@@ -62,23 +77,27 @@ public class FileList {
 
     private final Map<IPath, Long> unaltered = new HashMap<IPath, Long>();
 
-    private final Comparator<IPath> comparator = new PathLengthComprarator();
+    private static final Comparator<IPath> PATH_LENGTH_COMPARATOR = new PathLengthComprarator();
 
     public static class PathLengthComprarator implements Comparator<IPath>,
         Serializable {
 
-        public int compare(IPath p1, IPath p2) {
-            int l1 = p1.toString().length();
-            int l2 = p2.toString().length();
+        private static final long serialVersionUID = 8656330038498525163L;
 
-            if (l1 < l2) {
-                return -1;
-            } else if (l1 > l2) {
-                return 1;
-            } else {
-                return 0;
-            }
+        /**
+         * Compares {@link IPath}s by the length of their string representation.
+         * 
+         * @see Comparator#compare(Object, Object)
+         */
+        public int compare(IPath path1, IPath path2) {
+            return path1.toString().length() - path2.toString().length();
         }
+    }
+
+    static {
+        xstream.registerConverter(new IPathConverter());
+        xstream.aliasType("path", Path.class);
+        xstream.processAnnotations(FileList.class);
     }
 
     /**
@@ -123,66 +142,6 @@ public class FileList {
         this.unaltered.putAll(this.all);
     }
 
-    /**
-     * Build the FileList from its XML representation.
-     * 
-     * @throws XmlPullParserException
-     * @throws IOException
-     */
-    public FileList(String xml) throws XmlPullParserException, IOException {
-        MXParser parser = new MXParser();
-        parser.setInput(new StringReader(xml));
-
-        Map<IPath, Long> context = this.added;
-
-        boolean done = false;
-        while (!done) {
-            int eventType = parser.next();
-            if (eventType == XmlPullParser.START_TAG) {
-
-                if (parser.getName().equals("added")) {
-                    context = this.added;
-
-                } else if (parser.getName().equals("removed")) {
-                    context = this.removed;
-
-                } else if (parser.getName().equals("altered")) {
-                    context = this.altered;
-
-                } else if (parser.getName().equals("unaltered")) {
-                    context = this.unaltered;
-
-                } else if (parser.getName().equals("file")) {
-                    IPath path = Path.fromPortableString(Util
-                        .urlUnescape(parser.getAttributeValue(null, "path")));
-                    Long checksum = Long.parseLong(parser.getAttributeValue(
-                        null, "checksum"));
-
-                    context.put(path, checksum);
-
-                    if (context != this.removed) {
-                        this.all.put(path, checksum);
-                    }
-
-                } else if (parser.getName().equals("folder")) {
-                    IPath path = Path.fromPortableString(Util
-                        .urlUnescape(parser.getAttributeValue(null, "path")));
-
-                    context.put(path, null);
-
-                    if (context != this.removed) {
-                        this.all.put(path, null);
-                    }
-                }
-
-            } else if (eventType == XmlPullParser.END_TAG) {
-                if (parser.getName().equals("filelist")) {
-                    done = true;
-                }
-            }
-        }
-    }
-
     // TODO invert diff direction
     /**
      * Returns a new FileList which contains the diff from the two FileLists.
@@ -195,17 +154,17 @@ public class FileList {
      *         get from this FileList to the other FileList.
      */
     public FileList diff(FileList other) {
-        FileList fileList = new FileList();
+        FileList result = new FileList();
 
         for (Map.Entry<IPath, Long> entry : this.all.entrySet()) {
             if (!other.all.containsKey(entry.getKey())) {
-                fileList.removed.put(entry.getKey(), entry.getValue());
+                result.removed.put(entry.getKey(), entry.getValue());
             }
         }
 
         for (Map.Entry<IPath, Long> entry : other.all.entrySet()) {
             if (!this.all.containsKey(entry.getKey())) {
-                fileList.added.put(entry.getKey(), entry.getValue());
+                result.added.put(entry.getKey(), entry.getValue());
             }
         }
 
@@ -214,23 +173,22 @@ public class FileList {
             if (other.all.containsKey(path)) {
 
                 if (path.hasTrailingSeparator()) {
-                    fileList.unaltered.put(path, null);
+                    result.unaltered.put(path, null);
                 } else {
                     long checksum = entry.getValue();
                     long otherChecksum = other.all.get(path);
 
                     if (checksum == otherChecksum) {
-                        fileList.unaltered.put(path, checksum);
+                        result.unaltered.put(path, checksum);
                     } else {
-                        fileList.altered.put(path, checksum);
+                        result.altered.put(path, checksum);
                     }
                 }
-
             }
         }
 
-        fileList.all = new HashMap<IPath, Long>(other.all);
-        return fileList;
+        result.all.putAll(other.all);
+        return result;
     }
 
     /**
@@ -267,21 +225,34 @@ public class FileList {
     }
 
     /**
-     * @return the XML representation of this FileList. You can use the returned
-     *         string to construct the same file list again.
+     * @return the XML representation of this FileList.
+     * 
+     * @see #fromXML(String)
      */
     public String toXML() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<filelist>");
+        return xstream.toXML(this);
+    }
 
-        appendFileGroup(sb, "added", this.added);
-        appendFileGroup(sb, "removed", this.removed);
-        appendFileGroup(sb, "altered", this.altered);
-        appendFileGroup(sb, "unaltered", this.unaltered);
+    /**
+     * Parses given XML and returns a {@link FileList} instance.
+     * 
+     * @see FileList#toXML()
+     */
+    public static FileList fromXML(String xml) {
+        return (FileList) xstream.fromXML(xml);
+    }
 
-        sb.append("</filelist>");
-
-        return sb.toString();
+    /**
+     * Ensures the invariant of this class.
+     * 
+     * This is called after deserialization by XStream.
+     */
+    private Object readResolve() {
+        all = new HashMap<IPath, Long>();
+        all.putAll(added);
+        all.putAll(altered);
+        all.putAll(unaltered);
+        return this;
     }
 
     @Override
@@ -321,7 +292,7 @@ public class FileList {
 
     private List<IPath> sorted(Set<IPath> pathSet) {
         List<IPath> paths = new ArrayList<IPath>(pathSet);
-        Collections.sort(paths, this.comparator);
+        Collections.sort(paths, this.PATH_LENGTH_COMPARATOR);
         return paths;
     }
 
