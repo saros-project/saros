@@ -83,4 +83,8 @@ public abstract class AbstractActivity implements IActivity {
     public static IActivity parse(XmlPullParser parser) {
         return (IActivity) xstream.unmarshal(new XppReader(parser));
     }
+
+    public String toXML() {
+        return xstream.toXML(this);
+    }
 }

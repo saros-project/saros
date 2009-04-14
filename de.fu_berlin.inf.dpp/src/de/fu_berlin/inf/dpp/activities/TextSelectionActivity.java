@@ -42,6 +42,9 @@ public class TextSelectionActivity extends AbstractActivity {
     public TextSelectionActivity(String source, int offset, int length,
         IPath path) {
         super(source);
+        if (path == null) {
+            throw new IllegalArgumentException("path mus not be null");
+        }
         this.offset = offset;
         this.length = length;
         this.editor = path;
@@ -97,10 +100,5 @@ public class TextSelectionActivity extends AbstractActivity {
 
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
-    }
-
-    public String toXML() {
-        assert getEditor() != null;
-        return xstream.toXML(this);
     }
 }

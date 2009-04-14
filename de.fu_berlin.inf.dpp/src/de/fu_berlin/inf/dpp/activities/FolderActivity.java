@@ -39,8 +39,4 @@ public class FolderActivity extends AbstractActivity {
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
     }
-
-    public String toXML() {
-        return xstream.toXML(this);
-    }
 }

@@ -24,6 +24,10 @@ public class ViewportActivity extends AbstractActivity {
         IPath editor) {
         super(source);
 
+        if (editor == null) {
+            throw new IllegalArgumentException("editor must not be null");
+        }
+
         assert topIndex <= bottomIndex : "Top == " + topIndex + ", Bottom == "
             + bottomIndex;
 
@@ -93,10 +97,5 @@ public class ViewportActivity extends AbstractActivity {
 
     public boolean dispatch(IActivityReceiver receiver) {
         return receiver.receive(this);
-    }
-
-    public String toXML() {
-        assert getEditor() != null;
-        return xstream.toXML(this);
     }
 }

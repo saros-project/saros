@@ -243,9 +243,10 @@ public class FileList {
     }
 
     /**
-     * Ensures the invariant of this class.
-     * 
      * This is called after deserialization by XStream.
+     * 
+     * Initializes {@link #all} (which is not sent via XML) to ensure the
+     * invariant of this class.
      */
     private Object readResolve() {
         all = new HashMap<IPath, Long>();
