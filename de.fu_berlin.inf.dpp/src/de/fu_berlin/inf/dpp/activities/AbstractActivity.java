@@ -8,9 +8,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 import de.fu_berlin.inf.dpp.util.xstream.XppReader;
@@ -73,11 +70,6 @@ public abstract class AbstractActivity implements IActivity {
 
         AbstractActivity other = (AbstractActivity) obj;
         return ObjectUtils.equals(this.source, other.source);
-    }
-
-    public User getUser() {
-        return Saros.getDefault().getSessionManager().getSharedProject()
-            .getParticipant(new JID(source));
     }
 
     public static IActivity parse(XmlPullParser parser) {

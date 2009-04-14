@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -155,11 +156,22 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
     };
 
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    @Inject
+    protected ISessionManager sessionManager;
+
     public SharedProjectFileDecorator() {
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+
+        Saros.getDefault().reinject(this);
+
         sessionManager.addSessionListener(sessionListener);
 
-        EditorManager.getDefault().addSharedEditorListener(editorListener);
+        editorManager.addSharedEditorListener(editorListener);
         if (sessionManager.getSharedProject() != null) {
             sessionListener.sessionStarted(sessionManager.getSharedProject());
         }
@@ -183,8 +195,6 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             if (path == null)
                 return;
 
-            EditorManager editorManager = EditorManager.getDefault();
-
             if (containsUserToDisplay(editorManager
                 .getRemoteActiveEditorUsers(path))) {
                 log.trace("Active Deco: " + element);
@@ -204,7 +214,6 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     private boolean containsUserToDisplay(List<User> activeUsers) {
 
-        EditorManager editorManager = EditorManager.getDefault();
         for (User user : activeUsers) {
             if (user.isDriver() || user.equals(editorManager.getFollowedUser())) {
                 return true;
@@ -222,9 +231,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     }
 
     public void dispose() {
-        Saros.getDefault().getSessionManager().removeSessionListener(
-            sessionListener);
-        EditorManager.getDefault().removeSharedEditorListener(editorListener);
+        sessionManager.removeSessionListener(sessionListener);
+        editorManager.removeSharedEditorListener(editorListener);
         // TODO clean up better
         this.sharedProject = null;
     }

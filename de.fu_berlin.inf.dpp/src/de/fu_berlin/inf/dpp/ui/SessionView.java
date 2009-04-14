@@ -61,6 +61,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
 import org.picocontainer.Disposable;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -151,7 +152,7 @@ public class SessionView extends ViewPart {
 
         public void roleChanged(User user, boolean replicated) {
             // Show balloon notification
-            if (user.equals(Saros.getDefault().getLocalUser())) {
+            if (user.equals(saros.getLocalUser())) {
                 if (user.isDriver()) {
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
@@ -233,7 +234,7 @@ public class SessionView extends ViewPart {
             }
 
             User user = (User) element;
-            if (user.equals(EditorManager.getDefault().getFollowedUser())) {
+            if (user.equals(editorManager.getFollowedUser())) {
                 return this.boldFont;
             }
             return null;
@@ -250,9 +251,9 @@ public class SessionView extends ViewPart {
         }
     }
 
-    public static String getName(User participant) {
+    public String getName(User participant) {
 
-        if (participant.equals(Saros.getDefault().getLocalUser())) {
+        if (participant.equals(saros.getLocalUser())) {
             return "You";
         }
 
@@ -311,7 +312,18 @@ public class SessionView extends ViewPart {
         }
     };
 
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    @Inject
+    protected ISessionManager sessionManager;
+
     public SessionView() {
+
+        Saros.getDefault().reinject(this);
 
         /**
          * Register with the Editors preference store, for getting notified when
@@ -324,15 +336,14 @@ public class SessionView extends ViewPart {
          * Register for our preference store, so we can be notified if the
          * Multi-Driver setting changes
          */
-        Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
+        saros.getPreferenceStore().addPropertyChangeListener(
             multiDriverPrefsListener);
 
         /**
          * Listener responsible for refreshing the viewer if the follow mode
          * changed (because the followed user is shown in bold)
          */
-        EditorManager.getDefault()
-            .addSharedEditorListener(sharedEditorListener);
+        editorManager.addSharedEditorListener(sharedEditorListener);
 
     }
 
@@ -340,10 +351,9 @@ public class SessionView extends ViewPart {
     public void dispose() {
         EditorsUI.getPreferenceStore().removePropertyChangeListener(
             editorPrefsListener);
-        Saros.getDefault().getPreferenceStore().removePropertyChangeListener(
+        saros.getPreferenceStore().removePropertyChangeListener(
             multiDriverPrefsListener);
-        EditorManager.getDefault().removeSharedEditorListener(
-            sharedEditorListener);
+        editorManager.removeSharedEditorListener(sharedEditorListener);
 
         // FIXME All actions need to be properly disposed, because they use
         // Listeners
@@ -351,7 +361,6 @@ public class SessionView extends ViewPart {
             toDispose.dispose();
         }
 
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         sessionManager.removeSessionListener(sessionListener);
 
         super.dispose();
@@ -462,8 +471,6 @@ public class SessionView extends ViewPart {
     };
 
     private void attachSessionListener() {
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
-
         sessionManager.addSessionListener(sessionListener);
         if (sessionManager.getSharedProject() != null) {
             this.viewer.setInput(sessionManager.getSharedProject());
@@ -521,7 +528,7 @@ public class SessionView extends ViewPart {
     }
 
     protected boolean isMultiDriverEnabled() {
-        return Saros.getDefault().getPreferenceStore().getBoolean(
+        return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.MULTI_DRIVER);
     }
 

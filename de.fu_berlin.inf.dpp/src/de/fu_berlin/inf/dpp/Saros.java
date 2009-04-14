@@ -53,6 +53,11 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.Reinjector;
 
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
+import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -87,6 +92,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  * @author coezbek
+ * 
  */
 public class Saros extends AbstractUIPlugin {
 
@@ -135,10 +141,13 @@ public class Saros extends AbstractUIPlugin {
     public Saros() {
         setDefault(this);
 
+        // Initialize our dependency injection container
         this.container = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().build();
 
+        // All singletons which exist for the whole plug-in
+        // life-cycle are managed by PicoContainer for us
         this.container.addComponent(Saros.class, this);
         this.container.addComponent(CDTFacade.class);
         this.container.addComponent(JDTFacade.class);
@@ -163,8 +172,21 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SharedResourcesManager.class);
         this.container.addComponent(RoleManager.class);
         this.container.addComponent(SkypeManager.class);
+        this.container.addComponent(EditorManager.class);
+        this.container.addComponent(ConsistencyWatchdogServer.class);
+        this.container.addComponent(ConsistencyWatchdogClient.class);
+        this.container.addComponent(IsInconsistentObservable.class);
+        this.container.addComponent(SessionViewOpener.class);
 
+        /*
+         * The following classes are initialized by the re-injector because they
+         * are created by Eclipse:
+         * 
+         * All User interface classes like all Views, all Actions... but also
+         * SharedDocumentProvider.
+         */
         reinjector = new Reinjector(this.container);
+
     }
 
     /**
@@ -274,25 +296,22 @@ public class Saros extends AbstractUIPlugin {
     /**
      * @return the MessagingManager which is responsible for handling instant
      *         messaging. Is never <code>null</code>.
+     * 
+     * @deprecated Rather everybody should get their own instance
      */
+    @Deprecated
     public MessagingManager getMessagingManager() {
-        // TODO [PICO] Rather everybody should get their own instance
         return getContainer().getComponent(MessagingManager.class);
     }
 
     /**
-     * @return the SarosUI which is the central class responsible for handling
-     *         UI events because of Sessions. Is never <code>null</code>.
-     */
-    public SarosUI getSarosUI() {
-        return getContainer().getComponent(SarosUI.class);
-    }
-
-    /**
      * @return the SessionManager. Is never <code>null</code>.
+     * 
+     * @deprecated Rather everybody should get their own instance via
+     *             PicoContainer
      */
+    @Deprecated
     public ISessionManager getSessionManager() {
-        // TODO [PICO] Rather everybody should get their own instance
         return getContainer().getComponent(SessionManager.class);
     }
 

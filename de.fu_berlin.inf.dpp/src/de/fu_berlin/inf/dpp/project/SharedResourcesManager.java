@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -50,6 +51,9 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
  * folder activities.
  * 
  * @author rdjemili
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class SharedResourcesManager implements IResourceChangeListener,
     IActivityProvider {
@@ -120,12 +124,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
         private IActivity handleFolderDelta(IPath path, int kind) {
             switch (kind) {
             case IResourceDelta.ADDED:
-                return new FolderActivity(Saros.getDefault().getMyJID()
-                    .toString(), FolderActivity.Type.Created, path);
+                return new FolderActivity(saros.getMyJID().toString(),
+                    FolderActivity.Type.Created, path);
 
             case IResourceDelta.REMOVED:
-                return new FolderActivity(Saros.getDefault().getMyJID()
-                    .toString(), FolderActivity.Type.Removed, path);
+                return new FolderActivity(saros.getMyJID().toString(),
+                    FolderActivity.Type.Removed, path);
 
             default:
                 return null;
@@ -146,16 +150,16 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceDelta.ADDED:
                 // ignore opened files because otherwise we might send CHANGED
                 // events for files that are also handled by the editor manager.
-                if (EditorManager.getDefault().isOpened(path)) {
+                if (editorManager.isOpened(path)) {
                     // TODO Think about if this is needed...
                     return null;
                 }
-                return new FileActivity(Saros.getDefault().getMyJID()
-                    .toString(), FileActivity.Type.Created, path);
+                return new FileActivity(saros.getMyJID().toString(),
+                    FileActivity.Type.Created, path);
 
             case IResourceDelta.REMOVED:
-                return new FileActivity(Saros.getDefault().getMyJID()
-                    .toString(), FileActivity.Type.Removed, path);
+                return new FileActivity(saros.getMyJID().toString(),
+                    FileActivity.Type.Removed, path);
 
             default:
                 return null;
@@ -173,9 +177,17 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    public SharedResourcesManager() {
-        Saros.getDefault().getSessionManager().addSessionListener(
-            sessionListener);
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    protected ISessionManager sessionManager;
+
+    public SharedResourcesManager(ISessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+        sessionManager.addSessionListener(sessionListener);
     }
 
     public ISessionListener sessionListener = new AbstractSessionListener() {

@@ -37,7 +37,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
@@ -53,11 +52,9 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -70,8 +67,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
@@ -88,13 +84,13 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.BalloonNotification;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -113,8 +109,10 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * 
  *         TODO CO This class contains too many different concerns: TextEdits,
  *         Editor opening and closing, Parsing of activities, executing of
- *         activities, dirty state management,
+ *         activities, dirty state management,...
  * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class EditorManager implements IActivityProvider {
 
@@ -255,9 +253,6 @@ public class EditorManager implements IActivityProvider {
 
     protected RemoteEditorManager remoteEditorManager;
 
-    protected final ConsistencyWatchdogServer consistencyWatchdog = new ConsistencyWatchdogServer(
-        "ConsistencyWatchdog");
-
     protected ISharedProject sharedProject;
 
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
@@ -296,12 +291,15 @@ public class EditorManager implements IActivityProvider {
     protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public boolean receive(EditorActivity editorActivity) {
+
+            User sender = sharedProject.getParticipant(new JID(editorActivity
+                .getSource()));
+
             if (editorActivity.getType().equals(Type.Activated)) {
-                execActivated(editorActivity.getUser(), editorActivity
-                    .getPath());
+                execActivated(sender, editorActivity.getPath());
 
             } else if (editorActivity.getType().equals(Type.Closed)) {
-                execClosed(editorActivity.getUser(), editorActivity.getPath());
+                execClosed(sender, editorActivity.getPath());
 
             } else if (editorActivity.getType().equals(Type.Saved)) {
                 saveText(editorActivity.getPath());
@@ -447,37 +445,10 @@ public class EditorManager implements IActivityProvider {
             isDriver = sharedProject.isDriver();
             sharedProject.addListener(sharedProjectListener);
 
-            // Add ConsistencyListener
-            ConsistencyWatchdogClient.getDefault().getConsistencyToResolve()
-                .add(new ValueChangeListener<Boolean>() {
-                    public void setValue(Boolean inconsistency) {
-                        if (inconsistency) {
-                            Util.runSafeSWTSync(log, new Runnable() {
-                                public void run() {
-                                    try {
-                                        // Open Session view
-                                        PlatformUI
-                                            .getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage()
-                                            .showView(
-                                                "de.fu_berlin.inf.dpp.ui.SessionView",
-                                                null,
-                                                IWorkbenchPage.VIEW_ACTIVATE);
-                                    } catch (PartInitException e) {
-                                        log
-                                            .error("Could not open session view!");
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
-
             sharedProject.getActivityManager().addProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
                 project);
-            remoteEditorManager = new RemoteEditorManager();
+            remoteEditorManager = new RemoteEditorManager(sharedProject);
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -504,13 +475,6 @@ public class EditorManager implements IActivityProvider {
                     }
                 }
             });
-
-            if (sharedProject.isHost()) {
-                log.debug("Starting consistency watchdog");
-                consistencyWatchdog.setSystem(true);
-                consistencyWatchdog.setPriority(Job.SHORT);
-                consistencyWatchdog.schedule();
-            }
         }
 
         /*
@@ -522,10 +486,6 @@ public class EditorManager implements IActivityProvider {
         public void sessionEnded(ISharedProject project) {
 
             assert sharedProject == project;
-
-            if (sharedProject.isHost()) {
-                consistencyWatchdog.stop();
-            }
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -556,23 +516,14 @@ public class EditorManager implements IActivityProvider {
         }
     };
 
-    protected EditorManager() {
+    protected Saros saros;
+
+    public EditorManager(Saros saros, SessionManager sessionManager) {
+
+        this.saros = saros;
+
         setEditorAPI(new EditorAPI());
-        if ((Saros.getDefault() != null)
-            && (Saros.getDefault().getSessionManager() != null)) {
-            Saros.getDefault().getSessionManager().addSessionListener(
-                this.sessionListener);
-        } else {
-            log.error("EditorManager could not be started!", new StackTrace());
-        }
-    }
-
-    public static EditorManager getDefault() {
-        if (EditorManager.instance == null) {
-            EditorManager.instance = new EditorManager();
-        }
-
-        return EditorManager.instance;
+        sessionManager.addSessionListener(this.sessionListener);
     }
 
     public boolean isConnected(IFile file) {
@@ -735,20 +686,8 @@ public class EditorManager implements IActivityProvider {
             .toString(), offset, length, path));
     }
 
-    /**
-     * Asks the ConsistencyWatchdog if there are currently any inconsistencies
-     * to resolve.
-     */
-    public static boolean isConsistencyToResolve() {
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
-
-        if (project == null)
-            return false;
-
-        return ConsistencyWatchdogClient.getDefault().getConsistencyToResolve()
-            .getValue();
-    }
+    @Inject
+    protected IsInconsistentObservable isInconsistent;
 
     public void textAboutToBeChanged(int offset, String text, int replace,
         IDocument document) {
@@ -757,7 +696,8 @@ public class EditorManager implements IActivityProvider {
          * TODO When Inconsistencies exists, all listeners should be stopped
          * rather than catching events -> Think Start/Stop on the SharedProject
          */
-        if (!this.isDriver || isConsistencyToResolve()) {
+        if (!this.isDriver || sharedProject == null
+            || isInconsistent.getValue()) {
 
             /**
              * TODO If we are not a driver, then receiving this event might
@@ -766,6 +706,9 @@ public class EditorManager implements IActivityProvider {
              * 
              * But watch out for changes because of a consistency check!
              */
+            log.warn("Received text changes without being"
+                + " driver or while shared project has ended");
+
             return;
         }
 
@@ -842,8 +785,7 @@ public class EditorManager implements IActivityProvider {
     protected void execTextEdit(TextEditActivity textEdit) {
 
         String source = textEdit.getSource();
-        User user = Saros.getDefault().getSessionManager().getSharedProject()
-            .getParticipant(new JID(source));
+        User user = sharedProject.getParticipant(new JID(source));
 
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);

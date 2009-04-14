@@ -105,7 +105,10 @@ public class FollowModeAction extends Action implements Disposable {
     };
 
     @Inject
-    ISessionManager sessionManager;
+    protected ISessionManager sessionManager;
+
+    @Inject
+    protected EditorManager editorManager;
 
     public FollowModeAction() {
         super(null, AS_CHECK_BOX);
@@ -117,7 +120,7 @@ public class FollowModeAction extends Action implements Disposable {
         Saros.getDefault().reinject(this);
 
         sessionManager.addSessionListener(sessionListener);
-        EditorManager.getDefault().addSharedEditorListener(editorListener);
+        editorManager.addSharedEditorListener(editorListener);
 
         updateEnablement();
     }
@@ -133,7 +136,7 @@ public class FollowModeAction extends Action implements Disposable {
                 User toFollow = getNewToFollow();
 
                 log.info("setFollowing to " + toFollow);
-                EditorManager.getDefault().setFollowing(toFollow);
+                editorManager.setFollowing(toFollow);
             }
 
             private User getNewToFollow() {
@@ -141,7 +144,7 @@ public class FollowModeAction extends Action implements Disposable {
 
                 assert project != null;
 
-                User following = EditorManager.getDefault().getFollowedUser();
+                User following = editorManager.getFollowedUser();
 
                 if (following != null) {
                     return null;
@@ -165,7 +168,7 @@ public class FollowModeAction extends Action implements Disposable {
         if (project == null)
             return false;
 
-        User following = EditorManager.getDefault().getFollowedUser();
+        User following = editorManager.getFollowedUser();
 
         if (following != null) {
             // While following the button must be enabled to de-follow
@@ -188,6 +191,6 @@ public class FollowModeAction extends Action implements Disposable {
 
     public void dispose() {
         sessionManager.removeSessionListener(sessionListener);
-        EditorManager.getDefault().removeSharedEditorListener(editorListener);
+        editorManager.removeSharedEditorListener(editorListener);
     }
 }

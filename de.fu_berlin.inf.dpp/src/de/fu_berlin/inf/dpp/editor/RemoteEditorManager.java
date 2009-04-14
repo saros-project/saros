@@ -21,6 +21,8 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
@@ -37,16 +39,18 @@ public class RemoteEditorManager {
     protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
         public boolean receive(EditorActivity editorActivity) {
+
+            User sender = sharedProject.getParticipant(new JID(editorActivity
+                .getSource()));
+
             switch (editorActivity.getType()) {
             case Activated:
-                getEditorState(editorActivity.getUser()).activated(
-                    editorActivity.getPath());
+                getEditorState(sender).activated(editorActivity.getPath());
                 break;
             case Saved:
                 break;
             case Closed:
-                getEditorState(editorActivity.getUser()).closed(
-                    editorActivity.getPath());
+                getEditorState(sender).closed(editorActivity.getPath());
                 break;
             }
 
@@ -56,8 +60,11 @@ public class RemoteEditorManager {
         @Override
         public boolean receive(ViewportActivity viewportActivity) {
 
-            getEditorState(viewportActivity.getUser()).setViewport(
-                viewportActivity.getEditor(), viewportActivity.getLineRange());
+            User sender = sharedProject.getParticipant(new JID(viewportActivity
+                .getSource()));
+
+            getEditorState(sender).setViewport(viewportActivity.getEditor(),
+                viewportActivity.getLineRange());
 
             return false;
         }
@@ -65,13 +72,18 @@ public class RemoteEditorManager {
         @Override
         public boolean receive(TextSelectionActivity textSelectionActivity) {
 
-            getEditorState(textSelectionActivity.getUser()).setSelection(
+            User sender = sharedProject.getParticipant(new JID(
+                textSelectionActivity.getSource()));
+
+            getEditorState(sender).setSelection(
                 textSelectionActivity.getEditor(),
                 textSelectionActivity.getSelection());
 
             return false;
         }
     };
+
+    protected ISharedProject sharedProject;
 
     /**
      * One editor of one user
@@ -230,6 +242,10 @@ public class RemoteEditorManager {
             return this.user;
         }
 
+    }
+
+    public RemoteEditorManager(ISharedProject sharedProject) {
+        this.sharedProject = sharedProject;
     }
 
     public RemoteEditorState getEditorState(User user) {

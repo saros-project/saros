@@ -21,7 +21,13 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
         .getLogger(JumpToDriverPositionAction.class.getName());
 
     @Inject
-    SessionManager sessionManager;
+    protected SessionManager sessionManager;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    @Inject
+    protected Saros saros;
 
     public JumpToDriverPositionAction(ISelectionProvider provider) {
         super(provider, "Jump to position of selected user");
@@ -49,7 +55,7 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
             public void run() {
                 User jumpTo = getSelectedUser();
                 assert jumpTo != null;
-                EditorManager.getDefault().jumpToUser(jumpTo);
+                editorManager.jumpToUser(jumpTo);
             }
         });
     }
@@ -62,7 +68,7 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
 
         User selectedUser = (User) selected;
 
-        if (selectedUser.equals(Saros.getDefault().getLocalUser()))
+        if (selectedUser.equals(saros.getLocalUser()))
             return null;
 
         return selectedUser;

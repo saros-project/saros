@@ -13,15 +13,29 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 
+/**
+ * This class is responsible to process checksums sent to us from the server by
+ * checking our locally existing files against them.
+ * 
+ * If an inconsistency is detected the inconsistency state is set via the
+ * {@link IsInconsistentObservable}. This enables the {@link ConsistencyAction}
+ * (a.k.a. the yellow triangle) in the {@link SessionView}.
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
+ */
 public class ConsistencyWatchdogClient {
 
     private static Logger logger = Logger
@@ -31,16 +45,11 @@ public class ConsistencyWatchdogClient {
 
     protected final Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
-    protected final ObservableValue<Boolean> inconsistencyToResolve = new ObservableValue<Boolean>(
-        false);
+    @Inject
+    protected IsInconsistentObservable inconsistencyToResolve;
 
-    public static ConsistencyWatchdogClient getDefault() {
-        if (ConsistencyWatchdogClient.instance == null) {
-            ConsistencyWatchdogClient.instance = new ConsistencyWatchdogClient();
-        }
-
-        return ConsistencyWatchdogClient.instance;
-    }
+    @Inject
+    protected EditorManager editorManager;
 
     protected ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
         TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1),
@@ -131,7 +140,7 @@ public class ConsistencyWatchdogClient {
             return true;
         }
 
-        IDocument doc = EditorManager.getDefault().getDocument(path);
+        IDocument doc = editorManager.getDocument(path);
 
         // if doc is still null give up
         if (doc == null) {
@@ -143,10 +152,9 @@ public class ConsistencyWatchdogClient {
         if ((doc.getLength() != checksum.getLength())
             || (doc.get().hashCode() != checksum.getHash())) {
 
-            long lastEdited = (EditorManager.getDefault().getLastEditTime(path));
+            long lastEdited = editorManager.getLastEditTime(path);
 
-            long lastRemoteEdited = (EditorManager.getDefault()
-                .getLastRemoteEditTime(path));
+            long lastRemoteEdited = editorManager.getLastRemoteEditTime(path);
 
             if ((System.currentTimeMillis() - lastEdited) > 4000
                 && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {

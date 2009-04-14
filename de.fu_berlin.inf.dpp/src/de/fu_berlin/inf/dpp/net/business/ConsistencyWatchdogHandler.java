@@ -37,8 +37,8 @@ import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * @Component The single instance of this class per application is managed by
- *            PicoContainer
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class ConsistencyWatchdogHandler {
 
@@ -70,7 +70,7 @@ public class ConsistencyWatchdogHandler {
 
             // Save document before sending to clients
             try {
-                EditorManager.getDefault().saveLazy(path);
+                editorManager.saveLazy(path);
             } catch (FileNotFoundException e) {
                 // TODO Handle case, when file does not exist locally any
                 // more
@@ -237,9 +237,6 @@ public class ConsistencyWatchdogHandler {
 
             assert currentProject != null;
 
-            ConsistencyWatchdogClient watchdogClient = ConsistencyWatchdogClient
-                .getDefault();
-
             watchdogClient.setChecksums(checksums);
             watchdogClient.checkConsistency();
         }
@@ -261,10 +258,16 @@ public class ConsistencyWatchdogHandler {
     };
 
     @Inject
-    ITransmitter transmitter;
+    protected ITransmitter transmitter;
 
     @Inject
-    CurrentProjectProxy project;
+    protected CurrentProjectProxy project;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    @Inject
+    ConsistencyWatchdogClient watchdogClient;
 
     public ConsistencyWatchdogHandler(XMPPChatReceiver receiver) {
 

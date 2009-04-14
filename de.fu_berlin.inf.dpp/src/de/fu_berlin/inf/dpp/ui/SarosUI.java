@@ -48,6 +48,12 @@ import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 
+/**
+ * Some helper functionality to interface with Eclipse.
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
+ */
 public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());
@@ -110,27 +116,52 @@ public class SarosUI {
     }
 
     /**
-     * TODO What to do if no Views are active?
-     * 
      * @swt
      */
     public void openSarosViews() {
-        try {
-            // Create Session View
-            IWorkbench workbench = PlatformUI.getWorkbench();
-            IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-            window.getActivePage().showView(SarosUI.SESSION_VIEW, null,
-                IWorkbenchPage.VIEW_CREATE);
-        } catch (PartInitException e) {
-            log.error("Could not create Session View", e);
-        }
+        // Create Session View
+        createSessionView();
+        // Open Roster so that a participant can be invited
+        activateRosterView();
+    }
 
+    /**
+     * @swt
+     */
+    public void activateRosterView() {
+        activateView(SarosUI.ROSTER_VIEW);
+    }
+
+    /**
+     * @swt
+     */
+    public void createSessionView() {
+        createView(SarosUI.SESSION_VIEW);
+    }
+
+    /**
+     * @swt
+     */
+    public void activateSessionView() {
+        activateView(SarosUI.SESSION_VIEW);
+    }
+
+    protected void activateView(String view) {
+        showView(view, IWorkbenchPage.VIEW_ACTIVATE);
+    }
+
+    protected void createView(String view) {
+        showView(view, IWorkbenchPage.VIEW_CREATE);
+    }
+
+    /**
+     * TODO What to do if no WorkbenchWindows are are active?
+     */
+    protected void showView(String view, int mode) {
         try {
-            // Open Roster so that a participant can be invited
             IWorkbench workbench = PlatformUI.getWorkbench();
             IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-            window.getActivePage().showView(SarosUI.ROSTER_VIEW, null,
-                IWorkbenchPage.VIEW_ACTIVATE);
+            window.getActivePage().showView(view, null, mode);
         } catch (PartInitException e) {
             log.error("Could not create Session View", e);
         }
@@ -189,4 +220,5 @@ public class SarosUI {
         return AbstractUIPlugin.imageDescriptorFromPlugin(
             "de.fu_berlin.inf.dpp", path);
     }
+
 }

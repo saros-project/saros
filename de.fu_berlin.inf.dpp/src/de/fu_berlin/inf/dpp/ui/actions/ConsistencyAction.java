@@ -49,17 +49,20 @@ public class ConsistencyAction extends Action {
 
     protected Set<IPath> pathsOfHandledFiles;
 
-    protected ConsistencyWatchdogClient watchdogClient = ConsistencyWatchdogClient
-        .getDefault();
+    @Inject
+    protected SessionManager sessionManager;
 
     @Inject
-    SessionManager sessionManager;
+    protected DataTransferManager dataTransferManager;
 
     @Inject
-    DataTransferManager dataTransferManager;
+    protected ITransmitter transmitter;
 
     @Inject
-    ITransmitter transmitter;
+    protected EditorManager editorManager;
+
+    @Inject
+    protected ConsistencyWatchdogClient watchdogClient;
 
     ISharedProject sharedProject;
 
@@ -261,7 +264,7 @@ public class ConsistencyAction extends Action {
 
                     // Save document before asking host to resend
                     try {
-                        EditorManager.getDefault().saveLazy(path);
+                        editorManager.saveLazy(path);
                     } catch (FileNotFoundException e) {
                         // Sending the checksum error message should recreate
                         // this file

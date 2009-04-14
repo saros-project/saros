@@ -10,10 +10,26 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
+/**
+ * An interface behind which the {@link SessionManager} hides its non-public
+ * methods.
+ * 
+ * The (I)SessionManager is responsible for providing a link between the
+ * basically static world managed by PicoContainer where every class has just a
+ * singleton instance which never changes and the {@link SharedProject} which
+ * can change many times during the course of the plug-in life-cycle.
+ */
 public interface ISessionManager {
 
     public final static String NOT_IN_SESSION = "NOT_IN_SESSION";
+
+    /**
+     * @return the active SharedProject object or <code>null</code> if there is
+     *         no active project.
+     */
+    public ISharedProject getSharedProject();
 
     /**
      * Starts a new shared project with the local user as only participant.
@@ -27,6 +43,9 @@ public interface ISessionManager {
 
     /**
      * Every Session is identified by an int as identifier.
+     * 
+     * Note: The session ID is also set during an invitation process being in
+     * handled
      * 
      * @return the session id of this session
      */
@@ -55,12 +74,6 @@ public interface ISessionManager {
      * Has no effect if there is no currently shared project.
      */
     public void stopSharedProject();
-
-    /**
-     * @return the active SharedProject object or <code>null</code> if there is
-     *         no active project.
-     */
-    public ISharedProject getSharedProject();
 
     /**
      * Add the given session listener. Is ignored if the listener is already
@@ -108,7 +121,11 @@ public interface ISessionManager {
      * Get the transmitter of the session.
      * 
      * @return the transmitter of the session
+     * 
+     * @deprecated Rather everybody should get their own instance via
+     *             PicoContainer
      */
+    @Deprecated
     public ITransmitter getTransmitter();
 
     /**

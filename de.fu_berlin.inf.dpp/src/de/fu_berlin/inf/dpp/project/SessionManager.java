@@ -48,8 +48,12 @@ import de.fu_berlin.inf.dpp.util.Util;
  * reacting to invitations. The user can be only part of one session at most.
  * 
  * @author rdjemili
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class SessionManager implements IConnectionListener, ISessionManager {
+
     private static Logger log = Logger
         .getLogger(SessionManager.class.getName());
 
@@ -66,6 +70,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     private String sessionID = NOT_IN_SESSION;
 
+    @Deprecated
     public ITransmitter getTransmitter() {
         return transmitter;
     }
