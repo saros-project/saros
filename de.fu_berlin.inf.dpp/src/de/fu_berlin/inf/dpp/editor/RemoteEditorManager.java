@@ -2,10 +2,12 @@ package de.fu_berlin.inf.dpp.editor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -283,6 +285,20 @@ public class RemoteEditorManager {
             if (state.isRemoteActiveEditor(path)) {
                 result.add(state.getUser());
             }
+        }
+        return result;
+    }
+
+    /**
+     * Returns a set of all paths representing the editors which are currently
+     * opened by the remote users of this shared session (i.e. not our own).
+     * 
+     * If no editors are opened an empty set is being returned.
+     */
+    public Set<IPath> getRemoteOpenEditors() {
+        Set<IPath> result = new HashSet<IPath>();
+        for (RemoteEditorState state : editorStates.values()) {
+            result.addAll(state.openEditors.keySet());
         }
         return result;
     }
