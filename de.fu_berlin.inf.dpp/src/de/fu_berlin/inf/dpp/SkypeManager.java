@@ -32,14 +32,19 @@ import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
  * 
  * @author rdjemili
  * @author oezbek
+ * 
+ * @picocontainer This component is managed by the PicoContainer in
+ *                {@link Saros}
  */
 public class SkypeManager implements IConnectionListener {
-    private static SkypeManager instance;
 
-    private final Map<JID, String> skypeNames = new HashMap<JID, String>();
+    protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
-    private SkypeManager() {
-        Saros.getDefault().addListener(this);
+    protected Saros saros;
+
+    public SkypeManager(Saros saros) {
+        this.saros = saros;
+        saros.addListener(this);
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager
             .addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
@@ -48,7 +53,7 @@ public class SkypeManager implements IConnectionListener {
          * Register for our preference store, so we can be notified if the Skype
          * Username changes.
          */
-        IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
+        IPreferenceStore prefs = saros.getPreferenceStore();
         prefs.addPropertyChangeListener(new IPropertyChangeListener() {
 
             public void propertyChange(PropertyChangeEvent event) {
@@ -61,22 +66,16 @@ public class SkypeManager implements IConnectionListener {
 
     }
 
-    public static SkypeManager getDefault() {
-        if (SkypeManager.instance == null) {
-            SkypeManager.instance = new SkypeManager();
-        }
-
-        return SkypeManager.instance;
-    }
-
     /**
      * Returns the Skype-URL for given roster entry.
      * 
      * @return the skype url for given roster entry or <code>null</code> if
      *         roster entry has no skype name.
+     * 
+     * @blocking This method is potentially long-running
      */
     public String getSkypeURL(RosterEntry rosterEntry) {
-        XMPPConnection connection = Saros.getDefault().getConnection();
+        XMPPConnection connection = saros.getConnection();
         JID jid = new JID(rosterEntry.getUser());
 
         String name;
@@ -94,29 +93,30 @@ public class SkypeManager implements IConnectionListener {
     }
 
     /**
-     * Send the given Username to all our contacts that are currently available.
+     * Send the given Skype user name to all our contacts that are currently
+     * available.
      * 
      * TODO SS only send to those, that we know use Saros.
      */
     public void publishSkypeIQ(String newSkypeName) {
         XMPPConnection connection = Saros.getDefault().getConnection();
-        if (connection != null) {
-            Roster roster = connection.getRoster();
-            if (roster != null) {
-                for (RosterEntry entry : roster.getEntries()) {
-                    String username = entry.getUser();
-                    Presence presence = roster.getPresence(username);
+        if (connection == null)
+            return;
 
-                    if (presence != null) {
-                        if (presence.isAvailable()) {
-                            SkypeIQ result = new SkypeIQ();
-                            result.setType(IQ.Type.SET);
-                            result.setTo(username + "/Smack");
-                            result.setName(newSkypeName);
-                            connection.sendPacket(result);
-                        }
-                    }
-                }
+        Roster roster = connection.getRoster();
+        if (roster == null)
+            return;
+
+        for (RosterEntry entry : roster.getEntries()) {
+            String username = entry.getUser();
+            Presence presence = roster.getPresence(username);
+
+            if (presence != null && presence.isAvailable()) {
+                SkypeIQ result = new SkypeIQ();
+                result.setType(IQ.Type.SET);
+                result.setTo(username + "/Smack");
+                result.setName(newSkypeName);
+                connection.sendPacket(result);
             }
         }
     }
@@ -154,16 +154,16 @@ public class SkypeManager implements IConnectionListener {
                 }
             }, new PacketTypeFilter(SkypeIQ.class));
         } else {
-            // Otherwise clear or cache
+            // Otherwise clear our cache
             skypeNames.clear();
         }
     }
 
     /**
-     * @return the local skype name or <code>null</code> if none is set.
+     * @return the local Skype name or <code>null</code> if none is set.
      */
-    private String getLocalSkypeName() {
-        IPreferenceStore prefs = Saros.getDefault().getPreferenceStore();
+    protected String getLocalSkypeName() {
+        IPreferenceStore prefs = saros.getPreferenceStore();
         return prefs.getString(PreferenceConstants.SKYPE_USERNAME);
     }
 
@@ -171,13 +171,13 @@ public class SkypeManager implements IConnectionListener {
      * Requests the Skype user name of given user. This method blocks up to 5
      * seconds to receive the value.
      * 
-     * @param connection
      * @param user
      *            the user for which the Skype name is requested.
      * @return the Skype user name of given user or <code>null</code> if the
-     *         user doesn't respond in time or has no Skype name.
+     *         user doesn't respond in time (5s) or has no Skype name.
      */
-    private static String requestSkypeName(XMPPConnection connection, JID user) {
+    protected static String requestSkypeName(XMPPConnection connection, JID user) {
+
         if ((connection == null) || !connection.isConnected()) {
             return null;
         }

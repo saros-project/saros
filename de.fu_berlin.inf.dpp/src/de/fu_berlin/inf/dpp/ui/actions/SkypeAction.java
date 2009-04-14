@@ -7,7 +7,9 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -22,10 +24,16 @@ public class SkypeAction extends SelectionProviderAction {
     private static final Logger log = Logger.getLogger(SkypeAction.class
         .getName());
 
-    private String skypeURL;
+    protected String skypeURL;
+
+    @Inject
+    protected SkypeManager skypeManager;
 
     public SkypeAction(ISelectionProvider provider) {
         super(provider, "Skype this user");
+
+        Saros.getDefault().reinject(this);
+
         setEnabled(false);
 
         setToolTipText("Start a Skype-VoIP session with this user");
@@ -60,13 +68,12 @@ public class SkypeAction extends SelectionProviderAction {
         if ((selection.size() != 1) || !(item instanceof RosterEntry)) {
             setEnabled(false);
         } else {
+            setEnabled(false);
             Util.runSafeAsync("SkypeAction-", log, new Runnable() {
                 public void run() {
                     setEnabled(false);
-                    SkypeManager sm = SkypeManager.getDefault();
-                    SkypeAction.this.skypeURL = sm
-                        .getSkypeURL((RosterEntry) item);
-                    setEnabled(SkypeAction.this.skypeURL != null);
+                    skypeURL = skypeManager.getSkypeURL((RosterEntry) item);
+                    setEnabled(skypeURL != null);
                 }
             });
         }

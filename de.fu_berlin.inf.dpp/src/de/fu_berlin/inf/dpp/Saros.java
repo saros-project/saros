@@ -162,6 +162,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(SharedResourcesManager.class);
         this.container.addComponent(RoleManager.class);
+        this.container.addComponent(SkypeManager.class);
 
         reinjector = new Reinjector(this.container);
     }
@@ -206,8 +207,6 @@ public class Saros extends AbstractUIPlugin {
 
         setupLoggers();
         logger.debug("Starting Saros with id " + xmppFeatureID);
-
-        SkypeManager.getDefault();
 
         // Make sure that all components in the container are
         // instantiated
