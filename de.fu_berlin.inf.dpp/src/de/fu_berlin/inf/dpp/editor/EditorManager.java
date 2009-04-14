@@ -37,6 +37,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
@@ -69,6 +70,8 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
@@ -251,6 +254,9 @@ public class EditorManager implements IActivityProvider {
     protected IEditorAPI editorAPI;
 
     protected RemoteEditorManager remoteEditorManager;
+
+    protected final ConsistencyWatchdogServer consistencyWatchdog = new ConsistencyWatchdogServer(
+        "ConsistencyWatchdog");
 
     protected ISharedProject sharedProject;
 
@@ -442,32 +448,31 @@ public class EditorManager implements IActivityProvider {
             sharedProject.addListener(sharedProjectListener);
 
             // Add ConsistencyListener
-            Saros.getDefault().getSessionManager().getSharedProject()
-                .getConcurrentDocumentManager().getConsistencyToResolve().add(
-                    new ValueChangeListener<Boolean>() {
-                        public void setValue(Boolean inconsistency) {
-                            if (inconsistency) {
-                                Util.runSafeSWTSync(log, new Runnable() {
-                                    public void run() {
-                                        try {
-                                            // Open Session view
-                                            PlatformUI
-                                                .getWorkbench()
-                                                .getActiveWorkbenchWindow()
-                                                .getActivePage()
-                                                .showView(
-                                                    "de.fu_berlin.inf.dpp.ui.SessionView",
-                                                    null,
-                                                    IWorkbenchPage.VIEW_ACTIVATE);
-                                        } catch (PartInitException e) {
-                                            log
-                                                .error("Could not open session view!");
-                                        }
+            ConsistencyWatchdogClient.getDefault().getConsistencyToResolve()
+                .add(new ValueChangeListener<Boolean>() {
+                    public void setValue(Boolean inconsistency) {
+                        if (inconsistency) {
+                            Util.runSafeSWTSync(log, new Runnable() {
+                                public void run() {
+                                    try {
+                                        // Open Session view
+                                        PlatformUI
+                                            .getWorkbench()
+                                            .getActiveWorkbenchWindow()
+                                            .getActivePage()
+                                            .showView(
+                                                "de.fu_berlin.inf.dpp.ui.SessionView",
+                                                null,
+                                                IWorkbenchPage.VIEW_ACTIVATE);
+                                    } catch (PartInitException e) {
+                                        log
+                                            .error("Could not open session view!");
                                     }
-                                });
-                            }
+                                }
+                            });
                         }
-                    });
+                    }
+                });
 
             sharedProject.getActivityManager().addProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
@@ -499,6 +504,13 @@ public class EditorManager implements IActivityProvider {
                     }
                 }
             });
+
+            if (sharedProject.isHost()) {
+                log.debug("Starting consistency watchdog");
+                consistencyWatchdog.setSystem(true);
+                consistencyWatchdog.setPriority(Job.SHORT);
+                consistencyWatchdog.schedule();
+            }
         }
 
         /*
@@ -510,6 +522,10 @@ public class EditorManager implements IActivityProvider {
         public void sessionEnded(ISharedProject project) {
 
             assert sharedProject == project;
+
+            if (sharedProject.isHost()) {
+                consistencyWatchdog.stop();
+            }
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -720,8 +736,8 @@ public class EditorManager implements IActivityProvider {
     }
 
     /**
-     * Asks the ConcurrentDocumentManager if there are currently any
-     * inconsistencies to resolve.
+     * Asks the ConsistencyWatchdog if there are currently any inconsistencies
+     * to resolve.
      */
     public static boolean isConsistencyToResolve() {
         ISharedProject project = Saros.getDefault().getSessionManager()
@@ -730,7 +746,7 @@ public class EditorManager implements IActivityProvider {
         if (project == null)
             return false;
 
-        return project.getConcurrentDocumentManager().getConsistencyToResolve()
+        return ConsistencyWatchdogClient.getDefault().getConsistencyToResolve()
             .getValue();
     }
 
@@ -1572,5 +1588,17 @@ public class EditorManager implements IActivityProvider {
 
     public List<User> getRemoteActiveEditorUsers(IPath path) {
         return remoteEditorManager.getRemoteActiveEditorUsers(path);
+    }
+
+    /**
+     * Returns the set of paths representing the editors which are currently
+     * opened by the remote users and the local user.
+     * 
+     * Returns an empty set if no editors are opened.
+     */
+    public Set<IPath> getOpenEditorsOfAllParticipants() {
+        Set<IPath> result = remoteEditorManager.getRemoteOpenEditors();
+        result.addAll(locallyOpenEditors);
+        return result;
     }
 }

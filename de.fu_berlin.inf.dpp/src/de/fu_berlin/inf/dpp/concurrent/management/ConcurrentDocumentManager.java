@@ -1,32 +1,14 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.text.DocumentEvent;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentListener;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -40,26 +22,14 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
-import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 
-/**
- * TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or not,
- * etc.
- * 
- * TODO Extract ConsistencyWatchdog into a class on its own
- * 
- * TODO Split into a Server (run only on the host) and Client (run on the host
- * and client) component
- */
 public class ConcurrentDocumentManager {
 
     public static enum Side {
@@ -90,14 +60,6 @@ public class ConcurrentDocumentManager {
     private final Side side;
 
     private final ActivitySequencer sequencer;
-
-    private final ConsistencyWatchdog consistencyWatchdog = new ConsistencyWatchdog(
-        "ConsistencyWatchdog");
-
-    private final ObservableValue<Boolean> inconsistencyToResolve = new ObservableValue<Boolean>(
-        false);
-
-    private final Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
     private final ISharedProject sharedProject;
 
@@ -151,134 +113,6 @@ public class ConcurrentDocumentManager {
         }
     };
 
-    /**
-     * This class is an eclipse job run on the host side ONLY.
-     * 
-     * The job computes checksums for all files currently managed by Jupiter
-     * (the ConcurrentDocumentManager) and sends them to all guests.
-     * 
-     * These will call their ConcurrentDocumentManager.check(...) method, to
-     * verify that their version is correct.
-     * 
-     * Once started with schedule() the job is scheduled to rerun every 5
-     * seconds.
-     * 
-     * @author chjacob
-     */
-    public class ConsistencyWatchdog extends Job {
-
-        public ConsistencyWatchdog(String name) {
-            super(name);
-        }
-
-        // this map holds for all jupiter controlled documents the checksums
-        private final HashMap<IPath, DocumentChecksum> docsChecksums = new HashMap<IPath, DocumentChecksum>();
-
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-
-            assert isHostSide() : "This job is intended to be run on host side!";
-
-            // If connection is closed, checking does not make sense...
-            if (Saros.getDefault().getConnectionState() != ConnectionState.CONNECTED) {
-                // Reschedule the next run in 30 seconds
-                schedule(30000);
-                return Status.OK_STATUS;
-            }
-
-            Set<IDocument> missingDocuments = new HashSet<IDocument>(
-                registeredDocuments);
-
-            // Update Checksums for all documents controlled by jupiter
-            for (IPath docPath : clientDocs.keySet()) {
-
-                // Get document
-                IDocument doc = EditorManager.getDefault().getDocument(docPath);
-
-                // TODO CO Handle missing files correctly
-                if (doc == null) {
-                    logger.error("Can't get Document");
-                    docsChecksums.remove(docPath);
-                    continue;
-                }
-
-                // Update listener management
-                missingDocuments.remove(doc);
-                if (!registeredDocuments.contains(doc)) {
-                    registeredDocuments.add(doc);
-                    doc.addDocumentListener(dirtyListener);
-                    dirtyDocument.add(doc);
-                }
-
-                // If document not changed, skip
-                if (!dirtyDocument.contains(doc))
-                    continue;
-
-                // If no entry for this document exists create a new one
-                if (docsChecksums.get(docPath) == null) {
-                    DocumentChecksum c = new DocumentChecksum(docPath, doc
-                        .getLength(), doc.get().hashCode());
-                    docsChecksums.put(docPath, c);
-                } else {
-                    // else set new length and hash
-                    DocumentChecksum c = docsChecksums.get(docPath);
-                    c.setLength(doc.getLength());
-                    c.setHash(doc.get().hashCode());
-                }
-            }
-
-            // Reset dirty states
-            dirtyDocument.clear();
-
-            // Unregister all documents that are no longer there
-            for (IDocument missing : missingDocuments) {
-                registeredDocuments.remove(missing);
-                missing.removeDocumentListener(dirtyListener);
-            }
-
-            // Send to all Clients
-            if (docsChecksums.values().size() > 0) {
-                // TODO Connection of Transmitter might be closed at the moment
-                Saros.getDefault().getSessionManager().getTransmitter()
-                    .sendDocChecksumsToClients(docsChecksums.values());
-            }
-
-            // Reschedule the next run in 10 seconds
-            schedule(10000);
-            return Status.OK_STATUS;
-        }
-
-        Set<IDocument> registeredDocuments = new HashSet<IDocument>();
-
-        Set<IDocument> dirtyDocument = new HashSet<IDocument>();
-
-        public IDocumentListener dirtyListener = new IDocumentListener() {
-
-            public void documentAboutToBeChanged(DocumentEvent event) {
-                // we are only interested in events after the change
-            }
-
-            public void documentChanged(DocumentEvent event) {
-                dirtyDocument.add(event.getDocument());
-            }
-        };
-
-        public void stop() {
-
-            // Cancel Job
-            cancel();
-
-            // Unregister from all documents
-            for (IDocument document : registeredDocuments) {
-                document.removeDocumentListener(dirtyListener);
-            }
-            registeredDocuments.clear();
-
-            // Reset all dirty states
-            dirtyDocument.clear();
-        }
-    }
-
     public ConcurrentDocumentManager(final Side side, User host, JID myJID,
         ISharedProject sharedProject, ActivitySequencer sequencer) {
 
@@ -290,10 +124,6 @@ public class ConcurrentDocumentManager {
 
         if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
-            logger.debug("Starting consistency watchdog");
-            consistencyWatchdog.setSystem(true);
-            consistencyWatchdog.setPriority(Job.SHORT);
-            consistencyWatchdog.schedule();
 
             projectListener = new HostSideProjectListener();
         } else {
@@ -314,13 +144,6 @@ public class ConcurrentDocumentManager {
                         .removeSessionListener(this);
 
                     endedProject.removeListener(projectListener);
-
-                    if (isHostSide()) {
-                        consistencyWatchdog.stop();
-                    }
-
-                    // TODO we should not need this
-                    pathsWithWrongChecksums.clear();
                 }
             });
     }
@@ -699,144 +522,6 @@ public class ConcurrentDocumentManager {
      */
     public boolean isManagedByJupiter(IPath path) {
         return this.clientDocs.containsKey(path);
-    }
-
-    ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
-        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1),
-        new NamedThreadFactory("ChecksumCruncher-"));
-
-    /**
-     * Starts a new Consistency Check.
-     * 
-     * If a check is already in progress, nothing happens (but a warning)
-     * 
-     * @nonBlocking This method returns immediately.
-     */
-    public void checkConsistency() {
-
-        try {
-            executor.submit(Util.wrapSafe(logger, new Runnable() {
-                public void run() {
-                    performCheck(currentChecksums);
-                }
-            }));
-        } catch (RejectedExecutionException e) {
-            /*
-             * Ignore Checksums that arrive before we are done processing the
-             * last set of Checksums.
-             */
-            logger
-                .warn("Received Checksums before processing of previous checksums finished");
-        }
-
-    }
-
-    List<DocumentChecksum> currentChecksums;
-
-    public void setChecksums(List<DocumentChecksum> checksums) {
-        this.currentChecksums = checksums;
-    }
-
-    /**
-     * Checks the local documents against the given checksums.
-     * 
-     * Use the VariableProxy getConsistenciesToResolve() to be notified if
-     * inconsistencies are found or resolved.
-     * 
-     * @param checksums
-     *            the checksums to check the documents against
-     * 
-     * @nonReentrant This method cannot be called twice at the same time.
-     */
-    public void performCheck(List<DocumentChecksum> checksums) {
-
-        if (checksums == null) {
-            logger
-                .warn("Consistency Check triggered with out preceeding call to setChecksums()");
-            return;
-        }
-
-        logger.trace(String.format(
-            "Received %d checksums for %d inconsistencies", checksums.size(),
-            pathsWithWrongChecksums.size()));
-
-        ConcurrentDocumentManager.this.pathsWithWrongChecksums.clear();
-
-        for (DocumentChecksum checksum : checksums) {
-            if (isInconsistent(checksum)) {
-
-                ConcurrentDocumentManager.this.pathsWithWrongChecksums
-                    .add(checksum.getPath());
-            }
-        }
-
-        if (pathsWithWrongChecksums.isEmpty()) {
-            if (inconsistencyToResolve.getValue()) {
-                logger.info("All Inconsistencies are resolved");
-                inconsistencyToResolve.setValue(false);
-            }
-        } else {
-            inconsistencyToResolve.setValue(true);
-        }
-
-    }
-
-    private boolean isInconsistent(DocumentChecksum checksum) {
-        IPath path = checksum.getPath();
-
-        IFile file = sharedProject.getProject().getFile(path);
-        if (!file.exists()) {
-            return true;
-        }
-
-        IDocument doc = EditorManager.getDefault().getDocument(path);
-
-        // if doc is still null give up
-        if (doc == null) {
-            logger
-                .warn("Could not check checksum of file " + path.toOSString());
-            return false;
-        }
-
-        if ((doc.getLength() != checksum.getLength())
-            || (doc.get().hashCode() != checksum.getHash())) {
-
-            long lastEdited = (EditorManager.getDefault().getLastEditTime(path));
-
-            long lastRemoteEdited = (EditorManager.getDefault()
-                .getLastRemoteEditTime(path));
-
-            if ((System.currentTimeMillis() - lastEdited) > 4000
-                && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
-
-                logger.debug(String.format(
-                    "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)", path
-                        .toString(), doc.getLength(),
-                    doc.getLength() == checksum.getLength() ? "==" : "!=",
-                    checksum.getLength(), doc.get().hashCode(), doc.get()
-                        .hashCode() == checksum.getHash() ? "==" : "!=",
-                    checksum.getHash()));
-
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns the variable proxy which stores the current inconsistency state
-     * 
-     */
-    public ObservableValue<Boolean> getConsistencyToResolve() {
-        return this.inconsistencyToResolve;
-    }
-
-    /**
-     * Returns the set of files for which the ConsistencyWatchdog has identified
-     * an inconsistency (this is a subset of the files managed by Jupiter)
-     */
-    public Set<IPath> getPathsWithWrongChecksums() {
-        return this.pathsWithWrongChecksums;
     }
 
     /**

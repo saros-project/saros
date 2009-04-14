@@ -23,6 +23,7 @@ import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -47,6 +48,9 @@ public class ConsistencyAction extends Action {
     protected boolean executingChecksumErrorHandling;
 
     protected Set<IPath> pathsOfHandledFiles;
+
+    protected ConsistencyWatchdogClient watchdogClient = ConsistencyWatchdogClient
+        .getDefault();
 
     @Inject
     SessionManager sessionManager;
@@ -86,8 +90,8 @@ public class ConsistencyAction extends Action {
         // Unregister from previous project
         if (sharedProject != null) {
             this.pathsOfHandledFiles.clear();
-            sharedProject.getConcurrentDocumentManager()
-                .getConsistencyToResolve().remove(isConsistencyListener);
+            watchdogClient.getConsistencyToResolve().remove(
+                isConsistencyListener);
 
         }
 
@@ -96,8 +100,8 @@ public class ConsistencyAction extends Action {
         // Register to new project
         if (sharedProject != null) {
             this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>();
-            sharedProject.getConcurrentDocumentManager()
-                .getConsistencyToResolve().addAndNotify(isConsistencyListener);
+            watchdogClient.getConsistencyToResolve().addAndNotify(
+                isConsistencyListener);
         } else {
             setEnabled(false);
         }
@@ -111,9 +115,7 @@ public class ConsistencyAction extends Action {
 
             if (newValue) {
                 final Set<IPath> paths = new CopyOnWriteArraySet<IPath>(
-                    sessionManager.getSharedProject()
-                        .getConcurrentDocumentManager()
-                        .getPathsWithWrongChecksums());
+                    watchdogClient.getPathsWithWrongChecksums());
 
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
@@ -192,7 +194,7 @@ public class ConsistencyAction extends Action {
 
             // Trigger a new consistency check, so we don't have to wait for new
             // checksums from the host
-            concurrentManager.checkConsistency();
+            watchdogClient.checkConsistency();
 
             return true;
         }
@@ -293,9 +295,7 @@ public class ConsistencyAction extends Action {
             public void run() {
                 // TODO move this into ConsistencyWatchdog
                 pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(
-                    sessionManager.getSharedProject()
-                        .getConcurrentDocumentManager()
-                        .getPathsWithWrongChecksums());
+                    watchdogClient.getPathsWithWrongChecksums());
 
                 if (executingChecksumErrorHandling) {
                     log.warn("Restarting Checksum Error Handling"

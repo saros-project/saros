@@ -19,6 +19,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -236,11 +237,11 @@ public class ConsistencyWatchdogHandler {
 
             assert currentProject != null;
 
-            ConcurrentDocumentManager concurrentManager = currentProject
-                .getConcurrentDocumentManager();
+            ConsistencyWatchdogClient watchdogClient = ConsistencyWatchdogClient
+                .getDefault();
 
-            concurrentManager.setChecksums(checksums);
-            concurrentManager.checkConsistency();
+            watchdogClient.setChecksums(checksums);
+            watchdogClient.checkConsistency();
         }
     };
 
