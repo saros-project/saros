@@ -20,18 +20,18 @@
 package de.fu_berlin.inf.dpp.activities;
 
 /**
- * A generic interface for activities that happen in sessions. All activities
- * should be implemented by the value pattern, i.e. created activities are
- * immutable.
+ * An interface for all things that occur in a shared project session such as
+ * editing a file, opening or closing editors, switching roles, etc.
+ * 
+ * All activities should be implemented using the value pattern, i.e. created
+ * activities should be immutable.
  * 
  * @author rdjemili
  */
 public interface IActivity {
 
     /**
-     * Get jabber_id of remote producer
-     * 
-     * @return jabber_id
+     * Returns the Jabber ID of the user which has caused this activity.
      */
     public String getSource();
 
