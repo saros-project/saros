@@ -71,13 +71,14 @@ import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
-import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
+import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -159,6 +160,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JingleFileTransferManagerObservable.class);
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(SubscriptionListener.class);
+        this.container.addComponent(SharedResourcesManager.class);
+        this.container.addComponent(RoleManager.class);
 
         reinjector = new Reinjector(this.container);
     }
@@ -204,7 +207,6 @@ public class Saros extends AbstractUIPlugin {
         setupLoggers();
         logger.debug("Starting Saros with id " + xmppFeatureID);
 
-        ActivityRegistry.getDefault();
         SkypeManager.getDefault();
 
         // Make sure that all components in the container are

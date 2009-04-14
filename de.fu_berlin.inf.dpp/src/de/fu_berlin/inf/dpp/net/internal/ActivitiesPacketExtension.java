@@ -108,7 +108,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
             sequenceNumber++;
 
             IActivity activity = timedActivity.getActivity();
-            activity.toXML(buf);
+            buf.append(activity.toXML());
         }
 
         buf.append("</").append(getElementName()).append(">");

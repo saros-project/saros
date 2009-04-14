@@ -27,9 +27,8 @@ import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.project.ActivityRegistry;
 
 public class ActivitiesExtensionProvider implements PacketExtensionProvider {
 
@@ -47,25 +46,15 @@ public class ActivitiesExtensionProvider implements PacketExtensionProvider {
         while (!done) {
             int eventType = parser.next();
             if (eventType == XmlPullParser.START_TAG) {
-
                 if (parser.getName().equals(
                     ActivitiesPacketExtension.SESSION_ID)) {
                     sessionID = parseSessionId(parser);
-                }
-                if (parser.getName().equals("timestamp")) {
+                } else if (parser.getName().equals("timestamp")) {
                     sequenceNumber = parseSequenceNumber(parser);
+                } else {
+                    timedActivities.add(new TimedActivity(AbstractActivity
+                        .parse(parser), sequenceNumber++));
                 }
-
-                ActivityRegistry activityRegistry = ActivityRegistry
-                    .getDefault();
-                IActivity activity = activityRegistry.parseActivity(parser);
-                if (activity != null) {
-                    assert sequenceNumber != TimedActivity.UNKNOWN_SEQUENCE_NR;
-                    timedActivities.add(new TimedActivity(activity,
-                        sequenceNumber));
-                    sequenceNumber++;
-                }
-
             } else if (eventType == XmlPullParser.END_TAG) {
                 if (parser.getName().equals("activities")) {
                     done = true;

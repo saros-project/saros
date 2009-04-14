@@ -99,9 +99,8 @@ public class TextSelectionActivity extends AbstractActivity {
         return receiver.receive(this);
     }
 
-    public void toXML(StringBuilder sb) {
+    public String toXML() {
         assert getEditor() != null;
-
-        sb.append(xstream.toXML(this));
+        return xstream.toXML(this);
     }
 }

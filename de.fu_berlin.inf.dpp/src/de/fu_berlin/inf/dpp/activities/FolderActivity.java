@@ -40,7 +40,7 @@ public class FolderActivity extends AbstractActivity {
         return receiver.receive(this);
     }
 
-    public void toXML(StringBuilder sb) {
-        sb.append(xstream.toXML(this));
+    public String toXML() {
+        return xstream.toXML(this);
     }
 }

@@ -477,7 +477,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             .createFileListTransferDescription(recipient, new JID(connection
                 .getUser()));
         /*
-         * TODO Not portable because String#getBytes() uses the platform's
+         * TODO [MR] Not portable because String#getBytes() uses the platform's
          * default encoding.
          */
         dataManager.sendData(data, fileList.toXML().getBytes(), callback);

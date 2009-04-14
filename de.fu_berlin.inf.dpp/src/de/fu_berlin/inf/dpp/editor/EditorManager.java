@@ -57,12 +57,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
@@ -94,7 +92,6 @@ import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
-import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
  * The EditorManager is responsible for handling all editors in a DPP-session.
@@ -1082,27 +1079,6 @@ public class EditorManager implements IActivityProvider {
      */
     protected Set<IEditorPart> getEditors(IPath path) {
         return this.editorPool.getEditors(path);
-    }
-
-    public IActivity fromXML(XmlPullParser parser) {
-        /*
-         * TODO When all activities are switched to XStream, this method can be
-         * deleted and parsing can be handled in the caller of this method.
-         */
-        boolean canParse = false;
-        for (String tagName : new String[] { "editor", "edit", "textSelection",
-            "viewport" }) {
-            if (parser.getName().equals(tagName)) {
-                canParse = true;
-                break;
-            }
-        }
-        if (canParse) {
-            return (IActivity) AbstractActivity.xstream
-                .unmarshal(new XppReader(parser));
-        } else {
-            return null;
-        }
     }
 
     protected boolean isSharedEditor(IEditorPart editorPart) {

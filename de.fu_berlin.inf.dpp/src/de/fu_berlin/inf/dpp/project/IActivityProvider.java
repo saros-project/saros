@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.project;
 
-import org.xmlpull.v1.XmlPullParser;
-
 import de.fu_berlin.inf.dpp.activities.IActivity;
 
 /**
@@ -18,10 +16,4 @@ public interface IActivityProvider {
     public void addActivityListener(IActivityListener listener);
 
     public void removeActivityListener(IActivityListener listener);
-
-    /**
-     * Converts the XML doc to an activity.
-     */
-    public IActivity fromXML(XmlPullParser parser);
-
 }

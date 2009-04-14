@@ -18,7 +18,7 @@ public class IPathConverter extends AbstractSingleValueConverter {
     @SuppressWarnings("unchecked")
     @Override
     public boolean canConvert(Class clazz) {
-        return clazz.equals(IPath.class) || clazz.equals(Path.class);
+        return clazz.isAssignableFrom(IPath.class);
     }
 
     @Override

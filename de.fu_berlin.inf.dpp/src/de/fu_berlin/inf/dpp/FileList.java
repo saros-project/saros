@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -42,7 +41,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 /**
@@ -58,7 +56,7 @@ public class FileList {
      * {@link XStream} instance to serialize {@link FileList} objects to and
      * from XML.
      */
-    public static final XStream xstream = new XStream();
+    protected static XStream xstream;
 
     /**
      * @invariant Contains all entries from this.added, this.altered, and
@@ -77,9 +75,7 @@ public class FileList {
 
     private final Map<IPath, Long> unaltered = new HashMap<IPath, Long>();
 
-    private static final Comparator<IPath> PATH_LENGTH_COMPARATOR = new PathLengthComprarator();
-
-    public static class PathLengthComprarator implements Comparator<IPath>,
+    public static class PathLengthComparator implements Comparator<IPath>,
         Serializable {
 
         private static final long serialVersionUID = 8656330038498525163L;
@@ -92,12 +88,6 @@ public class FileList {
         public int compare(IPath path1, IPath path2) {
             return path1.toString().length() - path2.toString().length();
         }
-    }
-
-    static {
-        xstream.registerConverter(new IPathConverter());
-        xstream.aliasType("path", Path.class);
-        xstream.processAnnotations(FileList.class);
     }
 
     /**
@@ -200,6 +190,16 @@ public class FileList {
             * diff(other).getUnalteredPaths().size() / getPaths().size();
     }
 
+    protected static XStream getXStream() {
+        if (xstream == null) {
+            xstream = new XStream();
+            xstream.registerConverter(new IPathConverter());
+            xstream.aliasType("path", Path.class);
+            xstream.processAnnotations(FileList.class);
+        }
+        return xstream;
+    }
+
     /**
      * @return a sorted list of all paths in this file list. The paths are
      *         sorted by their character length.
@@ -230,7 +230,7 @@ public class FileList {
      * @see #fromXML(String)
      */
     public String toXML() {
-        return xstream.toXML(this);
+        return getXStream().toXML(this);
     }
 
     /**
@@ -239,7 +239,7 @@ public class FileList {
      * @see FileList#toXML()
      */
     public static FileList fromXML(String xml) {
-        return (FileList) xstream.fromXML(xml);
+        return (FileList) getXStream().fromXML(xml);
     }
 
     /**
@@ -292,7 +292,7 @@ public class FileList {
 
     private List<IPath> sorted(Set<IPath> pathSet) {
         List<IPath> paths = new ArrayList<IPath>(pathSet);
-        Collections.sort(paths, this.PATH_LENGTH_COMPARATOR);
+        Collections.sort(paths, new PathLengthComparator());
         return paths;
     }
 
@@ -327,29 +327,5 @@ public class FileList {
                 addMembers(folder.members(), members, ignoreDerived);
             }
         }
-    }
-
-    private void appendFileGroup(StringBuilder sb, String element,
-        Map<IPath, Long> map) {
-
-        if (map.size() == 0) {
-            return;
-        }
-
-        sb.append('<').append(element).append('>');
-        for (Entry<IPath, Long> entry : map.entrySet()) {
-            IPath path = entry.getKey();
-
-            if (path.hasTrailingSeparator()) {
-                sb.append("<folder path=\"").append(
-                    Util.urlEscape(path.toPortableString())).append("\"/>");
-            } else {
-                long checksum = entry.getValue();
-                sb.append("<file path=\"").append(
-                    Util.urlEscape(path.toPortableString())).append("\" ");
-                sb.append("checksum=\"").append(checksum).append("\"/>");
-            }
-        }
-        sb.append("</").append(element).append('>');
     }
 }

@@ -45,9 +45,8 @@ public interface IActivity {
     public boolean dispatch(IActivityReceiver receiver);
 
     /**
-     * Implementors should append an XML representation of themselves on the
-     * given StringBuilder.
+     * Implementors should return an XML representation of themselves.
      */
-    public void toXML(StringBuilder sb);
+    public String toXML();
 
 }

@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.xmlpull.v1.XmlPullParser;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -10,9 +11,9 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
+import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 // TODO Add some information what needs to be done to add a new activity.
 public abstract class AbstractActivity implements IActivity {
@@ -21,14 +22,19 @@ public abstract class AbstractActivity implements IActivity {
     private static final Logger log = Logger.getLogger(AbstractActivity.class
         .getName());
 
-    // TODO Move to ActivityPacketExtension or ActivityRegistry.
-    public static final XStream xstream = new XStream();
+    // TODO [MR] Move to ActivitiesPacketExtension.
+    protected static final XStream xstream = new XStream();
 
     @XStreamAsAttribute
     @XStreamConverter(UrlEncodingStringConverter.class)
     protected final String source;
 
-    // TODO Move to ActivityPacketExtension or ActivityRegistry.
+    /*
+     * TODO [MR] Move to ActivityPacketExtension.
+     * 
+     * TODO [MR] Create a static getter for this.xstream create the field
+     * lazily.
+     */
     static {
         /*
          * Register converters and classes that will be (de)serialized with the
@@ -69,21 +75,12 @@ public abstract class AbstractActivity implements IActivity {
         return ObjectUtils.equals(this.source, other.source);
     }
 
-    // TODO Remove when not needed anymore.
-    public void sourceToXML(StringBuilder sb) {
-        sb.append("source=\"" + Util.urlEscape(this.source) + "\" ");
-    }
-
-    public String toXML() {
-        // TODO When all Activities use XStream the StringBuilder can be
-        // removed.
-        StringBuilder sb = new StringBuilder();
-        this.toXML(sb);
-        return sb.toString();
-    }
-
     public User getUser() {
         return Saros.getDefault().getSessionManager().getSharedProject()
             .getParticipant(new JID(source));
+    }
+
+    public static IActivity parse(XmlPullParser parser) {
+        return (IActivity) xstream.unmarshal(new XppReader(parser));
     }
 }

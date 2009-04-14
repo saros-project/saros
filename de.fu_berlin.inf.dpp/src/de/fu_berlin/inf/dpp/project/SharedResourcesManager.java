@@ -34,17 +34,14 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -285,21 +282,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         } finally {
             this.replicationInProgess = false;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.IActivityProvider
-     */
-    public IActivity fromXML(XmlPullParser parser) {
-        String name = parser.getName();
-        if (name.equals("file") || name.equals("folder")) {
-            return (IActivity) AbstractActivity.xstream
-                .unmarshal(new XppReader(parser));
-        } else {
-            return null;
         }
     }
 
