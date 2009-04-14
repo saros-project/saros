@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
 
 /**
@@ -22,7 +23,8 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
  * 
  * @author oezbek
  * 
- * @component Instances of this class are created via PicoContainer
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class JDTFacade implements IJDTSupport {
 

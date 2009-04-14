@@ -51,6 +51,9 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  * 
  *         TODO Needs Review and Clean-up
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class MessagingManager implements PacketListener, MessageListener,
     IConnectionListener, InvitationListener {

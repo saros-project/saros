@@ -20,6 +20,9 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
  * This manager is responsible for handling driver changes.
  * 
  * @author rdjemili
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class RoleManager implements IActivityProvider {
 

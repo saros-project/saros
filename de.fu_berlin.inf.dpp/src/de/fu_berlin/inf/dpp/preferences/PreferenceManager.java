@@ -19,12 +19,14 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * SharedProject session is started
  * 
  * b.) restoring the preference after the end of the session
- *
- * c.) TODO Tracking changes to the preferences during the session and warning the user
- *
+ * 
+ * c.) TODO Tracking changes to the preferences during the session and warning
+ * the user
+ * 
  * d.) TODO Show proper warnings to the user
  * 
- * @component The instances of this class are managed using PicoContainer
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class PreferenceManager {
 

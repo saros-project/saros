@@ -87,8 +87,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * Hides the complexity of dealing with changing XMPPConnection objects and
  * provides convenience functions for sending messages.
  * 
- * @Component The single instance of this class per application is managed by
- *            PicoContainer
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {

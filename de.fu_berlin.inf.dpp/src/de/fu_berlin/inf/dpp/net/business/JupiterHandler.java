@@ -8,6 +8,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
@@ -21,8 +22,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * requests are dispatched to the receiveRequest method of the
  * ActivitySequencer.
  * 
- * @Component The single instance of this class per application is managed by
- *            PicoContainer
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class JupiterHandler {
 

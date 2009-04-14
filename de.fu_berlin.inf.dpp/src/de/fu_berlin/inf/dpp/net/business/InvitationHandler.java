@@ -16,6 +16,9 @@ import de.fu_berlin.inf.dpp.project.ISessionManager;
 
 /**
  * Business Logic for handling Invitation requests
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class InvitationHandler extends InviteExtension {
 

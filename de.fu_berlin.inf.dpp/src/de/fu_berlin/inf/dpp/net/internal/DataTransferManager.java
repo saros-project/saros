@@ -54,8 +54,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * This class is responsible for handling all transfers of binary data
  * 
- * @Component The single instance of this class per application is managed by
- *            PicoContainer
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class DataTransferManager implements ConnectionSessionListener {
 

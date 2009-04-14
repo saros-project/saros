@@ -22,6 +22,13 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
+/**
+ * This class is responsible for parsing RequestForActivities and sending the
+ * requested activities back.
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
+ */
 public class RequestForActivityHandler extends RequestActivityExtension {
 
     @Inject

@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.fu_berlin.inf.dpp.Saros;
+
 /**
  * 
  * Class which hides access to the CDT Plugin functionality, so that Saros only
@@ -16,6 +18,9 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
  * To make this work, no static dependencies to CDTSupport may exist.
  * 
  * @author oezbek
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class CDTFacade implements ICDTSupport {
 

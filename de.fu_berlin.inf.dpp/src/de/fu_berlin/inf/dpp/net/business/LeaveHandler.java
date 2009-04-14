@@ -16,6 +16,9 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 
 /**
  * Business logic for handling Leave Message
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class LeaveHandler extends LeaveExtension {
 

@@ -9,7 +9,10 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * Implements the lifecycle management of all ConnectionSessionListeners
+ * Implements the life-cycle management of all ConnectionSessionListeners
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class ConnectionSessionManager {
 

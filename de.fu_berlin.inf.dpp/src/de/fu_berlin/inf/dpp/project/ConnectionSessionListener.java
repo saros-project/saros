@@ -5,6 +5,8 @@ package de.fu_berlin.inf.dpp.project;
 
 import org.jivesoftware.smack.XMPPConnection;
 
+import de.fu_berlin.inf.dpp.Saros;
+
 /**
  * The general contract of this listener is that the order of calls to these
  * methods will always be in the following order:
@@ -18,6 +20,9 @@ import org.jivesoftware.smack.XMPPConnection;
  * 
  * Once the session has been disposed it can only be prepared again.
  * 
+ * @component All implementors need to be added to the PicoContainer in the
+ *            central plug-in class {@link Saros} to be automatically injected
+ *            into the {@link ConnectionSessionManager}
  */
 public interface ConnectionSessionListener {
 

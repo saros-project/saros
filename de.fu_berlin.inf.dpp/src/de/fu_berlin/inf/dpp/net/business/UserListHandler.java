@@ -19,7 +19,14 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
+/**
+ * This class is responsible for parsing and processing a user list sent to us.
+ * 
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
+ */
 public class UserListHandler extends UserListExtension {
 
     @Override
@@ -34,6 +41,9 @@ public class UserListHandler extends UserListExtension {
     @Inject
     protected IXMPPTransmitter transmitter;
 
+    @Inject
+    protected SessionManager sessionManager;
+
     public UserListHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
     }
@@ -41,8 +51,7 @@ public class UserListHandler extends UserListExtension {
     @Override
     public void userListReceived(JID fromJID, List<User> userList) {
 
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
 
         assert project != null;
         assert project.getHost().getJID().equals(fromJID);

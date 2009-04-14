@@ -33,8 +33,8 @@ import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
  * @author rdjemili
  * @author oezbek
  * 
- * @picocontainer This component is managed by the PicoContainer in
- *                {@link Saros}
+ * @component The single instance of this class per application is created by
+ *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class SkypeManager implements IConnectionListener {
 
