@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -27,27 +28,101 @@ import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamImplicit;
+
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
+import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 public class ActivitiesPacketExtension implements PacketExtension {
 
     private static final Logger log = Logger
         .getLogger(ActivitiesPacketExtension.class.getName());
 
+    protected static XStream xstream;
+
     public static PacketFilter getFilter() {
         return new PacketExtensionFilter(ELEMENT, NAMESPACE);
     }
 
+    // TODO This string constant is defined several times throughout the source.
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
-
-    public static final String SESSION_ID = "sessionID";
 
     public static final String ELEMENT = "activities";
 
     private List<TimedActivity> activities;
 
     private String sessionID;
+
+    /**
+     * Simple helper class for (de)serializion with {@link XStream}.
+     * 
+     * Only the first sequence number of the contained activities is stored and
+     * transmitted, which means all given activities must have consecutive,
+     * increasing sequence numbers.
+     */
+    @XStreamAlias(ELEMENT)
+    public static class Content {
+        @XStreamAsAttribute
+        protected String xmlns = NAMESPACE;
+
+        @XStreamAsAttribute
+        protected String sessionID;
+
+        @XStreamAsAttribute
+        protected int firstSequenceNumber;
+
+        @XStreamImplicit
+        protected List<IActivity> activities;
+
+        public Content(String sessionID, List<TimedActivity> activities) {
+            this.sessionID = sessionID;
+            this.firstSequenceNumber = activities.get(0).getSequenceNumber();
+            int sequenceNumber = this.firstSequenceNumber;
+            this.activities = new ArrayList<IActivity>(activities.size());
+            for (TimedActivity timedActivity : activities) {
+                if (timedActivity.getSequenceNumber() != sequenceNumber) {
+                    log
+                        .error("Sequence number in activity ("
+                            + timedActivity.getSequenceNumber()
+                            + ") does not match expected number: "
+                            + sequenceNumber);
+                }
+                sequenceNumber++;
+
+                this.activities.add(timedActivity.getActivity());
+            }
+        }
+
+        public String getSessionID() {
+            return sessionID;
+        }
+
+        public List<TimedActivity> getTimedActivities() {
+            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
+                activities.size());
+            /*
+             * There is only one sequence number in the message, so all
+             * activities get increasing numbers based on that sequence number.
+             */
+            int sequenceNumber = firstSequenceNumber;
+            for (IActivity activity : activities) {
+                result.add(new TimedActivity(activity, sequenceNumber++));
+            }
+            return result;
+        }
+    }
 
     public ActivitiesPacketExtension(String sessionID,
         List<TimedActivity> activities) {
@@ -56,6 +131,24 @@ public class ActivitiesPacketExtension implements PacketExtension {
         }
         this.sessionID = sessionID;
         this.activities = activities;
+    }
+
+    public static XStream getXStream() {
+        if (xstream == null) {
+            xstream = new XStream();
+            /*
+             * Register converters and classes that will be (de)serialized with
+             * the XStream instance.
+             */
+            xstream.registerConverter(new IPathConverter());
+            xstream.processAnnotations(Content.class);
+            // Add new activities here:
+            xstream.processAnnotations(new Class[] { AbstractActivity.class,
+                EditorActivity.class, FileActivity.class, FolderActivity.class,
+                RoleActivity.class, TextEditActivity.class,
+                TextSelectionActivity.class, ViewportActivity.class });
+        }
+        return xstream;
     }
 
     /*
@@ -80,44 +173,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
         return this.activities;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jivesoftware.smack.packet.PacketExtension#toXML()
-     */
     public String toXML() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("<").append(getElementName());
-        buf.append(" xmlns=\"").append(getNamespace()).append("\">");
-
-        buf.append(sessionIdToXML());
-        /*
-         * Only the first sequence number is put into the message, which means
-         * all given activities must have consecutive, increasing sequence
-         * numbers.
-         */
-        int sequenceNumber = this.activities.get(0).getSequenceNumber();
-        buf.append("<timestamp>").append(sequenceNumber).append("</timestamp>");
-
-        for (TimedActivity timedActivity : this.activities) {
-            if (timedActivity.getSequenceNumber() != sequenceNumber) {
-                log.error("Sequence number in activity ("
-                    + timedActivity.getSequenceNumber()
-                    + ") does not match expected number: " + sequenceNumber);
-            }
-            sequenceNumber++;
-
-            IActivity activity = timedActivity.getActivity();
-            buf.append(activity.toXML());
-        }
-
-        buf.append("</").append(getElementName()).append(">");
-        return buf.toString();
-    }
-
-    private String sessionIdToXML() {
-        return "<" + ActivitiesPacketExtension.SESSION_ID + ">" + sessionID
-            + "</" + ActivitiesPacketExtension.SESSION_ID + ">";
+        return getXStream().toXML(new Content(sessionID, activities));
     }
 
     @Override

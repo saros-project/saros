@@ -19,69 +19,18 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivity;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension.Content;
+import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 public class ActivitiesExtensionProvider implements PacketExtensionProvider {
 
-    public ActivitiesPacketExtension parseExtension(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-
-        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>();
-        String sessionID = null;
-        /*
-         * There is only one sequence number in the message, so all activities
-         * get increasing numbers based on that sequence number.
-         */
-        int sequenceNumber = TimedActivity.UNKNOWN_SEQUENCE_NR;
-        boolean done = false;
-        while (!done) {
-            int eventType = parser.next();
-            if (eventType == XmlPullParser.START_TAG) {
-                if (parser.getName().equals(
-                    ActivitiesPacketExtension.SESSION_ID)) {
-                    sessionID = parseSessionId(parser);
-                } else if (parser.getName().equals("timestamp")) {
-                    sequenceNumber = parseSequenceNumber(parser);
-                } else {
-                    timedActivities.add(new TimedActivity(AbstractActivity
-                        .parse(parser), sequenceNumber++));
-                }
-            } else if (eventType == XmlPullParser.END_TAG) {
-                if (parser.getName().equals("activities")) {
-                    done = true;
-                }
-            }
-        }
-
-        return new ActivitiesPacketExtension(sessionID, timedActivities);
-    }
-
-    private String parseSessionId(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-
-        parser.next(); // read text
-        String sessionID = parser.getText();
-        parser.next(); // read end tag
-
-        return sessionID;
-    }
-
-    private int parseSequenceNumber(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-
-        parser.next(); // read text
-        int result = Integer.parseInt(parser.getText());
-        parser.next(); // read end tag
-
-        return result;
+    public ActivitiesPacketExtension parseExtension(XmlPullParser parser) {
+        Content content = (Content) ActivitiesPacketExtension.getXStream()
+            .unmarshal(new XppReader(parser));
+        return new ActivitiesPacketExtension(content.getSessionID(), content
+            .getTimedActivities());
     }
 }
