@@ -167,7 +167,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
         /* 1. execute locally */
         doc.execOperation(op);
         /* 2. transform operation. */
-        Request req = algorithm.generateRequest(op);
+        Request req = algorithm.generateRequest(op, this.jid, null);
         /* sent to client */
         // connection.sendOperation(jid, req,delay);
         connection.sendOperation(new NetworkRequest(this.jid, jid, req), delay);

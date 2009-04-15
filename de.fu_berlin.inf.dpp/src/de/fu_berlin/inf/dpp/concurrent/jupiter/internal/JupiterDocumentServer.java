@@ -71,9 +71,8 @@ public class JupiterDocumentServer {
 
             Jupiter remoteProxy = entry.getValue();
 
-            Request transformed = remoteProxy.generateRequest(op);
-            transformed.setEditorPath(editor);
-            transformed.setJID(source);
+            Request transformed = remoteProxy.generateRequest(op, source,
+                editor);
 
             result.put(jid, transformed);
         }

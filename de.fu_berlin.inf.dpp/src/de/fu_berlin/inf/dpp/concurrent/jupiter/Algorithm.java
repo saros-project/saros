@@ -1,5 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
+import org.eclipse.core.runtime.IPath;
+
+import de.fu_berlin.inf.dpp.net.JID;
+
 public interface Algorithm {
 
     /**
@@ -26,7 +30,7 @@ public interface Algorithm {
      * @return the generated request
      * @see Request
      */
-    Request generateRequest(Operation op);
+    Request generateRequest(Operation op, JID jid, IPath editor);
 
     /**
      * Receives a request from a remote site. The request must be transformed

@@ -13,7 +13,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
@@ -39,6 +38,8 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         String sessionID = null;
         String path = null;
         String jid = null;
+        int sideID = 0;
+        Timestamp timestamp = null;
         try {
             int eventType = parser.next();
             if (eventType == XmlPullParser.START_TAG) {
@@ -62,9 +63,25 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
                     parser.next();
                 }
 
-                request = parseRequest(parser);
-                request.setEditorPath(Path.fromPortableString(path));
-                request.setJID(new JID(jid));
+                if (parser.getName().equals(RequestPacketExtension.SIDE_ID)) {
+                    sideID = parseSideID(parser);
+                    parser.next();
+                }
+
+                if (parser.getName().equals(RequestPacketExtension.VECTOR_TIME)) {
+                    int local = Integer.parseInt(parser.getAttributeValue(null,
+                        "local"));
+                    int remote = Integer.parseInt(parser.getAttributeValue(
+                        null, "remote"));
+                    timestamp = new JupiterVectorTime(local, remote);
+                    parser.next();
+                    parser.next();
+                }
+
+                Operation op = parseOperation(parser);
+
+                request = new Request(sideID, timestamp, op, new JID(jid), Path
+                    .fromPortableString(path));
             }
         } catch (Exception e) {
             log.error("Internal error while parsing RequestPacket: ", e);
@@ -109,32 +126,6 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         parser.next(); // read end tag
 
         return id;
-    }
-
-    protected Request parseRequest(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-        // // extract current editor for text edit.
-        int id = 0;
-        Timestamp timestamp = null;
-
-        if (parser.getName().equals(RequestPacketExtension.SIDE_ID)) {
-            id = parseSideID(parser);
-            parser.next();
-        }
-
-        if (parser.getName().equals(RequestPacketExtension.VECTOR_TIME)) {
-            int local = Integer.parseInt(parser
-                .getAttributeValue(null, "local"));
-            int remote = Integer.parseInt(parser.getAttributeValue(null,
-                "remote"));
-            timestamp = new JupiterVectorTime(local, remote);
-            parser.next();
-            parser.next();
-        }
-
-        Operation op = parseOperation(parser);
-
-        return new RequestImpl(id, timestamp, op);
     }
 
     protected Operation parseOperation(XmlPullParser parser)

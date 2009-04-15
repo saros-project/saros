@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
+import de.fu_berlin.inf.dpp.net.JID;
 
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
@@ -19,26 +20,26 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
      * other sides.
      */
     public void testExecuteLocalOperations() {
-	Algorithm algo = new Jupiter(true);
+        Algorithm algo = new Jupiter(true);
 
-	Document doc = new Document("abc");
-	assertEquals("abc", doc.getDocument());
+        Document doc = new Document("abc");
+        assertEquals("abc", doc.getDocument());
 
-	/* insert one char. */
-	Operation op = new InsertOperation(2, "d");
-	doc.execOperation(op);
-	assertEquals("abdc", doc.getDocument());
+        /* insert one char. */
+        Operation op = new InsertOperation(2, "d");
+        doc.execOperation(op);
+        assertEquals("abdc", doc.getDocument());
 
-	Request req = algo.generateRequest(op);
-	assertTrue(req.getOperation().equals(op));
+        Request req = algo.generateRequest(op, new JID("jid@jabber.cc"), null);
+        assertTrue(req.getOperation().equals(op));
 
-	/* insert one short string. */
-	op = new InsertOperation(2, "insert");
-	doc.execOperation(op);
-	assertEquals("abinsertdc", doc.getDocument());
+        /* insert one short string. */
+        op = new InsertOperation(2, "insert");
+        doc.execOperation(op);
+        assertEquals("abinsertdc", doc.getDocument());
 
-	req = algo.generateRequest(op);
-	System.out.println(req.getOperation().toString());
+        req = algo.generateRequest(op, new JID("jid@jabber.cc"), null);
+        System.out.println(req.getOperation().toString());
 
     }
 

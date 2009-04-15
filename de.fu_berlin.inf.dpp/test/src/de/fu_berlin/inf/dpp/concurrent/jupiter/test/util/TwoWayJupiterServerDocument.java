@@ -72,7 +72,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         /* 1. execute locally */
         doc.execOperation(op);
         /* 2. transform operation. */
-        Request req = algorithm.generateRequest(op);
+        Request req = algorithm.generateRequest(op, jidServer, null);
         /* sent to client */
         connection.sendOperation(new NetworkRequest(jidServer,
             TwoWayJupiterClientDocument.jidClient, req), delay);

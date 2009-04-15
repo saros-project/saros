@@ -87,8 +87,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
         doc.execOperation(op);
 
         /* 2. transform operation. */
-        Request req = algorithm.generateRequest(op);
-        req.setJID(this.jid);
+        Request req = algorithm.generateRequest(op, jid, null);
 
         /* 3. send operation. */
         connection.sendOperation(new NetworkRequest(this.jid, remoteJid, req),

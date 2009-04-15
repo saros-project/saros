@@ -84,9 +84,7 @@ public class ConcurrentDocumentManager {
 
             Jupiter document = getClientDoc(textEdit.getEditor());
             final Request request = document.generateRequest(textEdit
-                .toOperation());
-            request.setJID(myJID);
-            request.setEditorPath(textEdit.getEditor());
+                .toOperation(), myJID, textEdit.getEditor());
 
             if (isHostSide()) {
 

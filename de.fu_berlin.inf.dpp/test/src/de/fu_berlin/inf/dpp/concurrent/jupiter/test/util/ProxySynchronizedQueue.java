@@ -7,7 +7,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.RequestImpl;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -57,15 +56,16 @@ public class ProxySynchronizedQueue {
      * @param op
      *            operation has transformed and only send to client side.
      */
+    // TODO: Is this method necessary?
     public void sendTransformedOperation(Operation op, JID jid) {
-        Request send_req = new RequestImpl(algorithm.getSiteId(), algorithm
-            .getTimestamp(), op);
+        Request send_req = new Request(algorithm.getSiteId(), algorithm
+            .getTimestamp(), op, this.jid, null);
         connection
             .sendOperation(new NetworkRequest(this.jid, jid, send_req), 0);
     }
 
     public void sendOperation(Operation op) {
-        Request req = algorithm.generateRequest(op);
+        Request req = algorithm.generateRequest(op, this.jid, null);
         connection.sendOperation(new NetworkRequest(this.jid, jid, req), 0);
     }
 

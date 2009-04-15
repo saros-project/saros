@@ -27,6 +27,8 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.eclipse.core.runtime.IPath;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -35,6 +37,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This class implements the client-side core of the Jupiter control algorithm.
@@ -81,13 +84,15 @@ public class Jupiter implements Algorithm {
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateRequest(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation)
+     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateRequest(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation,
+     *      de.fu_berlin.inf.dpp.net.JID, IPath)
      */
-    public Request generateRequest(Operation op) {
+    public Request generateRequest(Operation op, JID jid, IPath editor) {
 
         // send(op, myMsgs, otherMsgs);
-        Request req = new RequestImpl(getSiteId(), (Timestamp) this.vectorTime
-            .clone(), op);
+        Request req = new Request(getSiteId(), (Timestamp) this.vectorTime
+            .clone(), op, jid, editor); // TODO: replace vectorTime.clone() by a
+                                        // better solution
 
         // add(op, myMsgs) to outgoing;
         if (op instanceof SplitOperation) {
@@ -280,7 +285,7 @@ public class Jupiter implements Algorithm {
      * the current local operation count and inserted into the outgoing queue
      * (see {@link Jupiter#ackRequestList}).
      * 
-     * @see Jupiter#generateRequest(Operation)
+     * @see Jupiter#generateRequest(Operation, JID, IPath)
      * @see Jupiter#receiveRequest(Request)
      */
     private static class OperationWrapper {
@@ -359,7 +364,7 @@ public class Jupiter implements Algorithm {
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#getTimestamp()
      */
     public synchronized Timestamp getTimestamp() {
-        return (Timestamp) this.vectorTime.clone();
+        return this.vectorTime;
     }
 
     /**

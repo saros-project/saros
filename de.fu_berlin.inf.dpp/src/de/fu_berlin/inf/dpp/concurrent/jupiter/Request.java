@@ -1,74 +1,141 @@
-/*
- * $Id: Request.java 2430 2005-12-11 15:17:11Z sim $
- *
- * ace - a collaborative editor
- * Copyright (C) 2005 Mark Bigler, Simon Raess, Lukas Zbinden
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
-
-import java.io.Serializable;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * This interface represents a request. Requests are typically sent over the
- * network to other sites. A request consists at least of the identifier of the
- * sending site, an operation and a timestamp that specifies the definition
- * context of the operation.
- * 
+ * A Request is an Activity that can be handled by the Jupiter Algorithm.
  */
-public interface Request extends Serializable {
+public class Request extends AbstractActivity {
 
     /**
-     * Gets the identifier of the sending site.
-     * 
-     * @return the identifier of the sending site
+     * identifier of the sending site
      */
-    public int getSiteId();
+    private final int siteId;
 
     /**
-     * Gets the operation to be propagated.
-     * 
-     * @return the operation
-     */
-    public Operation getOperation();
-
-    /**
-     * Gets the timestamp that specifies the definition context of the enclosed
+     * Timestamp that specifies the definition context of the enclosed
      * operation.
-     * 
-     * @return the timestamp of the definition context
      */
-    public Timestamp getTimestamp();
+    private final Timestamp timestamp;
 
-    /**
-     * Gets the jid of the appropriate client site.
+    private final Operation operation;
+
+    private JID jid;
+
+    private IPath editor;
+
+    public Request(int siteId, Timestamp timestamp, Operation operation,
+        JID jid, IPath editor) {
+        super(jid.toString());
+        this.siteId = siteId;
+        this.timestamp = timestamp;
+        this.operation = operation;
+        this.jid = jid;
+        this.editor = editor;
+    }
+
+    /*
+     * (non-Javadoc)
      * 
-     * @return the jid of the client
+     * @see de.fu_berlin.inf.dpp.jupiter.Request#getSiteId()
      */
-    public JID getJID();
+    public int getSiteId() {
+        return this.siteId;
+    }
 
-    public void setJID(JID jid);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.jupiter.Request#getOperation()
+     */
+    public Operation getOperation() {
+        return this.operation;
+    }
 
-    public IPath getEditorPath();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.jupiter.Request#getTimestamp()
+     */
+    public Timestamp getTimestamp() {
+        return this.timestamp;
+    }
 
-    public void setEditorPath(IPath editor);
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Request other = (Request) obj;
+        if (operation == null) {
+            if (other.operation != null)
+                return false;
+        } else if (!operation.equals(other.operation))
+            return false;
+        if (siteId != other.siteId)
+            return false;
+        if (timestamp == null) {
+            if (other.timestamp != null)
+                return false;
+        } else if (!timestamp.equals(other.timestamp))
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result
+            + ((operation == null) ? 0 : operation.hashCode());
+        result = prime * result + siteId;
+        result = prime * result
+            + ((timestamp == null) ? 0 : timestamp.hashCode());
+        return result;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("request(");
+        buffer.append(this.siteId);
+        buffer.append(",");
+        buffer.append(this.timestamp);
+        buffer.append(",");
+        buffer.append(this.operation);
+        buffer.append(",");
+        buffer.append(this.jid);
+        buffer.append(")");
+        return buffer.toString();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see de.fu_berlin.inf.dpp.jupiter.Request#getJID()
+     */
+    public JID getJID() {
+        return this.jid;
+    }
+
+    public IPath getEditorPath() {
+        return this.editor;
+    }
+
+    public boolean dispatch(IActivityReceiver receiver) {
+        return receiver.receive(this);
+    }
 
 }

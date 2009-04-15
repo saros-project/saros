@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.activities;
 
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+
 public class AbstractActivityReceiver implements IActivityReceiver {
 
     public boolean receive(ViewportActivity viewportActivity) {
@@ -33,6 +35,11 @@ public class AbstractActivityReceiver implements IActivityReceiver {
     }
 
     public boolean receive(EditorActivity editorActivity) {
+        // empty implementation
+        return false;
+    }
+
+    public boolean receive(Request jupiterRequest) {
         // empty implementation
         return false;
     }
