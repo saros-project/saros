@@ -36,8 +36,6 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class DeleteOperation implements Operation {
 
-    private static final long serialVersionUID = -8486323536916454961L;
-
     /**
      * the text to be deleted.
      */
@@ -145,31 +143,32 @@ public class DeleteOperation implements Operation {
             + Util.escapeForLogging(this.text) + "')";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
+        if (this == obj)
             return true;
-        } else if (obj == null) {
+        if (obj == null)
             return false;
-        } else if (obj.getClass().equals(getClass())) {
-            DeleteOperation op = (DeleteOperation) obj;
-            return (op.position == this.position) && op.text.equals(this.text);
-        } else {
+        if (getClass() != obj.getClass())
             return false;
-        }
+        DeleteOperation other = (DeleteOperation) obj;
+        if (position != other.position)
+            return false;
+        if (text == null) {
+            if (other.text != null)
+                return false;
+        } else if (!text.equals(other.text))
+            return false;
+        return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
-        int hashcode = this.position;
-        hashcode += 13 * this.text.hashCode();
-        return hashcode;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + position;
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        return result;
     }
 
     public List<TextEditActivity> toTextEdit(IPath path, String source) {

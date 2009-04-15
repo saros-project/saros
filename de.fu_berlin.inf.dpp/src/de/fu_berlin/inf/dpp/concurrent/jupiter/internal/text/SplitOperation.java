@@ -44,8 +44,6 @@ public class SplitOperation implements Operation {
     private static final Logger log = Logger.getLogger(SplitOperation.class
         .getName());
 
-    private static final long serialVersionUID = 3948091155375639761L;
-
     /**
      * The first operation.
      */
@@ -122,32 +120,35 @@ public class SplitOperation implements Operation {
         return "Split(" + this.op1 + ", " + this.op2 + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
+        if (this == obj)
             return true;
-        } else if (obj == null) {
+        if (obj == null)
             return false;
-        } else if (obj.getClass().equals(getClass())) {
-            SplitOperation op = (SplitOperation) obj;
-            return op.getFirst().equals(this.op1)
-                && op.getSecond().equals(this.op2);
-        } else {
+        if (getClass() != obj.getClass())
             return false;
-        }
+        SplitOperation other = (SplitOperation) obj;
+        if (op1 == null) {
+            if (other.op1 != null)
+                return false;
+        } else if (!op1.equals(other.op1))
+            return false;
+        if (op2 == null) {
+            if (other.op2 != null)
+                return false;
+        } else if (!op2.equals(other.op2))
+            return false;
+        return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
-        int hashcode = this.op1.hashCode();
-        hashcode += 17 * this.op2.hashCode();
-        return hashcode;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((op1 == null) ? 0 : op1.hashCode());
+        result = prime * result + ((op2 == null) ? 0 : op2.hashCode());
+        return result;
     }
 
     public List<TextEditActivity> toTextEdit(IPath path, String source) {

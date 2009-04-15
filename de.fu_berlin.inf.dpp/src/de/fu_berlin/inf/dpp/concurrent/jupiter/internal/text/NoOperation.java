@@ -34,8 +34,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class NoOperation implements Operation {
 
-    private static final long serialVersionUID = 9112890844550221292L;
-
     /**
      * Returns the position.
      * 

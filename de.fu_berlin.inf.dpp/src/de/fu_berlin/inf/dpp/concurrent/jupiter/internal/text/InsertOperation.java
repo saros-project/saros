@@ -36,8 +36,6 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class InsertOperation implements Operation {
 
-    private static final long serialVersionUID = -1285726114177092936L;
-
     /**
      * the text to be inserted.
      */
@@ -199,33 +197,35 @@ public class InsertOperation implements Operation {
             + Util.escapeForLogging(this.text) + "'," + this.origin + ")";
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        } else if (obj == null) {
+        if (obj == null)
             return false;
-        } else if (obj.getClass().equals(getClass())) {
-            InsertOperation op = (InsertOperation) obj;
-            return (op.position == this.position) && op.text.equals(this.text)
-                && (op.origin == this.origin);
-        } else {
+        if (getClass() != obj.getClass())
             return false;
-        }
+        InsertOperation other = (InsertOperation) obj;
+        if (origin != other.origin)
+            return false;
+        if (position != other.position)
+            return false;
+        if (text == null) {
+            if (other.text != null)
+                return false;
+        } else if (!text.equals(other.text))
+            return false;
+        return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
-        int hashcode = this.position;
-        hashcode += 13 * this.origin;
-        hashcode += 13 * this.text.hashCode();
-        return hashcode;
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + origin;
+        result = prime * result + position;
+        result = prime * result + ((text == null) ? 0 : text.hashCode());
+        return result;
     }
 
     public List<TextEditActivity> toTextEdit(IPath path, String source) {

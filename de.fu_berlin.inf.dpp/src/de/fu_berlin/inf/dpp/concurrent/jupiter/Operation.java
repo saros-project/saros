@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -12,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
  * application dependent and therefore this interface does not contain any
  * specific methods at all.
  */
-public interface Operation extends Serializable {
+public interface Operation {
 
     List<TextEditActivity> toTextEdit(IPath path, String source);
 
