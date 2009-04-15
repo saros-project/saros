@@ -23,10 +23,18 @@ public abstract class InviteExtension extends SessionDefaultPacketExtension {
      *            an informal text that will be shown with the invitation.
      * @return the packet extension.
      */
-    public PacketExtension create(String sender, String description, int colorID) {
-        DefaultPacketExtension extension = create();
+    public PacketExtension create(String projectName, String description,
+        int colorID) {
 
-        extension.setValue(PacketExtensions.PROJECTNAME, sender);
+        DefaultPacketExtension extension = create();
+        /*
+         * TODO PROJECTNAME and DESCRIPTION have the same value and there isn't
+         * a description for projects available.
+         * 
+         * Both arguments contain the shared project's name when this method is
+         * called.
+         */
+        extension.setValue(PacketExtensions.PROJECTNAME, projectName);
         extension.setValue(PacketExtensions.DESCRIPTION, description);
         extension.setValue(PacketExtensions.COLOR_ID, String.valueOf(colorID));
 
