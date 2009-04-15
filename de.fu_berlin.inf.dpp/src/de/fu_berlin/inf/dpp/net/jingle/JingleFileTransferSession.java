@@ -282,8 +282,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         creators.add(new SocketCreator(NetTransferMode.JINGLEUDP) {
 
             public Socket call() throws Exception {
-                Socket usock = udpSelectorProvider.openAcceptorSocketChannel()
-                    .socket();
+                Socket usock = udpSelectorProvider.openSocketChannel().socket();
                 usock.setSoTimeout(0);
                 usock.connect(new InetSocketAddress(InetAddress
                     .getByName(remoteIp), remotePort));
