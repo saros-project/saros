@@ -43,7 +43,7 @@ public class TextSelectionActivity extends AbstractActivity {
         IPath path) {
         super(source);
         if (path == null) {
-            throw new IllegalArgumentException("path mus not be null");
+            throw new IllegalArgumentException("path must not be null");
         }
         this.offset = offset;
         this.length = length;
