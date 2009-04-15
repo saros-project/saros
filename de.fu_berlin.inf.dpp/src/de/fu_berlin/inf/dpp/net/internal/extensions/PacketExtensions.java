@@ -44,8 +44,8 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -56,8 +56,11 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * 
  * @author rdjemili
  * 
- *         TODO This class should be converted to many small classes
- *         implementing the SarosPacketExtension and subclasses.
+ * @TODO Naming convention for classes with just static methods is something
+ *       with "Util" in the name.
+ * 
+ * @TODO This class should be converted to many small classes implementing the
+ *       {@link SarosDefaultPacketExtension} and subclasses.
  */
 public class PacketExtensions {
 
@@ -65,13 +68,14 @@ public class PacketExtensions {
      * A Saros Packet Extension is responsible for converting between the
      * network component (XMPPChatTransmitter) and the business logic
      */
-    public static abstract class SarosPacketExtension implements PacketListener {
+    public static abstract class SarosDefaultPacketExtension implements
+        PacketListener {
 
-        public SarosPacketExtension(String element) {
+        protected String element;
+
+        public SarosDefaultPacketExtension(String element) {
             this.element = element;
         }
-
-        String element;
 
         /**
          * Dispatch all Packets that pass the filter to the processMessage
@@ -93,18 +97,6 @@ public class PacketExtensions {
 
         public PacketFilter getFilter() {
             return new PacketExtensionFilter(element, NAMESPACE);
-        }
-
-        public boolean hasExtension(Message m) {
-            return m.getExtension(element, NAMESPACE) != null;
-        }
-    }
-
-    public static abstract class SarosDefaultPacketExtension extends
-        SarosPacketExtension {
-
-        public SarosDefaultPacketExtension(String element) {
-            super(element);
         }
 
         public DefaultPacketExtension create() {
