@@ -63,16 +63,8 @@ public class SplitOperation implements Operation {
         return this.op1;
     }
 
-    public void setFirst(Operation op1) {
-        this.op1 = op1;
-    }
-
     public Operation getSecond() {
         return this.op2;
-    }
-
-    public void setSecond(Operation op2) {
-        this.op2 = op2;
     }
 
     /**
@@ -114,6 +106,7 @@ public class SplitOperation implements Operation {
         return result;
     }
 
+    // TODO review for nested SplitOperations
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
 
         try {
@@ -131,9 +124,9 @@ public class SplitOperation implements Operation {
                 return result;
 
             if (result.size() == 2) {
-
                 // TODO Somehow delete operations need to be shifted, don't know
                 // why
+
                 TextEditActivity op1 = result.get(0);
                 TextEditActivity op2 = result.get(1);
 

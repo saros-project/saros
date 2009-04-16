@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 /**
  * This interface must be implemented by all operations. An operation is
  * application dependent and therefore this interface does not contain any
- * specific methods at all.
+ * specific methods at all. Operations are immutable.
  */
 public interface Operation {
 

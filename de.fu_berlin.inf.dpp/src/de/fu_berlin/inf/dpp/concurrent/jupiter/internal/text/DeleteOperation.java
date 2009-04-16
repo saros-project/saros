@@ -51,32 +51,19 @@ public class DeleteOperation implements Operation {
      *            the text to be deleted
      */
     public DeleteOperation(int position, String text) {
-        setPosition(position);
-        setText(text);
-    }
-
-    /**
-     * @param position
-     *            the position in the document
-     * @param text
-     *            the text to be deleted
-     * @param isUndo
-     *            flag to indicate whether this operation is an undo
-     */
-    public DeleteOperation(int position, String text, boolean isUndo) {
-        setPosition(position);
-        setText(text);
-    }
-
-    public int getPosition() {
-        return this.position;
-    }
-
-    public void setPosition(int position) {
         if (position < 0) {
             throw new IllegalArgumentException("position index must be >= 0");
         }
         this.position = position;
+
+        if (text == null) {
+            throw new IllegalArgumentException("text may not be null");
+        }
+        this.text = text;
+    }
+
+    public int getPosition() {
+        return this.position;
     }
 
     public int getTextLength() {
@@ -90,19 +77,6 @@ public class DeleteOperation implements Operation {
      */
     public String getText() {
         return this.text;
-    }
-
-    /**
-     * Sets the text to be deleted.
-     * 
-     * @param text
-     *            the text to be deleted
-     */
-    public void setText(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("text may not be null");
-        }
-        this.text = text;
     }
 
     /**
