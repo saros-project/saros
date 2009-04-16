@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp;
 
 import java.awt.Toolkit;
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,7 @@ import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
 /**
  * The main plug-in of Saros.
@@ -101,32 +103,40 @@ public class Saros extends AbstractUIPlugin {
     }
 
     // The shared instance.
-    private static Saros plugin;
+    protected static Saros plugin;
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
     public String xmppFeatureID;
 
-    private MutablePicoContainer container;
+    protected MutablePicoContainer container;
+
+    /**
+     * To print an architecture diagram at the end of the plug-in life-cycle
+     * initialize the dotMonitor with a new instance:
+     * 
+     * <code>dotMonitor= new DotGraphMonitor();</code>
+     */
+    protected DotGraphMonitor dotMonitor = null;
 
     /**
      * The reinjector used to inject dependencies for those objects that are
      * created by Eclipse and not by our PicoContainer.
      */
-    private Reinjector reinjector;
+    protected Reinjector reinjector;
 
-    private XMPPConnection connection;
+    protected XMPPConnection connection;
 
-    private JID myjid;
+    protected JID myjid;
 
-    private ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
+    protected ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
-    private String connectionError;
+    protected String connectionError;
 
-    private final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
+    protected final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
     // Smack (XMPP) connection listener
-    private ConnectionListener smackConnectionListener;
+    protected ConnectionListener smackConnectionListener;
 
     private Logger logger;
 
@@ -141,10 +151,20 @@ public class Saros extends AbstractUIPlugin {
     public Saros() {
         setDefault(this);
 
-        // Initialize our dependency injection container
-        this.container = new PicoBuilder(new CompositeInjection(
+        PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
-            .withCaching().build();
+            .withCaching();
+
+        /*
+         * If given, the dotMonitor is used to capture an architecture diagram
+         * of the application
+         */
+        if (dotMonitor != null) {
+            picoBuilder = picoBuilder.withMonitor(dotMonitor);
+        }
+
+        // Initialize our dependency injection container
+        this.container = picoBuilder.build();
 
         /*
          * All singletons which exist for the whole plug-in life-cycle are
@@ -254,6 +274,14 @@ public class Saros extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
+
+        if (dotMonitor != null) {
+            File f = new File("Saros-" + xmppFeatureID + ".dot");
+            logger.info("Saving Saros architecture diagram dot file: "
+                + f.getAbsolutePath());
+            dotMonitor.save(f);
+        }
+
         try {
             disconnect();
         } finally {
@@ -570,7 +598,7 @@ public class Saros extends AbstractUIPlugin {
         this.listeners.remove(listener);
     }
 
-    private void assertConnection() throws XMPPException {
+    protected void assertConnection() throws XMPPException {
         if (!isConnected()) {
             throw new XMPPException("No connection");
         }
@@ -592,7 +620,7 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
-    private void setupLoggers() {
+    protected void setupLoggers() {
         try {
             PropertyConfigurator.configureAndWatch("log4j.properties",
                 60 * 1000);
@@ -620,7 +648,7 @@ public class Saros extends AbstractUIPlugin {
             new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message, e));
     }
 
-    private class XMPPConnectionListener implements ConnectionListener {
+    protected class XMPPConnectionListener implements ConnectionListener {
 
         public void connectionClosed() {
             // self inflicted, controlled disconnect

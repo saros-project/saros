@@ -20,8 +20,8 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This class is an eclipse job run on the host side ONLY.
@@ -74,11 +74,11 @@ public class ConsistencyWatchdogServer extends Job {
     @Inject
     protected EditorManager editorManager;
 
-    protected ISessionManager sessionManager;
+    protected SessionManager sessionManager;
 
     protected ISharedProject sharedProject;
 
-    public ConsistencyWatchdogServer(ISessionManager sessionManager) {
+    public ConsistencyWatchdogServer(SessionManager sessionManager) {
         super("ConsistencyWatchdog");
 
         this.sessionManager = sessionManager;

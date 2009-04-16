@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This manager is responsible for handling driver changes.
@@ -44,9 +45,8 @@ public class RoleManager implements IActivityProvider {
         }
     };
 
-    public RoleManager() {
-        Saros.getDefault().getSessionManager().addSessionListener(
-            sessionListener);
+    public RoleManager(SessionManager sessionManager) {
+        sessionManager.addSessionListener(sessionListener);
     }
 
     public final ISessionListener sessionListener = new AbstractSessionListener() {

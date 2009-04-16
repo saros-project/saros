@@ -35,7 +35,8 @@ Bundle-ClassPath: bin/,
  lib/lw-common-4.18.8-Java1.5.jar,
  lib/lw-io-4.18.8-Java1.5.jar,
  lib/lw-nio-4.18.8-Java1.5.jar,
- lib/lw-rudp-4.18.8-Java1.5.jar
+ lib/lw-rudp-4.18.8-Java1.5.jar,
+ lib/picocontainer-gems-2.7.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
