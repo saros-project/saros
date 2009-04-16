@@ -33,6 +33,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -68,7 +69,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  * @author coezbek
  */
-public class ActivitySequencer implements IActivityListener, IActivityManager {
+public class ActivitySequencer implements IActivityListener, IActivityManager,
+    Disposable {
 
     private static Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
@@ -374,6 +376,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
 
     private final ActivityQueuesManager queues = new ActivityQueuesManager();
 
+    /*
+     * TODO The AS should not know the ConcurrentDocumentManager but rather pass
+     * all calls up into the SharedProject.
+     */
     private ConcurrentDocumentManager concurrentDocumentManager;
 
     /**
@@ -736,5 +742,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager {
      */
     public void userLeft(JID jid) {
         queues.removeQueue(jid);
+    }
+
+    public void dispose() {
+        concurrentDocumentManager.dispose();
     }
 }

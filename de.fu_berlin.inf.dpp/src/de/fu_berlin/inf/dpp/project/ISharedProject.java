@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
+import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 
@@ -201,6 +202,12 @@ public interface ISharedProject {
      * @return the concurrent document manager
      */
     public ConcurrentDocumentManager getConcurrentDocumentManager();
+
+    /**
+     * The ITransmitter is the network component and responsible for
+     * transmitting changes to the other participants
+     */
+    public ITransmitter getTransmitter();
 
     /**
      * Get a free color from the pool.

@@ -6,8 +6,8 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.Disposable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
@@ -24,13 +24,12 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class ConcurrentDocumentManager {
+public class ConcurrentDocumentManager implements Disposable {
 
     public static enum Side {
         CLIENT_SIDE, HOST_SIDE
@@ -88,11 +87,14 @@ public class ConcurrentDocumentManager {
 
             if (isHostSide()) {
 
+                // TODO ConcurrentDocumentManager should not depend on
+                // Transmitter.
+
                 // Skip network and apply directly but make sure that we use
                 // the same thread as the messages that really arrive via
                 // the network.
-                Saros.getDefault().getSessionManager().getTransmitter()
-                    .executeAsDispatch(new Runnable() {
+                sharedProject.getTransmitter().executeAsDispatch(
+                    new Runnable() {
                         public void run() {
                             receiveRequestHostSide(request);
                         }
@@ -104,6 +106,10 @@ public class ConcurrentDocumentManager {
                  */
                 return false;
             } else {
+
+                // TODO ConcurrentDocumentManager should not depend on
+                // ActivitySequencer.
+
                 // Send to host
                 sequencer.forwardOutgoingRequest(host, request);
                 return true;
@@ -112,7 +118,7 @@ public class ConcurrentDocumentManager {
     };
 
     public ConcurrentDocumentManager(final Side side, User host, JID myJID,
-        ISharedProject sharedProject, ActivitySequencer sequencer) {
+        final ISharedProject sharedProject, ActivitySequencer sequencer) {
 
         this.side = side;
         this.host = host.getJID();
@@ -127,23 +133,11 @@ public class ConcurrentDocumentManager {
         } else {
             projectListener = new ClientSideProjectListener();
         }
-
         sharedProject.addListener(projectListener);
+    }
 
-        Saros.getDefault().getSessionManager().addSessionListener(
-            new AbstractSessionListener() {
-
-                @Override
-                public void sessionEnded(ISharedProject endedProject) {
-
-                    assert endedProject == ConcurrentDocumentManager.this.sharedProject;
-
-                    Saros.getDefault().getSessionManager()
-                        .removeSessionListener(this);
-
-                    endedProject.removeListener(projectListener);
-                }
-            });
+    public void dispose() {
+        sharedProject.removeListener(projectListener);
     }
 
     /**

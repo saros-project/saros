@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.window.Window;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -51,7 +52,11 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
-public class SharedProject implements ISharedProject {
+/**
+ * TODO Review if SharedProject, ConcurrentDocumentManager, ActivitySequencer
+ * all honor start() and stop() semantics.
+ */
+public class SharedProject implements ISharedProject, Disposable {
     public static Logger log = Logger.getLogger(SharedProject.class.getName());
 
     protected JID myID;
@@ -343,6 +348,10 @@ public class SharedProject implements ISharedProject {
         stopped = true;
     }
 
+    public void dispose() {
+        activitySequencer.dispose();
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -395,6 +404,10 @@ public class SharedProject implements ISharedProject {
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
         return this.activitySequencer.getConcurrentDocumentManager();
+    }
+
+    public ITransmitter getTransmitter() {
+        return transmitter;
     }
 
     public int getFreeColor() {

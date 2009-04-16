@@ -155,6 +155,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         project.setProjectReadonly(false);
 
         project.stop();
+        project.dispose();
 
         this.currentlySharedProject.setValue(null);
 
