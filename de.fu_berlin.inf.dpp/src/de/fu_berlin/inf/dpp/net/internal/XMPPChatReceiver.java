@@ -31,11 +31,11 @@ public class XMPPChatReceiver {
      * Adds the given listener to the list of listeners notified when a new
      * packet arrives.
      * 
-     * While only pass those packets to the listener that are accepted by the
-     * given filter or all Packets if no-filter is given.
+     * Will only pass those packets to the listener that are accepted by the
+     * given filter or all Packets if no filter is given.
      * 
      * @param listener
-     *            The listener to pass Packets to.
+     *            The listener to pass packets to.
      * @param filter
      *            The filter to use when trying to identify Packets to send to
      *            the listener. may be null, in which case all Packets are sent.

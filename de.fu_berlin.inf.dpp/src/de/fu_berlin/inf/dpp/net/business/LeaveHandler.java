@@ -44,7 +44,8 @@ public class LeaveHandler extends LeaveExtension {
 
             WarningMessageDialog.showWarningMessage("Closing the Session",
                 "Closing the session because the host left.");
-        } else {// Client
+        } else {
+            // Client
             project.removeUser(project.getParticipant(fromJID));
         }
     }
