@@ -689,8 +689,24 @@ public class EditorManager implements IActivityProvider {
     @Inject
     protected IsInconsistentObservable isInconsistent;
 
-    public void textAboutToBeChanged(int offset, String text, int replace,
-        IDocument document) {
+    /**
+     * This method is called from Eclipse (via the StoppableDocumentListener)
+     * whenever the local user has changed some text in an editor.
+     * 
+     * @param offset
+     *            The index into the given document where the text change
+     *            started.
+     * @param text
+     *            The text that has been inserted (is "" if no text was inserted
+     *            but just characters were removed)
+     * @param replaceLength
+     *            The number of characters which have been replaced by this edit
+     *            (is 0 if no character has been removed)
+     * @param document
+     *            The document which was changed.
+     */
+    public void textAboutToBeChanged(int offset, String text,
+        int replaceLength, IDocument document) {
 
         /*
          * TODO When Inconsistencies exists, all listeners should be stopped
@@ -732,12 +748,12 @@ public class EditorManager implements IActivityProvider {
 
         String replacedText;
         try {
-            replacedText = document.get(offset, replace);
+            replacedText = document.get(offset, replaceLength);
         } catch (BadLocationException e) {
             log.error("Offset and/or replace invalid", e);
 
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < replace; i++)
+            for (int i = 0; i < replaceLength; i++)
                 sb.append("?");
             replacedText = sb.toString();
         }
@@ -1051,6 +1067,33 @@ public class EditorManager implements IActivityProvider {
         return (resource.getProject() == this.sharedProject.getProject());
     }
 
+    /**
+     * This method is called when a remote text edit has been received over the
+     * network to apply the change to the local files.
+     * 
+     * @param file
+     *            The file in which the change should be made.
+     * 
+     *            TODO We would like to be able to allow changing editors which
+     *            are not driven by files someday, but it is not possible yet.
+     * 
+     * @param offset
+     *            The position into the document of the given file, where the
+     *            change started.
+     * 
+     * @param replacedText
+     *            The text which is to be replaced by this operation at the
+     *            given offset (is "" if this operation is only inserting text)
+     * 
+     * @param text
+     *            The text which is to be inserted at the given offset instead
+     *            of the replaced text (is "" if this operation is only deleting
+     *            text)
+     * @param source
+     *            The JID as a string of the user who caused this change.
+     * 
+     *            TODO Use Users instead
+     */
     protected void replaceText(IFile file, int offset, String replacedText,
         String text, String source) {
 
