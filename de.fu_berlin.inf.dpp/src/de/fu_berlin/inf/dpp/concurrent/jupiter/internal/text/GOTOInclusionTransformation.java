@@ -54,8 +54,9 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         Operation transformedOp;
         if (op1 instanceof SplitOperation) {
             SplitOperation s = (SplitOperation) op1;
-            transformedOp = new SplitOperation((transform(s.getFirst(), op2,
-                param)), (transform(s.getSecond(), op2, param)));
+            s.setFirst(transform(s.getFirst(), op2, param));
+            s.setSecond(transform(s.getSecond(), op2, param));
+            transformedOp = s;
         } else if (op2 instanceof SplitOperation) {
             SplitOperation s = (SplitOperation) op2;
             op1 = transform(op1, s.getSecond(), param);
@@ -86,8 +87,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
             transformedOp = transform((DeleteOperation) op1,
                 (DeleteOperation) op2);
         } else {
-            // TODO This was caused once by a complicated combination of split
-            // ops
+            // TODO This was caused once by a complicated combination of split ops
             throw new InvalidParameterException("op1: " + op1 + ", op2: " + op2);
         }
         return transformedOp;

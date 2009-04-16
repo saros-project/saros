@@ -15,6 +15,37 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class TimestampOperation implements Operation {
 
+    public int getPosition() {
+        return 0;
+    }
+
+    public void setPosition(int position) {
+        throw new UnsupportedOperationException();
+    }
+
+    public int getTextLength() {
+        return 0;
+    }
+
+    /**
+     * Returns the text to be deleted.
+     * 
+     * @return the text to be deleted
+     */
+    public String getText() {
+        return "";
+    }
+
+    /**
+     * Sets the text to be deleted.
+     * 
+     * @param text
+     *            the text to be deleted
+     */
+    public void setText(String text) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * {@inheritDoc}
      */
