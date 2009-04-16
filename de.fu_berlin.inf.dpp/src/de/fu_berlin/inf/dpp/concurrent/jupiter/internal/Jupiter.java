@@ -212,19 +212,18 @@ public class Jupiter implements Algorithm {
             if (newOp instanceof SplitOperation) {
                 SplitOperation split = (SplitOperation) newOp;
                 if (isClientSide()) {
-                    split.setFirst(this.inclusion.transform(split.getFirst(),
-                        existingOp, Boolean.TRUE));
-                    split.setSecond(this.inclusion.transform(split.getSecond(),
-                        existingOp, Boolean.TRUE));
+                    split = new SplitOperation(this.inclusion.transform(split
+                        .getFirst(), existingOp, Boolean.TRUE), this.inclusion
+                        .transform(split.getSecond(), existingOp, Boolean.TRUE));
                     existingOp = this.inclusion.transform(existingOp, split
                         .getFirst(), Boolean.FALSE);
                     existingOp = this.inclusion.transform(existingOp, split
                         .getSecond(), Boolean.FALSE);
                 } else {
-                    split.setFirst(this.inclusion.transform(split.getFirst(),
-                        existingOp, Boolean.FALSE));
-                    split.setSecond(this.inclusion.transform(split.getSecond(),
-                        existingOp, Boolean.FALSE));
+                    split = new SplitOperation(this.inclusion.transform(split
+                        .getFirst(), existingOp, Boolean.FALSE),
+                        this.inclusion.transform(split.getSecond(), existingOp,
+                            Boolean.FALSE));
                     existingOp = this.inclusion.transform(existingOp, split
                         .getFirst(), Boolean.TRUE);
                     existingOp = this.inclusion.transform(existingOp, split

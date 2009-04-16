@@ -34,8 +34,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
- * The SplitOperation contains two operations. It is used when an operation
- * needs to be split up under certain transformation conditions.
+ * The SplitOperation contains two operations to be performed after each other.
+ * It is used when an operation needs to be split up under certain
+ * transformation conditions.
  * 
  * @see Operation
  */
@@ -63,16 +64,8 @@ public class SplitOperation implements Operation {
         return this.op1;
     }
 
-    public void setFirst(Operation op1) {
-        this.op1 = op1;
-    }
-
     public Operation getSecond() {
         return this.op2;
-    }
-
-    public void setSecond(Operation op2) {
-        this.op2 = op2;
     }
 
     /**
@@ -114,6 +107,7 @@ public class SplitOperation implements Operation {
         return result;
     }
 
+    // TODO review for nested SplitOperations
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
 
         try {
@@ -131,9 +125,9 @@ public class SplitOperation implements Operation {
                 return result;
 
             if (result.size() == 2) {
-
                 // TODO Somehow delete operations need to be shifted, don't know
                 // why
+
                 TextEditActivity op1 = result.get(0);
                 TextEditActivity op2 = result.get(1);
 
@@ -148,6 +142,12 @@ public class SplitOperation implements Operation {
                             "Split operation shifts second delete operation:"
                                 + this, new StackTrace()));
 
+                    /*
+                     * I think it has to be result.set(1, new
+                     * TextEditActivity(source, op2.offset +
+                     * op2.replacedText.length() - op1.replacedText.length(),
+                     * "", op2.replacedText, path));
+                     */
                     result.set(1,
                         new TextEditActivity(source, op2.offset
                             - op1.replacedText.length(), "", op2.replacedText,
