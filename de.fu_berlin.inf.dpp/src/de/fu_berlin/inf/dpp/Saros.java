@@ -146,37 +146,43 @@ public class Saros extends AbstractUIPlugin {
             new ConstructorInjection(), new AnnotatedFieldInjection()))
             .withCaching().build();
 
-        // All singletons which exist for the whole plug-in
-        // life-cycle are managed by PicoContainer for us
-        this.container.addComponent(Saros.class, this);
+        /*
+         * All singletons which exist for the whole plug-in life-cycle are
+         * managed by PicoContainer for us.
+         * 
+         * The addComponent() calls are sorted alphabetically according to the
+         * first argument. This makes it easier to search for a class without
+         * tool support.
+         */
         this.container.addComponent(CDTFacade.class);
-        this.container.addComponent(JDTFacade.class);
-        this.container.addComponent(MessagingManager.class);
-        this.container.addComponent(SessionManager.class);
-        this.container.addComponent(SarosUI.class);
-        this.container.addComponent(CurrentProjectProxy.class);
-        this.container.addComponent(XMPPChatTransmitter.class);
-        this.container.addComponent(JupiterHandler.class);
         this.container.addComponent(ConnectionSessionManager.class);
-        this.container.addComponent(SarosRosterListener.class);
-        this.container.addComponent(ConsistencyWatchdogHandler.class);
-        this.container.addComponent(XMPPChatReceiver.class);
-        this.container.addComponent(InvitationHandler.class);
-        this.container.addComponent(LeaveHandler.class);
-        this.container.addComponent(RequestForActivityHandler.class);
-        this.container.addComponent(UserListHandler.class);
-        this.container.addComponent(DataTransferManager.class);
-        this.container.addComponent(JingleFileTransferManagerObservable.class);
-        this.container.addComponent(PreferenceManager.class);
-        this.container.addComponent(SubscriptionListener.class);
-        this.container.addComponent(SharedResourcesManager.class);
-        this.container.addComponent(RoleManager.class);
-        this.container.addComponent(SkypeManager.class);
-        this.container.addComponent(EditorManager.class);
-        this.container.addComponent(ConsistencyWatchdogServer.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
+        this.container.addComponent(ConsistencyWatchdogHandler.class);
+        this.container.addComponent(ConsistencyWatchdogServer.class);
+        this.container.addComponent(CurrentProjectProxy.class);
+        this.container.addComponent(DataTransferManager.class);
+        this.container.addComponent(EditorManager.class);
+        this.container.addComponent(InvitationHandler.class);
         this.container.addComponent(IsInconsistentObservable.class);
+        this.container.addComponent(JDTFacade.class);
+        this.container.addComponent(JingleFileTransferManagerObservable.class);
+        this.container.addComponent(JupiterHandler.class);
+        this.container.addComponent(LeaveHandler.class);
+        this.container.addComponent(MessagingManager.class);
+        this.container.addComponent(PreferenceManager.class);
+        this.container.addComponent(RequestForActivityHandler.class);
+        this.container.addComponent(RoleManager.class);
+        this.container.addComponent(Saros.class, this);
+        this.container.addComponent(SarosRosterListener.class);
+        this.container.addComponent(SarosUI.class);
+        this.container.addComponent(SessionManager.class);
         this.container.addComponent(SessionViewOpener.class);
+        this.container.addComponent(SharedResourcesManager.class);
+        this.container.addComponent(SkypeManager.class);
+        this.container.addComponent(SubscriptionListener.class);
+        this.container.addComponent(UserListHandler.class);
+        this.container.addComponent(XMPPChatReceiver.class);
+        this.container.addComponent(XMPPChatTransmitter.class);
 
         /*
          * The following classes are initialized by the re-injector because they
