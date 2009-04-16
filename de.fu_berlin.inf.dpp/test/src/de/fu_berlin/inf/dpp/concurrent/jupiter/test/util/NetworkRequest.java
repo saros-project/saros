@@ -15,9 +15,9 @@ public class NetworkRequest {
         this.from = from;
         this.to = to;
         /* adaption to new request format. */
-        if (req.getJID() == null) {
-            this.request = new Request(req.getSiteId(), req.getTimestamp(), req
-                .getOperation(), from, req.getEditorPath());
+        if (req.getSource() == null) {
+            this.request = new Request(req.getTimestamp(), req.getOperation(),
+                from, req.getEditorPath());
         } else {
             this.request = req;
         }

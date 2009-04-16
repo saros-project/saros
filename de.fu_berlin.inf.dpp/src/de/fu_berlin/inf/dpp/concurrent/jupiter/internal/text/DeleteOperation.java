@@ -47,17 +47,6 @@ public class DeleteOperation implements Operation {
     private int position;
 
     /**
-     * Class constructor.
-     */
-    public DeleteOperation() {
-        // Empty Default constructor
-    }
-
-    /**
-     * Class constructor.
-     * 
-     * @param position
-     *            the position into the document
      * @param text
      *            the text to be deleted
      */
@@ -67,10 +56,8 @@ public class DeleteOperation implements Operation {
     }
 
     /**
-     * Class constructor.
-     * 
      * @param position
-     *            the position into the document
+     *            the position in the document
      * @param text
      *            the text to be deleted
      * @param isUndo
@@ -81,21 +68,10 @@ public class DeleteOperation implements Operation {
         setText(text);
     }
 
-    /**
-     * Returns the position.
-     * 
-     * @return the position
-     */
     public int getPosition() {
         return this.position;
     }
 
-    /**
-     * Sets the position of this operation.
-     * 
-     * @param position
-     *            the position to set
-     */
     public void setPosition(int position) {
         if (position < 0) {
             throw new IllegalArgumentException("position index must be >= 0");
@@ -103,11 +79,6 @@ public class DeleteOperation implements Operation {
         this.position = position;
     }
 
-    /**
-     * Returns the text length.
-     * 
-     * @return the length of the text
-     */
     public int getTextLength() {
         return this.text.length();
     }

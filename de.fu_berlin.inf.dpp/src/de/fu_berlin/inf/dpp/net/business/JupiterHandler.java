@@ -55,8 +55,7 @@ public class JupiterHandler {
 
             assert project != null;
 
-            log.debug("Recv Jupiter [" + request.getJID().getBase() + "]: "
-                + request);
+            log.debug("Recv Jupiter [" + request.getSource() + "]: " + request);
 
             project.getConcurrentDocumentManager().receiveRequest(
                 packetExtension.getRequest());

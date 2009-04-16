@@ -38,7 +38,6 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         String sessionID = null;
         String path = null;
         String jid = null;
-        int sideID = 0;
         Timestamp timestamp = null;
         try {
             int eventType = parser.next();
@@ -63,11 +62,6 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
                     parser.next();
                 }
 
-                if (parser.getName().equals(RequestPacketExtension.SIDE_ID)) {
-                    sideID = parseSideID(parser);
-                    parser.next();
-                }
-
                 if (parser.getName().equals(RequestPacketExtension.VECTOR_TIME)) {
                     int local = Integer.parseInt(parser.getAttributeValue(null,
                         "local"));
@@ -80,7 +74,7 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
 
                 Operation op = parseOperation(parser);
 
-                request = new Request(sideID, timestamp, op, new JID(jid), Path
+                request = new Request(timestamp, op, new JID(jid), Path
                     .fromPortableString(path));
             }
         } catch (Exception e) {
@@ -117,15 +111,6 @@ public class RequestExtensionProvider implements PacketExtensionProvider {
         parser.next(); // read end tag
 
         return jid;
-    }
-
-    protected int parseSideID(XmlPullParser parser)
-        throws XmlPullParserException, IOException {
-        parser.next(); // read text
-        int id = Integer.parseInt(parser.getText());
-        parser.next(); // read end tag
-
-        return id;
     }
 
     protected Operation parseOperation(XmlPullParser parser)

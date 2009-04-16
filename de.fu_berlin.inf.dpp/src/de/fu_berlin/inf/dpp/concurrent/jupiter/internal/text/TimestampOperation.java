@@ -15,32 +15,14 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  */
 public class TimestampOperation implements Operation {
 
-    private static final long serialVersionUID = 2756378905499193184L;
-
-    /**
-     * Returns the position.
-     * 
-     * @return the position
-     */
     public int getPosition() {
         return 0;
     }
 
-    /**
-     * Sets the position of this operation.
-     * 
-     * @param position
-     *            the position to set
-     */
     public void setPosition(int position) {
         throw new UnsupportedOperationException();
     }
 
-    /**
-     * Returns the text length.
-     * 
-     * @return the length of the text
-     */
     public int getTextLength() {
         return 0;
     }

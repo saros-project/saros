@@ -12,11 +12,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class Request extends AbstractActivity {
 
     /**
-     * identifier of the sending site
-     */
-    private final int siteId;
-
-    /**
      * Timestamp that specifies the definition context of the enclosed
      * operation.
      */
@@ -24,27 +19,14 @@ public class Request extends AbstractActivity {
 
     private final Operation operation;
 
-    private JID jid;
-
     private IPath editor;
 
-    public Request(int siteId, Timestamp timestamp, Operation operation,
-        JID jid, IPath editor) {
+    public Request(Timestamp timestamp, Operation operation, JID jid,
+        IPath editor) {
         super(jid.toString());
-        this.siteId = siteId;
         this.timestamp = timestamp;
         this.operation = operation;
-        this.jid = jid;
         this.editor = editor;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.jupiter.Request#getSiteId()
-     */
-    public int getSiteId() {
-        return this.siteId;
     }
 
     /*
@@ -74,12 +56,15 @@ public class Request extends AbstractActivity {
         if (getClass() != obj.getClass())
             return false;
         Request other = (Request) obj;
+        if (editor == null) {
+            if (other.editor != null)
+                return false;
+        } else if (!editor.equals(other.editor))
+            return false;
         if (operation == null) {
             if (other.operation != null)
                 return false;
         } else if (!operation.equals(other.operation))
-            return false;
-        if (siteId != other.siteId)
             return false;
         if (timestamp == null) {
             if (other.timestamp != null)
@@ -93,9 +78,9 @@ public class Request extends AbstractActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
         result = prime * result
             + ((operation == null) ? 0 : operation.hashCode());
-        result = prime * result + siteId;
         result = prime * result
             + ((timestamp == null) ? 0 : timestamp.hashCode());
         return result;
@@ -110,24 +95,13 @@ public class Request extends AbstractActivity {
     public String toString() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("request(");
-        buffer.append(this.siteId);
-        buffer.append(",");
         buffer.append(this.timestamp);
         buffer.append(",");
         buffer.append(this.operation);
         buffer.append(",");
-        buffer.append(this.jid);
+        buffer.append(this.getSource());
         buffer.append(")");
         return buffer.toString();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.jupiter.Request#getJID()
-     */
-    public JID getJID() {
-        return this.jid;
     }
 
     public IPath getEditorPath() {

@@ -90,9 +90,7 @@ public class Jupiter implements Algorithm {
     public Request generateRequest(Operation op, JID jid, IPath editor) {
 
         // send(op, myMsgs, otherMsgs);
-        Request req = new Request(getSiteId(), (Timestamp) this.vectorTime
-            .clone(), op, jid, editor); // TODO: replace vectorTime.clone() by a
-                                        // better solution
+        Request req = new Request(this.vectorTime, op, jid, editor);
 
         // add(op, myMsgs) to outgoing;
         if (op instanceof SplitOperation) {
@@ -107,7 +105,7 @@ public class Jupiter implements Algorithm {
         }
 
         // myMsgs = myMsgs + 1;
-        this.vectorTime.incrementLocalOperationCount();
+        this.vectorTime = this.vectorTime.incrementLocalOperationCount();
 
         return req;
     }
@@ -125,7 +123,7 @@ public class Jupiter implements Algorithm {
         discardAcknowledgedOperations((JupiterVectorTime) timestamp);
 
         Operation newOp = transform(req.getOperation());
-        this.vectorTime.incrementRemoteRequestCount();
+        this.vectorTime = this.vectorTime.incrementRemoteRequestCount();
 
         return newOp;
     }
@@ -351,13 +349,6 @@ public class Jupiter implements Algorithm {
      */
     public InclusionTransformation getInclusionTransformation() {
         return this.inclusion;
-    }
-
-    /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#getSiteId()
-     */
-    public int getSiteId() {
-        return isClientSide() ? 1 : 0;
     }
 
     /**

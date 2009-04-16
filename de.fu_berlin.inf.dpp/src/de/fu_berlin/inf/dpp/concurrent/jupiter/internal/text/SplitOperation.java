@@ -54,60 +54,23 @@ public class SplitOperation implements Operation {
      */
     private Operation op2;
 
-    /**
-     * Class constructor.
-     */
-    public SplitOperation() {
-        // Empty default constructor
-    }
-
-    /**
-     * Class constructor.
-     * 
-     * @param op1
-     *            the first operation
-     * @param op2
-     *            the second operation
-     */
     public SplitOperation(Operation op1, Operation op2) {
         this.op1 = op1;
         this.op2 = op2;
     }
 
-    /**
-     * Returns the first operation.
-     * 
-     * @return the first operation
-     */
     public Operation getFirst() {
         return this.op1;
     }
 
-    /**
-     * Sets the first operation.
-     * 
-     * @param op1
-     *            the first operation
-     */
     public void setFirst(Operation op1) {
         this.op1 = op1;
     }
 
-    /**
-     * Returns the second operation.
-     * 
-     * @return the second operation
-     */
     public Operation getSecond() {
         return this.op2;
     }
 
-    /**
-     * Sets the second operation.
-     * 
-     * @param op2
-     *            the second operation
-     */
     public void setSecond(Operation op2) {
         this.op2 = op2;
     }

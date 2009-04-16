@@ -96,7 +96,6 @@ public class RequestPacketExtension implements PacketExtension {
         sb.append(sessionIdToXML());
         sb.append(pathToXML());
         sb.append(jidToXML());
-        sb.append(sideIDToXML());
         sb.append(vectorTimeToXML());
         operationToXML(sb, request.getOperation());
 
@@ -118,14 +117,8 @@ public class RequestPacketExtension implements PacketExtension {
 
     private String jidToXML() {
         return "<" + RequestPacketExtension.JID + ">"
-            + Util.escapeCDATA(this.request.getJID().toString()) + "</"
+            + Util.escapeCDATA(this.request.getSource()) + "</"
             + RequestPacketExtension.JID + ">";
-    }
-
-    private String sideIDToXML() {
-        return "<" + RequestPacketExtension.SIDE_ID + ">"
-            + this.request.getSiteId() + "</" + RequestPacketExtension.SIDE_ID
-            + ">";
     }
 
     private String vectorTimeToXML() {

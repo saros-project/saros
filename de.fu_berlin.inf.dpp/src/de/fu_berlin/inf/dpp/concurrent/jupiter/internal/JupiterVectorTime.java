@@ -6,9 +6,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.VectorTime;
 /**
  * This class models the vector time for the Jupiter control algorithm.
  */
-public class JupiterVectorTime implements VectorTime, Cloneable {
-
-    private static final long serialVersionUID = 7679625564488573511L;
+public class JupiterVectorTime implements VectorTime {
 
     /**
      * Counter for the number of local operations.
@@ -87,8 +85,8 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      * 
      * @return the counter after increment.
      */
-    public int incrementLocalOperationCount() {
-        return ++this.localOperationCnt;
+    public JupiterVectorTime incrementLocalOperationCount() {
+        return new JupiterVectorTime(localOperationCnt + 1, remoteOperationCnt);
     }
 
     /**
@@ -96,8 +94,8 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
      * 
      * @return the counter after increment.
      */
-    public int incrementRemoteRequestCount() {
-        return ++this.remoteOperationCnt;
+    public JupiterVectorTime incrementRemoteRequestCount() {
+        return new JupiterVectorTime(localOperationCnt, remoteOperationCnt + 1);
     }
 
     /**
@@ -141,19 +139,6 @@ public class JupiterVectorTime implements VectorTime, Cloneable {
         hashcode = 37 * hashcode + this.localOperationCnt;
         hashcode = 37 * hashcode + this.remoteOperationCnt;
         return hashcode;
-    }
-
-    /**
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            // this shouldn't happen, since we are Cloneable
-            throw new InternalError();
-        }
     }
 
 }

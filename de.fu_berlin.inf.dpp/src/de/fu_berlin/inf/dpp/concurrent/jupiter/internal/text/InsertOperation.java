@@ -42,7 +42,7 @@ public class InsertOperation implements Operation {
     private String text;
 
     /**
-     * the position index in the document model.
+     * the position index in the document
      */
     private int position;
 
@@ -56,7 +56,8 @@ public class InsertOperation implements Operation {
     private int origin;
 
     /**
-     * Class constructor.
+     * Syntactic sugar for creating a new InsertOperation with the origin set to
+     * the given position.
      * 
      * @param position
      *            the position in the document
@@ -64,29 +65,10 @@ public class InsertOperation implements Operation {
      *            the text to be inserted
      */
     public InsertOperation(int position, String text) {
-        setPosition(position);
-        setText(text);
-        this.origin = getPosition();
+        this(position, text, position);
     }
 
     /**
-     * Class constructor.
-     * 
-     * @param position
-     *            the position in the document
-     * @param text
-     *            the text to be inserted
-     * @param isUndo
-     *            flag to indicate an undo operation
-     */
-    public InsertOperation(int position, String text, boolean isUndo) {
-        this(position, text);
-        this.origin = getPosition();
-    }
-
-    /**
-     * Class constructor.
-     * 
      * @param position
      *            the position in the document
      * @param text
@@ -95,7 +77,17 @@ public class InsertOperation implements Operation {
      *            the origin position of this insert operation
      */
     public InsertOperation(int position, String text, int origin) {
-        this(position, text);
+        if (position < 0) {
+            throw new IllegalArgumentException("position index must be >= 0");
+        }
+        this.position = position;
+        if (text == null) {
+            throw new IllegalArgumentException("text may not be null");
+        }
+        this.text = text;
+        if (origin < 0) {
+            throw new IllegalArgumentException("origin index must be >= 0");
+        }
         this.origin = origin;
     }
 
@@ -113,26 +105,8 @@ public class InsertOperation implements Operation {
         this(position, text, origin);
     }
 
-    /**
-     * Returns the position.
-     * 
-     * @return the position
-     */
     public int getPosition() {
         return this.position;
-    }
-
-    /**
-     * Sets the position of this operation.
-     * 
-     * @param position
-     *            the position to set
-     */
-    public void setPosition(int position) {
-        if (position < 0) {
-            throw new IllegalArgumentException("position index must be >= 0");
-        }
-        this.position = position;
     }
 
     /**
@@ -144,11 +118,6 @@ public class InsertOperation implements Operation {
         return this.text;
     }
 
-    /**
-     * Returns the text length.
-     * 
-     * @return the length of the text
-     */
     public int getTextLength() {
         return this.text.length();
     }
@@ -160,32 +129,6 @@ public class InsertOperation implements Operation {
      */
     public int getOrigin() {
         return this.origin;
-    }
-
-    /**
-     * Sets the origin position.
-     * 
-     * @param origin
-     *            the origin position to set
-     */
-    public void setOrigin(int origin) {
-        if (origin < 0) {
-            throw new IllegalArgumentException("origin index must be >= 0");
-        }
-        this.origin = origin;
-    }
-
-    /**
-     * Sets the text to be deleted.
-     * 
-     * @param text
-     *            the text to be deleted
-     */
-    public void setText(String text) {
-        if (text == null) {
-            throw new IllegalArgumentException("text may not be null");
-        }
-        this.text = text;
     }
 
     /**

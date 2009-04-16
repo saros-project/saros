@@ -58,8 +58,8 @@ public class ProxySynchronizedQueue {
      */
     // TODO: Is this method necessary?
     public void sendTransformedOperation(Operation op, JID jid) {
-        Request send_req = new Request(algorithm.getSiteId(), algorithm
-            .getTimestamp(), op, this.jid, null);
+        Request send_req = new Request(algorithm.getTimestamp(), op, this.jid,
+            null);
         connection
             .sendOperation(new NetworkRequest(this.jid, jid, send_req), 0);
     }

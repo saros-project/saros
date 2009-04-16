@@ -21,15 +21,13 @@
 
 package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
-import java.io.Serializable;
-
 /**
  * This interface represents the concept of a timestamp. Timestamps is a general
- * concept, so this interface remains empty.
+ * concept, so this interface remains empty. Timestamps are immutable.
  * 
  * @see VectorTime
  */
-public interface Timestamp extends Serializable {
+public interface Timestamp {
 
     /**
      * Retrieves the components of the timestamp as an int array. The exact

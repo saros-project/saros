@@ -25,7 +25,7 @@ public class RequestExtensionProviderTest extends TestCase {
 
     public void testTimestampRequest() throws XmlPullParserException,
         IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new TimestampOperation(), new JID("ori79@jabber.cc"), new Path(
                 "hello"));
         RequestPacketExtension requestPacket = new RequestPacketExtension("1",
@@ -41,7 +41,7 @@ public class RequestExtensionProviderTest extends TestCase {
     }
 
     public void xtestNoOPRequest() throws XmlPullParserException, IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new NoOperation(), new JID("ori79@jabber.cc"), new Path("hello"));
         RequestPacketExtension requestPacket = new RequestPacketExtension("1",
             req);
@@ -56,7 +56,7 @@ public class RequestExtensionProviderTest extends TestCase {
     }
 
     public void xtestInsertRequest() throws XmlPullParserException, IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new InsertOperation(34, "insert text"), new JID("ori79@jabber.cc"),
             new Path("hello"));
         RequestPacketExtension requestPacket = new RequestPacketExtension("1",
@@ -72,7 +72,7 @@ public class RequestExtensionProviderTest extends TestCase {
     }
 
     public void testDeleteRequest() throws XmlPullParserException, IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new DeleteOperation(34, "insert text"), new JID("ori79@jabber.cc"),
             new Path("hello"));
         RequestPacketExtension requestPacket = new RequestPacketExtension("1",
@@ -88,7 +88,7 @@ public class RequestExtensionProviderTest extends TestCase {
     }
 
     public void testSplitRequest() throws XmlPullParserException, IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new SplitOperation(new InsertOperation(34, "insert text"),
                 new DeleteOperation(34, "insert text")), new JID(
                 "ori79@jabber.cc"), new Path("hello"));
@@ -105,7 +105,7 @@ public class RequestExtensionProviderTest extends TestCase {
     }
 
     public void testSplitRequest2() throws XmlPullParserException, IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new SplitOperation(new DeleteOperation(34, "insert text"),
                 new DeleteOperation(37, "insert text")), new JID(
                 "ori79@jabber.cc"), new Path("hello"));
@@ -122,7 +122,7 @@ public class RequestExtensionProviderTest extends TestCase {
     }
 
     public void testSplitRequest3() throws XmlPullParserException, IOException {
-        Request req = new Request(1, new JupiterVectorTime(1, 3),
+        Request req = new Request(new JupiterVectorTime(1, 3),
             new SplitOperation(new DeleteOperation(34, "insert text"),
                 new NoOperation()), new JID("ori79@jabber.cc"), new Path(
                 "hello"));

@@ -7,13 +7,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 public interface Algorithm {
 
     /**
-     * Gets the site id of this algorithm.
-     * 
-     * @return the site id
-     */
-    int getSiteId();
-
-    /**
      * Gets the current timestamp at the local site.
      * 
      * @return the current timestamp

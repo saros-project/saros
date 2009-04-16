@@ -291,7 +291,7 @@ public class ConcurrentDocumentManager {
 
                 /* execute activity in activity sequencer. */
                 for (TextEditActivity textEdit : op.toTextEdit(request
-                    .getEditorPath(), request.getJID().toString())) {
+                    .getEditorPath(), request.getSource())) {
 
                     sequencer.execTransformedActivity(textEdit);
                 }
@@ -391,7 +391,7 @@ public class ConcurrentDocumentManager {
             .getEditorPath());
 
         // Check if sender exists in proxy list
-        JID sender = request.getJID();
+        JID sender = new JID(request.getSource());
         if (!docServer.isExist(sender)) {
             docServer.addProxyClient(sender);
         }
