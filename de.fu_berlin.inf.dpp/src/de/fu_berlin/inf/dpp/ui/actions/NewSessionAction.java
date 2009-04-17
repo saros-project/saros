@@ -31,10 +31,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.jivesoftware.smack.XMPPException;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -50,11 +51,19 @@ public class NewSessionAction implements IObjectActionDelegate {
 
     protected IProject selectedProject;
 
+    @Inject
+    protected SessionManager sessionManager;
+
     /*
      * (non-Javadoc) Defined in IActionDelegate
      */
     public void setActivePart(IAction action, IWorkbenchPart targetPart) {
         // We deal with everything in selectionChanged
+    }
+
+    public NewSessionAction() {
+        super();
+        Saros.getDefault().reinject(this);
     }
 
     /**
@@ -70,8 +79,7 @@ public class NewSessionAction implements IObjectActionDelegate {
 
     public void runNewSession() {
         try {
-            Saros.getDefault().getSessionManager().startSession(
-                this.selectedProject);
+            sessionManager.startSession(this.selectedProject);
         } catch (final XMPPException e) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -88,8 +96,7 @@ public class NewSessionAction implements IObjectActionDelegate {
     public void selectionChanged(IAction action, ISelection selection) {
         this.selectedProject = getProject(selection);
 
-        ISessionManager sm = Saros.getDefault().getSessionManager();
-        boolean running = sm.getSharedProject() != null;
+        boolean running = sessionManager.getSharedProject() != null;
         boolean connected = Saros.getDefault().isConnected();
 
         // TODO This action should rather connect if not already connected
