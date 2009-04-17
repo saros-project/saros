@@ -56,7 +56,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
@@ -215,8 +214,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                                 return;
                             }
 
-                            ISharedProject project = Saros.getDefault()
-                                .getSessionManager().getSharedProject();
+                            ISharedProject project = saros.getSessionManager()
+                                .getSharedProject();
 
                             if (project != null) {
                                 // a new user joined this session
@@ -373,7 +372,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             return;
         }
         sendMessageToAll(sharedProject, JoinExtension.getDefault().create(
-            Saros.getDefault().getLocalUser().getColorID()));
+            saros.getLocalUser().getColorID()));
     }
 
     /*
@@ -388,8 +387,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendTimedActivities(JID recipient,
         List<TimedActivity> timedActivities) {
 
-        if (recipient == null
-            || recipient.equals(Saros.getDefault().getMyJID())) {
+        if (recipient == null || recipient.equals(saros.getMyJID())) {
             throw new IllegalArgumentException(
                 "recipient may not be null or equal the local user");
         }
@@ -405,99 +403,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         XMPPChatTransmitter.log.info("Sent Activities to " + recipient + ": "
             + timedActivities);
-    }
-
-    @Deprecated
-    public void sendActivities(ISharedProject sharedProject,
-        ActivitySequencer sequencer, List<IActivity> activities) {
-
-        // Set sender of TextEditActivity's and source if it is not set yet.
-        for (IActivity activity : activities) {
-            if (activity instanceof TextEditActivity) {
-                TextEditActivity textEditActivity = (TextEditActivity) activity;
-
-                String sender = Saros.getDefault().getMyJID().toString();
-                textEditActivity.setSender(sender);
-
-                assert textEditActivity.getSource() != null;
-            }
-        }
-
-        // Send the activities to each user.
-        JID myJID = Saros.getDefault().getMyJID();
-        for (User user : sharedProject.getParticipants()) {
-
-            JID recipientJID = user.getJID();
-            if (recipientJID.equals(myJID)) {
-                continue;
-            }
-
-            ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
-                activities.size());
-            List<TimedActivity> timedActivities = sequencer
-                .createTimedActivities(recipientJID, activities);
-            for (TimedActivity timedActivity : timedActivities) {
-
-                // Check each activity if it is a file creation which will be
-                // send asynchronous, and collect all others in stillToSend.
-                // TODO boolean methods with side effects are bad style
-                if (!ifFileCreateSendAsync(recipientJID, sharedProject,
-                    timedActivity)) {
-                    stillToSend.add(timedActivity);
-                }
-            }
-
-            if (stillToSend.size() > 0) {
-
-                assert containsNoFileCreationActivities(stillToSend);
-
-                sendMessage(recipientJID, new ActivitiesPacketExtension(Saros
-                    .getDefault().getSessionManager().getSessionID(),
-                    stillToSend));
-            }
-            XMPPChatTransmitter.log.info("Sent Activities to " + recipientJID
-                + ": " + timedActivities);
-        }
-    }
-
-    /**
-     * If given {@link TimedActivity} is a file creation, send it asynchronous
-     * to given recipient.
-     * 
-     * @param recipientJID
-     * @param sharedProject
-     * @param timedActivity
-     * 
-     * @return <code>true</code> if timedActivity was a file creation, otherwise
-     *         <code>false</code>.
-     */
-    private boolean ifFileCreateSendAsync(JID recipientJID,
-        ISharedProject sharedProject, TimedActivity timedActivity) {
-
-        IActivity activity = timedActivity.getActivity();
-        if (activity instanceof FileActivity) {
-            FileActivity fileActivity = (FileActivity) activity;
-            if (fileActivity.getType().equals(FileActivity.Type.Created)) {
-                try {
-                    sendFileAsync(recipientJID, sharedProject.getProject(),
-                        fileActivity.getPath(), timedActivity
-                            .getSequenceNumber(),
-                        new AbstractFileTransferCallback() {
-                            @Override
-                            public void fileTransferFailed(IPath path,
-                                Exception e) {
-                                log.error("File could not be send:", e);
-                            }
-                        });
-                } catch (IOException e) {
-                    log.error("File could not be send:", e);
-                    // TODO This means we were really unable to send
-                    // this file. No more falling back.
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     public void sendFileList(JID recipient, FileList fileList,
@@ -630,7 +535,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected void sendMessageToAll(ISharedProject sharedProject,
         PacketExtension extension) {
 
-        JID myJID = Saros.getDefault().getMyJID();
+        JID myJID = saros.getMyJID();
 
         for (User participant : sharedProject.getParticipants()) {
 
@@ -818,13 +723,13 @@ public class XMPPChatTransmitter implements ITransmitter,
      *            The JID which sent these activities (the source in the
      *            activities might be different!)
      * @param timedActivities
-     *            The received activities including timestamps.
+     *            The received activities including sequence numbers.
      */
     protected void receiveActivities(JID fromJID,
         List<TimedActivity> timedActivities) {
         String source = fromJID.toString();
 
-        final ISharedProject project = Saros.getDefault().getSessionManager()
+        final ISharedProject project = saros.getSessionManager()
             .getSharedProject();
 
         if ((project == null) || (project.getParticipant(fromJID) == null)) {

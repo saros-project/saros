@@ -19,7 +19,9 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -433,8 +435,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
                 if (activities.size() > 0
                     && sharedProject.getParticipantCount() > 1) {
-                    transmitter.sendActivities(sharedProject,
-                        ActivitySequencer.this, activities);
+                    sendActivities(sharedProject.getParticipants(), activities);
                 }
 
                 synchronized (queues) {
@@ -549,6 +550,94 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
         return optimize(out);
+    }
+
+    /**
+     * Sends given activities to given recipients.
+     */
+    public void sendActivities(Collection<User> recipients,
+        List<IActivity> activities) {
+
+        setSenderOnTextEditActivities(activities);
+
+        // Send the activities to each user.
+        JID myJID = Saros.getDefault().getMyJID();
+        for (User user : recipients) {
+
+            JID recipientJID = user.getJID();
+            if (recipientJID.equals(myJID)) {
+                continue;
+            }
+
+            ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
+                activities.size());
+            List<TimedActivity> timedActivities = createTimedActivities(
+                recipientJID, activities);
+            for (TimedActivity timedActivity : timedActivities) {
+
+                // Check each activity if it is a file creation which will be
+                // send asynchronous, and collect all others in stillToSend.
+                // TODO boolean methods with side effects are bad style
+                if (!ifFileCreateSendAsync(recipientJID, timedActivity)) {
+                    stillToSend.add(timedActivity);
+                }
+            }
+            if (stillToSend.size() > 0) {
+                transmitter.sendTimedActivities(recipientJID, stillToSend);
+            }
+            log.info("Sent Activities to " + recipientJID + ": "
+                + timedActivities);
+        }
+    }
+
+    /**
+     * Sets sender on {@link TextEditActivity}s.
+     */
+    private void setSenderOnTextEditActivities(List<IActivity> activities) {
+        String sender = Saros.getDefault().getMyJID().toString();
+        for (IActivity activity : activities) {
+            if (activity instanceof TextEditActivity) {
+                TextEditActivity textEditActivity = (TextEditActivity) activity;
+                textEditActivity.setSender(sender);
+                assert textEditActivity.getSource() != null;
+            }
+        }
+    }
+
+    /**
+     * Sends given {@link TimedActivity} asynchronous to the given recipient,
+     * iff the activity is a {@link TextEditActivity}.
+     * 
+     * @return <code>true</code> if the activity was a file creation, otherwise
+     *         <code>false</code>.
+     */
+    private boolean ifFileCreateSendAsync(JID recipientJID,
+        TimedActivity timedActivity) {
+
+        IActivity activity = timedActivity.getActivity();
+        if (activity instanceof FileActivity) {
+            FileActivity fileActivity = (FileActivity) activity;
+            if (fileActivity.getType().equals(FileActivity.Type.Created)) {
+                try {
+                    transmitter.sendFileAsync(recipientJID, sharedProject
+                        .getProject(), fileActivity.getPath(), timedActivity
+                        .getSequenceNumber(),
+                        new AbstractFileTransferCallback() {
+                            @Override
+                            public void fileTransferFailed(IPath path,
+                                Exception e) {
+                                log.error("File could not be send:", e);
+                            }
+                        });
+                } catch (IOException e) {
+                    log.error("File could not be send:", e);
+                    // TODO This means we were really unable to send
+                    // this file. No more falling back.
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addProvider(IActivityProvider provider) {

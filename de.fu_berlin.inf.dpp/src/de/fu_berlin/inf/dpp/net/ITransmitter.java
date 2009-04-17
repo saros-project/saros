@@ -32,11 +32,9 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -117,7 +115,7 @@ public interface ITransmitter {
     public void sendRequestForFileListMessage(JID recipient);
 
     /**
-     * Sends given file to given recipient with given timestamp.
+     * Sends given file to given recipient with given sequence number.
      * 
      * @param recipient
      *            the Jabber ID of the recipient.
@@ -126,8 +124,9 @@ public interface ITransmitter {
      *            sent.
      * @param path
      *            the project-relative path of the resource that is to be sent.
-     * @param timestamp
-     *            the time that will be associated with this activity.
+     * @param sequenceNumber
+     *            the sequence number that will be associated with this
+     *            activity.
      * @param callback
      *            an callback for the file transfer state. CANNOT be null.
      * @throws IOException
@@ -135,10 +134,11 @@ public interface ITransmitter {
      *             the callback.
      */
     public void sendFileAsync(JID recipient, IProject project, IPath path,
-        int timestamp, IFileTransferCallback callback) throws IOException;
+        int sequenceNumber, IFileTransferCallback callback) throws IOException;
 
     /**
-     * Sends given file to given recipient with given timestamp SYNCHRONOUSLY.
+     * Sends given file to given recipient with given sequence number
+     * SYNCHRONOUSLY.
      * 
      * This methods thus block until the file has been sent or it failed.
      * 
@@ -149,14 +149,14 @@ public interface ITransmitter {
      *            sent.
      * @param path
      *            the project-relative path of the resource that is to be sent.
-     * @param timestamp
+     * @param sequenceNumber
      *            the time that will be associated with this activity.
      * @throws IOException
      *             If we file could not be read or an error occurred while
      *             sending
      */
-    public void sendFile(JID to, IProject project, IPath path, int timestamp,
-        IFileTransferCallback callback) throws IOException;
+    public void sendFile(JID to, IProject project, IPath path,
+        int sequenceNumber, IFileTransferCallback callback) throws IOException;
 
     /**
      * Sends given archive file to given recipient.
@@ -237,23 +237,6 @@ public interface ITransmitter {
      *            the shared project that this join message refers to.
      */
     public void sendLeaveMessage(ISharedProject sharedProject);
-
-    /**
-     * Sends given list of activities to the participants of given shared
-     * project. The {@link ActivitySequencer} is used to create the sequence
-     * numbers for the activities to send.
-     * 
-     * @param sharedProject
-     *            the shared project the activities refer to.
-     * @param sequencer
-     *            to generate sequence numbers.
-     * @param activities
-     *            a list of activities.
-     * @deprecated use {@link #sendTimedActivities(JID, List)} instead
-     */
-    @Deprecated
-    public void sendActivities(ISharedProject sharedProject,
-        ActivitySequencer sequencer, List<IActivity> activities);
 
     /**
      * Sends given list of TimedActivities to the given recipient.
