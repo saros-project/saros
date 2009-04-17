@@ -69,6 +69,7 @@ import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
@@ -189,6 +190,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JingleFileTransferManagerObservable.class);
         this.container.addComponent(JupiterHandler.class);
         this.container.addComponent(LeaveHandler.class);
+        this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(RequestForActivityHandler.class);
