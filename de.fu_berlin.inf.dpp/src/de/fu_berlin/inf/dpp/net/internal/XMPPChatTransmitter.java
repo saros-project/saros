@@ -378,6 +378,29 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessageToAll(sharedProject, LeaveExtension.getDefault().create());
     }
 
+    public void sendTimedActivities(JID recipient,
+        List<TimedActivity> timedActivities) {
+
+        if (recipient == null
+            || recipient.equals(Saros.getDefault().getMyJID())) {
+            throw new IllegalArgumentException(
+                "recipient may not be null or equal the local user");
+        }
+        if (timedActivities == null || timedActivities.size() == 0) {
+            throw new IllegalArgumentException(
+                "timedActivities may not be null or null");
+        }
+
+        assert containsNoFileCreationActivities(timedActivities);
+
+        sendMessage(recipient, new ActivitiesPacketExtension(Saros.getDefault()
+            .getSessionManager().getSessionID(), timedActivities));
+
+        XMPPChatTransmitter.log.info("Sent Activities to " + recipient + ": "
+            + timedActivities);
+    }
+
+    @Deprecated
     public void sendActivities(ISharedProject sharedProject,
         ActivitySequencer sequencer, List<IActivity> activities) {
 
@@ -663,6 +686,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendMessage(JID jid, PacketExtension extension) {
 
+        // TODO Also queue like in sendMessageToAll if user is offline
         if (!this.connection.isConnected()) {
             queueMessage(jid, extension);
             return;

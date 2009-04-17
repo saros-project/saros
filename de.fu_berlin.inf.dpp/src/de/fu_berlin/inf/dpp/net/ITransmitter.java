@@ -29,7 +29,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
@@ -39,7 +41,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * An humble interface that is responsible for network functionality. The idea
- * behind this interface is to only capsulates the least possible amount of
+ * behind this interface is to only encapsulates the least possible amount of
  * functionality - the one that can't be easily tested.
  * 
  * @author rdjemili
@@ -69,7 +71,7 @@ public interface ITransmitter {
      * Sends an invitation message for given shared project to given user.
      * 
      * @param sharedProject
-     *            the shared project to which the user should be invitited to.
+     *            the shared project to which the user should be invited to.
      * @param jid
      *            the Jabber ID of the user that is to be invited.
      * @param description
@@ -84,7 +86,7 @@ public interface ITransmitter {
      * is canceled.
      * 
      * @param jid
-     *            the Jabber ID of the receipient.
+     *            the Jabber ID of the recipient.
      * @param errorMsg
      *            the reason why the invitation was canceled or
      *            <code>null</code>.
@@ -169,7 +171,7 @@ public interface ITransmitter {
      * @param archive
      *            the project-relative path of the resource that is to be sent.
      * @param callback
-     *            an callback for the file transfer state. Can be
+     *            a callback for the file transfer state. Can be
      *            <code>null</code>.
      */
     public void sendProjectArchive(JID recipient, IProject project,
@@ -189,7 +191,7 @@ public interface ITransmitter {
      * Sends a list of users to given recipient
      * 
      * @param to
-     *            Receipient of this list
+     *            Recipient of this list
      * @param participants
      *            List of Users, of current shared project participants
      */
@@ -247,9 +249,36 @@ public interface ITransmitter {
      *            to generate sequence numbers.
      * @param activities
      *            a list of activities.
+     * @deprecated use {@link #sendTimedActivities(JID, List)} instead
      */
+    @Deprecated
     public void sendActivities(ISharedProject sharedProject,
         ActivitySequencer sequencer, List<IActivity> activities);
+
+    /**
+     * Sends given list of TimedActivities to the given recipient.
+     * 
+     * This list MUST not contain any {@link FileActivity}s where
+     * {@link FileActivity#getType()} == {@link FileActivity.Type#Created} as
+     * binary data is not supported in messages bodies.
+     * 
+     * @param recipient
+     *            The JID of the user who is to receive the given list of timed
+     *            activities.
+     * @param timedActivities
+     *            The list of timed activities to send to the user.
+     * 
+     * @throws IllegalArgumentException
+     *             if the recipient is null, the recipient equals the local user
+     *             as returned by {@link Saros#getMyJID()} or the given list is
+     *             null or contains no activities.
+     * 
+     * @throws AssertionError
+     *             if the given list of timed activities contains FileActivities
+     *             of type created AND the application is run using asserts.
+     */
+    public void sendTimedActivities(JID recipient,
+        List<TimedActivity> timedActivities);
 
     /**
      * Sends given request to given participant of given shared project.
