@@ -1,10 +1,8 @@
-/**
- * 
- */
 package de.fu_berlin.inf.dpp.net.business;
 
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -12,6 +10,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 
 /**
@@ -21,6 +20,9 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
  *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class LeaveHandler extends LeaveExtension {
+
+    @Inject
+    protected SessionManager sessionManager;
 
     public LeaveHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
@@ -35,12 +37,11 @@ public class LeaveHandler extends LeaveExtension {
     @Override
     public void leaveReceived(JID fromJID) {
 
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
 
         if (project.getHost().getJID().equals(fromJID)) {
             // Host
-            Saros.getDefault().getSessionManager().stopSharedProject();
+            sessionManager.stopSharedProject();
 
             WarningMessageDialog.showWarningMessage("Closing the Session",
                 "Closing the session because the host left.");

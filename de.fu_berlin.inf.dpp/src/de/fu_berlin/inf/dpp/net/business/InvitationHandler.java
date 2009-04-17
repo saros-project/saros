@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.fu_berlin.inf.dpp.net.business;
 
 import org.apache.log4j.Logger;
@@ -13,7 +10,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * Business Logic for handling Invitation requests
@@ -29,6 +26,12 @@ public class InvitationHandler extends InviteExtension {
     @Inject
     protected IXMPPTransmitter transmitter;
 
+    @Inject
+    protected SessionManager sessionManager;
+
+    @Inject
+    protected SessionIDObservable sessionID;
+
     public InvitationHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
     }
@@ -36,13 +39,12 @@ public class InvitationHandler extends InviteExtension {
     @Override
     public void invitationReceived(JID sender, String sessionID,
         String projectName, String description, int colorID) {
-        ISessionManager sm = Saros.getDefault().getSessionManager();
-        if (sm.getSessionID().equals(SessionIDObservable.NOT_IN_SESSION)) {
+        if (this.sessionID.getValue().equals(SessionIDObservable.NOT_IN_SESSION)) {
             log.debug("Received invitation with session id " + sessionID);
             log.debug("and ColorID: " + colorID + ", i'm "
                 + Saros.getDefault().getMyJID());
-            sm.invitationReceived(sender, sessionID, projectName, description,
-                colorID);
+            sessionManager.invitationReceived(sender, sessionID, projectName,
+                description, colorID);
         } else {
             transmitter
                 .sendMessage(

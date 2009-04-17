@@ -1,6 +1,3 @@
-/**
- * 
- */
 package de.fu_berlin.inf.dpp.net.business;
 
 import java.util.List;
@@ -19,8 +16,9 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This class is responsible for parsing RequestForActivities and sending the
@@ -33,6 +31,12 @@ public class RequestForActivityHandler extends RequestActivityExtension {
 
     @Inject
     protected IXMPPTransmitter transmitter;
+
+    @Inject
+    protected SessionManager sessionManager;
+
+    @Inject
+    protected SessionIDObservable sessionID;
 
     public RequestForActivityHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(this, this.getFilter());
@@ -51,7 +55,6 @@ public class RequestForActivityHandler extends RequestActivityExtension {
     public void requestForResendingActivitiesReceived(JID fromJID,
         int sequenceNumber, boolean andUp) {
 
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.getSharedProject();
 
         if (sharedProject == null
@@ -67,8 +70,8 @@ public class RequestForActivityHandler extends RequestActivityExtension {
                 : "", sequenceNumber, andUp ? " (andup)" : ""));
 
         if (activities.size() > 0) {
-            PacketExtension extension = new ActivitiesPacketExtension(
-                sessionManager.getSessionID(), activities);
+            PacketExtension extension = new ActivitiesPacketExtension(sessionID
+                .getValue(), activities);
 
             transmitter.sendMessage(fromJID, extension);
             log.info("I sent back " + activities.size() + " activities.");
