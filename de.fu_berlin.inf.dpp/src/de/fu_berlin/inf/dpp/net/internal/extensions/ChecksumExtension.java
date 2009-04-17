@@ -17,13 +17,12 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
 
     @Override
     public PacketFilter getFilter() {
-        return new AndFilter(super.getFilter(), PacketExtensions
+        return new AndFilter(super.getFilter(), PacketExtensionUtils
             .getInSessionFilter());
     }
 
@@ -53,7 +52,7 @@ public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
     }
 
     public static ChecksumExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             ChecksumExtension.class);
     }
 

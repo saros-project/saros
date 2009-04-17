@@ -9,7 +9,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class RequestActivityExtension extends
     SessionDefaultPacketExtension {
@@ -39,7 +38,7 @@ public abstract class RequestActivityExtension extends
      *         nothing in requestForSendingActivitiesReceived(...)
      */
     public static RequestActivityExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             RequestActivityExtension.class);
     }
 

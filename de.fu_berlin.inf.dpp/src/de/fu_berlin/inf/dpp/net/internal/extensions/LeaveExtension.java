@@ -7,7 +7,6 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class LeaveExtension extends SessionDefaultPacketExtension {
 
@@ -25,7 +24,7 @@ public abstract class LeaveExtension extends SessionDefaultPacketExtension {
      *         nothing in leaveReceived(...)
      */
     public static LeaveExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             LeaveExtension.class);
     }
 

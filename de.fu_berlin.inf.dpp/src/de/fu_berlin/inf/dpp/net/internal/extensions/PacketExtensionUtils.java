@@ -23,10 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IPath;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
-import org.jivesoftware.smack.filter.PacketExtensionFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
@@ -54,86 +52,11 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * extensions.
  * 
  * @author rdjemili
- * 
- * @TODO Naming convention for classes with just static methods is something
- *       with "Util" in the name.
- * 
- * @TODO This class should be converted to many small classes implementing the
- *       {@link SarosDefaultPacketExtension} and subclasses.
  */
-public class PacketExtensions {
-
-    /**
-     * A Saros Packet Extension is responsible for converting between the
-     * network component (XMPPChatTransmitter) and the business logic
-     */
-    public static abstract class SarosDefaultPacketExtension implements
-        PacketListener {
-
-        protected String element;
-
-        public SarosDefaultPacketExtension(String element) {
-            this.element = element;
-        }
-
-        /**
-         * Dispatch all Packets that pass the filter to the processMessage
-         * method, because we always work with Messages.
-         */
-        public void processPacket(Packet packet) {
-            if (!getFilter().accept(packet))
-                return;
-
-            processMessage(new JID(packet.getFrom()), (Message) packet);
-        }
-
-        /**
-         * Every subclass that represents a PackageExtension is supposed to
-         * implement this method by unpacking the data in message an calling a
-         * method that subclasses in PacketExtensions can implement.
-         */
-        public abstract void processMessage(JID sender, Message message);
-
-        public PacketFilter getFilter() {
-            return new PacketExtensionFilter(element, NAMESPACE);
-        }
-
-        public DefaultPacketExtension create() {
-            DefaultPacketExtension extension = new DefaultPacketExtension(
-                element, NAMESPACE);
-            return extension;
-        }
-
-        public DefaultPacketExtension getExtension(Message message) {
-            return (DefaultPacketExtension) message.getExtension(element,
-                NAMESPACE);
-        }
-    }
-
-    /**
-     * Abstract base class for all DefaultPacketExtension that need to include
-     * the current SessionID
-     */
-    public static abstract class SessionDefaultPacketExtension extends
-        SarosDefaultPacketExtension {
-
-        public SessionDefaultPacketExtension(String element) {
-            super(element);
-        }
-
-        @Override
-        public DefaultPacketExtension create() {
-            DefaultPacketExtension extension = super.create();
-
-            extension.setValue(PacketExtensions.SESSION_ID, getSessionID());
-
-            return extension;
-        }
-    }
+public class PacketExtensionUtils {
 
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
-    // attributes
     public static final String SESSION_ID = "sessionID";
 
     public static final String DESCRIPTION = "description";
@@ -146,7 +69,7 @@ public class PacketExtensions {
 
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-            PacketExtensions.NAMESPACE, new ActivitiesExtensionProvider());
+            PacketExtensionUtils.NAMESPACE, new ActivitiesExtensionProvider());
         providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
             RequestPacketExtension.NAMESPACE, new RequestExtensionProvider());
     }
@@ -158,13 +81,13 @@ public class PacketExtensions {
     public static ActivitiesPacketExtension getActvitiesExtension(
         Message message) {
         return (ActivitiesPacketExtension) message.getExtension(
-            ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            ActivitiesPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
     }
 
     public static RequestPacketExtension getJupiterRequestExtension(
         Message message) {
         return (RequestPacketExtension) message.getExtension(
-            RequestPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            RequestPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
     }
 
     /**
@@ -175,16 +98,16 @@ public class PacketExtensions {
      */
     public static String getSessionID(Message message) {
         PacketExtension extension = message.getExtension(
-            ActivitiesPacketExtension.ELEMENT, PacketExtensions.NAMESPACE);
+            ActivitiesPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
         if (extension != null) {
             return ((ActivitiesPacketExtension) extension).getSessionID();
         }
         extension = message.getExtension(RequestPacketExtension.ELEMENT,
-            PacketExtensions.NAMESPACE);
+            PacketExtensionUtils.NAMESPACE);
         if (extension != null) {
             return ((RequestPacketExtension) extension).getSessionID();
         }
-        extension = message.getExtension(PacketExtensions.NAMESPACE);
+        extension = message.getExtension(PacketExtensionUtils.NAMESPACE);
         return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
     }
 
@@ -231,7 +154,7 @@ public class PacketExtensions {
 
                     return Saros.getDefault().getSessionManager()
                         .getSessionID().equals(
-                            PacketExtensions.getSessionID(message));
+                            PacketExtensionUtils.getSessionID(message));
                 }
             });
     }

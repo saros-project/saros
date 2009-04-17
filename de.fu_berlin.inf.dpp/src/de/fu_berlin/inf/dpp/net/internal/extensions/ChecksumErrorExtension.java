@@ -13,7 +13,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class ChecksumErrorExtension extends
     SessionDefaultPacketExtension {
@@ -45,7 +44,7 @@ public abstract class ChecksumErrorExtension extends
     }
 
     public static ChecksumErrorExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             ChecksumErrorExtension.class);
     }
 

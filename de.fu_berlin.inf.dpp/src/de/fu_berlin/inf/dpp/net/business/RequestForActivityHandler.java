@@ -17,7 +17,7 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -40,7 +40,7 @@ public class RequestForActivityHandler extends RequestActivityExtension {
 
     @Override
     public PacketFilter getFilter() {
-        return new AndFilter(super.getFilter(), PacketExtensions
+        return new AndFilter(super.getFilter(), PacketExtensionUtils
             .getInSessionFilter());
     }
 

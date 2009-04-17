@@ -7,7 +7,6 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class RequestForFileListExtension extends
     SessionDefaultPacketExtension {
@@ -26,7 +25,7 @@ public abstract class RequestForFileListExtension extends
      *         nothing in requestForFileListReceived(...)
      */
     public static RequestForFileListExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             RequestForFileListExtension.class);
     }
 

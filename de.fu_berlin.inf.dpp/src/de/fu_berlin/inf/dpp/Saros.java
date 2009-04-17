@@ -72,7 +72,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
@@ -142,7 +142,7 @@ public class Saros extends AbstractUIPlugin {
     private Logger logger;
 
     static {
-        PacketExtensions.hookExtensionProviders();
+        PacketExtensionUtils.hookExtensionProviders();
         Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
     }
 

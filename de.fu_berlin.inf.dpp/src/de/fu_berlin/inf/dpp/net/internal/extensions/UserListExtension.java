@@ -14,7 +14,6 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class UserListExtension extends SessionDefaultPacketExtension {
 
@@ -50,7 +49,7 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
      *         nothing in userListReceived
      */
     public static UserListExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             UserListExtension.class);
     }
 

@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -31,7 +31,7 @@ public class UserListHandler extends UserListExtension {
 
     @Override
     public PacketFilter getFilter() {
-        return new AndFilter(super.getFilter(), PacketExtensions
+        return new AndFilter(super.getFilter(), PacketExtensionUtils
             .getFromHostFilter());
     }
 

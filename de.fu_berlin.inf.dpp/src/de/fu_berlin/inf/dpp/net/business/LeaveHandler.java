@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 
@@ -28,7 +28,7 @@ public class LeaveHandler extends LeaveExtension {
 
     @Override
     public PacketFilter getFilter() {
-        return new AndFilter(super.getFilter(), PacketExtensions
+        return new AndFilter(super.getFilter(), PacketExtensionUtils
             .getInSessionFilter());
     }
 

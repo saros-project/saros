@@ -8,7 +8,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class DataTransferExtension extends
     SessionDefaultPacketExtension {
@@ -42,7 +41,7 @@ public abstract class DataTransferExtension extends
     }
 
     public static DataTransferExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             DataTransferExtension.class);
     }
 

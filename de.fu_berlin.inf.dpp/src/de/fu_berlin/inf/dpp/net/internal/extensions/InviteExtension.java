@@ -8,7 +8,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class InviteExtension extends SessionDefaultPacketExtension {
 
@@ -34,9 +33,9 @@ public abstract class InviteExtension extends SessionDefaultPacketExtension {
          * Both arguments contain the shared project's name when this method is
          * called.
          */
-        extension.setValue(PacketExtensions.PROJECTNAME, projectName);
-        extension.setValue(PacketExtensions.DESCRIPTION, description);
-        extension.setValue(PacketExtensions.COLOR_ID, String.valueOf(colorID));
+        extension.setValue(PacketExtensionUtils.PROJECTNAME, projectName);
+        extension.setValue(PacketExtensionUtils.DESCRIPTION, description);
+        extension.setValue(PacketExtensionUtils.COLOR_ID, String.valueOf(colorID));
 
         return extension;
     }
@@ -46,7 +45,7 @@ public abstract class InviteExtension extends SessionDefaultPacketExtension {
      *         nothing in invitationReceived(...)
      */
     public static InviteExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             InviteExtension.class);
     }
 
@@ -54,12 +53,12 @@ public abstract class InviteExtension extends SessionDefaultPacketExtension {
     public void processMessage(JID sender, Message message) {
         DefaultPacketExtension inviteExtension = getExtension(message);
 
-        String desc = inviteExtension.getValue(PacketExtensions.DESCRIPTION);
-        String pName = inviteExtension.getValue(PacketExtensions.PROJECTNAME);
+        String desc = inviteExtension.getValue(PacketExtensionUtils.DESCRIPTION);
+        String pName = inviteExtension.getValue(PacketExtensionUtils.PROJECTNAME);
         String sessionID = inviteExtension
-            .getValue(PacketExtensions.SESSION_ID);
+            .getValue(PacketExtensionUtils.SESSION_ID);
         int colorID = Integer.parseInt(inviteExtension
-            .getValue(PacketExtensions.COLOR_ID));
+            .getValue(PacketExtensionUtils.COLOR_ID));
 
         invitationReceived(sender, sessionID, pName, desc, colorID);
     }

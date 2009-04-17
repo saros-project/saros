@@ -70,7 +70,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
@@ -136,7 +136,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         GodPacketListener godListener = new GodPacketListener();
 
-        PacketFilter sessionFilter = PacketExtensions
+        PacketFilter sessionFilter = PacketExtensionUtils
             .getSessionIDPacketFilter();
 
         public void processPacket(final Packet packet) {
@@ -237,7 +237,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 // Change the input method to get the right chats
                 putIncomingChat(fromJID, message.getThread());
 
-                if (PacketExtensions.getActvitiesExtension(message) != null) {
+                if (PacketExtensionUtils.getActvitiesExtension(message) != null) {
                     processActivitiesExtension(message, fromJID);
                 }
 
@@ -256,7 +256,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         private void processActivitiesExtension(final Message message,
             JID fromJID) {
 
-            ActivitiesPacketExtension activitiesPacket = PacketExtensions
+            ActivitiesPacketExtension activitiesPacket = PacketExtensionUtils
                 .getActvitiesExtension(message);
 
             List<TimedActivity> timedActivities = activitiesPacket

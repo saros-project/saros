@@ -12,7 +12,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
+import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -44,7 +44,7 @@ public class JupiterHandler {
         public void processPacket(Packet packet) {
             Message message = (Message) packet;
 
-            RequestPacketExtension packetExtension = PacketExtensions
+            RequestPacketExtension packetExtension = PacketExtensionUtils
                 .getJupiterRequestExtension(message);
 
             assert packetExtension != null;

@@ -7,7 +7,6 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SarosDefaultPacketExtension;
 
 public abstract class CancelInviteExtension extends SarosDefaultPacketExtension {
 
@@ -20,7 +19,7 @@ public abstract class CancelInviteExtension extends SarosDefaultPacketExtension 
     public DefaultPacketExtension create(String sessionID, String error) {
         DefaultPacketExtension extension = create();
 
-        extension.setValue(PacketExtensions.SESSION_ID, sessionID);
+        extension.setValue(PacketExtensionUtils.SESSION_ID, sessionID);
 
         if ((error != null) && (error.length() > 0)) {
             extension.setValue(ERROR, error);
@@ -34,7 +33,7 @@ public abstract class CancelInviteExtension extends SarosDefaultPacketExtension 
      * @return
      */
     public static CancelInviteExtension getDefault() {
-        return PacketExtensions.getContainer().getComponent(
+        return PacketExtensionUtils.getContainer().getComponent(
             CancelInviteExtension.class);
     }
 
@@ -48,5 +47,6 @@ public abstract class CancelInviteExtension extends SarosDefaultPacketExtension 
         invitationCanceledReceived(sender, errorMsg);
     }
 
-    public abstract void invitationCanceledReceived(JID sender, String errorMessage);
+    public abstract void invitationCanceledReceived(JID sender,
+        String errorMessage);
 }

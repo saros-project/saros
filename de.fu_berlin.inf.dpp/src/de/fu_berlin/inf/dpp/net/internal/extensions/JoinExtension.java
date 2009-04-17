@@ -8,7 +8,6 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions.SessionDefaultPacketExtension;
 
 public abstract class JoinExtension extends SessionDefaultPacketExtension {
 
@@ -19,7 +18,7 @@ public abstract class JoinExtension extends SessionDefaultPacketExtension {
     public PacketExtension create(int colorID) {
         DefaultPacketExtension extension = create();
 
-        extension.setValue(PacketExtensions.COLOR_ID, String.valueOf(colorID));
+        extension.setValue(PacketExtensionUtils.COLOR_ID, String.valueOf(colorID));
         return extension;
     }
 
@@ -28,7 +27,7 @@ public abstract class JoinExtension extends SessionDefaultPacketExtension {
      *         nothing in joinReceived(...)
      */
     public static JoinExtension getDefault() {
-        return PacketExtensions.getContainer()
+        return PacketExtensionUtils.getContainer()
             .getComponent(JoinExtension.class);
     }
 
@@ -38,7 +37,7 @@ public abstract class JoinExtension extends SessionDefaultPacketExtension {
             .getExtension(message);
 
         int colorID = Integer.parseInt(extension
-            .getValue(PacketExtensions.COLOR_ID));
+            .getValue(PacketExtensionUtils.COLOR_ID));
 
         joinReceived(sender, colorID);
     }
