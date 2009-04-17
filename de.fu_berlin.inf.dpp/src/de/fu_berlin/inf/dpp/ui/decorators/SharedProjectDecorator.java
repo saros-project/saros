@@ -29,12 +29,13 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -73,8 +74,12 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
         }
     };
 
+    @Inject
+    protected SessionManager sessionManager;
+
     public SharedProjectDecorator() {
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
+
+        Saros.getDefault().reinject(this);
 
         sessionManager.addSessionListener(sessionListener);
 
@@ -110,8 +115,7 @@ public class SharedProjectDecorator implements ILightweightLabelDecorator {
     }
 
     public void dispose() {
-        Saros.getDefault().getSessionManager().removeSessionListener(
-            sessionListener);
+        sessionManager.removeSessionListener(sessionListener);
     }
 
     public boolean isLabelProperty(Object element, String property) {

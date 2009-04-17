@@ -19,6 +19,7 @@ import org.eclipse.ui.editors.text.TextSourceViewerConfiguration;
 import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
 import de.fu_berlin.inf.dpp.Saros;
@@ -44,6 +45,13 @@ public class ChatView extends ViewPart implements IConnectionListener,
     private Action connectAction;
 
     private static final int[] WEIGHTS = { 75, 25 };
+
+    @Inject
+    protected MessagingManager messagingManager;
+
+    public ChatView() {
+        Saros.getDefault().reinject(this);
+    }
 
     @Override
     public void createPartControl(Composite parent) {
@@ -77,8 +85,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
                         ChatView.this.inputText.setText(""); //$NON-NLS-1$
 
                         if (!text.equals("")) { //$NON-NLS-1$
-                            Saros.getDefault().getMessagingManager()
-                                .getSession().sendMessage(text);
+                            messagingManager.getSession().sendMessage(text);
                         }
                     }
                     break;
@@ -101,7 +108,6 @@ public class ChatView extends ViewPart implements IConnectionListener,
 
             @Override
             public void run() {
-                MessagingManager mm = Saros.getDefault().getMessagingManager();
                 Saros.getDefault().getConnection().getUser();
                 if (ChatView.this.joined) {
                     try {
@@ -109,7 +115,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
                             .sendMessage("is leaving the chat...");
                         ChatView.this.inputText
                             .setText("You have left the chat. To re-enter the chat please use the connect button.");
-                        mm.disconnectMultiUserChat();
+                        messagingManager.disconnectMultiUserChat();
                         ChatView.this.session = null;
                         ChatView.this.inputText.setEditable(false);
 
@@ -122,15 +128,14 @@ public class ChatView extends ViewPart implements IConnectionListener,
                         .getImageDescriptor("/icons/disconnect.png"));
                 } else {
                     try {
-                        mm.connectMultiUserChat();
+                        messagingManager.connectMultiUserChat();
                         ChatView.this.joined = true;
                         ChatView.this.viewer.setDocument(new Document());
                         ChatView.this.inputText.setEditable(true);
                         ChatView.this.inputText.setText("");
                         ChatView.this.connectAction.setImageDescriptor(SarosUI
                             .getImageDescriptor("/icons/connect.png"));
-                        ChatView.this.session = Saros.getDefault()
-                            .getMessagingManager().getSession();
+                        ChatView.this.session = messagingManager.getSession();
                         ChatView.this.session
                             .sendMessage("has joined the chat");
                     } catch (XMPPException e) {
@@ -158,8 +163,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
         mgr.add(this.connectAction);
 
         // register ChatView as chat listener
-        MessagingManager mm = Saros.getDefault().getMessagingManager();
-        mm.addChatListener(this);
+        messagingManager.addChatListener(this);
 
         // register as connection listener
         Saros.getDefault().addListener(this);

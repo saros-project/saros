@@ -11,11 +11,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This model provider is responsible for preventing an session observer from
@@ -80,11 +81,15 @@ public class SharedModelProvider extends ModelProvider {
         }
     }
 
+    @Inject
+    protected SessionManager sessionManager;
+
     @Override
     protected void initialize() {
-        ISessionManager sm = Saros.getDefault().getSessionManager();
 
-        sm.addSessionListener(new AbstractSessionListener() {
+        Saros.getDefault().reinject(this);
+
+        sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
             public void sessionStarted(ISharedProject project) {
                 sharedProject = project;
@@ -95,9 +100,8 @@ public class SharedModelProvider extends ModelProvider {
                 assert sharedProject == project;
                 sharedProject = null;
             }
-
         });
-        this.sharedProject = sm.getSharedProject();
+        this.sharedProject = sessionManager.getSharedProject();
     }
 
     @Override
