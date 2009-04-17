@@ -4,14 +4,17 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -22,11 +25,26 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
 
     protected User selectedUser;
 
-    private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void roleChanged(User user, boolean replicated) {
             updateEnablemnet();
+        }
+    };
+
+    @Inject
+    protected SessionManager sessionManager;
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+        @Override
+        public void sessionEnded(ISharedProject sharedProject) {
+            sharedProject.removeListener(projectListener);
+        }
+
+        @Override
+        public void sessionStarted(ISharedProject sharedProject) {
+            sharedProject.addListener(projectListener);
         }
     };
 
@@ -36,18 +54,9 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the exclusive driver role to this user");
 
-        Saros.getDefault().getSessionManager().addSessionListener(
-            new AbstractSessionListener() {
-                @Override
-                public void sessionEnded(ISharedProject sharedProject) {
-                    sharedProject.removeListener(projectListener);
-                }
+        Saros.getDefault().reinject(this);
 
-                @Override
-                public void sessionStarted(ISharedProject sharedProject) {
-                    sharedProject.addListener(projectListener);
-                }
-            });
+        sessionManager.addSessionListener(sessionListener);
 
         updateEnablemnet();
     }
@@ -65,8 +74,8 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     }
 
     public void runGiveExclusiveDriver() {
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+
+        ISharedProject project = sessionManager.getSharedProject();
 
         // set all participants other than the selected to observer
         for (User user : project.getParticipants()) {
@@ -88,8 +97,7 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     }
 
     private void updateEnablemnet() {
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
 
         // Only the host can use this action
         boolean enabled = project != null && project.isHost();
