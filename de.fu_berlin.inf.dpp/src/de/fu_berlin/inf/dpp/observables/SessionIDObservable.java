@@ -7,7 +7,7 @@ public class SessionIDObservable extends ObservableValue<String> {
     public final static String NOT_IN_SESSION = "NOT_IN_SESSION";
 
     public SessionIDObservable() {
-        super(null);
+        super(NOT_IN_SESSION);
     }
 
     public boolean isInASession() {
