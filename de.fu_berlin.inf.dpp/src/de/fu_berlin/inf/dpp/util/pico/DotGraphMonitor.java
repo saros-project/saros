@@ -67,6 +67,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
         try {
             String output = "digraph G {\n" + "  node [shape=box];\n"
+                + "  rank=source;\n" + "  rankdir=LR;\n"
                 + getClassDependencyGraph() + "\n" + "}";
 
             FileUtils.writeStringToFile(file, output);
