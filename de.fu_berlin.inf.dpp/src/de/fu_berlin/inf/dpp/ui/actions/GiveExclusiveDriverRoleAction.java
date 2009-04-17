@@ -40,11 +40,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         @Override
         public void sessionEnded(ISharedProject sharedProject) {
             sharedProject.removeListener(projectListener);
+            updateEnablemnet();
         }
 
         @Override
         public void sessionStarted(ISharedProject sharedProject) {
             sharedProject.addListener(projectListener);
+            updateEnablemnet();
         }
     };
 

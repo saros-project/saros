@@ -32,14 +32,14 @@ public class FollowModeAction extends Action implements Disposable {
     private static final Logger log = Logger.getLogger(FollowModeAction.class
         .getName());
 
-    ISharedProjectListener roleChangeListener = new AbstractSharedProjectListener() {
+    protected ISharedProjectListener roleChangeListener = new AbstractSharedProjectListener() {
         @Override
         public void roleChanged(User user, boolean replicated) {
             updateEnablement();
         }
     };
 
-    ISessionListener sessionListener = new AbstractSessionListener() {
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void sessionStarted(ISharedProject sharedProject) {
 
@@ -91,7 +91,7 @@ public class FollowModeAction extends Action implements Disposable {
         }
     };
 
-    ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
+    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user) {
 
@@ -138,28 +138,28 @@ public class FollowModeAction extends Action implements Disposable {
                 log.info("setFollowing to " + toFollow);
                 editorManager.setFollowing(toFollow);
             }
+        });
+    }
 
-            private User getNewToFollow() {
-                ISharedProject project = sessionManager.getSharedProject();
+    protected User getNewToFollow() {
+        ISharedProject project = sessionManager.getSharedProject();
 
-                assert project != null;
+        assert project != null;
 
-                User following = editorManager.getFollowedUser();
+        User following = editorManager.getFollowedUser();
 
-                if (following != null) {
-                    return null;
-                } else {
-                    for (User user : project.getParticipants()) {
-                        if (user.equals(Saros.getDefault().getLocalUser()))
-                            continue;
-                        if (user.isDriver()) {
-                            return user;
-                        }
-                    }
-                    return null;
+        if (following != null) {
+            return null;
+        } else {
+            for (User user : project.getParticipants()) {
+                if (user.equals(Saros.getDefault().getLocalUser()))
+                    continue;
+                if (user.isDriver()) {
+                    return user;
                 }
             }
-        });
+            return null;
+        }
     }
 
     protected boolean canFollow() {
