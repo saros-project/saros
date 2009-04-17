@@ -1,16 +1,16 @@
-package de.fu_berlin.inf.dpp.project;
+package de.fu_berlin.inf.dpp.observables;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
- * This proxy contains the SharedProject that is currently open or null if no
- * project is open.
+ * This observable contains the SharedProject that is currently open or null if
+ * no project is open.
  * 
- * The proxy is set to a new project, before ISharedProject.start() has been
- * called and before the ISessionListeners are notified that the Session has
- * started.
+ * The observable is set to a new project, before ISharedProject.start() has
+ * been called and before the ISessionListeners are notified that the Session
+ * has started.
  * 
  * The proxy is set to null, after ISharedProject.stop() has been called but
  * before the ISessionListeners are notified that the Session is has ended.
@@ -18,9 +18,9 @@ import de.fu_berlin.inf.dpp.util.ObservableValue;
  * @component The single instance of this class per application is created by
  *            PicoContainer in the central plug-in class {@link Saros}
  */
-public class CurrentProjectProxy extends ObservableValue<SharedProject> {
+public class SharedProjectObservable extends ObservableValue<SharedProject> {
 
-    public CurrentProjectProxy() {
+    public SharedProjectObservable() {
         super(null);
     }
 

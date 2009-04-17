@@ -13,7 +13,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -31,7 +31,7 @@ public class JupiterHandler {
         .getName());
 
     @Inject
-    CurrentProjectProxy currentProject;
+    SharedProjectObservable currentProject;
 
     public JupiterHandler(XMPPChatReceiver receiver) {
         receiver.addPacketListener(listener, new AndFilter(

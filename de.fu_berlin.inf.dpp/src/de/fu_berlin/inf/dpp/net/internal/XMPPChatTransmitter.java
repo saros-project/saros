@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
@@ -119,6 +120,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     @Inject
     protected SessionIDObservable sessionID;
+
+    @Inject
+    protected SharedProjectObservable sharedProject;
 
     protected DataTransferManager dataManager;
 
@@ -215,8 +219,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                                 return;
                             }
 
-                            ISharedProject project = saros.getSessionManager()
-                                .getSharedProject();
+                            ISharedProject project = sharedProject.getValue();
 
                             if (project != null) {
                                 // a new user joined this session
@@ -730,8 +733,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         List<TimedActivity> timedActivities) {
         String source = fromJID.toString();
 
-        final ISharedProject project = saros.getSessionManager()
-            .getSharedProject();
+        final ISharedProject project = sharedProject.getValue();
 
         if ((project == null) || (project.getParticipant(fromJID) == null)) {
             XMPPChatTransmitter.log.warn("Received activities from " + source

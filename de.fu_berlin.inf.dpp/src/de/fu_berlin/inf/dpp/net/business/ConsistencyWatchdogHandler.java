@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.project.CurrentProjectProxy;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -261,7 +261,7 @@ public class ConsistencyWatchdogHandler {
     protected ITransmitter transmitter;
 
     @Inject
-    protected CurrentProjectProxy project;
+    protected SharedProjectObservable project;
 
     @Inject
     protected EditorManager editorManager;

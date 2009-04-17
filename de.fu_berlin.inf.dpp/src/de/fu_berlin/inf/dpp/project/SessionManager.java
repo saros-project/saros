@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -59,7 +60,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         .getLogger(SessionManager.class.getName());
 
     @Inject
-    protected CurrentProjectProxy currentlySharedProject;
+    protected SharedProjectObservable currentlySharedProject;
 
     @Inject
     protected XMPPChatReceiver xmppReceiver;

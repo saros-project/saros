@@ -14,6 +14,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
 /**
@@ -23,7 +24,7 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 public class SarosRosterListener implements ConnectionSessionListener {
 
     @Inject
-    protected CurrentProjectProxy currentlySharedProject;
+    protected SharedProjectObservable currentlySharedProject;
 
     RosterListener listener = new RosterListener() {
         public void entriesAdded(Collection<String> addresses) {
