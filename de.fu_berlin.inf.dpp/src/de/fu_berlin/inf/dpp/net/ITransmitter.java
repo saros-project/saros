@@ -294,7 +294,12 @@ public interface ITransmitter {
         Request request, JID jid);
 
     /**
-     * Sends a FileChecksumErrorMessage with the given path to all clients.
+     * Sends a FileChecksumErrorMessage with the given path to the given list of
+     * users.
+     * 
+     * @param recipients
+     *            The list of users to send this message to. The local user is
+     *            explicitly allowed to be contained in this list.
      * 
      * @param paths
      *            The project relative path of files which are affected. This
@@ -305,7 +310,8 @@ public interface ITransmitter {
      *            inconsistency has been detected and clients should block all
      *            further user operation.
      */
-    public void sendFileChecksumErrorMessage(Set<IPath> paths, boolean resolved);
+    public void sendFileChecksumErrorMessage(List<JID> recipients,
+        Set<IPath> paths, boolean resolved);
 
     /**
      * Sends the given DocumentChecksums to all clients.
@@ -314,7 +320,8 @@ public interface ITransmitter {
      * 
      * @host This method should only be called on the host.
      */
-    public void sendDocChecksumsToClients(Collection<DocumentChecksum> checksums);
+    public void sendDocChecksumsToClients(List<JID> recipients,
+        Collection<DocumentChecksum> checksums);
 
     /**
      * Execute the given runnable as if it was received via the network

@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
@@ -195,6 +196,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(Saros.class, this);
         this.container.addComponent(SarosRosterListener.class);
         this.container.addComponent(SarosUI.class);
+        this.container.addComponent(SessionIDObservable.class);
         this.container.addComponent(SessionManager.class);
         this.container.addComponent(SessionViewOpener.class);
         this.container.addComponent(SharedResourcesManager.class);

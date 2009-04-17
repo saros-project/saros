@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -66,9 +67,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     @Inject
     protected XMPPChatTransmitter transmitter;
 
-    private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
+    @Inject
+    protected SessionIDObservable sessionID;
 
-    private String sessionID = NOT_IN_SESSION;
+    private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
     @Deprecated
     public ITransmitter getTransmitter() {
@@ -91,7 +93,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
 
         JID myJID = saros.getMyJID();
-        this.sessionID = String.valueOf(sessionRandom.nextInt());
+        this.sessionID.setValue(String.valueOf(sessionRandom.nextInt()));
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
             project, myJID);
@@ -110,12 +112,13 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     /**
-     * Every Session is identified by an int as identifier.
+     * Every Session is identified by an random integer as an identifier.
      * 
      * @return the session id of this session
      */
+    @Deprecated
     public String getSessionID() {
-        return sessionID;
+        return sessionID.getValue();
     }
 
     /**
@@ -168,7 +171,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             }
         }
 
-        sessionID = NOT_IN_SESSION;
+        sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
 
         SessionManager.log.info("Session left");
     }
@@ -190,7 +193,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public IIncomingInvitationProcess invitationReceived(JID from,
         String sessionID, String projectName, String description, int colorID) {
 
-        this.sessionID = sessionID;
+        this.sessionID.setValue(sessionID);
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
             this.transmitter, from, projectName, description, colorID);
@@ -237,6 +240,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
          * We never started a session, but still had set a session ID because we
          * were in an InvitationProcess.
          */
-        sessionID = NOT_IN_SESSION;
+        sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
     }
 }

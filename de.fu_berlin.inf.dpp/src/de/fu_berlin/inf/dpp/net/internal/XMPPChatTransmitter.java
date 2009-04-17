@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensions;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
@@ -112,6 +113,12 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     @Inject
     protected XMPPChatReceiver receiver;
+
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected SessionIDObservable sessionID;
 
     protected DataTransferManager dataManager;
 
@@ -307,7 +314,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             .debug("Send request to cancel Invititation to [" + user.getBase()
                 + "] with error msg: " + errorMsg);
         sendMessage(user, CancelInviteExtension.getDefault().create(
-            Saros.getDefault().getSessionManager().getSessionID(), errorMsg));
+            sessionID.getValue(), errorMsg));
     }
 
     public void sendRequestForFileListMessage(JID toJID) {
@@ -393,8 +400,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         assert containsNoFileCreationActivities(timedActivities);
 
-        sendMessage(recipient, new ActivitiesPacketExtension(Saros.getDefault()
-            .getSessionManager().getSessionID(), timedActivities));
+        sendMessage(recipient, new ActivitiesPacketExtension(sessionID
+            .getValue(), timedActivities));
 
         XMPPChatTransmitter.log.info("Sent Activities to " + recipient + ": "
             + timedActivities);
@@ -548,49 +555,31 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessage(to, UserListExtension.getDefault().create(participants));
     }
 
-    public void sendFileChecksumErrorMessage(Set<IPath> paths, boolean resolved) {
-
-        Collection<User> participants = Saros.getDefault().getSessionManager()
-            .getSharedProject().getParticipants();
+    public void sendFileChecksumErrorMessage(List<JID> recipients,
+        Set<IPath> paths, boolean resolved) {
 
         XMPPChatTransmitter.log.debug("Sending checksum "
             + (resolved ? "resolved" : "error") + " message of files "
-            + Util.toOSString(paths) + " to all");
+            + Util.toOSString(paths) + " to " + recipients);
 
-        for (User user : participants) {
-            sendMessage(user.getJID(), ChecksumErrorExtension.getDefault()
-                .create(paths, resolved));
+        for (JID recipient : recipients) {
+            sendMessage(recipient, ChecksumErrorExtension.getDefault().create(
+                paths, resolved));
         }
     }
 
-    public void sendDocChecksumsToClients(Collection<DocumentChecksum> checksums) {
+    public void sendDocChecksumsToClients(List<JID> recipients,
+        Collection<DocumentChecksum> checksums) {
 
         if (!connection.isConnected())
             return;
 
-        // send checksums to all clients
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        // TODO: Assert on the client side that this message was send by the
+        // host
+        // assert project.isHost() :
+        // "This message should only be called from the host";
 
-        if (project == null) {
-            return;
-        }
-
-        assert project.isHost() : "This message should only be called from the host";
-
-        Collection<User> participants = project.getParticipants();
-        if (participants == null) {
-            return;
-        }
-
-        for (User participant : participants) {
-
-            JID jid = participant.getJID();
-
-            if (project.getHost().getJID().equals(jid)) {
-                continue;
-            }
-
+        for (JID jid : recipients) {
             try {
                 sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault()
                     .create(checksums));
@@ -628,8 +617,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         Request request, JID jid) {
         XMPPChatTransmitter.log.info("Send Jupiter [" + jid.getName() + "]: "
             + request);
-        sendMessage(jid, new RequestPacketExtension(Saros.getDefault()
-            .getSessionManager().getSessionID(), request));
+        sendMessage(jid, new RequestPacketExtension(sessionID.getValue(),
+            request));
     }
 
     /**

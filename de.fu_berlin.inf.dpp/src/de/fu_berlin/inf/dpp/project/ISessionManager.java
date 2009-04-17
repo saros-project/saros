@@ -23,8 +23,6 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
  */
 public interface ISessionManager {
 
-    public final static String NOT_IN_SESSION = "NOT_IN_SESSION";
-
     /**
      * @return the active SharedProject object or <code>null</code> if there is
      *         no active project.

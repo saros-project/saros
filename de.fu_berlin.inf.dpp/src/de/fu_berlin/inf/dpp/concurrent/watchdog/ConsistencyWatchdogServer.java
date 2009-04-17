@@ -1,7 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -16,9 +18,11 @@ import org.eclipse.jface.text.IDocumentListener;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -186,14 +190,25 @@ public class ConsistencyWatchdogServer extends Job {
         }
 
         // Send to all Clients
-        if (docsChecksums.values().size() > 0) {
-            // TODO Connection of Transmitter might be closed at the moment
+        // TODO Since this is done asynchronously a race condition might occur
+        if (docsChecksums.values().size() > 0 && saros.isConnected()) {
+
             sessionManager.getTransmitter().sendDocChecksumsToClients(
-                docsChecksums.values());
+                getOthers(), docsChecksums.values());
         }
 
         // Reschedule the next run in INTERVAL ms
         schedule(INTERVAL);
         return Status.OK_STATUS;
+    }
+
+    public List<JID> getOthers() {
+        ArrayList<JID> result = new ArrayList<JID>();
+        for (User user : sharedProject.getParticipants()) {
+            if (!user.equals(saros.getLocalUser())) {
+                result.add(user.getJID());
+            }
+        }
+        return result;
     }
 }

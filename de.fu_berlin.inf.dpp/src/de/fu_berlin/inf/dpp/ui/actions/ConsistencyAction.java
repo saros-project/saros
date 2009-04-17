@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -22,6 +24,7 @@ import org.picocontainer.annotations.Inject;
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -272,8 +275,8 @@ public class ConsistencyAction extends Action {
                 }
 
                 // Send checksumErrorMessage to host
-                transmitter.sendFileChecksumErrorMessage(pathsOfHandledFiles,
-                    false);
+                transmitter.sendFileChecksumErrorMessage(getParticipants(),
+                    pathsOfHandledFiles, false);
 
             } else {
 
@@ -281,11 +284,19 @@ public class ConsistencyAction extends Action {
                 dataTransferManager.removeDataReceiver(receiver);
 
                 // Send message to host that all inconsistencies are resolved
-                transmitter.sendFileChecksumErrorMessage(pathsOfHandledFiles,
-                    true);
+                transmitter.sendFileChecksumErrorMessage(getParticipants(),
+                    pathsOfHandledFiles, true);
                 pathsOfHandledFiles.clear();
             }
         }
+    }
+
+    public List<JID> getParticipants() {
+        ArrayList<JID> result = new ArrayList<JID>();
+        for (User user : sharedProject.getParticipants()) {
+            result.add(user.getJID());
+        }
+        return result;
     }
 
     /**

@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISessionManager;
 
 /**
@@ -36,7 +37,7 @@ public class InvitationHandler extends InviteExtension {
     public void invitationReceived(JID sender, String sessionID,
         String projectName, String description, int colorID) {
         ISessionManager sm = Saros.getDefault().getSessionManager();
-        if (sm.getSessionID().equals(ISessionManager.NOT_IN_SESSION)) {
+        if (sm.getSessionID().equals(SessionIDObservable.NOT_IN_SESSION)) {
             log.debug("Received invitation with session id " + sessionID);
             log.debug("and ColorID: " + colorID + ", i'm "
                 + Saros.getDefault().getMyJID());
