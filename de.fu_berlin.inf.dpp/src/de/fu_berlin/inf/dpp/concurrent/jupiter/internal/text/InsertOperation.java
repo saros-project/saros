@@ -26,6 +26,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -34,6 +37,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * The InsertOperation is used to hold a text together with its position index.
  * The text is to be inserted in the document model.
  */
+@XStreamAlias("insertOp")
 public class InsertOperation implements Operation {
 
     /**
@@ -44,6 +48,7 @@ public class InsertOperation implements Operation {
     /**
      * the position index in the document
      */
+    @XStreamAsAttribute
     private int position;
 
     /**
@@ -53,6 +58,7 @@ public class InsertOperation implements Operation {
      * Therefore, if the two positions do not relate on the same document
      * context, a least synchronization point (LSP) would have to be determined.
      */
+    @XStreamAsAttribute
     private int origin;
 
     /**

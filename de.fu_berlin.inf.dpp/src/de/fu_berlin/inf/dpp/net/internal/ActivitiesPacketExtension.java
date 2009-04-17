@@ -42,6 +42,13 @@ import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
@@ -147,6 +154,10 @@ public class ActivitiesPacketExtension implements PacketExtension {
                 EditorActivity.class, FileActivity.class, FolderActivity.class,
                 RoleActivity.class, TextEditActivity.class,
                 TextSelectionActivity.class, ViewportActivity.class });
+            xstream.processAnnotations(new Class[] { Request.class,
+                JupiterVectorTime.class, DeleteOperation.class,
+                InsertOperation.class, NoOperation.class, SplitOperation.class,
+                TimestampOperation.class });
         }
         return xstream;
     }

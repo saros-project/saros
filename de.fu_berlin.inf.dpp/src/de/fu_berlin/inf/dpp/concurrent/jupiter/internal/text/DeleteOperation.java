@@ -26,6 +26,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -34,6 +37,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * The DeleteOperation is used to hold a text together with its position that is
  * to be deleted in the document model.
  */
+@XStreamAlias("deleteOp")
 public class DeleteOperation implements Operation {
 
     /**
@@ -44,6 +48,7 @@ public class DeleteOperation implements Operation {
     /**
      * the position in the document where the text is to be deleted.
      */
+    @XStreamAsAttribute
     private int position;
 
     /**

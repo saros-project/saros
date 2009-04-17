@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -40,6 +42,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * 
  * @see Operation
  */
+@XStreamAlias("splitOp")
 public class SplitOperation implements Operation {
 
     private static final Logger log = Logger.getLogger(SplitOperation.class

@@ -1,21 +1,29 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.VectorTime;
 
 /**
  * This class models the vector time for the Jupiter control algorithm.
  */
+@XStreamAlias("vectorTime")
 public class JupiterVectorTime implements VectorTime {
 
     /**
      * Counter for the number of local operations.
      */
+    @XStreamAlias("local")
+    @XStreamAsAttribute
     private int localOperationCnt;
 
     /**
      * Counter for the number of remote operations.
      */
+    @XStreamAlias("remote")
+    @XStreamAsAttribute
     private int remoteOperationCnt;
 
     /**

@@ -26,12 +26,15 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
 /**
  * The NoOperation is used to hold a empty text together with the position zero.
  */
+@XStreamAlias("noOp")
 public class NoOperation implements Operation {
 
     /**

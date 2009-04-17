@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
@@ -15,6 +17,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  * 
  * @author orieger
  */
+@XStreamAlias("timestampOp")
 public class TimestampOperation implements Operation {
 
     /**

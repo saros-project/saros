@@ -2,6 +2,9 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import org.eclipse.core.runtime.IPath;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -9,6 +12,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 /**
  * A Request is an Activity that can be handled by the Jupiter Algorithm.
  */
+@XStreamAlias("jupiterRequest")
 public class Request extends AbstractActivity {
 
     /**
@@ -19,6 +23,7 @@ public class Request extends AbstractActivity {
 
     private final Operation operation;
 
+    @XStreamAsAttribute
     private IPath editor;
 
     public Request(Timestamp timestamp, Operation operation, JID jid,
