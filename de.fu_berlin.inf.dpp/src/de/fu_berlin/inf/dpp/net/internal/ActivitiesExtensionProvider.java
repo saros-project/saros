@@ -22,7 +22,8 @@ package de.fu_berlin.inf.dpp.net.internal;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.xmlpull.v1.XmlPullParser;
 
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension.Content;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
 import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 public class ActivitiesExtensionProvider implements PacketExtensionProvider {

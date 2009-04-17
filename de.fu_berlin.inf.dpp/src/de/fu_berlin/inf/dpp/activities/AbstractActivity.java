@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 // TODO [MR] Add some information what needs to be done to add a new activity.
