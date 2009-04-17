@@ -28,11 +28,14 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -47,6 +50,21 @@ public class InviteAction extends SelectionProviderAction {
     private static final Logger log = Logger.getLogger(InviteAction.class
         .getName());
 
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+        @Override
+        public void sessionStarted(ISharedProject sharedProject) {
+            updateEnablement();
+        }
+
+        @Override
+        public void sessionEnded(ISharedProject sharedProject) {
+            updateEnablement();
+        }
+    };
+
+    @Inject
+    protected SessionManager sessionManager;
+
     public InviteAction(ISelectionProvider provider) {
         super(provider, "Invite user to shared project..");
         setToolTipText("Invite user to shared project..");
@@ -54,16 +72,8 @@ public class InviteAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/transmit_blue.png"));
 
-        Saros.getDefault().getSessionManager().addSessionListener(
-            new AbstractSessionListener() {
-                public void sessionStarted(ISharedProject sharedProject) {
-                    updateEnablement();
-                }
-
-                public void sessionEnded(ISharedProject sharedProject) {
-                    updateEnablement();
-                }
-            });
+        Saros.getDefault().reinject(this);
+        sessionManager.addSessionListener(sessionListener);
 
         updateEnablement();
     }
@@ -75,7 +85,7 @@ public class InviteAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                Saros.getDefault().getSessionManager().getSharedProject()
+                sessionManager.getSharedProject()
                     .startInvitation(getSelected());
             }
         });
@@ -112,8 +122,7 @@ public class InviteAction extends SelectionProviderAction {
 
     public boolean canInviteSelected() {
 
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
 
         List<JID> selected = getSelected();
 
