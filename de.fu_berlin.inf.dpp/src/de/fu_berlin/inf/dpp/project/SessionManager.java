@@ -113,16 +113,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     /**
-     * Every Session is identified by an random integer as an identifier.
-     * 
-     * @return the session id of this session
-     */
-    @Deprecated
-    public String getSessionID() {
-        return sessionID.getValue();
-    }
-
-    /**
      * {@inheritDoc}
      */
     public ISharedProject joinSession(IProject project, JID host, int colorID) {

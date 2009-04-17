@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -75,7 +76,8 @@ public class PacketExtensionUtils {
     }
 
     public static String getSessionID() {
-        return Saros.getDefault().getSessionManager().getSessionID();
+        return Saros.getDefault().getContainer().getComponent(
+            SessionIDObservable.class).getValue();
     }
 
     public static ActivitiesPacketExtension getActvitiesExtension(
@@ -152,9 +154,8 @@ public class PacketExtensionUtils {
                 public boolean accept(Packet arg0) {
                     Message message = (Message) arg0;
 
-                    return Saros.getDefault().getSessionManager()
-                        .getSessionID().equals(
-                            PacketExtensionUtils.getSessionID(message));
+                    return getSessionID().equals(
+                        PacketExtensionUtils.getSessionID(message));
                 }
             });
     }

@@ -4,18 +4,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 
@@ -37,9 +37,11 @@ public class MultiUserChatManager {
     /* current muc connection. */
     private MultiUserChat muc;
 
-    public MultiUserChatManager(String roomName) {
-        this.room = roomName;
-    }
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected SessionIDObservable sessionID;
 
     public void initMUC(XMPPConnection connection, String user, String room)
         throws XMPPException {
@@ -118,6 +120,7 @@ public class MultiUserChatManager {
         return this.muc;
     }
 
+    @Deprecated
     public void sendActivities(ISharedProject sharedProject,
         List<TimedActivity> activities) {
 
@@ -126,21 +129,18 @@ public class MultiUserChatManager {
             /* create new message for multi chat. */
             Message newMessage = this.muc.createMessage();
             /* add packet extension. */
-            newMessage.addExtension(new ActivitiesPacketExtension(Saros
-                .getDefault().getSessionManager().getSessionID(), activities));
+            newMessage.addExtension(new ActivitiesPacketExtension(sessionID
+                .getValue(), activities));
             /* add jid property */
-            newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, Saros
-                .getDefault().getMyJID().toString());
+            newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, saros
+                .getMyJID().toString());
 
             // newMessage.setBody("test");
             this.muc.sendMessage(newMessage);
             PacketProtokollLogger.getInstance().sendPacket(newMessage);
 
         } catch (XMPPException e) {
-
-            Saros.getDefault().getLog().log(
-                new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                    "Could not send message, message queued", e));
+            log.error("Could not send message, message queued", e);
         }
 
     }

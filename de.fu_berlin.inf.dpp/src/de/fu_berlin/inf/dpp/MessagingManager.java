@@ -37,6 +37,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.MessageEventManager;
 import org.jivesoftware.smackx.muc.InvitationListener;
 import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -63,9 +64,8 @@ public class MessagingManager implements PacketListener, MessageListener,
 
     MessageEventManager messageEventManager;
 
-    MultiUserChatManager multitrans = null;
-
-    private final String CHAT_ROOM = "saros";
+    @Inject
+    MultiUserChatManager multitrans;
 
     public static class ChatLine {
         public String sender;
@@ -330,10 +330,8 @@ public class MessagingManager implements PacketListener, MessageListener,
 
     private MultiChatSession session;
 
-    public MessagingManager() {
-        Saros.getDefault().addListener(this);
-
-        this.multitrans = new MultiUserChatManager(this.CHAT_ROOM);
+    public MessagingManager(Saros saros) {
+        saros.addListener(this);
     }
 
     /*

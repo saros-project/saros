@@ -312,6 +312,8 @@ public class Saros extends AbstractUIPlugin {
      * 
      * @return The PicoContainer containing all Singleton objects of this Saros
      *         plug-in instance.
+     * 
+     *         TODO This method should be @deprecated
      */
     public PicoContainer getContainer() {
         return container;

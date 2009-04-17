@@ -40,16 +40,6 @@ public interface ISessionManager {
     public void startSession(IProject project) throws XMPPException;
 
     /**
-     * Every Session is identified by an int as identifier.
-     * 
-     * Note: The session ID is also set during an invitation process being in
-     * handled
-     * 
-     * @return the session id of this session
-     */
-    public String getSessionID();
-
-    /**
      * Creates a shared project for a session hosted remotely. The returned
      * project is NOT started!
      * 
