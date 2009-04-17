@@ -21,14 +21,17 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -47,12 +50,30 @@ public class RemoveAllDriverRoleAction extends Action {
     private static final Logger log = Logger
         .getLogger(RemoveAllDriverRoleAction.class.getName());
 
-    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
         public void roleChanged(User user, boolean replicated) {
             updateEnablement();
         }
     };
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+
+        @Override
+        public void sessionStarted(ISharedProject sharedProject) {
+            sharedProject.addListener(sharedProjectListener);
+            updateEnablement();
+        }
+
+        @Override
+        public void sessionEnded(ISharedProject sharedProject) {
+            sharedProject.removeListener(sharedProjectListener);
+            updateEnablement();
+        }
+    };
+
+    @Inject
+    protected SessionManager sessionManager;
 
     public RemoveAllDriverRoleAction() {
         super("Remove driver roles");
@@ -60,21 +81,8 @@ public class RemoveAllDriverRoleAction extends Action {
         setToolTipText("Remove all driver roles");
         setId(ACTION_ID);
 
-        Saros.getDefault().getSessionManager().addSessionListener(
-            new AbstractSessionListener() {
-
-                @Override
-                public void sessionStarted(ISharedProject sharedProject) {
-                    sharedProject.addListener(sharedProjectListener);
-                    updateEnablement();
-                }
-
-                @Override
-                public void sessionEnded(ISharedProject sharedProject) {
-                    sharedProject.removeListener(sharedProjectListener);
-                    updateEnablement();
-                }
-            });
+        Saros.getDefault().reinject(this);
+        sessionManager.addSessionListener(sessionListener);
         updateEnablement();
     }
 
@@ -92,18 +100,17 @@ public class RemoveAllDriverRoleAction extends Action {
 
     public void runRemoveAllDrivers() {
 
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
         for (User user : project.getParticipants()) {
             if (user.isDriver()) {
                 project.setUserRole(user, UserRole.OBSERVER, false);
             }
         }
+        updateEnablement();
     }
 
-    private void updateEnablement() {
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+    protected void updateEnablement() {
+        ISharedProject project = sessionManager.getSharedProject();
         setEnabled((project != null && project.isHost()));
     }
 }

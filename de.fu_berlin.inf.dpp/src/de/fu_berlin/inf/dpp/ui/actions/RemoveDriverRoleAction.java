@@ -23,13 +23,13 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     private static final Logger log = Logger
         .getLogger(RemoveDriverRoleAction.class.getName());
 
-    private User selectedUser;
+    protected User selectedUser;
 
-    private ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
+    protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void roleChanged(User user, boolean replicated) {
-            updateEnablemnet();
+            updateEnablement();
         }
     };
 
@@ -37,6 +37,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         @Override
         public void sessionStarted(ISharedProject sharedProject) {
             sharedProject.addListener(projectListener);
+            updateEnablement();
         }
 
         @Override
@@ -55,8 +56,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
         Saros.getDefault().reinject(this);
         sessionManager.addSessionListener(sessionListener);
-
-        updateEnablemnet();
+        updateEnablement();
     }
 
     /**
@@ -72,20 +72,23 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     }
 
     public void runRemoveDriver() {
-        ISharedProject project = sessionManager.getSharedProject();
-        if (selectedUser.isDriver())
-            project.setUserRole(selectedUser, UserRole.OBSERVER, false);
-        updateEnablemnet();
+        if (selectedUser.isDriver()) {
+            sessionManager.getSharedProject().setUserRole(selectedUser,
+                UserRole.OBSERVER, false);
+        } else {
+            log.warn("User is no driver: " + selectedUser);
+        }
+        updateEnablement();
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
         this.selectedUser = (selection.size() == 1) ? (User) selection
             .getFirstElement() : null;
-        updateEnablemnet();
+        updateEnablement();
     }
 
-    private void updateEnablemnet() {
+    protected void updateEnablement() {
         ISharedProject project = sessionManager.getSharedProject();
 
         boolean enabled = ((project != null) && (this.selectedUser != null)

@@ -29,7 +29,7 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
 
         @Override
         public void roleChanged(User user, boolean replicated) {
-            updateEnablemnet();
+            updateEnablement();
         }
     };
 
@@ -40,13 +40,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         @Override
         public void sessionEnded(ISharedProject sharedProject) {
             sharedProject.removeListener(projectListener);
-            updateEnablemnet();
+            updateEnablement();
         }
 
         @Override
         public void sessionStarted(ISharedProject sharedProject) {
             sharedProject.addListener(projectListener);
-            updateEnablemnet();
+            updateEnablement();
         }
     };
 
@@ -60,7 +60,7 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
 
         sessionManager.addSessionListener(sessionListener);
 
-        updateEnablemnet();
+        updateEnablement();
     }
 
     /**
@@ -95,10 +95,10 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     public void selectionChanged(IStructuredSelection selection) {
         this.selectedUser = (selection.size() == 1) ? (User) selection
             .getFirstElement() : null;
-        updateEnablemnet();
+        updateEnablement();
     }
 
-    private void updateEnablemnet() {
+    protected void updateEnablement() {
         ISharedProject project = sessionManager.getSharedProject();
 
         // Only the host can use this action
