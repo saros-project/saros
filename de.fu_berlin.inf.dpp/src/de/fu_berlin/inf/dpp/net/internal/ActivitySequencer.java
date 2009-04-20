@@ -272,8 +272,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
                 activities.size());
             ActivityQueue queue = getActivityQueue(recipient);
-            for (IActivity activity : activities) {
-                result.add(queue.createTimedActivity(activity));
+            synchronized (queue) {
+                for (IActivity activity : activities) {
+                    result.add(queue.createTimedActivity(activity));
+                }
             }
             return result;
         }
@@ -555,7 +557,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     /**
      * Sends given activities to given recipients.
      */
-    public void sendActivities(Collection<User> recipients,
+    protected void sendActivities(Collection<User> recipients,
         List<IActivity> activities) {
 
         setSenderOnTextEditActivities(activities);
@@ -672,8 +674,12 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     /**
      * Create {@link TimedActivity}s for the given recipient and activities and
      * add them to the history of activities for the recipient.
+     * 
+     * This operation is thread safe, i.e. it is guaranteed that all activities
+     * get increasing, consecutive sequencer numbers, even if this method is
+     * called from different threads concurrently.
      */
-    List<TimedActivity> createTimedActivities(JID recipient,
+    protected List<TimedActivity> createTimedActivities(JID recipient,
         List<IActivity> activities) {
         return queues.createTimedActivities(recipient, activities);
     }
