@@ -124,6 +124,16 @@ public class ConsistencyWatchdogServer extends Job {
     @Override
     protected IStatus run(IProgressMonitor monitor) {
 
+        try {
+            return runUnsafe(monitor);
+        } catch (RuntimeException e) {
+            log.error("Internal Error: ", e);
+            schedule(10000);
+            return Status.OK_STATUS;
+        }
+    }
+
+    protected IStatus runUnsafe(IProgressMonitor monitor) {
         if (sessionManager.getSharedProject() == null)
             return Status.OK_STATUS;
 

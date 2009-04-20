@@ -55,6 +55,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -386,7 +387,7 @@ public class EditorManager implements IActivityProvider {
         @Override
         public void userJoined(JID user) {
 
-            // TODO This should only be sent to this user
+            // TODO [MR] This should only be sent to this user
 
             // TODO The user should be able to ask us for this state
 
@@ -394,8 +395,7 @@ public class EditorManager implements IActivityProvider {
             // position
 
             // TODO Since we send the information about editors and viewports in
-            // different activities,
-            // there are always warnings displayed
+            // different activities, there are always warnings displayed
 
             // Let the new user know where we are
             fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
@@ -609,6 +609,9 @@ public class EditorManager implements IActivityProvider {
      */
     public IDocument getDocument(IPath path) {
 
+        if (path == null)
+            throw new IllegalArgumentException();
+
         IDocument result = null;
 
         Set<IEditorPart> editors = getEditors(path);
@@ -636,15 +639,19 @@ public class EditorManager implements IActivityProvider {
     }
 
     /**
-     * Sets the currently active driver editor.
+     * Sets the editor open by the local user and fires an EditorActivity of
+     * type Activated.
      * 
      * @param path
      *            the project-relative path to the resource that the editor is
-     *            currently editing.
+     *            currently editing or null if the local user has no editor
+     *            open.
      */
-    public void generateEditorActivated(IPath path) {
+    public void generateEditorActivated(@Nullable IPath path) {
         this.locallyActiveEditor = path;
-        this.locallyOpenEditors.add(path);
+
+        if (path != null)
+            this.locallyOpenEditors.add(path);
 
         for (ISharedEditorListener listener : this.editorListeners) {
             listener.activeEditorChanged(Saros.getDefault().getLocalUser(),
