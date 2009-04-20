@@ -31,6 +31,7 @@ import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
@@ -243,7 +244,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * session.
      */
     protected static class ActivityQueuesManager {
-        protected final Map<JID, ActivityQueue> jid2queue = new HashMap<JID, ActivityQueue>();
+        protected final Map<JID, ActivityQueue> jid2queue = new ConcurrentHashMap<JID, ActivityQueue>();
 
         /**
          * Get the {@link ActivityQueue} for the given {@link JID}.
@@ -254,7 +255,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
          *            {@link JID} to get the queue for.
          * @return the {@link ActivityQueue} for the given {@link JID}.
          */
-        protected ActivityQueue getActivityQueue(JID jid) {
+        protected synchronized ActivityQueue getActivityQueue(JID jid) {
             ActivityQueue queue = jid2queue.get(jid);
             if (queue == null) {
                 queue = new ActivityQueue(jid);
@@ -266,8 +267,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         /**
          * @see ActivitySequencer#createTimedActivities(JID, List)
          */
-        public List<TimedActivity> createTimedActivities(JID recipient,
-            List<IActivity> activities) {
+        public synchronized List<TimedActivity> createTimedActivities(
+            JID recipient, List<IActivity> activities) {
 
             ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
                 activities.size());
