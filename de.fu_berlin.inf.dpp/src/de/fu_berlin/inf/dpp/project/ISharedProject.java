@@ -196,17 +196,6 @@ public interface ISharedProject {
     public boolean isExclusiveDriver();
 
     /**
-     * Returns the number of remote users that are drivers.
-     */
-    public int countRemoteDrivers();
-
-    /**
-     * Returns a driver that is different from the local user or
-     * <code>null</code> if there is no such driver.
-     */
-    public User getADriver();
-
-    /**
      * the concurrent document manager is responsible for all jupiter controlled
      * documents
      * 

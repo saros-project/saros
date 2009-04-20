@@ -154,11 +154,16 @@ public class FollowModeAction extends Action implements Disposable {
         if (editorManager.isFollowing()) {
             return null;
         } else {
-            User driver = project.getADriver();
-            if (driver == null) {
-                log.error("no driver to follow but action was enabled");
+            User localUser = Saros.getDefault().getLocalUser();
+            for (User user : project.getParticipants()) {
+                if (user.equals(localUser))
+                    continue;
+                if (user.isDriver()) {
+                    return user;
+                }
             }
-            return driver;
+            log.error("no driver to follow but action was enabled");
+            return null;
         }
     }
 
@@ -178,7 +183,15 @@ public class FollowModeAction extends Action implements Disposable {
             return true;
         }
 
-        return project.countRemoteDrivers() == 1;
+        User localUser = Saros.getDefault().getLocalUser();
+        int driverCount = 0;
+        for (User user : project.getParticipants()) {
+            if (user.equals(localUser))
+                continue;
+            if (user.isDriver())
+                driverCount++;
+        }
+        return driverCount == 1;
     }
 
     protected void updateEnablement() {

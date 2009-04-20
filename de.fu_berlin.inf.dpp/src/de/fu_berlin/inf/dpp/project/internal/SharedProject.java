@@ -31,7 +31,6 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
@@ -205,37 +204,20 @@ public class SharedProject implements ISharedProject, Disposable {
         return getParticipant(this.myID).isDriver();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
-     */
     public boolean isExclusiveDriver() {
-        return isDriver() && countRemoteDrivers() == 0;
-    }
-
-    public int countRemoteDrivers() {
-        User localUser = Saros.getDefault().getLocalUser();
-        int result = 0;
-        for (User user : getParticipants()) {
-            if (user.equals(localUser))
-                continue;
-            if (user.isDriver())
-                result++;
+        if (!isDriver()) {
+            return false;
         }
-        return result;
-    }
-
-    public User getADriver() {
-        User localUser = Saros.getDefault().getLocalUser();
+        User localUser = getParticipant(myID);
         for (User user : getParticipants()) {
-            if (user.equals(localUser))
+            if (user.equals(localUser)) {
                 continue;
+            }
             if (user.isDriver()) {
-                return user;
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     public void addUser(User user) {
