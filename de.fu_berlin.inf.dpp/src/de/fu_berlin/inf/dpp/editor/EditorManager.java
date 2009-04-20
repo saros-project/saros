@@ -257,7 +257,10 @@ public class EditorManager implements IActivityProvider {
 
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-    protected User isFollowing = null;
+    /**
+     * The user that is followed or <code>null</code> if no user is followed.
+     */
+    protected User userToFollow = null;
 
     protected boolean isDriver;
 
@@ -341,10 +344,10 @@ public class EditorManager implements IActivityProvider {
                 editorPool.setDriverEnabled(isDriver);
             }
 
-            if (isFollowing != null) {
+            if (userToFollow != null) {
                 if (Saros.getDefault().getPreferenceStore().getBoolean(
                     PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
-                    if (isFollowing.isObserver() && user.isDriver()
+                    if (userToFollow.isObserver() && user.isDriver()
                         && !user.equals(localUser)) {
                         setFollowing(user);
                     }
@@ -587,7 +590,11 @@ public class EditorManager implements IActivityProvider {
      *         is currently editing by using an editor. Never returns
      *         <code>null</code>. A empty set is returned if there are no
      *         currently opened editors.
+     * 
+     * @deprecated Isn't used anymore, and JavaDoc and method name don't match
+     *             the semantics.
      */
+    @Deprecated
     public Set<IPath> getDriverEditors() {
         return this.locallyOpenEditors;
     }
@@ -972,8 +979,8 @@ public class EditorManager implements IActivityProvider {
             RemoteEditor activeEditor = remoteEditorManager.getEditorState(
                 getFollowedUser()).getActiveEditor();
 
-            if (activeEditor == null
-                || !activeEditor.getPath().equals(
+            if (activeEditor != null
+                && !activeEditor.getPath().equals(
                     editorAPI.getEditorPath(editorPart))) {
                 setFollowing(null);
             }
@@ -1440,27 +1447,37 @@ public class EditorManager implements IActivityProvider {
     }
 
     /**
-     * to get the information whether the user is in following mode or not
-     * 
-     * @return <code>true</code> when in following mode, otherwise
-     *         <code>false</code>
+     * Returns <code>true</code> if there is currently a {@link User} followed,
+     * otherwise <code>false</code>.
      */
-    public User getFollowedUser() {
-        return isFollowing;
+    public boolean isFollowing() {
+        return getFollowedUser() != null;
     }
 
+    /**
+     * Returns the followed {@link User} or <code>null</code> if currently no
+     * user is followed.
+     */
+    public User getFollowedUser() {
+        return userToFollow;
+    }
+
+    /**
+     * Sets the {@link User} to follow or <code>null</code> if no user should be
+     * followed.
+     */
     public void setFollowing(User userToFollow) {
 
-        assert !Saros.getDefault().getLocalUser().equals(userToFollow) : "Local user cannot follow himself!";
+        assert !saros.getLocalUser().equals(userToFollow) : "Local user cannot follow himself!";
 
-        this.isFollowing = userToFollow;
+        this.userToFollow = userToFollow;
 
         for (ISharedEditorListener editorListener : this.editorListeners) {
-            editorListener.followModeChanged(this.isFollowing);
+            editorListener.followModeChanged(this.userToFollow);
         }
 
-        if (this.isFollowing != null)
-            this.jumpToUser(this.isFollowing);
+        if (this.userToFollow != null)
+            this.jumpToUser(this.userToFollow);
     }
 
     /**
@@ -1523,7 +1540,7 @@ public class EditorManager implements IActivityProvider {
 
             RemoteEditor remoteEditor = remoteEditorState.getRemoteEditor(path);
 
-            if (user.isDriver() || user.equals(isFollowing)) {
+            if (user.isDriver() || user.equals(userToFollow)) {
                 ILineRange viewport = remoteEditor.getViewport();
                 if (viewport != null) {
                     editorAPI.setViewportAnnotation(editorPart, viewport, user

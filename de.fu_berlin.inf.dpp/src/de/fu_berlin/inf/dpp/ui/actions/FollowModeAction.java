@@ -141,48 +141,44 @@ public class FollowModeAction extends Action implements Disposable {
         });
     }
 
+    /**
+     * Returns the new user to follow.
+     * 
+     * If there is already a user followed <code>null</code> is returned, i.e.
+     * this is a toggeling method, otherwise a random driver is returned.
+     */
     protected User getNewToFollow() {
         ISharedProject project = sessionManager.getSharedProject();
-
         assert project != null;
 
-        User following = editorManager.getFollowedUser();
-
-        if (following != null) {
+        if (editorManager.isFollowing()) {
             return null;
         } else {
-            for (User user : project.getParticipants()) {
-                if (user.equals(Saros.getDefault().getLocalUser()))
-                    continue;
-                if (user.isDriver()) {
-                    return user;
-                }
+            User driver = project.getADriver();
+            if (driver == null) {
+                log.error("no driver to follow but action was enabled");
             }
-            return null;
+            return driver;
         }
     }
 
+    /**
+     * Returns <code>true</code> if the follow mode button should be enabled,
+     * <code>false</code> otherwise.
+     */
     protected boolean canFollow() {
         ISharedProject project = sessionManager.getSharedProject();
 
         if (project == null)
             return false;
 
-        User following = editorManager.getFollowedUser();
-
-        if (following != null) {
-            // While following the button must be enabled to de-follow
+        if (editorManager.isFollowing()) {
+            // While following the button must be enabled to allow deactivation
+            // of follow mode.
             return true;
         }
-        int drivers = 0;
-        for (User user : project.getParticipants()) {
-            if (user.equals(Saros.getDefault().getLocalUser()))
-                continue;
-            if (user.isDriver())
-                drivers++;
-        }
 
-        return drivers == 1;
+        return project.countRemoteDrivers() == 1;
     }
 
     protected void updateEnablement() {

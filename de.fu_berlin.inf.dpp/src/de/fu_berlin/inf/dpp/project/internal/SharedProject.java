@@ -183,15 +183,6 @@ public class SharedProject implements ISharedProject, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
-    public boolean isDriver() {
-        return getParticipant(this.myID).isDriver();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
     public User getHost() {
         return this.host;
     }
@@ -208,20 +199,43 @@ public class SharedProject implements ISharedProject, Disposable {
     /*
      * (non-Javadoc)
      * 
+     * @see de.fu_berlin.inf.dpp.ISharedProject
+     */
+    public boolean isDriver() {
+        return getParticipant(this.myID).isDriver();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject#exclusiveDriver()
      */
     public boolean isExclusiveDriver() {
-        if (!isDriver()) {
-            return false;
-        } else {
-            for (User user : participants.values()) {
-                if (user.equals(Saros.getDefault().getLocalUser()))
-                    continue;
-                else if (user.isDriver())
-                    return false;
-            }
-            return true;
+        return isDriver() && countRemoteDrivers() == 0;
+    }
+
+    public int countRemoteDrivers() {
+        User localUser = Saros.getDefault().getLocalUser();
+        int result = 0;
+        for (User user : getParticipants()) {
+            if (user.equals(localUser))
+                continue;
+            if (user.isDriver())
+                result++;
         }
+        return result;
+    }
+
+    public User getADriver() {
+        User localUser = Saros.getDefault().getLocalUser();
+        for (User user : getParticipants()) {
+            if (user.equals(localUser))
+                continue;
+            if (user.isDriver()) {
+                return user;
+            }
+        }
+        return null;
     }
 
     public void addUser(User user) {

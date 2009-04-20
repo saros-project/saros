@@ -216,7 +216,6 @@ public class Saros extends AbstractUIPlugin {
          * SharedDocumentProvider.
          */
         reinjector = new Reinjector(this.container);
-
     }
 
     /**
