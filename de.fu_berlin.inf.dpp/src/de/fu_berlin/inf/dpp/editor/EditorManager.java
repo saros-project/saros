@@ -1487,7 +1487,8 @@ public class EditorManager implements IActivityProvider {
      */
     public void setFollowing(User userToFollow) {
 
-        assert !saros.getLocalUser().equals(userToFollow) : "Local user cannot follow himself!";
+        assert userToFollow == null
+            || !userToFollow.equals(saros.getLocalUser()) : "Local user cannot follow himself!";
 
         this.userToFollow = userToFollow;
 
