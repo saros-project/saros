@@ -457,16 +457,24 @@ public class Saros extends AbstractUIPlugin {
     public void disconnect() {
         setConnectionState(ConnectionState.DISCONNECTING, null);
 
-        if (this.connection != null) {
-            this.connection
-                .removeConnectionListener(this.smackConnectionListener);
-            this.connection.disconnect();
-            this.connection = null;
-        }
+        disconnectInternal();
 
         setConnectionState(ConnectionState.NOT_CONNECTED, null);
 
         this.myjid = null;
+    }
+
+    protected void disconnectInternal() {
+        if (connection != null) {
+            try {
+                connection.removeConnectionListener(smackConnectionListener);
+                connection.disconnect();
+            } catch (RuntimeException e) {
+                logger.warn("Could not disconnect old XMPPConnection: ", e);
+            } finally {
+                connection = null;
+            }
+        }
     }
 
     /**
@@ -661,7 +669,7 @@ public class Saros extends AbstractUIPlugin {
         public void connectionClosedOnError(Exception e) {
 
             Toolkit.getDefaultToolkit().beep();
-            logger.error("XMPP Connection Error: " + e.toString());
+            logger.error("XMPP Connection Error: " + e.toString(), e);
 
             if (e.toString().equals("stream:error (conflict)")) {
 
@@ -678,51 +686,43 @@ public class Saros extends AbstractUIPlugin {
                                     + "instance have connected with the same login.");
                     }
                 });
+                return;
+            }
+            setConnectionState(ConnectionState.ERROR, null);
 
-            } else {
+            disconnectInternal();
 
-                setConnectionState(ConnectionState.ERROR, null);
+            Util.runSafeAsync(logger, new Runnable() {
+                public void run() {
 
-                if (connection != null) {
-                    connection
-                        .removeConnectionListener(smackConnectionListener);
-                    connection.disconnect();
-                    connection = null;
-                }
+                    Map<JID, Integer> expectedSequenceNumbers = Collections
+                        .emptyMap();
+                    if (getSessionManager().getSharedProject() != null) {
+                        expectedSequenceNumbers = getSessionManager()
+                            .getSharedProject().getSequencer()
+                            .getExpectedSequenceNumbers();
+                    }
 
-                Util.runSafeAsync(logger, new Runnable() {
-                    public void run() {
+                    while (!isConnected()) {
 
-                        Map<JID, Integer> expectedSequenceNumbers = Collections
-                            .emptyMap();
-                        if (getSessionManager().getSharedProject() != null) {
-                            expectedSequenceNumbers = getSessionManager()
-                                .getSharedProject().getSequencer()
-                                .getExpectedSequenceNumbers();
-                        }
+                        logger.info("Reconnecting...");
 
-                        while (!isConnected()) {
+                        connect(true);
 
-                            logger.info("Reconnecting...");
-
-                            connect(true);
-
-                            if (!isConnected()) {
-                                try {
-                                    Thread.sleep(5000);
-                                } catch (InterruptedException e) {
-                                    return;
-                                }
+                        if (!isConnected()) {
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+                                return;
                             }
                         }
-
-                        getSessionManager()
-                            .onReconnect(expectedSequenceNumbers);
-                        setConnectionState(ConnectionState.CONNECTED, null);
-                        logger.debug("XMPP reconnected");
                     }
-                });
-            }
+
+                    getSessionManager().onReconnect(expectedSequenceNumbers);
+                    setConnectionState(ConnectionState.CONNECTED, null);
+                    logger.debug("XMPP reconnected");
+                }
+            });
         }
 
         public void reconnectingIn(int seconds) {
@@ -750,6 +750,10 @@ public class Saros extends AbstractUIPlugin {
     /**
      * @return the local user or null if not connected with a XMPP server or if
      *         not in a shared session
+     * 
+     *         TODO Move into SharedProject
+     * 
+     *         TODO Do not return null upon closed connection.
      */
     public User getLocalUser() {
         if (!isConnected())
