@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -44,6 +45,9 @@ public class ConsistencyWatchdogHandler {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogHandler.class.getName());
+
+    @Inject
+    protected SessionManager sessionManager;
 
     protected long lastReceivedActivityTime;
 
@@ -63,8 +67,7 @@ public class ConsistencyWatchdogHandler {
             }
         }
 
-        ISharedProject project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
 
         for (final IPath path : paths) {
 
@@ -137,8 +140,7 @@ public class ConsistencyWatchdogHandler {
 
             showChecksumErrorMessage(pathsOfInconsistencies, from);
 
-            if (Saros.getDefault().getSessionManager().getSharedProject()
-                .isHost()) {
+            if (sessionManager.getSharedProject().isHost()) {
                 Util.runSafeAsync("ConsistencyWatchdog-Start", log,
                     new Runnable() {
                         public void run() {

@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -77,6 +78,9 @@ public class ConsistencyWatchdogServer extends Job {
 
     @Inject
     protected EditorManager editorManager;
+
+    @Inject
+    protected XMPPChatTransmitter transmitter;
 
     protected SessionManager sessionManager;
 
@@ -149,7 +153,7 @@ public class ConsistencyWatchdogServer extends Job {
         Set<IDocument> missingDocuments = new HashSet<IDocument>(
             registeredDocuments);
 
-        // Update Checksums for all documents controlled by jupiter
+        // Update Checksums for all open documents
         for (IPath docPath : editorManager.getOpenEditorsOfAllParticipants()) {
 
             if (monitor.isCanceled())
@@ -203,8 +207,8 @@ public class ConsistencyWatchdogServer extends Job {
         // TODO Since this is done asynchronously a race condition might occur
         if (docsChecksums.values().size() > 0 && saros.isConnected()) {
 
-            sessionManager.getTransmitter().sendDocChecksumsToClients(
-                getOthers(), docsChecksums.values());
+            transmitter.sendDocChecksumsToClients(getOthers(), docsChecksums
+                .values());
         }
 
         // Reschedule the next run in INTERVAL ms
