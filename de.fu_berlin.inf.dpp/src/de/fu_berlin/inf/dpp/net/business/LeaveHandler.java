@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net.business;
 
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -21,17 +20,17 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
  */
 public class LeaveHandler extends LeaveExtension {
 
-    @Inject
     protected SessionManager sessionManager;
 
-    public LeaveHandler(XMPPChatReceiver receiver) {
+    public LeaveHandler(SessionManager sessionManager, XMPPChatReceiver receiver) {
+        this.sessionManager = sessionManager;
         receiver.addPacketListener(this, this.getFilter());
     }
 
     @Override
     public PacketFilter getFilter() {
         return new AndFilter(super.getFilter(), PacketExtensionUtils
-            .getInSessionFilter());
+            .getInSessionFilter(sessionManager));
     }
 
     @Override

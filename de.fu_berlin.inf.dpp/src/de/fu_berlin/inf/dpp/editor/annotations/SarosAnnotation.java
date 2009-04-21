@@ -10,9 +10,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -23,7 +21,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 public abstract class SarosAnnotation extends Annotation {
 
     /** Source of this annotation (jabber id). */
-    private String source;
+    private User source;
+    @SuppressWarnings("unused")
     private Logger log = Logger.getLogger(SarosAnnotation.class);
 
     /**
@@ -37,33 +36,19 @@ public abstract class SarosAnnotation extends Annotation {
      * @param text
      *            for the tooltip.
      * @param source
-     *            jabber ID of the source.
+     *            the user which created this annotation
      */
-    SarosAnnotation(String type, boolean isNumbered, String text, String source) {
+    SarosAnnotation(String type, boolean isNumbered, String text, User source) {
         super(type, false, text);
         this.source = source;
 
         if (isNumbered) {
-            setType(type + "." + (getColorIdForUser(source) + 1));
+            setType(type + "." + (source.getColorID() + 1));
         }
     }
 
-    public String getSource() {
+    public User getSource() {
         return this.source;
-    }
-
-    protected int getColorIdForUser(String username) {
-        User user = Saros.getDefault().getSessionManager().getSharedProject()
-            .getParticipant(new JID(username));
-
-        int colorid = 0;
-        if (user != null) {
-            colorid = user.getColorID();
-        } else {
-            // This should never happen.
-            log.warn("User does not exist: " + username);
-        }
-        return colorid;
     }
 
     public static Color getUserColor(User user) {
@@ -95,14 +80,11 @@ public abstract class SarosAnnotation extends Annotation {
     }
 
     /**
-     * @param prefix
-     * @param source
      * @return a string with the given prefix followed by either the nickname of
-     *         source or the name part of the jabber ID.
+     *         the given user or the name of the jabber ID of the user.
      */
-    protected static String createLabel(String prefix, String source) {
-        JID jid = new JID(source);
-        String nick = Util.getNickname(jid);
-        return prefix + " " + ((nick != null) ? nick : jid.getName());
+    protected static String createLabel(String prefix, User user) {
+        String nick = Util.getNickname(user.getJID());
+        return prefix + " " + ((nick != null) ? nick : user.getJID().getName());
     }
 }

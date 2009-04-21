@@ -41,8 +41,8 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
@@ -62,18 +62,18 @@ public class SarosUI {
 
     private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
 
-    public SarosUI(ISessionManager sessionManager, JDTFacade jdtFacade,
+    public SarosUI(SessionManager sessionManager, JDTFacade jdtFacade,
         CDTFacade cdtFacade) {
 
         // It would be nice to eliminiate these, because they cause dependencies
         // to the JDT and CDT, but they are necessary to prevent Observers
         // from editing the documents
         if (jdtFacade.isJDTAvailable()) {
-            jdtFacade.installSharedDocumentProvider();
+            jdtFacade.installSharedDocumentProvider(sessionManager);
         }
 
         if (cdtFacade.isCDTAvailable()) {
-            cdtFacade.installSharedDocumentProvider();
+            cdtFacade.installSharedDocumentProvider(sessionManager);
         }
 
         sessionManager.addSessionListener(new AbstractSessionListener() {

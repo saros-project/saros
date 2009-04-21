@@ -8,7 +8,6 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
@@ -104,17 +103,6 @@ public interface ISessionManager {
         ConnectionState newState);
 
     public void onReconnect(Map<JID, Integer> expectedSequenceNumbers);
-
-    /**
-     * Get the transmitter of the session.
-     * 
-     * @return the transmitter of the session
-     * 
-     * @deprecated Rather everybody should get their own instance via
-     *             PicoContainer
-     */
-    @Deprecated
-    public ITransmitter getTransmitter();
 
     /**
      * Called by the Invitation Process if the invitation did not work out

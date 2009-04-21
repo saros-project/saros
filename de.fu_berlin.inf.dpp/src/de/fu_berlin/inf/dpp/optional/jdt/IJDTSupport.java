@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 public interface IJDTSupport {
 
@@ -12,7 +13,7 @@ public interface IJDTSupport {
      * Will retrieve the DocumentProvider from the JDT plug-in and install a
      * SharedDocumentProvider by using a ForwardingDocumentProvider.
      */
-    public void installSharedDocumentProvider();
+    public void installSharedDocumentProvider(SessionManager sessionManager);
 
     /**
      * Will return the IDocumentProvider from the JDT plug-in by calling

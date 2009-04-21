@@ -82,6 +82,7 @@ public class ConsistencyWatchdogServer extends Job {
     @Inject
     protected XMPPChatTransmitter transmitter;
 
+    @Inject
     protected SessionManager sessionManager;
 
     protected ISharedProject sharedProject;
@@ -206,7 +207,6 @@ public class ConsistencyWatchdogServer extends Job {
         // Send to all Clients
         // TODO Since this is done asynchronously a race condition might occur
         if (docsChecksums.values().size() > 0 && saros.isConnected()) {
-
             transmitter.sendDocChecksumsToClients(getOthers(), docsChecksums
                 .values());
         }

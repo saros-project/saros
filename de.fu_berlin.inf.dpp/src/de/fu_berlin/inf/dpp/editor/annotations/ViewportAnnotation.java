@@ -13,6 +13,8 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
+import de.fu_berlin.inf.dpp.User;
+
 /**
  * The annotation that shows the viewports of the drivers.
  * 
@@ -37,12 +39,12 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     private Color fillColor;
 
-    public ViewportAnnotation(String source) {
+    public ViewportAnnotation(User source) {
         super(ViewportAnnotation.TYPE, false, createLabel("Visible scope of",
             source), source);
 
         String annotationType = ViewportAnnotation.TYPE + "."
-            + (getColorIdForUser(source) + 1);
+            + (source.getColorID() + 1);
         setType(annotationType);
 
         AnnotationPreferenceLookup lookup = EditorsUI

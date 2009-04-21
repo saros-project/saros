@@ -46,9 +46,6 @@ public class ConsistencyWatchdogHandler {
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogHandler.class.getName());
 
-    @Inject
-    protected SessionManager sessionManager;
-
     protected long lastReceivedActivityTime;
 
     /**
@@ -269,15 +266,20 @@ public class ConsistencyWatchdogHandler {
     protected EditorManager editorManager;
 
     @Inject
-    ConsistencyWatchdogClient watchdogClient;
+    protected ConsistencyWatchdogClient watchdogClient;
 
-    public ConsistencyWatchdogHandler(XMPPChatReceiver receiver) {
+    protected SessionManager sessionManager;
+
+    public ConsistencyWatchdogHandler(SessionManager sessionManager,
+        XMPPChatReceiver receiver) {
+
+        this.sessionManager = sessionManager;
 
         receiver.addPacketListener(listener, new AndFilter(
-            new MessageTypeFilter(Message.Type.chat),
-
-            Util.orFilter(checksum.getFilter(), checksumError.getFilter(),
-                RequestPacketExtension.getFilter())));
+            new MessageTypeFilter(Message.Type.chat), PacketExtensionUtils
+                .getInSessionFilter(sessionManager), Util.orFilter(checksum
+                .getFilter(), checksumError.getFilter(), RequestPacketExtension
+                .getFilter())));
     }
 
 }

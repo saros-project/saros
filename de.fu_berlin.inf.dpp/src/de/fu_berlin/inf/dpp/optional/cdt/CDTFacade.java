@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * 
@@ -52,12 +53,12 @@ public class CDTFacade implements ICDTSupport {
         }
     }
 
-    public void installSharedDocumentProvider() {
+    public void installSharedDocumentProvider(SessionManager sessionManager) {
 
         if (!isCDTAvailable())
             throw new IllegalStateException("CDT Plugin is not available");
 
-        cdtSupport.installSharedDocumentProvider();
+        cdtSupport.installSharedDocumentProvider(sessionManager);
     }
 
     public IDocumentProvider getDocumentProvider() {

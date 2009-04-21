@@ -32,7 +32,7 @@ public class UserListHandler extends UserListExtension {
     @Override
     public PacketFilter getFilter() {
         return new AndFilter(super.getFilter(), PacketExtensionUtils
-            .getFromHostFilter());
+            .getFromHostFilter(sessionManager));
     }
 
     private static final Logger log = Logger.getLogger(UserListHandler.class
@@ -41,10 +41,11 @@ public class UserListHandler extends UserListExtension {
     @Inject
     protected IXMPPTransmitter transmitter;
 
-    @Inject
     protected SessionManager sessionManager;
 
-    public UserListHandler(XMPPChatReceiver receiver) {
+    public UserListHandler(SessionManager sessionManager,
+        XMPPChatReceiver receiver) {
+        this.sessionManager = sessionManager;
         receiver.addPacketListener(this, this.getFilter());
     }
 
@@ -70,6 +71,8 @@ public class UserListHandler extends UserListExtension {
                 // Add him and send him a message, and tell him our
                 // color
                 project.addUser(user);
+
+                // TODO This needs to be
                 transmitter.sendMessage(user.getJID(), JoinExtension
                     .getDefault().create(
                         Saros.getDefault().getLocalUser().getColorID()));

@@ -42,8 +42,6 @@ public class ConsistencyWatchdogClient {
     private static Logger logger = Logger
         .getLogger(ConsistencyWatchdogClient.class);
 
-    protected static ConsistencyWatchdogClient instance;
-
     protected final Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
     @Inject

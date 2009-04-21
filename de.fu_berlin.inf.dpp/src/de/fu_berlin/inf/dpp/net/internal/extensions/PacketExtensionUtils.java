@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * Holds various simple helper methods to create and parse simple Smack packet
@@ -117,11 +118,11 @@ public class PacketExtensionUtils {
      * @return A PacketFilter that only accepts Packets if there is currently a
      *         SharedProject
      */
-    public static PacketFilter getInSessionFilter() {
+    public static PacketFilter getInSessionFilter(
+        final SessionManager sessionManager) {
         return new PacketFilter() {
             public boolean accept(Packet arg0) {
-                return Saros.getDefault().getSessionManager()
-                    .getSharedProject() != null;
+                return sessionManager.getSharedProject() != null;
             }
         };
     }
@@ -130,11 +131,11 @@ public class PacketExtensionUtils {
      * @return filter that returns true iff currently a shared project exists
      *         and the message was from the host of this shared project.
      */
-    public static PacketFilter getFromHostFilter() {
+    public static PacketFilter getFromHostFilter(
+        final SessionManager sessionManager) {
         return new PacketFilter() {
             public boolean accept(Packet packet) {
-                ISharedProject project = Saros.getDefault().getSessionManager()
-                    .getSharedProject();
+                ISharedProject project = sessionManager.getSharedProject();
 
                 return project != null
                     && project.getHost().getJID().equals(

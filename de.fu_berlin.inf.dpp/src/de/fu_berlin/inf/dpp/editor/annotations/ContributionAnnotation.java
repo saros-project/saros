@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.editor.annotations;
 
 import org.eclipse.jface.text.source.IAnnotationModel;
 
+import de.fu_berlin.inf.dpp.User;
+
 /**
  * Marks text contributions done by a driver.
  * 
@@ -16,7 +18,7 @@ public class ContributionAnnotation extends SarosAnnotation {
     /** The model this annotation belongs to. */
     protected IAnnotationModel model;
 
-    public ContributionAnnotation(String source, IAnnotationModel model) {
+    public ContributionAnnotation(User source, IAnnotationModel model) {
         super(ContributionAnnotation.TYPE, true, "", source);
         this.model = model;
     }

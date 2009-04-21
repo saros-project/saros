@@ -4,15 +4,16 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This Document provider tries tell others that files are not editable if not a
@@ -24,6 +25,9 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
         .getLogger(SharedDocumentProvider.class.getName());
 
     protected ISharedProject sharedProject;
+
+    @Inject
+    protected SessionManager sessionManager;
 
     protected boolean isDriver;
 
@@ -55,12 +59,29 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
         }
     };
 
-    public SharedDocumentProvider() {
-        ISessionManager sm = Saros.getDefault().getSessionManager();
-        if (sm.getSharedProject() != null) {
-            sessionListener.sessionStarted(sm.getSharedProject());
+    public SharedDocumentProvider(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+
+        if (sessionManager.getSharedProject() != null) {
+            sessionListener.sessionStarted(sessionManager.getSharedProject());
         }
-        sm.addSessionListener(sessionListener);
+        sessionManager.addSessionListener(sessionListener);
+    }
+
+    /**
+     * This constructor is necessary when Eclipse creates a
+     * SharedDocumentProvider.
+     */
+    public SharedDocumentProvider() {
+
+        log.debug("SharedDocumentProvider created by Eclipse");
+
+        Saros.getDefault().reinject(this);
+
+        if (sessionManager.getSharedProject() != null) {
+            sessionListener.sessionStarted(sessionManager.getSharedProject());
+        }
+        sessionManager.addSessionListener(sessionListener);
     }
 
     @Override

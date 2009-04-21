@@ -10,6 +10,7 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 public class ContributionAnnotationManager {
     private static int MAX_HISTORY_LENGTH = 20;
 
-    protected Map<String, Queue<ContributionAnnotation>> sourceToHistory = new HashMap<String, Queue<ContributionAnnotation>>();
+    protected Map<User, Queue<ContributionAnnotation>> sourceToHistory = new HashMap<User, Queue<ContributionAnnotation>>();
 
     protected SharedProjectListener sharedProjectListener = new SharedProjectListener();
 
@@ -33,8 +34,7 @@ public class ContributionAnnotationManager {
              * Just remove the annotations from the history. They are removed by
              * the EditorManager from the editors.
              */
-            ContributionAnnotationManager.this.sourceToHistory.remove(user
-                .toString());
+            ContributionAnnotationManager.this.sourceToHistory.remove(user);
         }
     }
 
@@ -61,7 +61,7 @@ public class ContributionAnnotationManager {
      *            of the annotation.
      */
     public void insertAnnotation(IAnnotationModel model, int offset,
-        int length, String source) {
+        int length, User source) {
 
         if (length > 0) {
             /* Return early if there already is an annotation at that offset */
@@ -114,7 +114,7 @@ public class ContributionAnnotationManager {
                     removeFromHistory(oldAnnotation);
 
                     ContributionAnnotation newAnnotation;
-                    String source = oldAnnotation.getSource();
+                    User source = oldAnnotation.getSource();
 
                     newAnnotation = new ContributionAnnotation(source, model);
                     addContributionAnnotation(newAnnotation, beforeOffset);
@@ -138,7 +138,7 @@ public class ContributionAnnotationManager {
      *            source of the user who's history we want.
      * @return the history of source.
      */
-    protected Queue<ContributionAnnotation> getHistory(String source) {
+    protected Queue<ContributionAnnotation> getHistory(User source) {
         Queue<ContributionAnnotation> result = sourceToHistory.get(source);
         if (result == null) {
             result = new LinkedList<ContributionAnnotation>();

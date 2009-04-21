@@ -50,8 +50,8 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -66,24 +66,28 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     private static Logger logger = Logger
         .getLogger(IncomingInvitationProcess.class);
 
-    private FileList remoteFileList;
+    protected FileList remoteFileList;
 
-    private IProject localProject;
+    protected IProject localProject;
 
-    private int filesLeftToSynchronize;
+    protected int filesLeftToSynchronize;
 
     /** size of current transfered part of archive file. */
-    private int transferedFileSize = 0;
+    protected int transferedFileSize = 0;
 
-    private IProgressMonitor progressMonitor;
+    protected IProgressMonitor progressMonitor;
 
     protected String projectName;
 
-    public IncomingInvitationProcess(ITransmitter transmitter, JID from,
-        String projectName, String description, int colorID) {
+    protected SessionManager sessionManager;
+
+    public IncomingInvitationProcess(SessionManager sessionManager,
+        ITransmitter transmitter, JID from, String projectName,
+        String description, int colorID) {
 
         super(transmitter, from, description, colorID);
 
+        this.sessionManager = sessionManager;
         this.projectName = projectName;
         setState(State.INVITATION_SENT);
 
@@ -504,7 +508,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     private void done() {
         JID host = this.peer;
 
-        ISessionManager sessionManager = Saros.getDefault().getSessionManager();
         ISharedProject sharedProject = sessionManager.joinSession(
             this.localProject, host, colorID);
 
@@ -546,6 +549,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     public void cancel(String errorMsg, boolean replicated) {
         super.cancel(errorMsg, replicated);
 
-        Saros.getDefault().getSessionManager().cancelIncomingInvitation();
+        sessionManager.cancelIncomingInvitation();
     }
 }

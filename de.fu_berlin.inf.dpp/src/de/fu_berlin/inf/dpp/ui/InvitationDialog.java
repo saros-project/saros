@@ -72,6 +72,8 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class InvitationDialog extends Dialog implements IInvitationUI,
@@ -88,6 +90,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     private Roster roster;
     private List<JID> autoinviteJID;
     private Display display;
+
+    protected SessionManager sessionManager;
 
     // assigned to any of the entries of the invite-tableview
     protected static class InviterData {
@@ -139,9 +143,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
     }
 
-    public InvitationDialog(Shell parentShell, List<JID> autoInvite) {
+    public InvitationDialog(SharedProject project, Shell parentShell,
+        List<JID> autoInvite) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
+        this.project = project;
     }
 
     @Override
@@ -255,10 +261,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     @Override
     public int open() {
 
-        this.project = Saros.getDefault().getSessionManager()
-            .getSharedProject();
-
-        if (project == null) {
+        if (this.project == null) {
             throw new IllegalStateException();
         }
 

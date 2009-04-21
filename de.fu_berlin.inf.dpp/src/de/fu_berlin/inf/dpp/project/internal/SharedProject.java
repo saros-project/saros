@@ -208,14 +208,11 @@ public class SharedProject implements ISharedProject, Disposable {
         }
         User localUser = getParticipant(myID);
         for (User user : getParticipants()) {
-            if (user.equals(localUser)) {
-                continue;
-            }
-            if (user.isDriver()) {
-                return true;
+            if (!user.equals(localUser) && user.isDriver()) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     public void addUser(User user) {
@@ -353,7 +350,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
                 // TODO check if anybody is online, empty dialog feels
                 // strange
-                Window iw = new InvitationDialog(EditorAPI.getShell(), toInvite);
+                Window iw = new InvitationDialog(SharedProject.this, EditorAPI
+                    .getShell(), toInvite);
                 iw.open();
 
                 if (!isDriver()) {

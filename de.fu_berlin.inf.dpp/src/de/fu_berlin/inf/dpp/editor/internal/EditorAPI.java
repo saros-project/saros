@@ -58,6 +58,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
@@ -333,7 +334,7 @@ public class EditorAPI implements IEditorAPI {
      * 
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
-        String source, boolean following) {
+        User source, boolean following) {
 
         if (!(editorPart instanceof ITextEditor)) {
             return;
@@ -656,7 +657,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     public void setViewportAnnotation(IEditorPart editorPart,
-        ILineRange viewport, String user) {
+        ILineRange viewport, User user) {
 
         int top = viewport.getStartLine();
         int bottom = top + viewport.getNumberOfLines();
@@ -690,7 +691,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     protected void updateViewportAnnotation(ITextViewer viewer, int top,
-        int bottom, String source) {
+        int bottom, User source) {
 
         if (!(viewer instanceof ISourceViewer)) {
             return;

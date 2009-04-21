@@ -8,6 +8,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * 
@@ -56,12 +57,12 @@ public class JDTFacade implements IJDTSupport {
         }
     }
 
-    public void installSharedDocumentProvider() {
+    public void installSharedDocumentProvider(SessionManager sessionManager) {
 
         if (!isJDTAvailable())
             throw new IllegalStateException("JDT Plugin is not available");
 
-        jdtSupport.installSharedDocumentProvider();
+        jdtSupport.installSharedDocumentProvider(sessionManager);
     }
 
     public IDocumentProvider getDocumentProvider() {

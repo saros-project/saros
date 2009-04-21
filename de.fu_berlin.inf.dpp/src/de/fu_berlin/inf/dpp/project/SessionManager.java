@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
-import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
@@ -72,11 +71,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected SessionIDObservable sessionID;
 
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
-
-    @Deprecated
-    public ITransmitter getTransmitter() {
-        return transmitter;
-    }
 
     protected Saros saros;
 
@@ -187,7 +181,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.sessionID.setValue(sessionID);
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
-            this.transmitter, from, projectName, description, colorID);
+            this, this.transmitter, from, projectName, description, colorID);
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);

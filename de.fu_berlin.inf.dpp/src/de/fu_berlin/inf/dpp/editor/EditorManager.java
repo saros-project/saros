@@ -204,7 +204,8 @@ public class EditorManager implements IActivityProvider {
             resetText(file);
 
             IDocument document = documentProvider.getDocument(input);
-            document.removeDocumentListener(documentListener);
+            if (document != null)
+                document.removeDocumentListener(documentListener);
 
         }
 
@@ -583,18 +584,16 @@ public class EditorManager implements IActivityProvider {
     }
 
     /**
-     * Returns the resource paths of editors that the driver is currently using.
+     * Returns the resource paths of editors that the local user is currently
+     * using.
      * 
-     * @return all paths (in project-relative format) of files that the driver
-     *         is currently editing by using an editor. Never returns
+     * @return all paths (in project-relative format) of files that the local
+     *         user is currently editing by using an editor. Never returns
      *         <code>null</code>. A empty set is returned if there are no
      *         currently opened editors.
      * 
-     * @deprecated Isn't used anymore, and JavaDoc and method name don't match
-     *             the semantics.
      */
-    @Deprecated
-    public Set<IPath> getDriverEditors() {
+    public Set<IPath> getLocallyOpenEditors() {
         return this.locallyOpenEditors;
     }
 
@@ -833,13 +832,13 @@ public class EditorManager implements IActivityProvider {
         documentListener.enabled = false;
 
         replaceText(file, textEdit.offset, textEdit.replacedText,
-            textEdit.text, source);
+            textEdit.text, user);
 
         documentListener.enabled = true;
 
         for (IEditorPart editorPart : editorPool.getEditors(path)) {
             editorAPI.setSelection(editorPart, new TextSelection(
-                textEdit.offset + textEdit.text.length(), 0), source, user
+                textEdit.offset + textEdit.text.length(), 0), user, user
                 .equals(getFollowedUser()));
         }
     }
@@ -862,8 +861,8 @@ public class EditorManager implements IActivityProvider {
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
         for (IEditorPart editorPart : editors) {
-            this.editorAPI.setSelection(editorPart, textSelection, selection
-                .getSource(), user.equals(getFollowedUser()));
+            this.editorAPI.setSelection(editorPart, textSelection, user, user
+                .equals(getFollowedUser()));
         }
     }
 
@@ -903,7 +902,7 @@ public class EditorManager implements IActivityProvider {
         for (IEditorPart editorPart : editors) {
             if (following || user.isDriver())
                 this.editorAPI.setViewportAnnotation(editorPart, lineRange,
-                    source);
+                    user);
             if (following)
                 this.editorAPI.reveal(editorPart, lineRange);
         }
@@ -1121,7 +1120,7 @@ public class EditorManager implements IActivityProvider {
      *            TODO Use Users instead
      */
     protected void replaceText(IFile file, int offset, String replacedText,
-        String text, String source) {
+        String text, User source) {
 
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
@@ -1563,15 +1562,13 @@ public class EditorManager implements IActivityProvider {
             if (user.isDriver() || user.equals(userToFollow)) {
                 ILineRange viewport = remoteEditor.getViewport();
                 if (viewport != null) {
-                    editorAPI.setViewportAnnotation(editorPart, viewport, user
-                        .getJID().toString());
+                    editorAPI.setViewportAnnotation(editorPart, viewport, user);
                 }
             }
 
             ITextSelection selection = remoteEditor.getSelection();
             if (selection != null) {
-                editorAPI.setSelection(editorPart, selection, user.getJID()
-                    .toString(), false);
+                editorAPI.setSelection(editorPart, selection, user, false);
             }
         }
     }

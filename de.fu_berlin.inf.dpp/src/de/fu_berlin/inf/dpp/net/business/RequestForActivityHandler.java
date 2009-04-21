@@ -33,19 +33,20 @@ public class RequestForActivityHandler extends RequestActivityExtension {
     protected IXMPPTransmitter transmitter;
 
     @Inject
-    protected SessionManager sessionManager;
-
-    @Inject
     protected SessionIDObservable sessionID;
 
-    public RequestForActivityHandler(XMPPChatReceiver receiver) {
+    protected SessionManager sessionManager;
+
+    public RequestForActivityHandler(SessionManager sessionManager,
+        XMPPChatReceiver receiver) {
+        this.sessionManager = sessionManager;
         receiver.addPacketListener(this, this.getFilter());
     }
 
     @Override
     public PacketFilter getFilter() {
         return new AndFilter(super.getFilter(), PacketExtensionUtils
-            .getInSessionFilter());
+            .getInSessionFilter(sessionManager));
     }
 
     private final Logger log = Logger.getLogger(RequestForActivityHandler.class

@@ -9,6 +9,7 @@ import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * Implementation of ICDTSupport which really uses CDT functionality. Do not
@@ -24,12 +25,13 @@ import de.fu_berlin.inf.dpp.editor.internal.SharedDocumentProvider;
 public class CDTSupport implements ICDTSupport {
 
     @SuppressWarnings( {})
-    public void installSharedDocumentProvider() {
+    public void installSharedDocumentProvider(SessionManager sessionManager) {
         // TODO RESTRICTED ACCESS
         TextFileDocumentProvider docProvider = CUIPlugin.getDefault()
             .getDocumentProvider();
 
-        SharedDocumentProvider sharedProvider = new SharedDocumentProvider();
+        SharedDocumentProvider sharedProvider = new SharedDocumentProvider(
+            sessionManager);
 
         IDocumentSetupParticipant setupParticipant = new CDocumentSetupParticipant();
         ForwardingDocumentProvider parentProvider = new ForwardingDocumentProvider(

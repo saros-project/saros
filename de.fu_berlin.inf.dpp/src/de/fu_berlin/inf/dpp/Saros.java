@@ -80,7 +80,6 @@ import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
-import de.fu_berlin.inf.dpp.project.ISessionManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -109,6 +108,8 @@ public class Saros extends AbstractUIPlugin {
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
     public String xmppFeatureID;
+
+    protected SessionManager sessionManager;
 
     protected MutablePicoContainer container;
 
@@ -261,6 +262,8 @@ public class Saros extends AbstractUIPlugin {
         // instantiated
         container.getComponents(Object.class);
 
+        this.sessionManager = container.getComponent(SessionManager.class);
+
         boolean hasUserName = getPreferenceStore().getString(
             PreferenceConstants.USERNAME).length() > 0;
 
@@ -328,28 +331,6 @@ public class Saros extends AbstractUIPlugin {
         }
 
         return this.connection.getRoster();
-    }
-
-    /**
-     * @return the MessagingManager which is responsible for handling instant
-     *         messaging. Is never <code>null</code>.
-     * 
-     * @deprecated Rather everybody should get their own instance
-     */
-    @Deprecated
-    public MessagingManager getMessagingManager() {
-        return getContainer().getComponent(MessagingManager.class);
-    }
-
-    /**
-     * @return the SessionManager. Is never <code>null</code>.
-     * 
-     * @deprecated Rather everybody should get their own instance via
-     *             PicoContainer
-     */
-    @Deprecated
-    public ISessionManager getSessionManager() {
-        return getContainer().getComponent(SessionManager.class);
     }
 
     /**
@@ -697,8 +678,8 @@ public class Saros extends AbstractUIPlugin {
 
                     Map<JID, Integer> expectedSequenceNumbers = Collections
                         .emptyMap();
-                    if (getSessionManager().getSharedProject() != null) {
-                        expectedSequenceNumbers = getSessionManager()
+                    if (sessionManager.getSharedProject() != null) {
+                        expectedSequenceNumbers = sessionManager
                             .getSharedProject().getSequencer()
                             .getExpectedSequenceNumbers();
                     }
@@ -718,7 +699,7 @@ public class Saros extends AbstractUIPlugin {
                         }
                     }
 
-                    getSessionManager().onReconnect(expectedSequenceNumbers);
+                    sessionManager.onReconnect(expectedSequenceNumbers);
                     setConnectionState(ConnectionState.CONNECTED, null);
                     logger.debug("XMPP reconnected");
                 }
@@ -759,7 +740,7 @@ public class Saros extends AbstractUIPlugin {
         if (!isConnected())
             return null;
 
-        ISharedProject project = getSessionManager().getSharedProject();
+        ISharedProject project = sessionManager.getSharedProject();
         if (project == null)
             return null;
 

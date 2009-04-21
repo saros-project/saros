@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
+import de.fu_berlin.inf.dpp.User;
+
 /**
  * Marks text selected by both driver and observer.
  * 
@@ -11,12 +13,12 @@ public class SelectionAnnotation extends SarosAnnotation {
 
     protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 
-    public SelectionAnnotation(String source, boolean isCursor) {
+    public SelectionAnnotation(User source, boolean isCursor) {
         super(SelectionAnnotation.TYPE, true, createLabel(source, isCursor),
             source);
     }
 
-    protected static String createLabel(String source, boolean isCursor) {
+    protected static String createLabel(User source, boolean isCursor) {
         return createLabel((isCursor ? "Cursor" : "Selection") + " of", source);
     }
 }

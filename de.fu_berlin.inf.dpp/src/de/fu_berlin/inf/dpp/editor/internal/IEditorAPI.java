@@ -11,6 +11,7 @@ import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.ui.IEditorPart;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 
 /**
@@ -58,7 +59,7 @@ public interface IEditorAPI {
      * Sets the text selection in given editor.
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
-        String source, boolean follow);
+        User source, boolean follow);
 
     /**
      * Returns the current text selection for given editor.
@@ -84,7 +85,7 @@ public interface IEditorAPI {
      * for the given user.
      */
     public void setViewportAnnotation(IEditorPart editorPart,
-        ILineRange viewport, String user);
+        ILineRange viewport, User user);
 
     /**
      * Try to make sure the given viewport is visible in the given editor
