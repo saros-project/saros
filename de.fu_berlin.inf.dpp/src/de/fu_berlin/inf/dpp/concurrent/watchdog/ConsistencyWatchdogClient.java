@@ -19,6 +19,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -50,6 +51,9 @@ public class ConsistencyWatchdogClient {
 
     @Inject
     protected EditorManager editorManager;
+
+    @Inject
+    protected SessionManager sessionManager;
 
     protected ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
         TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1),
@@ -133,8 +137,7 @@ public class ConsistencyWatchdogClient {
     private boolean isInconsistent(DocumentChecksum checksum) {
         IPath path = checksum.getPath();
 
-        ISharedProject sharedProject = Saros.getDefault().getSessionManager()
-            .getSharedProject();
+        ISharedProject sharedProject = sessionManager.getSharedProject();
         IFile file = sharedProject.getProject().getFile(path);
         if (!file.exists()) {
             return true;
