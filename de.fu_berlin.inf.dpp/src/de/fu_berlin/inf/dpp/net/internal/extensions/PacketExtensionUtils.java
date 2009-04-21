@@ -39,7 +39,6 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
@@ -261,7 +260,8 @@ public class PacketExtensionUtils {
                 new UserListExtension() {
 
                     @Override
-                    public void userListReceived(JID sender, List<User> userList) {
+                    public void userListReceived(JID sender,
+                        List<UserListEntry> userList) {
                         // Default implementation does nothing
                     }
                 });

@@ -22,6 +22,36 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
     private static final String USER_ROLE_KEY = "UserRole";
     private static final String USER_COLOR_KEY = "UserColor";
 
+    /**
+     * Simply value object class containing all information describing a single
+     * user in the user list.
+     */
+    public static class UserListEntry {
+        public UserListEntry(JID jid, int colorID, UserRole role) {
+            this.jid = jid;
+            this.colorID = colorID;
+            this.role = role;
+        }
+
+        protected JID jid;
+
+        protected int colorID;
+
+        protected UserRole role;
+
+        public int getColorID() {
+            return colorID;
+        }
+
+        public UserRole getUserRole() {
+            return role;
+        }
+
+        public JID getJID() {
+            return jid;
+        }
+    }
+
     public UserListExtension() {
         super("userList");
     }
@@ -59,7 +89,7 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         DefaultPacketExtension userlistExtension = UserListExtension
             .getDefault().getExtension(message);
 
-        List<User> users = new LinkedList<User>();
+        List<UserListEntry> users = new LinkedList<UserListEntry>();
 
         int n = Integer.parseInt(userlistExtension.getValue(COUNT_KEY));
 
@@ -67,18 +97,16 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
             JID jid = new JID(userlistExtension.getValue(USER_KEY + i));
             int colorID = Integer.parseInt(userlistExtension
                 .getValue(USER_COLOR_KEY + i));
+            UserRole userRole = UserRole.valueOf(userlistExtension
+                .getValue(USER_ROLE_KEY + i));
 
-            User user = new User(jid, colorID);
-
-            String userRole = userlistExtension.getValue(USER_ROLE_KEY + i);
-            user.setUserRole(UserRole.valueOf(userRole));
-
-            users.add(user);
+            users.add(new UserListEntry(jid, colorID, userRole));
         }
 
         userListReceived(sender, users);
     }
 
-    public abstract void userListReceived(JID sender, List<User> userList);
+    public abstract void userListReceived(JID sender,
+        List<UserListEntry> userList);
 
 }

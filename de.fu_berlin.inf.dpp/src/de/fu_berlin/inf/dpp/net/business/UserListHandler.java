@@ -50,7 +50,7 @@ public class UserListHandler extends UserListExtension {
     }
 
     @Override
-    public void userListReceived(JID fromJID, List<User> userList) {
+    public void userListReceived(JID fromJID, List<UserListEntry> userList) {
 
         ISharedProject project = sessionManager.getSharedProject();
 
@@ -59,14 +59,15 @@ public class UserListHandler extends UserListExtension {
 
         log.debug("Received user list");
 
-        for (User receivedUser : userList) {
+        for (UserListEntry receivedUser : userList) {
 
             // Check if we already know this user
             User user = project.getParticipant(receivedUser.getJID());
 
             if (user == null) {
                 // This user is not part of our project
-                user = receivedUser;
+                user = new User(receivedUser.getJID(), receivedUser
+                    .getColorID());
 
                 // Add him and send him a message, and tell him our
                 // color
