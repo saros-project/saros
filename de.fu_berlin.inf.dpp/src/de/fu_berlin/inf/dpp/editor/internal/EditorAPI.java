@@ -45,7 +45,6 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.IPathEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -54,6 +53,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -171,6 +171,9 @@ public class EditorAPI implements IEditorAPI {
      */
     protected Map<EditorManager, IPartListener2> partListeners = new HashMap<EditorManager, IPartListener2>();
 
+    /**
+     * {@inheritDoc}
+     */
     public void addEditorPartListener(EditorManager editorManager) {
 
         assert Util.isSWT();
@@ -193,6 +196,9 @@ public class EditorAPI implements IEditorAPI {
             partListener);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void removeEditorPartListener(EditorManager editorManager) {
 
         if (editorManager == null)
@@ -212,10 +218,8 @@ public class EditorAPI implements IEditorAPI {
             partListeners.remove(editorManager));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+    /**
+     * {@inheritDoc}
      */
     public IEditorPart openEditor(IFile file) {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
@@ -242,10 +246,8 @@ public class EditorAPI implements IEditorAPI {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+    /**
+     * {@inheritDoc}
      */
     public void closeEditor(IEditorPart part) {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
@@ -256,7 +258,7 @@ public class EditorAPI implements IEditorAPI {
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI#getOpenEditors()
+     * {@inheritDoc}
      */
     public Set<IEditorPart> getOpenEditors() {
         Set<IEditorPart> editorParts = new HashSet<IEditorPart>();
@@ -294,10 +296,8 @@ public class EditorAPI implements IEditorAPI {
         return editorParts;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+    /**
+     * {@inheritDoc}
      */
     public IEditorPart getActiveEditor() {
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
@@ -311,44 +311,26 @@ public class EditorAPI implements IEditorAPI {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+    /**
+     * {@inheritDoc}
      */
     public IResource getEditorResource(IEditorPart editorPart) {
+
         IEditorInput input = editorPart.getEditorInput();
 
-        if (input instanceof IPathEditorInput) {
+        IResource resource = ResourceUtil.getResource(input);
 
-            // TODO Why do we not directly try to get an IResource?
-            IResource resource = (IResource) input.getAdapter(IFile.class);
-
-            if (resource == null) {
-                resource = (IResource) input.getAdapter(IResource.class);
-            }
-
-            if (resource == null) {
-                log.warn("Could not get resource from EditorInput " + input);
-            }
-
-            return resource;
-        } else {
-            log
-                .warn("The input of this editor is not an IPathEditorInput but a "
-                    + input.getClass().getName());
+        if (resource == null) {
+            log.warn("Could not get resource from IEditorInput " + input);
         }
 
-        return null;
+        return resource;
     }
 
-    /*
+    /**
      * This implementation does not really set the selection but rather adds an
-     * annotation.
+     * selection annotation.
      * 
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
      */
     public void setSelection(IEditorPart editorPart, ITextSelection selection,
         String source, boolean following) {

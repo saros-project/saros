@@ -125,11 +125,10 @@ public class EditorManager implements IActivityProvider {
 
             IPath path = editorAPI.getEditorPath(editorPart);
             if (path == null) {
-                log.warn("Could not find path for editor "
+                log.warn("Could not find path/resource for editor "
                     + editorPart.getTitle());
                 return;
             }
-
             if (getEditors(path).contains(editorPart)) {
                 log.error("EditorPart was added twice to the EditorPool: "
                     + editorPart.getTitle(), new StackTrace());
@@ -1069,8 +1068,21 @@ public class EditorManager implements IActivityProvider {
         return this.editorPool.getEditors(path);
     }
 
+    /**
+     * This method verifies if the given EditorPart is supported by Saros, which
+     * is based basically on two facts:
+     * 
+     * 1.) Has a IResource belonging to the project
+     * 
+     * 2.) Can be mapped to a ITextViewer
+     * 
+     * Since a null editor does not support either, this method returns false.
+     */
     protected boolean isSharedEditor(IEditorPart editorPart) {
         if (sharedProject == null)
+            return false;
+
+        if (EditorAPI.getViewer(editorPart) == null)
             return false;
 
         IResource resource = this.editorAPI.getEditorResource(editorPart);
