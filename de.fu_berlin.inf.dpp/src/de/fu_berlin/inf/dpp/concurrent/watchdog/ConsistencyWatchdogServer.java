@@ -212,7 +212,7 @@ public class ConsistencyWatchdogServer extends Job {
 
         if (monitor.isCanceled())
             return Status.CANCEL_STATUS;
-        
+
         // Reschedule the next run in INTERVAL ms
         schedule(INTERVAL);
         return Status.OK_STATUS;
@@ -221,7 +221,7 @@ public class ConsistencyWatchdogServer extends Job {
     public List<JID> getOthers() {
         ArrayList<JID> result = new ArrayList<JID>();
         for (User user : sharedProject.getParticipants()) {
-            if (!user.equals(sharedProject.getLocalUser())) {
+            if (user.isRemote()) {
                 result.add(user.getJID());
             }
         }

@@ -55,7 +55,14 @@ public class UserListHandler extends UserListExtension {
         ISharedProject project = sessionManager.getSharedProject();
 
         assert project != null;
-        assert project.getHost().getJID().equals(fromJID);
+
+        User fromUser = project.getParticipant(fromJID);
+
+        if (fromUser == null || !fromUser.isHost()) {
+            log.error("Received UserList from user which "
+                + "is not part of our session or is not host: " + fromJID);
+            return;
+        }
 
         log.debug("Received user list");
 
@@ -66,7 +73,7 @@ public class UserListHandler extends UserListExtension {
 
             if (user == null) {
                 // This user is not part of our project
-                user = new User(receivedUser.getJID(), receivedUser
+                user = new User(project, receivedUser.getJID(), receivedUser
                     .getColorID());
 
                 // Add him and send him a message, and tell him our

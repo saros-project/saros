@@ -218,7 +218,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         assertState(State.SYNCHRONIZING_DONE);
 
-        this.sharedProject.addUser(new User(from, colorID));
+        this.sharedProject.addUser(new User(sharedProject, from, colorID));
         setState(State.DONE);
 
         // TODO Find a more reliable way to remove InvitationProcess

@@ -24,8 +24,25 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
+/**
+ * A user is a representation of a person sitting in front of an eclipse
+ * instance for the use in a Saros SharedProject session.
+ * 
+ * A user object always has the following immutable characteristics: S/he
+ * belongs to a single SharedProject instance, has a final color, and unchanging
+ * JID.
+ * 
+ * There is one user who is a host, all others are clients.
+ * 
+ * There is one local user representing the person in front of the current
+ * eclipse instance, all others are remote users.
+ * 
+ * The public and mutable properties are the role (Driver/Observer), time since
+ * going off-line and connection state.
+ */
 public class User {
 
     private static final Logger log = Logger.getLogger(User.class.getName());
@@ -38,20 +55,25 @@ public class User {
         DRIVER, OBSERVER
     }
 
-    private UserConnectionState presence = UserConnectionState.UNKNOWN;
+    protected final ISharedProject sharedProject;
 
-    private final JID jid;
+    protected final JID jid;
 
-    private int colorID;
+    protected final int colorID;
+
+    protected UserConnectionState presence = UserConnectionState.UNKNOWN;
 
     /**
      * Time stamp when User became offline the last time. In seconds.
      */
-    private long offlineTime = 0;
+    protected long offlineTime = 0;
 
-    private UserRole role = UserRole.OBSERVER;
+    protected UserRole role = UserRole.OBSERVER;
 
-    public User(JID jid, int colorID) {
+    public User(ISharedProject sharedProject, JID jid, int colorID) {
+        if (sharedProject == null || jid == null)
+            throw new IllegalArgumentException();
+        this.sharedProject = sharedProject;
         this.jid = jid;
         this.colorID = colorID;
     }
@@ -161,5 +183,43 @@ public class User {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Gets the ISharedProject to which this user belongs.
+     */
+    public ISharedProject getSharedProject() {
+        return sharedProject;
+    }
+
+    /**
+     * Returns true if this User object identifies the user which is using the
+     * local Eclipse instance as opposed to the remote users in different
+     * Eclipse instances.
+     */
+    public boolean isLocal() {
+        return this.equals(sharedProject.getLocalUser());
+    }
+
+    /**
+     * Returns true if this User is not the local user.
+     */
+    public boolean isRemote() {
+        return !isLocal();
+    }
+
+    /**
+     * Returns true if this user is the one that initiated the SharedProject
+     * session and thus is responsible for synchronization, role management,
+     */
+    public boolean isHost() {
+        return this.equals(sharedProject.getHost());
+    }
+
+    /**
+     * Returns true if this user is not the host.
+     */
+    public boolean isClient() {
+        return !isHost();
     }
 }

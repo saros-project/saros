@@ -68,10 +68,9 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
 
         User selectedUser = (User) selected;
 
-        if (selectedUser.equals(sessionManager.getSharedProject()
-            .getLocalUser()))
+        if (selectedUser.isLocal())
             return null;
-
-        return selectedUser;
+        else
+            return selectedUser;
     }
 }

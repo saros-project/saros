@@ -90,7 +90,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
-        this.localUser = new User(myID, 0);
+        this.localUser = new User(this, myID, 0);
         localUser.setUserRole(UserRole.DRIVER);
         this.host = localUser;
 
@@ -111,13 +111,13 @@ public class SharedProject implements ISharedProject, Disposable {
 
         this(transmitter, project);
 
-        User host = new User(hostID, 0);
+        this.host = new User(this, hostID, 0);
+        this.host.setUserRole(UserRole.DRIVER);
 
-        host.setUserRole(UserRole.DRIVER);
+        this.localUser = new User(this, myID, myColorID);
+
         this.participants.put(hostID, host);
-        this.participants.put(myID, new User(myID, myColorID));
-        this.localUser = getParticipant(myID);
-        this.host = getParticipant(hostID);
+        this.participants.put(myID, localUser);
 
         this.activitySequencer.initConcurrentManager(Side.CLIENT_SIDE,
             this.host, myID, this);
@@ -164,7 +164,7 @@ public class SharedProject implements ISharedProject, Disposable {
         assert user != null;
 
         user.setUserRole(role);
-        if (user.equals(localUser)) {
+        if (user.isLocal()) {
             setProjectReadonly(user.isObserver());
         }
 
@@ -205,7 +205,7 @@ public class SharedProject implements ISharedProject, Disposable {
             return false;
         }
         for (User user : getParticipants()) {
-            if (!user.equals(localUser) && user.isDriver()) {
+            if (user.isRemote() && user.isDriver()) {
                 return false;
             }
         }
@@ -213,6 +213,8 @@ public class SharedProject implements ISharedProject, Disposable {
     }
 
     public void addUser(User user) {
+
+        assert user.getSharedProject().equals(this);
 
         if (this.participants.containsKey(user.getJID())) {
             log.warn("User " + user.getJID() + " added twice to SharedProject");

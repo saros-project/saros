@@ -222,7 +222,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
                             if (project != null) {
                                 // a new user joined this session
-                                project.addUser(new User(sender, colorID));
+                                project.addUser(new User(project, sender,
+                                    colorID));
                             }
                         }
                     });
@@ -365,8 +366,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendJoinMessage(ISharedProject sharedProject) {
         try {
-            /* HACK sleep process for 1000 millis to ensure invitation state process
-             * on host.
+            /*
+             * HACK sleep process for 1000 millis to ensure invitation state
+             * process on host.
              */
             Thread.sleep(1000);
         } catch (InterruptedException e) {

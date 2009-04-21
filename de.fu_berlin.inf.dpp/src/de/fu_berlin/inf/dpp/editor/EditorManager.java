@@ -335,13 +335,11 @@ public class EditorManager implements IActivityProvider {
         @Override
         public void roleChanged(final User user, boolean replicated) {
 
-            User localUser = sharedProject.getLocalUser();
-
             // Make sure we have the up-to-date facts about ourself
             isDriver = sharedProject.isDriver();
 
             // Lock / unlock editors
-            if (user.equals(localUser)) {
+            if (user.isLocal()) {
                 editorPool.setDriverEnabled(isDriver);
             }
 
@@ -349,7 +347,7 @@ public class EditorManager implements IActivityProvider {
                 if (Saros.getDefault().getPreferenceStore().getBoolean(
                     PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
                     if (userToFollow.isObserver() && user.isDriver()
-                        && !user.equals(localUser)) {
+                        && user.isRemote()) {
                         setFollowing(user);
                     }
                 }
@@ -363,7 +361,7 @@ public class EditorManager implements IActivityProvider {
              * the balloon notification in the control which has the keyboard
              * focus
              */
-            if (localUser.equals(user)) {
+            if (user.isLocal()) {
 
                 IViewPart view = Util
                     .findView("de.fu_berlin.inf.dpp.ui.SessionView");
@@ -1543,11 +1541,9 @@ public class EditorManager implements IActivityProvider {
             }
         });
 
-        User localUser = sharedProject.getLocalUser();
-
         for (User user : sharedProject.getParticipants()) {
 
-            if (user.equals(localUser)) {
+            if (user.isLocal()) {
                 continue;
             }
 

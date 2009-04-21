@@ -1,9 +1,11 @@
 package de.fu_berlin.inf.dpp.net.business;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
@@ -19,6 +21,9 @@ import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
  *            PicoContainer in the central plug-in class {@link Saros}
  */
 public class LeaveHandler extends LeaveExtension {
+
+    private static final Logger log = Logger.getLogger(LeaveHandler.class
+        .getName());
 
     protected SessionManager sessionManager;
 
@@ -38,15 +43,22 @@ public class LeaveHandler extends LeaveExtension {
 
         ISharedProject project = sessionManager.getSharedProject();
 
-        if (project.getHost().getJID().equals(fromJID)) {
-            // Host
+        User user = project.getParticipant(fromJID);
+
+        if (user == null) {
+            log.warn("Received leave Message from user which"
+                + " is not part of our shared project session: " + fromJID);
+            return;
+        }
+
+        if (user.isHost()) {
             sessionManager.stopSharedProject();
 
             WarningMessageDialog.showWarningMessage("Closing the Session",
                 "Closing the session because the host left.");
         } else {
             // Client
-            project.removeUser(project.getParticipant(fromJID));
+            project.removeUser(user);
         }
     }
 }

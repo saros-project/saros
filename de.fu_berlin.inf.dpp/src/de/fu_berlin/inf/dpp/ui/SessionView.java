@@ -152,7 +152,7 @@ public class SessionView extends ViewPart {
 
         public void roleChanged(User user, boolean replicated) {
             // Show balloon notification
-            if (user.equals(sharedProject.getLocalUser())) {
+            if (user.isLocal()) {
                 if (user.isDriver()) {
                     BalloonNotification.showNotification(
                         tableViewer.getTable(), "Role changed",
@@ -253,7 +253,7 @@ public class SessionView extends ViewPart {
 
     public String getName(User participant) {
 
-        if (participant.equals(sharedProject.getLocalUser())) {
+        if (participant.isLocal()) {
             return "You";
         }
 
