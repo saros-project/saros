@@ -82,7 +82,6 @@ public class ConsistencyWatchdogServer extends Job {
     @Inject
     protected XMPPChatTransmitter transmitter;
 
-    @Inject
     protected SessionManager sessionManager;
 
     protected ISharedProject sharedProject;
