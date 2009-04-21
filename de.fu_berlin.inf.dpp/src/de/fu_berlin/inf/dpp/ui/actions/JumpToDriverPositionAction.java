@@ -68,7 +68,8 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
 
         User selectedUser = (User) selected;
 
-        if (selectedUser.equals(saros.getLocalUser()))
+        if (selectedUser.equals(sessionManager.getSharedProject()
+            .getLocalUser()))
             return null;
 
         return selectedUser;

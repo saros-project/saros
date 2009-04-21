@@ -80,7 +80,6 @@ import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
@@ -726,25 +725,6 @@ public class Saros extends AbstractUIPlugin {
             // logger.debug("saros reconnection successful");
             // setConnectionState(ConnectionState.CONNECTED, null);
         }
-    }
-
-    /**
-     * @return the local user or null if not connected with a XMPP server or if
-     *         not in a shared session
-     * 
-     *         TODO Move into SharedProject
-     * 
-     *         TODO Do not return null upon closed connection.
-     */
-    public User getLocalUser() {
-        if (!isConnected())
-            return null;
-
-        ISharedProject project = sessionManager.getSharedProject();
-        if (project == null)
-            return null;
-
-        return project.getParticipant(getMyJID());
     }
 
     public static boolean getFileTransferModeViaChat() {

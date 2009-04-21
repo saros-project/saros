@@ -74,8 +74,7 @@ public class UserListHandler extends UserListExtension {
 
                 // TODO This needs to be
                 transmitter.sendMessage(user.getJID(), JoinExtension
-                    .getDefault().create(
-                        Saros.getDefault().getLocalUser().getColorID()));
+                    .getDefault().create(project.getLocalUser().getColorID()));
             } else {
                 // User already exists
 

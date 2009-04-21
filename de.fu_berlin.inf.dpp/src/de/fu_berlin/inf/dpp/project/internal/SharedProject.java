@@ -56,7 +56,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class SharedProject implements ISharedProject, Disposable {
     public static Logger log = Logger.getLogger(SharedProject.class.getName());
 
-    protected JID myID;
+    protected User localUser;
 
     protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
@@ -90,10 +90,9 @@ public class SharedProject implements ISharedProject, Disposable {
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
 
-        this.myID = myID;
-        User user = new User(myID, 0);
-        user.setUserRole(UserRole.DRIVER);
-        this.host = user;
+        this.localUser = new User(myID, 0);
+        localUser.setUserRole(UserRole.DRIVER);
+        this.host = localUser;
 
         this.participants.put(this.host.getJID(), this.host);
 
@@ -112,13 +111,12 @@ public class SharedProject implements ISharedProject, Disposable {
 
         this(transmitter, project);
 
-        this.myID = myID;
-
         User host = new User(hostID, 0);
+
         host.setUserRole(UserRole.DRIVER);
         this.participants.put(hostID, host);
         this.participants.put(myID, new User(myID, myColorID));
-
+        this.localUser = getParticipant(myID);
         this.host = getParticipant(hostID);
 
         this.activitySequencer.initConcurrentManager(Side.CLIENT_SIDE,
@@ -166,7 +164,7 @@ public class SharedProject implements ISharedProject, Disposable {
         assert user != null;
 
         user.setUserRole(role);
-        if (user.equals(getParticipant(this.myID))) {
+        if (user.equals(localUser)) {
             setProjectReadonly(user.isObserver());
         }
 
@@ -190,7 +188,7 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public boolean isHost() {
-        return this.host.getJID().equals(this.myID);
+        return this.host.equals(localUser);
     }
 
     /*
@@ -199,14 +197,13 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public boolean isDriver() {
-        return getParticipant(this.myID).isDriver();
+        return localUser.isDriver();
     }
 
     public boolean isExclusiveDriver() {
         if (!isDriver()) {
             return false;
         }
-        User localUser = getParticipant(myID);
         for (User user : getParticipants()) {
             if (!user.equals(localUser) && user.isDriver()) {
                 return false;
@@ -328,6 +325,10 @@ public class SharedProject implements ISharedProject, Disposable {
      */
     public User getParticipant(JID jid) {
         return this.participants.get(jid);
+    }
+
+    public User getLocalUser() {
+        return localUser;
     }
 
     public void startInvitation(final @Nullable List<JID> toInvite) {

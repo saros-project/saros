@@ -365,8 +365,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendJoinMessage(ISharedProject sharedProject) {
         try {
-            /*
-             * sleep process for 1000 millis to ensure invitation state process
+            /* HACK sleep process for 1000 millis to ensure invitation state process
              * on host.
              */
             Thread.sleep(1000);
@@ -375,7 +374,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             return;
         }
         sendMessageToAll(sharedProject, JoinExtension.getDefault().create(
-            saros.getLocalUser().getColorID()));
+            sharedProject.getLocalUser().getColorID()));
     }
 
     /*

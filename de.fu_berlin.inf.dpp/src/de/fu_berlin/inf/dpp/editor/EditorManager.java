@@ -335,7 +335,7 @@ public class EditorManager implements IActivityProvider {
         @Override
         public void roleChanged(final User user, boolean replicated) {
 
-            User localUser = Saros.getDefault().getLocalUser();
+            User localUser = sharedProject.getLocalUser();
 
             // Make sure we have the up-to-date facts about ourself
             isDriver = sharedProject.isDriver();
@@ -652,7 +652,7 @@ public class EditorManager implements IActivityProvider {
             this.locallyOpenEditors.add(path);
 
         for (ISharedEditorListener listener : this.editorListeners) {
-            listener.activeEditorChanged(Saros.getDefault().getLocalUser(),
+            listener.activeEditorChanged(sharedProject.getLocalUser(),
                 this.locallyActiveEditor);
         }
 
@@ -1034,7 +1034,7 @@ public class EditorManager implements IActivityProvider {
         this.locallyOpenEditors.remove(path);
 
         for (ISharedEditorListener listener : this.editorListeners) {
-            listener.editorRemoved(Saros.getDefault().getLocalUser(), path);
+            listener.editorRemoved(sharedProject.getLocalUser(), path);
         }
 
         fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
@@ -1487,7 +1487,7 @@ public class EditorManager implements IActivityProvider {
     public void setFollowing(User userToFollow) {
 
         assert userToFollow == null
-            || !userToFollow.equals(saros.getLocalUser()) : "Local user cannot follow himself!";
+            || !userToFollow.equals(sharedProject.getLocalUser()) : "Local user cannot follow himself!";
 
         this.userToFollow = userToFollow;
 
@@ -1543,7 +1543,7 @@ public class EditorManager implements IActivityProvider {
             }
         });
 
-        User localUser = Saros.getDefault().getLocalUser();
+        User localUser = sharedProject.getLocalUser();
 
         for (User user : sharedProject.getParticipants()) {
 

@@ -154,7 +154,7 @@ public class FollowModeAction extends Action implements Disposable {
         if (editorManager.isFollowing()) {
             return null;
         } else {
-            User localUser = Saros.getDefault().getLocalUser();
+            User localUser = project.getLocalUser();
             for (User user : project.getParticipants()) {
                 if (user.equals(localUser))
                     continue;
@@ -183,7 +183,7 @@ public class FollowModeAction extends Action implements Disposable {
             return true;
         }
 
-        User localUser = Saros.getDefault().getLocalUser();
+        User localUser = project.getLocalUser();
         int driverCount = 0;
         for (User user : project.getParticipants()) {
             if (user.equals(localUser))

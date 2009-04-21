@@ -181,6 +181,8 @@ public interface ISharedProject {
 
     public User getParticipant(JID jid);
 
+    public User getLocalUser();
+
     /**
      * Sets all resources of the project to a readonly state on the local file
      * system.

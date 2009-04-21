@@ -49,7 +49,7 @@ public class PreferenceManager {
 
                 // TODO The user should be told that we are disabling options...
                 IProject project = session.getProject();
-                if (session.getHost().equals(saros.getLocalUser())) {
+                if (session.getHost().equals(session.getLocalUser())) {
 
                     for (IPreferenceManipulator manipulator : manipulators) {
                         if (manipulator.isDangerousForHost()
