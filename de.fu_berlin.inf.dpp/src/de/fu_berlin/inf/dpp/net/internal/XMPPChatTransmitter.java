@@ -56,7 +56,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -520,14 +519,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         for (MessageTransfer pex : toTransfer) {
             sendMessage(pex.receipient, pex.packetextension);
         }
-    }
-
-    public void sendJupiterRequest(ISharedProject sharedProject,
-        Request request, JID jid) {
-        XMPPChatTransmitter.log.info("Send Jupiter [" + jid.getName() + "]: "
-            + request);
-        sendMessage(jid, new RequestPacketExtension(sessionID.getValue(),
-            request));
     }
 
     /**

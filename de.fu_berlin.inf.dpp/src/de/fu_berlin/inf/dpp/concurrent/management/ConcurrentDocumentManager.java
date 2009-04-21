@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -111,7 +114,11 @@ public class ConcurrentDocumentManager implements Disposable {
                 // ActivitySequencer.
 
                 // Send to host
-                sequencer.forwardOutgoingRequest(host, request);
+                Collection<JID> hostJID = new ArrayList<JID>(1);
+                hostJID.add(host);
+                List<IActivity> requests = new ArrayList<IActivity>(1);
+                requests.add(request);
+                sequencer.sendActivities(hostJID, requests);
                 return true;
             }
         }
@@ -408,7 +415,11 @@ public class ConcurrentDocumentManager implements Disposable {
             if (to.equals(host)) {
                 execTextEditActivity(transformed);
             } else {
-                sequencer.forwardOutgoingRequest(to, transformed);
+                Collection<JID> recipient = new ArrayList<JID>(1);
+                recipient.add(to);
+                List<IActivity> requests = new ArrayList<IActivity>(1);
+                requests.add(transformed);
+                sequencer.sendActivities(recipient, requests);
             }
         }
     }

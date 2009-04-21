@@ -30,9 +30,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -57,7 +55,6 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -392,11 +389,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     protected boolean started = false;
 
-    /**
-     * outgoing queue for direct client sync messages for all driver.
-     */
-    private final BlockingQueue<Pair<JID, Request>> outgoingSyncActivities = new LinkedBlockingQueue<Pair<JID, Request>>();
-
     private Timer flushTimer;
 
     private final ISharedProject sharedProject;
@@ -438,7 +430,12 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
                 if (activities.size() > 0
                     && sharedProject.getParticipantCount() > 1) {
-                    sendActivities(sharedProject.getParticipants(), activities);
+                    List<JID> participantJIDs = new ArrayList<JID>(
+                        sharedProject.getParticipantCount());
+                    for (User participant : sharedProject.getParticipants()) {
+                        participantJIDs.add(participant.getJID());
+                    }
+                    sendActivities(participantJIDs, activities);
                 }
 
                 synchronized (queues) {
@@ -480,6 +477,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     public void exec(final IActivity activity) {
 
+        // TODO Replace this with a single call to the ConcurrentDocumentManager
+        // and use the ActivityReceiver to handle all cases.
         try {
             if (activity instanceof EditorActivity) {
                 this.concurrentDocumentManager.execEditorActivity(activity);
@@ -489,6 +488,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             }
             if (activity instanceof FolderActivity) {
                 // TODO [FileOps] Does not handle FolderActivity
+            }
+            if (activity instanceof Request) {
+                this.concurrentDocumentManager
+                    .receiveRequest((Request) activity);
             }
         } catch (Exception e) {
             log.error("Error while executing activity.", e);
@@ -558,16 +561,15 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     /**
      * Sends given activities to given recipients.
      */
-    protected void sendActivities(Collection<User> recipients,
+    public void sendActivities(Collection<JID> recipients,
         List<IActivity> activities) {
 
         setSenderOnTextEditActivities(activities);
 
         // Send the activities to each user.
         JID myJID = Saros.getDefault().getMyJID();
-        for (User user : recipients) {
+        for (JID recipientJID : recipients) {
 
-            JID recipientJID = user.getJID();
             if (recipientJID.equals(myJID)) {
                 continue;
             }
@@ -782,16 +784,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
         return this.concurrentDocumentManager;
-    }
-
-    public synchronized void forwardOutgoingRequest(JID to, Request req) {
-        /* put request into outgoing queue. */
-        this.outgoingSyncActivities.add(new Pair<JID, Request>(to, req));
-    }
-
-    public Pair<JID, Request> getNextOutgoingRequest()
-        throws InterruptedException {
-        return this.outgoingSyncActivities.take();
     }
 
     /**

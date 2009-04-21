@@ -64,7 +64,6 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
-import de.fu_berlin.inf.dpp.net.business.JupiterHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
@@ -188,7 +187,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
-        this.container.addComponent(JupiterHandler.class);
         this.container.addComponent(LeaveHandler.class);
         this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);

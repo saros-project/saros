@@ -33,7 +33,6 @@ import org.picocontainer.annotations.Nullable;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -48,7 +47,6 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -305,29 +303,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
         activitySequencer.start();
 
-        /* Start thread for sending jupiter requests. */
-        this.requestTransmitter = new Thread(Util.wrapSafe(log, new Runnable() {
-            /**
-             * @review runSafe OK
-             */
-            public void run() {
-                while (!stopped && !Thread.interrupted()) {
-                    Pair<JID, Request> toSend;
-                    try {
-                        toSend = activitySequencer.getNextOutgoingRequest();
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
-                        return;
-                    }
-                    transmitter.sendJupiterRequest(SharedProject.this,
-                        toSend.v, toSend.p);
-                }
-            }
-        }));
-
         stopped = false;
 
-        this.requestTransmitter.start();
     }
 
     // TODO Review sendRequest for InterruptedException and remove this flag.
@@ -339,7 +316,6 @@ public class SharedProject implements ISharedProject, Disposable {
         }
 
         activitySequencer.stop();
-        this.requestTransmitter.interrupt();
 
         stopped = true;
     }

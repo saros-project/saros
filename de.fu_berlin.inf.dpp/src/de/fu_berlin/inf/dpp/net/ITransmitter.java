@@ -32,7 +32,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -262,19 +261,6 @@ public interface ITransmitter {
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivity> timedActivities);
-
-    /**
-     * Sends given request to given participant of given shared project.
-     * 
-     * @param sharedProject
-     *            the shared project the activities refer to.
-     * @param request
-     *            the request to send.
-     * @param jid
-     *            the recipient of the request.
-     */
-    public void sendJupiterRequest(ISharedProject sharedProject,
-        Request request, JID jid);
 
     /**
      * Sends a FileChecksumErrorMessage with the given path to the given list of
