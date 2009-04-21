@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.ui;
 
+import org.apache.log4j.Logger;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
@@ -10,7 +11,12 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.novocode.naf.swt.custom.BalloonWindow;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 public class BalloonNotification {
+
+    private static final Logger log = Logger
+        .getLogger(BalloonNotification.class.getName());
 
     /**
      * Opens a notification window next to a control. The notification window
@@ -58,11 +64,15 @@ public class BalloonNotification {
         window.setLocation(widgetLocation);
 
         // Runnable that will close the window after time has been expired
-        window.getShell().getDisplay().timerExec(pTimeout, new Runnable() {
-            public void run() {
-                window.close();
-            }
-        });
+        window.getShell().getDisplay().timerExec(pTimeout,
+            Util.wrapSafe(log, new Runnable() {
+                public void run() {
+                    // only close window if it isn't already disposed
+                    if (!window.getShell().isDisposed()) {
+                        window.close();
+                    }
+                }
+            }));
 
         window.open();
 
