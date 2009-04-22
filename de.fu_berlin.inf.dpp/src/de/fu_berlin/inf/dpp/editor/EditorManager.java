@@ -84,7 +84,6 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Predicate;
@@ -353,16 +352,6 @@ public class EditorManager implements IActivityProvider {
 
             // TODO [PERF] 1 Make this lazy triggered on activating a part?
             refreshAnnotations();
-            /*
-             * Not nice to have GUI stuff here, but it can't be handled in
-             * SessionView because it is not guaranteed there actually is a
-             * session view open.
-             */
-            if (user.isLocal()) {
-                SessionView.showNotification("Role changed", "You are now "
-                    + ((user.isDriver()) ? "a driver" : "an observer")
-                    + " of this session.");
-            }
         }
 
         @Override
@@ -461,11 +450,6 @@ public class EditorManager implements IActivityProvider {
             });
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see de.fu_berlin.inf.dpp.project.ISessionListener
-         */
         @Override
         public void sessionEnded(ISharedProject project) {
 

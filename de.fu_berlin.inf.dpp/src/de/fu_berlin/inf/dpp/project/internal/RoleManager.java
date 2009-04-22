@@ -8,6 +8,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -16,6 +17,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 
 /**
  * This manager is responsible for handling driver changes.
@@ -42,6 +44,27 @@ public class RoleManager implements IActivityProvider {
                     listener.activityCreated(activity);
                 }
             }
+            /*
+             * Not nice to have GUI stuff here, but it can't be handled in
+             * SessionView because it is not guaranteed there actually is a
+             * session view open.
+             */
+            SessionView.showNotification("Role changed", String.format(
+                "%s now %s of this session.", user.isLocal() ? "You are" : user
+                    .getJID().getBase()
+                    + "is", user.isDriver() ? "a driver" : "an observer"));
+        }
+
+        @Override
+        public void userJoined(JID user) {
+            SessionView.showNotification("User joined", user.toString()
+                + " joined the session.");
+        }
+
+        @Override
+        public void userLeft(JID user) {
+            SessionView.showNotification("User left", user.getBase()
+                + " left the session.");
         }
     };
 

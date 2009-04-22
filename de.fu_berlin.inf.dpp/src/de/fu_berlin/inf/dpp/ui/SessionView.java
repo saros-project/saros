@@ -526,15 +526,21 @@ public class SessionView extends ViewPart {
             consistencyAction.run();
     }
 
-    public static void showNotification(String title, String text) {
-        IViewPart sessionView = Util
-            .findView("de.fu_berlin.inf.dpp.ui.SessionView");
-        /*
-         * If no session view is open then show the balloon notification in the
-         * control which has the keyboard focus
-         */
-        Control control = (sessionView == null) ? Display.getDefault()
-            .getFocusControl() : ((SessionView) sessionView).viewer.getTable();
-        BalloonNotification.showNotification(control, title, text, 5000);
+    public static void showNotification(final String title, final String text) {
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                IViewPart sessionView = Util
+                    .findView("de.fu_berlin.inf.dpp.ui.SessionView");
+                /*
+                 * If no session view is open then show the balloon notification
+                 * in the control which has the keyboard focus
+                 */
+                Control control = (sessionView == null) ? Display.getDefault()
+                    .getFocusControl() : ((SessionView) sessionView).viewer
+                    .getTable();
+                BalloonNotification
+                    .showNotification(control, title, text, 5000);
+            }
+        });
     }
 }
