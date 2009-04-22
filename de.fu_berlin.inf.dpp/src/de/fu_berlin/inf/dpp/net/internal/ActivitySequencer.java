@@ -209,12 +209,12 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (queuedActivities.size() == 0) {
                 return;
             }
-            if (expectedSequenceNumber >= queuedActivities.peek()
-                .getSequenceNumber()) {
+            int firstQueuedSequenceNumber = queuedActivities.peek()
+                .getSequenceNumber();
+            if (expectedSequenceNumber >= firstQueuedSequenceNumber) {
 
                 log.error("Expected sequence number: " + expectedSequenceNumber
-                    + " >= first queued: "
-                    + queuedActivities.peek().getSequenceNumber());
+                    + " >= first queued: " + firstQueuedSequenceNumber);
                 return;
             }
             long age = System.currentTimeMillis() - oldestLocalTimestamp;
@@ -228,9 +228,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
                     }
                 }
 
-                log.warn("Gave up waiting for activity nr. "
-                    + expectedSequenceNumber + " for " + jid);
-                expectedSequenceNumber++;
+                int skipCount = firstQueuedSequenceNumber
+                    - expectedSequenceNumber;
+                log.warn("Gave up waiting for activity nrs. "
+                    + expectedSequenceNumber
+                    + ((skipCount == 1) ? "" : " to "
+                        + (firstQueuedSequenceNumber - 1)) + " from " + jid);
+                expectedSequenceNumber = firstQueuedSequenceNumber;
                 updateOldestLocalTimestamp();
             }
         }
