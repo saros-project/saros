@@ -274,10 +274,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
                 activities.size());
             ActivityQueue queue = getActivityQueue(recipient);
-            synchronized (queue) {
-                for (IActivity activity : activities) {
-                    result.add(queue.createTimedActivity(activity));
-                }
+            for (IActivity activity : activities) {
+                result.add(queue.createTimedActivity(activity));
             }
             return result;
         }
