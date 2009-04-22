@@ -57,7 +57,7 @@ public class RoleManager implements IActivityProvider {
 
         @Override
         public void userJoined(JID user) {
-            SessionView.showNotification("User joined", user.toString()
+            SessionView.showNotification("User joined", user.getBase()
                 + " joined the session.");
         }
 
