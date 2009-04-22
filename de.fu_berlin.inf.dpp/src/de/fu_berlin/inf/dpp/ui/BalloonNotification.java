@@ -67,10 +67,7 @@ public class BalloonNotification {
         window.getShell().getDisplay().timerExec(pTimeout,
             Util.wrapSafe(log, new Runnable() {
                 public void run() {
-                    // only close window if it isn't already disposed
-                    if (!window.getShell().isDisposed()) {
-                        window.close();
-                    }
+                    window.close();
                 }
             }));
 

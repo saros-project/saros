@@ -48,6 +48,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -56,6 +57,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.EditorsUI;
@@ -151,20 +153,7 @@ public class SessionView extends ViewPart {
         }
 
         public void roleChanged(User user, boolean replicated) {
-            // Show balloon notification
-            if (user.isLocal()) {
-                if (user.isDriver()) {
-                    BalloonNotification.showNotification(
-                        tableViewer.getTable(), "Role changed",
-                        "You are now a driver of this session.", 5000);
-                } else {
-                    BalloonNotification.showNotification(
-                        tableViewer.getTable(), "Role changed",
-                        "You are now an observer of this session.", 5000);
-                }
-            }
             refreshTable();
-
         }
 
         public void userJoined(JID user) {
@@ -535,5 +524,17 @@ public class SessionView extends ViewPart {
     public void runConsistencyActionIfEnabled() {
         if (this.consistencyAction.isEnabled())
             consistencyAction.run();
+    }
+
+    public static void showNotification(String title, String text) {
+        IViewPart sessionView = Util
+            .findView("de.fu_berlin.inf.dpp.ui.SessionView");
+        /*
+         * If no session view is open then show the balloon notification in the
+         * control which has the keyboard focus
+         */
+        Control control = (sessionView == null) ? Display.getDefault()
+            .getFocusControl() : ((SessionView) sessionView).viewer.getTable();
+        BalloonNotification.showNotification(control, title, text, 5000);
     }
 }

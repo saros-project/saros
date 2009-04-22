@@ -427,7 +427,10 @@ public class BalloonWindow {
     }
 
     public void close() {
-        shell.close();
+        // Only close window if it isn't already disposed.
+        if (!shell.isDisposed()) {
+            shell.close();
+        }
     }
 
     public void setVisible(boolean visible) {

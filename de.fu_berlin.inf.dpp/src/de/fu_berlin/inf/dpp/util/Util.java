@@ -497,9 +497,8 @@ public class Util {
     }
 
     /**
-     * 
-     * @swt Needs to be called from the SWT-UI thread, otherwise null are
-     *      returned.
+     * @swt Needs to be called from the SWT-UI thread, otherwise
+     *      <code>null</code> is returned.
      */
     public static IViewPart findView(String id) {
         IWorkbench workbench = PlatformUI.getWorkbench();

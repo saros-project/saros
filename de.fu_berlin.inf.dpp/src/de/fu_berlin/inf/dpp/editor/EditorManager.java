@@ -47,11 +47,9 @@ import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
 import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
@@ -86,7 +84,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.ui.BalloonNotification;
+import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Predicate;
@@ -355,31 +353,16 @@ public class EditorManager implements IActivityProvider {
 
             // TODO [PERF] 1 Make this lazy triggered on activating a part?
             refreshAnnotations();
-
             /*
-             * If local user is affected and no session view is open then show
-             * the balloon notification in the control which has the keyboard
-             * focus
+             * Not nice to have GUI stuff here, but it can't be handled in
+             * SessionView because it is not guaranteed there actually is a
+             * session view open.
              */
             if (user.isLocal()) {
-
-                IViewPart view = Util
-                    .findView("de.fu_berlin.inf.dpp.ui.SessionView");
-
-                if (view == null) {
-                    // TODO This should not be necessary
-                    Util.runSafeSWTAsync(log, new Runnable() {
-                        public void run() {
-                            BalloonNotification.showNotification(Display
-                                .getDefault().getFocusControl(),
-                                "Role changed", "You are now a "
-                                    + (user.isDriver() ? "driver" : "observer")
-                                    + " of this session.", 5000);
-                        }
-                    });
-                }
+                SessionView.showNotification("Role changed", "You are now "
+                    + ((user.isDriver()) ? "a driver" : "an observer")
+                    + " of this session.");
             }
-
         }
 
         @Override
