@@ -213,8 +213,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
                 .getSequenceNumber();
             if (expectedSequenceNumber >= firstQueuedSequenceNumber) {
 
-                log.error("Expected sequence number: " + expectedSequenceNumber
-                    + " >= first queued: " + firstQueuedSequenceNumber);
+                log.error("Expected activity #" + expectedSequenceNumber
+                    + " >= first queued #" + firstQueuedSequenceNumber);
                 return;
             }
             long age = System.currentTimeMillis() - oldestLocalTimestamp;
@@ -230,7 +230,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
                 int skipCount = firstQueuedSequenceNumber
                     - expectedSequenceNumber;
-                log.warn("Gave up waiting for activity nrs. "
+                log.warn("Gave up waiting for activity # "
                     + expectedSequenceNumber
                     + ((skipCount == 1) ? "" : " to "
                         + (firstQueuedSequenceNumber - 1)) + " from " + jid);
