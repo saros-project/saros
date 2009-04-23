@@ -33,8 +33,7 @@ public class ContributionAnnotationManager {
              * Just remove the annotations from the history. They are removed by
              * the EditorManager from the editors.
              */
-            ContributionAnnotationManager.this.sourceToHistory.remove(user
-                .getJID());
+            ContributionAnnotationManager.this.sourceToHistory.remove(user);
         }
     }
 
