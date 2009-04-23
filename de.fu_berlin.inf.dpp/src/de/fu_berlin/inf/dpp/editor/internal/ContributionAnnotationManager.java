@@ -12,7 +12,6 @@ import org.eclipse.jface.text.source.IAnnotationModel;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.annotations.ContributionAnnotation;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
@@ -29,12 +28,13 @@ public class ContributionAnnotationManager {
 
     protected class SharedProjectListener extends AbstractSharedProjectListener {
         @Override
-        public void userLeft(JID user) {
+        public void userLeft(User user) {
             /*
              * Just remove the annotations from the history. They are removed by
              * the EditorManager from the editors.
              */
-            ContributionAnnotationManager.this.sourceToHistory.remove(user);
+            ContributionAnnotationManager.this.sourceToHistory.remove(user
+                .getJID());
         }
     }
 

@@ -84,7 +84,6 @@ public abstract class SarosAnnotation extends Annotation {
      *         the given user or the name of the jabber ID of the user.
      */
     protected static String createLabel(String prefix, User user) {
-        String nick = Util.getNickname(user.getJID());
-        return prefix + " " + ((nick != null) ? nick : user.getJID().getName());
+        return prefix + " " + Util.getName(user);
     }
 }

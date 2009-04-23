@@ -72,7 +72,6 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -156,11 +155,11 @@ public class SessionView extends ViewPart {
             refreshTable();
         }
 
-        public void userJoined(JID user) {
+        public void userJoined(User user) {
             refreshTable();
         }
 
-        public void userLeft(JID user) {
+        public void userLeft(User user) {
             refreshTable();
         }
 
@@ -189,7 +188,7 @@ public class SessionView extends ViewPart {
 
             User participant = (User) obj;
 
-            return getName(participant)
+            return Util.getName(participant)
                 + (participant.isDriver() ? " (Driver)" : "");
         }
 
@@ -238,22 +237,6 @@ public class SessionView extends ViewPart {
 
             super.dispose();
         }
-    }
-
-    public String getName(User participant) {
-
-        if (participant.isLocal()) {
-            return "You";
-        }
-
-        String nickName = Util.getNickname(participant.getJID());
-        String jidBase = participant.getJID().getBase();
-
-        if (nickName != null && nickName.trim().length() > 0) {
-            return nickName + " (" + jidBase + ")";
-        }
-
-        return jidBase;
     }
 
     protected IPropertyChangeListener editorPrefsListener = new IPropertyChangeListener() {

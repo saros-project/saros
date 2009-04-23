@@ -168,17 +168,17 @@ public class ConcurrentDocumentManager implements Disposable {
                  * them), because new drivers are added lazily, once they edit a
                  * file
                  */
-                userLeft(jid);
+                userLeft(user);
             }
-
         }
 
         @Override
-        public void userLeft(JID user) {
+        public void userLeft(User user) {
             /* remove user proxies from jupiter server. */
+            JID jid = user.getJID();
             for (JupiterDocumentServer server : concurrentDocuments.values()) {
-                if (server.isExist(user)) {
-                    server.removeProxyClient(user);
+                if (server.isExist(jid)) {
+                    server.removeProxyClient(jid);
                 }
             }
         }

@@ -216,14 +216,15 @@ public class SharedProject implements ISharedProject, Disposable {
 
         assert user.getSharedProject().equals(this);
 
-        if (this.participants.containsKey(user.getJID())) {
-            log.warn("User " + user.getJID() + " added twice to SharedProject");
+        JID jid = user.getJID();
+        if (this.participants.containsKey(jid)) {
+            log.warn("User " + jid + " added twice to SharedProject");
         }
-        participants.putIfAbsent(user.getJID(), user);
+        participants.putIfAbsent(jid, user);
         for (ISharedProjectListener listener : this.listeners) {
-            listener.userJoined(user.getJID());
+            listener.userJoined(user);
         }
-        SharedProject.log.info("User " + user.getJID() + " joined session");
+        SharedProject.log.info("User " + jid + " joined session");
     }
 
     public void removeUser(User user) {
@@ -243,7 +244,7 @@ public class SharedProject implements ISharedProject, Disposable {
         // TODO what is to do here if no driver exists anymore?
 
         for (ISharedProjectListener listener : this.listeners) {
-            listener.userLeft(jid);
+            listener.userLeft(user);
         }
 
         SharedProject.log.info("User " + jid + " left session");

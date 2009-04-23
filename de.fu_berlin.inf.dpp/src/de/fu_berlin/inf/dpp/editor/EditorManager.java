@@ -77,7 +77,6 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -327,9 +326,8 @@ public class EditorManager implements IActivityProvider {
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
+    protected ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
 
-        @Override
         public void roleChanged(final User user, boolean replicated) {
 
             // Make sure we have the up-to-date facts about ourself
@@ -354,8 +352,7 @@ public class EditorManager implements IActivityProvider {
             refreshAnnotations();
         }
 
-        @Override
-        public void userJoined(JID user) {
+        public void userJoined(User user) {
 
             // TODO [MR] This should only be sent to this user
 
@@ -368,16 +365,16 @@ public class EditorManager implements IActivityProvider {
             // different activities, there are always warnings displayed
 
             // Let the new user know where we are
-            fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
-                .toString(), Type.Activated, locallyActiveEditor));
+            fireActivity(new EditorActivity(saros.getMyJID().toString(),
+                Type.Activated, locallyActiveEditor));
 
             if (locallyActiveEditor == null) {
                 return;
             }
 
             if (localViewport != null) {
-                fireActivity(new ViewportActivity(Saros.getDefault().getMyJID()
-                    .toString(), localViewport, locallyActiveEditor));
+                fireActivity(new ViewportActivity(saros.getMyJID().toString(),
+                    localViewport, locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -387,8 +384,8 @@ public class EditorManager implements IActivityProvider {
                 int offset = localSelection.getOffset();
                 int length = localSelection.getLength();
 
-                fireActivity(new TextSelectionActivity(Saros.getDefault()
-                    .getMyJID().toString(), offset, length, locallyActiveEditor));
+                fireActivity(new TextSelectionActivity(saros.getMyJID()
+                    .toString(), offset, length, locallyActiveEditor));
             } else {
                 log.warn("No select for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -396,14 +393,15 @@ public class EditorManager implements IActivityProvider {
 
         }
 
-        @Override
-        public void userLeft(final JID user) {
+        public void userLeft(final User user) {
             removeAllAnnotations(new Predicate<SarosAnnotation>() {
                 public boolean evaluate(SarosAnnotation annotation) {
-                    return annotation.getSource().equals(user.toString());
+                    return annotation.getSource().equals(
+                        user.getJID().toString());
                 }
             });
-            remoteEditorManager.removeUser(sharedProject.getParticipant(user));
+            remoteEditorManager.removeUser(sharedProject.getParticipant(user
+                .getJID()));
         }
     };
 

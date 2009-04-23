@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.project;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * Listens for events that can happen inside a SharedProject session. For
@@ -63,7 +62,7 @@ public interface ISharedProjectListener {
      * @param user
      *            the user that has joined.
      */
-    public void userJoined(JID user);
+    public void userJoined(User user);
 
     /**
      * Is fired when an user leaves the shared project.
@@ -71,5 +70,5 @@ public interface ISharedProjectListener {
      * @param user
      *            the user that has left.
      */
-    public void userLeft(JID user);
+    public void userLeft(User user);
 }

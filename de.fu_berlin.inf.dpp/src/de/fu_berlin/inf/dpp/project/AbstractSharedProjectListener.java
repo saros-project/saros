@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * Abstract {@link ISharedProjectListener} that does nothing in all the methods.
@@ -15,11 +14,11 @@ public abstract class AbstractSharedProjectListener implements
         // Do nothing.
     }
 
-    public void userJoined(JID user) {
+    public void userJoined(User user) {
         // Do nothing.
     }
 
-    public void userLeft(JID user) {
+    public void userLeft(User user) {
         // Do nothing.
     }
 }

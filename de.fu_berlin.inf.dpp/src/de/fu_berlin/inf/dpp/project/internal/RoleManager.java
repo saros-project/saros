@@ -8,9 +8,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -18,6 +16,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This manager is responsible for handling driver changes.
@@ -33,8 +32,8 @@ public class RoleManager implements IActivityProvider {
 
     private ISharedProject sharedProject;
 
-    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
-        @Override
+    private ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
+
         public void roleChanged(User user, boolean replicated) {
             if (!replicated) {
                 IActivity activity = new RoleActivity(Saros.getDefault()
@@ -50,20 +49,18 @@ public class RoleManager implements IActivityProvider {
              * session view open.
              */
             SessionView.showNotification("Role changed", String.format(
-                "%s now %s of this session.", user.isLocal() ? "You are" : user
-                    .getJID().getBase()
-                    + "is", user.isDriver() ? "a driver" : "an observer"));
+                "%s %s now %s of this session.", Util.getName(user), user
+                    .isLocal() ? "are" : "is", user.isDriver() ? "a driver"
+                    : "an observer"));
         }
 
-        @Override
-        public void userJoined(JID user) {
-            SessionView.showNotification("User joined", user.getBase()
+        public void userJoined(User user) {
+            SessionView.showNotification("User joined", Util.getName(user)
                 + " joined the session.");
         }
 
-        @Override
-        public void userLeft(JID user) {
-            SessionView.showNotification("User left", user.getBase()
+        public void userLeft(User user) {
+            SessionView.showNotification("User left", Util.getName(user)
                 + " left the session.");
         }
     };
