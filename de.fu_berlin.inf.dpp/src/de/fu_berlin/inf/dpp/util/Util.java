@@ -25,6 +25,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -37,6 +38,8 @@ import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.Constants;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -543,4 +546,41 @@ public class Util {
         }
     }
 
+    public static String getEclipsePlatformInfo() {
+        return getBundleVersion(Platform.getBundle("org.eclipse.core.runtime"),
+            "Unknown Eclipse Version");
+    }
+
+    public static String getBundleVersion(Bundle bundle, String defaultValue) {
+        if (bundle == null)
+            return defaultValue;
+
+        Object version = bundle.getHeaders().get(Constants.BUNDLE_VERSION);
+        if (version != null) {
+            return version.toString();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public static String getPlatformInfo() {
+
+        String javaVersion = System.getProperty("java.version",
+            "Unknown Java Version");
+        String javaVendor = System.getProperty("java.vendor", "Unknown Vendor");
+        String os = System.getProperty("os.name", "Unknown OS");
+        String osVersion = System.getProperty("os.version", "Unknown Version");
+        String hardware = System.getProperty("os.arch", "Unknown Architecture");
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("  Java Version: " + javaVersion + "\n");
+        sb.append("  Java Vendor: " + javaVendor + "\n");
+        sb.append("  Eclipse Runtime Version: " + getEclipsePlatformInfo()
+            + "\n");
+        sb.append("  Operating System: " + os + " (" + osVersion + ")\n");
+        sb.append("  Hardware Architecture: " + hardware);
+
+        return sb.toString();
+    }
 }

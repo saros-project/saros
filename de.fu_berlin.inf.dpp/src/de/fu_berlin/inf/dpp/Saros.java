@@ -246,16 +246,16 @@ public class Saros extends AbstractUIPlugin {
 
         super.start(context);
 
-        xmppFeatureID = plugin.toString()
-            + "_"
-            + (String) getBundle().getHeaders().get(
-                org.osgi.framework.Constants.BUNDLE_VERSION);
+        String version = Util.getBundleVersion(getBundle(), "Unknown Version");
+
+        xmppFeatureID = plugin.toString() + "_" + version;
 
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
 
         setupLoggers();
-        logger.debug("Starting Saros with id " + xmppFeatureID);
+        logger.info("Starting Saros " + version + " running:\n"
+            + Util.getPlatformInfo());
 
         // Make sure that all components in the container are
         // instantiated
