@@ -93,7 +93,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
         @XStreamImplicit
         protected List<IActivity> activities;
 
-        public Content(String sessionID, List<TimedActivity> activities) {
+        public Content(String sessionID, List<TimedActivity> activities)
+            throws IllegalArgumentException {
+
             this.sessionID = sessionID;
             this.firstSequenceNumber = activities.get(0).getSequenceNumber();
             int sequenceNumber = this.firstSequenceNumber;
@@ -105,6 +107,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
                             + timedActivity.getSequenceNumber()
                             + ") does not match expected number: "
                             + sequenceNumber);
+                    throw new IllegalArgumentException(
+                        "sequence numbers must be consecutive");
                 }
                 sequenceNumber++;
 
