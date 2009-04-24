@@ -146,7 +146,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             // Ignore activities with sequence numbers we have already seen or
             // don't expect anymore.
             if (activity.getSequenceNumber() < expectedSequenceNumber) {
-                log.warn("Unexpected activity: " + activity);
+                log.warn("Ignored activity. Expected Nr. "
+                    + expectedSequenceNumber + ", got: " + activity);
                 return;
             }
 
