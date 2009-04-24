@@ -93,21 +93,24 @@ public class Jupiter implements Algorithm {
         Request req = new Request(this.vectorTime, op, jid, editor);
 
         // add(op, myMsgs) to outgoing;
-        if (op instanceof SplitOperation) {
-            SplitOperation split = (SplitOperation) op;
-            this.ackRequestList.add(new OperationWrapper(split.getFirst(),
-                this.vectorTime.getLocalOperationCount()));
-            this.ackRequestList.add(new OperationWrapper(split.getSecond(),
-                this.vectorTime.getLocalOperationCount()));
-        } else {
-            this.ackRequestList.add(new OperationWrapper(op, this.vectorTime
-                .getLocalOperationCount()));
-        }
+        add(op, this.vectorTime.getLocalOperationCount());
 
         // myMsgs = myMsgs + 1;
         this.vectorTime = this.vectorTime.incrementLocalOperationCount();
 
         return req;
+    }
+
+    private void add(Operation op, int localOperationCount) {
+
+        if (op instanceof SplitOperation) {
+            SplitOperation split = (SplitOperation) op;
+            add(split.getFirst(), localOperationCount);
+            add(split.getSecond(), localOperationCount);
+        } else {
+            this.ackRequestList.add(new OperationWrapper(op,
+                localOperationCount));
+        }
     }
 
     /**
@@ -166,7 +169,7 @@ public class Jupiter implements Algorithm {
      *            the operation to be transformed
      * @return the transformed index
      */
-    private int transformIndex(int index, Operation op) {
+    protected int transformIndex(int index, Operation op) {
         if (isClientSide()) {
             return this.inclusion.transformIndex(index, op, Boolean.TRUE);
         } else {
@@ -180,7 +183,7 @@ public class Jupiter implements Algorithm {
      * @param time
      *            the request to the remote operation count from
      */
-    private void discardAcknowledgedOperations(JupiterVectorTime time) {
+    protected void discardAcknowledgedOperations(JupiterVectorTime time) {
         Iterator<OperationWrapper> iter = this.ackRequestList.iterator();
         while (iter.hasNext()) {
             OperationWrapper wrap = iter.next();
@@ -202,46 +205,24 @@ public class Jupiter implements Algorithm {
      * @return the transformed operation
      * @see #ackRequestList
      */
-    private Operation transform(Operation newOp) {
+    protected Operation transform(Operation newOp) {
         for (int ackRequestListCnt = 0; ackRequestListCnt < this.ackRequestList
             .size(); ackRequestListCnt++) {
             OperationWrapper wrap = this.ackRequestList.get(ackRequestListCnt);
             Operation existingOp = wrap.getOperation();
 
             Operation transformedOp;
-            if (newOp instanceof SplitOperation) {
-                SplitOperation split = (SplitOperation) newOp;
-                if (isClientSide()) {
-                    split = new SplitOperation(this.inclusion.transform(split
-                        .getFirst(), existingOp, Boolean.TRUE), this.inclusion
-                        .transform(split.getSecond(), existingOp, Boolean.TRUE));
-                    existingOp = this.inclusion.transform(existingOp, split
-                        .getFirst(), Boolean.FALSE);
-                    existingOp = this.inclusion.transform(existingOp, split
-                        .getSecond(), Boolean.FALSE);
-                } else {
-                    split = new SplitOperation(this.inclusion.transform(split
-                        .getFirst(), existingOp, Boolean.FALSE),
-                        this.inclusion.transform(split.getSecond(), existingOp,
-                            Boolean.FALSE));
-                    existingOp = this.inclusion.transform(existingOp, split
-                        .getFirst(), Boolean.TRUE);
-                    existingOp = this.inclusion.transform(existingOp, split
-                        .getSecond(), Boolean.TRUE);
-                }
-                transformedOp = split;
+
+            if (isClientSide()) {
+                transformedOp = this.inclusion.transform(newOp, existingOp,
+                    Boolean.TRUE);
+                existingOp = this.inclusion.transform(existingOp, newOp,
+                    Boolean.FALSE);
             } else {
-                if (isClientSide()) {
-                    transformedOp = this.inclusion.transform(newOp, existingOp,
-                        Boolean.TRUE);
-                    existingOp = this.inclusion.transform(existingOp, newOp,
-                        Boolean.FALSE);
-                } else {
-                    transformedOp = this.inclusion.transform(newOp, existingOp,
-                        Boolean.FALSE);
-                    existingOp = this.inclusion.transform(existingOp, newOp,
-                        Boolean.TRUE);
-                }
+                transformedOp = this.inclusion.transform(newOp, existingOp,
+                    Boolean.FALSE);
+                existingOp = this.inclusion.transform(existingOp, newOp,
+                    Boolean.TRUE);
             }
             this.ackRequestList.set(ackRequestListCnt, new OperationWrapper(
                 existingOp, wrap.getLocalOperationCount()));
@@ -258,7 +239,7 @@ public class Jupiter implements Algorithm {
      * @param time
      *            the request to be tested.
      */
-    private void checkPreconditions(JupiterVectorTime time)
+    protected void checkPreconditions(JupiterVectorTime time)
         throws TransformationException {
         if (!this.ackRequestList.isEmpty()
             && (time.getRemoteOperationCount() < this.ackRequestList.get(0)
@@ -285,7 +266,7 @@ public class Jupiter implements Algorithm {
      * @see Jupiter#generateRequest(Operation, JID, IPath)
      * @see Jupiter#receiveRequest(Request)
      */
-    private static class OperationWrapper {
+    protected static class OperationWrapper {
 
         private final Operation op;
 
@@ -331,23 +312,6 @@ public class Jupiter implements Algorithm {
      */
     public Request redo() {
         throw new CannotRedoException();
-    }
-
-    /**
-     * Set an inclusion transformation function.
-     * 
-     * @param it
-     *            the inclusion transformation function to set.
-     */
-    public void setInclusionTransformation(InclusionTransformation it) {
-        this.inclusion = it;
-    }
-
-    /**
-     * @return the algorithms inclusion transformation
-     */
-    public InclusionTransformation getInclusionTransformation() {
-        return this.inclusion;
     }
 
     /**

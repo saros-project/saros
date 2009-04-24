@@ -22,6 +22,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
 import java.security.InvalidParameterException;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
@@ -33,6 +35,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
  * David Chen.
  */
 public class GOTOInclusionTransformation implements InclusionTransformation {
+
+    private static final Logger log = Logger
+        .getLogger(GOTOInclusionTransformation.class.getName());
 
     /**
      * Include operation <var>op2</var> into the context of operation
@@ -51,46 +56,68 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
      * @return the transformed operation <var>op1'</var>
      */
     public Operation transform(Operation op1, Operation op2, Object param) {
-        Operation transformedOp;
+
+        log.trace("Transform: In the context of " + op1 + " transform " + op2
+            + " (privileged==" + param + ")");
+
+        boolean privileged = (Boolean) param;
+
+        if (op1 instanceof NoOperation) {
+            return op2;
+        }
+
+        if (op2 instanceof NoOperation) {
+            return op1;
+        }
+
+        if (op1 instanceof SplitOperation && op2 instanceof SplitOperation) {
+            return transform((SplitOperation) op1, (SplitOperation) op2,
+                privileged);
+        }
+
         if (op1 instanceof SplitOperation) {
             SplitOperation s = (SplitOperation) op1;
-            transformedOp = new SplitOperation((transform(s.getFirst(), op2,
-                param)), (transform(s.getSecond(), op2, param)));
-        } else if (op2 instanceof SplitOperation) {
-            SplitOperation s = (SplitOperation) op2;
-            op1 = transform(op1, s.getSecond(), param);
-            op1 = transform(op1, s.getFirst(), param);
-            transformedOp = op1;
-        } else if (op1 instanceof NoOperation) {
-            transformedOp = clone((NoOperation) op1);
-        } else if (op2 instanceof NoOperation) {
-            if (op1 instanceof InsertOperation) {
-                transformedOp = clone((InsertOperation) op1);
-            } else {
-                transformedOp = clone((DeleteOperation) op1);
-            }
-        } else if ((op1 instanceof InsertOperation)
-            && (op2 instanceof InsertOperation)) {
-            transformedOp = transform((InsertOperation) op1,
-                (InsertOperation) op2, ((Boolean) param).booleanValue());
-        } else if ((op1 instanceof InsertOperation)
-            && (op2 instanceof DeleteOperation)) {
-            transformedOp = transform((InsertOperation) op1,
-                (DeleteOperation) op2);
-        } else if ((op1 instanceof DeleteOperation)
-            && (op2 instanceof InsertOperation)) {
-            transformedOp = transform((DeleteOperation) op1,
-                (InsertOperation) op2);
-        } else if ((op1 instanceof DeleteOperation)
-            && (op2 instanceof DeleteOperation)) {
-            transformedOp = transform((DeleteOperation) op1,
-                (DeleteOperation) op2);
-        } else {
-            // TODO This was caused once by a complicated combination of split
-            // ops
-            throw new InvalidParameterException("op1: " + op1 + ", op2: " + op2);
+            return new SplitOperation(transform(s.getFirst(), op2, param),
+                transform(s.getSecond(), op2, param));
         }
-        return transformedOp;
+        if (op2 instanceof SplitOperation) {
+            SplitOperation s = (SplitOperation) op2;
+            return transform(transform(op1, s.getFirst(), param),
+                s.getSecond(), param);
+        }
+
+        if (op1 instanceof InsertOperation) {
+            if (op2 instanceof InsertOperation) {
+                return transform((InsertOperation) op1, (InsertOperation) op2,
+                    privileged);
+            }
+            if (op2 instanceof DeleteOperation) {
+                return transform((InsertOperation) op1, (DeleteOperation) op2);
+            }
+        }
+        if (op1 instanceof DeleteOperation) {
+            if (op2 instanceof InsertOperation) {
+                return transform((DeleteOperation) op1, (InsertOperation) op2);
+            }
+            if (op2 instanceof DeleteOperation) {
+                return transform((DeleteOperation) op1, (DeleteOperation) op2);
+            }
+        }
+        throw new InvalidParameterException("op1: " + op1 + ", op2: " + op2);
+    }
+
+    protected Operation transform(SplitOperation s1, SplitOperation s2,
+        boolean param) {
+
+        Operation transOp1 = transform(s1.getFirst(), transform(s2.getFirst(),
+            s2.getSecond(), param), param);
+        transOp1 = transform(transOp1, transform(s2.getSecond(), s2.getFirst(),
+            param), param);
+        Operation transOp2 = transform(s1.getSecond(), transform(s2.getFirst(),
+            s2.getSecond(), param), param);
+        transOp2 = transform(transOp2, transform(s2.getSecond(), s2.getFirst(),
+            param), param);
+        return new SplitOperation(transOp1, transOp2);
     }
 
     public int transformIndex(int index, Operation op, Object param) {
@@ -134,7 +161,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              * Operation A starts before operation B. (B): "ABCD" (A): "12"
              * (A'): "12"
              */
-            transformedOperation = clone(insA);
+            transformedOperation = insA;
         } else {
             /*
              * Operation A starts in or behind operation B. Index of operation
@@ -158,7 +185,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              * Operation A starts before or at the same position like operation
              * B. (B): "ABCD" | "ABCD" (A): "12" | "12" (A'): "12" | "12"
              */
-            transformedOperation = clone(insA);
+            transformedOperation = insA;
         } else if (posA > (posB + lenB)) {
             /*
              * Operation A starts after operation B. Index of operation A' must
@@ -190,7 +217,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              * Operation A is completly before operation B. (B): "ABCD" (A):
              * "12" (A'): "12"
              */
-            transformedOperation = clone(delA);
+            transformedOperation = delA;
         } else if (posA >= posB) {
             /*
              * Operation A starts before or at the same position like operation
@@ -225,7 +252,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
              * Operation A is completly before operation B. (B): "ABCD" (A):
              * "12" (A'): "12"
              */
-            transformedOperation = clone(delA);
+            transformedOperation = delA;
         } else if (posA >= (posB + lenB)) {
             /*
              * Operation A starts at the end or after operation B. Index of
@@ -276,38 +303,4 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         return transformedOperation;
     }
 
-    /**
-     * Clone an insert operation and update its transformation history.
-     * 
-     * @param insA
-     * @return InsertOperation
-     */
-    private InsertOperation clone(InsertOperation insA) {
-        InsertOperation cloneOp = new InsertOperation(insA.getPosition(), insA
-            .getText(), insA.getOrigin());
-        return cloneOp;
-    }
-
-    /**
-     * Clone a delete operation and update its transformation history.
-     * 
-     * @param delA
-     * @return DeleteOperation
-     */
-    private DeleteOperation clone(DeleteOperation delA) {
-        DeleteOperation cloneOp = new DeleteOperation(delA.getPosition(), delA
-            .getText());
-        return cloneOp;
-    }
-
-    /**
-     * Clones a no-operation and updates its transformation history.
-     * 
-     * @param noop
-     * @return DeleteOperation
-     */
-    private NoOperation clone(NoOperation noop) {
-        NoOperation cloneOp = new NoOperation();
-        return cloneOp;
-    }
 }
