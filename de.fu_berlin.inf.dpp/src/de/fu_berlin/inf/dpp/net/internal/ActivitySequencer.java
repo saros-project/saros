@@ -63,8 +63,6 @@ import de.fu_berlin.inf.dpp.util.Util;
  * TODO Remove the dependency of this class on the ConcurrentDocumentManager,
  * push all responsibility up a layer into the SharedProject
  * 
- * TODO This class violates the visibility requirements from the SE.CodeRules
- * 
  * @author rdjemili
  * @author coezbek
  */
@@ -81,9 +79,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     protected static final int MILLIS_UPDATE = 1000;
 
     /** Buffer for outgoing activities. */
-    private final List<IActivity> activities = new LinkedList<IActivity>();
+    protected final List<IActivity> activities = new LinkedList<IActivity>();
 
-    private final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
+    protected final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
     /**
      * A priority queue for timed activities.
@@ -92,31 +90,31 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * may be all names and documentation should be changed to reflect this.
      */
     protected static class ActivityQueue {
-        private static final int UNKNOWN_NUMBER = -1;
+        protected static final int UNKNOWN_NUMBER = -1;
 
         /** How long to wait until ignore missing activities in milliseconds. */
-        private static final long ACTIVITY_TIMEOUT = 30 * 1000;
+        protected static final long ACTIVITY_TIMEOUT = 30 * 1000;
 
         /** This {@link ActivityQueue} is for this user. */
-        private final JID jid;
+        protected final JID jid;
 
         /** Sequence number this user sends next. */
-        private int nextSequenceNumber = 0;
+        protected int nextSequenceNumber = 0;
 
         /** Sequence number expected from the next activity. */
-        private int expectedSequenceNumber = UNKNOWN_NUMBER;
+        protected int expectedSequenceNumber = UNKNOWN_NUMBER;
 
         /**
          * Oldest local timestamp for the queued activities or 0 if there are no
          * activities queued.
          */
-        private long oldestLocalTimestamp = Long.MAX_VALUE;
+        protected long oldestLocalTimestamp = Long.MAX_VALUE;
 
         /** Queue of activities received. */
-        private final PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
+        protected final PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
 
         /** History of activities sent */
-        private final List<TimedActivity> history = new LinkedList<TimedActivity>();
+        protected final List<TimedActivity> history = new LinkedList<TimedActivity>();
 
         public ActivityQueue(JID jid) {
             this.jid = jid;
@@ -378,24 +376,24 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         }
     }
 
-    private final ActivityQueuesManager queues = new ActivityQueuesManager();
+    protected final ActivityQueuesManager queues = new ActivityQueuesManager();
 
     /*
      * TODO The AS should not know the ConcurrentDocumentManager but rather pass
      * all calls up into the SharedProject.
      */
-    private ConcurrentDocumentManager concurrentDocumentManager;
+    protected ConcurrentDocumentManager concurrentDocumentManager;
 
     /**
      * Whether this AS currently sends or receives events
      */
     protected boolean started = false;
 
-    private Timer flushTimer;
+    protected Timer flushTimer;
 
-    private final ISharedProject sharedProject;
+    protected final ISharedProject sharedProject;
 
-    private final ITransmitter transmitter;
+    protected final ITransmitter transmitter;
 
     public ActivitySequencer(ISharedProject sharedProject,
         ITransmitter transmitter) {
