@@ -711,8 +711,9 @@ public class EditorAPI implements IEditorAPI {
 
         IDocument document = viewer.getDocument();
         try {
-            top = Math.max(0, Math.min(document.getLength() - 1, top));
-            bottom = Math.max(0, Math.min(document.getLength() - 1, bottom));
+            int lines = document.getNumberOfLines();
+            top = Math.max(0, Math.min(lines - 1, top));
+            bottom = Math.max(0, Math.min(lines - 1, bottom));
 
             int start = document.getLineOffset(top);
             if (start == -1)
