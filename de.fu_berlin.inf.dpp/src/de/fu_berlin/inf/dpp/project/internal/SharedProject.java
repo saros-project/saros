@@ -97,8 +97,9 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(this.host.getJID(), this.host);
 
         /* add host to driver list. */
-        this.activitySequencer.initConcurrentManager(Side.HOST_SIDE, this.host,
-            myID, this);
+        this.activitySequencer
+            .setConcurrentManager(new ConcurrentDocumentManager(Side.HOST_SIDE,
+                this.host, myID, this, activitySequencer));
 
         setProjectReadonly(false);
     }
@@ -119,8 +120,9 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(hostID, host);
         this.participants.put(myID, localUser);
 
-        this.activitySequencer.initConcurrentManager(Side.CLIENT_SIDE,
-            this.host, myID, this);
+        this.activitySequencer
+            .setConcurrentManager(new ConcurrentDocumentManager(
+                Side.CLIENT_SIDE, this.host, myID, this, activitySequencer));
     }
 
     /*

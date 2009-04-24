@@ -26,5 +26,8 @@
 	<classpathentry kind="lib" path="lib/lw-nio-4.18.8-Java1.5.jar"/>
 	<classpathentry kind="lib" path="lib/lw-rudp-4.18.8-Java1.5.jar"/>
 	<classpathentry kind="lib" path="lib/picocontainer-gems-2.7.jar" sourcepath="lib/picocontainer-gems-2.7-sources.jar"/>
+	<classpathentry kind="lib" path="lib/easymock-2.0.jar"/>
+	<classpathentry kind="lib" path="lib/easymockclassextension-2.0-pre-release.jar"/>
+	<classpathentry kind="lib" path="lib/cglib-nodep-2.1_3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

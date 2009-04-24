@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -409,11 +408,18 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * Start periodical flushing and sending of outgoing activities and checking
      * for received activities that are queued for too long.
      * 
+     * @throws IllegalStateException
+     *             if this method is called on an already started
+     *             {@link ActivitySequencer} or if the
+     *             {@link ConcurrentDocumentManager} was not set before this
+     *             method is called.
+     * 
      * @see #stop()
+     * @see #setConcurrentManager(ConcurrentDocumentManager)
      */
     public void start() {
 
-        if (started) {
+        if (started || concurrentDocumentManager == null) {
             throw new IllegalStateException();
         }
 
@@ -478,7 +484,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     /**
      * TODO This should be pushed up into the SharedProject
      */
-    public void exec(final IActivity activity) {
+    protected void exec(final IActivity activity) {
 
         // TODO Replace this with a single call to the ConcurrentDocumentManager
         // and use the ActivityReceiver to handle all cases.
@@ -555,7 +561,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * @return List of activities that can be executed. The list is empty if
      *         there are no activities to execute.
      */
-    public List<IActivity> flush() {
+    protected List<IActivity> flush() {
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
         return optimize(out);
@@ -779,10 +785,15 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         return textEdit;
     }
 
-    public void initConcurrentManager(Side side, User host, JID myJID,
-        ISharedProject sharedProject) {
-        this.concurrentDocumentManager = new ConcurrentDocumentManager(side,
-            host, myJID, sharedProject, this);
+    /**
+     * Sets the {@link ConcurrentDocumentManager}.
+     * 
+     * Must be called before {@link #start()}.
+     */
+    public void setConcurrentManager(
+        ConcurrentDocumentManager concurrentDocumentManager) {
+
+        this.concurrentDocumentManager = concurrentDocumentManager;
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {

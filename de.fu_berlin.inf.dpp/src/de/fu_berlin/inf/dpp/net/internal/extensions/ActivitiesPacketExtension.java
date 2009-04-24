@@ -93,8 +93,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
         @XStreamImplicit
         protected List<IActivity> activities;
 
-        public Content(String sessionID, List<TimedActivity> activities)
-            throws IllegalArgumentException {
+        public Content(String sessionID, List<TimedActivity> activities) {
 
             this.sessionID = sessionID;
             this.firstSequenceNumber = activities.get(0).getSequenceNumber();

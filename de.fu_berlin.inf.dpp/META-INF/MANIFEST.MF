@@ -36,7 +36,10 @@ Bundle-ClassPath: bin/,
  lib/lw-io-4.18.8-Java1.5.jar,
  lib/lw-nio-4.18.8-Java1.5.jar,
  lib/lw-rudp-4.18.8-Java1.5.jar,
- lib/picocontainer-gems-2.7.jar
+ lib/picocontainer-gems-2.7.jar,
+ lib/cglib-nodep-2.1_3.jar,
+ lib/easymock-2.0.jar,
+ lib/easymockclassextension-2.0-pre-release.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
