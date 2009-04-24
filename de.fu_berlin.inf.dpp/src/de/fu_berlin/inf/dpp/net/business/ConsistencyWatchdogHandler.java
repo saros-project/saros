@@ -26,8 +26,8 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
@@ -250,7 +250,7 @@ public class ConsistencyWatchdogHandler {
 
             checksumError.processPacket(packet);
 
-            if (PacketExtensionUtils.getJupiterRequestExtension(message) != null) {
+            if (PacketExtensionUtils.containsJupiterRequest(message)) {
                 lastReceivedActivityTime = System.currentTimeMillis();
             }
         }
@@ -278,8 +278,8 @@ public class ConsistencyWatchdogHandler {
         receiver.addPacketListener(listener, new AndFilter(
             new MessageTypeFilter(Message.Type.chat), PacketExtensionUtils
                 .getInSessionFilter(sessionManager), Util.orFilter(checksum
-                .getFilter(), checksumError.getFilter(), RequestPacketExtension
-                .getFilter())));
+                .getFilter(), checksumError.getFilter(),
+                ActivitiesPacketExtension.getFilter())));
     }
 
 }

@@ -39,11 +39,11 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.RequestExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.RequestPacketExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -71,8 +71,6 @@ public class PacketExtensionUtils {
         ProviderManager providermanager = ProviderManager.getInstance();
         providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
             PacketExtensionUtils.NAMESPACE, new ActivitiesExtensionProvider());
-        providermanager.addExtensionProvider(RequestPacketExtension.ELEMENT,
-            RequestPacketExtension.NAMESPACE, new RequestExtensionProvider());
     }
 
     public static String getSessionID() {
@@ -86,10 +84,20 @@ public class PacketExtensionUtils {
             ActivitiesPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
     }
 
-    public static RequestPacketExtension getJupiterRequestExtension(
-        Message message) {
-        return (RequestPacketExtension) message.getExtension(
-            RequestPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
+    /**
+     * @return true if message contains a JupiterRequest
+     */
+    public static boolean containsJupiterRequest(Message message) {
+        ActivitiesPacketExtension extension = (ActivitiesPacketExtension) message
+            .getExtension(ActivitiesPacketExtension.ELEMENT,
+                PacketExtensionUtils.NAMESPACE);
+        if (extension != null) {
+            for (TimedActivity timedActivity : extension.getActivities()) {
+                if (timedActivity.getActivity() instanceof Request)
+                    return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -103,11 +111,6 @@ public class PacketExtensionUtils {
             ActivitiesPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
         if (extension != null) {
             return ((ActivitiesPacketExtension) extension).getSessionID();
-        }
-        extension = message.getExtension(RequestPacketExtension.ELEMENT,
-            PacketExtensionUtils.NAMESPACE);
-        if (extension != null) {
-            return ((RequestPacketExtension) extension).getSessionID();
         }
         extension = message.getExtension(PacketExtensionUtils.NAMESPACE);
         return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
