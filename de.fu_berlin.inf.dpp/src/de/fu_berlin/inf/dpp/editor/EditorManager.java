@@ -687,8 +687,7 @@ public class EditorManager implements IActivityProvider {
          * TODO When Inconsistencies exists, all listeners should be stopped
          * rather than catching events -> Think Start/Stop on the SharedProject
          */
-        if (!this.isDriver || sharedProject == null
-            || isInconsistent.getValue()) {
+        if (!this.isDriver || sharedProject == null) {
 
             /**
              * TODO If we are not a driver, then receiving this event might
