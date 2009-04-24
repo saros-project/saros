@@ -23,7 +23,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
 
         Operation newOp = inclusion.transform(splitOp1, insertOp, Boolean.TRUE);
         Operation expectedOp = new SplitOperation(new SplitOperation(
-            new DeleteOperation(2, "2"), new DeleteOperation(6, "34")),
+            new DeleteOperation(2, "2"), new DeleteOperation(5, "34")),
             new DeleteOperation(9, "6"));
         assertEquals(expectedOp, newOp);
     }
@@ -40,7 +40,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
 
         Operation newOp = inclusion.transform(splitOp1, splitOp2, Boolean.TRUE);
         Operation expectedOp = new SplitOperation(new SplitOperation(
-            new DeleteOperation(2, "2"), new DeleteOperation(6, "34")),
+            new DeleteOperation(2, "2"), new DeleteOperation(5, "34")),
             new DeleteOperation(9, "6"));
         assertEquals(expectedOp, newOp);
     }
@@ -49,7 +49,7 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
 
         Operation newOp = inclusion.transform(splitOp1, splitOp3, Boolean.TRUE);
         Operation expectedOp = new SplitOperation(new SplitOperation(
-            new DeleteOperation(2, "2"), new DeleteOperation(6, "34")),
+            new DeleteOperation(2, "2"), new DeleteOperation(5, "34")),
             new DeleteOperation(12, "6"));
         assertEquals(expectedOp, newOp);
     }

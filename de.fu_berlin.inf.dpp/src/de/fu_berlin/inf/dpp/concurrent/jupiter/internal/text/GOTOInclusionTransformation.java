@@ -40,14 +40,13 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         .getLogger(GOTOInclusionTransformation.class.getName());
 
     /**
-     * Include operation <var>op2</var> into the context of operation
-     * <var>op1</var>. The transformed operation <var>op1'</var> is returned.
+     * Transform operation <var>op1</var> in the context of another operation
+     * <var>op2</var>. The transformed operation <var>op1'</var> is returned.
      * 
      * @param op1
-     *            the operation into which another is to be contextually
-     *            included.
+     *            the operation to transform
      * @param op2
-     *            the operation to be included.
+     *            the operation which is the context for the other one
      * @param param
      *            a boolean flag to privilege the first operation
      *            <code>op1</code> (i.e. remains unchanged) when two insert
@@ -57,7 +56,7 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
      */
     public Operation transform(Operation op1, Operation op2, Object param) {
 
-        log.trace("Transform: In the context of " + op1 + " transform " + op2
+        log.trace("Transform " + op1 + " in the context of " + op2
             + " (privileged==" + param + ")");
 
         boolean privileged = (Boolean) param;
@@ -106,20 +105,6 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         throw new InvalidParameterException("op1: " + op1 + ", op2: " + op2);
     }
 
-    protected Operation transform(SplitOperation s1, SplitOperation s2,
-        boolean param) {
-
-        Operation transOp1 = transform(s1.getFirst(), transform(s2.getFirst(),
-            s2.getSecond(), param), param);
-        transOp1 = transform(transOp1, transform(s2.getSecond(), s2.getFirst(),
-            param), param);
-        Operation transOp2 = transform(s1.getSecond(), transform(s2.getFirst(),
-            s2.getSecond(), param), param);
-        transOp2 = transform(transOp2, transform(s2.getSecond(), s2.getFirst(),
-            param), param);
-        return new SplitOperation(transOp1, transOp2);
-    }
-
     public int transformIndex(int index, Operation op, Object param) {
         if (op instanceof SplitOperation) {
             SplitOperation s = (SplitOperation) op;
@@ -148,9 +133,21 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         }
     }
 
-    private Operation transform(InsertOperation insA, InsertOperation insB,
+    protected Operation transform(SplitOperation s1, SplitOperation s2,
+        boolean param) {
+
+        Operation transOp1 = transform(s1.getFirst(), s2.getFirst(), param);
+        transOp1 = transform(transOp1, transform(s2.getSecond(), s2.getFirst(),
+            param), param);
+        Operation transOp2 = transform(s1.getSecond(), s2.getFirst(), param);
+        transOp2 = transform(transOp2, transform(s2.getSecond(), s2.getFirst(),
+            param), param);
+        return new SplitOperation(transOp1, transOp2);
+    }
+
+    protected Operation transform(InsertOperation insA, InsertOperation insB,
         boolean isTransformPrivileged) {
-        InsertOperation transformedOperation = null;
+
         int posA = insA.getPosition();
         int posB = insB.getPosition();
         int lenB = insB.getTextLength();
@@ -158,24 +155,21 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
             || ((posA == posB) && (insA.getOrigin() < insB.getOrigin()))
             || ((posA == posB) && (insA.getOrigin() == insB.getOrigin()) && isTransformPrivileged)) {
             /*
-             * Operation A starts before operation B. (B): "ABCD" (A): "12"
-             * (A'): "12"
+             * Operation A starts before operation B.
              */
-            transformedOperation = insA;
+            return insA;
         } else {
             /*
              * Operation A starts in or behind operation B. Index of operation
              * A' must be increased by the length of the text of operation B.
-             * (B): "ABCD" | "ABCD" (A): "12" | "12" (A'): "    12" | "12"
              */
-            transformedOperation = new InsertOperation(posA + lenB, insA
-                .getText(), insA.getOrigin());
+            return new InsertOperation(posA + lenB, insA.getText(), insA
+                .getOrigin());
         }
-        return transformedOperation;
     }
 
-    private Operation transform(InsertOperation insA, DeleteOperation delB) {
-        InsertOperation transformedOperation = null;
+    protected Operation transform(InsertOperation insA, DeleteOperation delB) {
+
         int posA = insA.getPosition();
         int posB = delB.getPosition();
         int lenB = delB.getTextLength();
@@ -183,30 +177,26 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
         if (posA <= posB) {
             /*
              * Operation A starts before or at the same position like operation
-             * B. (B): "ABCD" | "ABCD" (A): "12" | "12" (A'): "12" | "12"
              */
-            transformedOperation = insA;
+            return insA;
         } else if (posA > (posB + lenB)) {
             /*
              * Operation A starts after operation B. Index of operation A' must
-             * be reduced by the length of the text of operation B. (B): "ABCD"
-             * (A): "12" (A'): "12"
+             * be reduced by the length of the text of operation B.
              */
-            transformedOperation = new InsertOperation(posA - lenB, insA
-                .getText(), insA.getOrigin());
+            return new InsertOperation(posA - lenB, insA.getText(), insA
+                .getOrigin());
         } else {
             /*
              * Operation A starts in operation B. Index of A' must be the index
-             * of operation B. (B): "ABCD" (A): "12" (A'): "12"
+             * of operation B.
              */
-            transformedOperation = new InsertOperation(posB, insA.getText(),
-                insA.getOrigin());
+            return new InsertOperation(posB, insA.getText(), insA.getOrigin());
         }
-        return transformedOperation;
     }
 
-    private Operation transform(DeleteOperation delA, InsertOperation insB) {
-        Operation transformedOperation = null;
+    protected Operation transform(DeleteOperation delA, InsertOperation insB) {
+
         int posA = delA.getPosition();
         int lenA = delA.getTextLength();
         int posB = insB.getPosition();
@@ -214,34 +204,31 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
 
         if (posB >= (posA + lenA)) {
             /*
-             * Operation A is completly before operation B. (B): "ABCD" (A):
-             * "12" (A'): "12"
+             * Operation B is completely after operation A.
              */
-            transformedOperation = delA;
-        } else if (posA >= posB) {
+            return delA;
+        } else if (posB <= posA) {
             /*
-             * Operation A starts before or at the same position like operation
-             * B. (B): "ABCD" | "ABCD" (A): "12" | "12" (A'): "12" | "12"
+             * Operation B starts before or at the same position like operation
+             * A
              */
-            transformedOperation = new DeleteOperation(posA + lenB, delA
-                .getText());
+            return new DeleteOperation(posA + lenB, delA.getText());
         } else {
             /*
              * Operation B (insert) is in the range of operation A (delete).
-             * Operation A' must be split up into two delete operations. (B):
-             * "ABCD" (A): "123456" (A'): "1" "23456"
+             * Operation A' must be split up into two delete operations. (A):
+             * "123456" (A'): "1" "23456"
              */
             DeleteOperation del1 = new DeleteOperation(posA, delA.getText()
                 .substring(0, posB - posA));
-            DeleteOperation del2 = new DeleteOperation(posA + lenB
-                + (posB - posA), delA.getText().substring(posB - posA, lenA));
-            transformedOperation = new SplitOperation(del1, del2);
+            DeleteOperation del2 = new DeleteOperation(posA + lenB, delA
+                .getText().substring(posB - posA, lenA));
+            return new SplitOperation(del1, del2);
         }
-        return transformedOperation;
     }
 
-    private Operation transform(DeleteOperation delA, DeleteOperation delB) {
-        Operation transformedOperation;
+    protected Operation transform(DeleteOperation delA, DeleteOperation delB) {
+
         int posA = delA.getPosition();
         int lenA = delA.getTextLength();
         int posB = delB.getPosition();
@@ -249,18 +236,16 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
 
         if (posB >= (posA + lenA)) {
             /*
-             * Operation A is completly before operation B. (B): "ABCD" (A):
-             * "12" (A'): "12"
+             * Operation A is completely before operation B.
              */
-            transformedOperation = delA;
+            return delA;
         } else if (posA >= (posB + lenB)) {
             /*
              * Operation A starts at the end or after operation B. Index of
              * operation A' must be reduced by the length of the text of
-             * operation B. (B): "ABCD" (A): "12" (A'): "12"
+             * operation B.
              */
-            transformedOperation = new DeleteOperation(posA - lenB, delA
-                .getText());
+            return new DeleteOperation(posA - lenB, delA.getText());
         } else {
             /*
              * Operation A and operation B are overlapping.
@@ -269,38 +254,32 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
                 /*
                  * Operation B starts before or at the same position like
                  * operation A and ends after or at the same position like
-                 * operation A. (B): "ABCD" | "ABCD (A): "12" | "12" (A'): "" |
-                 * ""
+                 * operation A.
                  */
-                NoOperation noop = new NoOperation();
-                transformedOperation = noop;
+                return new NoOperation();
             } else if ((posB <= posA) && ((posA + lenA) > (posB + lenB))) {
                 /*
                  * Operation B starts before or at the same position like
-                 * operation A and ends before operation A. (B): "ABCD" (A):
-                 * "12345" (A'): "345"
+                 * operation A and ends before operation A.
                  */
-                transformedOperation = new DeleteOperation(posB, delA.getText()
-                    .substring(posB + lenB - posA, lenA));
+                return new DeleteOperation(posB, delA.getText().substring(
+                    posB + lenB - posA, lenA));
             } else if ((posB > posA) && ((posB + lenB) >= (posA + lenA))) {
                 /*
                  * Operation B starts after operation A and ends after or at the
-                 * same position like operation A. (B): "ABCD" (A): "12345"
-                 * (A'): "12"
+                 * same position like operation A.
                  */
-                transformedOperation = new DeleteOperation(posA, delA.getText()
-                    .substring(0, posB - posA));
+                return new DeleteOperation(posA, delA.getText().substring(0,
+                    posB - posA));
             } else {
                 /*
-                 * Operation B is fully in operation A. (B): "ABCD" (A):
-                 * "123456" (A'): "16"
+                 * Operation B is fully in operation A.
                  */
-                transformedOperation = new DeleteOperation(posA, delA.getText()
-                    .substring(0, posB - posA)
+                return new DeleteOperation(posA, delA.getText().substring(0,
+                    posB - posA)
                     + delA.getText().substring(posB + lenB - posA, lenA));
             }
         }
-        return transformedOperation;
     }
 
 }

@@ -36,7 +36,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -47,20 +46,20 @@ public class Jupiter implements Algorithm {
     /**
      * The inclusion transformation function used to transform operations.
      */
-    private InclusionTransformation inclusion;
+    protected InclusionTransformation inclusion;
 
     /**
      * The vector time, representing the number of processed requests, of this
      * algorithm.
      */
-    private JupiterVectorTime vectorTime;
+    protected JupiterVectorTime vectorTime;
 
     /**
      * Flag indicating whether this algorithm is used on the client-side. In
      * some situations, the requests from the server-side have a higher priority
      * in transformations.
      */
-    private final boolean isClientSide;
+    protected final boolean isClientSide;
 
     /**
      * A list that contains the requests sent to the server which are to be
@@ -68,7 +67,7 @@ public class Jupiter implements Algorithm {
      * corresponds to the 'outgoing' list in the Jupiter pseudo code
      * description.
      */
-    private final List<OperationWrapper> ackRequestList;
+    protected final List<OperationWrapper> ackRequestList;
 
     /**
      * Class constructor that creates a new Jupiter algorithm.
@@ -93,24 +92,13 @@ public class Jupiter implements Algorithm {
         Request req = new Request(this.vectorTime, op, jid, editor);
 
         // add(op, myMsgs) to outgoing;
-        add(op, this.vectorTime.getLocalOperationCount());
+        this.ackRequestList.add(new OperationWrapper(op, this.vectorTime
+            .getLocalOperationCount()));
 
         // myMsgs = myMsgs + 1;
         this.vectorTime = this.vectorTime.incrementLocalOperationCount();
 
         return req;
-    }
-
-    private void add(Operation op, int localOperationCount) {
-
-        if (op instanceof SplitOperation) {
-            SplitOperation split = (SplitOperation) op;
-            add(split.getFirst(), localOperationCount);
-            add(split.getSecond(), localOperationCount);
-        } else {
-            this.ackRequestList.add(new OperationWrapper(op,
-                localOperationCount));
-        }
     }
 
     /**
@@ -263,14 +251,17 @@ public class Jupiter implements Algorithm {
      * the current local operation count and inserted into the outgoing queue
      * (see {@link Jupiter#ackRequestList}).
      * 
+     * @valueObject Instances of this class should be treated as value objects
+     *              and should be treated as immutable.
+     * 
      * @see Jupiter#generateRequest(Operation, JID, IPath)
      * @see Jupiter#receiveRequest(Request)
      */
     protected static class OperationWrapper {
 
-        private final Operation op;
+        protected final Operation op;
 
-        private final int count;
+        protected final int count;
 
         OperationWrapper(Operation op, int count) {
             this.op = op;
