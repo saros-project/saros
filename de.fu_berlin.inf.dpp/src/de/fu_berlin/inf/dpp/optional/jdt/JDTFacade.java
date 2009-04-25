@@ -49,7 +49,7 @@ public class JDTFacade implements IJDTSupport {
                 jdtSupport = (IJDTSupport) Class.forName(
                     "de.fu_berlin.inf.dpp.optional.jdt.JDTSupport")
                     .newInstance();
-            } catch (Exception e) {
+            } catch (Throwable t) {
                 // We were unable to enable the JDT-Support
                 log
                     .warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");

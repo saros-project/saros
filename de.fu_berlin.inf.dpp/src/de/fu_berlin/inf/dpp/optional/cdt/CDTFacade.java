@@ -45,10 +45,10 @@ public class CDTFacade implements ICDTSupport {
                 cdtSupport = (ICDTSupport) Class.forName(
                     "de.fu_berlin.inf.dpp.optional.cdt.CDTSupport")
                     .newInstance();
-            } catch (Exception e) {
+            } catch (Throwable t) {
                 // We were unable to enable the CDT-Support
-                log
-                    .warn("ICDTSupport could not be instantiated, despite CDT Plugin being installed");
+                log.warn("ICDTSupport could not be instantiated,"
+                    + " despite CDT Plugin being installed");
             }
         }
     }
