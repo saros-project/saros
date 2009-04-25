@@ -90,7 +90,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * may be all names and documentation should be changed to reflect this.
      */
     protected static class ActivityQueue {
-        protected static final int UNKNOWN_NUMBER = -1;
 
         /** How long to wait until ignore missing activities in milliseconds. */
         protected static final long ACTIVITY_TIMEOUT = 30 * 1000;
@@ -102,7 +101,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         protected int nextSequenceNumber = 0;
 
         /** Sequence number expected from the next activity. */
-        protected int expectedSequenceNumber = UNKNOWN_NUMBER;
+        protected int expectedSequenceNumber = 0;
 
         /**
          * Oldest local timestamp for the queued activities or 0 if there are no
@@ -136,9 +135,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
          * Add a received activity to the priority queue.
          */
         public void add(TimedActivity activity) {
-            if (expectedSequenceNumber == UNKNOWN_NUMBER) {
-                expectedSequenceNumber = activity.getSequenceNumber();
-            }
 
             // Ignore activities with sequence numbers we have already seen or
             // don't expect anymore.
@@ -603,7 +599,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (stillToSend.size() > 0) {
                 transmitter.sendTimedActivities(recipientJID, stillToSend);
             }
-            log.info("Sent Activities to " + recipientJID + ": "
+            log.debug("Sent Activities to " + recipientJID + ": "
                 + timedActivities);
         }
     }
