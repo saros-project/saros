@@ -144,9 +144,9 @@ public interface IEditorAPI {
     public IPath getActiveEditorPath();
 
     /**
-     * Returns the file currently displayed in the given editorPart, this maybe
-     * null if the given editor is not operating on a file or has several files
-     * (TeamEditor for instance).
+     * Returns the resource currently displayed in the given editorPart, this
+     * maybe null if the given editor is not operating on a resource or has
+     * several resources (TeamEditor for instance).
      */
     public IResource getEditorResource(IEditorPart editorPart);
 
