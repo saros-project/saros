@@ -12,9 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentListener;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -58,21 +56,6 @@ public class ConsistencyWatchdogServer extends Job {
     // this map holds for all open editors of all participants the checksums
     protected final HashMap<IPath, DocumentChecksum> docsChecksums = new HashMap<IPath, DocumentChecksum>();
 
-    protected Set<IDocument> registeredDocuments = new HashSet<IDocument>();
-
-    protected Set<IDocument> dirtyDocument = new HashSet<IDocument>();
-
-    protected IDocumentListener dirtyListener = new IDocumentListener() {
-
-        public void documentAboutToBeChanged(DocumentEvent event) {
-            // we are only interested in events after the change
-        }
-
-        public void documentChanged(DocumentEvent event) {
-            dirtyDocument.add(event.getDocument());
-        }
-    };
-
     @Inject
     protected Saros saros;
 
@@ -100,7 +83,7 @@ public class ConsistencyWatchdogServer extends Job {
                     log.debug("Starting consistency watchdog");
                     setSystem(true);
                     setPriority(Job.SHORT);
-                    schedule();
+                    schedule(10000);
                 }
             }
 
@@ -113,13 +96,10 @@ public class ConsistencyWatchdogServer extends Job {
                     sharedProject = null;
 
                     // Unregister from all documents
-                    for (IDocument document : registeredDocuments) {
-                        document.removeDocumentListener(dirtyListener);
+                    for (DocumentChecksum document : docsChecksums.values()) {
+                        document.dispose();
                     }
-                    registeredDocuments.clear();
-
-                    // Reset all dirty states
-                    dirtyDocument.clear();
+                    docsChecksums.clear();
                 }
             }
         });
@@ -150,8 +130,7 @@ public class ConsistencyWatchdogServer extends Job {
             return Status.OK_STATUS;
         }
 
-        Set<IDocument> missingDocuments = new HashSet<IDocument>(
-            registeredDocuments);
+        Set<IPath> missingDocuments = new HashSet<IPath>(docsChecksums.keySet());
 
         // Update Checksums for all open documents
         for (IPath docPath : editorManager.getOpenEditorsOfAllParticipants()) {
@@ -164,48 +143,29 @@ public class ConsistencyWatchdogServer extends Job {
 
             // TODO CO Handle missing files correctly
             if (doc == null) {
-                log.error("Can't get Document");
-                docsChecksums.remove(docPath);
                 continue;
             }
 
             // Update listener management
-            missingDocuments.remove(doc);
-            if (!registeredDocuments.contains(doc)) {
-                registeredDocuments.add(doc);
-                doc.addDocumentListener(dirtyListener);
-                dirtyDocument.add(doc);
+            missingDocuments.remove(docPath);
+            DocumentChecksum checksum = docsChecksums.get(docPath);
+            if (checksum == null) {
+                checksum = new DocumentChecksum(docPath);
+                docsChecksums.put(docPath, checksum);
             }
 
-            // If document not changed, skip
-            if (!dirtyDocument.contains(doc))
-                continue;
-
-            // If no entry for this document exists create a new one
-            if (docsChecksums.get(docPath) == null) {
-                DocumentChecksum c = new DocumentChecksum(docPath, doc
-                    .getLength(), doc.get().hashCode());
-                docsChecksums.put(docPath, c);
-            } else {
-                // else set new length and hash
-                DocumentChecksum c = docsChecksums.get(docPath);
-                c.setLength(doc.getLength());
-                c.setHash(doc.get().hashCode());
-            }
+            checksum.bind(doc);
+            checksum.update();
         }
 
-        // Reset dirty states
-        dirtyDocument.clear();
-
         // Unregister all documents that are no longer there
-        for (IDocument missing : missingDocuments) {
-            registeredDocuments.remove(missing);
-            missing.removeDocumentListener(dirtyListener);
+        for (IPath missing : missingDocuments) {
+            docsChecksums.remove(missing).dispose();
         }
 
         // Send to all Clients
         // TODO Since this is done asynchronously a race condition might occur
-        if (docsChecksums.values().size() > 0 && saros.isConnected()) {
+        if (docsChecksums.size() > 0 && saros.isConnected()) {
             transmitter.sendDocChecksumsToClients(getOthers(), docsChecksums
                 .values());
         }

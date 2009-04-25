@@ -60,7 +60,9 @@ public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
             IPath path = Path.fromPortableString(ext.getValue("path" + i));
             int length = Integer.parseInt(ext.getValue("length" + i));
             int hash = Integer.parseInt(ext.getValue("hash" + i));
-            checksums[i - 1] = new DocumentChecksum(path, length, hash);
+            checksums[i - 1] = new DocumentChecksum(path);
+            checksums[i - 1].setLength(length);
+            checksums[i - 1].setHash(hash);
         }
 
         checksumsReceived(sender, Arrays.asList(checksums));

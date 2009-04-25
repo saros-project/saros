@@ -76,6 +76,7 @@ public class ConsistencyWatchdogHandler {
                 // more
                 log.error("Currently we cannot deal with the situation"
                     + " of files being deleted on the host: ", e);
+                return;
             }
 
             // Reset jupiter
@@ -132,7 +133,7 @@ public class ConsistencyWatchdogHandler {
                 return;
             }
 
-            log.debug("Checksum Error for " + pathsOfInconsistencies + "from "
+            log.debug("Checksum Error for " + pathsOfInconsistencies + " from "
                 + from.getBase());
 
             showChecksumErrorMessage(pathsOfInconsistencies, from);

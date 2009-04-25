@@ -1,6 +1,9 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
 
 /**
  * This Class represents a checksum of an document. It contains the path, the
@@ -10,8 +13,19 @@ import org.eclipse.core.runtime.IPath;
  */
 public class DocumentChecksum {
 
+    protected IDocumentListener dirtyListener = new IDocumentListener() {
+
+        public void documentAboutToBeChanged(DocumentEvent event) {
+            // we are only interested in events after the change
+        }
+
+        public void documentChanged(DocumentEvent event) {
+            dirty = true;
+        }
+    };
+
     // the path to the concurrent document
-    private IPath path;
+    private final IPath path;
 
     // the length of the document
     private int length;
@@ -19,18 +33,17 @@ public class DocumentChecksum {
     // the hash code of the document
     private int hash;
 
-    public DocumentChecksum(IPath path, int length, int hash) {
+    protected IDocument document;
+
+    protected boolean dirty;
+
+    public DocumentChecksum(IPath path) {
         this.path = path;
-        this.length = length;
-        this.hash = hash;
+        this.dirty = true;
     }
 
     public IPath getPath() {
         return path;
-    }
-
-    public void setPath(IPath path) {
-        this.path = path;
     }
 
     public int getLength() {
@@ -47,5 +60,45 @@ public class DocumentChecksum {
 
     public void setHash(int hash) {
         this.hash = hash;
+    }
+
+    public void setDirty(boolean b) {
+        this.dirty = b;
+    }
+
+    public void dispose() {
+        unbind();
+    }
+
+    private void unbind() {
+        if (document != null) {
+            document.removeDocumentListener(dirtyListener);
+        }
+    }
+
+    public void bind(IDocument doc) {
+
+        if (this.document == doc)
+            return;
+
+        unbind();
+
+        this.document = doc;
+
+        doc.addDocumentListener(dirtyListener);
+    }
+
+    public void update() {
+
+        assert document != null;
+
+        // If document not changed, skip
+        if (!dirty)
+            return;
+
+        this.length = document.getLength();
+        this.hash = document.get().hashCode();
+
+        dirty = false;
     }
 }
