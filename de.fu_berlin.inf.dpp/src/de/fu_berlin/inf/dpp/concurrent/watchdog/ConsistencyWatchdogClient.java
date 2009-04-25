@@ -116,7 +116,6 @@ public class ConsistencyWatchdogClient {
 
         for (DocumentChecksum checksum : checksums) {
             if (isInconsistent(checksum)) {
-
                 pathsWithWrongChecksums.add(checksum.getPath());
             }
         }
