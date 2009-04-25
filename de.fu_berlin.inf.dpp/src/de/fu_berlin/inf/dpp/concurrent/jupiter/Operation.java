@@ -23,4 +23,11 @@ public interface Operation {
      */
     List<TextEditActivity> toTextEdit(IPath path, String source);
 
+    /**
+     * Returns a list of all operations represented by this operation that
+     * perform text changes in the order they should be executed. This method
+     * can return an empty list (for NoOperations for instance).
+     */
+    List<Operation> getTextOperations();
+
 }

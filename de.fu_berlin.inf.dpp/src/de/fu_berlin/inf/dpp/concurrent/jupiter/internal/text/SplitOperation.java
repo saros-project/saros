@@ -102,6 +102,15 @@ public class SplitOperation implements Operation {
         return result;
     }
 
+    public List<Operation> getTextOperations() {
+        List<Operation> result = new ArrayList<Operation>();
+
+        result.addAll(getFirst().getTextOperations());
+        result.addAll(getSecond().getTextOperations());
+
+        return result;
+    }
+
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>();

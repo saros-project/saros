@@ -73,4 +73,8 @@ public class NoOperation implements Operation {
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
         return Collections.emptyList();
     }
+
+    public List<Operation> getTextOperations() {
+        return Collections.emptyList();
+    }
 }

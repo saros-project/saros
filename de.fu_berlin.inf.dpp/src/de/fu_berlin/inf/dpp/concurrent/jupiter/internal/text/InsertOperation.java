@@ -182,4 +182,8 @@ public class InsertOperation implements Operation {
             getPosition(), getText(), "", path));
     }
 
+    public List<Operation> getTextOperations() {
+        return Collections.singletonList((Operation) this);
+    }
+
 }

@@ -125,4 +125,8 @@ public class DeleteOperation implements Operation {
         return Collections.singletonList(new TextEditActivity(source,
             getPosition(), "", getText(), path));
     }
+
+    public List<Operation> getTextOperations() {
+        return Collections.singletonList((Operation) this);
+    }
 }

@@ -69,17 +69,44 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
             return op1;
         }
 
-        if (op1 instanceof SplitOperation && op2 instanceof SplitOperation) {
-            return transform((SplitOperation) op1, (SplitOperation) op2,
-                privileged);
-        }
-
         if (op1 instanceof SplitOperation) {
+            /**
+             * Given two operations s1 and s2 to be transformed in the context
+             * of op2, we need to calculate s1' as t(s1, op2) and s2' as t(s2,
+             * op2') where op2' is t(op2, s1)
+             * 
+             * <code>
+             *          O
+             *     s1 /   \ op2
+             *      O       O
+             * s2 /   \   / s1'
+             *  O       O
+             *    \   / s2'
+             *      O
+             * </code>
+             */
+
             SplitOperation s = (SplitOperation) op1;
             return new SplitOperation(transform(s.getFirst(), op2, param),
-                transform(s.getSecond(), op2, param));
+                transform(s.getSecond(), transform(op2, s.getFirst(),
+                    !privileged), param));
         }
         if (op2 instanceof SplitOperation) {
+            /**
+             * Given an operation op1 to be transformed in the context of two
+             * operations s1 and s2, we need to calculate op1' as t(op1', s2)
+             * where op1' is t(op1, s1)
+             * 
+             * <code>
+             *           O
+             *      s1 /   \ op1
+             *       O       O
+             *  s2 /   \   /   
+             *   O       O
+             * op1'\   /    
+             *       O
+             *      </code>
+             */
             SplitOperation s = (SplitOperation) op2;
             return transform(transform(op1, s.getFirst(), param),
                 s.getSecond(), param);
@@ -131,18 +158,6 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
             throw new IllegalArgumentException("Unsupported Operation type: "
                 + op);
         }
-    }
-
-    protected Operation transform(SplitOperation s1, SplitOperation s2,
-        boolean param) {
-
-        Operation transOp1 = transform(s1.getFirst(), s2.getFirst(), param);
-        transOp1 = transform(transOp1, transform(s2.getSecond(), s2.getFirst(),
-            param), param);
-        Operation transOp2 = transform(s1.getSecond(), s2.getFirst(), param);
-        transOp2 = transform(transOp2, transform(s2.getSecond(), s2.getFirst(),
-            param), param);
-        return new SplitOperation(transOp1, transOp2);
     }
 
     protected Operation transform(InsertOperation insA, InsertOperation insB,
