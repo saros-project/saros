@@ -78,16 +78,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.core.resources.IResourceDeltaVisitor
-         */
         public boolean visit(IResourceDelta delta) {
+
             assert SharedResourcesManager.this.sharedProject != null;
 
-            if (SharedResourcesManager.this.replicationInProgess
-                || !SharedResourcesManager.this.sharedProject.isDriver()) {
+            if (!SharedResourcesManager.this.sharedProject.isDriver()) {
                 return false;
             }
 
@@ -116,7 +111,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 activity = handleFolderDelta(path, kind);
             }
 
-            fireActivity(activity);
+            if (activity != null) {
+                // TODO A delete activity is triggered twice
+                // log.debug("File Activity Fired: " + activity + " for Delta: "
+                // + delta, new StackTrace());
+                fireActivity(activity);
+            }
 
             return delta.getKind() != IResourceDelta.NO_CHANGE;
         }
@@ -167,10 +167,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         private void fireActivity(IActivity activity) {
-            if (activity == null) {
-                return;
-            }
-
             for (IActivityListener listener : SharedResourcesManager.this.listeners) {
                 listener.activityCreated(activity);
             }
@@ -233,12 +229,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
         this.listeners.remove(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.core.resources.IResourceChangeListener
+    /**
+     * This method is called from Eclipse when changes to resource are detected
      */
     public void resourceChanged(IResourceChangeEvent event) {
+
+        if (replicationInProgess)
+            return;
+
         try {
 
             switch (event.getType()) {
@@ -269,7 +267,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     + event);
             }
 
-        } catch (CoreException e) {
+        } catch (Exception e) {
             log.error("Couldn't handle resource change.", e);
         }
     }
