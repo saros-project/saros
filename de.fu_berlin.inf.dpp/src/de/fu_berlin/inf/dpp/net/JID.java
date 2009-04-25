@@ -45,7 +45,7 @@ public class JID implements Serializable {
      */
     public JID(String jid) {
         if (jid == null)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("JID cannot be null");
 
         this.jid = jid;
     }
