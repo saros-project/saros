@@ -49,7 +49,7 @@ import org.eclipse.jface.text.source.IAnnotationModelExtension;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
@@ -60,6 +60,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -117,6 +118,12 @@ public class EditorManager implements IActivityProvider {
 
         protected Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
+        /**
+         * The EditorPool only managed those IEditorParts whose IEditorInput can
+         * be traced to a file with a viewer.
+         */
+        protected Map<IEditorPart, IEditorInput> editorInputMap = new HashMap<IEditorPart, IEditorInput>();
+
         public void add(IEditorPart editorPart) {
 
             IPath path = editorAPI.getEditorPath(editorPart);
@@ -139,7 +146,9 @@ public class EditorManager implements IActivityProvider {
             }
 
             IEditorInput input = editorPart.getEditorInput();
-            if (!(input instanceof IFileEditorInput)) {
+
+            IFile file = ResourceUtil.getFile(input);
+            if (file == null) {
                 log.warn("This editor does not use IFiles as input");
                 return;
             }
@@ -148,7 +157,7 @@ public class EditorManager implements IActivityProvider {
              * Connecting causes Conversion of Delimiters which trigger
              * Selection and Save Activities, so connect before adding listeners
              */
-            connect(((IFileEditorInput) input).getFile());
+            connect(file);
 
             editorAPI.addSharedEditorListener(EditorManager.this, editorPart);
             editorAPI.setEditable(editorPart, isDriver);
@@ -162,24 +171,40 @@ public class EditorManager implements IActivityProvider {
             document.addDocumentListener(documentListener);
 
             getEditors(path).add(editorPart);
+            editorInputMap.put(editorPart, input);
 
             lastEditTimes.put(path, System.currentTimeMillis());
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
         }
 
-        public void remove(IEditorPart editorPart) {
-            IPath path = editorAPI.getEditorPath(editorPart);
+        public IPath remove(IEditorPart editorPart) {
+
+            IEditorInput input = editorInputMap.remove(editorPart);
+            if (input == null) {
+                log.warn("EditorPart was never added to the EditorPool: "
+                    + editorPart.getTitle());
+                return null;
+            }
+
+            IFile file = ResourceUtil.getFile(input);
+            if (file == null) {
+                log.warn("Could not find file for editor input "
+                    + editorPart.getTitle());
+                return null;
+            }
+
+            IPath path = file.getProjectRelativePath();
             if (path == null) {
                 log.warn("Could not find path for editor "
                     + editorPart.getTitle());
-                return;
+                return null;
             }
 
             // TODO Remove should remove empty HashSets
             if (!getEditors(path).remove(editorPart)) {
-                log.warn("EditorPart was never added to the EditorPool: "
+                log.error("EditorPart was never added to the EditorPool: "
                     + editorPart.getTitle());
-                return;
+                return null;
             }
 
             // Unregister and unhook
@@ -187,22 +212,17 @@ public class EditorManager implements IActivityProvider {
             editorAPI
                 .removeSharedEditorListener(EditorManager.this, editorPart);
 
-            IEditorInput input = editorPart.getEditorInput();
-            if (!(input instanceof IFileEditorInput)) {
-                log.error("This editor does not use IFiles as input");
-            }
-
             IDocumentProvider documentProvider = EditorUtils
                 .getDocumentProvider(input);
             documentProvider.removeElementStateListener(dirtyStateListener);
 
-            IFile file = ((IFileEditorInput) input).getFile();
             resetText(file);
 
             IDocument document = documentProvider.getDocument(input);
             if (document != null)
                 document.removeDocumentListener(documentListener);
 
+            return path;
         }
 
         public Set<IEditorPart> getEditors(IPath path) {
@@ -238,6 +258,10 @@ public class EditorManager implements IActivityProvider {
             for (IEditorPart editorPart : getAllEditors()) {
                 editorAPI.setEditable(editorPart, isDriver);
             }
+        }
+
+        public boolean isManaged(IEditorPart editor) {
+            return editorInputMap.containsKey(editor);
         }
     }
 
@@ -304,25 +328,25 @@ public class EditorManager implements IActivityProvider {
             } else if (editorActivity.getType().equals(Type.Saved)) {
                 saveText(editorActivity.getPath());
             }
-            return true;
+            return false;
         }
 
         @Override
         public boolean receive(TextEditActivity textEditActivity) {
             execTextEdit(textEditActivity);
-            return true;
+            return false;
         }
 
         @Override
         public boolean receive(TextSelectionActivity textSelectionActivity) {
             execTextSelection(textSelectionActivity);
-            return true;
+            return false;
         }
 
         @Override
         public boolean receive(ViewportActivity viewportActivity) {
             execViewport(viewportActivity);
-            return true;
+            return false;
         }
     };
 
@@ -910,6 +934,14 @@ public class EditorManager implements IActivityProvider {
             return;
         }
 
+        /*
+         * If the resource is not accessible it might have been deleted without
+         * the editor having been closed (for instance outside of Eclipse).
+         * Others might be confused about if they receive this editor from us.
+         */
+        if (!editorAPI.getEditorResource(editorPart).isAccessible())
+            return;
+
         this.editorPool.add(editorPart);
 
         refreshAnnotations(editorPart);
@@ -930,8 +962,10 @@ public class EditorManager implements IActivityProvider {
             return;
         }
 
-        // Is the new editor part supported by Saros (and inside the project?)
-        if (!isSharedEditor(editorPart)) {
+        // Is the new editor part supported by Saros (and inside the project)
+        // and the Resource accessible (we don't want to report stale files)?
+        if (!isSharedEditor(editorPart)
+            || !editorAPI.getEditorResource(editorPart).isAccessible()) {
             if (getFollowedUser() != null) {
                 setFollowing(null);
             }
@@ -964,6 +998,29 @@ public class EditorManager implements IActivityProvider {
             log.warn("Shared Editor does not have a Viewport: " + editorPart);
         } else {
             generateViewport(editorPart, viewport);
+        }
+    }
+
+    /**
+     * Called if the IEditorInput of the IEditorPart is now something different
+     * than before! Probably when renaming.
+     * 
+     */
+    public void partInputChanged(IEditorPart editor) {
+
+        if (editorPool.isManaged(editor)) {
+
+            IPath path = editorPool.remove(editor);
+
+            if (path == null) {
+                log.warn("Editor was managed but path could not be found: "
+                    + editor);
+            } else {
+                fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+                    .toString(), Type.Closed, path));
+            }
+
+            partActivated(editor);
         }
     }
 
@@ -1141,10 +1198,10 @@ public class EditorManager implements IActivityProvider {
             return;
         }
 
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
-
         if (isConnected(file)) {
+            FileEditorInput input = new FileEditorInput(file);
+            IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+
             provider.disconnect(input);
             this.connectedFiles.remove(file);
         }
@@ -1580,4 +1637,5 @@ public class EditorManager implements IActivityProvider {
         result.addAll(locallyOpenEditors);
         return result;
     }
+
 }

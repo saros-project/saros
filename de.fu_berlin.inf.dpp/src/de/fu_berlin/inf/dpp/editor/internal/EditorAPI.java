@@ -130,8 +130,17 @@ public class EditorAPI implements IEditorAPI {
             // do nothing
         }
 
+        /**
+         * Called for instance when a file was renamed. We just close and open
+         * the editor.
+         */
         public void partInputChanged(IWorkbenchPartReference partRef) {
-            // do nothing
+            IWorkbenchPart part = partRef.getPart(false);
+
+            if ((part != null) && (part instanceof IEditorPart)) {
+                IEditorPart editor = (IEditorPart) part;
+                editorManager.partInputChanged(editor);
+            }
         }
     }
 
