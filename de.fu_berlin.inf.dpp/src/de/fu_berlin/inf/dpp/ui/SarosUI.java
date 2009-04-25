@@ -160,7 +160,19 @@ public class SarosUI {
     protected void showView(String view, int mode) {
         try {
             IWorkbench workbench = PlatformUI.getWorkbench();
+            if (workbench == null) {
+                log.error("Workbench not created when trying to show view!");
+                return;
+            }
+
             IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+            if (window == null) {
+                log.error("No Active WorkbenchWindow found "
+                    + "(the platform is shutting down)"
+                    + " when trying to show view!");
+                return;
+            }
+
             window.getActivePage().showView(view, null, mode);
         } catch (PartInitException e) {
             log.error("Could not create Session View", e);
