@@ -562,11 +562,30 @@ public class Util {
      * Crude check whether we are on the SWT thread
      */
     public static boolean isSWT() {
+
+        if (Display.getCurrent() != null) {
+            return true;
+        }
         try {
-            return PlatformUI.getWorkbench().getDisplay().getThread() == Thread
-                .currentThread();
+            boolean platformSWT = PlatformUI.getWorkbench().getDisplay()
+                .getThread() == Thread.currentThread();
+            if (platformSWT) {
+                log.warn("Running in PlatformSWT Thread"
+                    + " which is not found with Display.getCurrent()");
+            }
+            return platformSWT;
         } catch (SWTException e) {
-            return false;
+            try {
+                boolean defaultSWT = Display.getDefault().getThread() == Thread
+                    .currentThread();
+                if (defaultSWT) {
+                    log.warn("Running in Display.getDefault() but"
+                        + " PlatformUI Display is already disposed.");
+                }
+                return defaultSWT;
+            } catch (SWTException e2) {
+                return false;
+            }
         }
     }
 
