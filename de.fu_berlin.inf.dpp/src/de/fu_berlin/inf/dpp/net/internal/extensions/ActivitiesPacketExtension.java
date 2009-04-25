@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -37,7 +36,6 @@ import de.fu_berlin.inf.dpp.activities.AbstractActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
@@ -54,6 +52,7 @@ import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 
 public class ActivitiesPacketExtension implements PacketExtension {
 
+    @SuppressWarnings("unused")
     private static final Logger log = Logger
         .getLogger(ActivitiesPacketExtension.class.getName());
 
@@ -68,9 +67,9 @@ public class ActivitiesPacketExtension implements PacketExtension {
 
     public static final String ELEMENT = "activities";
 
-    private List<TimedActivity> activities;
+    protected List<TimedActivity> activities;
 
-    private String sessionID;
+    protected String sessionID;
 
     /**
      * Simple helper class for (de)serializion with {@link XStream}.
@@ -87,32 +86,12 @@ public class ActivitiesPacketExtension implements PacketExtension {
         @XStreamAsAttribute
         protected String sessionID;
 
-        @XStreamAsAttribute
-        protected int firstSequenceNumber;
-
         @XStreamImplicit
-        protected List<IActivity> activities;
+        protected List<TimedActivity> activities;
 
         public Content(String sessionID, List<TimedActivity> activities) {
-
             this.sessionID = sessionID;
-            this.firstSequenceNumber = activities.get(0).getSequenceNumber();
-            int sequenceNumber = this.firstSequenceNumber;
-            this.activities = new ArrayList<IActivity>(activities.size());
-            for (TimedActivity timedActivity : activities) {
-                if (timedActivity.getSequenceNumber() != sequenceNumber) {
-                    log
-                        .error("Sequence number in activity ("
-                            + timedActivity.getSequenceNumber()
-                            + ") does not match expected number: "
-                            + sequenceNumber);
-                    throw new IllegalArgumentException(
-                        "sequence numbers must be consecutive");
-                }
-                sequenceNumber++;
-
-                this.activities.add(timedActivity.getActivity());
-            }
+            this.activities = activities;
         }
 
         public String getSessionID() {
@@ -120,17 +99,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
         }
 
         public List<TimedActivity> getTimedActivities() {
-            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
-                activities.size());
-            /*
-             * There is only one sequence number in the message, so all
-             * activities get increasing numbers based on that sequence number.
-             */
-            int sequenceNumber = firstSequenceNumber;
-            for (IActivity activity : activities) {
-                result.add(new TimedActivity(activity, sequenceNumber++));
-            }
-            return result;
+            return activities;
         }
     }
 
@@ -156,7 +125,8 @@ public class ActivitiesPacketExtension implements PacketExtension {
             xstream.processAnnotations(new Class[] { AbstractActivity.class,
                 EditorActivity.class, FileActivity.class, FolderActivity.class,
                 RoleActivity.class, TextEditActivity.class,
-                TextSelectionActivity.class, ViewportActivity.class });
+                TextSelectionActivity.class, ViewportActivity.class,
+                TimedActivity.class });
             xstream.processAnnotations(new Class[] { Request.class,
                 JupiterVectorTime.class, DeleteOperation.class,
                 InsertOperation.class, NoOperation.class, SplitOperation.class,

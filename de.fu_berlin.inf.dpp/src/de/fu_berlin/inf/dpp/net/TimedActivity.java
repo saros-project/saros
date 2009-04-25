@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.net;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import de.fu_berlin.inf.dpp.activities.IActivity;
 
 /**
@@ -7,6 +10,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  * 
  * @author rdjemili
  */
+
 public class TimedActivity implements Comparable<TimedActivity> {
 
     /** Sequence number for Activities that don't have to wait. */
@@ -17,18 +21,20 @@ public class TimedActivity implements Comparable<TimedActivity> {
      */
     public static final int UNKNOWN_SEQUENCE_NR = -2;
 
-    private final IActivity activity;
+    protected final IActivity activity;
 
-    private final int sequenceNumber;
+    @XStreamAsAttribute
+    protected final int sequenceNumber;
 
     /** A "real" wall clock timestamp for this activity. */
-    private long localTimestamp = 0;
+    @XStreamOmitField
+    protected long localTimestamp = 0;
 
     /**
      * Constructs a new TimedActivity.
      * 
      * @param activity
-     *            the activity.
+     *            the activity to wrap
      * @param sequenceNumber
      *            the sequence number that belongs to the activity.
      * 
@@ -98,8 +104,8 @@ public class TimedActivity implements Comparable<TimedActivity> {
             return false;
 
         TimedActivity other = (TimedActivity) obj;
-        return other.activity.equals(this.activity)
-            && (other.sequenceNumber == this.sequenceNumber);
+        return (other.sequenceNumber == this.sequenceNumber)
+            && other.activity.equals(this.activity);
     }
 
     public int compareTo(TimedActivity other) {

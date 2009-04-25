@@ -82,8 +82,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     public void assertRoundtrip(IActivity activity)
         throws XmlPullParserException, IOException {
 
-        ActivitiesPacketExtension extension = createPacketExtension(activity);
-        assertEquals(extension, parseExtension(extension));
+        assertRoundtrip(createPacketExtension(activity));
     }
 
     public void testActivities() throws XmlPullParserException, IOException {
@@ -115,7 +114,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         }
     }
 
-    public void testGapInSequenceNumbers() {
+    public void testGapInSequenceNumbers() throws XmlPullParserException,
+        IOException {
         IActivity activity = new EditorActivity(source,
             EditorActivity.Type.Activated, null);
 
@@ -126,12 +126,12 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         ActivitiesPacketExtension extension = new ActivitiesPacketExtension(
             "Session-ID", timedActivities);
 
-        try {
-            extension.toXML();
-            fail();
-        } catch (IllegalArgumentException e) {
-            // Expected exception.
-        }
+        assertRoundtrip(extension);
+    }
+
+    protected void assertRoundtrip(ActivitiesPacketExtension extension)
+        throws XmlPullParserException, IOException {
+        assertEquals(extension, parseExtension(extension.toXML()));
     }
 
     protected ActivitiesPacketExtension createPacketExtension(IActivity activity) {
@@ -139,15 +139,14 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             .singletonList(new TimedActivity(activity, 42)));
     }
 
-    protected ActivitiesPacketExtension parseExtension(
-        ActivitiesPacketExtension packet) throws XmlPullParserException,
-        IOException {
+    protected ActivitiesPacketExtension parseExtension(String xml)
+        throws XmlPullParserException, IOException {
         /*
          * Smack calls the provider with a parser that is already within the
          * document, so we call the next() method to simulate this aspect.
          */
         MXParser parser = new MXParser();
-        parser.setInput(new StringReader(packet.toXML()));
+        parser.setInput(new StringReader(xml));
         parser.next();
 
         return provider.parseExtension(parser);
