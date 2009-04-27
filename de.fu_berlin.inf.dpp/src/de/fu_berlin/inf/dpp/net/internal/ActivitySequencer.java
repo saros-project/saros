@@ -89,7 +89,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * TODO "Timestamps" are treated more like consecutive sequence numbers, so
      * may be all names and documentation should be changed to reflect this.
      */
-    protected static class ActivityQueue {
+    protected class ActivityQueue {
 
         /** How long to wait until ignore missing activities in milliseconds. */
         protected static final long ACTIVITY_TIMEOUT = 30 * 1000;
@@ -215,8 +215,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (age > ACTIVITY_TIMEOUT) {
                 if (age < ACTIVITY_TIMEOUT * 2) {
                     // Early exit if there is a file transfer running.
-                    DataTransferManager transferManager = Saros.getDefault()
-                        .getContainer().getComponent(DataTransferManager.class);
                     if (transferManager.isReceiving(jid)) {
                         return;
                     }
@@ -238,7 +236,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * This class manages a {@link ActivityQueue} for each other user of a
      * session.
      */
-    protected static class ActivityQueuesManager {
+    protected class ActivityQueuesManager {
         protected final Map<JID, ActivityQueue> jid2queue = new ConcurrentHashMap<JID, ActivityQueue>();
 
         /**
@@ -391,6 +389,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
     protected final ITransmitter transmitter;
 
+    protected final DataTransferManager transferManager;
+
     /**
      * This object is used to synchronize on the execution of activities.
      * 
@@ -403,10 +403,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     protected Object execLock = new Object();
 
     public ActivitySequencer(ISharedProject sharedProject,
-        ITransmitter transmitter) {
+        ITransmitter transmitter, DataTransferManager transferManager) {
 
         this.sharedProject = sharedProject;
         this.transmitter = transmitter;
+        this.transferManager = transferManager;
     }
 
     /**

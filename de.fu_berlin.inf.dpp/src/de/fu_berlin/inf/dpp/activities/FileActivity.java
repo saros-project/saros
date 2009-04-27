@@ -8,7 +8,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-@XStreamAlias("file")
+@XStreamAlias("fileActivity")
 public class FileActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed

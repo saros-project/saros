@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.net;
 
+import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
@@ -10,7 +11,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
  * 
  * @author rdjemili
  */
-
+@XStreamAlias("timedActivity")
 public class TimedActivity implements Comparable<TimedActivity> {
 
     /** Sequence number for Activities that don't have to wait. */

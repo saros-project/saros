@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
  * A role activity indicates that a user has a new Role in the Driver/Observer
  * schemes of things.
  */
-@XStreamAlias("user")
+@XStreamAlias("roleActivity")
 public class RoleActivity extends AbstractActivity {
 
     @XStreamAsAttribute

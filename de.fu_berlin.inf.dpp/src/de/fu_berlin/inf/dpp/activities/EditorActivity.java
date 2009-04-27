@@ -30,7 +30,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
  * 
  * @author rdjemili
  */
-@XStreamAlias("editor")
+@XStreamAlias("editorActivity")
 public class EditorActivity extends AbstractActivity {
 
     public static enum Type {

@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -73,19 +74,24 @@ public class SharedProject implements ISharedProject, Disposable {
     private static final int MAX_USERCOLORS = 5;
     private FreeColors freeColors = null;
 
-    private SharedProject(ITransmitter transmitter, IProject project) {
+    private SharedProject(ITransmitter transmitter,
+        DataTransferManager transferManager, IProject project) {
+
         assert (transmitter != null);
 
         this.transmitter = transmitter;
         this.project = project;
-        this.activitySequencer = new ActivitySequencer(this, transmitter);
+        this.activitySequencer = new ActivitySequencer(this, transmitter,
+            transferManager);
     }
 
     /**
      * Constructor called for SharedProject of the host
      */
-    public SharedProject(ITransmitter transmitter, IProject project, JID myID) {
-        this(transmitter, project);
+    public SharedProject(ITransmitter transmitter,
+        DataTransferManager transferManager, IProject project, JID myID) {
+
+        this(transmitter, transferManager, project);
         assert (myID != null);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
@@ -107,10 +113,11 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Constructor of client
      */
-    public SharedProject(ITransmitter transmitter, IProject project, JID myID,
+    public SharedProject(ITransmitter transmitter,
+        DataTransferManager transferManager, IProject project, JID myID,
         JID hostID, int myColorID) {
 
-        this(transmitter, project);
+        this(transmitter, transferManager, project);
 
         this.host = new User(this, hostID, 0);
         this.host.setUserRole(UserRole.DRIVER);

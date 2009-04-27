@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("folder")
+@XStreamAlias("folderActivity")
 public class FolderActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed

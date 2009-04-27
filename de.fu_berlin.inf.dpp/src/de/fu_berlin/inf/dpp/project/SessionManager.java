@@ -37,6 +37,7 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -68,6 +69,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected XMPPChatTransmitter transmitter;
 
     @Inject
+    protected DataTransferManager transferManager;
+
+    @Inject
     protected SessionIDObservable sessionID;
 
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
@@ -91,7 +95,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.sessionID.setValue(String.valueOf(sessionRandom.nextInt()));
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
-            project, myJID);
+            this.transferManager, project, myJID);
 
         this.currentlySharedProject.setValue(sharedProject);
 
@@ -112,7 +116,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
         SharedProject sharedProject = new SharedProject(this.transmitter,
-            project, saros.getMyJID(), host, colorID);
+            this.transferManager, project, saros.getMyJID(), host, colorID);
         this.currentlySharedProject.setValue(sharedProject);
 
         for (ISessionListener listener : this.listeners) {

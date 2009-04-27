@@ -7,7 +7,7 @@ import org.eclipse.jface.text.source.LineRange;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("viewport")
+@XStreamAlias("viewportActivity")
 public class ViewportActivity extends AbstractActivity {
     @XStreamAsAttribute
     @XStreamAlias("top")

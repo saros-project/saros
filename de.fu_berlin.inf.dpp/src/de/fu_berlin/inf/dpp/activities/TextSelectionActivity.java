@@ -27,7 +27,7 @@ import org.eclipse.jface.text.TextSelection;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-@XStreamAlias("textSelection")
+@XStreamAlias("textSelectionActivity")
 public class TextSelectionActivity extends AbstractActivity {
 
     @XStreamAsAttribute

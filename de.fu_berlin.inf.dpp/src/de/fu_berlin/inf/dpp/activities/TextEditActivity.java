@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
  * 
  * @author rdjemili
  */
-@XStreamAlias("edit")
+@XStreamAlias("textEditActivity")
 public class TextEditActivity extends AbstractActivity {
 
     @XStreamAsAttribute

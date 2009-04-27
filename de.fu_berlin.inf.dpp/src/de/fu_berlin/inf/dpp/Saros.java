@@ -301,7 +301,11 @@ public class Saros extends AbstractUIPlugin {
      * Returns the shared instance.
      * 
      * @return the shared instance.
+     * 
+     * @deprecated The Saros instance should be (re)injected by PicoContainer or
+     *             passed around as argument.
      */
+    @Deprecated
     public static Saros getDefault() {
         return Saros.plugin;
     }
