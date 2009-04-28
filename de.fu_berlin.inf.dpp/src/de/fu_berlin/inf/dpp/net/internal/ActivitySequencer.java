@@ -436,7 +436,14 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         this.flushTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                Util.runSafeSync(log, new Runnable() {
+                    public void run() {
+                        flushTask();
+                    }
+                });
+            }
 
+            private void flushTask() {
                 // Just to assert that after stop() no task is executed anymore
                 if (!started)
                     return;

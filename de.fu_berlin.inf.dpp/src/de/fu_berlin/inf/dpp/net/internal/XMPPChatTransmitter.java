@@ -747,8 +747,14 @@ public class XMPPChatTransmitter implements ITransmitter,
             assert activity.getSource() != null : "Received activity without source:"
                 + activity;
 
-            // Ask sequencer to execute or queue until missing activities arrive
-            project.getSequencer().exec(timedActivity);
+            try {
+                // Ask sequencer to execute or queue until missing activities
+                // arrive
+                project.getSequencer().exec(timedActivity);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                log.error("Internal error", e);
+            }
         }
     }
 

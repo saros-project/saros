@@ -630,8 +630,12 @@ public class DataTransferManager implements ConnectionSessionListener {
             TimedActivity timedActivity = new TimedActivity(new FileActivity(
                 from.toString(), path, input), sequenceNumber);
 
-            chatTransmitter.receiveActivities(from, Collections
-                .singletonList(timedActivity));
+            try {
+                chatTransmitter.receiveActivities(from, Collections
+                    .singletonList(timedActivity));
+            } catch (RuntimeException e) {
+                log.error("Internal error", e);
+            }
 
             return true;
         }
