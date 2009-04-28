@@ -721,7 +721,8 @@ public class EditorManager implements IActivityProvider {
              * But watch out for changes because of a consistency check!
              */
             log.warn("Received text changes without being"
-                + " driver or while shared project has ended");
+                + " driver, while shared project has ended "
+                + "or an inconsistency was detected");
 
             return;
         }
