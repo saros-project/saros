@@ -60,7 +60,6 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
@@ -681,8 +680,8 @@ public class EditorManager implements IActivityProvider {
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
 
-        fireActivity(new TextSelectionActivity(Saros.getDefault().getMyJID()
-            .toString(), offset, length, path));
+        fireActivity(new TextSelectionActivity(sharedProject.getLocalUser()
+            .getJID().toString(), offset, length, path));
     }
 
     @Inject
@@ -711,7 +710,8 @@ public class EditorManager implements IActivityProvider {
          * TODO When Inconsistencies exists, all listeners should be stopped
          * rather than catching events -> Think Start/Stop on the SharedProject
          */
-        if (!this.isDriver || sharedProject == null) {
+        if (!this.isDriver || sharedProject == null
+            || isInconsistent.getValue()) {
 
             /**
              * TODO If we are not a driver, then receiving this event might
