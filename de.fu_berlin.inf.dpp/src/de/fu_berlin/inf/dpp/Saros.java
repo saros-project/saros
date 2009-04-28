@@ -106,7 +106,7 @@ public class Saros extends AbstractUIPlugin {
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
-    public String xmppFeatureID;
+    public String sarosFeatureID;
 
     protected SessionManager sessionManager;
 
@@ -248,7 +248,7 @@ public class Saros extends AbstractUIPlugin {
 
         String version = Util.getBundleVersion(getBundle(), "Unknown Version");
 
-        xmppFeatureID = plugin.toString() + "_" + version;
+        sarosFeatureID = plugin.toString() + "_" + version;
 
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
@@ -279,7 +279,7 @@ public class Saros extends AbstractUIPlugin {
     public void stop(BundleContext context) throws Exception {
 
         if (dotMonitor != null) {
-            File f = new File("Saros-" + xmppFeatureID + ".dot");
+            File f = new File("Saros-" + sarosFeatureID + ".dot");
             logger.info("Saving Saros architecture diagram dot file: "
                 + f.getAbsolutePath());
             dotMonitor.save(f);
@@ -379,7 +379,7 @@ public class Saros extends AbstractUIPlugin {
             ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                 .getInstanceFor(connection);
 
-            sdm.addFeature(xmppFeatureID);
+            sdm.addFeature(sarosFeatureID);
 
             // add Jingle feature to the supported extensions
             if (!prefStore
