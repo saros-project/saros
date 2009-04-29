@@ -109,6 +109,6 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
     }
 
     public boolean isDangerousForHost() {
-        return false;
+        return true;
     }
 }

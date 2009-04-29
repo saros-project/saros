@@ -180,9 +180,12 @@ public class JingleFileTransferManager {
 
     private FileMediaManager mediaManager;
 
-    public JingleFileTransferManager(XMPPConnection connection,
+    protected Saros saros;
+
+    public JingleFileTransferManager(Saros saros, XMPPConnection connection,
         IJingleFileTransferListener listener) {
         this.xmppConnection = connection;
+        this.saros = saros;
 
         logger.debug("Starting to initialize jingle file transfer manager.");
 
@@ -195,7 +198,7 @@ public class JingleFileTransferManager {
     public void initialize() {
 
         // get STUN Server from Preferences
-        IPreferenceStore prefStore = Saros.getDefault().getPreferenceStore();
+        IPreferenceStore prefStore = saros.getPreferenceStore();
         final String stunServer = prefStore.getString(PreferenceConstants.STUN);
         final int stunServerPort = Integer.parseInt(prefStore
             .getString(PreferenceConstants.STUN_PORT));

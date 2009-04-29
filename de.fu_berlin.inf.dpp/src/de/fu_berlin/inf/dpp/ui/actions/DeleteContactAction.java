@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPException;
@@ -39,17 +40,21 @@ public class DeleteContactAction extends SelectionProviderAction {
     private static final Logger log = Logger
         .getLogger(DeleteContactAction.class.getName());
 
-    private RosterEntry rosterEntry;
+    protected RosterEntry rosterEntry;
 
-    public DeleteContactAction(ISelectionProvider provider) {
+    protected Saros saros;
+
+    public DeleteContactAction(Saros saros, ISelectionProvider provider) {
         super(provider, "Delete");
         selectionChanged((IStructuredSelection) provider.getSelection());
 
         setToolTipText("Delete this contact.");
 
-        IWorkbench workbench = Saros.getDefault().getWorkbench();
+        IWorkbench workbench = PlatformUI.getWorkbench();
         setImageDescriptor(workbench.getSharedImages().getImageDescriptor(
             ISharedImages.IMG_TOOL_DELETE));
+
+        this.saros = saros;
     }
 
     public static String toString(RosterEntry entry) {
@@ -86,7 +91,7 @@ public class DeleteContactAction extends SelectionProviderAction {
                 + " from your roster?")) {
 
             try {
-                Saros.getDefault().removeContact(this.rosterEntry);
+                saros.removeContact(this.rosterEntry);
             } catch (XMPPException e) {
                 log.error("Could not delete contact "
                     + toString(this.rosterEntry) + ":", e);

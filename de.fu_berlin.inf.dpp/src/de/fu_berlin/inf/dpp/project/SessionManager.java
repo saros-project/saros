@@ -74,6 +74,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     @Inject
     protected SessionIDObservable sessionID;
 
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
     protected Saros saros;
@@ -94,8 +97,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         JID myJID = saros.getMyJID();
         this.sessionID.setValue(String.valueOf(sessionRandom.nextInt()));
 
-        SharedProject sharedProject = new SharedProject(this.transmitter,
-            this.transferManager, project, myJID);
+        SharedProject sharedProject = new SharedProject(saros,
+            this.transmitter, this.transferManager, project, myJID);
 
         this.currentlySharedProject.setValue(sharedProject);
 
@@ -105,7 +108,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             listener.sessionStarted(sharedProject);
         }
 
-        sharedProject.startInvitation(PreferenceUtils.getAutoInviteUsers());
+        sharedProject.startInvitation(preferenceUtils.getAutoInviteUsers());
 
         SessionManager.log.info("Session started");
     }
@@ -115,8 +118,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      */
     public ISharedProject joinSession(IProject project, JID host, int colorID) {
 
-        SharedProject sharedProject = new SharedProject(this.transmitter,
-            this.transferManager, project, saros.getMyJID(), host, colorID);
+        SharedProject sharedProject = new SharedProject(saros,
+            this.transmitter, this.transferManager, project, saros.getMyJID(),
+            host, colorID);
         this.currentlySharedProject.setValue(sharedProject);
 
         for (ISessionListener listener : this.listeners) {
@@ -185,7 +189,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.sessionID.setValue(sessionID);
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
-            this, this.transmitter, from, projectName, description, colorID);
+            this, this.transmitter, transferManager, from, projectName,
+            description, colorID);
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);

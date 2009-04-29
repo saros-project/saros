@@ -26,21 +26,28 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
-/**
- * TODO Why is this not a normal Action like all the others?
- * 
- * Use PlatformUI to get a Shell?
- */
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     private static final Logger log = Logger.getLogger(NewAccountAction.class
         .getName());
 
-    private IWorkbenchWindow window;
+    protected IWorkbenchWindow window;
+
+    @Inject
+    protected Saros saros;
+
+    /**
+     * This class is created by Eclipse to hook it up in the Menu bar.
+     */
+    public NewAccountAction() {
+        Saros.reinject(this);
+    }
 
     /**
      * @review runSafe OK
@@ -55,8 +62,8 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     public void runNewAccount() {
         Shell shell = this.window.getShell();
-        WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(true,
-            true, true));
+        WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
+            saros, true, true, true));
         wd.setHelpAvailable(false);
         wd.open();
     }

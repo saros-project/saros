@@ -38,11 +38,15 @@ public class NewContactAction extends Action {
     private static final Logger log = Logger.getLogger(NewContactAction.class
         .getName());
 
-    public NewContactAction() {
+    protected Saros saros;
+
+    public NewContactAction(Saros saros) {
         setToolTipText("Add a new contact");
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/user_add.png"));
 
-        Saros.getDefault().addListener(new IConnectionListener() {
+        this.saros = saros;
+
+        saros.addListener(new IConnectionListener() {
             public void connectionStateChanged(XMPPConnection connection,
                 ConnectionState newState) {
                 updateEnablement();
@@ -65,12 +69,12 @@ public class NewContactAction extends Action {
 
     public void runNewContact() {
         Shell shell = EditorAPI.getShell();
-        WizardDialog wd = new WizardDialog(shell, new AddContactWizard());
+        WizardDialog wd = new WizardDialog(shell, new AddContactWizard(saros));
         wd.setHelpAvailable(false);
         wd.open();
     }
 
     protected void updateEnablement() {
-        setEnabled(Saros.getDefault().isConnected());
+        setEnabled(saros.isConnected());
     }
 }

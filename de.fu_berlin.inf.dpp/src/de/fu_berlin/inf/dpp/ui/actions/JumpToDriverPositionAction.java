@@ -5,7 +5,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.picocontainer.Disposable;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -20,22 +19,23 @@ public class JumpToDriverPositionAction extends SelectionProviderAction
     private static final Logger log = Logger
         .getLogger(JumpToDriverPositionAction.class.getName());
 
-    @Inject
     protected SessionManager sessionManager;
 
-    @Inject
     protected EditorManager editorManager;
 
-    @Inject
     protected Saros saros;
 
-    public JumpToDriverPositionAction(ISelectionProvider provider) {
+    public JumpToDriverPositionAction(Saros saros,
+        SessionManager sessionManager, EditorManager editorManager,
+        ISelectionProvider provider) {
         super(provider, "Jump to position of selected user");
 
         setToolTipText("Jump to position of selected user");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/table_edit.png"));
 
-        Saros.getDefault().reinject(this);
+        this.saros = saros;
+        this.editorManager = editorManager;
+        this.sessionManager = sessionManager;
 
         selectionChanged(getStructuredSelection());
     }

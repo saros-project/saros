@@ -167,7 +167,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     public SharedProjectFileDecorator() {
 
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
 
         sessionManager.addSessionListener(sessionListener);
 

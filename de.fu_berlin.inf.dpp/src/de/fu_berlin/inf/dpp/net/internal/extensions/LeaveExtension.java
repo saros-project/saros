@@ -7,11 +7,12 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class LeaveExtension extends SessionDefaultPacketExtension {
+public class LeaveExtension extends SessionDefaultPacketExtension {
 
-    public LeaveExtension() {
-        super("leave");
+    public LeaveExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "leave");
     }
 
     @Override
@@ -19,19 +20,14 @@ public abstract class LeaveExtension extends SessionDefaultPacketExtension {
         return super.create();
     }
 
-    /**
-     * @return Returns a default implementation of this extension that does
-     *         nothing in leaveReceived(...)
-     */
-    public static LeaveExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            LeaveExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
         leaveReceived(sender);
     }
 
-    public abstract void leaveReceived(JID sender);
+    public void leaveReceived(JID sender) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
+
 }

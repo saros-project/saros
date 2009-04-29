@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.picocontainer.annotations.Inject;
 
 /**
  * Class used to initialize default preference values.
@@ -29,12 +30,19 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
+    @Inject
+    protected Saros saros;
+
+    public PreferenceInitializer() {
+        Saros.reinject(this);
+    }
+
     /*
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = Saros.getDefault().getPreferenceStore();
+        IPreferenceStore store = saros.getPreferenceStore();
         store.setDefault(PreferenceConstants.SERVER, "jabber.org");
         store.setDefault(PreferenceConstants.USERNAME, "");
         store.setDefault(PreferenceConstants.PASSWORD, "");

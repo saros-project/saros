@@ -94,8 +94,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {
 
-    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
-        .getName());
+    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class.getName());
 
     public static final int MAX_PARALLEL_SENDS = 10;
     public static final int MAX_TRANSFER_RETRIES = 5;
@@ -123,11 +122,43 @@ public class XMPPChatTransmitter implements ITransmitter,
     @Inject
     protected SharedProjectObservable sharedProject;
 
+    @Inject
+    protected ChecksumErrorExtension checksumErrorExtension;
+
+    @Inject
+    protected ChecksumExtension checksumExtension;
+
+    @Inject
+    protected InviteExtension inviteExtension;
+
+    @Inject
+    protected LeaveExtension leaveExtension;
+
+    @Inject
+    protected RequestActivityExtension requestActivityExtension;
+
+    @Inject
+    protected UserListExtension userListExtension;
+
+    @Inject
+    protected CancelInviteExtension cancelInviteExtension;
+
     protected DataTransferManager dataManager;
 
-    public XMPPChatTransmitter(DataTransferManager dataManager) {
+    protected RequestForFileListExtension requestForFileListExtension;
+
+    protected JoinExtension joinExtension;
+
+    public XMPPChatTransmitter(SessionIDObservable sessionID,
+        DataTransferManager dataManager) {
         // TODO Use DI better
         this.dataManager = dataManager;
+        this.sessionID = sessionID;
+
+        this.requestForFileListExtension = new RequestForFileListHandler(
+            sessionID);
+        this.joinExtension = new JoinHandler(sessionID);
+
         dataManager.chatTransmitter = this;
     }
 
@@ -135,12 +166,72 @@ public class XMPPChatTransmitter implements ITransmitter,
         .newSingleThreadExecutor(new NamedThreadFactory(
             "XMPPChatTransmitter-Dispatch"));
 
+    protected class JoinHandler extends JoinExtension {
+        protected JoinHandler(SessionIDObservable sessionIDObservable) {
+            super(sessionIDObservable);
+        }
+
+        @Override
+        public void joinReceived(final JID sender, final int colorID) {
+
+            XMPPChatTransmitter.log.debug("[" + sender.getName()
+                + "] Join: ColorID=" + colorID);
+
+            Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList", log,
+                new Runnable() {
+                    public void run() {
+                        IInvitationProcess process = getInvitationProcess(sender);
+                        if (process != null) {
+                            process.joinReceived(sender);
+                            return;
+                        }
+
+                        ISharedProject project = sharedProject.getValue();
+
+                        if (project != null) {
+                            // a new user joined this session
+                            project.addUser(new User(project, sender, colorID));
+                        }
+                    }
+                });
+        }
+    }
+
+    protected class RequestForFileListHandler extends
+        RequestForFileListExtension {
+        protected RequestForFileListHandler(
+            SessionIDObservable sessionIDObservable) {
+            super(sessionIDObservable);
+        }
+
+        @Override
+        public void requestForFileListReceived(final JID sender) {
+
+            XMPPChatTransmitter.log.debug("[" + sender.getName()
+                + "] Request for FileList");
+
+            Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList", log,
+                new Runnable() {
+                    public void run() {
+                        IInvitationProcess process = getInvitationProcess(sender);
+                        if (process != null) {
+                            process.invitationAccepted(sender);
+                        } else {
+                            log
+                                .warn("Received Invitation Acceptance from unknown user ["
+                                    + sender.getBase() + "]");
+                        }
+                    }
+                });
+        }
+    }
+
     public class XMPPChatTransmitterPacketListener implements PacketListener {
 
         GodPacketListener godListener = new GodPacketListener();
 
         PacketFilter sessionFilter = PacketExtensionUtils
-            .getSessionIDPacketFilter();
+            .getSessionIDPacketFilter(sessionID);
 
         public void processPacket(final Packet packet) {
             executeAsDispatch(new Runnable() {
@@ -163,73 +254,6 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     public final class GodPacketListener implements PacketListener {
 
-        private CancelInviteExtension cancelInvite = new CancelInviteExtension() {
-            @Override
-            public void invitationCanceledReceived(JID sender, String errorMsg) {
-                IInvitationProcess process = getInvitationProcess(sender);
-                if (process != null) {
-                    process.cancel(errorMsg, true);
-                } else {
-                    log
-                        .warn("Received Invitation Canceled message from unknown user ["
-                            + sender.getBase() + "]");
-                }
-            }
-        };
-
-        private RequestForFileListExtension requestForFileList = new RequestForFileListExtension() {
-
-            @Override
-            public void requestForFileListReceived(final JID sender) {
-
-                XMPPChatTransmitter.log.debug("[" + sender.getName()
-                    + "] Request for FileList");
-
-                Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList",
-                    log, new Runnable() {
-                        public void run() {
-                            IInvitationProcess process = getInvitationProcess(sender);
-                            if (process != null) {
-                                process.invitationAccepted(sender);
-                            } else {
-                                log
-                                    .warn("Received Invitation Acceptance from unknown user ["
-                                        + sender.getBase() + "]");
-                            }
-                        }
-                    });
-            }
-        };
-
-        private JoinExtension join = new JoinExtension() {
-
-            @Override
-            public void joinReceived(final JID sender, final int colorID) {
-
-                XMPPChatTransmitter.log.debug("[" + sender.getName()
-                    + "] Join: ColorID=" + colorID);
-
-                Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList",
-                    log, new Runnable() {
-                        public void run() {
-                            IInvitationProcess process = getInvitationProcess(sender);
-                            if (process != null) {
-                                process.joinReceived(sender);
-                                return;
-                            }
-
-                            ISharedProject project = sharedProject.getValue();
-
-                            if (project != null) {
-                                // a new user joined this session
-                                project.addUser(new User(project, sender,
-                                    colorID));
-                            }
-                        }
-                    });
-            }
-        };
-
         public void processPacket(Packet packet) {
 
             try {
@@ -244,11 +268,9 @@ public class XMPPChatTransmitter implements ITransmitter,
                     processActivitiesExtension(message, fromJID);
                 }
 
-                join.processPacket(packet);
+                joinExtension.processPacket(packet);
 
-                requestForFileList.processPacket(packet);
-
-                cancelInvite.processPacket(packet);
+                requestForFileListExtension.processPacket(packet);
 
             } catch (Exception e) {
                 XMPPChatTransmitter.log.error(
@@ -316,14 +338,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         XMPPChatTransmitter.log
             .debug("Send request to cancel Invititation to [" + user.getBase()
                 + "] with error msg: " + errorMsg);
-        sendMessage(user, CancelInviteExtension.getDefault().create(
-            sessionID.getValue(), errorMsg));
+        sendMessage(user, cancelInviteExtension.create(sessionID.getValue(),
+            errorMsg));
     }
 
     public void sendRequestForFileListMessage(JID toJID) {
         XMPPChatTransmitter.log.debug("Send request for FileList to " + toJID);
 
-        sendMessage(toJID, RequestForFileListExtension.getDefault().create());
+        sendMessage(toJID, requestForFileListExtension.create());
     }
 
     public void awaitJingleManager(JID peer) {
@@ -351,8 +373,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             int expectedSequenceNumber = entry.getValue();
             log.info("Requesting old activity (sequence number="
                 + expectedSequenceNumber + "," + andup + ") from " + recipient);
-            sendMessage(recipient, RequestActivityExtension.getDefault()
-                .create(expectedSequenceNumber, andup));
+            sendMessage(recipient, requestActivityExtension.create(
+                expectedSequenceNumber, andup));
         }
     }
 
@@ -360,8 +382,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         String description, int colorID) {
         XMPPChatTransmitter.log.debug("Send invitation to [" + guest.getBase()
             + "] with description: " + description);
-        sendMessage(guest, InviteExtension.getDefault().create(
-            sharedProject.getProject().getName(), description, colorID));
+        sendMessage(guest, inviteExtension.create(sharedProject.getProject()
+            .getName(), description, colorID));
     }
 
     public void sendJoinMessage(ISharedProject sharedProject) {
@@ -375,8 +397,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             Thread.currentThread().interrupt();
             return;
         }
-        sendMessageToAll(sharedProject, JoinExtension.getDefault().create(
-            sharedProject.getLocalUser().getColorID()));
+        sendMessageToAll(sharedProject, joinExtension.create(sharedProject
+            .getLocalUser().getColorID()));
     }
 
     /*
@@ -385,7 +407,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      * @see de.fu_berlin.inf.dpp.ITransmitter
      */
     public void sendLeaveMessage(ISharedProject sharedProject) {
-        sendMessageToAll(sharedProject, LeaveExtension.getDefault().create());
+        sendMessageToAll(sharedProject, leaveExtension.create());
     }
 
     public void sendTimedActivities(JID recipient,
@@ -461,7 +483,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendUserListTo(JID to, Collection<User> participants) {
         XMPPChatTransmitter.log.debug("Sending user list to " + to.toString());
 
-        sendMessage(to, UserListExtension.getDefault().create(participants));
+        sendMessage(to, userListExtension.create(participants));
     }
 
     public void sendFileChecksumErrorMessage(List<JID> recipients,
@@ -472,8 +494,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             + Util.toOSString(paths) + " to " + recipients);
 
         for (JID recipient : recipients) {
-            sendMessage(recipient, ChecksumErrorExtension.getDefault().create(
-                paths, resolved));
+            sendMessage(recipient, checksumErrorExtension.create(paths,
+                resolved));
         }
     }
 
@@ -490,7 +512,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         for (JID jid : recipients) {
             try {
-                sendMessageWithoutQueueing(jid, ChecksumExtension.getDefault()
+                sendMessageWithoutQueueing(jid, checksumExtension
                     .create(checksums));
             } catch (IOException e) {
                 // If checksums are failed to be sent, this is not a big problem

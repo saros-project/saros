@@ -2,9 +2,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -29,15 +27,15 @@ public class OpenInviteInterface extends Action {
         }
     };
 
-    @Inject
     protected SessionManager sessionManager;
 
-    public OpenInviteInterface() {
+    public OpenInviteInterface(SessionManager sessionManager) {
         super();
+        this.sessionManager = sessionManager;
+
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/invites.png"));
         setToolTipText("Open invitation interface");
 
-        Saros.getDefault().reinject(this);
         sessionManager.addSessionListener(sessionListener);
 
         // Needed when the Interface is created during a session

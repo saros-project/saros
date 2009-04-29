@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferCon
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
+import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
 import de.fu_berlin.inf.dpp.ui.actions.InviteAction;
@@ -117,10 +118,19 @@ public class RosterView extends ViewPart implements IConnectionListener,
     @Inject
     protected JingleFileTransferManagerObservable jingleManager;
 
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected SarosUI sarosUI;
+
+    @Inject
+    protected SessionManager sessionManager;
+
     public RosterView() {
 
         // Make sure that we get all dependencies injected
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
 
         jingleManager
             .addAndNotify(new ValueChangeListener<JingleFileTransferManager>() {
@@ -489,7 +499,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
         updateEnablement();
         composite.layout();
 
-        Saros saros = Saros.getDefault();
         saros.addListener(this);
 
         connectionStateChanged(saros.getConnection(), saros
@@ -504,7 +513,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
             disposable.dispose();
         }
 
-        Saros.getDefault().removeListener(this);
+        saros.removeListener(this);
     }
 
     /**
@@ -546,14 +555,14 @@ public class RosterView extends ViewPart implements IConnectionListener,
      * Needs to called from an UI thread.
      */
     private void updateEnablement() {
-        this.label.setEnabled(Saros.getDefault().isConnected());
+        this.label.setEnabled(saros.isConnected());
     }
 
     /**
      * @swt Needs to called from UI thread.
      */
     private void updateStatusInformation(final ConnectionState newState) {
-        label.setText(SarosUI.getDescription(newState));
+        label.setText(sarosUI.getDescription(newState));
         composite.layout();
     }
 
@@ -666,10 +675,10 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         IToolBarManager toolBarManager = bars.getToolBarManager();
         ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
-            bars.getStatusLineManager());
+            sarosUI, saros, bars.getStatusLineManager());
         disposables.add(connectAction);
         toolBarManager.add(connectAction);
-        toolBarManager.add(new NewContactAction());
+        toolBarManager.add(new NewContactAction(saros));
     }
 
     private void fillContextMenu(IMenuManager manager) {
@@ -687,8 +696,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
     private void makeActions() {
         // this.messagingAction = new MessagingAction(this.viewer);
         this.skypeAction = new SkypeAction(this.viewer);
-        this.inviteAction = new InviteAction(this.viewer);
-        this.renameContactAction = new RenameContactAction(this.viewer);
-        this.deleteContactAction = new DeleteContactAction(this.viewer);
+        this.inviteAction = new InviteAction(sessionManager, saros, this.viewer);
+        this.renameContactAction = new RenameContactAction(saros, this.viewer);
+        this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
     }
 }

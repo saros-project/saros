@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -54,26 +55,37 @@ public class JoinSessionWizard extends Wizard {
     private static final Logger log = Logger.getLogger(JoinSessionWizard.class
         .getName());
 
-    ShowDescriptionPage descriptionPage;
+    protected ShowDescriptionPage descriptionPage;
 
-    EnterProjectNamePage namePage;
+    protected EnterProjectNamePage namePage;
 
-    WizardDialogAccessable wizardDialog;
+    protected WizardDialogAccessable wizardDialog;
 
-    IIncomingInvitationProcess process;
+    protected IIncomingInvitationProcess process;
 
-    boolean requested = false;
+    protected boolean requested = false;
 
-    String updateProjectName;
+    protected String updateProjectName;
 
-    boolean updateSelected;
+    protected boolean updateSelected;
 
-    public JoinSessionWizard(IIncomingInvitationProcess process) {
+    protected DataTransferManager dataTransferManager;
+
+    protected PreferenceUtils preferenceUtils;
+
+    public JoinSessionWizard(IIncomingInvitationProcess process,
+        DataTransferManager dataTransferManager, PreferenceUtils preferenceUtils) {
         this.process = process;
+        this.dataTransferManager = dataTransferManager;
+        this.preferenceUtils = preferenceUtils;
 
         setWindowTitle("Session Invitation");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
+    }
+
+    public PreferenceUtils getPreferenceUtils() {
+        return preferenceUtils;
     }
 
     @Override
@@ -113,7 +125,7 @@ public class JoinSessionWizard extends Wizard {
             return false;
         }
 
-        if (PreferenceUtils.isAutoReuseExisting()
+        if (preferenceUtils.isAutoReuseExisting()
             && JoinSessionWizardUtils.existsProjects(process.getProjectName())) {
             updateSelected = true;
             updateProjectName = process.getProjectName();
@@ -189,7 +201,8 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public void addPages() {
         this.descriptionPage = new ShowDescriptionPage(this);
-        this.namePage = new EnterProjectNamePage(this);
+        this.namePage = new EnterProjectNamePage(this, dataTransferManager,
+            preferenceUtils);
 
         addPage(this.descriptionPage);
         addPage(this.namePage);

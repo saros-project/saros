@@ -4,9 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -33,7 +31,6 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         }
     };
 
-    @Inject
     protected SessionManager sessionManager;
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
@@ -50,13 +47,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         }
     };
 
-    public GiveExclusiveDriverRoleAction(ISelectionProvider provider,
-        String text) {
+    public GiveExclusiveDriverRoleAction(SessionManager sessionManager,
+        ISelectionProvider provider, String text) {
         super(provider, text);
+
+        this.sessionManager = sessionManager;
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the exclusive driver role to this user");
-
-        Saros.getDefault().reinject(this);
 
         sessionManager.addSessionListener(sessionListener);
 

@@ -44,8 +44,12 @@ public class RenameContactAction extends SelectionProviderAction {
 
     private RosterEntry rosterEntry;
 
-    public RenameContactAction(ISelectionProvider provider) {
+    protected Saros saros;
+
+    public RenameContactAction(Saros saros, ISelectionProvider provider) {
         super(provider, "Rename...");
+
+        this.saros = saros;
         selectionChanged((IStructuredSelection) provider.getSelection());
 
         setToolTipText("Set the nickname of this contact.");
@@ -104,7 +108,7 @@ public class RenameContactAction extends SelectionProviderAction {
         if (selected instanceof RosterEntry) {
             RosterEntry result = (RosterEntry) selected;
 
-            if (!result.getUser().equals(Saros.getDefault().getMyJID())) {
+            if (!result.getUser().equals(saros.getMyJID())) {
                 return result;
             }
         }

@@ -45,6 +45,13 @@ public class AddContactWizard extends Wizard {
 
     public static final boolean allowToEnterNick = false;
 
+    protected Saros saros;
+
+    public AddContactWizard(Saros saros) {
+        setWindowTitle("New Contact");
+        this.saros = saros;
+    }
+
     public static class AddContactPage extends WizardPage {
         protected Text idText;
 
@@ -155,10 +162,6 @@ public class AddContactWizard extends Wizard {
 
     private final AddContactPage page = new AddContactPage();
 
-    public AddContactWizard() {
-        setWindowTitle("New Contact");
-    }
-
     @Override
     public void addPages() {
         addPage(this.page);
@@ -168,11 +171,11 @@ public class AddContactWizard extends Wizard {
     public boolean performFinish() {
         try {
             if (allowToEnterNick && !(page.getNickname().length() == 0)) {
-                Saros.getDefault().addContact(this.page.getJID(),
-                    this.page.getNickname(), null);
+                saros.addContact(this.page.getJID(), this.page.getNickname(),
+                    null);
             } else {
-                Saros.getDefault().addContact(this.page.getJID(),
-                    this.page.getJID().toString(), null);
+                saros.addContact(this.page.getJID(), this.page.getJID()
+                    .toString(), null);
             }
             return true;
 

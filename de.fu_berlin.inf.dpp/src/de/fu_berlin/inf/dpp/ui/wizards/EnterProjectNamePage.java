@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 
 import de.fu_berlin.inf.dpp.PreferenceUtils;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
@@ -54,11 +53,18 @@ class EnterProjectNamePage extends WizardPage {
     /* project for update or base project for copy into new project */
     protected IProject similarProject;
 
-    protected EnterProjectNamePage(JoinSessionWizard joinSessionWizard) {
+    protected DataTransferManager dataTransferManager;
+
+    protected PreferenceUtils preferenceUtils;
+
+    protected EnterProjectNamePage(JoinSessionWizard joinSessionWizard,
+        DataTransferManager dataTransferManager, PreferenceUtils preferenceUtils) {
         super("namePage");
         this.joinSessionWizard = joinSessionWizard;
-        setPageComplete(false);
+        this.dataTransferManager = dataTransferManager;
+        this.preferenceUtils = preferenceUtils;
 
+        setPageComplete(false);
         setTitle("Select local project.");
     }
 
@@ -92,11 +98,8 @@ class EnterProjectNamePage extends WizardPage {
      */
     protected void updateConnectionStatus() {
 
-        DataTransferManager manager = Saros.getDefault().getContainer()
-            .getComponent(DataTransferManager.class);
-
-        switch (manager.getIncomingTransferMode(joinSessionWizard.process
-            .getPeer())) {
+        switch (dataTransferManager
+            .getIncomingTransferMode(joinSessionWizard.process.getPeer())) {
         case JINGLETCP:
         case JINGLEUDP:
             setDescription("P2P Connection with Jingle available.\nThis means that sharing a project from scratch will be fast.");
@@ -292,7 +295,7 @@ class EnterProjectNamePage extends WizardPage {
         updateConnectionStatus();
         updateEnabled();
 
-        if (PreferenceUtils.isAutoAcceptInvitation()) {
+        if (preferenceUtils.isAutoAcceptInvitation()) {
             joinSessionWizard.pressWizardButton(IDialogConstants.FINISH_ID);
         }
     }

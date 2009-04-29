@@ -7,13 +7,14 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class CancelInviteExtension extends SarosDefaultPacketExtension {
+public class CancelInviteExtension extends SessionDefaultPacketExtension {
 
     public static final String ERROR = "CI_ERROR";
 
-    public CancelInviteExtension() {
-        super("cancelInvite");
+    public CancelInviteExtension(SessionIDObservable sessionID) {
+        super(sessionID, "cancelInvite");
     }
 
     public DefaultPacketExtension create(String sessionID, String error) {
@@ -27,16 +28,6 @@ public abstract class CancelInviteExtension extends SarosDefaultPacketExtension 
         return extension;
     }
 
-    /**
-     * Returns a version of CancelInviteExtension that does nothing
-     * 
-     * @return
-     */
-    public static CancelInviteExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            CancelInviteExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
 
@@ -47,6 +38,9 @@ public abstract class CancelInviteExtension extends SarosDefaultPacketExtension 
         invitationCanceledReceived(sender, errorMsg);
     }
 
-    public abstract void invitationCanceledReceived(JID sender,
-        String errorMessage);
+    public void invitationCanceledReceived(JID sender, String errorMessage) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
+
 }

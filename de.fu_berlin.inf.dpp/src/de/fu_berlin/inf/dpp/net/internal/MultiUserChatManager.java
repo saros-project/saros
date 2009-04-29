@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.PacketProtokollLogger;
 
 public class MultiUserChatManager {
 
@@ -137,7 +136,6 @@ public class MultiUserChatManager {
 
             // newMessage.setBody("test");
             this.muc.sendMessage(newMessage);
-            PacketProtokollLogger.getInstance().sendPacket(newMessage);
 
         } catch (XMPPException e) {
             log.error("Could not send message, message queued", e);

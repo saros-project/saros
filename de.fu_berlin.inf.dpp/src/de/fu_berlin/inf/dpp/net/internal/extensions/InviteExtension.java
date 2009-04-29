@@ -8,11 +8,12 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class InviteExtension extends SessionDefaultPacketExtension {
+public class InviteExtension extends SessionDefaultPacketExtension {
 
-    public InviteExtension() {
-        super("invite");
+    public InviteExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "invite");
     }
 
     /**
@@ -35,26 +36,20 @@ public abstract class InviteExtension extends SessionDefaultPacketExtension {
          */
         extension.setValue(PacketExtensionUtils.PROJECTNAME, projectName);
         extension.setValue(PacketExtensionUtils.DESCRIPTION, description);
-        extension.setValue(PacketExtensionUtils.COLOR_ID, String.valueOf(colorID));
+        extension.setValue(PacketExtensionUtils.COLOR_ID, String
+            .valueOf(colorID));
 
         return extension;
-    }
-
-    /**
-     * @return Returns a default implementation of this extension that does
-     *         nothing in invitationReceived(...)
-     */
-    public static InviteExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            InviteExtension.class);
     }
 
     @Override
     public void processMessage(JID sender, Message message) {
         DefaultPacketExtension inviteExtension = getExtension(message);
 
-        String desc = inviteExtension.getValue(PacketExtensionUtils.DESCRIPTION);
-        String pName = inviteExtension.getValue(PacketExtensionUtils.PROJECTNAME);
+        String desc = inviteExtension
+            .getValue(PacketExtensionUtils.DESCRIPTION);
+        String pName = inviteExtension
+            .getValue(PacketExtensionUtils.PROJECTNAME);
         String sessionID = inviteExtension
             .getValue(PacketExtensionUtils.SESSION_ID);
         int colorID = Integer.parseInt(inviteExtension
@@ -63,6 +58,10 @@ public abstract class InviteExtension extends SessionDefaultPacketExtension {
         invitationReceived(sender, sessionID, pName, desc, colorID);
     }
 
-    public abstract void invitationReceived(JID sender, String sessionID,
-        String projectName, String description, int colorID);
+    public void invitationReceived(JID sender, String sessionID,
+        String projectName, String description, int colorID) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
+
 }

@@ -2,19 +2,24 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import org.eclipse.jface.wizard.Wizard;
 
+import de.fu_berlin.inf.dpp.Saros;
+
 public class PropertyConfigurationWizard extends Wizard {
 
-    public PropertyConfigurationWizard() {
+    protected final Saros saros;
+
+    public PropertyConfigurationWizard(Saros saros) {
         setWindowTitle("Saros Configuration");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
+        this.saros = saros;
     }
 
     private NetworkSettingsPage firewallPage;
 
     @Override
     public void addPages() {
-        this.firewallPage = new NetworkSettingsPage();
+        this.firewallPage = new NetworkSettingsPage(saros);
         addPage(this.firewallPage);
     }
 

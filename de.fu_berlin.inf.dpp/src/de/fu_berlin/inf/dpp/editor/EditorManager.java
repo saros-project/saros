@@ -51,6 +51,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
@@ -76,6 +77,8 @@ import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
+import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -161,11 +164,10 @@ public class EditorManager implements IActivityProvider {
             editorAPI.addSharedEditorListener(EditorManager.this, editorPart);
             editorAPI.setEditable(editorPart, isDriver);
 
-            IDocumentProvider documentProvider = EditorUtils
-                .getDocumentProvider(input);
+            IDocumentProvider documentProvider = getDocumentProvider(input);
             documentProvider.addElementStateListener(dirtyStateListener);
 
-            IDocument document = EditorUtils.getDocument(editorPart);
+            IDocument document = getDocument(editorPart);
 
             document.addDocumentListener(documentListener);
 
@@ -211,8 +213,7 @@ public class EditorManager implements IActivityProvider {
             editorAPI
                 .removeSharedEditorListener(EditorManager.this, editorPart);
 
-            IDocumentProvider documentProvider = EditorUtils
-                .getDocumentProvider(input);
+            IDocumentProvider documentProvider = getDocumentProvider(input);
             documentProvider.removeElementStateListener(dirtyStateListener);
 
             resetText(file);
@@ -362,7 +363,7 @@ public class EditorManager implements IActivityProvider {
             }
 
             if (userToFollow != null) {
-                if (Saros.getDefault().getPreferenceStore().getBoolean(
+                if (saros.getPreferenceStore().getBoolean(
                     PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
                     if (userToFollow.isObserver() && user.isDriver()
                         && user.isRemote()) {
@@ -505,13 +506,22 @@ public class EditorManager implements IActivityProvider {
         }
     };
 
+    @Inject
+    protected IsInconsistentObservable isInconsistent;
+
+    @Inject
+    protected JDTFacade jdtFacade;
+
+    @Inject
+    protected CDTFacade cdtFacade;
+
     protected Saros saros;
 
     public EditorManager(Saros saros, SessionManager sessionManager) {
 
         this.saros = saros;
 
-        setEditorAPI(new EditorAPI());
+        setEditorAPI(new EditorAPI(saros));
         sessionManager.addSessionListener(this.sessionListener);
     }
 
@@ -525,8 +535,7 @@ public class EditorManager implements IActivityProvider {
 
         if (!isConnected(file)) {
             FileEditorInput input = new FileEditorInput(file);
-            IDocumentProvider documentProvider = EditorUtils
-                .getDocumentProvider(input);
+            IDocumentProvider documentProvider = getDocumentProvider(input);
             try {
                 documentProvider.connect(input);
             } catch (CoreException e) {
@@ -601,7 +610,7 @@ public class EditorManager implements IActivityProvider {
         Set<IEditorPart> editors = getEditors(path);
 
         if (!editors.isEmpty()) {
-            result = EditorUtils.getDocument(editors.iterator().next());
+            result = getDocument(editors.iterator().next());
         }
 
         // if result == null there is no editor with this resource open
@@ -642,7 +651,7 @@ public class EditorManager implements IActivityProvider {
                 this.locallyActiveEditor);
         }
 
-        fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
             .toString(), Type.Activated, path));
     }
 
@@ -662,7 +671,7 @@ public class EditorManager implements IActivityProvider {
         if (path.equals(locallyActiveEditor))
             this.localViewport = viewport;
 
-        fireActivity(new ViewportActivity(Saros.getDefault().getMyJID()
+        fireActivity(new ViewportActivity(sharedProject.getLocalUser().getJID()
             .toString(), viewport, path));
     }
 
@@ -683,9 +692,6 @@ public class EditorManager implements IActivityProvider {
         fireActivity(new TextSelectionActivity(sharedProject.getLocalUser()
             .getJID().toString(), offset, length, path));
     }
-
-    @Inject
-    protected IsInconsistentObservable isInconsistent;
 
     /**
      * This method is called from Eclipse (via the StoppableDocumentListener)
@@ -731,7 +737,7 @@ public class EditorManager implements IActivityProvider {
 
         // search editor which changed
         for (IEditorPart editor : editorPool.getAllEditors()) {
-            if (ObjectUtils.equals(EditorUtils.getDocument(editor), document)) {
+            if (ObjectUtils.equals(getDocument(editor), document)) {
                 changedEditor = editor;
                 break;
             }
@@ -757,8 +763,9 @@ public class EditorManager implements IActivityProvider {
             replacedText = sb.toString();
         }
 
-        TextEditActivity activity = new TextEditActivity(Saros.getDefault()
-            .getMyJID().toString(), offset, text, replacedText, path);
+        TextEditActivity activity = new TextEditActivity(sharedProject
+            .getLocalUser().getJID().toString(), offset, text, replacedText,
+            path);
 
         EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
@@ -769,7 +776,7 @@ public class EditorManager implements IActivityProvider {
          */
         {
             IEditorInput input = changedEditor.getEditorInput();
-            IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+            IDocumentProvider provider = getDocumentProvider(input);
             IAnnotationModel model = provider.getAnnotationModel(input);
             contributionAnnotationManager.splitAnnotation(model, offset);
         }
@@ -1017,8 +1024,8 @@ public class EditorManager implements IActivityProvider {
                 log.warn("Editor was managed but path could not be found: "
                     + editor);
             } else {
-                fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
-                    .toString(), Type.Closed, path));
+                fireActivity(new EditorActivity(sharedProject.getLocalUser()
+                    .getJID().toString(), Type.Closed, path));
             }
 
             partActivated(editor);
@@ -1057,7 +1064,7 @@ public class EditorManager implements IActivityProvider {
             listener.editorRemoved(sharedProject.getLocalUser(), path);
         }
 
-        fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
             .toString(), Type.Closed, path));
 
         if (newActiveEditor)
@@ -1143,7 +1150,7 @@ public class EditorManager implements IActivityProvider {
         String text, User source) {
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+        IDocumentProvider provider = getDocumentProvider(input);
 
         connect(file);
 
@@ -1201,7 +1208,7 @@ public class EditorManager implements IActivityProvider {
 
         if (isConnected(file)) {
             FileEditorInput input = new FileEditorInput(file);
-            IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+            IDocumentProvider provider = getDocumentProvider(input);
 
             provider.disconnect(input);
             this.connectedFiles.remove(file);
@@ -1255,7 +1262,7 @@ public class EditorManager implements IActivityProvider {
 
         FileEditorInput input = new FileEditorInput(file);
 
-        return EditorUtils.getDocumentProvider(input).canSaveDocument(input);
+        return getDocumentProvider(input).canSaveDocument(input);
     }
 
     /**
@@ -1294,7 +1301,7 @@ public class EditorManager implements IActivityProvider {
 
         FileEditorInput input = new FileEditorInput(file);
 
-        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+        IDocumentProvider provider = getDocumentProvider(input);
 
         if (isConnected(file)) {
             if (provider.canSaveDocument(input)) {
@@ -1380,7 +1387,7 @@ public class EditorManager implements IActivityProvider {
         // TODO technically we can should mark the file as saved in the
         // editorPool, or?
 
-        fireActivity(new EditorActivity(Saros.getDefault().getMyJID()
+        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
             .toString(), Type.Saved, path));
     }
 
@@ -1414,7 +1421,7 @@ public class EditorManager implements IActivityProvider {
     protected void removeAllAnnotations(IEditorPart editor,
         Predicate<SarosAnnotation> predicate) {
         IEditorInput input = editor.getEditorInput();
-        IDocumentProvider provider = EditorUtils.getDocumentProvider(input);
+        IDocumentProvider provider = getDocumentProvider(input);
         IAnnotationModel model = provider.getAnnotationModel(input);
 
         if (model == null) {
@@ -1637,6 +1644,47 @@ public class EditorManager implements IActivityProvider {
         Set<IPath> result = remoteEditorManager.getRemoteOpenEditors();
         result.addAll(locallyOpenEditors);
         return result;
+    }
+
+    /**
+     * TODO Review and document the purpose of this
+     */
+    public IDocumentProvider getDocumentProvider(IEditorInput input) {
+
+        Object adapter = input.getAdapter(IFile.class);
+        if (adapter != null) {
+            IFile file = (IFile) adapter;
+
+            String fileExtension = file.getFileExtension();
+
+            if (fileExtension != null) {
+                if (fileExtension.equals("java")) {
+
+                    if (jdtFacade.isJDTAvailable()) {
+                        return jdtFacade.getDocumentProvider();
+                    }
+
+                } else if (fileExtension.equals("c")
+                    || fileExtension.equals("h") || fileExtension.equals("cpp")
+                    || fileExtension.equals("cxx")
+                    || fileExtension.equals("hxx")) {
+
+                    if (cdtFacade.isCDTAvailable()) {
+                        return cdtFacade.getDocumentProvider();
+                    }
+                }
+            }
+        }
+
+        DocumentProviderRegistry registry = DocumentProviderRegistry
+            .getDefault();
+        return registry.getDocumentProvider(input);
+    }
+
+    public IDocument getDocument(IEditorPart editorPart) {
+        IEditorInput input = editorPart.getEditorInput();
+
+        return getDocumentProvider(input).getDocument(input);
     }
 
 }

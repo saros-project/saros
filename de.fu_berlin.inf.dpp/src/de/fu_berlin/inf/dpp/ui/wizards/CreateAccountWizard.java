@@ -39,9 +39,11 @@ import de.fu_berlin.inf.dpp.Saros;
  */
 public class CreateAccountWizard extends Wizard {
 
-    private final RegisterAccountPage page;
+    protected final RegisterAccountPage page;
 
-    public CreateAccountWizard(boolean createAccount,
+    protected final Saros saros;
+
+    public CreateAccountWizard(Saros saros, boolean createAccount,
         boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
 
         if (createAccount) {
@@ -49,9 +51,10 @@ public class CreateAccountWizard extends Wizard {
         } else {
             setWindowTitle("Enter User Account");
         }
-        this.page = new RegisterAccountPage(createAccount,
+        this.page = new RegisterAccountPage(saros, createAccount,
             showStoreInPrefsButton, storeInPrefsDefault);
         setNeedsProgressMonitor(true);
+        this.saros = saros;
     }
 
     public String getServer() {
@@ -88,7 +91,7 @@ public class CreateAccountWizard extends Wizard {
                     "de.fu_berlin.inf.dpp.ui.RosterView", null,
                     IWorkbenchPage.VIEW_ACTIVATE);
             } catch (PartInitException e) {
-                Saros.getDefault().getLog().log(
+                saros.getLog().log(
                     new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
                         "Could not activate Roster View", e));
             }

@@ -33,11 +33,14 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -61,6 +64,15 @@ public class SarosUI {
     private static final String SESSION_VIEW = "de.fu_berlin.inf.dpp.ui.SessionView";
 
     private static final String ROSTER_VIEW = "de.fu_berlin.inf.dpp.ui.RosterView";
+
+    @Inject
+    protected DataTransferManager dataTransferManager;
+
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
+    @Inject
+    protected Saros saros;
 
     public SarosUI(SessionManager sessionManager, JDTFacade jdtFacade,
         CDTFacade cdtFacade) {
@@ -101,7 +113,8 @@ public class SarosUI {
 
     protected void showIncomingInvitationUI(IIncomingInvitationProcess process) {
 
-        JoinSessionWizard sessionWizard = new JoinSessionWizard(process);
+        JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
+            dataTransferManager, preferenceUtils);
         WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), sessionWizard);
 
@@ -184,19 +197,18 @@ public class SarosUI {
      * @return a nice string description of the given state, which can be used
      *         to be shown in labels (e.g. CONNECTING becomes "Connecting...").
      */
-    public static String getDescription(ConnectionState state) {
+    public String getDescription(ConnectionState state) {
         switch (state) {
         case NOT_CONNECTED:
             return "Not connected";
         case CONNECTING:
             return "Connecting...";
         case CONNECTED:
-            return "Connected (as "
-                + Saros.getDefault().getConnection().getUser() + ")";
+            return "Connected (as " + saros.getConnection().getUser() + ")";
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:
-            return "Error (" + Saros.getDefault().getConnectionError() + ")";
+            return "Error (" + saros.getConnectionError() + ")";
         }
 
         return "";

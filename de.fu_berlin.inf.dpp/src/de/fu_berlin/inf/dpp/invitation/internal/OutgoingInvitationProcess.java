@@ -58,8 +58,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     protected final static Logger log = Logger
         .getLogger(OutgoingInvitationProcess.class);
 
-    protected final ISharedProject sharedProject;
+    /* Dependencies */
+    protected Saros saros;
 
+    protected DataTransferManager dataTransferManager;
+
+    protected ISharedProject sharedProject;
+
+    /* Fields */
     protected int progress_done;
     protected int progress_max;
     protected String progress_info = "";
@@ -77,6 +83,28 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     /** size of current transfered part of archive file. */
     protected long transferedFileSize = 0;
+
+    public OutgoingInvitationProcess(Saros saros, ITransmitter transmitter,
+        DataTransferManager dataTransferManager, JID to,
+        ISharedProject sharedProject, String description, boolean startNow,
+        IInvitationUI inviteUI, int colorID, FileList localFileList) {
+
+        super(transmitter, to, description, colorID);
+
+        this.localFileList = localFileList;
+        this.invitationUI = inviteUI;
+        this.saros = saros;
+        this.sharedProject = sharedProject;
+        this.dataTransferManager = dataTransferManager;
+
+        if (startNow) {
+            transmitter.sendInviteMessage(sharedProject, to, description,
+                colorID);
+            setState(State.INVITATION_SENT);
+        } else {
+            setState(State.INITIALIZED);
+        }
+    }
 
     public int getProgressCurrent() {
         // TODO SS Jingle File Transfer progress information
@@ -99,25 +127,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         return this.progress_info;
     }
 
-    public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
-        ISharedProject sharedProject, String description, boolean startNow,
-        IInvitationUI inviteUI, int colorID, FileList localFileList) {
-
-        super(transmitter, to, description, colorID);
-
-        this.localFileList = localFileList;
-        this.invitationUI = inviteUI;
-        this.sharedProject = sharedProject;
-
-        if (startNow) {
-            transmitter.sendInviteMessage(sharedProject, to, description,
-                colorID);
-            setState(State.INVITATION_SENT);
-        } else {
-            setState(State.INITIALIZED);
-        }
-    }
-
     public void startSynchronization() {
         assertState(State.GUEST_FILELIST_SENT);
 
@@ -135,10 +144,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.progress_max = this.toSend.size();
         this.progress_done = 0;
 
-        DataTransferManager manager = Saros.getDefault().getContainer()
-            .getComponent(DataTransferManager.class);
-
-        JingleFileTransferManager jingleManager = manager.getJingleManager();
+        JingleFileTransferManager jingleManager = dataTransferManager
+            .getJingleManager();
 
         // If fast p2p connection send individual files, otherwise archive
         if (jingleManager != null

@@ -55,7 +55,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the driver role to this user");
 
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
         sessionManager.addSessionListener(sessionListener);
         updateEnablement();
     }

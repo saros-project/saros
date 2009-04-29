@@ -4,9 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -46,15 +44,16 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         }
     };
 
-    @Inject
     protected SessionManager sessionManager;
 
-    public RemoveDriverRoleAction(ISelectionProvider provider) {
+    public RemoveDriverRoleAction(SessionManager sessionManager,
+        ISelectionProvider provider) {
         super(provider, "Remove driver role");
+        this.sessionManager = sessionManager;
+
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user.png"));
         setToolTipText("Remove the driver role from this user.");
 
-        Saros.getDefault().reinject(this);
         sessionManager.addSessionListener(sessionListener);
         updateEnablement();
     }

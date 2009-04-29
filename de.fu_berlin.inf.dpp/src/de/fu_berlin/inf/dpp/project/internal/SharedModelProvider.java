@@ -87,7 +87,7 @@ public class SharedModelProvider extends ModelProvider {
     @Override
     protected void initialize() {
 
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override

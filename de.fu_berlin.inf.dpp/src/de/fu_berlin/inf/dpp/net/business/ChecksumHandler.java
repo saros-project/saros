@@ -1,44 +1,56 @@
+/**
+ * 
+ */
 package de.fu_berlin.inf.dpp.net.business;
 
-import org.apache.log4j.Logger;
+import java.util.List;
+
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 
 /**
- * Business logic for handling Leave Message
+ * This class is responsible for processing a Checksum sent to us.
  * 
  * @component The single instance of this class per application is created by
  *            PicoContainer in the central plug-in class {@link Saros}
  */
-public class LeaveHandler {
+public class ChecksumHandler {
 
-    private static final Logger log = Logger.getLogger(LeaveHandler.class
-        .getName());
+    /* Dependencies */
+    @Inject
+    protected ConsistencyWatchdogClient watchdogClient;
+
+    @Inject
+    protected SharedProjectObservable project;
 
     protected SessionManager sessionManager;
 
+    /* Fields */
     protected Handler handler;
 
-    public LeaveHandler(SessionManager sessionManager,
+    public ChecksumHandler(SessionManager sessionManager,
         XMPPChatReceiver receiver, SessionIDObservable sessionIDObservable) {
 
         this.sessionManager = sessionManager;
         this.handler = new Handler(sessionIDObservable);
+
         receiver.addPacketListener(handler, handler.getFilter());
     }
 
-    protected class Handler extends LeaveExtension {
+    protected class Handler extends ChecksumExtension {
 
         public Handler(SessionIDObservable sessionID) {
             super(sessionID);
@@ -51,27 +63,15 @@ public class LeaveHandler {
         }
 
         @Override
-        public void leaveReceived(JID fromJID) {
+        public void checksumsReceived(JID sender,
+            List<DocumentChecksum> checksums) {
+            ISharedProject currentProject = project.getValue();
 
-            ISharedProject project = sessionManager.getSharedProject();
+            assert currentProject != null;
 
-            User user = project.getParticipant(fromJID);
-
-            if (user == null) {
-                log.warn("Received leave Message from user which"
-                    + " is not part of our shared project session: " + fromJID);
-                return;
-            }
-
-            if (user.isHost()) {
-                sessionManager.stopSharedProject();
-
-                WarningMessageDialog.showWarningMessage("Closing the Session",
-                    "Closing the session because the host left.");
-            } else {
-                // Client
-                project.removeUser(user);
-            }
+            watchdogClient.setChecksums(checksums);
+            watchdogClient.checkConsistency();
         }
     }
+
 }

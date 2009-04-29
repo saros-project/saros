@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.picocontainer.Disposable;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
@@ -584,7 +583,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         setSenderOnTextEditActivities(activities);
 
         // Send the activities to each user.
-        JID myJID = Saros.getDefault().getMyJID();
+        JID myJID = sharedProject.getLocalUser().getJID();
         for (JID recipientJID : recipients) {
 
             if (recipientJID.equals(myJID)) {
@@ -616,7 +615,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * Sets sender on {@link TextEditActivity}s.
      */
     private void setSenderOnTextEditActivities(List<IActivity> activities) {
-        String sender = Saros.getDefault().getMyJID().toString();
+        String sender = sharedProject.getLocalUser().getJID().toString();
         for (IActivity activity : activities) {
             if (activity instanceof TextEditActivity) {
                 TextEditActivity textEditActivity = (TextEditActivity) activity;

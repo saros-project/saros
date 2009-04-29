@@ -23,6 +23,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.wizard.Wizard;
+import org.picocontainer.annotations.Inject;
+
+import de.fu_berlin.inf.dpp.Saros;
 
 /**
  * A wizard to configure Saros.
@@ -30,16 +33,20 @@ import org.eclipse.jface.wizard.Wizard;
  */
 public class ConfigurationWizard extends Wizard {
 
+    @Inject
+    Saros saros;
+
     public ConfigurationWizard() {
         setWindowTitle("Saros Configuration");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
 
-        this.wizards.add(new RegisterAccountPage(false, false, true));
-        this.wizards.add(new NetworkSettingsPage());
+        Saros.reinject(this);
+        this.wizards.add(new RegisterAccountPage(saros, false, false, true));
+        this.wizards.add(new NetworkSettingsPage(saros));
     }
 
-    List<IWizardPage2> wizards = new LinkedList<IWizardPage2>();
+    protected List<IWizardPage2> wizards = new LinkedList<IWizardPage2>();
 
     @Override
     public void addPages() {
@@ -65,5 +72,4 @@ public class ConfigurationWizard extends Wizard {
     public boolean performCancel() {
         return true;
     }
-
 }

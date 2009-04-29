@@ -13,9 +13,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class ChecksumErrorExtension extends
-    SessionDefaultPacketExtension {
+public class ChecksumErrorExtension extends SessionDefaultPacketExtension {
 
     public static final String FILE_PATH = "CE_FILE_PATH";
 
@@ -23,8 +23,8 @@ public abstract class ChecksumErrorExtension extends
 
     public static final String RESOLVED = "CE_RESOLVED";
 
-    public ChecksumErrorExtension() {
-        super("FileChecksumError");
+    public ChecksumErrorExtension(SessionIDObservable sessionID) {
+        super(sessionID, "FileChecksumError");
     }
 
     public PacketExtension create(Set<IPath> paths, boolean resolved) {
@@ -41,11 +41,6 @@ public abstract class ChecksumErrorExtension extends
         extension.setValue(RESOLVED, String.valueOf(resolved));
 
         return extension;
-    }
-
-    public static ChecksumErrorExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            ChecksumErrorExtension.class);
     }
 
     @Override
@@ -69,6 +64,10 @@ public abstract class ChecksumErrorExtension extends
         checksumErrorReceived(sender, paths, resolved);
     }
 
-    public abstract void checksumErrorReceived(JID sender, Set<IPath> paths,
-        boolean resolved);
+    public void checksumErrorReceived(JID sender, Set<IPath> paths,
+        boolean resolved) {
+        throw new UnsupportedOperationException(
+            "This implementation of the ChecksumErrorExtension should only be used to construct Extensions to be sent.");
+    }
+
 }

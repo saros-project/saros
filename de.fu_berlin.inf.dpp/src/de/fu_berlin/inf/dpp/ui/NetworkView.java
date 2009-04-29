@@ -12,6 +12,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
@@ -29,6 +30,13 @@ public class NetworkView extends ViewPart implements IConnectionListener {
 
     private Text loggingView;
 
+    @Inject
+    protected Saros saros;
+
+    public NetworkView() {
+        Saros.reinject(this);
+    }
+
     @Override
     public void createPartControl(Composite parent) {
         Composite rootComposite = new Composite(parent, SWT.NONE);
@@ -37,7 +45,7 @@ public class NetworkView extends ViewPart implements IConnectionListener {
         this.loggingView = new Text(sash, SWT.MULTI | SWT.BORDER | SWT.V_SCROLL);
 
         // register as connection listener
-        Saros.getDefault().addListener(this);
+        saros.addListener(this);
     }
 
     @Override

@@ -197,7 +197,7 @@ public class MessagingManager implements PacketListener, MessageListener,
                 this.chat.sendMessage(msg);
 
                 // for Testing
-                addChatLine(Saros.getDefault().getMyJID().getName(), text);
+                addChatLine(saros.getMyJID().getName(), text);
 
             } catch (XMPPException e1) {
                 e1.printStackTrace();
@@ -237,8 +237,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
         public MultiChatSession(MultiUserChat muc) {
             this.muc = muc;
-            this.name = "Multi User Chat ("
-                + Saros.getDefault().getMyJID().getName() + ")";
+            this.name = "Multi User Chat (" + saros.getMyJID().getName() + ")";
             muc.addMessageListener(this);
         }
 
@@ -330,8 +329,11 @@ public class MessagingManager implements PacketListener, MessageListener,
 
     private MultiChatSession session;
 
+    protected Saros saros;
+
     public MessagingManager(Saros saros) {
         saros.addListener(this);
+        this.saros = saros;
     }
 
     /*
@@ -432,8 +434,7 @@ public class MessagingManager implements PacketListener, MessageListener,
      */
     public void initMultiChatListener() {
         // listens for MUC invitations
-        MultiUserChat.addInvitationListener(Saros.getDefault().getConnection(),
-            this);
+        MultiUserChat.addInvitationListener(saros.getConnection(), this);
     }
 
     public MultiChatSession getSession() {
@@ -441,15 +442,14 @@ public class MessagingManager implements PacketListener, MessageListener,
     }
 
     public void connectMultiUserChat() throws XMPPException {
-        if (!Saros.getDefault().isConnected()) {
+        if (!saros.isConnected()) {
             throw new XMPPException("No connection ");
         }
-        String user = Saros.getDefault().getConnection().getUser();
+        String user = saros.getConnection().getUser();
         if (this.session == null) {
             MultiUserChat muc = this.multitrans.getMUC();
             if (muc == null) {
-                this.multitrans.initMUC(Saros.getDefault().getConnection(),
-                    user);
+                this.multitrans.initMUC(saros.getConnection(), user);
                 muc = this.multitrans.getMUC();
             }
             MessagingManager.log.debug("Creating MUC session..");

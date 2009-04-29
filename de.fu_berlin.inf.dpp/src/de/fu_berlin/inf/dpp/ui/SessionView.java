@@ -188,7 +188,7 @@ public class SessionView extends ViewPart {
 
             User participant = (User) obj;
 
-            return Util.getName(participant)
+            return Util.getName(saros, participant)
                 + (participant.isDriver() ? " (Driver)" : "");
         }
 
@@ -295,7 +295,7 @@ public class SessionView extends ViewPart {
 
     public SessionView() {
 
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
 
         /**
          * Register with the Editors preference store, for getting notified when
@@ -384,17 +384,22 @@ public class SessionView extends ViewPart {
         this.viewer.setInput(null);
 
         this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
-            this.viewer, "Give exclusive driver role");
-        this.followModeAction = new FollowModeAction();
+            sessionManager, this.viewer, "Give exclusive driver role");
+        this.followModeAction = new FollowModeAction(saros, sessionManager,
+            editorManager);
         this.disposables.add(followModeAction);
-        this.leaveSessionAction = new LeaveSessionAction();
+        this.leaveSessionAction = new LeaveSessionAction(sessionManager);
         this.consistencyAction = new ConsistencyAction();
-        this.openInvitationInterfaceAction = new OpenInviteInterface();
-        this.removeAllDriverRoleAction = new RemoveAllDriverRoleAction();
+        this.openInvitationInterfaceAction = new OpenInviteInterface(
+            sessionManager);
+        this.removeAllDriverRoleAction = new RemoveAllDriverRoleAction(
+            sessionManager);
         this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
             "Give driver role");
-        this.jumpToAction = new JumpToDriverPositionAction(this.viewer);
-        this.removeDriverRoleAction = new RemoveDriverRoleAction(this.viewer);
+        this.jumpToAction = new JumpToDriverPositionAction(saros,
+            sessionManager, editorManager, this.viewer);
+        this.removeDriverRoleAction = new RemoveDriverRoleAction(
+            sessionManager, this.viewer);
 
         contributeToActionBars();
         hookContextMenu();

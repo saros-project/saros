@@ -28,7 +28,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
 import org.jivesoftware.smack.RosterEntry;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -62,17 +61,20 @@ public class InviteAction extends SelectionProviderAction {
         }
     };
 
-    @Inject
     protected SessionManager sessionManager;
 
-    public InviteAction(ISelectionProvider provider) {
+    protected Saros saros;
+
+    public InviteAction(SessionManager sessionManager, Saros saros,
+        ISelectionProvider provider) {
         super(provider, "Invite user to shared project..");
         setToolTipText("Invite user to shared project..");
 
         setImageDescriptor(SarosUI
             .getImageDescriptor("icons/transmit_blue.png"));
 
-        Saros.getDefault().reinject(this);
+        this.sessionManager = sessionManager;
+        this.saros = saros;
         sessionManager.addSessionListener(sessionListener);
 
         updateEnablement();
@@ -134,8 +136,7 @@ public class InviteAction extends SelectionProviderAction {
 
             // Participant needs to be...
             // ...available
-            if (!Saros.getDefault().getRoster().getPresence(jid.toString())
-                .isAvailable())
+            if (!saros.getRoster().getPresence(jid.toString()).isAvailable())
                 return false;
 
             // ...not in a session already

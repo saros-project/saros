@@ -13,6 +13,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 
 /**
@@ -39,9 +40,9 @@ public class ViewportAnnotation extends SarosAnnotation implements
 
     private Color fillColor;
 
-    public ViewportAnnotation(User source) {
-        super(ViewportAnnotation.TYPE, false, createLabel("Visible scope of",
-            source), source);
+    public ViewportAnnotation(Saros saros, User source) {
+        super(ViewportAnnotation.TYPE, false, createLabel(saros,
+            "Visible scope of", source), source);
 
         String annotationType = ViewportAnnotation.TYPE + "."
             + (source.getColorID() + 1);

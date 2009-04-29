@@ -25,8 +25,11 @@ import de.fu_berlin.inf.dpp.Saros;
  */
 public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
 
-    protected NetworkSettingsPage() {
+    protected final Saros saros;
+
+    protected NetworkSettingsPage(Saros saros) {
         super("networksettings");
+        this.saros = saros;
     }
 
     private Text portText, skypeText;
@@ -77,7 +80,7 @@ public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
             false));
 
         // Set initial values
-        IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+        IPreferenceStore preferences = saros.getPreferenceStore();
         this.portText.setText(String.valueOf(preferences
             .getInt(PreferenceConstants.FILE_TRANSFER_PORT)));
         this.autoText.setSelection(preferences
@@ -119,7 +122,7 @@ public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
     }
 
     public boolean performFinish() {
-        IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+        IPreferenceStore preferences = saros.getPreferenceStore();
         preferences.setValue(PreferenceConstants.FILE_TRANSFER_PORT,
             this.portText.getText());
         preferences.setValue(PreferenceConstants.AUTO_CONNECT, this.autoText

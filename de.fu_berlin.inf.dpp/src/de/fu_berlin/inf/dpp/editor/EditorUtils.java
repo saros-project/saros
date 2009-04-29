@@ -13,71 +13,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.texteditor.DocumentProviderRegistry;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
  * Static utility methods for working with Eclipse Editors
  */
 public class EditorUtils {
-
-    /**
-     * TODO Review and document the purpose of this
-     */
-    public static IDocumentProvider getDocumentProvider(IEditorInput input) {
-
-        Object adapter = input.getAdapter(IFile.class);
-        if (adapter != null) {
-            IFile file = (IFile) adapter;
-
-            String fileExtension = file.getFileExtension();
-
-            if (fileExtension != null) {
-                if (fileExtension.equals("java")) {
-                    // TODO Rather this dependency should be injected when the
-                    // EditorAPI is created itself.
-                    JDTFacade facade = Saros.getDefault().getContainer()
-                        .getComponent(JDTFacade.class);
-
-                    if (facade.isJDTAvailable()) {
-                        return facade.getDocumentProvider();
-                    }
-
-                } else if (fileExtension.equals("c")
-                    || fileExtension.equals("h") || fileExtension.equals("cpp")
-                    || fileExtension.equals("cxx")
-                    || fileExtension.equals("hxx")) {
-
-                    // TODO Rather this dependency should be injected when the
-                    // EditorAPI is created itself.
-                    CDTFacade facade = Saros.getDefault().getContainer()
-                        .getComponent(CDTFacade.class);
-
-                    if (facade.isCDTAvailable()) {
-                        return facade.getDocumentProvider();
-                    }
-                }
-            }
-        }
-
-        DocumentProviderRegistry registry = DocumentProviderRegistry
-            .getDefault();
-        return registry.getDocumentProvider(input);
-    }
-
-    public static IDocument getDocument(IEditorPart editorPart) {
-        IEditorInput input = editorPart.getEditorInput();
-
-        return getDocumentProvider(input).getDocument(input);
-    }
 
     /**
      * Returns the TextFileBuffer associated with the given resource OR null if

@@ -31,6 +31,7 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
@@ -55,32 +56,42 @@ import de.fu_berlin.inf.dpp.util.Util;
  * all honor start() and stop() semantics.
  */
 public class SharedProject implements ISharedProject, Disposable {
+
     public static Logger log = Logger.getLogger(SharedProject.class.getName());
 
+    public static final int MAX_USERCOLORS = 5;
+
+    /* Dependencies */
+    protected Saros saros;
+
+    protected ITransmitter transmitter;
+
+    protected ActivitySequencer activitySequencer;
+
+    protected DataTransferManager transferManager;
+
+    protected IProject project;
+
+    /* Instance fields */
     protected User localUser;
 
     protected ConcurrentHashMap<JID, User> participants = new ConcurrentHashMap<JID, User>();
 
-    private final IProject project;
+    protected List<ISharedProjectListener> listeners = new ArrayList<ISharedProjectListener>();
 
-    private final List<ISharedProjectListener> listeners = new ArrayList<ISharedProjectListener>();
+    protected User host;
 
-    private User host;
+    protected FreeColors freeColors = null;
 
-    private final ITransmitter transmitter;
-
-    private final ActivitySequencer activitySequencer;
-
-    private static final int MAX_USERCOLORS = 5;
-    private FreeColors freeColors = null;
-
-    private SharedProject(ITransmitter transmitter,
+    protected SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager, IProject project) {
 
         assert (transmitter != null);
 
+        this.saros = saros;
         this.transmitter = transmitter;
         this.project = project;
+        this.transferManager = transferManager;
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager);
     }
@@ -88,10 +99,10 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Constructor called for SharedProject of the host
      */
-    public SharedProject(ITransmitter transmitter,
+    public SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager, IProject project, JID myID) {
 
-        this(transmitter, transferManager, project);
+        this(saros, transmitter, transferManager, project);
         assert (myID != null);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
@@ -113,11 +124,11 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Constructor of client
      */
-    public SharedProject(ITransmitter transmitter,
+    public SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager, IProject project, JID myID,
         JID hostID, int myColorID) {
 
-        this(transmitter, transferManager, project);
+        this(saros, transmitter, transferManager, project);
 
         this.host = new User(this, hostID, 0);
         this.host.setUserRole(UserRole.DRIVER);
@@ -267,8 +278,9 @@ public class SharedProject implements ISharedProject, Disposable {
     public IOutgoingInvitationProcess invite(JID jid, String description,
         boolean inactive, IInvitationUI inviteUI, FileList filelist) {
 
-        return new OutgoingInvitationProcess(this.transmitter, jid, this,
-            description, inactive, inviteUI, getFreeColor(), filelist);
+        return new OutgoingInvitationProcess(saros, transmitter,
+            transferManager, jid, this, description, inactive, inviteUI,
+            getFreeColor(), filelist);
     }
 
     /*
@@ -363,8 +375,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
                 // TODO check if anybody is online, empty dialog feels
                 // strange
-                Window iw = new InvitationDialog(SharedProject.this, EditorAPI
-                    .getShell(), toInvite);
+                Window iw = new InvitationDialog(saros, SharedProject.this,
+                    EditorAPI.getShell(), toInvite);
                 iw.open();
 
                 if (!isDriver()) {

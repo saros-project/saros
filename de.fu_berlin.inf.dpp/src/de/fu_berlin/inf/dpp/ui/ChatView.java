@@ -49,8 +49,11 @@ public class ChatView extends ViewPart implements IConnectionListener,
     @Inject
     protected MessagingManager messagingManager;
 
+    @Inject
+    protected Saros saros;
+
     public ChatView() {
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
     }
 
     @Override
@@ -108,7 +111,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
 
             @Override
             public void run() {
-                Saros.getDefault().getConnection().getUser();
+                saros.getConnection().getUser();
                 if (ChatView.this.joined) {
                     try {
                         ChatView.this.session
@@ -154,7 +157,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
                 .getImageDescriptor("/icons/disconnect.png"));
         }
 
-        if (Saros.getDefault().isConnected()) {
+        if (saros.isConnected()) {
             this.connectAction.setEnabled(true);
         } else {
             this.connectAction.setEnabled(false);
@@ -166,7 +169,7 @@ public class ChatView extends ViewPart implements IConnectionListener,
         messagingManager.addChatListener(this);
 
         // register as connection listener
-        Saros.getDefault().addListener(this);
+        saros.addListener(this);
     }
 
     @Override

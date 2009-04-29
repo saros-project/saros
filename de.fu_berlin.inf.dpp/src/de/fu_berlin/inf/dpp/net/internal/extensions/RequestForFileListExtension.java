@@ -7,12 +7,12 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class RequestForFileListExtension extends
-    SessionDefaultPacketExtension {
+public class RequestForFileListExtension extends SessionDefaultPacketExtension {
 
-    public RequestForFileListExtension() {
-        super("requestList");
+    public RequestForFileListExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "requestList");
     }
 
     @Override
@@ -20,19 +20,14 @@ public abstract class RequestForFileListExtension extends
         return super.create();
     }
 
-    /**
-     * @return Returns a default implementation of this extension that does
-     *         nothing in requestForFileListReceived(...)
-     */
-    public static RequestForFileListExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            RequestForFileListExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
         requestForFileListReceived(sender);
     }
 
-    public abstract void requestForFileListReceived(JID sender);
+    public void requestForFileListReceived(JID sender) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
+
 }

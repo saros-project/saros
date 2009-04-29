@@ -24,6 +24,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -36,9 +37,14 @@ import de.fu_berlin.inf.dpp.Saros;
 public class PreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
 
+    @Inject
+    Saros saros;
+
     public PreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(Saros.getDefault().getPreferenceStore());
+        Saros.reinject(this);
+
+        setPreferenceStore(saros.getPreferenceStore());
         setDescription("Your settings for Jabber.");
     }
 

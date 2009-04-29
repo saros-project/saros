@@ -48,7 +48,6 @@ import org.osgi.framework.BundleContext;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
-import org.picocontainer.PicoContainer;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
@@ -62,6 +61,8 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
+import de.fu_berlin.inf.dpp.net.business.ChecksumHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
@@ -72,7 +73,17 @@ import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.DataTransferExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
+import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
@@ -178,20 +189,17 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(CDTFacade.class);
         this.container.addComponent(ConnectionSessionManager.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
-        this.container.addComponent(ConsistencyWatchdogHandler.class);
         this.container.addComponent(ConsistencyWatchdogServer.class);
         this.container.addComponent(SharedProjectObservable.class);
         this.container.addComponent(DataTransferManager.class);
         this.container.addComponent(EditorManager.class);
-        this.container.addComponent(InvitationHandler.class);
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
-        this.container.addComponent(LeaveHandler.class);
         this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);
         this.container.addComponent(PreferenceManager.class);
-        this.container.addComponent(RequestForActivityHandler.class);
+        this.container.addComponent(PreferenceUtils.class);
         this.container.addComponent(RoleManager.class);
         this.container.addComponent(Saros.class, this);
         this.container.addComponent(SarosRosterListener.class);
@@ -202,16 +210,39 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SharedResourcesManager.class);
         this.container.addComponent(SkypeManager.class);
         this.container.addComponent(SubscriptionListener.class);
-        this.container.addComponent(UserListHandler.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);
+
+        // Handlers
+        this.container.addComponent(CancelInviteHandler.class);
+        this.container.addComponent(UserListHandler.class);
+        this.container.addComponent(InvitationHandler.class);
+        this.container.addComponent(LeaveHandler.class);
+        this.container.addComponent(RequestForActivityHandler.class);
+        this.container.addComponent(ConsistencyWatchdogHandler.class);
+        this.container.addComponent(ChecksumHandler.class);
+
+        // Extensions
+        this.container.addComponent(ChecksumErrorExtension.class);
+        this.container.addComponent(ChecksumExtension.class);
+        this.container.addComponent(CancelInviteExtension.class);
+        this.container.addComponent(UserListExtension.class);
+        this.container.addComponent(RequestActivityExtension.class);
+        this.container.addComponent(DataTransferExtension.class);
+        this.container.addComponent(InviteExtension.class);
+        this.container.addComponent(JoinExtension.class);
+        this.container.addComponent(LeaveExtension.class);
+        this.container.addComponent(RequestForFileListExtension.class);
 
         /*
          * The following classes are initialized by the re-injector because they
          * are created by Eclipse:
          * 
-         * All User interface classes like all Views, all Actions... but also
+         * All User interface classes like all Views, but also
          * SharedDocumentProvider.
+         * 
+         * CAUTION: Classes from which duplicates can exists, should not be
+         * managed by PicoContainer.
          */
         reinjector = new Reinjector(this.container);
     }
@@ -219,22 +250,28 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Injects dependencies into the annotated fields of the given object.
      */
-    public synchronized void reinject(Object toInjectInto) {
+    public static synchronized void reinject(Object toInjectInto) {
+
+        if (plugin == null) {
+            throw new IllegalStateException();
+        }
+
         try {
             // Remove the component if an instance of it was already registered
-            this.container.removeComponent(toInjectInto.getClass());
+            plugin.container.removeComponent(toInjectInto.getClass());
 
             // Add the given instance to the container
-            this.container.addComponent(toInjectInto.getClass(), toInjectInto);
+            plugin.container
+                .addComponent(toInjectInto.getClass(), toInjectInto);
 
             /*
              * Ask PicoContainer to inject into the component via fields
              * annotated with @Inject
              */
-            reinjector.reinject(toInjectInto.getClass(),
+            plugin.reinjector.reinject(toInjectInto.getClass(),
                 new AnnotatedFieldInjection());
         } catch (PicoCompositionException e) {
-            logger.error("Internal error in reinjection:", e);
+            plugin.logger.error("Internal error in reinjection:", e);
         }
     }
 
@@ -295,33 +332,6 @@ public class Saros extends AbstractUIPlugin {
 
     public static void setDefault(Saros newPlugin) {
         Saros.plugin = newPlugin;
-    }
-
-    /**
-     * Returns the shared instance.
-     * 
-     * @return the shared instance.
-     * 
-     * @deprecated The Saros instance should be (re)injected by PicoContainer or
-     *             passed around as argument.
-     */
-    @Deprecated
-    public static Saros getDefault() {
-        return Saros.plugin;
-    }
-
-    /**
-     * Return the PicoContainer that can be asked for all Singleton objects
-     * relative to this Saros instance (see the constructor for a complete list
-     * of components in this container):
-     * 
-     * @return The PicoContainer containing all Singleton objects of this Saros
-     *         plug-in instance.
-     * 
-     *         TODO This method should be @deprecated
-     */
-    public PicoContainer getContainer() {
-        return container;
     }
 
     public JID getMyJID() {
@@ -639,7 +649,7 @@ public class Saros extends AbstractUIPlugin {
      *            The exception associated with the error (may be null)
      */
     public static void log(String message, Exception e) {
-        Saros.getDefault().getLog().log(
+        plugin.getLog().log(
             new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message, e));
     }
 
@@ -732,7 +742,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     public static boolean getFileTransferModeViaChat() {
-        return getDefault().getPreferenceStore().getBoolean(
+        return plugin.getPreferenceStore().getBoolean(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
 

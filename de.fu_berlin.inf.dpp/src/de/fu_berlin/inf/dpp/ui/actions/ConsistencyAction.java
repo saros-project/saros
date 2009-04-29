@@ -74,7 +74,7 @@ public class ConsistencyAction extends Action {
             .getImageDescriptor(ISharedImages.IMG_OBJS_WARN_TSK));
         setToolTipText("No inconsistencies");
 
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override

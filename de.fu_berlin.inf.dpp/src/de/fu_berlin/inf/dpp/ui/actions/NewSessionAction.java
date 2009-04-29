@@ -43,6 +43,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  * 
+ *         This action is created by Eclipse!
+ * 
  */
 public class NewSessionAction implements IObjectActionDelegate {
 
@@ -54,6 +56,9 @@ public class NewSessionAction implements IObjectActionDelegate {
     @Inject
     protected SessionManager sessionManager;
 
+    @Inject
+    protected Saros saros;
+
     /*
      * (non-Javadoc) Defined in IActionDelegate
      */
@@ -63,7 +68,7 @@ public class NewSessionAction implements IObjectActionDelegate {
 
     public NewSessionAction() {
         super();
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
     }
 
     /**
@@ -97,7 +102,7 @@ public class NewSessionAction implements IObjectActionDelegate {
         this.selectedProject = getProject(selection);
 
         boolean running = sessionManager.getSharedProject() != null;
-        boolean connected = Saros.getDefault().isConnected();
+        boolean connected = saros.isConnected();
 
         // TODO This action should rather connect if not already connected
         // instead of being disabled.

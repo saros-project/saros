@@ -10,6 +10,7 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.texteditor.AnnotationPreference;
 import org.eclipse.ui.texteditor.AnnotationPreferenceLookup;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -83,7 +84,7 @@ public abstract class SarosAnnotation extends Annotation {
      * @return a string with the given prefix followed by either the nickname of
      *         the given user or the name of the jabber ID of the user.
      */
-    protected static String createLabel(String prefix, User user) {
-        return prefix + " " + Util.getName(user);
+    protected static String createLabel(Saros saros, String prefix, User user) {
+        return prefix + " " + Util.getName(saros, user);
     }
 }

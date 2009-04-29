@@ -15,11 +15,12 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
+public class ChecksumExtension extends SessionDefaultPacketExtension {
 
-    public ChecksumExtension() {
-        super("DocChecksum");
+    public ChecksumExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "DocChecksum");
     }
 
     public PacketExtension create(Collection<DocumentChecksum> checksums) {
@@ -43,11 +44,6 @@ public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
 
     }
 
-    public static ChecksumExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            ChecksumExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
 
@@ -68,6 +64,9 @@ public abstract class ChecksumExtension extends SessionDefaultPacketExtension {
         checksumsReceived(sender, Arrays.asList(checksums));
     }
 
-    public abstract void checksumsReceived(JID sender,
-        List<DocumentChecksum> checksums);
+    public void checksumsReceived(JID sender, List<DocumentChecksum> checksums) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
+
 }

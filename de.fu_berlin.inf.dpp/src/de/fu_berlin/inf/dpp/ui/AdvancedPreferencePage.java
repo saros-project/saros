@@ -6,6 +6,7 @@ import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -19,9 +20,15 @@ import de.fu_berlin.inf.dpp.Saros;
 public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
 
+    @Inject
+    protected Saros saros;
+
     public AdvancedPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
-        setPreferenceStore(Saros.getDefault().getPreferenceStore());
+
+        Saros.reinject(this);
+
+        setPreferenceStore(saros.getPreferenceStore());
         setDescription("Advanced settings geared toward developers and power users.");
     }
 

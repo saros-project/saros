@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
@@ -64,7 +63,7 @@ class ShowDescriptionPage extends WizardPage {
 
         setControl(composite);
 
-        if (PreferenceUtils.isAutoAcceptInvitation()) {
+        if (joinSessionWizard.getPreferenceUtils().isAutoAcceptInvitation()) {
             joinSessionWizard.pressWizardButton(IDialogConstants.NEXT_ID);
         }
     }

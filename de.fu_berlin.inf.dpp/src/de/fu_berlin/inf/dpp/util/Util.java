@@ -479,9 +479,8 @@ public class Util {
      *         or null if the current roster is not available or the nickname
      *         has not been set.
      */
-    public static String getNickname(JID jid) {
+    public static String getNickname(Saros saros, JID jid) {
 
-        Saros saros = Saros.getDefault();
         if (saros != null) {
             XMPPConnection connection = saros.getConnection();
             if (connection != null) {
@@ -507,13 +506,13 @@ public class Util {
      * nickname, if available, and the JID. If no nickname is known, only the
      * JID is returned.
      */
-    public static String getName(User participant) {
+    public static String getName(Saros saros, User participant) {
 
         if (participant.isLocal()) {
             return "You";
         }
 
-        String nickName = getNickname(participant.getJID());
+        String nickName = getNickname(saros, participant.getJID());
         String jidBase = participant.getJID().getBase();
 
         if (nickName != null && nickName.trim().length() > 0) {

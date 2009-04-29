@@ -40,7 +40,8 @@ public abstract class SarosDefaultPacketExtension implements PacketListener {
     public abstract void processMessage(JID sender, Message message);
 
     public PacketFilter getFilter() {
-        return new PacketExtensionFilter(element, PacketExtensionUtils.NAMESPACE);
+        return new PacketExtensionFilter(element,
+            PacketExtensionUtils.NAMESPACE);
     }
 
     public DefaultPacketExtension create() {

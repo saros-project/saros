@@ -27,57 +27,69 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * @component The single instance of this class per application is created by
  *            PicoContainer in the central plug-in class {@link Saros}
  */
-public class RequestForActivityHandler extends RequestActivityExtension {
+public class RequestForActivityHandler {
+
+    private static final Logger log = Logger
+        .getLogger(RequestForActivityHandler.class.getName());
 
     @Inject
     protected IXMPPTransmitter transmitter;
 
-    @Inject
     protected SessionIDObservable sessionID;
 
     protected SessionManager sessionManager;
 
+    protected Handler handler;
+
     public RequestForActivityHandler(SessionManager sessionManager,
-        XMPPChatReceiver receiver) {
+        XMPPChatReceiver receiver, SessionIDObservable sessionID) {
+
+        this.sessionID = sessionID;
         this.sessionManager = sessionManager;
-        receiver.addPacketListener(this, this.getFilter());
+        this.handler = new Handler(sessionID);
+
+        receiver.addPacketListener(handler, handler.getFilter());
     }
 
-    @Override
-    public PacketFilter getFilter() {
-        return new AndFilter(super.getFilter(), PacketExtensionUtils
-            .getInSessionFilter(sessionManager));
-    }
+    protected class Handler extends RequestActivityExtension {
 
-    private final Logger log = Logger.getLogger(RequestForActivityHandler.class
-        .getName());
-
-    @Override
-    public void requestForResendingActivitiesReceived(JID fromJID,
-        int sequenceNumber, boolean andUp) {
-
-        ISharedProject sharedProject = sessionManager.getSharedProject();
-
-        if (sharedProject == null
-            || sharedProject.getParticipant(fromJID) == null) {
-            return;
+        public Handler(SessionIDObservable sessionID) {
+            super(sessionID);
         }
 
-        List<TimedActivity> activities = sharedProject.getSequencer()
-            .getActivityHistory(fromJID, sequenceNumber, andUp);
+        @Override
+        public PacketFilter getFilter() {
+            return new AndFilter(super.getFilter(), PacketExtensionUtils
+                .getInSessionFilter(sessionManager));
+        }
 
-        log.info(String.format(
-            "Received request for resending of timestamp%s %d%s.", andUp ? "s"
-                : "", sequenceNumber, andUp ? " (andup)" : ""));
+        @Override
+        public void requestForResendingActivitiesReceived(JID fromJID,
+            int sequenceNumber, boolean andUp) {
 
-        if (activities.size() > 0) {
-            PacketExtension extension = new ActivitiesPacketExtension(sessionID
-                .getValue(), activities);
+            ISharedProject sharedProject = sessionManager.getSharedProject();
 
-            transmitter.sendMessage(fromJID, extension);
-            log.info("I sent back " + activities.size() + " activities.");
-        } else {
-            log.error("No matching activities found");
+            if (sharedProject == null
+                || sharedProject.getParticipant(fromJID) == null) {
+                return;
+            }
+
+            List<TimedActivity> activities = sharedProject.getSequencer()
+                .getActivityHistory(fromJID, sequenceNumber, andUp);
+
+            log.info(String.format(
+                "Received request for resending of timestamp%s %d%s.",
+                andUp ? "s" : "", sequenceNumber, andUp ? " (andup)" : ""));
+
+            if (activities.size() > 0) {
+                PacketExtension extension = new ActivitiesPacketExtension(
+                    sessionID.getValue(), activities);
+
+                transmitter.sendMessage(fromJID, extension);
+                log.info("I sent back " + activities.size() + " activities.");
+            } else {
+                log.error("No matching activities found");
+            }
         }
     }
 }

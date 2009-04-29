@@ -9,15 +9,15 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class RequestActivityExtension extends
-    SessionDefaultPacketExtension {
+public class RequestActivityExtension extends SessionDefaultPacketExtension {
 
     private static Logger log = Logger.getLogger(RequestActivityExtension.class
         .getName());
 
-    public RequestActivityExtension() {
-        super("requestActivity");
+    public RequestActivityExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "requestActivity");
     }
 
     public PacketExtension create(int timestamp, boolean andup) {
@@ -33,19 +33,9 @@ public abstract class RequestActivityExtension extends
         return extension;
     }
 
-    /**
-     * @return Returns a default implementation of this extension that does
-     *         nothing in requestForSendingActivitiesReceived(...)
-     */
-    public static RequestActivityExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            RequestActivityExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
-        DefaultPacketExtension extension = RequestActivityExtension
-            .getDefault().getExtension(message);
+        DefaultPacketExtension extension = getExtension(message);
 
         String tmp = extension.getValue("ID");
         boolean andUp = extension.getValue("ANDUP") != null;
@@ -60,6 +50,10 @@ public abstract class RequestActivityExtension extends
 
     }
 
-    public abstract void requestForResendingActivitiesReceived(JID sender,
-        int timeStamp, boolean andUp);
+    public void requestForResendingActivitiesReceived(JID sender,
+        int timeStamp, boolean andUp) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
+
 }

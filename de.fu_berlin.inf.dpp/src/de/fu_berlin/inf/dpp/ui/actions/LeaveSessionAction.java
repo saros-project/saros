@@ -27,9 +27,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -49,14 +47,14 @@ public class LeaveSessionAction extends Action {
     private static final Logger log = Logger.getLogger(LeaveSessionAction.class
         .getName());
 
-    @Inject
-    SessionManager sessionManager;
+    protected SessionManager sessionManager;
 
-    public LeaveSessionAction() {
+    public LeaveSessionAction(SessionManager sessionManager) {
+
+        this.sessionManager = sessionManager;
+
         setToolTipText("Leave the session");
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/door_open.png"));
-
-        Saros.getDefault().reinject(this);
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override

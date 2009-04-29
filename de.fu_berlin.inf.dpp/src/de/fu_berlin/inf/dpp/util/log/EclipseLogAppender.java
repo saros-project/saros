@@ -25,9 +25,13 @@ public class EclipseLogAppender extends AppenderSkeleton {
         }
     }
 
+    protected Saros saros;
+
     public void log(int level, String message, @Nullable Throwable t) {
 
-        Saros saros = Saros.getDefault();
+        if (saros == null) {
+            Saros.reinject(this);
+        }
 
         if (saros != null) {
             IStatus logMessage = new Status(level, Saros.SAROS, IStatus.OK,

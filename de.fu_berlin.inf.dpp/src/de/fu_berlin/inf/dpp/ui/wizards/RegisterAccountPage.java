@@ -39,32 +39,32 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     private static final Logger log = Logger
         .getLogger(RegisterAccountPage.class.getName());
 
-    private Text serverText;
+    protected Text serverText;
 
-    private Text userText;
+    protected Text userText;
 
-    private Text passwordText;
+    protected Text passwordText;
 
-    private Text repeatPasswordText;
+    protected Text repeatPasswordText;
 
-    private Button prefButton;
+    protected Button prefButton;
 
-    private final boolean createAccount;
+    protected final boolean createAccount;
 
-    private final boolean showPrefButton;
+    protected final boolean showPrefButton;
 
-    private final boolean storePreferences;
+    protected final boolean storePreferences;
 
-    public RegisterAccountPage() {
-        this(true, true, true);
-    }
+    protected final Saros saros;
 
-    public RegisterAccountPage(boolean createAccount, boolean showPrefButton,
-        boolean storePreferences) {
+    public RegisterAccountPage(Saros saros, boolean createAccount,
+        boolean showPrefButton, boolean storePreferences) {
+
         super("create");
         this.createAccount = createAccount;
         this.showPrefButton = showPrefButton;
         this.storePreferences = storePreferences;
+        this.saros = saros;
     }
 
     public void createControl(Composite parent) {
@@ -136,7 +136,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                                 Shell shell = EditorAPI.getShell();
 
                                 CreateAccountWizard wizard = new CreateAccountWizard(
-                                    true, false, false);
+                                    saros, true, false, false);
                                 boolean success = Window.OK == new WizardDialog(
                                     shell, wizard).open();
 
@@ -152,8 +152,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                                 }
 
                             } catch (Exception e) {
-                                Saros
-                                    .getDefault()
+                                saros
                                     .getLog()
                                     .log(
                                         new Status(
@@ -214,8 +213,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 }
 
                 public void widgetSelected(SelectionEvent e) {
-                    IPreferenceStore preferences = Saros.getDefault()
-                        .getPreferenceStore();
+                    IPreferenceStore preferences = saros.getPreferenceStore();
                     if ((preferences.getString(PreferenceConstants.USERNAME)
                         .length() != 0)
                         && RegisterAccountPage.this.prefButton.getSelection()) {
@@ -249,7 +247,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     }
 
     public void setInitialValues() {
-        IPreferenceStore preferences = Saros.getDefault().getPreferenceStore();
+        IPreferenceStore preferences = saros.getPreferenceStore();
         this.serverText.setText(preferences
             .getDefaultString(PreferenceConstants.SERVER));
         if (this.showPrefButton) {
@@ -272,12 +270,12 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                     public void run(IProgressMonitor monitor)
                         throws InvocationTargetException, InterruptedException {
                         try {
-                            Saros.getDefault().createAccount(server, username,
-                                password, monitor);
+                            saros.createAccount(server, username, password,
+                                monitor);
 
                             if (storeInPreferences) {
-                                IPreferenceStore preferences = Saros
-                                    .getDefault().getPreferenceStore();
+                                IPreferenceStore preferences = saros
+                                    .getPreferenceStore();
                                 preferences.setValue(
                                     PreferenceConstants.SERVER, server);
                                 preferences.setValue(
@@ -321,8 +319,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 final String username = getUsername();
                 final String password = getPassword();
 
-                IPreferenceStore preferences = Saros.getDefault()
-                    .getPreferenceStore();
+                IPreferenceStore preferences = saros.getPreferenceStore();
                 preferences.setValue(PreferenceConstants.SERVER, server);
                 preferences.setValue(PreferenceConstants.USERNAME, username);
                 preferences.setValue(PreferenceConstants.PASSWORD, password);

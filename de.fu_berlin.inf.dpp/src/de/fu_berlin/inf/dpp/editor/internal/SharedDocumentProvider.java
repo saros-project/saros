@@ -76,7 +76,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
         log.debug("SharedDocumentProvider created by Eclipse");
 
-        Saros.getDefault().reinject(this);
+        Saros.reinject(this);
 
         if (sessionManager.getSharedProject() != null) {
             sessionListener.sessionStarted(sessionManager.getSharedProject());

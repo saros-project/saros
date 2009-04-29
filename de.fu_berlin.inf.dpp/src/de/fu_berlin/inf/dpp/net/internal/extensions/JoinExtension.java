@@ -8,33 +8,25 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class JoinExtension extends SessionDefaultPacketExtension {
+public class JoinExtension extends SessionDefaultPacketExtension {
 
-    public JoinExtension() {
-        super("join");
+    public JoinExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "join");
     }
 
     public PacketExtension create(int colorID) {
         DefaultPacketExtension extension = create();
 
-        extension.setValue(PacketExtensionUtils.COLOR_ID, String.valueOf(colorID));
+        extension.setValue(PacketExtensionUtils.COLOR_ID, String
+            .valueOf(colorID));
         return extension;
-    }
-
-    /**
-     * @return Returns a default implementation of this extension that does
-     *         nothing in joinReceived(...)
-     */
-    public static JoinExtension getDefault() {
-        return PacketExtensionUtils.getContainer()
-            .getComponent(JoinExtension.class);
     }
 
     @Override
     public void processMessage(JID sender, Message message) {
-        DefaultPacketExtension extension = JoinExtension.getDefault()
-            .getExtension(message);
+        DefaultPacketExtension extension = getExtension(message);
 
         int colorID = Integer.parseInt(extension
             .getValue(PacketExtensionUtils.COLOR_ID));
@@ -42,6 +34,9 @@ public abstract class JoinExtension extends SessionDefaultPacketExtension {
         joinReceived(sender, colorID);
     }
 
-    public abstract void joinReceived(JID sender, int colorID);
+    public void joinReceived(JID sender, int colorID) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
 
 }

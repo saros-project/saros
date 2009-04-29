@@ -8,9 +8,9 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class DataTransferExtension extends
-    SessionDefaultPacketExtension {
+public class DataTransferExtension extends SessionDefaultPacketExtension {
 
     public static final String DT_NAME = "DT_NAME";
 
@@ -22,8 +22,8 @@ public abstract class DataTransferExtension extends
 
     public static final String DT_DATA = "DT_BASE64";
 
-    public DataTransferExtension() {
-        super("DataTransfer");
+    public DataTransferExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "DataTransfer");
     }
 
     public PacketExtension create(String name, String desc, int index,
@@ -40,11 +40,6 @@ public abstract class DataTransferExtension extends
 
     }
 
-    public static DataTransferExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            DataTransferExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
         DefaultPacketExtension dt = getExtension(message);
@@ -58,7 +53,10 @@ public abstract class DataTransferExtension extends
         chunkReceived(sender, name, desc, index, maxIndex, data);
     }
 
-    public abstract void chunkReceived(JID sender, String name, String desc,
-        int index, int maxIndex, String data);
+    public void chunkReceived(JID sender, String name, String desc, int index,
+        int maxIndex, String data) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
 
 }

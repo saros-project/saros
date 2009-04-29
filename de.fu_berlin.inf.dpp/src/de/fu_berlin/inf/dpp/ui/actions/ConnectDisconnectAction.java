@@ -42,6 +42,10 @@ public class ConnectDisconnectAction extends Action implements Disposable {
 
     protected IStatusLineManager statusLineManager;
 
+    protected Saros saros;
+
+    protected SarosUI sarosUI;
+
     protected IConnectionListener connectionListener = new IConnectionListener() {
         public void connectionStateChanged(XMPPConnection connection,
             ConnectionState newState) {
@@ -57,19 +61,23 @@ public class ConnectDisconnectAction extends Action implements Disposable {
         }
     };
 
-    public ConnectDisconnectAction(IStatusLineManager statusLineManager) {
+    public ConnectDisconnectAction(SarosUI sarosUI, Saros saros,
+        IStatusLineManager statusLineManager) {
+
+        this.saros = saros;
         this.statusLineManager = statusLineManager;
+        this.sarosUI = sarosUI;
 
         updateStatus();
 
-        Saros.getDefault().addListener(connectionListener);
-        Saros.getDefault().getPreferenceStore().addPropertyChangeListener(
+        saros.addListener(connectionListener);
+        saros.getPreferenceStore().addPropertyChangeListener(
             propertyChangeListener);
     }
 
     public void dispose() {
-        Saros.getDefault().removeListener(connectionListener);
-        Saros.getDefault().getPreferenceStore().removePropertyChangeListener(
+        saros.removeListener(connectionListener);
+        saros.getPreferenceStore().removePropertyChangeListener(
             propertyChangeListener);
     }
 
@@ -85,8 +93,6 @@ public class ConnectDisconnectAction extends Action implements Disposable {
 
     protected void runConnectDisconnect() {
         try {
-            Saros saros = Saros.getDefault();
-
             if (saros.isConnected()) {
                 saros.disconnect();
             } else {
@@ -117,7 +123,7 @@ public class ConnectDisconnectAction extends Action implements Disposable {
 
     protected void updateStatus() {
         try {
-            ConnectionState state = Saros.getDefault().getConnectionState();
+            ConnectionState state = saros.getConnectionState();
 
             /*
              * FIXME The ConnectDisconnectAction should not be the one that is
@@ -128,7 +134,7 @@ public class ConnectDisconnectAction extends Action implements Disposable {
             switch (state) {
             case CONNECTED:
                 String user = "";
-                XMPPConnection c = Saros.getDefault().getConnection();
+                XMPPConnection c = saros.getConnection();
                 if (c != null)
                     user = " as " + c.getUser();
                 setStatusBar("Connected" + user, false);
@@ -158,8 +164,8 @@ public class ConnectDisconnectAction extends Action implements Disposable {
                 break;
             }
 
-            String username = Saros.getDefault().getPreferenceStore()
-                .getString(PreferenceConstants.USERNAME);
+            String username = saros.getPreferenceStore().getString(
+                PreferenceConstants.USERNAME);
 
             boolean validUsername = (username != null)
                 && (username.length() > 0);
@@ -167,7 +173,7 @@ public class ConnectDisconnectAction extends Action implements Disposable {
                 && (state == ConnectionState.NOT_CONNECTED || state == ConnectionState.ERROR);
             setEnabled(state == ConnectionState.CONNECTED || canConnect);
 
-            setText(SarosUI.getDescription(state));
+            setText(sarosUI.getDescription(state));
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);
         }

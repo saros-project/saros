@@ -93,6 +93,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     protected SessionManager sessionManager;
 
+    protected Saros saros;
+
     // assigned to any of the entries of the invite-tableview
     protected static class InviterData {
         JID jid;
@@ -143,11 +145,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
     }
 
-    public InvitationDialog(SharedProject project, Shell parentShell,
-        List<JID> autoInvite) {
+    public InvitationDialog(Saros saros, SharedProject project,
+        Shell parentShell, List<JID> autoInvite) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
         this.project = project;
+        this.saros = saros;
     }
 
     @Override
@@ -234,7 +237,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.cancelSelectedInvitationButton.setEnabled(false);
 
         // get online users from roster
-        setRoster(Saros.getDefault().getRoster());
+        setRoster(saros.getRoster());
         refreshRosterList();
 
         Control c = super.createContents(parent);
@@ -496,7 +499,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     public void connectionStateChanged(XMPPConnection connection,
         final ConnectionState newState) {
 
-        setRoster(Saros.getDefault().getRoster());
+        setRoster(saros.getRoster());
         refreshRosterList();
     }
 

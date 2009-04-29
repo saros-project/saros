@@ -14,8 +14,9 @@ import org.jivesoftware.smack.packet.PacketExtension;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
-public abstract class UserListExtension extends SessionDefaultPacketExtension {
+public class UserListExtension extends SessionDefaultPacketExtension {
 
     private static final String COUNT_KEY = "Count";
     private static final String USER_KEY = "User";
@@ -52,8 +53,8 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         }
     }
 
-    public UserListExtension() {
-        super("userList");
+    public UserListExtension(SessionIDObservable sessionIDObservable) {
+        super(sessionIDObservable, "userList");
     }
 
     public PacketExtension create(Collection<User> userList) {
@@ -74,20 +75,10 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         return extension;
     }
 
-    /**
-     * @return Returns a default implementation of this extension that does
-     *         nothing in userListReceived
-     */
-    public static UserListExtension getDefault() {
-        return PacketExtensionUtils.getContainer().getComponent(
-            UserListExtension.class);
-    }
-
     @Override
     public void processMessage(JID sender, Message message) {
 
-        DefaultPacketExtension userlistExtension = UserListExtension
-            .getDefault().getExtension(message);
+        DefaultPacketExtension userlistExtension = getExtension(message);
 
         List<UserListEntry> users = new LinkedList<UserListEntry>();
 
@@ -106,7 +97,9 @@ public abstract class UserListExtension extends SessionDefaultPacketExtension {
         userListReceived(sender, users);
     }
 
-    public abstract void userListReceived(JID sender,
-        List<UserListEntry> userList);
+    public void userListReceived(JID sender, List<UserListEntry> userList) {
+        throw new UnsupportedOperationException(
+            "This implementation should only be used to construct Extensions to be sent.");
+    }
 
 }

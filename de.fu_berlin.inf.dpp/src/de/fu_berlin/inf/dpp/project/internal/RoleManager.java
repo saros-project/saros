@@ -3,6 +3,8 @@ package de.fu_berlin.inf.dpp.project.internal;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.picocontainer.annotations.Inject;
+
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
@@ -36,9 +38,9 @@ public class RoleManager implements IActivityProvider {
 
         public void roleChanged(User user, boolean replicated) {
             if (!replicated) {
-                IActivity activity = new RoleActivity(Saros.getDefault()
-                    .getMyJID().toString(), user.getJID().toString(), user
-                    .getUserRole());
+                IActivity activity = new RoleActivity(sharedProject
+                    .getLocalUser().getJID().toString(), user.getJID()
+                    .toString(), user.getUserRole());
                 for (IActivityListener listener : RoleManager.this.activityListeners) {
                     listener.activityCreated(activity);
                 }
@@ -49,21 +51,25 @@ public class RoleManager implements IActivityProvider {
              * session view open.
              */
             SessionView.showNotification("Role changed", String.format(
-                "%s %s now %s of this session.", Util.getName(user), user
-                    .isLocal() ? "are" : "is", user.isDriver() ? "a driver"
+                "%s %s now %s of this session.", Util.getName(saros, user),
+                user.isLocal() ? "are" : "is", user.isDriver() ? "a driver"
                     : "an observer"));
         }
 
         public void userJoined(User user) {
-            SessionView.showNotification("User joined", Util.getName(user)
+            SessionView.showNotification("User joined", Util.getName(saros,
+                user)
                 + " joined the session.");
         }
 
         public void userLeft(User user) {
-            SessionView.showNotification("User left", Util.getName(user)
+            SessionView.showNotification("User left", Util.getName(saros, user)
                 + " left the session.");
         }
     };
+
+    @Inject
+    protected Saros saros;
 
     public RoleManager(SessionManager sessionManager) {
         sessionManager.addSessionListener(sessionListener);

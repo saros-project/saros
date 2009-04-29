@@ -81,14 +81,18 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
     protected SessionManager sessionManager;
 
+    protected DataTransferManager dataTransferManager;
+
     public IncomingInvitationProcess(SessionManager sessionManager,
-        ITransmitter transmitter, JID from, String projectName,
-        String description, int colorID) {
+        ITransmitter transmitter, DataTransferManager dataTransferManager,
+        JID from, String projectName, String description, int colorID) {
 
         super(transmitter, from, description, colorID);
 
         this.sessionManager = sessionManager;
         this.projectName = projectName;
+        this.dataTransferManager = dataTransferManager;
+
         setState(State.INVITATION_SENT);
 
     }
@@ -221,10 +225,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
             this.progressMonitor = monitor;
 
-            DataTransferManager manager = Saros.getDefault().getContainer()
-                .getComponent(DataTransferManager.class);
-
-            if (manager.getIncomingTransferMode(getPeer()).isP2P()) {
+            if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
                 this.progressMonitor.beginTask("Synchronizing",
                     this.filesLeftToSynchronize);
             } else {

@@ -8,9 +8,15 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 public class PreferenceUtils {
 
-    public static List<JID> getAutoInviteUsers() {
+    Saros saros;
 
-        String autoInvite = Saros.getDefault().getPreferenceStore().getString(
+    public PreferenceUtils(Saros saros) {
+        this.saros = saros;
+    }
+
+    public List<JID> getAutoInviteUsers() {
+
+        String autoInvite = saros.getPreferenceStore().getString(
             PreferenceConstants.AUTO_INVITE);
 
         if (autoInvite == null || autoInvite.trim().length() == 0)
@@ -24,13 +30,13 @@ public class PreferenceUtils {
         return result;
     }
 
-    public static boolean isAutoReuseExisting() {
-        return Saros.getDefault().getPreferenceStore().getBoolean(
+    public boolean isAutoReuseExisting() {
+        return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_REUSE_PROJECT);
     }
 
-    public static boolean isAutoAcceptInvitation() {
-        return Saros.getDefault().getPreferenceStore().getBoolean(
+    public boolean isAutoAcceptInvitation() {
+        return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_ACCEPT_INVITATION);
     }
 

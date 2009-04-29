@@ -21,9 +21,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
-import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -72,16 +70,16 @@ public class RemoveAllDriverRoleAction extends Action {
         }
     };
 
-    @Inject
     protected SessionManager sessionManager;
 
-    public RemoveAllDriverRoleAction() {
+    public RemoveAllDriverRoleAction(SessionManager sessionManager) {
         super("Remove driver roles");
+        this.sessionManager = sessionManager;
+
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Remove all driver roles");
         setId(ACTION_ID);
 
-        Saros.getDefault().reinject(this);
         sessionManager.addSessionListener(sessionListener);
         updateEnablement();
     }

@@ -3,7 +3,6 @@ package de.fu_berlin.inf.dpp.ui.actions;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
 import org.picocontainer.Disposable;
-import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
@@ -51,7 +50,7 @@ public class FollowModeAction extends Action implements Disposable {
              * Auto-Follow-Mode is enabled.
              */
             if (isEnabled()
-                && Saros.getDefault().getPreferenceStore().getBoolean(
+                && saros.getPreferenceStore().getBoolean(
                     PreferenceConstants.AUTO_FOLLOW_MODE)) {
 
                 /*
@@ -104,20 +103,23 @@ public class FollowModeAction extends Action implements Disposable {
         }
     };
 
-    @Inject
     protected SessionManager sessionManager;
 
-    @Inject
     protected EditorManager editorManager;
 
-    public FollowModeAction() {
+    protected Saros saros;
+
+    public FollowModeAction(Saros saros, SessionManager sessionManager,
+        EditorManager editorManager) {
         super(null, AS_CHECK_BOX);
+
+        this.saros = saros;
+        this.sessionManager = sessionManager;
+        this.editorManager = editorManager;
 
         setImageDescriptor(SarosUI.getImageDescriptor("/icons/monitor_add.png"));
         setToolTipText("Enable/disable follow mode");
         setId(ACTION_ID);
-
-        Saros.getDefault().reinject(this);
 
         sessionManager.addSessionListener(sessionListener);
         editorManager.addSharedEditorListener(editorListener);

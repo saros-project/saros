@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.editor.annotations;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 
 /**
@@ -13,12 +14,14 @@ public class SelectionAnnotation extends SarosAnnotation {
 
     protected static final String TYPE = "de.fu_berlin.inf.dpp.annotations.selection";
 
-    public SelectionAnnotation(User source, boolean isCursor) {
-        super(SelectionAnnotation.TYPE, true, createLabel(source, isCursor),
-            source);
+    public SelectionAnnotation(Saros saros, User source, boolean isCursor) {
+        super(SelectionAnnotation.TYPE, true, createLabel(saros, source,
+            isCursor), source);
     }
 
-    protected static String createLabel(User source, boolean isCursor) {
-        return createLabel((isCursor ? "Cursor" : "Selection") + " of", source);
+    protected static String createLabel(Saros saros, User source,
+        boolean isCursor) {
+        return createLabel(saros, (isCursor ? "Cursor" : "Selection") + " of",
+            source);
     }
 }

@@ -58,6 +58,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
@@ -78,6 +79,12 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  */
 public class EditorAPI implements IEditorAPI {
+
+    protected Saros saros;
+
+    public EditorAPI(Saros saros) {
+        this.saros = saros;
+    }
 
     public static class EditorPartListener implements IPartListener2 {
 
@@ -382,8 +389,8 @@ public class EditorAPI implements IEditorAPI {
                     }
                 }
                 Position position = new Position(offset, length);
-                SarosAnnotation newAnnotation = new SelectionAnnotation(source,
-                    isCursor);
+                SarosAnnotation newAnnotation = new SelectionAnnotation(saros,
+                    source, isCursor);
 
                 for (@SuppressWarnings("unchecked")
                 Iterator<Annotation> it = model.getAnnotationIterator(); it
@@ -730,7 +737,7 @@ public class EditorAPI implements IEditorAPI {
             int end = document.getLineOffset(bottom);
             if (end == -1 || end < start)
                 throw new BadLocationException("End line -1 or less than start");
-            SarosAnnotation annotation = new ViewportAnnotation(source);
+            SarosAnnotation annotation = new ViewportAnnotation(saros, source);
             Position position = new Position(start, end - start);
             model.addAnnotation(annotation, position);
         } catch (BadLocationException e) {
