@@ -135,13 +135,42 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
 
     public void testReplaceTransformation() {
 
+        // abcdefghi -> abc345ghi
         Operation replace1 = new SplitOperation(new DeleteOperation(3, "def"),
             new InsertOperation(3, "345"));
+
+        // abcdefghi -> a123defghi
         Operation replace2 = new SplitOperation(new InsertOperation(1, "123"),
             new DeleteOperation(4, "bcd"));
+
+        // op1'(op2) (transformed op1 dependent on op2)
         Operation newOp = inclusion.transform(replace1, replace2, Boolean.TRUE);
         Operation expectedOp = new SplitOperation(new DeleteOperation(4, "ef"),
             new InsertOperation(4, "345", 3));
+        assertEquals(expectedOp, newOp);
+    }
+
+    public void testSplitTransformation() {
+
+        // 0123456789 -> 01234fuenf5689
+        Operation op1 = new SplitOperation(new DeleteOperation(7, "7"),
+            new InsertOperation(5, "fuenf"));
+
+        // 0123456789 -> 0123abc6789
+        Operation op2 = new SplitOperation(new DeleteOperation(4, "45"),
+            new InsertOperation(4, "abc"));
+
+        // op1'(op2)
+        Operation newOp = inclusion.transform(op1, op2, Boolean.TRUE);
+        Operation expectedOp = new SplitOperation(new DeleteOperation(8, "7"),
+            new InsertOperation(7, "fuenf", 5));
+        assertEquals(expectedOp, newOp);
+
+        // op2'(op1)
+        newOp = inclusion.transform(op2, op1, Boolean.TRUE);
+        expectedOp = new SplitOperation(new SplitOperation(new DeleteOperation(
+            4, "4"), new DeleteOperation(9, "5")),
+            new InsertOperation(4, "abc"));
         assertEquals(expectedOp, newOp);
     }
 }
