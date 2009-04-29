@@ -99,7 +99,7 @@ public class SkypeManager implements IConnectionListener {
      * TODO SS only send to those, that we know use Saros.
      */
     public void publishSkypeIQ(String newSkypeName) {
-        XMPPConnection connection = Saros.getDefault().getConnection();
+        XMPPConnection connection = saros.getConnection();
         if (connection == null)
             return;
 
