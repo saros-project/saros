@@ -626,7 +626,9 @@ public class DataTransferManager implements ConnectionSessionListener {
         public boolean receivedResource(JID from, IPath path,
             InputStream input, int sequenceNumber) {
 
-            log.info("Incoming resource from " + from.toString() + ": " + path);
+            log
+                .debug("Incoming resource from " + from.toString() + ": "
+                    + path);
 
             // TODO CJ: move this to business logic
             IInvitationProcess process = chatTransmitter

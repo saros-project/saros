@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -59,6 +62,9 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class JingleFileTransferSession extends JingleMediaSession {
 
+    private static final Logger log = Logger
+        .getLogger(JingleFileTransferSession.class.getName());
+
     public static final int TIMEOUTSECONDS = 15;
 
     private class ReceiverThread extends Thread {
@@ -70,6 +76,16 @@ public class JingleFileTransferSession extends JingleMediaSession {
         }
 
         /**
+         * This executor is used to decouple the reading from the
+         * ObjectInputStream and the notification of the listeners. Thus we can
+         * continue reading, even while the DataTransferManager is handling our
+         * data.
+         */
+        ExecutorService dispatch = Executors
+            .newSingleThreadExecutor(new NamedThreadFactory(
+                "JingleFileTransferSession-Dispatch-"));
+
+        /**
          * @review runSafe OK
          */
         @Override
@@ -77,9 +93,9 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
             try {
                 while (!isInterrupted()) {
-                    TransferDescription data;
+                    final TransferDescription data;
                     try {
-                        data = (TransferDescription) input.readObject();
+                        data = (TransferDescription) input.readUnshared();
                     } catch (IOException e) {
                         logger.error("JingleFileTransferSession crashed", e);
                         return;
@@ -89,14 +105,19 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         continue;
                     }
 
-                    for (IJingleFileTransferListener listener : listeners) {
-                        listener.incomingDescription(data, connectionType);
-                    }
+                    dispatch.submit(Util.wrapSafe(log, new Runnable() {
+                        public void run() {
+                            for (IJingleFileTransferListener listener : listeners) {
+                                listener.incomingDescription(data,
+                                    connectionType);
+                            }
+                        }
+                    }));
 
-                    byte[] content;
+                    final byte[] content;
 
                     try {
-                        content = (byte[]) input.readObject();
+                        content = (byte[]) input.readUnshared();
                     } catch (IOException e) {
                         logger.error("JingleFileTransferSession crashed", e);
                         for (IJingleFileTransferListener listener : listeners) {
@@ -112,11 +133,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         continue;
                     }
 
-                    for (IJingleFileTransferListener listener : listeners) {
-                        listener.incomingData(data, new ByteArrayInputStream(
-                            content), connectionType);
-                    }
-
+                    dispatch.submit(Util.wrapSafe(log, new Runnable() {
+                        public void run() {
+                            for (IJingleFileTransferListener listener : listeners) {
+                                listener.incomingData(data,
+                                    new ByteArrayInputStream(content),
+                                    connectionType);
+                            }
+                        }
+                    }));
                 }
             } catch (RuntimeException e) {
                 logger.error("Internal Error in Receive Thread: ", e);
@@ -359,10 +384,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
             }
 
             try {
-                this.objectOutputStream = new ObjectOutputStream(socket
-                    .getOutputStream());
-                this.objectInputStream = new ObjectInputStream(socket
-                    .getInputStream());
+                this.objectOutputStream = new ObjectOutputStream(
+                    new BufferedOutputStream(socket.getOutputStream()));
+                this.objectOutputStream.flush();
+                this.objectInputStream = new ObjectInputStream(
+                    new BufferedInputStream(socket.getInputStream()));
 
                 this.receiveThread = new ReceiverThread(objectInputStream);
                 this.receiveThread.start();
@@ -392,6 +418,12 @@ public class JingleFileTransferSession extends JingleMediaSession {
     }
 
     /**
+     * This field is used by the send method to reset the given object stream
+     * ever now and then.
+     */
+    private int resetCounter = 0;
+
+    /**
      * This method is called from the JingleFileTransferManager to send files
      * with this session.
      * 
@@ -403,9 +435,17 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         if (objectOutputStream != null) {
             try {
-                objectOutputStream.writeObject(transferData);
-                objectOutputStream.writeObject(content);
+                objectOutputStream.writeUnshared(transferData);
+                // Prevent caching of byte[] data in the handle table of the OOS
+                objectOutputStream.writeUnshared(content);
                 objectOutputStream.flush();
+
+                if (resetCounter++ > 128) {
+                    // Reset periodically to flush stream handles to the data
+                    objectOutputStream.reset();
+                    resetCounter = 0;
+                }
+
                 logger.debug("Jingle [" + connectTo.getName() + "] Send: "
                     + transferData);
                 return connectionType;

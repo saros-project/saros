@@ -94,7 +94,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {
 
-    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class.getName());
+    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
+        .getName());
 
     public static final int MAX_PARALLEL_SENDS = 10;
     public static final int MAX_TRANSFER_RETRIES = 5;
@@ -164,7 +165,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     ExecutorService dispatch = Executors
         .newSingleThreadExecutor(new NamedThreadFactory(
-            "XMPPChatTransmitter-Dispatch"));
+            "XMPPChatTransmitter-Dispatch-"));
 
     protected class JoinHandler extends JoinExtension {
         protected JoinHandler(SessionIDObservable sessionIDObservable) {

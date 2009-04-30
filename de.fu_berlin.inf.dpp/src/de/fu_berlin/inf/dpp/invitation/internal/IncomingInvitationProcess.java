@@ -30,6 +30,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -235,13 +237,31 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             }
             setState(State.SYNCHRONIZING);
 
-            this.transmitter.sendFileList(this.peer, new FileList(
-                this.localProject), this);
+            // Disable Autobuilding while we receive files
+            IWorkspace ws = ResourcesPlugin.getWorkspace();
+            IWorkspaceDescription desc = ws.getDescription();
+            boolean wasAutobuilding = desc.isAutoBuilding();
+            if (wasAutobuilding) {
+                desc.setAutoBuilding(false);
+                ws.setDescription(desc);
+            }
 
-            if (blockUntilAllFilesSynchronized(monitor)) {
-                done();
-            } else {
-                cancel(null, false);
+            try {
+                this.transmitter.sendFileList(this.peer, new FileList(
+                    this.localProject), this);
+
+                if (blockUntilAllFilesSynchronized(monitor)) {
+                    done();
+                } else {
+                    cancel(null, false);
+                }
+            } finally {
+
+                // Reenable Autobuilding...
+                if (wasAutobuilding) {
+                    desc.setAutoBuilding(true);
+                    ws.setDescription(desc);
+                }
             }
         } catch (CoreException e) {
             ErrorMessageDialog.showErrorMessage(new Exception(

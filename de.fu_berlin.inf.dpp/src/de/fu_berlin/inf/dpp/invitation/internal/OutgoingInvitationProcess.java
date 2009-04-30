@@ -151,7 +151,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         if (jingleManager != null
             && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
             isP2P = true;
-            sendNext();
+            sendFiles();
         } else {
             isP2P = false;
             sendArchive();
@@ -277,11 +277,9 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     public void fileSent(IPath path) {
 
-        if (isP2P && this.toSend.size() > 0) {
-            progress_done++;
-            sendNext();
-        } else {
-            // Archive was sent
+        this.setProgressInfo(path.toFile().getName());
+        progress_done++;
+        if (progress_done == progress_max && getState() == State.SYNCHRONIZING) {
             setState(State.SYNCHRONIZING_DONE);
         }
     }
@@ -293,7 +291,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         invitationUI.updateInvitationProgress(peer);
     }
 
-    private void sendNext() {
+    private void sendFiles() {
 
         if (getState() == State.CANCELED) {
             this.toSend.clear();
@@ -305,20 +303,24 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             return;
         }
 
-        IPath path = this.toSend.remove(0);
-        this.setProgressInfo(path.toFile().getName());
+        this.setProgressInfo("Sending...");
 
-        if (this.toSend.size() == 0) {
-            // Set before sending the last file, because a race condition might
-            // otherwise occur
-            setState(State.SYNCHRONIZING_DONE);
-        }
+        while (this.toSend.size() > 0 && getState() != State.CANCELED) {
 
-        try {
-            this.transmitter.sendFileAsync(this.peer, this.sharedProject
-                .getProject(), path, TimedActivity.NO_SEQUENCE_NR, this);
-        } catch (IOException e) {
-            this.fileTransferFailed(path, e);
+            IPath path = this.toSend.remove(0);
+
+            if (this.toSend.size() == 0) {
+                // Set before sending the last file, because a race condition
+                // might otherwise occur
+                setState(State.SYNCHRONIZING_DONE);
+            }
+
+            try {
+                this.transmitter.sendFileAsync(this.peer, this.sharedProject
+                    .getProject(), path, TimedActivity.NO_SEQUENCE_NR, this);
+            } catch (IOException e) {
+                this.fileTransferFailed(path, e);
+            }
         }
     }
 
