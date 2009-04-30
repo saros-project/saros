@@ -56,7 +56,7 @@ public class ProxySynchronizedQueue {
      * @param op
      *            operation has transformed and only send to client side.
      */
-    // TODO: Is this method necessary?
+    // TODO Is this method necessary?
     public void sendTransformedOperation(Operation op, JID jid) {
         Request send_req = new Request(algorithm.getTimestamp(), op, this.jid,
             null);
