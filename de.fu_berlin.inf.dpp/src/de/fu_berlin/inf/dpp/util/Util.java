@@ -625,4 +625,12 @@ public class Util {
 
         return sb.toString();
     }
+
+    public static String prefix(JID jid) {
+        if (jid == null) {
+            return "[Unknown] ";
+        } else {
+            return "[" + jid.getName() + "] ";
+        }
+    }
 }

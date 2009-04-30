@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class manages all Jingle Peer to Peer Sessions. Jingle is a
@@ -285,7 +286,7 @@ public class JingleFileTransferManager {
         connection.getSession().addListener(new JingleSessionListener() {
 
             public void sessionClosed(String arg0, JingleSession session) {
-                logger.info("JingleSession closed [" + jid.getBase() + "]");
+                logger.info(Util.prefix(jid) + "JingleSession closed");
 
                 if (connection.state != JingleConnectionState.ERROR) {
                     connection.setState(JingleConnectionState.CLOSED);
@@ -373,8 +374,8 @@ public class JingleFileTransferManager {
                 // TODO observe state rather than sleep
                 while (connection.state == JingleConnectionState.INIT && i < 60) {
                     try {
-                        logger.debug("Jingle [" + toJID
-                            + "] Waiting for Init since " + (i * 500) / 1000
+                        logger.debug(Util.prefix(toJID)
+                            + "Waiting for Init since " + (i * 500) / 1000
                             + "s");
                         i++;
                         Thread.sleep(500);
@@ -390,15 +391,15 @@ public class JingleFileTransferManager {
         } else {
             // If we want to reconnect, then we should not set this to ERROR
             connection.setState(JingleConnectionState.ERROR);
-            throw new JingleSessionException(
-                "Could not establish connection when trying to send");
+            throw new JingleSessionException(Util.prefix(toJID)
+                + "Could not establish connection when trying to send");
         }
     }
 
     private FileTransferConnection startJingleSession(JID toJID)
         throws JingleSessionException {
 
-        logger.debug("Jingle [" + toJID.getName() + "] Start Session");
+        logger.debug(Util.prefix(toJID) + "Start Session");
 
         FileTransferConnection connection = new FileTransferConnection(toJID);
         connections.put(toJID, connection);

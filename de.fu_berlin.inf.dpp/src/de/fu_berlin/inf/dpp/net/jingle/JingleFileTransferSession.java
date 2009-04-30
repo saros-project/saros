@@ -435,6 +435,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         if (objectOutputStream != null) {
             try {
+                long startTime = System.currentTimeMillis();
                 objectOutputStream.writeUnshared(transferData);
                 // Prevent caching of byte[] data in the handle table of the OOS
                 objectOutputStream.writeUnshared(content);
@@ -446,12 +447,23 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     resetCounter = 0;
                 }
 
-                logger.debug("Jingle [" + connectTo.getName() + "] Send: "
-                    + transferData);
+                long endTime = System.currentTimeMillis();
+                long delta = endTime - startTime;
+                String throughput;
+                if (delta == 0) {
+                    throughput = "";
+                } else {
+                    throughput = " (" + (content.length / 1024) + "kb in "
+                        + delta + " ms at " + (1000 * content.length / 1024)
+                        / delta + " kb/s)";
+                }
+
+                logger.debug(Util.prefix(connectTo) + "Sent" + throughput
+                    + ": " + transferData);
                 return connectionType;
             } catch (IOException e) {
-                throw new JingleSessionException("Jingle ["
-                    + connectTo.getName() + "] Failed to send files");
+                throw new JingleSessionException(Util.prefix(connectTo)
+                    + "Failed to send files");
             }
         }
 

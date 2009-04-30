@@ -128,37 +128,43 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     public void startSynchronization() {
+
         assertState(State.GUEST_FILELIST_SENT);
 
         setState(State.SYNCHRONIZING);
 
-        FileList diff = this.remoteFileList.diff(localFileList);
+        try {
+            FileList diff = this.remoteFileList.diff(localFileList);
 
-        List<IPath> added = diff.getAddedPaths();
-        List<IPath> altered = diff.getAlteredPaths();
-        // TODO A linked list might be more efficient. See #sendNext().
-        this.toSend = new ArrayList<IPath>(added.size() + altered.size());
-        this.toSend.addAll(added);
-        this.toSend.addAll(altered);
+            List<IPath> added = diff.getAddedPaths();
+            List<IPath> altered = diff.getAlteredPaths();
+            // TODO A linked list might be more efficient. See #sendNext().
+            this.toSend = new ArrayList<IPath>(added.size() + altered.size());
+            this.toSend.addAll(added);
+            this.toSend.addAll(altered);
 
-        this.progress_max = this.toSend.size();
-        this.progress_done = 0;
+            this.progress_max = this.toSend.size();
+            this.progress_done = 0;
 
-        JingleFileTransferManager jingleManager = dataTransferManager
-            .getJingleManager();
+            JingleFileTransferManager jingleManager = dataTransferManager
+                .getJingleManager();
 
-        // If fast p2p connection send individual files, otherwise archive
-        if (jingleManager != null
-            && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
-            isP2P = true;
-            sendFiles();
-        } else {
-            isP2P = false;
-            sendArchive();
-        }
+            // If fast p2p connection send individual files, otherwise archive
+            if (jingleManager != null
+                && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
+                isP2P = true;
+                sendFiles();
+            } else {
+                isP2P = false;
+                sendArchive();
+            }
 
-        if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
-            cancel(null, false);
+            if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
+                cancel(null, false);
+            }
+        } catch (RuntimeException e) {
+            cancel("An internal error occurred while starting to synchronize: "
+                + e.toString(), false);
         }
 
     }
@@ -308,12 +314,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         while (this.toSend.size() > 0 && getState() != State.CANCELED) {
 
             IPath path = this.toSend.remove(0);
-
-            if (this.toSend.size() == 0) {
-                // Set before sending the last file, because a race condition
-                // might otherwise occur
-                setState(State.SYNCHRONIZING_DONE);
-            }
 
             try {
                 this.transmitter.sendFileAsync(this.peer, this.sharedProject

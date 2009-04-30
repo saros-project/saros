@@ -530,13 +530,15 @@ public class DataTransferManager implements ConnectionSessionListener {
                     setTransferMode(transferData.recipient, mode, false);
                     return;
                 } catch (Exception e) {
-                    log.error("Failed to send file with "
-                        + transmitter.getName() + ":", e);
+                    log.error(Util.prefix(transferData.recipient)
+                        + "Failed to send file with " + transmitter.getName()
+                        + ":", e);
                 }
             }
         }
 
-        throw new IOException("Exhausted all options to send the given file.");
+        throw new IOException(Util.prefix(transferData.recipient)
+            + "Exhausted all options to send the " + "given file.");
 
     }
 
