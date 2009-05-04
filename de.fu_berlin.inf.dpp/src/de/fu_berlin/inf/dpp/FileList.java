@@ -183,11 +183,23 @@ public class FileList {
 
     /**
      * @return the amount in percentage by which this file list has the same
-     *         files as the other file list.
+     *         files as the other file list. Returns 100 only if the given
+     *         FileList matches perfectly.
      */
     public int match(FileList other) {
-        return getPaths().size() == 0 ? 0 : 100
-            * diff(other).getUnalteredPaths().size() / getPaths().size();
+        int nPaths = getPaths().size();
+        
+        if (nPaths == 0) {
+            return 0;
+        } else {
+            FileList diff = this.diff(other);
+            int nUnalteredPaths = diff.getUnalteredPaths().size();
+            if (nPaths == nUnalteredPaths) {
+                return 100;
+            } else {
+                return Math.min(99, nUnalteredPaths / nPaths);
+            }
+        }
     }
 
     protected static XStream getXStream() {
