@@ -19,18 +19,30 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import org.apache.log4j.Logger;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.PacketExtensionProvider;
 import org.xmlpull.v1.XmlPullParser;
 
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.DropSilentlyPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
 import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 public class ActivitiesExtensionProvider implements PacketExtensionProvider {
 
-    public ActivitiesPacketExtension parseExtension(XmlPullParser parser) {
-        Content content = (Content) ActivitiesPacketExtension.getXStream()
-            .unmarshal(new XppReader(parser));
+    private static final Logger log = Logger
+        .getLogger(ActivitiesExtensionProvider.class.getName());
+
+    public PacketExtension parseExtension(XmlPullParser parser) {
+        Content content;
+        try {
+            content = (Content) ActivitiesPacketExtension.getXStream()
+                .unmarshal(new XppReader(parser));
+        } catch (RuntimeException e) {
+            log.error("Malformed data received!", e);
+            return new DropSilentlyPacketExtension();
+        }
         return new ActivitiesPacketExtension(content.getSessionID(), content
             .getTimedActivities());
     }

@@ -112,7 +112,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
         this.activities = activities;
     }
 
-    public static XStream getXStream() {
+    public static synchronized XStream getXStream() {
         if (xstream == null) {
             xstream = new XStream();
             /*

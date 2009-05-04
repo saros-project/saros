@@ -84,10 +84,10 @@ public class PacketExtensionUtils {
     }
 
     /**
-     * TODO CJ: write javadoc
+     * Retrieves the SessionID from the given message by checking all supported
+     * PacketExtensions-types.
      * 
-     * @param message
-     * @return
+     * Returns null if no SessionID is found.
      */
     public static String getSessionID(Message message) {
         PacketExtension extension = message.getExtension(
@@ -96,7 +96,10 @@ public class PacketExtensionUtils {
             return ((ActivitiesPacketExtension) extension).getSessionID();
         }
         extension = message.getExtension(PacketExtensionUtils.NAMESPACE);
-        return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
+        if (extension != null && extension instanceof DefaultPacketExtension) {
+            return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
+        }
+        return null;
     }
 
     /**
