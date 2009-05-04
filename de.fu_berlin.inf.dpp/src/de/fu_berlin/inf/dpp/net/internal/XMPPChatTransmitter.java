@@ -428,7 +428,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessage(recipient, new ActivitiesPacketExtension(sessionID
             .getValue(), timedActivities));
 
-        XMPPChatTransmitter.log.info("Sent Activities to " + recipient + ": "
+        XMPPChatTransmitter.log.debug("Sent Activities to " + recipient + ": "
             + timedActivities);
     }
 
