@@ -627,10 +627,9 @@ public class Saros extends AbstractUIPlugin {
 
     protected void setupLoggers() {
         try {
+            logger = Logger.getLogger("de.fu_berlin.inf.dpp");
             PropertyConfigurator.configureAndWatch("log4j.properties",
                 60 * 1000);
-            logger = Logger.getLogger("de.fu_berlin.inf.dpp");
-
         } catch (SecurityException e) {
             System.err.println("Could not start logging:");
             e.printStackTrace();
@@ -745,5 +744,4 @@ public class Saros extends AbstractUIPlugin {
         return plugin.getPreferenceStore().getBoolean(
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
-
 }
