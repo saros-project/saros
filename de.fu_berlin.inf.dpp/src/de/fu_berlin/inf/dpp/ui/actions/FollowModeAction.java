@@ -137,7 +137,7 @@ public class FollowModeAction extends Action implements Disposable {
 
                 User toFollow = getNewToFollow();
 
-                log.info("setFollowing to " + toFollow);
+                log.info("Following: " + toFollow);
                 editorManager.setFollowing(toFollow);
             }
         });
