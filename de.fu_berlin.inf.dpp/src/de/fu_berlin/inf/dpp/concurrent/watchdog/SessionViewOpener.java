@@ -29,7 +29,7 @@ public class SessionViewOpener {
                 }
                 Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
-                        sarosUI.activateSessionView();
+                        sarosUI.bringToFrontSessionView();
                     }
                 });
 

@@ -149,7 +149,15 @@ public class SarosUI {
      * @swt
      */
     public void createSessionView() {
-        createView(SarosUI.SESSION_VIEW);
+        if (Util.findView(SarosUI.SESSION_VIEW) == null)
+            createView(SarosUI.SESSION_VIEW);
+    }
+
+    /**
+     * @swt
+     */
+    public void bringToFrontSessionView() {
+        bringToFrontView(SarosUI.SESSION_VIEW);
     }
 
     /**
@@ -157,6 +165,10 @@ public class SarosUI {
      */
     public void activateSessionView() {
         activateView(SarosUI.SESSION_VIEW);
+    }
+
+    protected void bringToFrontView(String view) {
+        showView(view, IWorkbenchPage.VIEW_VISIBLE);
     }
 
     protected void activateView(String view) {
