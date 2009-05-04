@@ -43,7 +43,7 @@ public class JoinSessionWizardUtils {
             ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
                 .getShell());
             try {
-                dialog.run(true, false, new IRunnableWithProgress() {
+                dialog.run(true, true, new IRunnableWithProgress() {
                     public void run(IProgressMonitor monitor) {
 
                         monitor.beginTask("Scanning workspace projects ... ",
@@ -90,7 +90,8 @@ public class JoinSessionWizardUtils {
 
     /**
      * Return the best match among all project from workspace with the given
-     * remote file list or null if no best match could be found.
+     * remote file list or null if no best match could be found or if the
+     * operation was canceled by the user.
      * 
      * To be considered a match, projects have to match at least 80%.
      */
@@ -107,6 +108,9 @@ public class JoinSessionWizardUtils {
 
         for (int i = 0; i < projects.length; i++) {
             monitor.worked(1);
+            if (monitor.isCanceled())
+                return null;
+
             if (!projects[i].isOpen()) {
                 continue;
             }
@@ -117,6 +121,8 @@ public class JoinSessionWizardUtils {
             if (matchScore > bestMatchScore) {
                 bestMatchScore = matchScore;
                 bestMatch = projects[i];
+                if (matchScore == 100)
+                    return bestMatch;
             }
         }
 
