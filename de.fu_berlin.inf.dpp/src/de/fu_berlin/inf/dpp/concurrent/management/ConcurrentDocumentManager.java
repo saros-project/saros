@@ -279,6 +279,10 @@ public class ConcurrentDocumentManager implements Disposable {
                 Operation op;
                 try {
                     op = jupiterClient.receiveRequest(request);
+                    // logger.trace("\n  " + "Transforming: "
+                    // + request.getOperation() + " ("
+                    // + request.getTimestamp() + ")\n" + "  into        : "
+                    // + op);
                 } catch (TransformationException e) {
                     ConcurrentDocumentManager.logger.error(
                         "Error during transformation: ", e);
