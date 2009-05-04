@@ -55,6 +55,11 @@ public class Document {
         return doc.toString();
     }
 
+    @Override
+    public String toString() {
+        return doc.toString();
+    }
+
     /**
      * Execute Operation on document state.
      * 

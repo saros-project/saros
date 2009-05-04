@@ -61,10 +61,16 @@ public class GOTOInclusionTransformation implements InclusionTransformation {
 
         boolean privileged = (Boolean) param;
 
+        /**
+         * A NoOperation is not affected.
+         */
         if (op1 instanceof NoOperation) {
-            return op2;
+            return new NoOperation();
         }
 
+        /**
+         * If the context is null, we return op1 unchanged.
+         */
         if (op2 instanceof NoOperation) {
             return op1;
         }

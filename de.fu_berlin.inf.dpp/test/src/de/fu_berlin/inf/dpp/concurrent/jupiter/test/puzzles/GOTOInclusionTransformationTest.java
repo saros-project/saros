@@ -5,10 +5,23 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 
 public class GOTOInclusionTransformationTest extends JupiterTestCase {
+
+    public static Operation S(Operation one, Operation two) {
+        return new SplitOperation(one, two);
+    }
+
+    public static Operation I(int i, String s) {
+        return new InsertOperation(i, s);
+    }
+
+    public static Operation D(int i, String s) {
+        return new DeleteOperation(i, s);
+    }
 
     protected InclusionTransformation inclusion = new GOTOInclusionTransformation();
     protected Operation insertOp = new InsertOperation(3, "abc");
@@ -172,5 +185,102 @@ public class GOTOInclusionTransformationTest extends JupiterTestCase {
             4, "4"), new DeleteOperation(9, "5")),
             new InsertOperation(4, "abc"));
         assertEquals(expectedOp, newOp);
+    }
+
+    public void testNoOperation() {
+
+        Operation op1 = new NoOperation();
+        Operation op2 = S(D(4, "AB"), I(4, "D"));
+
+        // op1'(op2)
+        assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+            Boolean.FALSE));
+
+        // op2'(op1)
+        assertEquals(op2, inclusion.transform(op2, op1, Boolean.FALSE));
+    }
+
+    public void testPartiallyConsumedDeleteOperation() {
+
+        {
+            Operation op1 = D(4, "ABC");
+            Operation op2 = D(5, "BC");
+
+            // op1'(op2)
+            assertEquals(D(4, "A"), inclusion
+                .transform(op1, op2, Boolean.FALSE));
+        }
+        {
+            Operation op1 = D(4, "ABC");
+            Operation op2 = D(4, "AB");
+
+            // op1'(op2)
+            assertEquals(D(4, "C"), inclusion
+                .transform(op1, op2, Boolean.FALSE));
+        }
+
+        {
+            Operation op1 = D(4, "ABC");
+            Operation op2 = D(5, "BCDEF");
+
+            // op1'(op2)
+            assertEquals(D(4, "A"), inclusion
+                .transform(op1, op2, Boolean.FALSE));
+        }
+        {
+            Operation op1 = D(4, "ABC");
+            Operation op2 = D(2, "89AB");
+
+            // op1'(op2)
+            assertEquals(D(2, "C"), inclusion
+                .transform(op1, op2, Boolean.FALSE));
+        }
+
+    }
+
+    public void testTotallyConsumedDeleteOperation() {
+
+        {
+            Operation op1 = D(4, "A");
+            Operation op2 = D(4, "AB");
+
+            // op1'(op2)
+            assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+                Boolean.FALSE));
+        }
+        {
+            Operation op1 = D(5, "B");
+            Operation op2 = D(4, "AB");
+
+            // op1'(op2)
+            assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+                Boolean.FALSE));
+        }
+
+        {
+            Operation op1 = D(5, "B");
+            Operation op2 = D(4, "ABC");
+
+            // op1'(op2)
+            assertEquals(new NoOperation(), inclusion.transform(op1, op2,
+                Boolean.FALSE));
+        }
+
+    }
+
+    public void testNoOperationInternal() {
+
+        /**
+         * This test causes a NoOperation to occur when transforming two
+         * SplitOperations
+         */
+        Operation op1 = S(D(4, "A"), I(4, "C"));
+        Operation op2 = S(D(4, "AB"), I(4, "D"));
+
+        // op1'(op2)
+        Operation newOp = inclusion.transform(op1, op2, Boolean.FALSE);
+        Operation expectedOp = new InsertOperation(5, "C", 4);
+        assertEquals(expectedOp, newOp);
+
     }
 }
