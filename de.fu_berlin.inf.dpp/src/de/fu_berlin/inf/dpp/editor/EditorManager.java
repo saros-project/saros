@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -1163,8 +1164,9 @@ public class EditorManager implements IActivityProvider {
             try {
                 is = doc.get(offset, replacedText.length());
                 if (!is.equals(replacedText)) {
-                    log.error("replaceText should be '" + replacedText
-                        + "' is '" + is + "'");
+                    log.error("replaceText should be '"
+                        + StringEscapeUtils.escapeJava(replacedText) + "' is '"
+                        + StringEscapeUtils.escapeJava(is) + "'");
                 }
             } catch (BadLocationException e) {
                 // Ignore, because this is going to fail again just below
