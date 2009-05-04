@@ -493,6 +493,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     protected void exec(final IActivity activity) {
 
+        log.debug("Executing untransformed activity: " + activity);
+
         // TODO Replace this with a single call to the ConcurrentDocumentManager
         // and use the ActivityReceiver to handle all cases.
         try {
@@ -508,6 +510,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (activity instanceof Request) {
                 this.concurrentDocumentManager
                     .receiveRequest((Request) activity);
+                return;
             }
         } catch (Exception e) {
             log.error("Error while executing activity.", e);
@@ -553,6 +556,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
          * the host.
          */
         synchronized (execLock) {
+
+            log.debug("Rcvd Activities fr " + nextActivity.getSource() + ":"
+                + nextActivity);
+
             queues.add(nextActivity);
 
             if (!started)
@@ -821,7 +828,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         assert Util.isSWT();
 
         try {
-            log.debug("execute transformed activity: " + activity);
+            log.debug("Executing   transformed activity: " + activity);
 
             for (IActivityProvider exec : this.providers) {
                 exec.exec(activity);
@@ -835,7 +842,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
             // send activity to everybody
             if (this.concurrentDocumentManager.isHostSide()) {
-                log.debug("send transformed activity: " + activity);
+                // log.debug("send transformed activity: " + activity);
                 this.activities.add(activity);
             }
         } catch (Exception e) {
