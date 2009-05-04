@@ -661,11 +661,17 @@ public class EditorAPI implements IEditorAPI {
         int bottom = top + viewport.getNumberOfLines();
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
+        IDocument document = viewer.getDocument();
+
+        // Normalize line range...
+        int lines = document.getNumberOfLines();
+        top = Math.max(0, Math.min(lines - 1, top));
+        bottom = Math.max(0, Math.min(lines - 1, bottom));
 
         try {
             // Show the middle of the driver's viewport.
-            viewer.revealRange(viewer.getDocument().getLineOffset(
-                top + ((bottom - top) / 2)), 0);
+            viewer.revealRange(document.getLineOffset(top
+                + ((bottom - top) / 2)), 0);
         } catch (BadLocationException e) {
             log.error("Internal Error: BadLocationException - ", e);
         }
