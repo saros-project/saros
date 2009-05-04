@@ -10,6 +10,7 @@ import junit.framework.TestCase;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -139,7 +140,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             .singletonList(new TimedActivity(activity, 42)));
     }
 
-    protected ActivitiesPacketExtension parseExtension(String xml)
+    protected PacketExtension parseExtension(String xml)
         throws XmlPullParserException, IOException {
         /*
          * Smack calls the provider with a parser that is already within the
