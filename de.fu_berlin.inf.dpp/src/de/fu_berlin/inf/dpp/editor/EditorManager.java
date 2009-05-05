@@ -425,8 +425,7 @@ public class EditorManager implements IActivityProvider {
                         user.getJID().toString());
                 }
             });
-            remoteEditorManager.removeUser(sharedProject.getParticipant(user
-                .getJID()));
+            remoteEditorManager.removeUser(user);
         }
     };
 
