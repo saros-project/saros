@@ -389,8 +389,8 @@ public class EditorAPI implements IEditorAPI {
                     }
                 }
                 Position position = new Position(offset, length);
-                SarosAnnotation newAnnotation = new SelectionAnnotation(saros,
-                    source, isCursor);
+                SarosAnnotation newAnnotation = new SelectionAnnotation(source,
+                    isCursor);
 
                 for (@SuppressWarnings("unchecked")
                 Iterator<Annotation> it = model.getAnnotationIterator(); it
@@ -743,7 +743,7 @@ public class EditorAPI implements IEditorAPI {
             int end = document.getLineOffset(bottom);
             if (end == -1 || end < start)
                 throw new BadLocationException("End line -1 or less than start");
-            SarosAnnotation annotation = new ViewportAnnotation(saros, source);
+            SarosAnnotation annotation = new ViewportAnnotation(source);
             Position position = new Position(start, end - start);
             model.addAnnotation(annotation, position);
         } catch (BadLocationException e) {

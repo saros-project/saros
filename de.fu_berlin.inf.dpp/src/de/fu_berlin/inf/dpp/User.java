@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A user is a representation of a person sitting in front of an eclipse
@@ -221,5 +222,26 @@ public class User {
      */
     public boolean isClient() {
         return !isHost();
+    }
+
+    public String getHumanReadableName() {
+
+        if (isLocal()) {
+            return "You";
+        }
+
+        /*
+         * TODO This should use a subscription based mechanism or cache the
+         * nick, to prevent this being called too many times
+         */
+        String nickName = Util.getNickname(getSharedProject().getSaros(),
+            getJID());
+        String jidBase = getJID().getBase();
+
+        if (nickName != null && nickName.trim().length() > 0) {
+            return nickName + " (" + jidBase + ")";
+        }
+
+        return jidBase;
     }
 }
