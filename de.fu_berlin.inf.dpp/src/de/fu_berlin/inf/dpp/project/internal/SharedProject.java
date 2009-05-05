@@ -328,6 +328,11 @@ public class SharedProject implements ISharedProject, Disposable {
     // TODO Review sendRequest for InterruptedException and remove this flag.
     boolean stopped = true;
 
+    /**
+     * Stops the associated activity sequencer.
+     * 
+     * @throws IllegalStateException if the shared project is already stopped.
+     */
     public void stop() {
         if (stopped) {
             throw new IllegalStateException();
@@ -403,6 +408,10 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public ITransmitter getTransmitter() {
         return transmitter;
+    }
+
+    public Saros getSaros() {
+        return saros;
     }
 
     public int getFreeColor() {

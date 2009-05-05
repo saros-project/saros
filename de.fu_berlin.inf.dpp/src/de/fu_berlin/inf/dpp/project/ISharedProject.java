@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IProject;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
@@ -210,6 +211,11 @@ public interface ISharedProject {
      * transmitting changes to the other participants
      */
     public ITransmitter getTransmitter();
+
+    /**
+     * The Saros Plugin this SharedProject is running in.
+     */
+    public Saros getSaros();
 
     /**
      * Get a free color from the pool.
