@@ -77,7 +77,7 @@ public class SarosUI {
     public SarosUI(SessionManager sessionManager, JDTFacade jdtFacade,
         CDTFacade cdtFacade) {
 
-        // It would be nice to eliminiate these, because they cause dependencies
+        // It would be nice to eliminate these, because they cause dependencies
         // to the JDT and CDT, but they are necessary to prevent Observers
         // from editing the documents
         if (jdtFacade.isJDTAvailable()) {

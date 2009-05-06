@@ -111,7 +111,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         /** Queue of activities received. */
         protected final PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
 
-        /** History of activities sent */
+        /**
+         * History of activities sent.
+         * 
+         * TODO Not really used at the moment. File creation activities don't
+         * store the content at the time they were sent, so they can't be
+         * re-send.
+         */
         protected final List<TimedActivity> history = new LinkedList<TimedActivity>();
 
         public ActivityQueue(JID jid) {
