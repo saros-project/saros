@@ -21,6 +21,7 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -114,6 +115,67 @@ public class SplitOperation implements Operation {
     public List<TextEditActivity> toTextEdit(IPath path, String source) {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>();
+
+        if (getFirst() instanceof InsertOperation
+            && getSecond() instanceof InsertOperation) {
+
+            InsertOperation op1 = (InsertOperation) getFirst();
+            InsertOperation op2 = (InsertOperation) getSecond();
+
+            // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
+            if (op1.getPosition() + op1.getTextLength() == op2.getPosition()) {
+                op1 = new InsertOperation(op1.getPosition(), op1.getText()
+                    + op2.getText());
+                return op1.toTextEdit(path, source);
+            } else if (op1.getPosition() == op2.getPosition()
+                + op2.getTextLength()) {
+                op1 = new InsertOperation(op2.getPosition(), op2.getText()
+                    + op1.getText());
+                return op1.toTextEdit(path, source);
+            }
+
+        } else if (getFirst() instanceof DeleteOperation
+            && getSecond() instanceof DeleteOperation) {
+            DeleteOperation op1 = (DeleteOperation) getFirst();
+            DeleteOperation op2 = (DeleteOperation) getSecond();
+
+            // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
+            if (op1.getPosition() == op2.getPosition()) {
+                op1 = new DeleteOperation(op1.getPosition(), op1.getText()
+                    + op2.getText());
+                return op1.toTextEdit(path, source);
+            }
+
+        } else if (getFirst() instanceof InsertOperation
+            && getSecond() instanceof DeleteOperation) {
+            InsertOperation op1 = (InsertOperation) getFirst();
+            DeleteOperation op2 = (DeleteOperation) getSecond();
+
+            if (op1.getPosition() == op2.getPosition()) {
+                // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
+                if (op2.getText().startsWith(op1.getText())) {
+                    op2 = new DeleteOperation(op1.getPosition(), op2.getText()
+                        .substring(op1.getTextLength()));
+                    return op2.toTextEdit(path, source);
+                }
+                // Ins(5,"abcd") + Del(5,"ab") -> Ins(5,"cd")
+                else if (op1.getText().startsWith(op2.getText())) {
+                    op1 = new InsertOperation(op1.getPosition(), op1.getText()
+                        .substring(op2.getTextLength()));
+                    return op1.toTextEdit(path, source);
+                }
+            }
+
+        } else if (getFirst() instanceof DeleteOperation
+            && getSecond() instanceof InsertOperation) {
+            DeleteOperation op1 = (DeleteOperation) getFirst();
+            InsertOperation op2 = (InsertOperation) getSecond();
+
+            // Del(8,"abc") + Ins(8,"ghijk") -> Replace "abc" with "ghijk"
+            if (op1.getPosition() == op2.getPosition())
+                return Collections.singletonList(new TextEditActivity(source,
+                    op1.getPosition(), op2.getText(), op1.getText(), path));
+        }
 
         result.addAll(getFirst().toTextEdit(path, source));
         result.addAll(getSecond().toTextEdit(path, source));
