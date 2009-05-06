@@ -68,6 +68,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -293,6 +294,9 @@ public class SessionView extends ViewPart {
     @Inject
     protected SessionManager sessionManager;
 
+    @Inject
+    protected ConsistencyWatchdogClient consistencyWatchdogClient;
+
     public SessionView() {
 
         Saros.reinject(this);
@@ -389,7 +393,8 @@ public class SessionView extends ViewPart {
             editorManager);
         this.disposables.add(followModeAction);
         this.leaveSessionAction = new LeaveSessionAction(sessionManager);
-        this.consistencyAction = new ConsistencyAction();
+        this.consistencyAction = new ConsistencyAction(
+            consistencyWatchdogClient, sessionManager);
         this.openInvitationInterfaceAction = new OpenInviteInterface(
             sessionManager);
         this.removeAllDriverRoleAction = new RemoveAllDriverRoleAction(
