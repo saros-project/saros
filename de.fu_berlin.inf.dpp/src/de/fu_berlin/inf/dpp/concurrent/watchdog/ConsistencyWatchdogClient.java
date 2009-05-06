@@ -136,10 +136,6 @@ public class ConsistencyWatchdogClient {
             // checksums from the host
             checkConsistency();
 
-            // Send message to host that inconsistency are handled
-            transmitter.sendFileChecksumErrorMessage(getParticipants(),
-                pathsOfHandledFiles, true);
-
             return true;
         }
 
@@ -283,17 +279,12 @@ public class ConsistencyWatchdogClient {
      * 
      * @param newState
      *            If <code>true</code> the method starts the error handling. If
-     *            the last call of performCheck didn't find any inconsistencies
-     *            this method does nothing. If <code>false</code> the watchdog
-     *            unregister his {@link DataReceiver} and finish the error
-     *            handling.
+     *            <code>false</code> the watchdog unregister his
+     *            {@link DataReceiver} and finish the error handling.
      */
     public void setChecksumErrorHandling(boolean newState) {
 
-        if (pathsWithWrongChecksums.isEmpty())
-            return;
-
-        if (executingChecksumErrorHandling) {
+        if (executingChecksumErrorHandling && newState) {
             logger.warn("Restarting Checksum Error Handling"
                 + " while another operation is running");
             // HACK If we programmed correctly this should not happen
@@ -331,6 +322,10 @@ public class ConsistencyWatchdogClient {
 
                 // Unregister from dataTransferManager
                 dataTransferManager.removeDataReceiver(receiver);
+
+                // Send message to host that inconsistency are handled
+                transmitter.sendFileChecksumErrorMessage(getParticipants(),
+                    pathsOfHandledFiles, true);
 
                 pathsOfHandledFiles.clear();
             }
