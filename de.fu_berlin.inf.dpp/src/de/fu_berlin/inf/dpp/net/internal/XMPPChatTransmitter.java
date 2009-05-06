@@ -755,8 +755,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 + " but User is no participant: " + timedActivities);
             return;
         } else {
-            XMPPChatTransmitter.log.debug("Received activities from " + source
-                + ": " + timedActivities);
+            XMPPChatTransmitter.log.debug("Rcvd [" + fromJID.getName() + "]: "
+                + timedActivities);
         }
 
         for (TimedActivity timedActivity : timedActivities) {

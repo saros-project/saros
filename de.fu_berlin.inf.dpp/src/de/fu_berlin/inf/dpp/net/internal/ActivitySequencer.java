@@ -562,10 +562,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
          * the host.
          */
         synchronized (execLock) {
-
-            log.debug("Rcvd Activities fr " + nextActivity.getSource() + ":"
-                + nextActivity);
-
             queues.add(nextActivity);
 
             if (!started)
