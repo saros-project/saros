@@ -689,9 +689,10 @@ public class EditorAPI implements IEditorAPI {
         updateViewportAnnotation(viewer, top, bottom, user);
     }
 
-    public static LineRange getViewport(ITextViewer viewer) {
+    public static ILineRange getViewport(ITextViewer viewer) {
         int top = viewer.getTopIndex();
-        int bottom = viewer.getBottomIndex();
+        // Have to add +1 because a LineRange should excludes the bottom line
+        int bottom = viewer.getBottomIndex() + 1;
 
         if (bottom < top) {
             // FIXME This warning occurs when the document is shorter than the
@@ -704,7 +705,7 @@ public class EditorAPI implements IEditorAPI {
         return new LineRange(top, bottom - top);
     }
 
-    public LineRange getViewport(IEditorPart editorPart) {
+    public ILineRange getViewport(IEditorPart editorPart) {
         ITextViewer textViewer = EditorAPI.getViewer(editorPart);
         if (textViewer == null)
             return null;

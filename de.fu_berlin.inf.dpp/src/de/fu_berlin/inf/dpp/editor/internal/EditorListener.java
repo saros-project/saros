@@ -4,10 +4,13 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.text.ITextListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.IViewportListener;
+import org.eclipse.jface.text.TextEvent;
 import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -39,6 +42,8 @@ public class EditorListener {
 
     protected ITextSelection lastSelection = new TextSelection(-1, -1);
 
+    protected ILineRange lastViewport = new LineRange(-1, -1);
+
     public EditorListener(EditorManager manager) {
         this.manager = manager;
     }
@@ -61,7 +66,7 @@ public class EditorListener {
         textWidget.addControlListener(controlListener);
         textWidget.addMouseListener(mouseListener);
         textWidget.addKeyListener(keyListener);
-
+        viewer.addTextListener(textListener);
         viewer.getSelectionProvider().addSelectionChangedListener(
             selectionChangedListener);
         viewer.addViewportListener(viewportListener);
@@ -87,6 +92,7 @@ public class EditorListener {
         viewer.getSelectionProvider().removeSelectionChangedListener(
             selectionChangedListener);
         viewer.removeViewportListener(viewportListener);
+        viewer.removeTextListener(textListener);
 
         viewer = null;
         part = null;
@@ -149,6 +155,23 @@ public class EditorListener {
         }
     };
 
+    /**
+     * Listens to newlines being inserted or deleted to inform our listener of
+     * updates to the view port
+     */
+    protected ITextListener textListener = new ITextListener() {
+
+        public void textChanged(TextEvent event) {
+
+            String text = event.getText();
+            String replaced = event.getReplacedText();
+            if ((text != null && text.indexOf('\n') != -1)
+                || (replaced != null && replaced.indexOf('\n') != -1)) {
+                generateViewport();
+            }
+        }
+    };
+
     protected void generateSelection() {
 
         ITextSelection selection = (ITextSelection) viewer
@@ -160,14 +183,30 @@ public class EditorListener {
         }
     }
 
+    public boolean equals(ILineRange one, ILineRange two) {
+
+        if (one == null ^ two == null)
+            return false;
+
+        if (one == null && two == null)
+            return true;
+
+        // both != null
+        return one.getNumberOfLines() == two.getNumberOfLines()
+            && one.getStartLine() == two.getStartLine();
+    }
+
     protected void generateViewport() {
 
-        LineRange viewport = EditorAPI.getViewport(viewer);
+        ILineRange viewport = EditorAPI.getViewport(viewer);
 
-        if (log.isDebugEnabled()) {
-            log.debug("Viewport changed: " + viewport);
+        if (!equals(viewport, lastViewport)) {
+            lastViewport = viewport;
+            if (log.isDebugEnabled() && viewport != null) {
+                log.debug("Viewport changed: " + viewport.getStartLine() + "+"
+                    + viewport.getNumberOfLines());
+            }
+            manager.generateViewport(part, viewport);
         }
-
-        manager.generateViewport(part, viewport);
     }
 }
