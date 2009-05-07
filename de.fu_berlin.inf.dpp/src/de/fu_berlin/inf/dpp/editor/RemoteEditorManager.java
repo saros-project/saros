@@ -242,6 +242,14 @@ public class RemoteEditorManager {
             return this.user;
         }
 
+        /**
+         * Returns a snapshot copy of the editors open for the remote user
+         * represented by this RemoteEditorState.
+         */
+        public Set<IPath> getRemoteOpenEditors() {
+            return new HashSet<IPath>(openEditors.keySet());
+        }
+
     }
 
     public RemoteEditorManager(ISharedProject sharedProject) {
@@ -317,5 +325,17 @@ public class RemoteEditorManager {
             result.addAll(state.openEditors.keySet());
         }
         return result;
+    }
+
+    /**
+     * Returns a snapshot copy of all paths representing the editors which are
+     * currently opened by the given remote user of this shared session (i.e.
+     * not our own).
+     * 
+     * If no editors are opened by the given user an empty set is being
+     * returned.
+     */
+    public Set<IPath> getRemoteOpenEditors(User user) {
+        return getEditorState(user).getRemoteOpenEditors();
     }
 }

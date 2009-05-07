@@ -1627,6 +1627,16 @@ public class EditorManager implements IActivityProvider {
         this.editorAPI.reveal(newEditor, viewport);
     }
 
+    /**
+     * Returns a snap shot copy of the paths representing the editors that the
+     * given user has currently opened (one of them being the active editor).
+     * 
+     * Returns an empty set if the user has no editors open.
+     */
+    public Set<IPath> getRemoteOpenEditors(User user) {
+        return remoteEditorManager.getRemoteOpenEditors(user);
+    }
+
     public List<User> getRemoteOpenEditorUsers(IPath path) {
         return remoteEditorManager.getRemoteOpenEditorUsers(path);
     }
