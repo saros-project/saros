@@ -552,21 +552,25 @@ public class RosterView extends ViewPart implements IConnectionListener,
     }
 
     /**
-     * Needs to called from an UI thread.
+     * @swt Needs to called from an UI thread.
      */
-    private void updateEnablement() {
+    protected void updateEnablement() {
         this.label.setEnabled(saros.isConnected());
+        if (saros.isConnected())
+            label.setToolTipText("Connected using Saros " + saros.getVersion());
+        else
+            label.setToolTipText(null);
     }
 
     /**
      * @swt Needs to called from UI thread.
      */
-    private void updateStatusInformation(final ConnectionState newState) {
+    protected void updateStatusInformation(final ConnectionState newState) {
         label.setText(sarosUI.getDescription(newState));
         composite.layout();
     }
 
-    private void attachRosterListener() {
+    protected void attachRosterListener() {
 
         this.connection.getRoster().addRosterListener(new RosterListener() {
             public void entriesAdded(Collection<String> addresses) {

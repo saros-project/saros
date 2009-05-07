@@ -117,6 +117,8 @@ public class Saros extends AbstractUIPlugin {
 
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
+    public String sarosVersion;
+
     public String sarosFeatureID;
 
     protected SessionManager sessionManager;
@@ -283,15 +285,15 @@ public class Saros extends AbstractUIPlugin {
 
         super.start(context);
 
-        String version = Util.getBundleVersion(getBundle(), "Unknown Version");
+        sarosVersion = Util.getBundleVersion(getBundle(), "Unknown Version");
 
-        sarosFeatureID = plugin.toString() + "_" + version;
+        sarosFeatureID = plugin.toString() + "_" + sarosVersion;
 
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
 
         setupLoggers();
-        logger.info("Starting Saros " + version + " running:\n"
+        logger.info("Starting Saros " + sarosVersion + " running:\n"
             + Util.getPlatformInfo());
 
         // Make sure that all components in the container are
@@ -558,7 +560,7 @@ public class Saros extends AbstractUIPlugin {
      * @param rosterEntry
      *            the contact that is to be removed
      * @throws XMPPException
-     *             is thrown if no connection is establised.
+     *             is thrown if no connection is established.
      */
     public void removeContact(RosterEntry rosterEntry) throws XMPPException {
         assertConnection();
@@ -738,6 +740,17 @@ public class Saros extends AbstractUIPlugin {
             // logger.debug("saros reconnection successful");
             // setConnectionState(ConnectionState.CONNECTED, null);
         }
+    }
+
+    /**
+     * Returns a string representing the Saros Version number for instance
+     * "9.5.7.r1266"
+     * 
+     * This method only returns a valid version string after the plugin has been
+     * started.
+     */
+    public String getVersion() {
+        return sarosVersion;
     }
 
     public static boolean getFileTransferModeViaChat() {

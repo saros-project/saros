@@ -280,7 +280,7 @@ public class ConsistencyWatchdogClient {
      * @param newState
      *            If <code>true</code> the method starts the error handling. If
      *            <code>false</code> the watchdog unregister his
-     *            {@link DataReceiver} and finish the error handling.
+     *            {@link IDataReceiver} and finish the error handling.
      */
     public void setChecksumErrorHandling(boolean newState) {
 
