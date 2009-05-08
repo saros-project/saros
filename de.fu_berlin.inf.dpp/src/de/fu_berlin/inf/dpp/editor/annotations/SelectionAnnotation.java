@@ -16,6 +16,6 @@ public class SelectionAnnotation extends SarosAnnotation {
     public SelectionAnnotation(User source, boolean isCursor) {
         super(SelectionAnnotation.TYPE, true, (isCursor ? "Cursor"
             : "Selection")
-            + " of" + source.getHumanReadableName(), source);
+            + " of " + source.getHumanReadableName(), source);
     }
 }

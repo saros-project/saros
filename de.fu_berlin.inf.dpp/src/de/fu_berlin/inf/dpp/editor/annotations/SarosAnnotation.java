@@ -19,10 +19,15 @@ import de.fu_berlin.inf.dpp.User;
  */
 public abstract class SarosAnnotation extends Annotation {
 
-    /** Source of this annotation (jabber id). */
-    private User source;
     @SuppressWarnings("unused")
     private Logger log = Logger.getLogger(SarosAnnotation.class);
+
+    /**
+     * Source of this annotation (jabber id).
+     * 
+     * All access should use getSource()
+     */
+    private User source;
 
     /**
      * Creates a SarosAnnotation.
@@ -37,7 +42,8 @@ public abstract class SarosAnnotation extends Annotation {
      * @param source
      *            the user which created this annotation
      */
-    SarosAnnotation(String type, boolean isNumbered, String text, User source) {
+    public SarosAnnotation(String type, boolean isNumbered, String text,
+        User source) {
         super(type, false, text);
         this.source = source;
 
@@ -54,7 +60,7 @@ public abstract class SarosAnnotation extends Annotation {
 
         int colorID = user.getColorID();
 
-        // TODO This should depend on the SelectionAnnotation, but be
+        // TODO This should not depend on the SelectionAnnotation, but be
         // configurable like all colors!
         String annotationType = SelectionAnnotation.TYPE + "."
             + String.valueOf(colorID + 1);
