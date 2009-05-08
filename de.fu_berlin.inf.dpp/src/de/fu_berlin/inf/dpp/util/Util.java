@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.util;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
@@ -632,5 +633,28 @@ public class Util {
         } else {
             return "[" + jid.getName() + "] ";
         }
+    }
+
+    /**
+     * Given a *File*name, this function will ensure that if the filename
+     * contains directories, these directories are created.
+     * 
+     * Returns true if the directory of the given file already exists or the
+     * file has no parent directory.
+     * 
+     * Returns false, if the directory could not be created.
+     */
+    public static boolean mkdirs(String filename) {
+        File parent = new File(filename).getParentFile();
+
+        if (parent == null || parent.isDirectory()) {
+            return true;
+        }
+
+        if (!parent.mkdirs()) {
+            log.error("Could not create Dir: " + parent.getPath());
+            return false;
+        } else
+            return true;
     }
 }
