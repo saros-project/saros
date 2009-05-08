@@ -11,7 +11,6 @@ import org.apache.log4j.spi.ThrowableInformation;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 
@@ -20,83 +19,61 @@ import de.fu_berlin.inf.dpp.Saros;
  */
 public class EclipseLogAppender extends AppenderSkeleton {
 
-    public static Throwable getThrowable(LoggingEvent event) {
-        ThrowableInformation information = event.getThrowableInformation();
-        if (information != null) {
-            return information.getThrowable();
-        } else {
-            return null;
-        }
-    }
+    /**
+     * While there is no Saros plug-in known the LoggingEvents are cached in
+     * this list
+     */
+    protected List<LoggingEvent> cache = new LinkedList<LoggingEvent>();
 
-    public static class LogEvent {
-
-        public LogEvent(int level, String message, Throwable t) {
-            this.level = level;
-            this.message = message;
-            this.t = t;
-        }
-
-        protected int level;
-
-        protected String message;
-
-        protected Throwable t;
-
-        public int getLevel() {
-            return level;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public Throwable getT() {
-            return t;
-        }
-    }
-
+    /*
+     * Dependencies
+     */
     @Inject
     protected Saros saros;
 
-    protected List<LogEvent> queuedMessages = new LinkedList<LogEvent>();
+    protected void appendInternal(LoggingEvent event) {
 
-    protected void log(int level, String message, @Nullable Throwable t) {
+        Level level = event.getLevel();
 
-        if (saros == null) {
-            try {
-                Saros.reinject(this);
-            } catch (RuntimeException e) {
-                // ignore
-            }
-        }
-
-        queuedMessages.add(new LogEvent(level, message, t));
-        if (saros == null) {
+        if (!level.isGreaterOrEqual(Level.WARN)) {
             return;
         }
 
-        while (queuedMessages.size() > 0) {
-            LogEvent event = queuedMessages.remove(0);
-            IStatus logMessage = new Status(event.getLevel(), Saros.SAROS,
-                IStatus.OK, event.getMessage(), event.getT());
-            saros.getLog().log(logMessage);
+        String message = this.layout.format(event);
+
+        int status;
+
+        if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
+            status = IStatus.ERROR;
+        } else {
+            status = IStatus.WARNING;
         }
+
+        IStatus logMessage = new Status(status, Saros.SAROS, IStatus.OK,
+            message, getThrowable(event));
+        saros.getLog().log(logMessage);
     }
 
     @Override
     protected void append(LoggingEvent event) {
-        if (event.getLevel().isGreaterOrEqual(Level.WARN)) {
 
-            String message = this.layout.format(event);
+        if (saros == null && Saros.isInitialized()) {
 
-            if (event.getLevel().isGreaterOrEqual(Level.ERROR)) {
-                log(IStatus.ERROR, message, getThrowable(event));
-            } else if (event.getLevel().equals(Level.WARN)) {
-                log(IStatus.WARNING, message, getThrowable(event));
+            // Initialize
+            Saros.reinject(this);
+
+            // Flush Cache
+            for (LoggingEvent cached : cache) {
+                appendInternal(cached);
             }
         }
 
+        // Cache events until Saros is initialized
+        if (saros != null) {
+            appendInternal(event);
+        } else {
+            cache.add(event);
+        }
     }
 
     @Override
@@ -110,6 +87,15 @@ public class EclipseLogAppender extends AppenderSkeleton {
 
     public boolean requiresLayout() {
         return true;
+    }
+
+    public static Throwable getThrowable(LoggingEvent event) {
+        ThrowableInformation information = event.getThrowableInformation();
+        if (information != null) {
+            return information.getThrowable();
+        } else {
+            return null;
+        }
     }
 
 }
