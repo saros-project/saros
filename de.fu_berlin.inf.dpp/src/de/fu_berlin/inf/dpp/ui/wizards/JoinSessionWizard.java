@@ -24,7 +24,9 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -39,14 +41,16 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * A wizard that guides the user through an incoming invitiation process.
+ * A wizard that guides the user through an incoming invitation process.
  * 
- * Todo:
+ * TODO Automatically switch to follow mode
  * 
- * o Automatically switch to follow mode
- * 
- * o Suggest if the project is a CVS project that the user checks it out and
+ * TODO Suggest if the project is a CVS project that the user checks it out and
  * offers an option to transfer the settings
+ * 
+ * TODO Create a separate Wizard class with the following concerns implemented
+ * more nicely: Long-Running Operation after each step, cancelation by a remote
+ * party, auto-advance.
  * 
  * @author rdjemili
  */
@@ -90,6 +94,12 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public IWizardPage getNextPage(IWizardPage page) {
+
+        /*
+         * Increment pages for auto-next, because the request will block too
+         * long
+         */
+        pageChanges++;
 
         if (page.equals(descriptionPage) && !requested) {
             if (!requestHostFileList()) {
@@ -251,9 +261,39 @@ public class JoinSessionWizard extends Wizard {
 
     public void setWizardDlg(WizardDialogAccessable wd) {
         this.wizardDialog = wd;
+
+        /**
+         * Listen to page changes so we can cancel our automatic clicking the
+         * next button
+         */
+        this.wizardDialog.addPageChangingListener(new IPageChangingListener() {
+            public void handlePageChanging(PageChangingEvent event) {
+                pageChanges++;
+            }
+        });
+
     }
 
+    /**
+     * Variable is only used to count how many times pageChanges were registered
+     * so we only press the next button if no page changes occurred.
+     * 
+     * The only place this is needed is below in the pressWizardButton, if you
+     * want to know the number of page changes, count them yourself.
+     */
+    private int pageChanges = 0;
+
+    protected boolean disposed = false;
+
+    /**
+     * Will wait one second and then press the next button, if the dialog is
+     * still on the given page (i.e. if the user presses next then this will not
+     * call next again).
+     */
     public void pressWizardButton(final int buttonID) {
+
+        final int pageChangesAtStart = pageChanges;
+
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
                 try {
@@ -264,11 +304,18 @@ public class JoinSessionWizard extends Wizard {
                 }
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        wizardDialog.buttonPressed(buttonID);
+                        if (pageChangesAtStart == pageChanges && !disposed)
+                            wizardDialog.buttonPressed(buttonID);
                     }
                 });
             }
         });
+    }
+
+    @Override
+    public void dispose() {
+        disposed = true;
+        super.dispose();
     }
 
     public String getUpdateProject() {
