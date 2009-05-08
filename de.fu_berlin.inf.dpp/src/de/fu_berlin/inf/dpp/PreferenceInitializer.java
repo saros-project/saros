@@ -20,8 +20,8 @@
 package de.fu_berlin.inf.dpp;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.picocontainer.annotations.Inject;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 /**
  * Class used to initialize default preference values.
@@ -30,34 +30,27 @@ import org.picocontainer.annotations.Inject;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-    @Inject
-    protected Saros saros;
-
-    public PreferenceInitializer() {
-        Saros.reinject(this);
-    }
-
     /*
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = saros.getPreferenceStore();
-        store.setDefault(PreferenceConstants.SERVER, "jabber.org");
-        store.setDefault(PreferenceConstants.USERNAME, "");
-        store.setDefault(PreferenceConstants.PASSWORD, "");
+        IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
 
-        store.setDefault(PreferenceConstants.AUTO_CONNECT, false);
-        store.setDefault(PreferenceConstants.AUTO_FOLLOW_MODE, false);
-        store.setDefault(PreferenceConstants.SKYPE_USERNAME, "");
-        store.setDefault(PreferenceConstants.DEBUG, false);
-        store.setDefault(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
-        store.setDefault(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
-        store.setDefault(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
-        store.setDefault(PreferenceConstants.STUN, "stunserver.org");
-        store.setDefault(PreferenceConstants.STUN_PORT, 3478);
-        store.setDefault(PreferenceConstants.MULTI_DRIVER, false);
-        store.setDefault(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
-        store.setDefault(PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, true);
+        prefs.put(PreferenceConstants.SERVER, "jabber.org");
+        prefs.put(PreferenceConstants.USERNAME, "");
+        prefs.put(PreferenceConstants.PASSWORD, "");
+        prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, false);
+        prefs.putBoolean(PreferenceConstants.AUTO_FOLLOW_MODE, false);
+        prefs.put(PreferenceConstants.SKYPE_USERNAME, "");
+        prefs.putBoolean(PreferenceConstants.DEBUG, false);
+        prefs.putInt(PreferenceConstants.FILE_TRANSFER_PORT, 7777);
+        prefs.putBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT, false);
+        prefs.putInt(PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE, 50000);
+        prefs.put(PreferenceConstants.STUN, "stunserver.org");
+        prefs.putInt(PreferenceConstants.STUN_PORT, 3478);
+        prefs.putBoolean(PreferenceConstants.MULTI_DRIVER, false);
+        prefs.putBoolean(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
+        prefs.putBoolean(PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, true);
     }
 }
