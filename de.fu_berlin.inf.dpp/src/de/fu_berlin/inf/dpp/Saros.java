@@ -28,6 +28,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -96,6 +97,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
@@ -112,9 +114,20 @@ public class Saros extends AbstractUIPlugin {
         NOT_CONNECTED, CONNECTING, CONNECTED, DISCONNECTING, ERROR
     }
 
-    // The shared instance.
+    /**
+     * The single instance of the Saros plugin.
+     */
     protected static Saros plugin;
 
+    /**
+     * True if the Saros instance has been initialized so that calling
+     * reinject() will be well defined.
+     */
+    protected static boolean isInitialized;
+
+    /**
+     * This is the Bundle-SymbolicName
+     */
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
     public String sarosVersion;
@@ -152,7 +165,7 @@ public class Saros extends AbstractUIPlugin {
     // Smack (XMPP) connection listener
     protected ConnectionListener smackConnectionListener;
 
-    private Logger logger;
+    protected Logger logger;
 
     static {
         PacketExtensionUtils.hookExtensionProviders();
@@ -163,6 +176,8 @@ public class Saros extends AbstractUIPlugin {
      * Create the shared instance.
      */
     public Saros() {
+
+        isInitialized = false;
         setDefault(this);
 
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
@@ -254,7 +269,8 @@ public class Saros extends AbstractUIPlugin {
      */
     public static synchronized void reinject(Object toInjectInto) {
 
-        if (plugin == null) {
+        if (plugin == null || !isInitialized()) {
+            LogLog.error("Saros not initialized", new StackTrace());
             throw new IllegalStateException();
         }
 
@@ -275,6 +291,14 @@ public class Saros extends AbstractUIPlugin {
         } catch (PicoCompositionException e) {
             plugin.logger.error("Internal error in reinjection:", e);
         }
+    }
+
+    /**
+     * Returns true if the Saros instance has been initialized so that calling
+     * {@link #reinject(Object)} will be well defined.
+     */
+    public static boolean isInitialized() {
+        return isInitialized;
     }
 
     /**
@@ -301,6 +325,8 @@ public class Saros extends AbstractUIPlugin {
         container.getComponents(Object.class);
 
         this.sessionManager = container.getComponent(SessionManager.class);
+
+        isInitialized = true;
 
         boolean hasUserName = getPreferenceStore().getString(
             PreferenceConstants.USERNAME).length() > 0;
@@ -329,11 +355,13 @@ public class Saros extends AbstractUIPlugin {
         } finally {
             super.stop(context);
         }
+        isInitialized = false;
         setDefault(null);
     }
 
     public static void setDefault(Saros newPlugin) {
         Saros.plugin = newPlugin;
+
     }
 
     public JID getMyJID() {
