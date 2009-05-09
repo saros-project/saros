@@ -388,7 +388,8 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Connects using the credentials from the preferences.
+     * Connects using the credentials from the preferences. It uses TLS if
+     * possible.
      * 
      * If there is already a established connection when calling this method, it
      * disconnects before connecting (including state transitions!).
@@ -410,51 +411,70 @@ public class Saros extends AbstractUIPlugin {
 
             ConnectionConfiguration conConfig = new ConnectionConfiguration(
                 server);
+
+            /*
+             * TODO: require TLS, because we only support PLAIN SASL (see below)
+             * 
+             * TODO It has to ask the user, if s/he wants to use non-TLS
+             * connections with PLAIN SASL if TLS is not supported by the
+             * server.
+             */
+            conConfig
+                .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+            /*
+             * We handle reconnecting ourselves
+             */
             conConfig.setReconnectionAllowed(false);
             this.connection = new XMPPConnection(conConfig);
+
             setConnectionState(ConnectionState.CONNECTING, null);
 
             this.connection.connect();
 
+            // add connection listener so we get notified if it will be closed
+            if (this.smackConnectionListener == null) {
+                this.smackConnectionListener = new SafeConnectionListener(
+                    logger, new XMPPConnectionListener());
+            }
+            connection.addConnectionListener(this.smackConnectionListener);
+
+            /* add Saros as XMPP feature */
             ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                 .getInstanceFor(connection);
-
             sdm.addFeature(sarosFeatureID);
 
             // add Jingle feature to the supported extensions
             if (!prefStore
                 .getBoolean(PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
-
                 // add Jingle Support for the current connection
                 sdm.addFeature(Jingle.NAMESPACE);
             }
 
-            // have to put this line to use new smack 3.1
-            // without this line a NullPointerException happens but after a
-            // longer time it connects anyway, with this line it connects fast
-            // TODO security issue?
+            /*
+             * We only support PLAIN SASL for now, because SASL support is
+             * broken in SMACK 3.1, see:
+             * 
+             * http://www.igniterealtime.org/community/message/185601
+             * 
+             * valid choices: PLAIN, DIGEST-MD5 or KERBEROS_V4
+             * 
+             * most significant choice: 0
+             */
             SASLAuthentication.supportSASLMechanism("PLAIN", 0);
 
-            this.connection.login(username, password);
+            Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
             /*
              * TODO SS Possible race condition, as our packet listeners are
-             * registered only after the login, so we might for instance receive
-             * subscription requests even though we do not have a packet
-             * listener running yet!
+             * registered only after the login (in CONNECTED Connection State),
+             * so we might for instance receive subscription requests even
+             * though we do not have a packet listener running yet!
              */
-            this.connection.getRoster().setSubscriptionMode(
-                SubscriptionMode.manual);
-
-            if (this.smackConnectionListener == null) {
-                this.smackConnectionListener = new SafeConnectionListener(
-                    logger, new XMPPConnectionListener());
-            }
-
-            this.connection.addConnectionListener(this.smackConnectionListener);
-            setConnectionState(ConnectionState.CONNECTED, null);
+            this.connection.login(username, password);
+            /* other people can now send invitations */
 
             this.myjid = new JID(this.connection.getUser());
+            setConnectionState(ConnectionState.CONNECTED, null);
 
         } catch (final Exception e) {
 
@@ -515,7 +535,7 @@ public class Saros extends AbstractUIPlugin {
      * @param monitor
      *            the progressmonitor for the operation.
      * @throws XMPPException
-     *             exception that occcurs while registering.
+     *             exception that occurs while registering.
      */
     public void createAccount(String server, String username, String password,
         IProgressMonitor monitor) throws XMPPException {
@@ -566,6 +586,7 @@ public class Saros extends AbstractUIPlugin {
         ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(connection);
         try {
             if (sdm.discoverInfo(jid.toString()).getIdentities().hasNext()) {
+
                 connection.getRoster().createEntry(jid.toString(), nickname,
                     groups);
             }
