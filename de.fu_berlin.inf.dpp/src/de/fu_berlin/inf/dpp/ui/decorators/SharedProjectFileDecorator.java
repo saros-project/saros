@@ -21,10 +21,13 @@ package de.fu_berlin.inf.dpp.ui.decorators;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -55,8 +58,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * awareness shows all drivers and the person followed which is kind of
  * confusing.
  * 
- * @see ILightweightLabelDecorator
- * 
+ * @see ILightweightLabelDecorator *
  */
 public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
@@ -71,13 +73,20 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     protected ISharedProject sharedProject;
 
+    protected Set<Object> decoratedElements;
+
     protected List<ILabelProviderListener> listeners = new ArrayList<ILabelProviderListener>();
 
+    /**
+     * SharedProjectListener responsible for triggering an update on the
+     * decorations if there is a role change.
+     */
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
         public void roleChanged(User user, boolean replicated) {
-            updateDecoratorsAsync(new Object[] { sharedProject.getProject() });
+
+            updateDecorations(user);
         }
     };
 
@@ -87,8 +96,14 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
             project.addListener(projectListener);
-            // Update all
-            updateDecoratorsAsync(new Object[] { project.getProject() });
+
+            if (!decoratedElements.isEmpty()) {
+                log
+                    .warn("Set of files to decorate not empty on session start. "
+                        + decoratedElements.toString());
+                // update remaining files
+                updateDecoratorsAsync(decoratedElements.toArray());
+            }
         }
 
         @Override
@@ -97,8 +112,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             sharedProject = null;
             project.removeListener(projectListener);
             // Update all
-            updateDecoratorsAsync(new Object[] { project.getProject() });
-
+            updateDecoratorsAsync(decoratedElements.toArray());
         }
     };
 
@@ -118,7 +132,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 IFile newFile = null;
                 if (path != null && sharedProject != null) {
                     newFile = sharedProject.getProject().getFile(path);
-                    if (newFile != null && !newFile.equals(oldActiveEditor)) {
+                    if (newFile.exists() && !newFile.equals(oldActiveEditor)) {
                         paths.add(newFile);
                     }
                 }
@@ -135,7 +149,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
                 if (path != null && sharedProject != null) {
                     IFile newFile = sharedProject.getProject().getFile(path);
                     IFile oldActiveEditor = oldActiveEditors.get(user);
-                    if (newFile != null) {
+                    if (newFile.exists()) {
                         if (newFile.equals(oldActiveEditor)) {
                             oldActiveEditors.put(user, null);
                         }
@@ -151,8 +165,21 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             // ignore
         }
 
+        User oldUserFollowed = null;
+
         public void followModeChanged(User user) {
-            // ignore
+
+            if (ObjectUtils.equals(user, oldUserFollowed))
+                return;
+
+            if (oldUserFollowed != null) {
+                updateDecorations(oldUserFollowed);
+            }
+            oldUserFollowed = user;
+            if (user != null) {
+                updateDecorations(user);
+            }
+
         }
     };
 
@@ -169,6 +196,8 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         Saros.reinject(this);
 
+        this.decoratedElements = new HashSet<Object>();
+
         sessionManager.addSessionListener(sessionListener);
 
         editorManager.addSharedEditorListener(editorListener);
@@ -177,42 +206,67 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
     }
 
-    public void decorate(Object element, IDecoration decoration) {
+    protected void updateDecorations(User user) {
+        if (sharedProject == null)
+            return;
 
+        List<IFile> files = new ArrayList<IFile>();
+
+        for (IPath path : editorManager.getRemoteOpenEditors(user)) {
+            IFile openFile = sharedProject.getProject().getFile(path);
+            if (openFile.exists())
+                files.add(openFile);
+        }
+        updateDecoratorsAsync(files.toArray());
+    }
+
+    public void decorate(Object element, IDecoration decoration) {
+        if (decorateInternal(element, decoration)) {
+            decoratedElements.add(element);
+        } else {
+            decoratedElements.remove(element);
+        }
+    }
+
+    private boolean decorateInternal(Object element, IDecoration decoration) {
         try {
             if (this.sharedProject == null)
-                return;
+                return false;
 
             // Enablement in the Plugin.xml ensures that we only get IFiles
             if (!(element instanceof IFile))
-                return;
+                return false;
 
             IFile file = (IFile) element;
             if (!this.sharedProject.getProject().equals(file.getProject())) {
-                return;
+                return false;
             }
             IPath path = file.getProjectRelativePath();
             if (path == null)
-                return;
+                return false;
 
             if (containsUserToDisplay(editorManager
                 .getRemoteActiveEditorUsers(path))) {
                 log.trace("Active Deco: " + element);
                 decoration.addOverlay(activeDescriptor, IDecoration.TOP_LEFT);
-            } else if (containsUserToDisplay(editorManager
+                return true;
+            }
+            if (containsUserToDisplay(editorManager
                 .getRemoteOpenEditorUsers(path))) {
                 log.trace("Passive Deco: " + element);
                 decoration.addOverlay(passiveDescriptor, IDecoration.TOP_LEFT);
-            } else {
-                log.trace("No Deco: " + element);
+                return true;
             }
+
+            log.trace("No Deco: " + element);
 
         } catch (RuntimeException e) {
             log.error("Internal Error in SharedProjectFileDecorator:", e);
         }
+        return false;
     }
 
-    private boolean containsUserToDisplay(List<User> activeUsers) {
+    protected boolean containsUserToDisplay(List<User> activeUsers) {
 
         for (User user : activeUsers) {
             if (user.isDriver() || user.equals(editorManager.getFollowedUser())) {
