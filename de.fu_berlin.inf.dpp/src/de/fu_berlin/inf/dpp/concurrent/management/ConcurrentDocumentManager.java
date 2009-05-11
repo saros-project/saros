@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Map.Entry;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -67,7 +67,13 @@ public class ConcurrentDocumentManager implements Disposable {
 
     private final ISharedProjectListener projectListener;
 
-    private final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    /**
+     * Queue containing the requests to be executed locally
+     * strictly in this order.
+     */
+    protected Queue<Request> executionQueue = new LinkedBlockingQueue<Request>();
+
+    private final IActivityReceiver activityCreatedReceiver = new AbstractActivityReceiver() {
         @Override
         public boolean receive(EditorActivity editor) {
 
@@ -114,11 +120,8 @@ public class ConcurrentDocumentManager implements Disposable {
                 // ActivitySequencer.
 
                 // Send to host
-                Collection<JID> hostJID = new ArrayList<JID>(1);
-                hostJID.add(host);
-                List<IActivity> requests = new ArrayList<IActivity>(1);
-                requests.add(request);
-                sequencer.sendActivities(hostJID, requests);
+                sequencer.sendActivities(Collections.singletonList(host),
+                    Collections.singletonList((IActivity) request));
                 return true;
             }
         }
@@ -135,9 +138,9 @@ public class ConcurrentDocumentManager implements Disposable {
 
         if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
-
             projectListener = new HostSideProjectListener();
         } else {
+            this.concurrentDocuments = null;
             projectListener = new ClientSideProjectListener();
         }
         sharedProject.addListener(projectListener);
@@ -212,7 +215,7 @@ public class ConcurrentDocumentManager implements Disposable {
      * @host and @client
      */
     public boolean activityCreated(IActivity activity) {
-        return activity.dispatch(activityReceiver);
+        return activity.dispatch(activityCreatedReceiver);
     }
 
     /**
@@ -270,12 +273,25 @@ public class ConcurrentDocumentManager implements Disposable {
      * 
      * @host and @client
      */
-    private void execTextEditActivity(final Request request) {
+    protected void execTextEditActivity(final Request request) {
 
-        final Jupiter jupiterClient = getClientDoc(request.getEditorPath());
+        executionQueue.add(request);
 
-        Util.runSafeSWTSync(logger, new Runnable() {
+        Util.runSafeSWTAsync(logger, new Runnable() {
             public void run() {
+
+                while (executionQueue.size() > 0) {
+                    Request request = executionQueue.poll();
+                    if (request == null)
+                        return;
+                    exec(request);
+                }
+            }
+
+            private void exec(Request request) {
+
+                Jupiter jupiterClient = getClientDoc(request.getEditorPath());
+
                 Operation op;
                 try {
                     op = jupiterClient.receiveRequest(request);
@@ -351,7 +367,7 @@ public class ConcurrentDocumentManager implements Disposable {
         }
     }
 
-    public Jupiter getClientDoc(IPath path) {
+    protected synchronized Jupiter getClientDoc(IPath path) {
 
         Jupiter clientDoc = this.clientDocs.get(path);
 
@@ -362,7 +378,7 @@ public class ConcurrentDocumentManager implements Disposable {
         return clientDoc;
     }
 
-    private JupiterDocumentServer getJupiterServer(IPath path) {
+    protected synchronized JupiterDocumentServer getJupiterServer(IPath path) {
 
         JupiterDocumentServer docServer = this.concurrentDocuments.get(path);
 
@@ -385,7 +401,7 @@ public class ConcurrentDocumentManager implements Disposable {
      * @notSWT This method may not be called from SWT, otherwise a deadlock
      *         might occur!!
      */
-    protected synchronized void receiveRequestHostSide(Request request) {
+    protected void receiveRequestHostSide(Request request) {
 
         assert isHostSide() : "receiveRequestHostSide called on the Client";
 
@@ -419,11 +435,8 @@ public class ConcurrentDocumentManager implements Disposable {
             if (to.equals(host)) {
                 execTextEditActivity(transformed);
             } else {
-                Collection<JID> recipient = new ArrayList<JID>(1);
-                recipient.add(to);
-                List<IActivity> requests = new ArrayList<IActivity>(1);
-                requests.add(transformed);
-                sequencer.sendActivities(recipient, requests);
+                sequencer.sendActivities(Collections.singletonList(to),
+                    Collections.singletonList((IActivity) transformed));
             }
         }
     }
@@ -468,7 +481,7 @@ public class ConcurrentDocumentManager implements Disposable {
      * 
      * @host
      */
-    public void resetJupiterServer(JID jid, IPath path) {
+    public synchronized void resetJupiterServer(JID jid, IPath path) {
 
         assert isHostSide();
 
