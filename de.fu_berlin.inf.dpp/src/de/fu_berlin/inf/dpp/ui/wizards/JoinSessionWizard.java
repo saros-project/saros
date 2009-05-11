@@ -95,13 +95,12 @@ public class JoinSessionWizard extends Wizard {
     @Override
     public IWizardPage getNextPage(IWizardPage page) {
 
-        /*
-         * Increment pages for auto-next, because the request will block too
-         * long
-         */
-        pageChanges++;
-
         if (page.equals(descriptionPage) && !requested) {
+            /*
+             * Increment pages for auto-next, because the request will block too
+             * long
+             */
+            pageChanges++;
             if (!requestHostFileList()) {
                 return null;
             }
