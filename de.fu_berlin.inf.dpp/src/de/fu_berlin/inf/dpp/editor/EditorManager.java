@@ -1142,9 +1142,7 @@ public class EditorManager implements IActivityProvider {
      *            of the replaced text (is "" if this operation is only deleting
      *            text)
      * @param source
-     *            The JID as a string of the user who caused this change.
-     * 
-     *            TODO Use Users instead
+     *            The User who caused this change.
      */
     protected void replaceText(IFile file, int offset, String replacedText,
         String text, User source) {
@@ -1210,7 +1208,6 @@ public class EditorManager implements IActivityProvider {
         if (isConnected(file)) {
             FileEditorInput input = new FileEditorInput(file);
             IDocumentProvider provider = getDocumentProvider(input);
-
             provider.disconnect(input);
             this.connectedFiles.remove(file);
         }
