@@ -80,6 +80,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
 import de.fu_berlin.inf.dpp.ui.actions.FollowModeAction;
+import de.fu_berlin.inf.dpp.ui.actions.FollowThisPersonAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.GiveExclusiveDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.JumpToDriverPositionAction;
@@ -274,7 +275,9 @@ public class SessionView extends ViewPart {
         }
     };
 
-    private JumpToDriverPositionAction jumpToAction;
+    protected JumpToDriverPositionAction jumpToAction;
+
+    protected FollowThisPersonAction followThisPersonAction;
 
     private List<Disposable> disposables = new ArrayList<Disposable>();
 
@@ -403,6 +406,8 @@ public class SessionView extends ViewPart {
             "Give driver role");
         this.jumpToAction = new JumpToDriverPositionAction(saros,
             sessionManager, editorManager, this.viewer);
+        this.followThisPersonAction = new FollowThisPersonAction(this.viewer,
+            saros, sessionManager, editorManager);
         this.removeDriverRoleAction = new RemoveDriverRoleAction(
             sessionManager, this.viewer);
 
@@ -503,6 +508,8 @@ public class SessionView extends ViewPart {
             manager.add(this.giveDriverRoleAction);
             manager.add(this.removeDriverRoleAction);
         }
+        manager.add(new Separator());
+        manager.add(this.followThisPersonAction);
         manager.add(this.jumpToAction);
 
         // Other plug-ins can contribute there actions here
