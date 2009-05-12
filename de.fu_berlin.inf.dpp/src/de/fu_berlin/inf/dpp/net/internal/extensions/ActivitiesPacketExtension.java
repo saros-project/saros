@@ -40,7 +40,7 @@ import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -127,7 +127,7 @@ public class ActivitiesPacketExtension implements PacketExtension {
                 RoleActivity.class, TextEditActivity.class,
                 TextSelectionActivity.class, ViewportActivity.class,
                 TimedActivity.class });
-            xstream.processAnnotations(new Class[] { Request.class,
+            xstream.processAnnotations(new Class[] { JupiterActivity.class,
                 JupiterVectorTime.class, DeleteOperation.class,
                 InsertOperation.class, NoOperation.class, SplitOperation.class,
                 TimestampOperation.class });

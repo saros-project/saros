@@ -19,8 +19,8 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
@@ -68,10 +68,10 @@ public class ConcurrentDocumentManager implements Disposable {
     private final ISharedProjectListener projectListener;
 
     /**
-     * Queue containing the requests to be executed locally
-     * strictly in this order.
+     * Queue containing the JupiterActivity to be executed locally strictly in
+     * this order.
      */
-    protected Queue<Request> executionQueue = new LinkedBlockingQueue<Request>();
+    protected Queue<JupiterActivity> executionQueue = new LinkedBlockingQueue<JupiterActivity>();
 
     private final IActivityReceiver activityCreatedReceiver = new AbstractActivityReceiver() {
         @Override
@@ -91,8 +91,9 @@ public class ConcurrentDocumentManager implements Disposable {
         public boolean receive(TextEditActivity textEdit) {
 
             Jupiter document = getClientDoc(textEdit.getEditor());
-            final Request request = document.generateRequest(textEdit
-                .toOperation(), myJID, textEdit.getEditor());
+            final JupiterActivity jupiterActivity = document
+                .generateJupiterActivity(textEdit.toOperation(), myJID,
+                    textEdit.getEditor());
 
             if (isHostSide()) {
 
@@ -105,13 +106,14 @@ public class ConcurrentDocumentManager implements Disposable {
                 sharedProject.getTransmitter().executeAsDispatch(
                     new Runnable() {
                         public void run() {
-                            receiveRequestHostSide(request);
+                            receiveJupiterActivityHostSide(jupiterActivity);
                         }
                     });
 
                 /*
                  * This activity still needs to be sent to all observers,
-                 * because they are not notified by receiveRequestHostSide(...).
+                 * because they are not notified by
+                 * receiveJupiterActivityHostSide(...).
                  */
                 return false;
             } else {
@@ -121,7 +123,7 @@ public class ConcurrentDocumentManager implements Disposable {
 
                 // Send to host
                 sequencer.sendActivities(Collections.singletonList(host),
-                    Collections.singletonList((IActivity) request));
+                    Collections.singletonList((IActivity) jupiterActivity));
                 return true;
             }
         }
@@ -222,16 +224,17 @@ public class ConcurrentDocumentManager implements Disposable {
      * This is called (only) from the JupiterHandler (the network layer) when a
      * remote activity has been received.
      * 
-     * Synchronizes the given request with the jupiter server document (if host)
-     * and local clients (if host or client) and applies the request locally.
+     * Synchronizes the given JupiterActivity with the jupiter server document
+     * (if host) and local clients (if host or client) and applies the
+     * JupiterActivity locally.
      * 
      * @host and @client
      */
-    public void receiveRequest(Request request) {
+    public void receiveJupiterActivity(JupiterActivity jupiterActivity) {
         if (isHostSide()) {
-            receiveRequestHostSide(request);
+            receiveJupiterActivityHostSide(jupiterActivity);
         } else {
-            receiveRequestClientSide(request);
+            receiveJupiterActivityClientSide(jupiterActivity);
         }
     }
 
@@ -266,38 +269,41 @@ public class ConcurrentDocumentManager implements Disposable {
     }
 
     /**
-     * This method is called when a given Request should be executed locally.
+     * This method is called when a given JupiterActivity should be executed
+     * locally.
      * 
      * It will be transformed and executed in the SWT thread to ensure that no
      * user activity occurs in between.
      * 
      * @host and @client
      */
-    protected void execTextEditActivity(final Request request) {
+    protected void execTextEditActivity(final JupiterActivity jupiterActivity) {
 
-        executionQueue.add(request);
+        executionQueue.add(jupiterActivity);
 
         Util.runSafeSWTAsync(logger, new Runnable() {
             public void run() {
 
                 while (executionQueue.size() > 0) {
-                    Request request = executionQueue.poll();
-                    if (request == null)
+                    JupiterActivity jupiterActivity = executionQueue.poll();
+                    if (jupiterActivity == null)
                         return;
-                    exec(request);
+                    exec(jupiterActivity);
                 }
             }
 
-            private void exec(Request request) {
+            private void exec(JupiterActivity jupiterActivity) {
 
-                Jupiter jupiterClient = getClientDoc(request.getEditorPath());
+                Jupiter jupiterClient = getClientDoc(jupiterActivity
+                    .getEditorPath());
 
                 Operation op;
                 try {
-                    op = jupiterClient.receiveRequest(request);
+                    op = jupiterClient.receiveJupiterActivity(jupiterActivity);
                     // logger.trace("\n  " + "Transforming: "
-                    // + request.getOperation() + " ("
-                    // + request.getTimestamp() + ")\n" + "  into        : "
+                    // + jupiterActivity.getOperation() + " ("
+                    // + jupiterActivity.getTimestamp() + ")\n" +
+                    // "  into        : "
                     // + op);
                 } catch (TransformationException e) {
                     ConcurrentDocumentManager.logger.error(
@@ -311,8 +317,8 @@ public class ConcurrentDocumentManager implements Disposable {
                 }
 
                 /* execute activity in activity sequencer. */
-                for (TextEditActivity textEdit : op.toTextEdit(request
-                    .getEditorPath(), request.getSource())) {
+                for (TextEditActivity textEdit : op.toTextEdit(jupiterActivity
+                    .getEditorPath(), jupiterActivity.getSource())) {
 
                     sequencer.execTransformedActivity(textEdit);
                 }
@@ -401,36 +407,37 @@ public class ConcurrentDocumentManager implements Disposable {
      * @notSWT This method may not be called from SWT, otherwise a deadlock
      *         might occur!!
      */
-    protected void receiveRequestHostSide(Request request) {
+    protected void receiveJupiterActivityHostSide(
+        JupiterActivity jupiterActivity) {
 
-        assert isHostSide() : "receiveRequestHostSide called on the Client";
+        assert isHostSide() : "receiveJupiterActivityHostSide called on the Client";
 
-        assert !Util.isSWT() : "receiveRequestHostSide called from SWT";
+        assert !Util.isSWT() : "receiveJupiterActivityHostSide called from SWT";
 
         // Get JupiterServer
-        JupiterDocumentServer docServer = getJupiterServer(request
+        JupiterDocumentServer docServer = getJupiterServer(jupiterActivity
             .getEditorPath());
 
         // Check if sender exists in proxy list
-        JID sender = new JID(request.getSource());
+        JID sender = new JID(jupiterActivity.getSource());
         if (!docServer.isExist(sender)) {
             docServer.addProxyClient(sender);
         }
 
-        /* sync request with jupiter document server. */
-        Map<JID, Request> outgoing;
+        /* sync jupiterActivity with jupiter document server. */
+        Map<JID, JupiterActivity> outgoing;
         try {
-            outgoing = docServer.transformRequest(request);
+            outgoing = docServer.transformJupiterActivity(jupiterActivity);
         } catch (TransformationException e) {
             // TODO this should trigger a consistency check
             logger.error("Transformation error: ", e);
             return;
         }
 
-        for (Entry<JID, Request> entry : outgoing.entrySet()) {
+        for (Entry<JID, JupiterActivity> entry : outgoing.entrySet()) {
 
             JID to = entry.getKey();
-            Request transformed = entry.getValue();
+            JupiterActivity transformed = entry.getValue();
 
             if (to.equals(host)) {
                 execTextEditActivity(transformed);
@@ -444,32 +451,33 @@ public class ConcurrentDocumentManager implements Disposable {
     /**
      * @client
      */
-    protected void receiveRequestClientSide(Request request) {
+    protected void receiveJupiterActivityClientSide(
+        JupiterActivity jupiterActivity) {
 
-        assert !isHostSide() : "receiveRequestClientSide called on the Host";
+        assert !isHostSide() : "receiveJupiterActivityClientSide called on the Host";
 
-        if (request.getOperation() instanceof TimestampOperation) {
+        if (jupiterActivity.getOperation() instanceof TimestampOperation) {
 
             // TODO Use timestamps correctly or discard this code
             logger.warn("Timestamp operations are not tested at the moment");
 
-            Jupiter jupClient = getClientDoc(request.getEditorPath());
+            Jupiter jupClient = getClientDoc(jupiterActivity.getEditorPath());
 
             try {
-                jupClient.updateVectorTime(request.getTimestamp());
+                jupClient.updateVectorTime(jupiterActivity.getTimestamp());
             } catch (TransformationException e) {
                 logger.error(
                     "Jupiter [Client] - Error during vector time update for "
-                        + request.getEditorPath(), e);
+                        + jupiterActivity.getEditorPath(), e);
             }
         } else {
             /*
              * This is an answer we received from the Host upon our
-             * JupiterRequest
+             * JupiterActivity
              * 
              * Transform it locally and execute it.
              */
-            execTextEditActivity(request);
+            execTextEditActivity(jupiterActivity);
         }
     }
 

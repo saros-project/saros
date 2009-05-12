@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.activities;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 
 public interface IActivityReceiver {
 
@@ -18,5 +18,5 @@ public interface IActivityReceiver {
 
     boolean receive(EditorActivity editorActivity);
 
-    boolean receive(Request jupiterRequest);
+    boolean receive(JupiterActivity jupiterActivity);
 }

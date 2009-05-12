@@ -9,8 +9,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -38,7 +38,7 @@ public class JupiterSimulator {
 
         Algorithm algorithm = new Jupiter(true);
 
-        List<Request> inQueue = new LinkedList<Request>();
+        List<JupiterActivity> inQueue = new LinkedList<JupiterActivity>();
 
         Document document;
 
@@ -47,21 +47,22 @@ public class JupiterSimulator {
             /* 1. execute locally */
             document.execOperation(o);
 
-            Request request = algorithm.generateRequest(o, new JID("DUMMY"),
-                new Path("DUMMY"));
+            JupiterActivity jupiterActivity = algorithm
+                .generateJupiterActivity(o, new JID("DUMMY"), new Path("DUMMY"));
 
             if (this == client) {
-                server.inQueue.add(request);
+                server.inQueue.add(jupiterActivity);
             } else {
-                client.inQueue.add(request);
+                client.inQueue.add(jupiterActivity);
             }
         }
 
         public void receive() throws TransformationException {
-            Request request = inQueue.remove(0);
-            Operation op = algorithm.receiveRequest(request);
-            log.info("\n  " + "Transforming: " + request.getOperation() + " ("
-                + request.getTimestamp() + ")\n" + "  into        : " + op);
+            JupiterActivity jupiterActivity = inQueue.remove(0);
+            Operation op = algorithm.receiveJupiterActivity(jupiterActivity);
+            log.info("\n  " + "Transforming: " + jupiterActivity.getOperation()
+                + " (" + jupiterActivity.getTimestamp() + ")\n"
+                + "  into        : " + op);
 
             document.execOperation(op);
         }

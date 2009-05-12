@@ -272,7 +272,7 @@ public class ConsistencyWatchdogHandler {
 
             handler.processPacket(packet);
 
-            if (PacketExtensionUtils.containsJupiterRequest(message)) {
+            if (PacketExtensionUtils.containsJupiterActivity(message)) {
                 lastReceivedActivityTime = System.currentTimeMillis();
             }
         }

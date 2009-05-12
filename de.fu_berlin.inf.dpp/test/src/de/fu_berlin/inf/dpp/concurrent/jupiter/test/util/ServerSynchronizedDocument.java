@@ -5,8 +5,8 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document.JupiterDocumentListener;
@@ -56,13 +56,14 @@ public class ServerSynchronizedDocument implements JupiterServer,
     /**
      * Receive operation between server and client as two-way protocol.
      */
-    public Operation receiveOperation(Request req) {
+    public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            logger.debug("Operation before OT:" + req.getOperation().toString()
-                + " " + algorithm.getTimestamp());
+            logger.debug("Operation before OT:"
+                + jupiterActivity.getOperation().toString() + " "
+                + algorithm.getTimestamp());
             /* 1. transform operation. */
-            op = algorithm.receiveRequest(req);
+            op = algorithm.receiveJupiterActivity(jupiterActivity);
             logger.debug("Operation after OT: " + op.toString() + " "
                 + algorithm.getTimestamp());
 
@@ -75,7 +76,8 @@ public class ServerSynchronizedDocument implements JupiterServer,
         return op;
     }
 
-    private synchronized Operation receiveOperation(Request req, JID jid) {
+    private synchronized Operation receiveOperation(
+        JupiterActivity jupiterActivity, JID jid) {
         while (accessDenied) {
             try {
                 logger.debug("wait for semaphore.");
@@ -92,10 +94,10 @@ public class ServerSynchronizedDocument implements JupiterServer,
         Operation op = null;
         try {
 
-            /* 1. transform client request in client proxy. */
+            /* 1. transform client JupiterActivities in client proxy. */
             ProxySynchronizedQueue proxy = proxyQueues.get(jid);
             if (proxy != null) {
-                op = proxy.receiveOperation(req);
+                op = proxy.receiveOperation(jupiterActivity);
             } else
                 throw new TransformationException("no proxy client queue for "
                     + jid);
@@ -107,8 +109,8 @@ public class ServerSynchronizedDocument implements JupiterServer,
                 if (!j.toString().equals(jid.toString())) {
                     logger.debug(j.toString() + " : proxy timestamp "
                         + proxy.getAlgorithm().getTimestamp() + " op before : "
-                        + req.getOperation() + " req timestamp: "
-                        + req.getTimestamp());
+                        + jupiterActivity.getOperation() + " req timestamp: "
+                        + jupiterActivity.getTimestamp());
 
                     /*
                      * 3. create submit op as local proxy operation and send to
@@ -167,16 +169,19 @@ public class ServerSynchronizedDocument implements JupiterServer,
         /* 1. execute locally */
         doc.execOperation(op);
         /* 2. transform operation. */
-        Request req = algorithm.generateRequest(op, this.jid, null);
+        JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
+            this.jid, null);
         /* sent to client */
         // connection.sendOperation(jid, req,delay);
-        connection.sendOperation(new NetworkRequest(this.jid, jid, req), delay);
+        connection.sendOperation(new NetworkRequest(this.jid, jid,
+            jupiterActivity), delay);
 
     }
 
-    public void receiveNetworkEvent(Request req) {
-        logger.info("receive operation : " + req.getOperation().toString());
-        receiveOperation(req);
+    public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
+        logger.info("receive operation : "
+            + jupiterActivity.getOperation().toString());
+        receiveOperation(jupiterActivity);
 
     }
 
@@ -202,7 +207,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
     public void receiveNetworkEvent(NetworkRequest req) {
         // logger.debug("receive network event with networtrequest from "+req.
         // getFrom());
-        receiveOperation(req.getRequest(), req.getFrom());
+        receiveOperation(req.getJupiterActivity(), req.getFrom());
     }
 
     public Algorithm getAlgorithm() {

@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -35,13 +35,13 @@ public class ProxySynchronizedQueue {
         return jid;
     }
 
-    public Operation receiveOperation(Request req) {
+    public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
             logger.debug(jid + ": Operation before OT:"
-                + req.getOperation().toString());
+                + jupiterActivity.getOperation().toString());
 
-            op = algorithm.receiveRequest(req);
+            op = algorithm.receiveJupiterActivity(jupiterActivity);
 
             logger.debug(jid + ": Operation after OT: " + op.toString());
         } catch (TransformationException e) {
@@ -50,23 +50,11 @@ public class ProxySynchronizedQueue {
         return op;
     }
 
-    /**
-     * send a transformed operation to client side.
-     * 
-     * @param op
-     *            operation has transformed and only send to client side.
-     */
-    // TODO Is this method necessary?
-    public void sendTransformedOperation(Operation op, JID jid) {
-        Request send_req = new Request(algorithm.getTimestamp(), op, this.jid,
-            null);
-        connection
-            .sendOperation(new NetworkRequest(this.jid, jid, send_req), 0);
-    }
-
     public void sendOperation(Operation op) {
-        Request req = algorithm.generateRequest(op, this.jid, null);
-        connection.sendOperation(new NetworkRequest(this.jid, jid, req), 0);
+        JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
+            this.jid, null);
+        connection.sendOperation(new NetworkRequest(this.jid, jid,
+            jupiterActivity), 0);
     }
 
     public Algorithm getAlgorithm() {

@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.activities;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 
 public class AbstractActivityReceiver implements IActivityReceiver {
 
@@ -39,7 +39,7 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         return false;
     }
 
-    public boolean receive(Request jupiterRequest) {
+    public boolean receive(JupiterActivity jupiterActivity) {
         // empty implementation
         return false;
     }

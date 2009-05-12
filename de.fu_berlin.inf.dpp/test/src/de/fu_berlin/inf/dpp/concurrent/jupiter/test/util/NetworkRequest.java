@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class NetworkRequest {
@@ -9,17 +9,18 @@ public class NetworkRequest {
 
     private JID to;
 
-    private Request request;
+    private JupiterActivity jupiterActivity;
 
-    public NetworkRequest(JID from, JID to, Request req) {
+    public NetworkRequest(JID from, JID to, JupiterActivity jupiterActivity) {
         this.from = from;
         this.to = to;
-        /* adaption to new request format. */
-        if (req.getSource() == null) {
-            this.request = new Request(req.getTimestamp(), req.getOperation(),
-                from, req.getEditorPath());
+        /* adaption to new JupiterActivity format. */
+        if (jupiterActivity.getSource() == null) {
+            this.jupiterActivity = new JupiterActivity(jupiterActivity
+                .getTimestamp(), jupiterActivity.getOperation(), from,
+                jupiterActivity.getEditorPath());
         } else {
-            this.request = req;
+            this.jupiterActivity = jupiterActivity;
         }
     }
 
@@ -31,7 +32,7 @@ public class NetworkRequest {
         return to;
     }
 
-    public Request getRequest() {
-        return request;
+    public JupiterActivity getJupiterActivity() {
+        return jupiterActivity;
     }
 }

@@ -31,8 +31,8 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
@@ -49,25 +49,25 @@ public class Jupiter implements Algorithm {
     protected InclusionTransformation inclusion;
 
     /**
-     * The vector time, representing the number of processed requests, of this
-     * algorithm.
+     * The vector time, representing the number of processed JupiterActivities,
+     * of this algorithm.
      */
     protected JupiterVectorTime vectorTime;
 
     /**
      * Flag indicating whether this algorithm is used on the client-side. In
-     * some situations, the requests from the server-side have a higher priority
-     * in transformations.
+     * some situations, the JupiterActivities from the server-side have a higher
+     * priority in transformations.
      */
     protected final boolean isClientSide;
 
     /**
-     * A list that contains the requests sent to the server which are to be
-     * acknowledged by the server before they can be removed. This list
+     * A list that contains the JupiterActivities sent to the server which are
+     * to be acknowledged by the server before they can be removed. This list
      * corresponds to the 'outgoing' list in the Jupiter pseudo code
      * description.
      */
-    protected final List<OperationWrapper> ackRequestList;
+    protected final List<OperationWrapper> ackJupiterActivityList;
 
     /**
      * Class constructor that creates a new Jupiter algorithm.
@@ -79,33 +79,36 @@ public class Jupiter implements Algorithm {
         this.inclusion = new GOTOInclusionTransformation();
         this.vectorTime = new JupiterVectorTime(0, 0);
         this.isClientSide = isClientSide;
-        this.ackRequestList = new ArrayList<OperationWrapper>();
+        this.ackJupiterActivityList = new ArrayList<OperationWrapper>();
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateRequest(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation,
+     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateJupiterActivity(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation,
      *      de.fu_berlin.inf.dpp.net.JID, IPath)
      */
-    public Request generateRequest(Operation op, JID jid, IPath editor) {
+    public JupiterActivity generateJupiterActivity(Operation op, JID jid,
+        IPath editor) {
 
         // send(op, myMsgs, otherMsgs);
-        Request req = new Request(this.vectorTime, op, jid, editor);
+        JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime,
+            op, jid, editor);
 
         // add(op, myMsgs) to outgoing;
-        this.ackRequestList.add(new OperationWrapper(op, this.vectorTime
-            .getLocalOperationCount()));
+        this.ackJupiterActivityList.add(new OperationWrapper(op,
+            this.vectorTime.getLocalOperationCount()));
 
         // myMsgs = myMsgs + 1;
         this.vectorTime = this.vectorTime.incrementLocalOperationCount();
 
-        return req;
+        return jupiterActivity;
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#receiveRequest(de.fu_berlin.inf.dpp.concurrent.jupiter.Request)
+     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#receiveJupiterActivity(de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity)
      */
-    public Operation receiveRequest(Request req) throws TransformationException {
-        Timestamp timestamp = req.getTimestamp();
+    public Operation receiveJupiterActivity(JupiterActivity jupiterActivity)
+        throws TransformationException {
+        Timestamp timestamp = jupiterActivity.getTimestamp();
         if (!(timestamp instanceof JupiterVectorTime)) {
             throw new IllegalArgumentException(
                 "Jupiter expects timestamps of type JupiterVectorTime");
@@ -113,8 +116,8 @@ public class Jupiter implements Algorithm {
         checkPreconditions((JupiterVectorTime) timestamp);
         discardAcknowledgedOperations((JupiterVectorTime) timestamp);
 
-        Operation newOp = transform(req.getOperation());
-        this.vectorTime = this.vectorTime.incrementRemoteRequestCount();
+        Operation newOp = transform(jupiterActivity.getOperation());
+        this.vectorTime = this.vectorTime.incrementRemoteOperationCount();
 
         return newOp;
     }
@@ -138,8 +141,8 @@ public class Jupiter implements Algorithm {
         discardAcknowledgedOperations((JupiterVectorTime) timestamp);
         int[] result = new int[indices.length];
         System.arraycopy(indices, 0, result, 0, indices.length);
-        for (int i = 0; i < this.ackRequestList.size(); i++) {
-            OperationWrapper wrap = this.ackRequestList.get(i);
+        for (int i = 0; i < this.ackJupiterActivityList.size(); i++) {
+            OperationWrapper wrap = this.ackJupiterActivityList.get(i);
             Operation ack = wrap.getOperation();
             for (int k = 0; k < indices.length; k++) {
                 result[k] = transformIndex(result[k], ack);
@@ -169,10 +172,11 @@ public class Jupiter implements Algorithm {
      * Discard from the other site (client/server) acknowledged operations.
      * 
      * @param time
-     *            the request to the remote operation count from
+     *            the remote JupiterVectorTime
      */
     protected void discardAcknowledgedOperations(JupiterVectorTime time) {
-        Iterator<OperationWrapper> iter = this.ackRequestList.iterator();
+        Iterator<OperationWrapper> iter = this.ackJupiterActivityList
+            .iterator();
         while (iter.hasNext()) {
             OperationWrapper wrap = iter.next();
             if (wrap.getLocalOperationCount() < time.getRemoteOperationCount()) {
@@ -186,17 +190,18 @@ public class Jupiter implements Algorithm {
 
     /**
      * Transforms an operation with the operations in the outgoing queue
-     * {@link #ackRequestList}.
+     * {@link #ackJupiterActivityList}.
      * 
      * @param newOp
      *            the operation to be transformed
      * @return the transformed operation
-     * @see #ackRequestList
+     * @see #ackJupiterActivityList
      */
     protected Operation transform(Operation newOp) {
-        for (int ackRequestListCnt = 0; ackRequestListCnt < this.ackRequestList
-            .size(); ackRequestListCnt++) {
-            OperationWrapper wrap = this.ackRequestList.get(ackRequestListCnt);
+        for (int ackJupiterActivityListCnt = 0; ackJupiterActivityListCnt < this.ackJupiterActivityList
+            .size(); ackJupiterActivityListCnt++) {
+            OperationWrapper wrap = this.ackJupiterActivityList
+                .get(ackJupiterActivityListCnt);
             Operation existingOp = wrap.getOperation();
 
             Operation transformedOp;
@@ -212,8 +217,9 @@ public class Jupiter implements Algorithm {
                 existingOp = this.inclusion.transform(existingOp, newOp,
                     Boolean.TRUE);
             }
-            this.ackRequestList.set(ackRequestListCnt, new OperationWrapper(
-                existingOp, wrap.getLocalOperationCount()));
+            this.ackJupiterActivityList
+                .set(ackJupiterActivityListCnt, new OperationWrapper(
+                    existingOp, wrap.getLocalOperationCount()));
 
             newOp = transformedOp;
         }
@@ -225,13 +231,13 @@ public class Jupiter implements Algorithm {
      * taken from the Jupiter paper.
      * 
      * @param time
-     *            the request to be tested.
+     *            the JupiterActivity to be tested.
      */
     protected void checkPreconditions(JupiterVectorTime time)
         throws TransformationException {
-        if (!this.ackRequestList.isEmpty()
-            && (time.getRemoteOperationCount() < this.ackRequestList.get(0)
-                .getLocalOperationCount())) {
+        if (!this.ackJupiterActivityList.isEmpty()
+            && (time.getRemoteOperationCount() < this.ackJupiterActivityList
+                .get(0).getLocalOperationCount())) {
             throw new TransformationException("Precondition #1 violated.");
         } else if (time.getRemoteOperationCount() > this.vectorTime
             .getLocalOperationCount()) {
@@ -249,13 +255,13 @@ public class Jupiter implements Algorithm {
      * This is a simple helper class used in the implementation of the Jupiter
      * algorithm. A OperationWrapper instance is created with an operation and
      * the current local operation count and inserted into the outgoing queue
-     * (see {@link Jupiter#ackRequestList}).
+     * (see {@link Jupiter#ackJupiterActivityList}).
      * 
      * @valueObject Instances of this class should be treated as value objects
      *              and should be treated as immutable.
      * 
-     * @see Jupiter#generateRequest(Operation, JID, IPath)
-     * @see Jupiter#receiveRequest(Request)
+     * @see Jupiter#generateJupiterActivity(Operation, JID, IPath)
+     * @see Jupiter#receiveJupiterActivity(JupiterActivity)
      */
     protected static class OperationWrapper {
 
@@ -291,7 +297,7 @@ public class Jupiter implements Algorithm {
      * 
      * This method used to be part of the {@link Algorithm} interface
      */
-    public Request undo() {
+    public JupiterActivity undo() {
         throw new CannotUndoException();
     }
 
@@ -301,7 +307,7 @@ public class Jupiter implements Algorithm {
      * 
      * This method used to be part of the {@link Algorithm} interface
      */
-    public Request redo() {
+    public JupiterActivity redo() {
         throw new CannotRedoException();
     }
 
@@ -323,9 +329,9 @@ public class Jupiter implements Algorithm {
 
     public void updateVectorTime(Timestamp timestamp)
         throws TransformationException {
-        if (this.ackRequestList.size() > 0) {
+        if (this.ackJupiterActivityList.size() > 0) {
             throw new TransformationException(
-                "ackRequestList have entries. Update Vector time failed.");
+                "ackJupiterActivityList have entries. Update Vector time failed.");
         }
         int local = timestamp.getComponents()[0];
         int remote = timestamp.getComponents()[1];

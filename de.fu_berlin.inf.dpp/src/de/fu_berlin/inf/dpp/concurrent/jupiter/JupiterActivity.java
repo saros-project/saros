@@ -10,10 +10,11 @@ import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * A Request is an Activity that can be handled by the Jupiter Algorithm.
+ * A JupiterActivity is an Activity that can be handled by the Jupiter
+ * Algorithm.
  */
-@XStreamAlias("jupiterRequest")
-public class Request extends AbstractActivity {
+@XStreamAlias("jupiterActivity")
+public class JupiterActivity extends AbstractActivity {
 
     /**
      * Timestamp that specifies the definition context of the enclosed
@@ -26,7 +27,7 @@ public class Request extends AbstractActivity {
     @XStreamAsAttribute
     private IPath editor;
 
-    public Request(Timestamp timestamp, Operation operation, JID jid,
+    public JupiterActivity(Timestamp timestamp, Operation operation, JID jid,
         IPath editor) {
         super(jid.toString());
         this.timestamp = timestamp;
@@ -60,7 +61,7 @@ public class Request extends AbstractActivity {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Request other = (Request) obj;
+        JupiterActivity other = (JupiterActivity) obj;
         if (editor == null) {
             if (other.editor != null)
                 return false;
@@ -99,7 +100,7 @@ public class Request extends AbstractActivity {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("request(");
+        buffer.append("JupiterActivity(");
         buffer.append(this.timestamp);
         buffer.append(",");
         buffer.append(this.operation);

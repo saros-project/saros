@@ -14,26 +14,27 @@ public interface Algorithm {
     Timestamp getTimestamp();
 
     /**
-     * Generates a request for the given operation. The operation is a locally
-     * generated operation. The returned request must be sent to the other
-     * sites.
+     * Generates a JupiterActivity for the given operation. The operation is a
+     * locally generated operation. The returned JupiterActivity must be sent to
+     * the other sites.
      * 
      * @param op
-     *            the operation for which a request should be generated
-     * @return the generated request
-     * @see Request
+     *            the operation for which a JupiterActivity should be generated
+     * @return the generated JupiterActivity
+     * @see JupiterActivity
      */
-    Request generateRequest(Operation op, JID jid, IPath editor);
+    JupiterActivity generateJupiterActivity(Operation op, JID jid, IPath editor);
 
     /**
-     * Receives a request from a remote site. The request must be transformed
-     * and the resulting operation is returned.
+     * Receives a JupiterActivity from a remote site. The JupiterActivity must
+     * be transformed and the resulting operation is returned.
      * 
-     * @param req
-     *            the request to transform and apply
+     * @param jupiterActivity
+     *            the JupiterActivity to transform and apply
      * @return the transformed Operation
      */
-    Operation receiveRequest(Request req) throws TransformationException;
+    Operation receiveJupiterActivity(JupiterActivity jupiterActivity)
+        throws TransformationException;
 
     /**
      * Notifies the algorithm that the site specified by the site id has

@@ -28,7 +28,7 @@ import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
@@ -68,15 +68,15 @@ public class PacketExtensionUtils {
     }
 
     /**
-     * @return true if message contains a JupiterRequest
+     * @return true if message contains a JupiterActivity
      */
-    public static boolean containsJupiterRequest(Message message) {
+    public static boolean containsJupiterActivity(Message message) {
         ActivitiesPacketExtension extension = (ActivitiesPacketExtension) message
             .getExtension(ActivitiesPacketExtension.ELEMENT,
                 PacketExtensionUtils.NAMESPACE);
         if (extension != null) {
             for (TimedActivity timedActivity : extension.getActivities()) {
-                if (timedActivity.getActivity() instanceof Request)
+                if (timedActivity.getActivity() instanceof JupiterActivity)
                     return true;
             }
         }

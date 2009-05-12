@@ -44,7 +44,7 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -513,9 +513,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (activity instanceof FolderActivity) {
                 // TODO [FileOps] Does not handle FolderActivity
             }
-            if (activity instanceof Request) {
+            if (activity instanceof JupiterActivity) {
                 this.concurrentDocumentManager
-                    .receiveRequest((Request) activity);
+                    .receiveJupiterActivity((JupiterActivity) activity);
                 return;
             }
         } catch (Exception e) {

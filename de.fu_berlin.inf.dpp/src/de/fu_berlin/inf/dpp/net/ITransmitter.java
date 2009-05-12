@@ -297,7 +297,7 @@ public interface ITransmitter {
      * component.
      * 
      * This is used by the ConcurrentDocumentManager to skip sending a
-     * JupiterRequest via the network which originated on the host to the
+     * JupiterActivity via the network which originated on the host to the
      * JupiterServer.
      */
     public void executeAsDispatch(Runnable runnable);

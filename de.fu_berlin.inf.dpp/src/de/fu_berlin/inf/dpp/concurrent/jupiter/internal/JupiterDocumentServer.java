@@ -6,8 +6,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -30,10 +30,6 @@ public class JupiterDocumentServer {
 
     protected final IPath editor;
 
-    /**
-     * this constructor init an external request forwarder. The generate answer
-     * request of the proxy clients forwarding to this forwarder.
-     */
     public JupiterDocumentServer(IPath path) {
         this.editor = path;
     }
@@ -49,18 +45,19 @@ public class JupiterDocumentServer {
         this.proxies.remove(jid);
     }
 
-    public Map<JID, Request> transformRequest(Request request)
-        throws TransformationException {
+    public Map<JID, JupiterActivity> transformJupiterActivity(
+        JupiterActivity jupiterActivity) throws TransformationException {
 
-        Map<JID, Request> result = new HashMap<JID, Request>();
+        Map<JID, JupiterActivity> result = new HashMap<JID, JupiterActivity>();
 
-        JID source = new JID(request.getSource());
+        JID source = new JID(jupiterActivity.getSource());
 
-        // 1. Use JupiterClient of sender to transform request
+        // 1. Use JupiterClient of sender to transform JupiterActivity
         Jupiter sourceProxy = proxies.get(source);
-        Operation op = sourceProxy.receiveRequest(request);
+        Operation op = sourceProxy.receiveJupiterActivity(jupiterActivity);
 
-        // 2. Generate outgoing requests for all other clients and the host
+        // 2. Generate outgoing JupiterActivities for all other clients and the
+        // host
         for (Map.Entry<JID, Jupiter> entry : proxies.entrySet()) {
 
             JID jid = entry.getKey();
@@ -71,8 +68,8 @@ public class JupiterDocumentServer {
 
             Jupiter remoteProxy = entry.getValue();
 
-            Request transformed = remoteProxy.generateRequest(op, source,
-                editor);
+            JupiterActivity transformed = remoteProxy.generateJupiterActivity(
+                op, source, editor);
 
             result.put(jid, transformed);
         }

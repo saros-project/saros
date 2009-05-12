@@ -102,7 +102,7 @@ public class JupiterVectorTime implements VectorTime {
      * 
      * @return the counter after increment.
      */
-    public JupiterVectorTime incrementRemoteRequestCount() {
+    public JupiterVectorTime incrementRemoteOperationCount() {
         return new JupiterVectorTime(localOperationCnt, remoteOperationCnt + 1);
     }
 

@@ -32,7 +32,7 @@ import org.picocontainer.PicoContainer;
 import org.picocontainer.monitors.AbstractComponentMonitor;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.concurrent.IRequestManager;
+import de.fu_berlin.inf.dpp.concurrent.IJupiterActivityManager;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -139,7 +139,8 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
         colors.put(JID.class.getPackage().getName(), "blue");
         colors.put(Util.class.getPackage().getName(), "grey");
         colors.put(ISharedProject.class.getPackage().getName(), "green");
-        colors.put(IRequestManager.class.getPackage().getName(), "yellow");
+        colors.put(IJupiterActivityManager.class.getPackage().getName(),
+            "yellow");
         colors.put(EditorManager.class.getPackage().getName(), "green");
 
         StringBuilder sb = new StringBuilder();

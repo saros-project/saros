@@ -3,8 +3,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
@@ -40,13 +40,13 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         return jidServer;
     }
 
-    public Operation receiveOperation(Request req) {
+    public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            logger
-                .debug("Operation before OT:" + req.getOperation().toString());
+            logger.debug("Operation before OT:"
+                + jupiterActivity.getOperation().toString());
             /* 1. transform operation. */
-            op = algorithm.receiveRequest(req);
+            op = algorithm.receiveJupiterActivity(jupiterActivity);
 
             logger.debug("Operation after OT: " + op.toString());
             /* 2. execution on server document */
@@ -72,10 +72,11 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         /* 1. execute locally */
         doc.execOperation(op);
         /* 2. transform operation. */
-        Request req = algorithm.generateRequest(op, jidServer, null);
+        JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
+            jidServer, null);
         /* sent to client */
         connection.sendOperation(new NetworkRequest(jidServer,
-            TwoWayJupiterClientDocument.jidClient, req), delay);
+            TwoWayJupiterClientDocument.jidClient, jupiterActivity), delay);
         // connection.sendOperation(jid, req,delay);
 
     }
@@ -84,9 +85,10 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
         sendOperation(TwoWayJupiterClientDocument.jidClient, op, delay);
     }
 
-    public void receiveNetworkEvent(Request req) {
-        logger.info("receive operation : " + req.getOperation().toString());
-        receiveOperation(req);
+    public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
+        logger.info("receive operation : "
+            + jupiterActivity.getOperation().toString());
+        receiveOperation(jupiterActivity);
 
     }
 
@@ -107,7 +109,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
      * receive network request.
      */
     public void receiveNetworkEvent(NetworkRequest req) {
-        receiveOperation(req.getRequest());
+        receiveOperation(req.getJupiterActivity());
     }
 
     public void addJupiterDocumentListener(JupiterDocumentListener jdl) {

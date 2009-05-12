@@ -23,8 +23,8 @@ import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Request;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -65,7 +65,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         new TextSelectionActivity(source, 1, 2, path),
         new ViewportActivity(source, 5, 10, path) };
 
-    public void testRequests() throws XmlPullParserException, IOException {
+    public void testJupiterActivities() throws XmlPullParserException,
+        IOException {
         assertRoundtrip(timestamp);
         assertRoundtrip(noOp);
         assertRoundtrip(insert);
@@ -77,7 +78,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     public void assertRoundtrip(Operation op) throws XmlPullParserException,
         IOException {
 
-        assertRoundtrip(new Request(jupiterTime, op, jid, path));
+        assertRoundtrip(new JupiterActivity(jupiterTime, op, jid, path));
     }
 
     public void assertRoundtrip(IActivity activity)

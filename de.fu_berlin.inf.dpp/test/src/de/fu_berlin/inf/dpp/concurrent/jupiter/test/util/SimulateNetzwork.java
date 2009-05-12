@@ -35,8 +35,8 @@ public class SimulateNetzwork {
         new Thread(new Runnable() {
             public void run() {
                 logger.debug("Delay in send operation "
-                    + req.getRequest().getOperation().toString() + " of "
-                    + delay + " millis");
+                    + req.getJupiterActivity().getOperation().toString()
+                    + " of " + delay + " millis");
                 try {
                     Thread.sleep(delay);
                 } catch (InterruptedException e) {
