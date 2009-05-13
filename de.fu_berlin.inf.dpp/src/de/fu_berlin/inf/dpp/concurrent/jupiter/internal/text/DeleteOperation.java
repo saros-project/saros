@@ -30,7 +30,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -38,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * to be deleted in the document model.
  */
 @XStreamAlias("deleteOp")
-public class DeleteOperation implements Operation {
+public class DeleteOperation implements ITextOperation {
 
     /**
      * the text to be deleted.
@@ -126,7 +125,7 @@ public class DeleteOperation implements Operation {
             getPosition(), "", getText(), path));
     }
 
-    public List<Operation> getTextOperations() {
-        return Collections.singletonList((Operation) this);
+    public List<ITextOperation> getTextOperations() {
+        return Collections.singletonList((ITextOperation) this);
     }
 }

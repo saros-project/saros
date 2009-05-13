@@ -5,6 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 
 /**
  * An Operation is a representation of a user activity for the use by an
@@ -28,6 +29,6 @@ public interface Operation {
      * perform text changes in the order they should be executed. This method
      * can return an empty list (for NoOperations for instance).
      */
-    List<Operation> getTextOperations();
+    List<ITextOperation> getTextOperations();
 
 }

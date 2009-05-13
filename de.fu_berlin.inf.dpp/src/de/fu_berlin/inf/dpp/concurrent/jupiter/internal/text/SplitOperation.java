@@ -21,7 +21,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -103,8 +102,8 @@ public class SplitOperation implements Operation {
         return result;
     }
 
-    public List<Operation> getTextOperations() {
-        List<Operation> result = new ArrayList<Operation>();
+    public List<ITextOperation> getTextOperations() {
+        List<ITextOperation> result = new ArrayList<ITextOperation>();
 
         result.addAll(getFirst().getTextOperations());
         result.addAll(getSecond().getTextOperations());
@@ -116,70 +115,143 @@ public class SplitOperation implements Operation {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>();
 
-        if (getFirst() instanceof InsertOperation
-            && getSecond() instanceof InsertOperation) {
+        /*
+         * remember the last operation for trying to combine it with the next
+         * one
+         */
+        ITextOperation lastOp = null;
 
-            InsertOperation op1 = (InsertOperation) getFirst();
-            InsertOperation op2 = (InsertOperation) getSecond();
+        List<ITextOperation> compressed = new ArrayList<ITextOperation>();
 
-            // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
-            if (op1.getPosition() + op1.getTextLength() == op2.getPosition()) {
-                op1 = new InsertOperation(op1.getPosition(), op1.getText()
-                    + op2.getText());
-                return op1.toTextEdit(path, source);
-            } else if (op1.getPosition() == op2.getPosition()
-                + op2.getTextLength()) {
-                op1 = new InsertOperation(op2.getPosition(), op2.getText()
-                    + op1.getText());
-                return op1.toTextEdit(path, source);
+        for (ITextOperation operation : this.getTextOperations()) {
+
+            // the first operation in the list
+            if (lastOp == null) {
+                lastOp = operation;
+                continue;
             }
 
-        } else if (getFirst() instanceof DeleteOperation
-            && getSecond() instanceof DeleteOperation) {
-            DeleteOperation op1 = (DeleteOperation) getFirst();
-            DeleteOperation op2 = (DeleteOperation) getSecond();
-
-            // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
-            if (op1.getPosition() == op2.getPosition()) {
-                op1 = new DeleteOperation(op1.getPosition(), op1.getText()
-                    + op2.getText());
-                return op1.toTextEdit(path, source);
+            ITextOperation combined = combine(lastOp, operation);
+            if (combined != null) {
+                lastOp = combined;
+                continue;
+            } else {
+                compressed.add(lastOp);
+                lastOp = operation;
             }
-
-        } else if (getFirst() instanceof InsertOperation
-            && getSecond() instanceof DeleteOperation) {
-            InsertOperation op1 = (InsertOperation) getFirst();
-            DeleteOperation op2 = (DeleteOperation) getSecond();
-
-            if (op1.getPosition() == op2.getPosition()) {
-                // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
-                if (op2.getText().startsWith(op1.getText())) {
-                    op2 = new DeleteOperation(op1.getPosition(), op2.getText()
-                        .substring(op1.getTextLength()));
-                    return op2.toTextEdit(path, source);
-                }
-                // Ins(5,"abcd") + Del(5,"ab") -> Ins(5,"cd")
-                else if (op1.getText().startsWith(op2.getText())) {
-                    op1 = new InsertOperation(op1.getPosition(), op1.getText()
-                        .substring(op2.getTextLength()));
-                    return op1.toTextEdit(path, source);
-                }
-            }
-
-        } else if (getFirst() instanceof DeleteOperation
-            && getSecond() instanceof InsertOperation) {
-            DeleteOperation op1 = (DeleteOperation) getFirst();
-            InsertOperation op2 = (InsertOperation) getSecond();
-
-            // Del(8,"abc") + Ins(8,"ghijk") -> Replace "abc" with "ghijk"
-            if (op1.getPosition() == op2.getPosition())
-                return Collections.singletonList(new TextEditActivity(source,
-                    op1.getPosition(), op2.getText(), op1.getText(), path));
         }
+        if (lastOp != null)
+            compressed.add(lastOp);
 
-        result.addAll(getFirst().toTextEdit(path, source));
-        result.addAll(getSecond().toTextEdit(path, source));
+        lastOp = null;
+
+        for (ITextOperation operation : compressed) {
+
+            // the first operation in the list
+            if (lastOp == null) {
+                lastOp = operation;
+                continue;
+            }
+
+            if (isReplace(lastOp, operation)) {
+                result.add(new TextEditActivity(source, lastOp.getPosition(),
+                    operation.getText(), lastOp.getText(), path));
+                lastOp = null;
+                continue;
+            } else {
+                // Cannot combine to operations to a replace
+                result.addAll(lastOp.toTextEdit(path, source));
+                lastOp = operation;
+            }
+        }
+        if (lastOp != null)
+            result.addAll(lastOp.toTextEdit(path, source));
 
         return result;
+    }
+
+    /**
+     * @param op1
+     * @param op2
+     * @return a list containing the combined operation if op1 and op2 can be
+     *         combined, else the list contains op1 and op2
+     */
+    protected ITextOperation combine(ITextOperation op1, ITextOperation op2) {
+
+        List<ITextOperation> result = new ArrayList<ITextOperation>();
+
+        if (op1 instanceof InsertOperation && op2 instanceof DeleteOperation) {
+            InsertOperation insert = (InsertOperation) op1;
+            DeleteOperation delete = (DeleteOperation) op2;
+
+            if (insert.getPosition() == delete.getPosition()) {
+                // Ins(5,"ab") + Del(5,"abcd") -> Del(5,"cd")
+                if (delete.getText().startsWith(insert.getText())) {
+                    return new DeleteOperation(insert.getPosition(), delete
+                        .getText().substring(insert.getTextLength()));
+                }
+                // Ins(5,"abcd") + Del(5,"ab") -> Ins(5,"cd")
+                else if (insert.getText().startsWith(delete.getText())) {
+                    return new InsertOperation(insert.getPosition(), insert
+                        .getText().substring(delete.getTextLength()));
+                }
+            }
+
+        } else if (op1 instanceof InsertOperation
+            && op2 instanceof InsertOperation) {
+            InsertOperation insert1 = (InsertOperation) op1;
+            InsertOperation insert2 = (InsertOperation) op2;
+
+            // Ins(2,"ab") + Ins(4,"cd") -> Ins(2,"abcd")
+            if (insert1.getPosition() + insert1.getTextLength() == insert2
+                .getPosition()) {
+                return new InsertOperation(insert1.getPosition(), insert1
+                    .getText()
+                    + insert2.getText());
+            } else if (insert1.getPosition() == insert2.getPosition()
+                + insert2.getTextLength()) {
+                return new InsertOperation(insert2.getPosition(), insert2
+                    .getText()
+                    + insert1.getText());
+            }
+
+        } else if (op1 instanceof DeleteOperation
+            && op2 instanceof DeleteOperation) {
+            DeleteOperation delete1 = (DeleteOperation) op1;
+            DeleteOperation delete2 = (DeleteOperation) op2;
+
+            // Del(5,"ab") + Del(5,"cde") -> Del(5,"abcde")
+            if (delete1.getPosition() == delete2.getPosition()) {
+                return new DeleteOperation(delete1.getPosition(), delete1
+                    .getText()
+                    + delete2.getText());
+            }
+        }
+        // Nothing can be combined
+        return null;
+
+    }
+
+    /**
+     * @param op1
+     * @param op2
+     * @return true if the combination of op1 and op2 describe a text replace
+     */
+    protected boolean isReplace(Operation op1, Operation op2) {
+        if (op1 == null)
+            return false;
+        if (op2 == null)
+            return false;
+
+        if (op1 instanceof DeleteOperation && op2 instanceof InsertOperation) {
+            DeleteOperation delete = (DeleteOperation) op1;
+            InsertOperation insert = (InsertOperation) op2;
+
+            // Del(8,"abc") + Ins(8,"ghijk") -> Replace "abc" with
+            // "ghijk"
+            if (delete.getPosition() == insert.getPosition())
+                return true;
+        }
+        return false;
     }
 }

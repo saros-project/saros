@@ -74,7 +74,7 @@ public class NoOperation implements Operation {
         return Collections.emptyList();
     }
 
-    public List<Operation> getTextOperations() {
+    public List<ITextOperation> getTextOperations() {
         return Collections.emptyList();
     }
 }

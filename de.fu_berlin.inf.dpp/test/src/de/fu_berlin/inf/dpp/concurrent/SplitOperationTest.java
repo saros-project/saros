@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent;
 
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -11,6 +13,7 @@ import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 
 /**
@@ -31,6 +34,10 @@ public class SplitOperationTest extends TestCase {
 
     public static Operation D(int i, String s) {
         return new DeleteOperation(i, s);
+    }
+
+    public static Operation Nop() {
+        return new NoOperation();
     }
 
     public void testInsertInsert() {
@@ -88,4 +95,51 @@ public class SplitOperationTest extends TestCase {
             path, source));
     }
 
+    public void testDelSplit() {
+        // Split(Del(8,"abc"), Split(NoOperation, Ins(8,"ghijk")
+        Operation split = S(D(8, "abc"), S(Nop(), I(8, "ghijk")));
+        TextEditActivity expected = new TextEditActivity(source, 8, "ghijk",
+            "abc", path);
+        assertEquals(Collections.singletonList(expected), split.toTextEdit(
+            path, source));
+    }
+
+    public void testSplitChain1() {
+        // Split(Split(A,B), Split(C,D)) with B and C can be combined
+        Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), D(
+            15, "xyz")));
+
+        List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
+        expected.add(new TextEditActivity(source, 8, "", "uvw", path));
+        expected.add(new TextEditActivity(source, 2, "e", "", path));
+        expected.add(new TextEditActivity(source, 15, "", "xyz", path));
+
+        assertEquals(expected, split.toTextEdit(path, source));
+    }
+
+    public void testSplitChain2() {
+        // Split(Split(A,B), Split(C,D)) with B, C and D can be combined
+        Operation split = S(S(D(8, "uvw"), I(2, "abcde")), S(D(2, "abcd"), I(3,
+            "xyz")));
+
+        List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
+        expected.add(new TextEditActivity(source, 8, "", "uvw", path));
+        expected.add(new TextEditActivity(source, 2, "exyz", "", path));
+
+        assertEquals(expected, split.toTextEdit(path, source));
+
+    }
+
+    public void testSplitChain3() {
+        // Split(Split(A,B), Split(C,D)) with A, B, C and D can be combined
+        Operation split = S(S(D(8, "abc"), D(8, "defg")), S(I(8, "1234"), I(12,
+            "56")));
+
+        List<TextEditActivity> expected = new LinkedList<TextEditActivity>();
+        expected
+            .add(new TextEditActivity(source, 8, "123456", "abcdefg", path));
+
+        assertEquals(expected, split.toTextEdit(path, source));
+
+    }
 }

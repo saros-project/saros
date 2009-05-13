@@ -30,7 +30,6 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -38,7 +37,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * The text is to be inserted in the document model.
  */
 @XStreamAlias("insertOp")
-public class InsertOperation implements Operation {
+public class InsertOperation implements ITextOperation {
 
     /**
      * the text to be inserted.
@@ -182,8 +181,8 @@ public class InsertOperation implements Operation {
             getPosition(), getText(), "", path));
     }
 
-    public List<Operation> getTextOperations() {
-        return Collections.singletonList((Operation) this);
+    public List<ITextOperation> getTextOperations() {
+        return Collections.singletonList((ITextOperation) this);
     }
 
 }

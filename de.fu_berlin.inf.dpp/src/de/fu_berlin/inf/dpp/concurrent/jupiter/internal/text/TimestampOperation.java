@@ -57,7 +57,7 @@ public class TimestampOperation implements Operation {
         return Collections.emptyList();
     }
 
-    public List<Operation> getTextOperations() {
+    public List<ITextOperation> getTextOperations() {
         return Collections.emptyList();
     }
 }
