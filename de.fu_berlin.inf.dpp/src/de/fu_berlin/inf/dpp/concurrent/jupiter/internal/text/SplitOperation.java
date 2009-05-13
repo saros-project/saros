@@ -171,14 +171,10 @@ public class SplitOperation implements Operation {
     }
 
     /**
-     * @param op1
-     * @param op2
-     * @return a list containing the combined operation if op1 and op2 can be
-     *         combined, else the list contains op1 and op2
+     * @return a combined ITextOperation representing both op1 and op2 or null
+     *         if the two operations cannot be combined
      */
     protected ITextOperation combine(ITextOperation op1, ITextOperation op2) {
-
-        List<ITextOperation> result = new ArrayList<ITextOperation>();
 
         if (op1 instanceof InsertOperation && op2 instanceof DeleteOperation) {
             InsertOperation insert = (InsertOperation) op1;
