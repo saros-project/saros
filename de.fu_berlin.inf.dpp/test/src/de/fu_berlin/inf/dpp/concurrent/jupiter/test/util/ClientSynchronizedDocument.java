@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class ClientSynchronizedDocument implements NetworkEventHandler,
     DocumentTestChecker {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(ClientSynchronizedDocument.class);
 
     private Document doc;
@@ -54,20 +54,20 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            logger.debug("Client: " + jid + " receive "
+            log.debug("Client: " + jid + " receive "
                 + jupiterActivity.getOperation().toString());
             /* 1. transform operation. */
             op = algorithm.receiveJupiterActivity(jupiterActivity);
             // op =
             // algorithm.receiveTransformedJupiterActivity(jupiterActivity);
             /* 2. execution on server document */
-            logger.info("" + jid + " exec: " + op.toString());
+            log.info("" + jid + " exec: " + op.toString());
             doc.execOperation(op);
         } catch (RuntimeException e) {
-            logger.error("" + jid + " fail: ", e);
+            log.error("" + jid + " fail: ", e);
             throw e;
         } catch (Exception e) {
-            logger.error("" + jid + " fail: ", e);
+            log.error("" + jid + " fail: ", e);
             throw new RuntimeException(e);
         }
         return op;
@@ -78,7 +78,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void sendOperation(Operation op, int delay) {
-        logger.info(jid + " send: " + op.toString());
+        log.info(jid + " send: " + op.toString());
         sendOperation(server_jid, op, delay);
     }
 
@@ -99,7 +99,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
-        logger.info(this.jid + " receive operation : "
+        log.info(this.jid + " receive operation : "
             + jupiterActivity.getOperation().toString());
         receiveOperation(jupiterActivity);
         informListener();
@@ -110,7 +110,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void receiveNetworkEvent(NetworkRequest req) {
-        logger.info(this.jid + " recv: "
+        log.info(this.jid + " recv: "
             + req.getJupiterActivity().getOperation().toString()
             + " timestamp : " + req.getJupiterActivity().getTimestamp());
         receiveOperation(req.getJupiterActivity());

@@ -241,6 +241,18 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             .getParticipants());
     }
 
+    /**
+     * Block until the given state 'until' has been reached, but allow only the
+     * given states as valid in the meantime.
+     * 
+     * This method cancels if this InvitationProcess is in an invalid state.
+     * 
+     * Returns false if the given state 'until' was not reached, but
+     * 
+     * a.) an invalid state was reached
+     * 
+     * b.) the cancel state was reached
+     */
     protected boolean blockUntil(State until, EnumSet<State> validStates) {
 
         while (this.state != until) {
@@ -257,6 +269,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
                 Thread.currentThread().interrupt();
                 return false;
             }
@@ -378,7 +391,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * the user.
      * 
      * @return <code>true</code> if all files have been synchronized.
-     *         <code>false</code> if the user chose to cancel.
+     *         <code>false</code> if the user chose to cancel
      */
     private boolean blockUntilFilesSent() {
         while ((this.state != State.SYNCHRONIZING_DONE)
@@ -390,6 +403,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                log.error("Code not designed to handle "
+                    + "InterruptedException", e);
                 Thread.currentThread().interrupt();
                 return false;
             }
@@ -402,7 +417,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      * Blocks until the join message has been received or the user cancelled.
      * 
      * @return <code>true</code> if the join message has been received.
-     *         <code>false</code> if the user chose to cancel.
+     *         <code>false</code> if the user chose to cancel
      */
     private boolean blockUntilJoinReceived() {
 
@@ -416,6 +431,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
                 Thread.currentThread().interrupt();
                 return false;
             }

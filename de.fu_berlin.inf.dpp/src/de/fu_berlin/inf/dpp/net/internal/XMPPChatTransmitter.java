@@ -395,6 +395,7 @@ public class XMPPChatTransmitter implements ITransmitter,
              */
             Thread.sleep(1000);
         } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
             Thread.currentThread().interrupt();
             return;
         }

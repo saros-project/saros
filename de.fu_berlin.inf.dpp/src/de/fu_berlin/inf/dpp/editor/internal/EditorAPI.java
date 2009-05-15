@@ -786,6 +786,7 @@ public class EditorAPI implements IEditorAPI {
         try {
             monitor.await();
         } catch (InterruptedException e) {
+            log.warn("Code not designed to handle InterruptedException");
             Thread.currentThread().interrupt();
         }
 

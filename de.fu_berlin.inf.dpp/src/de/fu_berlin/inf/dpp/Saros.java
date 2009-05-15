@@ -165,7 +165,7 @@ public class Saros extends AbstractUIPlugin {
     // Smack (XMPP) connection listener
     protected ConnectionListener smackConnectionListener;
 
-    protected Logger logger;
+    protected Logger log;
 
     static {
         PacketExtensionUtils.hookExtensionProviders();
@@ -289,7 +289,7 @@ public class Saros extends AbstractUIPlugin {
             plugin.reinjector.reinject(toInjectInto.getClass(),
                 new AnnotatedFieldInjection());
         } catch (PicoCompositionException e) {
-            plugin.logger.error("Internal error in reinjection:", e);
+            plugin.log.error("Internal error in reinjection:", e);
         }
     }
 
@@ -317,7 +317,7 @@ public class Saros extends AbstractUIPlugin {
             PreferenceConstants.DEBUG);
 
         setupLoggers();
-        logger.info("Starting Saros " + sarosVersion + " running:\n"
+        log.info("Starting Saros " + sarosVersion + " running:\n"
             + Util.getPlatformInfo());
 
         // Make sure that all components in the container are
@@ -345,7 +345,7 @@ public class Saros extends AbstractUIPlugin {
 
         if (dotMonitor != null) {
             File f = new File("Saros-" + sarosFeatureID + ".dot");
-            logger.info("Saving Saros architecture diagram dot file: "
+            log.info("Saving Saros architecture diagram dot file: "
                 + f.getAbsolutePath());
             dotMonitor.save(f);
         }
@@ -380,7 +380,7 @@ public class Saros extends AbstractUIPlugin {
      * @nonBlocking
      */
     public void asyncConnect() {
-        Util.runSafeAsync("Saros-AsyncConnect-", logger, new Runnable() {
+        Util.runSafeAsync("Saros-AsyncConnect-", log, new Runnable() {
             public void run() {
                 connect(false);
             }
@@ -433,8 +433,8 @@ public class Saros extends AbstractUIPlugin {
 
             // add connection listener so we get notified if it will be closed
             if (this.smackConnectionListener == null) {
-                this.smackConnectionListener = new SafeConnectionListener(
-                    logger, new XMPPConnectionListener());
+                this.smackConnectionListener = new SafeConnectionListener(log,
+                    new XMPPConnectionListener());
             }
             connection.addConnectionListener(this.smackConnectionListener);
 
@@ -481,7 +481,7 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.ERROR, e.getMessage());
 
             if (!failSilently) {
-                Util.runSafeSWTSync(logger, new Runnable() {
+                Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         MessageDialog.openError(EditorAPI.getShell(),
                             "Error Connecting", "Could not connect to server '"
@@ -514,7 +514,7 @@ public class Saros extends AbstractUIPlugin {
                 connection.removeConnectionListener(smackConnectionListener);
                 connection.disconnect();
             } catch (RuntimeException e) {
-                logger.warn("Could not disconnect old XMPPConnection: ", e);
+                log.warn("Could not disconnect old XMPPConnection: ", e);
             } finally {
                 connection = null;
             }
@@ -671,14 +671,14 @@ public class Saros extends AbstractUIPlugin {
             try {
                 listener.connectionStateChanged(this.connection, state);
             } catch (RuntimeException e) {
-                logger.error("Internal error in setConnectionState:", e);
+                log.error("Internal error in setConnectionState:", e);
             }
         }
     }
 
     protected void setupLoggers() {
         try {
-            logger = Logger.getLogger("de.fu_berlin.inf.dpp");
+            log = Logger.getLogger("de.fu_berlin.inf.dpp");
             PropertyConfigurator.configureAndWatch("log4j.properties",
                 60 * 1000);
         } catch (SecurityException e) {
@@ -713,13 +713,13 @@ public class Saros extends AbstractUIPlugin {
         public void connectionClosedOnError(Exception e) {
 
             Toolkit.getDefaultToolkit().beep();
-            logger.error("XMPP Connection Error: " + e.toString(), e);
+            log.error("XMPP Connection Error: " + e.toString(), e);
 
             if (e.toString().equals("stream:error (conflict)")) {
 
                 disconnect();
 
-                Util.runSafeSWTSync(logger, new Runnable() {
+                Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         MessageDialog
                             .openError(
@@ -736,7 +736,7 @@ public class Saros extends AbstractUIPlugin {
 
             disconnectInternal();
 
-            Util.runSafeAsync(logger, new Runnable() {
+            Util.runSafeAsync(log, new Runnable() {
                 public void run() {
 
                     Map<JID, Integer> expectedSequenceNumbers = Collections
@@ -749,7 +749,7 @@ public class Saros extends AbstractUIPlugin {
 
                     while (!isConnected()) {
 
-                        logger.info("Reconnecting...");
+                        log.info("Reconnecting...");
 
                         connect(true);
 
@@ -757,6 +757,9 @@ public class Saros extends AbstractUIPlugin {
                             try {
                                 Thread.sleep(5000);
                             } catch (InterruptedException e) {
+                                log.error(
+                                    "Code not designed to be interruptable", e);
+                                Thread.currentThread().interrupt();
                                 return;
                             }
                         }
@@ -764,7 +767,7 @@ public class Saros extends AbstractUIPlugin {
 
                     sessionManager.onReconnect(expectedSequenceNumbers);
                     setConnectionState(ConnectionState.CONNECTED, null);
-                    logger.debug("XMPP reconnected");
+                    log.debug("XMPP reconnected");
                 }
             });
         }
@@ -772,21 +775,18 @@ public class Saros extends AbstractUIPlugin {
         public void reconnectingIn(int seconds) {
             // TODO maybe using Smack reconnect is better
             assert false : "Reconnecting is disabled";
-            // logger.debug("saros reconnecting");
             // setConnectionState(ConnectionState.CONNECTING, null);
         }
 
         public void reconnectionFailed(Exception e) {
             // TODO maybe using Smack reconnect is better
             assert false : "Reconnecting is disabled";
-            // logger.debug("saros reconnection failed");
             // setConnectionState(ConnectionState.ERROR, e.getMessage());
         }
 
         public void reconnectionSuccessful() {
             // TODO maybe using Smack reconnect is better
             assert false : "Reconnecting is disabled";
-            // logger.debug("saros reconnection successful");
             // setConnectionState(ConnectionState.CONNECTED, null);
         }
     }

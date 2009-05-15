@@ -110,7 +110,7 @@ public class JingleFileTransferManager {
         }
     }
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(JingleFileTransferManager.class);
 
     private XMPPConnection xmppConnection;
@@ -143,7 +143,7 @@ public class JingleFileTransferManager {
                 jingleSession.getResponder()) : new JID(jingleSession
                 .getInitiator());
 
-            logger.debug("Jingle [" + remoteJID.getName()
+            log.debug("Jingle [" + remoteJID.getName()
                 + "] Media session - Start");
 
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
@@ -155,13 +155,13 @@ public class JingleFileTransferManager {
             connections.get(remoteJID).fileTransfer = newSession;
 
             if (newSession.isConnected()) {
-                logger.debug("Jingle [" + remoteJID.getName()
+                log.debug("Jingle [" + remoteJID.getName()
                     + "] Media Session - Success using "
                     + newSession.getConnectionType());
                 connections.get(remoteJID).setState(
                     JingleConnectionState.ESTABLISHED);
             } else {
-                logger.debug("Jingle [" + remoteJID.getName()
+                log.debug("Jingle [" + remoteJID.getName()
                     + "] Media Session - Failure");
                 connections.get(remoteJID)
                     .setState(JingleConnectionState.ERROR);
@@ -188,12 +188,12 @@ public class JingleFileTransferManager {
         this.xmppConnection = connection;
         this.saros = saros;
 
-        logger.debug("Starting to initialize jingle file transfer manager.");
+        log.debug("Starting to initialize jingle file transfer manager.");
 
         this.listeners.add(listener);
         initialize();
 
-        logger.debug("Initialized jingle file transfer manager.");
+        log.debug("Initialized jingle file transfer manager.");
     }
 
     public void initialize() {
@@ -253,7 +253,7 @@ public class JingleFileTransferManager {
                     // Start the call
                     session.startIncoming();
                 } catch (XMPPException e) {
-                    logger.error("Failed to start JingleSession", e);
+                    log.error("Failed to start JingleSession", e);
                     incoming.session = null;
                     incoming.setState(JingleConnectionState.ERROR);
                 }
@@ -272,11 +272,11 @@ public class JingleFileTransferManager {
         connection.getSession().addMediaListener(new JingleMediaListener() {
 
             public void mediaClosed(PayloadType cand) {
-                logger.debug("Media closed [" + jid.getBase() + "]");
+                log.debug("Media closed [" + jid.getBase() + "]");
             }
 
             public void mediaEstablished(PayloadType pt) {
-                logger.debug("Media established [" + jid.getBase() + "]");
+                log.debug("Media established [" + jid.getBase() + "]");
             }
         });
 
@@ -286,7 +286,7 @@ public class JingleFileTransferManager {
         connection.getSession().addListener(new JingleSessionListener() {
 
             public void sessionClosed(String arg0, JingleSession session) {
-                logger.info(Util.prefix(jid) + "JingleSession closed");
+                log.info(Util.prefix(jid) + "JingleSession closed");
 
                 if (connection.state != JingleConnectionState.ERROR) {
                     connection.setState(JingleConnectionState.CLOSED);
@@ -295,13 +295,13 @@ public class JingleFileTransferManager {
 
             public void sessionClosedOnError(XMPPException arg0,
                 JingleSession arg1) {
-                logger.info("JingleSession closed on error [" + jid.getBase()
+                log.info("JingleSession closed on error [" + jid.getBase()
                     + "]");
                 connection.setState(JingleConnectionState.ERROR);
             }
 
             public void sessionDeclined(String arg0, JingleSession arg1) {
-                logger.error("session declined : " + jid.toString());
+                log.error("session declined : " + jid.toString());
                 connection.setState(JingleConnectionState.CLOSED);
             }
 
@@ -371,17 +371,26 @@ public class JingleFileTransferManager {
             int i = 0;
 
             if (connection.state == JingleConnectionState.INIT) {
+
+                InterruptedException interrupted = null;
+
                 // TODO observe state rather than sleep
                 while (connection.state == JingleConnectionState.INIT && i < 60) {
                     try {
-                        logger.debug(Util.prefix(toJID)
+                        log.debug(Util.prefix(toJID)
                             + "Waiting for Init since " + (i * 500) / 1000
                             + "s");
                         i++;
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+                        interrupted = e;
                     }
+                }
+
+                if (interrupted != null) {
+                    log.error("Code not designed to be interruptable",
+                        interrupted);
+                    Thread.currentThread().interrupt();
                 }
             }
         }
@@ -399,7 +408,7 @@ public class JingleFileTransferManager {
     private FileTransferConnection startJingleSession(JID toJID)
         throws JingleSessionException {
 
-        logger.debug(Util.prefix(toJID) + "Start Session");
+        log.debug(Util.prefix(toJID) + "Start Session");
 
         FileTransferConnection connection = new FileTransferConnection(toJID);
         connections.put(toJID, connection);
@@ -431,7 +440,7 @@ public class JingleFileTransferManager {
      */
     public void terminateAllJingleSessions() {
 
-        logger.debug("Terminate all jingle sessions.");
+        log.debug("Terminate all jingle sessions.");
 
         for (JID jid : new ArrayList<JID>(connections.keySet())) {
             terminateJingleSession(jid);
@@ -449,9 +458,9 @@ public class JingleFileTransferManager {
         if (outgoing != null) {
             try {
                 outgoing.session.terminate();
-                logger.info("JingleSession Terminated [" + jid.getBase() + "]");
+                log.info("JingleSession Terminated [" + jid.getBase() + "]");
             } catch (XMPPException e1) {
-                logger.error(
+                log.error(
                     "Error during terminating outgoing jingle session with JID : "
                         + jid, e1);
             } finally {

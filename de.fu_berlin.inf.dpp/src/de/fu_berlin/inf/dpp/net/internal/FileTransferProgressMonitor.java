@@ -80,6 +80,7 @@ public class FileTransferProgressMonitor extends Thread {
         } catch (RuntimeException e) {
             this.exception = e;
         } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
             Thread.currentThread().interrupt();
         } finally {
             this.running = false;

@@ -14,7 +14,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class SimulateNetzwork {
 
-    private static Logger logger = Logger.getLogger(SimulateNetzwork.class);
+    private static Logger log = Logger.getLogger(SimulateNetzwork.class);
 
     private HashMap<JID, NetworkEventHandler> clients;
 
@@ -26,7 +26,7 @@ public class SimulateNetzwork {
 
     private void sendOperation(NetworkRequest req) {
         if (clients.containsKey(req.getTo())) {
-            logger.debug("send message to " + req.getTo());
+            log.debug("send message to " + req.getTo());
             clients.get(req.getTo()).receiveNetworkEvent(req);
         }
     }
@@ -34,7 +34,7 @@ public class SimulateNetzwork {
     public void sendOperation(final NetworkRequest req, final int delay) {
         new Thread(new Runnable() {
             public void run() {
-                logger.debug("Delay in send operation "
+                log.debug("Delay in send operation "
                     + req.getJupiterActivity().getOperation().toString()
                     + " of " + delay + " millis");
                 try {

@@ -207,6 +207,7 @@ public class Util {
                 try {
                     Thread.sleep(milliseconds);
                 } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
                     Thread.currentThread().interrupt();
                     return;
                 }
@@ -246,6 +247,8 @@ public class Util {
                         // https://www.limewire.org/jira/browse/LWC-2838
                         return null;
                     } catch (InterruptedException e) {
+                        log.error("Code not designed to be interruptable", e);
+                        Thread.currentThread().interrupt();
                         return null;
                     } catch (Exception e) {
                         // Log here for connection problems.
@@ -253,6 +256,9 @@ public class Util {
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException e2) {
+                            log.error("Code not designed to be interruptable",
+                                e);
+                            Thread.currentThread().interrupt();
                             return null;
                         }
                     }
@@ -332,7 +338,7 @@ public class Util {
 
     /**
      * Return a new Runnable which runs the given runnable but catches all
-     * RuntimeExceptions and logs them to the given logger.
+     * RuntimeExceptions and logs them to the given log.
      * 
      * Errors are logged and re-thrown.
      * 
@@ -374,7 +380,7 @@ public class Util {
 
     /**
      * Run the given runnable in a new thread (with the given name) and log any
-     * RuntimeExceptions to the given logger.
+     * RuntimeExceptions to the given log.
      * 
      * @nonBlocking
      */
@@ -389,7 +395,7 @@ public class Util {
 
     /**
      * Run the given runnable in a new thread and log any RuntimeExceptions to
-     * the given logger.
+     * the given log.
      * 
      * @nonBlocking
      */
@@ -399,7 +405,7 @@ public class Util {
 
     /**
      * Run the given runnable in the SWT-Thread, log any RuntimeExceptions to
-     * the given logger and block until the runnable returns.
+     * the given log and block until the runnable returns.
      * 
      * @blocking
      */
@@ -457,7 +463,7 @@ public class Util {
 
     /**
      * Run the given runnable in the SWT-Thread and log any RuntimeExceptions to
-     * the given logger.
+     * the given log.
      * 
      * @nonBlocking
      */
@@ -466,8 +472,8 @@ public class Util {
     }
 
     /**
-     * Run the given runnable and log any RuntimeExceptions to the given logger
-     * and block until the runnable returns.
+     * Run the given runnable and log any RuntimeExceptions to the given log and
+     * block until the runnable returns.
      * 
      * @blocking
      */

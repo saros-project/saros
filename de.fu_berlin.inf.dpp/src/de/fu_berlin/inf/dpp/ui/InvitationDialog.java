@@ -366,8 +366,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                     }
                 });
             } catch (InvocationTargetException e) {
+                log.error(
+                    "An error occurred while waiting for the file list: ", e);
                 return;
             } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
+                Thread.currentThread().interrupt();
                 return;
             }
         }

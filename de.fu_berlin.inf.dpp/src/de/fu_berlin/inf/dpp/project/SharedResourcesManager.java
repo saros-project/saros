@@ -316,6 +316,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             try {
                 monitor.await();
             } catch (InterruptedException e) {
+                log.error("Code not designed to handle InterruptedException");
                 Thread.currentThread().interrupt();
             }
             if (monitor.isCanceled()) {
@@ -326,6 +327,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             try {
                 monitor.await();
             } catch (InterruptedException e) {
+                log.error("Code not designed to handle InterruptedException");
                 Thread.currentThread().interrupt();
             }
             if (monitor.isCanceled()) {

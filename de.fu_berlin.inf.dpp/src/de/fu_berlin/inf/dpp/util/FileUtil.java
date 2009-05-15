@@ -125,6 +125,7 @@ public class FileUtil {
             try {
                 monitor.await();
             } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
                 Thread.currentThread().interrupt();
             }
         } catch (CoreException e) {
@@ -149,13 +150,10 @@ public class FileUtil {
                 }
             });
         } catch (InvocationTargetException e) {
-            /*
-             * FIXME InvocationTargetException and Interrupted Exceptions are
-             * incorrectly handled
-             */
-            log.warn("", e);
+            log.error("Could not set project read-only: ", e);
         } catch (InterruptedException e) {
-            log.warn("", e);
+            log.error("Code not designed to be interruptable", e);
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -192,6 +190,7 @@ public class FileUtil {
         try {
             monitor.await();
         } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
             Thread.currentThread().interrupt();
         }
 

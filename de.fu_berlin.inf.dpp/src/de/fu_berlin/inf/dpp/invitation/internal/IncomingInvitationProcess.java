@@ -65,7 +65,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class IncomingInvitationProcess extends InvitationProcess implements
     IIncomingInvitationProcess {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(IncomingInvitationProcess.class);
 
     protected FileList remoteFileList;
@@ -161,6 +161,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
+                    // Only warn, because we can reasonable deal with IE
+                    log.warn("Code not intended to be interrupted", e);
                     cancel(null, false);
                     throw e;
                 }
@@ -177,7 +179,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
      */
     public void accept(final IProject baseProject, final String newProjectName,
-        IProgressMonitor monitor) throws InterruptedException {
+        IProgressMonitor monitor) {
 
         if ((newProjectName == null) && (baseProject == null)) {
             throw new IllegalArgumentException(
@@ -185,83 +187,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
 
         try {
-            assertState(State.HOST_FILELIST_SENT);
-
-            // If a base project is given, save it
-            if (baseProject != null) {
-                if (!EditorAPI.saveProject(baseProject)) {
-                    // User canceled saving the source project
-                    cancel(null, false);
-                    return;
-                }
-            }
-            if (newProjectName != null) {
-
-                try {
-                    this.localProject = Util.runSWTSync(logger,
-                        new Callable<IProject>() {
-                            public IProject call() throws Exception {
-                                return createNewProject(newProjectName,
-                                    baseProject);
-
-                            }
-                        });
-                } catch (CoreException e) {
-                    // Eclipse reported an error
-                    throw e;
-                } catch (InterruptedException e) {
-                    // Canceled by user
-                    cancel(null, false);
-                    return;
-                } catch (Exception e) {
-                    // We are probably at fault!
-                    throw new RuntimeException(e);
-                }
-
+            if (acceptUnsafe(baseProject, newProjectName, monitor)) {
+                done();
             } else {
-                this.localProject = baseProject;
-            }
-
-            this.filesLeftToSynchronize = handleDiff(this.localProject,
-                this.remoteFileList);
-
-            this.progressMonitor = monitor;
-
-            if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
-                this.progressMonitor.beginTask("Synchronizing",
-                    this.filesLeftToSynchronize);
-            } else {
-                this.progressMonitor.beginTask("Synchronizing",
-                    100 + this.filesLeftToSynchronize);
-                this.progressMonitor.subTask("Receiving Archive...");
-            }
-            setState(State.SYNCHRONIZING);
-
-            // Disable Autobuilding while we receive files
-            IWorkspace ws = ResourcesPlugin.getWorkspace();
-            IWorkspaceDescription desc = ws.getDescription();
-            boolean wasAutobuilding = desc.isAutoBuilding();
-            if (wasAutobuilding) {
-                desc.setAutoBuilding(false);
-                ws.setDescription(desc);
-            }
-
-            try {
-                this.transmitter.sendFileList(this.peer, new FileList(
-                    this.localProject), this);
-
-                if (blockUntilAllFilesSynchronized(monitor)) {
-                    done();
-                } else {
-                    cancel(null, false);
-                }
-            } finally {
-
-                // Reenable Autobuilding...
-                if (wasAutobuilding) {
-                    desc.setAutoBuilding(true);
-                    ws.setDescription(desc);
-                }
+                cancel(null, false);
             }
         } catch (CoreException e) {
             ErrorMessageDialog.showErrorMessage(new Exception(
@@ -280,6 +209,83 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
     }
 
+    private boolean acceptUnsafe(final IProject baseProject,
+        final String newProjectName, IProgressMonitor monitor)
+        throws CoreException, IOException {
+        assertState(State.HOST_FILELIST_SENT);
+
+        // If a base project is given, save it
+        if (baseProject != null) {
+            if (!EditorAPI.saveProject(baseProject)) {
+                // User canceled saving the source project
+                return false;
+            }
+        }
+
+        if (newProjectName != null) {
+
+            try {
+                this.localProject = Util.runSWTSync(log,
+                    new Callable<IProject>() {
+                        public IProject call() throws CoreException,
+                            InterruptedException {
+                            return createNewProject(newProjectName, baseProject);
+
+                        }
+                    });
+            } catch (CoreException e) {
+                // Eclipse reported an error
+                throw e;
+            } catch (InterruptedException e) {
+                // @InterrupteExceptionOK - Method uses IE to signal cancelation
+                return false;
+            } catch (Exception e) {
+                // We are probably at fault!
+                throw new RuntimeException(e);
+            }
+
+        } else {
+            this.localProject = baseProject;
+        }
+
+        this.filesLeftToSynchronize = handleDiff(this.localProject,
+            this.remoteFileList);
+
+        this.progressMonitor = monitor;
+
+        if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
+            this.progressMonitor.beginTask("Synchronizing",
+                this.filesLeftToSynchronize);
+        } else {
+            this.progressMonitor.beginTask("Synchronizing",
+                100 + this.filesLeftToSynchronize);
+            this.progressMonitor.subTask("Receiving Archive...");
+        }
+        setState(State.SYNCHRONIZING);
+
+        // Disable Autobuilding while we receive files
+        IWorkspace ws = ResourcesPlugin.getWorkspace();
+        IWorkspaceDescription desc = ws.getDescription();
+        boolean wasAutobuilding = desc.isAutoBuilding();
+        if (wasAutobuilding) {
+            desc.setAutoBuilding(false);
+            ws.setDescription(desc);
+        }
+
+        try {
+            this.transmitter.sendFileList(this.peer, new FileList(
+                this.localProject), this);
+
+            return blockUntilAllFilesSynchronized(monitor);
+        } finally {
+            // Reenable Autobuilding...
+            if (wasAutobuilding) {
+                desc.setAutoBuilding(true);
+                ws.setDescription(desc);
+            }
+        }
+    }
+
     public void invitationAccepted(JID from) {
         failState();
     }
@@ -289,7 +295,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     public void resourceReceived(JID from, IPath path, InputStream in) {
-        IncomingInvitationProcess.logger.debug("new file received: " + path);
+        IncomingInvitationProcess.log.debug("new file received: " + path);
         if (this.localProject == null || this.progressMonitor.isCanceled()) {
             return; // we do not have started the new project yet, so received
             // resources are not welcomed
@@ -307,7 +313,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 // TODO Set ReadOnly again?
             } else {
                 file.create(in, true, new NullProgressMonitor());
-                IncomingInvitationProcess.logger.debug("New File created: "
+                IncomingInvitationProcess.log.debug("New File created: "
                     + file.getName());
             }
 
@@ -324,7 +330,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             + this.filesLeftToSynchronize);
 
         this.filesLeftToSynchronize--;
-        IncomingInvitationProcess.logger.debug("file counter: "
+        IncomingInvitationProcess.log.debug("file counter: "
             + this.filesLeftToSynchronize);
     }
 
@@ -361,6 +367,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                log.warn("Code not designed to handle InterruptedException", e);
+                Thread.currentThread().interrupt();
                 return false;
             }
 
@@ -406,7 +414,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         try {
             dialog.run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
-                    throws InvocationTargetException, InterruptedException {
+                    throws InvocationTargetException {
                     try {
 
                         SubMonitor subMonitor = SubMonitor.convert(monitor,

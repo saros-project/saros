@@ -268,7 +268,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             try {
                 getContainer().run(false, false, new IRunnableWithProgress() {
                     public void run(IProgressMonitor monitor)
-                        throws InvocationTargetException, InterruptedException {
+                        throws InvocationTargetException {
                         try {
                             saros.createAccount(server, username, password,
                                 monitor);
@@ -305,6 +305,8 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                 return false;
 
             } catch (InterruptedException e) {
+                log.error("An internal error occurred: InterruptedException"
+                    + " thrown from uninterruptable method", e);
                 setMessage(e.getCause().getMessage(), IMessageProvider.ERROR);
                 return false;
             }

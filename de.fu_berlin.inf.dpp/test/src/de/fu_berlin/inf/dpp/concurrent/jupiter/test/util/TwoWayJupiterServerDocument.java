@@ -16,7 +16,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
 
     public static final JID jidServer = new JID("Server");
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(TwoWayJupiterServerDocument.class);
 
     private Document doc;
@@ -43,12 +43,12 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            logger.debug("Operation before OT:"
+            log.debug("Operation before OT:"
                 + jupiterActivity.getOperation().toString());
             /* 1. transform operation. */
             op = algorithm.receiveJupiterActivity(jupiterActivity);
 
-            logger.debug("Operation after OT: " + op.toString());
+            log.debug("Operation after OT: " + op.toString());
             /* 2. execution on server document */
             doc.execOperation(op);
         } catch (TransformationException e) {
@@ -86,7 +86,7 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
-        logger.info("receive operation : "
+        log.info("receive operation : "
             + jupiterActivity.getOperation().toString());
         receiveOperation(jupiterActivity);
 

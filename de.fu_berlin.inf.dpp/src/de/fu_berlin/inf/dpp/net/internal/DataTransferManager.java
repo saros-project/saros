@@ -123,7 +123,9 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             startingJingleThread.join();
         } catch (InterruptedException e) {
-            // do nothing
+            log.error("Code not designed to be interruptable", e);
+            Thread.currentThread().interrupt();
+            return null;
         }
         return jingleManager.getValue();
     }
@@ -429,13 +431,20 @@ public class DataTransferManager implements ConnectionSessionListener {
                 "Filename managed by Description", content.length, data
                     .toBase64());
 
+            InterruptedException interrupted = null;
+
             /* wait for complete transfer. */
             while (monitor.isRunning()) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    break;
+                    interrupted = e;
                 }
+            }
+
+            if (interrupted != null) {
+                log.error("Code not designed to be interruptable", interrupted);
+                Thread.currentThread().interrupt();
             }
 
             if (monitor.getMonitoringException() != null) {
@@ -839,7 +848,9 @@ public class DataTransferManager implements ConnectionSessionListener {
             try {
                 startingJingleThread.join();
             } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
                 Thread.currentThread().interrupt();
+                return;
             }
         }
 

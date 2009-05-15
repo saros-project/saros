@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class ServerSynchronizedDocument implements JupiterServer,
     NetworkEventHandler, DocumentTestChecker {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(ServerSynchronizedDocument.class);
 
     private Document doc;
@@ -59,12 +59,12 @@ public class ServerSynchronizedDocument implements JupiterServer,
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            logger.debug("Operation before OT:"
+            log.debug("Operation before OT:"
                 + jupiterActivity.getOperation().toString() + " "
                 + algorithm.getTimestamp());
             /* 1. transform operation. */
             op = algorithm.receiveJupiterActivity(jupiterActivity);
-            logger.debug("Operation after OT: " + op.toString() + " "
+            log.debug("Operation after OT: " + op.toString() + " "
                 + algorithm.getTimestamp());
 
             /* 2. execution on server document */
@@ -80,10 +80,10 @@ public class ServerSynchronizedDocument implements JupiterServer,
         JupiterActivity jupiterActivity, JID jid) {
         while (accessDenied) {
             try {
-                logger.debug("wait for semaphore.");
+                log.debug("wait for semaphore.");
                 wait();
             } catch (InterruptedException e) {
-                logger.error(e.getMessage());
+                log.error(e.getMessage());
             }
         }
 
@@ -107,7 +107,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
                 proxy = proxyQueues.get(j);
 
                 if (!j.toString().equals(jid.toString())) {
-                    logger.debug(j.toString() + " : proxy timestamp "
+                    log.debug(j.toString() + " : proxy timestamp "
                         + proxy.getAlgorithm().getTimestamp() + " op before : "
                         + jupiterActivity.getOperation() + " req timestamp: "
                         + jupiterActivity.getTimestamp());
@@ -118,7 +118,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
                      */
                     proxy.sendOperation(op);
 
-                    logger.debug(j.toString() + " : vector after receive "
+                    log.debug(j.toString() + " : vector after receive "
                         + proxy.getAlgorithm().getTimestamp() + " op after : "
                         + op);
                 }
@@ -130,7 +130,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
             e.printStackTrace();
 
         } finally {
-            logger.debug("end of lock and clear semaphore.");
+            log.debug("end of lock and clear semaphore.");
             accessDenied = false;
             notifyAll();
         }
@@ -179,7 +179,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
-        logger.info("receive operation : "
+        log.info("receive operation : "
             + jupiterActivity.getOperation().toString());
         receiveOperation(jupiterActivity);
 
@@ -205,8 +205,6 @@ public class ServerSynchronizedDocument implements JupiterServer,
     }
 
     public void receiveNetworkEvent(NetworkRequest req) {
-        // logger.debug("receive network event with networtrequest from "+req.
-        // getFrom());
         receiveOperation(req.getJupiterActivity(), req.getFrom());
     }
 

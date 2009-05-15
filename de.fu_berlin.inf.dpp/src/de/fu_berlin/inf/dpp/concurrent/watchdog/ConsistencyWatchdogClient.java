@@ -59,7 +59,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class ConsistencyWatchdogClient {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
 
     protected final Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
@@ -103,7 +103,7 @@ public class ConsistencyWatchdogClient {
         public boolean receivedResource(JID from, IPath path,
             InputStream input, int sequenceNumber) {
 
-            logger.debug("Received consistency file [" + from.getName() + "] "
+            log.debug("Received consistency file [" + from.getName() + "] "
                 + path.toString());
 
             ISharedProject project = sessionManager.getSharedProject();
@@ -114,12 +114,12 @@ public class ConsistencyWatchdogClient {
 
             final IFile file = project.getProject().getFile(path);
 
-            if (logger.isDebugEnabled()) {
-                input = logDiff(logger, from, path, input, file);
+            if (log.isDebugEnabled()) {
+                input = logDiff(log, from, path, input, file);
             }
 
             final InputStream toWrite = input;
-            Util.runSafeSWTSync(logger, new Runnable() {
+            Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     FileUtil.writeFile(toWrite, file);
                 }
@@ -151,7 +151,7 @@ public class ConsistencyWatchdogClient {
     public void checkConsistency() {
 
         try {
-            executor.submit(Util.wrapSafe(logger, new Runnable() {
+            executor.submit(Util.wrapSafe(log, new Runnable() {
                 public void run() {
                     performCheck(currentChecksums);
                 }
@@ -161,7 +161,7 @@ public class ConsistencyWatchdogClient {
              * Ignore Checksums that arrive before we are done processing the
              * last set of Checksums.
              */
-            logger
+            log
                 .warn("Received Checksums before processing of previous checksums finished");
         }
 
@@ -187,12 +187,12 @@ public class ConsistencyWatchdogClient {
     public void performCheck(List<DocumentChecksum> checksums) {
 
         if (checksums == null) {
-            logger
+            log
                 .warn("Consistency Check triggered with out preceeding call to setChecksums()");
             return;
         }
 
-        logger.trace(String.format(
+        log.trace(String.format(
             "Received %d checksums for %d inconsistencies", checksums.size(),
             pathsWithWrongChecksums.size()));
 
@@ -206,7 +206,7 @@ public class ConsistencyWatchdogClient {
 
         if (pathsWithWrongChecksums.isEmpty()) {
             if (inconsistencyToResolve.getValue()) {
-                logger.info("All Inconsistencies are resolved");
+                log.info("All Inconsistencies are resolved");
                 inconsistencyToResolve.setValue(false);
             }
         } else {
@@ -228,7 +228,7 @@ public class ConsistencyWatchdogClient {
 
         // if doc is still null give up
         if (doc == null) {
-            logger
+            log
                 .warn("Could not check checksum of file " + path.toOSString());
             return false;
         }
@@ -243,7 +243,7 @@ public class ConsistencyWatchdogClient {
             if ((System.currentTimeMillis() - lastEdited) > 4000
                 && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
 
-                logger.debug(String.format(
+                log.debug(String.format(
                     "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)", path
                         .toString(), doc.getLength(),
                     doc.getLength() == checksum.getLength() ? "==" : "!=",
@@ -285,7 +285,7 @@ public class ConsistencyWatchdogClient {
     public void setChecksumErrorHandling(boolean newState) {
 
         if (executingChecksumErrorHandling && newState) {
-            logger.warn("Restarting Checksum Error Handling"
+            log.warn("Restarting Checksum Error Handling"
                 + " while another operation is running");
             // HACK If we programmed correctly this should not happen
             executingChecksumErrorHandling = false;

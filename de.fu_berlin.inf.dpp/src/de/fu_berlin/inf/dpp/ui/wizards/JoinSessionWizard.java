@@ -122,8 +122,8 @@ public class JoinSessionWizard extends Wizard {
         } catch (InvocationTargetException e) {
             log.warn("Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
+            // @InterruptedExceptionOK - IE is used to signal cancelation
             log.debug("Request of remote file list canceled/interrupted", e);
-            // User canceled...
             getShell().close();
             return false;
         }
@@ -240,6 +240,7 @@ public class JoinSessionWizard extends Wizard {
             log.warn("Exception while requesting remote file list", e);
             return false;
         } catch (InterruptedException e) {
+            // @InterruptedExceptionOK - IE is used to signal cancelation
             log.debug("Request of remote file list canceled/interrupted", e);
             return false;
         }
@@ -298,7 +299,8 @@ public class JoinSessionWizard extends Wizard {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
-                    log.warn("Internal error: ", e);
+                    log.error("Code not designed to be interruptable", e);
+                    Thread.currentThread().interrupt();
                     return;
                 }
                 Util.runSafeSWTAsync(log, new Runnable() {

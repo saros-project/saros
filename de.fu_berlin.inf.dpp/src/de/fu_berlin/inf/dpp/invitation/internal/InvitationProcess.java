@@ -31,7 +31,7 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  */
 public abstract class InvitationProcess implements IInvitationProcess {
 
-    private static Logger logger = Logger.getLogger(InvitationProcess.class);
+    private static Logger log = Logger.getLogger(InvitationProcess.class);
 
     protected final ITransmitter transmitter;
 
@@ -109,11 +109,11 @@ public abstract class InvitationProcess implements IInvitationProcess {
         }
 
         if (errorMsg != null) {
-            InvitationProcess.logger.error(
+            InvitationProcess.log.error(
                 "Invitation was canceled because of an error: " + errorMsg,
                 new StackTrace());
         } else {
-            InvitationProcess.logger.info("Invitation was canceled.");
+            InvitationProcess.log.info("Invitation was canceled.");
         }
 
         if (!replicated) {
@@ -137,7 +137,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
      */
     protected void failed(Exception e) {
         this.exception = e;
-        logger.error("Invitation process failed", e);
+        log.error("Invitation process failed", e);
         cancel(e.getMessage(), false);
     }
 

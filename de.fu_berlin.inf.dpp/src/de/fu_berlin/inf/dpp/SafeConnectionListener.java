@@ -25,15 +25,15 @@ public class SafeConnectionListener implements ConnectionListener {
      * RuntimeException occurs when calling the {@link #toForwardTo}
      * {@link ConnectionListener}.
      */
-    protected Logger logger;
+    protected Logger log;
 
-    public SafeConnectionListener(Logger logger, ConnectionListener toForwardTo) {
+    public SafeConnectionListener(Logger log, ConnectionListener toForwardTo) {
         this.toForwardTo = toForwardTo;
-        this.logger = logger;
+        this.log = log;
     }
 
     public void connectionClosed() {
-        Util.runSafeSync(logger, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.connectionClosed();
             }
@@ -41,7 +41,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void connectionClosedOnError(final Exception e) {
-        Util.runSafeSync(logger, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.connectionClosedOnError(e);
             }
@@ -49,7 +49,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void reconnectingIn(final int seconds) {
-        Util.runSafeSync(logger, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.reconnectingIn(seconds);
             }
@@ -58,7 +58,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void reconnectionFailed(final Exception e) {
-        Util.runSafeSync(logger, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.reconnectionFailed(e);
             }
@@ -66,7 +66,7 @@ public class SafeConnectionListener implements ConnectionListener {
     }
 
     public void reconnectionSuccessful() {
-        Util.runSafeSync(logger, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.reconnectionSuccessful();
             }

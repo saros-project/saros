@@ -20,7 +20,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class JupiterDocumentServer {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(JupiterDocumentServer.class);
 
     /**
@@ -103,11 +103,11 @@ public class JupiterDocumentServer {
                     new JupiterVectorTime(ts.getComponents()[1], ts
                         .getComponents()[0]));
             } catch (TransformationException e) {
-                JupiterDocumentServer.logger.error(
+                JupiterDocumentServer.log.error(
                     "Error during update vector time for " + dest, e);
             }
         } else {
-            JupiterDocumentServer.logger
+            JupiterDocumentServer.log
                 .error("No proxy found for given source jid: " + source);
         }
 

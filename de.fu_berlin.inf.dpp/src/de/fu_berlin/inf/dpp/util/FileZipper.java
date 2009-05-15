@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.IPath;
  */
 public class FileZipper {
 
-    private static Logger logger = Logger.getLogger(FileZipper.class);
+    private static Logger log = Logger.getLogger(FileZipper.class);
 
     /**
      * To create a checksum when unzipping one could use
@@ -52,7 +52,7 @@ public class FileZipper {
 
         for (IPath path : files) {
 
-            FileZipper.logger.debug("Compress file: " + path);
+            FileZipper.log.debug("Compress file: " + path);
 
             File file = project.getFile(path).getLocation().toFile();
             if (file.exists()) {
@@ -62,7 +62,7 @@ public class FileZipper {
 
                 zipStream.closeEntry();
             } else {
-                FileZipper.logger
+                FileZipper.log
                     .warn("File given to Zip which does not exist: " + path);
             }
         }
@@ -70,7 +70,7 @@ public class FileZipper {
 
         // Checksum
         if (calculateChecksum && cos != null) {
-            FileZipper.logger
+            FileZipper.log
                 .debug("Checksum: " + cos.getChecksum().getValue());
         }
     }

@@ -26,15 +26,15 @@ public class SafePacketListener implements PacketListener {
      * RuntimeException occurs when calling the {@link #toForwardTo}
      * {@link PacketListener}.
      */
-    protected Logger logger;
+    protected Logger log;
 
-    public SafePacketListener(Logger logger, PacketListener toForwardTo) {
+    public SafePacketListener(Logger log, PacketListener toForwardTo) {
         this.toForwardTo = toForwardTo;
-        this.logger = logger;
+        this.log = log;
     }
 
     public void processPacket(final Packet packet) {
-        Util.runSafeSync(logger, new Runnable() {
+        Util.runSafeSync(log, new Runnable() {
             public void run() {
                 toForwardTo.processPacket(packet);
             }

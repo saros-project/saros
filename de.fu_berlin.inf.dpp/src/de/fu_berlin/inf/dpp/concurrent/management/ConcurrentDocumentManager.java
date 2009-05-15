@@ -38,7 +38,7 @@ public class ConcurrentDocumentManager implements Disposable {
         CLIENT_SIDE, HOST_SIDE
     }
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(ConcurrentDocumentManager.class);
 
     /**
@@ -281,7 +281,7 @@ public class ConcurrentDocumentManager implements Disposable {
 
         executionQueue.add(jupiterActivity);
 
-        Util.runSafeSWTAsync(logger, new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
 
                 while (executionQueue.size() > 0) {
@@ -300,13 +300,13 @@ public class ConcurrentDocumentManager implements Disposable {
                 Operation op;
                 try {
                     op = jupiterClient.receiveJupiterActivity(jupiterActivity);
-                    // logger.trace("\n  " + "Transforming: "
+                    // log.trace("\n  " + "Transforming: "
                     // + jupiterActivity.getOperation() + " ("
                     // + jupiterActivity.getTimestamp() + ")\n" +
                     // "  into        : "
                     // + op);
                 } catch (TransformationException e) {
-                    ConcurrentDocumentManager.logger.error(
+                    ConcurrentDocumentManager.log.error(
                         "Error during transformation: ", e);
 
                     /*
@@ -430,7 +430,7 @@ public class ConcurrentDocumentManager implements Disposable {
             outgoing = docServer.transformJupiterActivity(jupiterActivity);
         } catch (TransformationException e) {
             // TODO this should trigger a consistency check
-            logger.error("Transformation error: ", e);
+            log.error("Transformation error: ", e);
             return;
         }
 
@@ -459,14 +459,14 @@ public class ConcurrentDocumentManager implements Disposable {
         if (jupiterActivity.getOperation() instanceof TimestampOperation) {
 
             // TODO Use timestamps correctly or discard this code
-            logger.warn("Timestamp operations are not tested at the moment");
+            log.warn("Timestamp operations are not tested at the moment");
 
             Jupiter jupClient = getClientDoc(jupiterActivity.getEditorPath());
 
             try {
                 jupClient.updateVectorTime(jupiterActivity.getTimestamp());
             } catch (TransformationException e) {
-                logger.error(
+                log.error(
                     "Jupiter [Client] - Error during vector time update for "
                         + jupiterActivity.getEditorPath(), e);
             }
@@ -497,16 +497,16 @@ public class ConcurrentDocumentManager implements Disposable {
             JupiterDocumentServer server = this.concurrentDocuments.get(path);
 
             if (server.isExist(jid)) {
-                logger.info("Resetting jupiter server for [" + jid.getBase()
+                log.info("Resetting jupiter server for [" + jid.getBase()
                     + "]: " + path.toOSString());
                 server.removeProxyClient(jid);
                 server.addProxyClient(jid);
             } else {
-                logger.warn("No Jupiter server for user [" + jid.getBase()
-                    + "]: " + path.toOSString());
+                log.warn("No Jupiter server for user [" + jid.getBase() + "]: "
+                    + path.toOSString());
             }
         } else {
-            logger.warn("No Jupiter server for path: " + path.toOSString());
+            log.warn("No Jupiter server for path: " + path.toOSString());
         }
     }
 
@@ -524,11 +524,11 @@ public class ConcurrentDocumentManager implements Disposable {
      */
     public void resetJupiterClient(IPath path) {
         if (this.clientDocs.containsKey(path)) {
-            logger.debug("Resetting jupiter client: " + path.toOSString());
+            log.debug("Resetting jupiter client: " + path.toOSString());
             this.clientDocs.remove(path);
             this.clientDocs.put(path, new Jupiter(true));
         } else {
-            logger.warn("No Jupiter document exists for path: "
+            log.warn("No Jupiter document exists for path: "
                 + path.toOSString());
         }
     }

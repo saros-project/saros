@@ -18,7 +18,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class ProxySynchronizedQueue {
 
-    private static Logger logger = Logger
+    private static Logger log = Logger
         .getLogger(ProxySynchronizedQueue.class);
 
     private Algorithm algorithm;
@@ -38,12 +38,12 @@ public class ProxySynchronizedQueue {
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            logger.debug(jid + ": Operation before OT:"
+            log.debug(jid + ": Operation before OT:"
                 + jupiterActivity.getOperation().toString());
 
             op = algorithm.receiveJupiterActivity(jupiterActivity);
 
-            logger.debug(jid + ": Operation after OT: " + op.toString());
+            log.debug(jid + ": Operation after OT: " + op.toString());
         } catch (TransformationException e) {
             throw new RuntimeException(e);
         }

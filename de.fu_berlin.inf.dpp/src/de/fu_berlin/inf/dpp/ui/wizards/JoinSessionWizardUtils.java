@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
@@ -32,35 +33,37 @@ public class JoinSessionWizardUtils {
 
         IIncomingInvitationProcess invitationProcess;
 
-        IProject project;
+        IProject project = null;
 
         public void run() {
 
-            /*
-             * FIXME InvocationTargetException and Interrupted Exceptions are
-             * incorrectly handled
-             */
             ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
                 .getShell());
             try {
                 dialog.run(true, true, new IRunnableWithProgress() {
-                    public void run(IProgressMonitor monitor) {
+                    public void run(IProgressMonitor monitor)
+                        throws InterruptedException {
 
                         monitor.beginTask("Scanning workspace projects ... ",
                             IProgressMonitor.UNKNOWN);
-                        ScanRunner.this.project = JoinSessionWizardUtils
+                        IProject project = JoinSessionWizardUtils
                             .getLocalProject(ScanRunner.this.invitationProcess
                                 .getRemoteFileList(), monitor);
                         monitor.done();
+
+                        ScanRunner.this.project = project;
                     }
 
                 });
             } catch (InvocationTargetException e) {
-                log.error("Internal Error:"
-                    + " InvocationTargetException not properly handeled!", e);
+                log.error("An error occurred while scanning "
+                    + "for best matching project: ", e);
+                MessageDialog.openError(EditorAPI.getShell(),
+                    "An Error occurred in Saros",
+                    "An error occurred while scanning "
+                        + "for best matching project: " + e.getMessage());
             } catch (InterruptedException e) {
-                log.error("Internal Error:"
-                    + " InterruptedException not properly handeled!", e);
+                this.project = null;
             }
         }
     }
@@ -96,7 +99,7 @@ public class JoinSessionWizardUtils {
      * To be considered a match, projects have to match at least 80%.
      */
     public static IProject getLocalProject(FileList remoteFileList,
-        IProgressMonitor monitor) {
+        IProgressMonitor monitor) throws InterruptedException {
 
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IProject[] projects = workspace.getRoot().getProjects();
@@ -109,7 +112,7 @@ public class JoinSessionWizardUtils {
         for (int i = 0; i < projects.length; i++) {
             monitor.worked(1);
             if (monitor.isCanceled())
-                return null;
+                throw new InterruptedException();
 
             if (!projects[i].isOpen()) {
                 continue;

@@ -1351,6 +1351,7 @@ public class EditorManager implements IActivityProvider {
                 log.warn("Timeout expired on saving document: " + path);
             }
         } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
             Thread.currentThread().interrupt();
         }
 

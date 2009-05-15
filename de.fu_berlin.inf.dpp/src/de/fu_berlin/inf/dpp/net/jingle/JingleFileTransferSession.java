@@ -97,10 +97,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     try {
                         data = (TransferDescription) input.readUnshared();
                     } catch (IOException e) {
-                        logger.error("JingleFileTransferSession crashed", e);
+                        log.error("JingleFileTransferSession crashed", e);
                         return;
                     } catch (ClassNotFoundException e) {
-                        logger.error(
+                        log.error(
                             "Received unexpected object in ReceiveThread", e);
                         continue;
                     }
@@ -119,13 +119,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     try {
                         content = (byte[]) input.readUnshared();
                     } catch (IOException e) {
-                        logger.error("JingleFileTransferSession crashed", e);
+                        log.error("JingleFileTransferSession crashed", e);
                         for (IJingleFileTransferListener listener : listeners) {
                             listener.transferFailed(data, connectionType);
                         }
                         return;
                     } catch (ClassNotFoundException e) {
-                        logger.error(
+                        log.error(
                             "Received unexpected object in ReceiveThread", e);
                         for (IJingleFileTransferListener listener : listeners) {
                             listener.transferFailed(data, connectionType);
@@ -144,13 +144,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     }));
                 }
             } catch (RuntimeException e) {
-                logger.error("Internal Error in Receive Thread: ", e);
+                log.error("Internal Error in Receive Thread: ", e);
             }
         }
     }
-
-    private static Logger logger = Logger
-        .getLogger(JingleFileTransferSession.class);
 
     private ReceiverThread receiveThread;
     private Set<IJingleFileTransferListener> listeners;
@@ -218,7 +215,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             remotePort = this.getLocal().getSymmetric().getPort();
 
             // TODO what does symmetric mean
-            logger.info("Jingle [" + connectTo.getName()
+            log.info("Jingle [" + connectTo.getName()
                 + "] Symmetric IPs - local: " + localIp + ":" + localPort
                 + " -> remote: " + remoteIp + ":" + remotePort);
 
@@ -229,7 +226,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             remoteIp = this.getRemote().getIp();
             remotePort = this.getRemote().getPort();
 
-            logger.info("Jingle [" + connectTo.getName()
+            log.info("Jingle [" + connectTo.getName()
                 + "] Not Symmetric IPs - local: " + localIp + ":" + localPort
                 + " <-> remote: " + remoteIp + ":" + remotePort);
         }
@@ -248,7 +245,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         try {
             service.start(localPort);
         } catch (IOException e) {
-            logger.error("Jingle [" + connectTo.getName()
+            log.error("Jingle [" + connectTo.getName()
                 + "] Failed to create RUDP service");
         }
 
@@ -362,12 +359,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 socketFuture = completionService.poll(TIMEOUTSECONDS,
                     TimeUnit.SECONDS);
             } catch (InterruptedException e) {
-                JingleFileTransferSession.logger.error(
-                    "Unexpected interrupted exception in startTrasmit", e);
+                log.error("Code not designed to be interruptable", e);
+                Thread.currentThread().interrupt();
+                return;
             }
 
             if (socketFuture == null) {
-                logger.debug("Jingle [" + connectTo.getName()
+                log.debug("Jingle [" + connectTo.getName()
                     + "] Could not connect with either TCP or UDP.");
                 break;
             }
@@ -375,10 +373,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
             try {
                 this.socket = socketFuture.get();
             } catch (InterruptedException e) {
-                logger.error("Jingle [" + connectTo.getName() + "] "
-                    + "Unexpected interrupted exception in startTrasmit", e);
+                log.error("Code not designed to be interruptable", e);
+                Thread.currentThread().interrupt();
+                return;
             } catch (ExecutionException e) {
-                logger.debug("Jingle [" + connectTo.getName()
+                log.debug("Jingle [" + connectTo.getName()
                     + "] Could not connect with either TCP or UDP.");
                 continue;
             }
@@ -402,7 +401,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
                 return;
             } catch (IOException e) {
-                logger.debug("Jingle [" + connectTo.getName() + "] "
+                log.debug("Jingle [" + connectTo.getName() + "] "
                     + "Failed to listen with either TCP or UDP.", e);
 
                 close();
@@ -414,6 +413,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
             future.cancel(true);
         }
 
+        // Failed to connect...
         assert objectOutputStream == null && objectInputStream == null;
     }
 
@@ -458,8 +458,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         / delta + " kb/s)";
                 }
 
-                logger.debug(Util.prefix(connectTo) + "Sent" + throughput
-                    + ": " + transferData);
+                log.debug(Util.prefix(connectTo) + "Sent" + throughput + ": "
+                    + transferData);
                 return connectionType;
             } catch (IOException e) {
                 throw new JingleSessionException(Util.prefix(connectTo)
@@ -487,7 +487,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     @Override
     public void setTrasmit(boolean active) {
-        logger.error("Unexpected call to setTrasmit(active ==" + active + ")");
+        log.error("Unexpected call to setTrasmit(active ==" + active + ")");
     }
 
     /**

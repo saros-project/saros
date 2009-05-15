@@ -207,7 +207,9 @@ public class ConsistencyWatchdogHandler {
             try {
                 Thread.sleep(200);
             } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
                 Thread.currentThread().interrupt();
+                return;
             }
         }
 
