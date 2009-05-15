@@ -123,7 +123,7 @@ public class JoinSessionWizard extends Wizard {
             log.warn("Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
             // @InterruptedExceptionOK - IE is used to signal cancelation
-            log.debug("Request of remote file list canceled/interrupted", e);
+            log.debug("Request of remote file list canceled/interrupted");
             getShell().close();
             return false;
         }
