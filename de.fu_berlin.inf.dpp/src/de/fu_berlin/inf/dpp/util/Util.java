@@ -428,8 +428,7 @@ public class Util {
      * Runs the given callable in the SWT Thread returning the result of the
      * computation or throwing an exception that was thrown by the callable.
      */
-    public static <T> T runSWTSync(final Logger log, final Callable<T> callable)
-        throws Exception {
+    public static <T> T runSWTSync(final Callable<T> callable) throws Exception {
 
         final CallableResult<T> result = new CallableResult<T>();
 

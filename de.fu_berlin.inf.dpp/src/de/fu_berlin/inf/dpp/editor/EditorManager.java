@@ -1230,7 +1230,7 @@ public class EditorManager implements IActivityProvider {
         }
 
         try {
-            Util.runSWTSync(log, new Callable<Object>() {
+            Util.runSWTSync(new Callable<Object>() {
                 public Object call() throws Exception {
                     saveText(path);
                     return null;

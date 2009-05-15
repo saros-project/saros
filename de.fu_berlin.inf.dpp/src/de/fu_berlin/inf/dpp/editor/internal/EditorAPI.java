@@ -772,7 +772,7 @@ public class EditorAPI implements IEditorAPI {
      */
     public static boolean saveProject(final IProject projectToSave) {
         try {
-            return Util.runSWTSync(log, new Callable<Boolean>() {
+            return Util.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     /**
                      * TODO saveAllEditors does not save the Documents that we

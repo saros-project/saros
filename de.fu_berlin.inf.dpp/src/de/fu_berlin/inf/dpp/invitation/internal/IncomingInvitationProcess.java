@@ -227,14 +227,13 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         if (newProjectName != null) {
 
             try {
-                this.localProject = Util.runSWTSync(log,
-                    new Callable<IProject>() {
-                        public IProject call() throws CoreException,
-                            InterruptedException {
-                            return createNewProject(newProjectName, baseProject);
+                this.localProject = Util.runSWTSync(new Callable<IProject>() {
+                    public IProject call() throws CoreException,
+                        InterruptedException {
+                        return createNewProject(newProjectName, baseProject);
 
-                        }
-                    });
+                    }
+                });
             } catch (CoreException e) {
                 // Eclipse reported an error
                 throw e;
