@@ -152,10 +152,6 @@ public class SharedProject implements ISharedProject, Disposable {
         return this.participants.values();
     }
 
-    public int getParticipantCount() {
-        return this.participants.size();
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -331,7 +327,8 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * Stops the associated activity sequencer.
      * 
-     * @throws IllegalStateException if the shared project is already stopped.
+     * @throws IllegalStateException
+     *             if the shared project is already stopped.
      */
     public void stop() {
         if (stopped) {

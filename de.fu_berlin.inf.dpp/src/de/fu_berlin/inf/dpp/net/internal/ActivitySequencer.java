@@ -454,11 +454,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
                     return;
 
                 List<IActivity> activities = flush();
-
-                if (activities.size() > 0
-                    && sharedProject.getParticipantCount() > 1) {
+                int participantsNumber = sharedProject.getParticipants().size();
+                if (activities.size() > 0 && participantsNumber > 1) {
                     List<JID> participantJIDs = new ArrayList<JID>(
-                        sharedProject.getParticipantCount());
+                        participantsNumber);
                     for (User participant : sharedProject.getParticipants()) {
                         participantJIDs.add(participant.getJID());
                     }
