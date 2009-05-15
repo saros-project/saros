@@ -47,8 +47,6 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -84,71 +82,6 @@ public class EditorAPI implements IEditorAPI {
 
     public EditorAPI(Saros saros) {
         this.saros = saros;
-    }
-
-    public static class EditorPartListener implements IPartListener2 {
-
-        protected EditorManager editorManager;
-
-        public EditorPartListener(EditorManager editorManager) {
-            this.editorManager = editorManager;
-        }
-
-        public void partActivated(IWorkbenchPartReference partRef) {
-            IWorkbenchPart part = partRef.getPart(false);
-
-            if ((part != null) && (part instanceof IEditorPart)) {
-                IEditorPart editor = (IEditorPart) part;
-                editorManager.partActivated(editor);
-            }
-        }
-
-        public void partOpened(IWorkbenchPartReference partRef) {
-            IWorkbenchPart part = partRef.getPart(false);
-
-            if ((part != null) && (part instanceof IEditorPart)) {
-                IEditorPart editor = (IEditorPart) part;
-                editorManager.partOpened(editor);
-            }
-        }
-
-        public void partClosed(IWorkbenchPartReference partRef) {
-            IWorkbenchPart part = partRef.getPart(false);
-
-            if ((part != null) && (part instanceof IEditorPart)) {
-                IEditorPart editor = (IEditorPart) part;
-                editorManager.partClosed(editor);
-            }
-        }
-
-        public void partBroughtToTop(IWorkbenchPartReference partRef) {
-            // do nothing
-        }
-
-        public void partDeactivated(IWorkbenchPartReference partRef) {
-            // do nothing
-        }
-
-        public void partHidden(IWorkbenchPartReference partRef) {
-            // do nothing
-        }
-
-        public void partVisible(IWorkbenchPartReference partRef) {
-            // do nothing
-        }
-
-        /**
-         * Called for instance when a file was renamed. We just close and open
-         * the editor.
-         */
-        public void partInputChanged(IWorkbenchPartReference partRef) {
-            IWorkbenchPart part = partRef.getPart(false);
-
-            if ((part != null) && (part instanceof IEditorPart)) {
-                IEditorPart editor = (IEditorPart) part;
-                editorManager.partInputChanged(editor);
-            }
-        }
     }
 
     private static Logger log = Logger.getLogger(EditorAPI.class.getName());
@@ -203,7 +136,8 @@ public class EditorAPI implements IEditorAPI {
             removeEditorPartListener(editorManager);
         }
 
-        IPartListener2 partListener = new EditorPartListener(editorManager);
+        IPartListener2 partListener = new SafePartListener2(log,
+            new EditorPartListener(editorManager));
 
         partListeners.put(editorManager, partListener);
 
