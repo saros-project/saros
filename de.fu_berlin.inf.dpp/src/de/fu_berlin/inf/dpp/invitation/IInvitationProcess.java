@@ -50,7 +50,7 @@ public interface IInvitationProcess extends IFileTransferCallback {
     }
 
     /**
-     * All states that an invitiation process can possibly have.
+     * All states that an invitation process can possibly have.
      */
     public static enum State {
         INITIALIZED, INVITATION_SENT, HOST_FILELIST_REQUESTED, HOST_FILELIST_SENT, GUEST_FILELIST_SENT, SYNCHRONIZING, SYNCHRONIZING_DONE, DONE, CANCELED
@@ -76,7 +76,7 @@ public interface IInvitationProcess extends IFileTransferCallback {
 
     /**
      * @return the user-provided informal description that can be provided with
-     *         an invitiation.
+     *         an invitation.
      */
     public String getDescription();
 
@@ -88,7 +88,7 @@ public interface IInvitationProcess extends IFileTransferCallback {
 
     /**
      * Cancels the invitation process. Is ignored if invitation was already
-     * cancelled.
+     * canceled.
      * 
      * @param errorMsg
      *            the error that caused the cancellation. This should be some
