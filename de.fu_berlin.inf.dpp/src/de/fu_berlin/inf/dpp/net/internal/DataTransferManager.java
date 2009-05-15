@@ -110,7 +110,10 @@ public class DataTransferManager implements ConnectionSessionListener {
     @Inject
     protected Saros saros;
 
+    protected SessionIDObservable sessionID;
+
     public DataTransferManager(SessionIDObservable sessionID) {
+        this.sessionID = sessionID;
         transferModeListeners = new ArrayList<ITransferModeListener>();
         transferModeListeners.add(trackingTransferModeListener);
         handmadeDataTransferExtension = new DataTransferHandler(sessionID);
@@ -578,6 +581,12 @@ public class DataTransferManager implements ConnectionSessionListener {
      * Closes the input stream, before returning.
      */
     protected void receiveData(TransferDescription data, InputStream input) {
+
+        if (!sessionID.getValue().equals(data.sessionID)) {
+            log.warn("Received Data with invalid " + "SessionID: "
+                + data.toString());
+            return;
+        }
 
         try {
             switch (data.type) {

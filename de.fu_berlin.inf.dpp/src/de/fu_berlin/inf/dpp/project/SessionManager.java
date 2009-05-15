@@ -95,7 +95,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
 
         JID myJID = saros.getMyJID();
-        this.sessionID.setValue(String.valueOf(sessionRandom.nextInt()));
+        this.sessionID.setValue(String.valueOf(Math
+            .abs(sessionRandom.nextInt())));
 
         SharedProject sharedProject = new SharedProject(saros,
             this.transmitter, this.transferManager, project, myJID);

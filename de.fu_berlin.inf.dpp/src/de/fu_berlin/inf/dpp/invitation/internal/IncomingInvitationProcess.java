@@ -105,6 +105,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @see de.fu_berlin.inf.dpp.IInvitationProcess
      */
     public void fileListReceived(JID from, FileList fileList) {
+
+        log.debug("Received file list from " + from.getBase());
         assertState(State.HOST_FILELIST_REQUESTED);
 
         if (fileList == null) {

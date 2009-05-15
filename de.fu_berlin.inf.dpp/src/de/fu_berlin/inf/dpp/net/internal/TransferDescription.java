@@ -46,6 +46,8 @@ public class TransferDescription implements Serializable {
 
     public FileTransferType type;
 
+    public String sessionID;
+
     public JID recipient;
 
     public JID sender;
@@ -59,27 +61,30 @@ public class TransferDescription implements Serializable {
 
         switch (type) {
         case ARCHIVE_TRANSFER:
-            return "Archive from " + getSender();
+            return "Archive from " + getSender() + " [SID=" + sessionID + "]";
         case FILELIST_TRANSFER:
-            return "FileList from " + getSender();
+            return "FileList from " + getSender() + " [SID=" + sessionID + "]";
         case RESOURCE_TRANSFER:
-            return "Resource from " + getSender() + ": " + file_project_path;
+            return "Resource from " + getSender() + ": " + file_project_path
+                + " [SID=" + sessionID + "]";
         default:
             return "Not a valid FileTransferType";
         }
     }
 
     public static TransferDescription createFileListTransferDescription(
-        JID recipient, JID sender) {
+        JID recipient, JID sender, String sessionID) {
         TransferDescription result = new TransferDescription();
         result.sender = sender;
         result.recipient = recipient;
         result.type = FileTransferType.FILELIST_TRANSFER;
+        result.sessionID = sessionID;
         return result;
     }
 
     public static TransferDescription createFileTransferDescription(
-        JID recipient, JID sender, IPath path, int sequenceNumber) {
+        JID recipient, JID sender, IPath path, int sequenceNumber,
+        String sessionID) {
 
         TransferDescription result = new TransferDescription();
         result.recipient = recipient;
@@ -87,16 +92,18 @@ public class TransferDescription implements Serializable {
         result.type = FileTransferType.RESOURCE_TRANSFER;
         result.file_project_path = path.toPortableString();
         result.sequenceNumber = sequenceNumber;
+        result.sessionID = sessionID;
         return result;
     }
 
     public static TransferDescription createArchiveTransferDescription(
-        JID recipient2, JID jid) {
+        JID recipient2, JID jid, String sessionID) {
 
         TransferDescription result = new TransferDescription();
         result.recipient = recipient2;
         result.sender = jid;
         result.type = FileTransferType.ARCHIVE_TRANSFER;
+        result.sessionID = sessionID;
 
         return result;
     }

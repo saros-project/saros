@@ -465,6 +465,23 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
     }
 
+    @Override
+    public boolean close() {
+        // If we still have on-going invitations, cancel them
+        for (InviterData data : input) {
+            IOutgoingInvitationProcess process = data.outgoingProcess;
+            if (process != null) {
+                State state = process.getState();
+                if (!(state == State.CANCELED || state == State.DONE)) {
+                    log.warn("Dialog closed, but an invitation"
+                        + " is still on-going with: " + process.getPeer());
+                    process.cancel(null, false);
+                }
+            }
+        }
+        return super.close();
+    }
+
     /**
      * Returns true if all users that are currently selected can be canceled.
      * 
@@ -546,8 +563,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     protected static final String[] StateNames = { "Initialized",
         "Invitation sent. Waiting for acknowledgement...",
-        "Filelist of inviter requested", "Filelist of inviter sent",
-        "Filelist of invitee sent",
+        "Invitation accepted. Sending filelist...",
+        "Filelist sent to client. Waiting for sync info...",
+        "Sync Info received",
         "Synchronizing project files. Transfering files...",
         "Files sent. Waiting for invitee...", "Invitiation completed",
         "Invitation canceled" };
@@ -654,9 +672,19 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             invdat.name = (entry.getName() == null) ? entry.getUser() : entry
                 .getName();
             // Check if we have a running invitation for the user
-            invdat.outgoingProcess = currentInvitations.get(invdat.jid);
+            invdat.outgoingProcess = currentInvitations.remove(invdat.jid);
 
             this.input.add(invdat);
+        }
+
+        // TODO Keep in dialog and show as error to user...
+        if (currentInvitations.size() > 0) {
+            for (IOutgoingInvitationProcess process : currentInvitations
+                .values()) {
+                log.warn("User " + process.getPeer()
+                    + " went offline during invitation.");
+                process.cancel("User went offline", true);
+            }
         }
 
         this.tableViewer.refresh();

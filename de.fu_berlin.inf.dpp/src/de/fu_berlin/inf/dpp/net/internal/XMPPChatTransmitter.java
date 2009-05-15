@@ -328,11 +328,21 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void addInvitationProcess(IInvitationProcess process) {
-        this.processes.put(process.getPeer(), process);
+        IInvitationProcess oldProcess = this.processes.put(process.getPeer(),
+            process);
+        if (oldProcess != null) {
+            log.error("An internal error occurred:"
+                + " An existing invititation process with "
+                + oldProcess.getPeer() + " was replace by a new one");
+        }
     }
 
     public void removeInvitationProcess(IInvitationProcess process) {
-        this.processes.remove(process.getPeer());
+        if (this.processes.remove(process.getPeer()) == null) {
+            log.error("An internal error occurred:"
+                + " No invititation process with " + process.getPeer()
+                + " could be found");
+        }
     }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
@@ -438,7 +448,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(connection
-                .getUser()));
+                .getUser()), sessionID.getValue());
         /*
          * TODO [MR] Not portable because String#getBytes() uses the platform's
          * default encoding.
@@ -451,7 +461,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         TransferDescription transfer = TransferDescription
             .createFileTransferDescription(to, new JID(connection.getUser()),
-                path, sequenceNumber);
+                path, sequenceNumber, sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
@@ -464,7 +474,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         TransferDescription transfer = TransferDescription
             .createArchiveTransferDescription(recipient, new JID(connection
-                .getUser()));
+                .getUser()), sessionID.getValue());
 
         // TODO monitor progress
         try {
@@ -679,7 +689,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         final TransferDescription transfer = TransferDescription
             .createFileTransferDescription(recipient, new JID(connection
-                .getUser()), path, sequenceNumber);
+                .getUser()), path, sequenceNumber, sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
