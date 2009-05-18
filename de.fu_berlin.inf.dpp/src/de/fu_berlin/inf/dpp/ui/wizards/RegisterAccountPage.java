@@ -18,8 +18,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,6 +32,7 @@ import org.jivesoftware.smack.XMPPException;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
@@ -57,14 +58,18 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
     protected final Saros saros;
 
+    protected final PreferenceUtils preferenceUtils;
+
     public RegisterAccountPage(Saros saros, boolean createAccount,
-        boolean showPrefButton, boolean storePreferences) {
+        boolean showPrefButton, boolean storePreferences,
+        PreferenceUtils preferenceUtils) {
 
         super("create");
         this.createAccount = createAccount;
         this.showPrefButton = showPrefButton;
         this.storePreferences = storePreferences;
         this.saros = saros;
+        this.preferenceUtils = preferenceUtils;
     }
 
     public void createControl(Composite parent) {
@@ -124,11 +129,9 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
             Button createAccountButton = new Button(root, SWT.NONE);
             createAccountButton.setText("Create Account");
-            createAccountButton.addSelectionListener(new SelectionListener() {
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    // Do nothing -> Use widget Selected
-                }
+            createAccountButton.addSelectionListener(new SelectionAdapter() {
 
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
@@ -136,7 +139,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                                 Shell shell = EditorAPI.getShell();
 
                                 CreateAccountWizard wizard = new CreateAccountWizard(
-                                    saros, true, false, false);
+                                    saros, preferenceUtils, true, false, false);
                                 boolean success = Window.OK == new WizardDialog(
                                     shell, wizard).open();
 
@@ -207,15 +210,11 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         this.passwordText.addModifyListener(listener);
         this.repeatPasswordText.addModifyListener(listener);
         if (this.showPrefButton) {
-            this.prefButton.addSelectionListener(new SelectionListener() {
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    // do nothing
-                }
+            this.prefButton.addSelectionListener(new SelectionAdapter() {
 
+                @Override
                 public void widgetSelected(SelectionEvent e) {
-                    IPreferenceStore preferences = saros.getPreferenceStore();
-                    if ((preferences.getString(PreferenceConstants.USERNAME)
-                        .length() != 0)
+                    if (preferenceUtils.hasUserName()
                         && RegisterAccountPage.this.prefButton.getSelection()) {
                         setMessage(
                             "Storing the configuration will override the existing settings.",
@@ -251,8 +250,7 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         this.serverText.setText(preferences
             .getDefaultString(PreferenceConstants.SERVER));
         if (this.showPrefButton) {
-            this.prefButton.setSelection(preferences.getString(
-                PreferenceConstants.USERNAME).length() == 0);
+            this.prefButton.setSelection(!preferenceUtils.hasUserName());
         }
     }
 

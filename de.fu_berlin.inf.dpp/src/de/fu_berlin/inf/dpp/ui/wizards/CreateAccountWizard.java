@@ -30,6 +30,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 
 /**
  * An wizard that is used to create Jabber accounts.
@@ -43,8 +44,9 @@ public class CreateAccountWizard extends Wizard {
 
     protected final Saros saros;
 
-    public CreateAccountWizard(Saros saros, boolean createAccount,
-        boolean showStoreInPrefsButton, boolean storeInPrefsDefault) {
+    public CreateAccountWizard(Saros saros, PreferenceUtils preferenceUtils,
+        boolean createAccount, boolean showStoreInPrefsButton,
+        boolean storeInPrefsDefault) {
 
         if (createAccount) {
             setWindowTitle("Create New User Account");
@@ -52,7 +54,7 @@ public class CreateAccountWizard extends Wizard {
             setWindowTitle("Enter User Account");
         }
         this.page = new RegisterAccountPage(saros, createAccount,
-            showStoreInPrefsButton, storeInPrefsDefault);
+            showStoreInPrefsButton, storeInPrefsDefault, preferenceUtils);
         setNeedsProgressMonitor(true);
         this.saros = saros;
     }

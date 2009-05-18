@@ -104,6 +104,12 @@
             class="de.fu_berlin.inf.dpp.ui.AdvancedPreferencePage"
             id="de.fu_berlin.inf.dpp.preferences.advanced"
             name="Advanced"/>
+      <page
+            category="de.fu_berlin.inf.dpp.preferences"
+            class="de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage"
+            id="de.fu_berlin.dpp.preferences.feedback"
+            name="Feedback">
+      </page>
    </extension>
    <extension
          point="org.eclipse.core.runtime.preferences">
@@ -452,5 +458,12 @@
       <enablement>
          <instanceof value="org.eclipse.core.resources.IResource"/>
       </enablement>
+   </extension>
+   <extension
+         id="de.fu_berlin.inf.dpp.startup"
+         point="org.eclipse.ui.startup">
+      <startup
+            class="de.fu_berlin.inf.dpp.StartupSaros">
+      </startup>
    </extension>
 </plugin>

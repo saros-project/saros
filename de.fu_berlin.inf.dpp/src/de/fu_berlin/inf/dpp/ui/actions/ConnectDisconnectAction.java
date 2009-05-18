@@ -19,20 +19,29 @@
  */
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.concurrent.Callable;
+
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.window.Window;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.wizards.ConfigurationWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class ConnectDisconnectAction extends Action implements Disposable {
@@ -45,6 +54,10 @@ public class ConnectDisconnectAction extends Action implements Disposable {
     protected Saros saros;
 
     protected SarosUI sarosUI;
+
+    protected StatisticManager statisticManager;
+
+    protected PreferenceUtils preferenceUtils;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
         public void connectionStateChanged(XMPPConnection connection,
@@ -62,11 +75,14 @@ public class ConnectDisconnectAction extends Action implements Disposable {
     };
 
     public ConnectDisconnectAction(SarosUI sarosUI, Saros saros,
-        IStatusLineManager statusLineManager) {
+        IStatusLineManager statusLineManager,
+        StatisticManager statisticManager, PreferenceUtils preferenceUtils) {
 
         this.saros = saros;
         this.statusLineManager = statusLineManager;
         this.sarosUI = sarosUI;
+        this.statisticManager = statisticManager;
+        this.preferenceUtils = preferenceUtils;
 
         updateStatus();
 
@@ -95,12 +111,56 @@ public class ConnectDisconnectAction extends Action implements Disposable {
         try {
             if (saros.isConnected()) {
                 saros.disconnect();
-            } else {
-                saros.connect(false);
+                return;
             }
+            // see if we have a user name and an agreement to submitting
+            // user statistics, if not, show wizard before connecting
+            boolean hasUsername = preferenceUtils.hasUserName();
+            boolean hasAgreement = statisticManager.hasStatisticAgreement();
+
+            if (!hasUsername || !hasAgreement) {
+                boolean ok = showConfigurationWizard(!hasUsername,
+                    !hasAgreement);
+                if (!ok)
+                    return;
+            }
+            saros.connect(false);
+
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);
         }
+    }
+
+    /**
+     * Opens the ConfigurationWizard to let the user specify his account
+     * settings and the agreement for statistic submissions.
+     * 
+     * @param askForAccount
+     * @param askAboutStatisticTransfer
+     * @return true if the user finished the wizard successfully, false if he
+     *         canceled the dialog or an error occurred
+     */
+    protected boolean showConfigurationWizard(final boolean askForAccount,
+        final boolean askAboutStatisticTransfer) {
+
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+
+                public Boolean call() {
+                    Wizard wiz = new ConfigurationWizard(askForAccount,
+                        askAboutStatisticTransfer);
+                    WizardDialog dialog = new WizardDialog(
+                        EditorAPI.getShell(), wiz);
+                    int status = dialog.open();
+                    return (status == Window.OK);
+                }
+
+            });
+        } catch (Exception e) {
+            log.error("Unable to open the ConfigurationWizard", e);
+            return false;
+        }
+
     }
 
     protected void setStatusBar(final String message, final boolean start) {
@@ -164,14 +224,14 @@ public class ConnectDisconnectAction extends Action implements Disposable {
                 break;
             }
 
-            String username = saros.getPreferenceStore().getString(
-                PreferenceConstants.USERNAME);
-
-            boolean validUsername = (username != null)
-                && (username.length() > 0);
-            boolean canConnect = validUsername
-                && (state == ConnectionState.NOT_CONNECTED || state == ConnectionState.ERROR);
-            setEnabled(state == ConnectionState.CONNECTED || canConnect);
+            /*
+             * Enable the button, if we are in the given states, even if we do
+             * not have a valid user name or statistics agreement, because we
+             * show the configuration dialog in such a case
+             */
+            setEnabled(state == ConnectionState.CONNECTED
+                || state == ConnectionState.NOT_CONNECTED
+                || state == ConnectionState.ERROR);
 
             setText(sarosUI.getDescription(state));
         } catch (RuntimeException e) {

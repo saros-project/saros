@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 
 /**
  * Class used to initialize default preference values.
@@ -54,5 +55,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.putBoolean(PreferenceConstants.MULTI_DRIVER, false);
         prefs.putBoolean(PreferenceConstants.AUTO_ACCEPT_INVITATION, false);
         prefs.putBoolean(PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER, true);
+
+        // InvitationDialog
+        prefs.putBoolean(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
+
+        // Initialize Feedback Preferences
+        prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_DISABLED, 0);
+        prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, 5);
+        prefs.putInt(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
+            StatisticManager.STATISTIC_UNKNOWN);
     }
 }

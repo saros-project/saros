@@ -19,12 +19,13 @@
  */
 package de.fu_berlin.inf.dpp;
 
-import java.awt.Toolkit;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -32,6 +33,7 @@ import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -46,6 +48,8 @@ import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.Jingle;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.prefs.BackingStoreException;
+import org.osgi.service.prefs.Preferences;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
@@ -61,6 +65,8 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
@@ -109,7 +115,6 @@ import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
  * 
  * @author rdjemili
  * @author coezbek
- * 
  */
 @Component(module = "core")
 public class Saros extends AbstractUIPlugin {
@@ -169,6 +174,12 @@ public class Saros extends AbstractUIPlugin {
     // Smack (XMPP) connection listener
     protected ConnectionListener smackConnectionListener;
 
+    /**
+     * The global plug-in preferences, shared among all workspaces. Should only
+     * be accessed over {@link #getConfigPrefs()} from outside this class.
+     */
+    protected Preferences configPrefs;
+
     protected Logger log;
 
     static {
@@ -214,6 +225,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SharedProjectObservable.class);
         this.container.addComponent(DataTransferManager.class);
         this.container.addComponent(EditorManager.class);
+        this.container.addComponent(FeedbackManager.class);
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
@@ -230,6 +242,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SessionViewOpener.class);
         this.container.addComponent(SharedResourcesManager.class);
         this.container.addComponent(SkypeManager.class);
+        this.container.addComponent(StatisticManager.class);
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);
@@ -332,11 +345,21 @@ public class Saros extends AbstractUIPlugin {
 
         isInitialized = true;
 
-        boolean hasUserName = getPreferenceStore().getString(
-            PreferenceConstants.USERNAME).length() > 0;
+        // determine if auto-connect can and should be performed
+        boolean autoConnect = getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_CONNECT);
 
-        if (getPreferenceStore().getBoolean(PreferenceConstants.AUTO_CONNECT)
-            && hasUserName) {
+        if (!autoConnect)
+            return;
+
+        // we need at least a user name, but also the agreement to the
+        // statistic submission
+        boolean hasUserName = this.container
+            .getComponent(PreferenceUtils.class).hasUserName();
+        boolean hasAgreement = this.container.getComponent(
+            StatisticManager.class).hasStatisticAgreement();
+
+        if (hasUserName && hasAgreement) {
             asyncConnect();
         }
     }
@@ -346,6 +369,8 @@ public class Saros extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
+        // TODO Devise a general way to stop and dispose our components
+        saveConfigPrefs();
 
         if (dotMonitor != null) {
             File f = new File("Saros-" + sarosFeatureID + ".dot");
@@ -378,6 +403,47 @@ public class Saros extends AbstractUIPlugin {
         }
 
         return this.connection.getRoster();
+    }
+
+    /**
+     * Returns the global {@link Preferences} with {@link ConfigurationScope}
+     * for this plug-in or null if the node couldn't be determined. <br>
+     * <br>
+     * The returned Preferences can be accessed concurrently by multiple threads
+     * of the same JVM without external synchronization. If they are used by
+     * multiple JVMs no guarantees can be made concerning data consistency (see
+     * {@link Preferences} for details).
+     * 
+     * @return the preferences node for this plug-in containing global
+     *         preferences that are visible for all workspaces of this eclipse
+     *         installation
+     */
+    public synchronized Preferences getConfigPrefs() {
+        // TODO Singleton-Pattern code smell: ConfigPrefs should be a @component
+        if (configPrefs == null) {
+            configPrefs = new ConfigurationScope().getNode(SAROS);
+        }
+        return configPrefs;
+    }
+
+    /**
+     * Saves the global preferences to disk. Should be called at least before
+     * the bundle is stopped to prevent loss of data. Can be called whenever
+     * found necessary.
+     */
+    public synchronized void saveConfigPrefs() {
+        /*
+         * Note: If multiple JVMs use the config preferences and the underlying
+         * backing store, they might not always work with latest data, e.g. when
+         * using multiple instances of the same eclipse installation.
+         */
+        if (configPrefs != null) {
+            try {
+                configPrefs.flush();
+            } catch (BackingStoreException e) {
+                log.error("Couldn't store global plug-in preferences", e);
+            }
+        }
     }
 
     /**
@@ -714,9 +780,10 @@ public class Saros extends AbstractUIPlugin {
             setConnectionState(ConnectionState.NOT_CONNECTED, null);
         }
 
+        Lock errorLock = new ReentrantLock();
+
         public void connectionClosedOnError(Exception e) {
 
-            Toolkit.getDefaultToolkit().beep();
             log.error("XMPP Connection Error: " + e.toString(), e);
 
             if (e.toString().equals("stream:error (conflict)")) {
@@ -736,6 +803,11 @@ public class Saros extends AbstractUIPlugin {
                 });
                 return;
             }
+
+            // Only try to reconnect if we did achieve a connection...
+            if (getConnectionState() != ConnectionState.CONNECTED)
+                return;
+
             setConnectionState(ConnectionState.ERROR, null);
 
             disconnectInternal();
@@ -801,6 +873,8 @@ public class Saros extends AbstractUIPlugin {
      * 
      * This method only returns a valid version string after the plugin has been
      * started.
+     * 
+     * This is equivalent to the bundle version.
      */
     public String getVersion() {
         return sarosVersion;

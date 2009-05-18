@@ -42,7 +42,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -73,6 +72,7 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
@@ -102,6 +102,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     protected Table table;
     protected ArrayList<InviterData> input;
     protected Button cancelSelectedInvitationButton;
+    protected Button autoCloseButton;
 
     protected Roster roster;
     protected List<JID> autoinviteJID;
@@ -230,13 +231,18 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.cancelSelectedInvitationButton = new Button(composite, SWT.NONE);
         this.cancelSelectedInvitationButton
             .setText("Cancel selected invitation");
+
+        this.autoCloseButton = new Button(composite, SWT.CHECK);
+        this.autoCloseButton
+            .setText("Automatically close this dialog after all invitations are complete.");
+        boolean autoCloseDialog = saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_CLOSE_DIALOG);
+        this.autoCloseButton.setSelection(autoCloseDialog);
+
         this.cancelSelectedInvitationButton
-            .addSelectionListener(new SelectionListener() {
+            .addSelectionListener(new SelectionAdapter() {
 
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    // Everything done in widgetSelected
-                }
-
+                @Override
                 public void widgetSelected(SelectionEvent e) {
                     cancelInvite();
                     Util.runSafeSWTSync(log, new Runnable() {
@@ -248,7 +254,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             });
 
         this.table.addSelectionListener(new SelectionAdapter() {
-            // TODO Use SelectionAdapter instead of SelectionListener everywhere
 
             @Override
             public void widgetSelected(SelectionEvent event) {
@@ -435,6 +440,15 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         return true;
     }
 
+    protected boolean autoCloseDialog() {
+        return autoCloseButton.getSelection();
+    }
+
+    protected void saveAutoCloseState() {
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.AUTO_CLOSE_DIALOG, autoCloseDialog());
+    }
+
     /**
      * Updates the invitation progress for all users in the table by refreshing
      * the table. MyLabelProvider will then poll the current progresses.
@@ -459,14 +473,19 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
         updateButtons();
 
-        // Are all invites done?
-        if (isAtLeastOneInvitationStarted() && isAllSuccessfullyDone()) {
+        // Are all invites done and did the user want to close the dialog
+        // automatically?
+        if (isAtLeastOneInvitationStarted() && isAllSuccessfullyDone()
+            && autoCloseDialog()) {
             this.close();
         }
     }
 
     @Override
     public boolean close() {
+        // save the status of the autoCloseButton in the preferences
+        saveAutoCloseState();
+
         // If we still have on-going invitations, cancel them
         for (InviterData data : input) {
             IOutgoingInvitationProcess process = data.outgoingProcess;

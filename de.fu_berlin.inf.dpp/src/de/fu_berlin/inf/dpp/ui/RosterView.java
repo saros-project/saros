@@ -64,6 +64,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
@@ -71,6 +72,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferCon
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.actions.ConnectDisconnectAction;
 import de.fu_berlin.inf.dpp.ui.actions.DeleteContactAction;
@@ -128,6 +130,12 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     @Inject
     protected SessionManager sessionManager;
+
+    @Inject
+    protected StatisticManager statisticManager;
+
+    @Inject
+    protected PreferenceUtils preferenceUtils;
 
     public RosterView() {
 
@@ -681,7 +689,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         IToolBarManager toolBarManager = bars.getToolBarManager();
         ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
-            sarosUI, saros, bars.getStatusLineManager());
+            sarosUI, saros, bars.getStatusLineManager(), statisticManager,
+            preferenceUtils);
         disposables.add(connectAction);
         toolBarManager.add(connectAction);
         toolBarManager.add(new NewContactAction(saros));

@@ -26,41 +26,62 @@ import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
- * A wizard to configure Saros.
+ * A wizard to configure Saros (Jabber account, network settings, statistic
+ * submission).
  * 
  */
 public class ConfigurationWizard extends Wizard {
 
     @Inject
-    Saros saros;
+    protected Saros saros;
 
-    public ConfigurationWizard() {
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
+    /**
+     * We keep our own list of IWizardPage2s so we can call performFinish on
+     * them.
+     */
+    protected List<IWizardPage2> pages = new LinkedList<IWizardPage2>();
+
+    public ConfigurationWizard(boolean askForAccount,
+        boolean askAboutStatisticSubmission) {
+
         setWindowTitle("Saros Configuration");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
+        setDefaultPageImageDescriptor(SarosUI
+            .getImageDescriptor("icons/saros-logo.png"));
 
         Saros.reinject(this);
-        this.wizards.add(new RegisterAccountPage(saros, false, false, true));
-        this.wizards.add(new GeneralSettingsPage(saros));
-    }
 
-    protected List<IWizardPage2> wizards = new LinkedList<IWizardPage2>();
+        if (askForAccount) {
+            this.pages.add(new RegisterAccountPage(saros, false, false, true,
+                preferenceUtils));
+            this.pages.add(new GeneralSettingsPage(saros, preferenceUtils));
+        }
+        if (askAboutStatisticSubmission) {
+            this.pages.add(new AllowStatisticSubmissionPage());
+        }
+    }
 
     @Override
     public void addPages() {
-        for (IWizardPage2 wizard : this.wizards) {
-            addPage(wizard);
+        for (IWizardPage2 page : this.pages) {
+            addPage(page);
         }
     }
 
     @Override
     public boolean performFinish() {
 
-        for (IWizardPage2 wizard : this.wizards) {
-            if (!wizard.performFinish()) {
-                getContainer().showPage(wizard);
+        for (IWizardPage2 page : this.pages) {
+            if (!page.performFinish()) {
+                getContainer().showPage(page);
                 return false;
             }
         }
@@ -72,4 +93,15 @@ public class ConfigurationWizard extends Wizard {
     public boolean performCancel() {
         return true;
     }
+
+    /**
+     * We override this method, because we only want to allow to finish when the
+     * last page is displayed (to make sure that the user saw/confirmed all
+     * pages)
+     */
+    @Override
+    public boolean canFinish() {
+        return getContainer().getCurrentPage().getNextPage() == null;
+    }
+
 }

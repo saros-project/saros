@@ -43,4 +43,45 @@ public class PreferenceUtils {
             PreferenceConstants.AUTO_ACCEPT_INVITATION);
     }
 
+    /**
+     * Returns the user name from the PreferenceStore. Might be an empty string
+     * but never null.
+     * 
+     * @return the user name
+     */
+    public String getUserName() {
+        return saros.getPreferenceStore().getString(
+            PreferenceConstants.USERNAME);
+    }
+
+    /**
+     * Returns if the user has specified a user name for a Jabber account.
+     * 
+     * @return true if there is a user name that is not equal to the empty
+     *         string
+     */
+    public boolean hasUserName() {
+        return getUserName().length() > 0;
+    }
+
+    /**
+     * Returns whether auto-connect is enabled or not.
+     * 
+     * @return true if auto-connect is enabled.
+     */
+    public boolean isAutoConnecting() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.AUTO_CONNECT);
+    }
+
+    /**
+     * Returns the Skype user name or an empty string if none was specified.
+     * 
+     * @return the user name.for Skype or an empty string
+     */
+    public String getSkypeUserName() {
+        return saros.getPreferenceStore().getString(
+            PreferenceConstants.SKYPE_USERNAME);
+    }
+
 }

@@ -61,4 +61,28 @@ public class PreferenceConstants {
 
     public static final String AUTO_REUSE_PROJECT = "AUTO_REUSE_PROJECT";
 
+    /** Preference of the InvitationDialog */
+    public static final String AUTO_CLOSE_DIALOG = "invitation.dialog.auto.close";
+
+    /**
+     * Preferences of the feedback preferences page
+     * 
+     * These preferences are kept both in the workspace scope and globally (in
+     * the configuration).
+     */
+    public static final String FEEDBACK_SURVEY_DISABLED = "feedback.survey.disabled";
+
+    public static final String FEEDBACK_SURVEY_INTERVAL = "feedback.survey.interval";
+
+    public static final String STATISTIC_ALLOW_SUBMISSION = "statistic.allow.submission";
+
+    /**
+     * Global preferences, not initialized i.e. no default values
+     */
+    public static final String SESSION_COUNT = "session.count";
+
+    public static final String SESSIONS_UNTIL_NEXT = "sessions.until.next.survey";
+
+    public static final String SAROS_VERSION = "saros.version";
+
 }

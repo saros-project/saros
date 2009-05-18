@@ -30,6 +30,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -43,6 +44,9 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     @Inject
     protected Saros saros;
+
+    @Inject
+    protected PreferenceUtils preferenceUtils;
 
     /**
      * This class is created by Eclipse to hook it up in the Menu bar.
@@ -65,7 +69,7 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
     public void runNewAccount() {
         Shell shell = this.window.getShell();
         WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
-            saros, true, true, true));
+            saros, preferenceUtils, true, true, true));
         wd.setHelpAvailable(false);
         wd.open();
     }
