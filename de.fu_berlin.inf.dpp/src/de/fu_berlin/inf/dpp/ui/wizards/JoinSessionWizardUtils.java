@@ -173,7 +173,7 @@ public class JoinSessionWizardUtils {
 
         } else {
             // Name is already in use!
-            Pattern p = Pattern.compile("^(.*)(\\d+)$");
+            Pattern p = Pattern.compile("^(.+?)(\\d+)$");
             Matcher m = p.matcher(projectProposal);
 
             int i;
