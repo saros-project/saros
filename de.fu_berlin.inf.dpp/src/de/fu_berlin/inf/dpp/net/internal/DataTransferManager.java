@@ -35,6 +35,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -54,10 +55,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class is responsible for handling all transfers of binary data
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class DataTransferManager implements ConnectionSessionListener {
 
     protected Map<JID, List<TransferDescription>> incomingTransfers = new HashMap<JID, List<TransferDescription>>();

@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -46,6 +47,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author oezbek
  */
+@Component(module = "integration")
 public class SharedProjectDecorator implements ILightweightLabelDecorator {
 
     private static final Logger log = Logger

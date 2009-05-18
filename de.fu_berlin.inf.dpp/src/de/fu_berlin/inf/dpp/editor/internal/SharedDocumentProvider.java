@@ -8,6 +8,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -19,6 +20,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * This Document provider tries tell others that files are not editable if not a
  * driver.
  */
+@Component(module = "util")
 public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     private static final Logger log = Logger

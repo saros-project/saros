@@ -19,6 +19,7 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
@@ -33,9 +34,8 @@ import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
  * @author rdjemili
  * @author oezbek
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class SkypeManager implements IConnectionListener {
 
     protected final Map<JID, String> skypeNames = new HashMap<JID, String>();

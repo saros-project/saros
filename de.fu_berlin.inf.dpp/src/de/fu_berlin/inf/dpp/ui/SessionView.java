@@ -68,6 +68,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -95,6 +96,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * color, who is being followed, and provide actions for changing roles and
  * follow mode.
  */
+@Component(module = "ui")
 public class SessionView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(SessionView.class

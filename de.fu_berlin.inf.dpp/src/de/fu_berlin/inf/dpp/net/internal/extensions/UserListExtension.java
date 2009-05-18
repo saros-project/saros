@@ -13,9 +13,11 @@ import org.jivesoftware.smack.packet.PacketExtension;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
+@Component(module = "net")
 public class UserListExtension extends SessionDefaultPacketExtension {
 
     private static final String COUNT_KEY = "Count";

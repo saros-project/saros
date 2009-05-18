@@ -29,9 +29,11 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
+@Component(module = "ui")
 public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     private static final Logger log = Logger.getLogger(NewAccountAction.class

@@ -10,8 +10,8 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
@@ -25,9 +25,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 /**
  * This class is responsible for parsing and processing a user list sent to us.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class UserListHandler {
 
     private static final Logger log = Logger.getLogger(UserListHandler.class

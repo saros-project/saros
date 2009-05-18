@@ -11,16 +11,17 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 
 /**
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
+ * This listener is responsible for updating the User presence state from the
+ * roster.
  */
+@Component(module = "net")
 public class SarosRosterListener implements ConnectionSessionListener {
 
     @Inject

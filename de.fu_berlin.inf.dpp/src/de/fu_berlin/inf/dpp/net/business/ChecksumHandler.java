@@ -9,7 +9,7 @@ import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -23,10 +23,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This class is responsible for processing a Checksum sent to us.
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class ChecksumHandler {
 
     /* Dependencies */

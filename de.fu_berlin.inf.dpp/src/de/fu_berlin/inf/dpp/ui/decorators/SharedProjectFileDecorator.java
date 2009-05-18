@@ -40,6 +40,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -60,6 +61,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @see ILightweightLabelDecorator *
  */
+@Component(module = "integration")
 public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
     private static final Logger log = Logger

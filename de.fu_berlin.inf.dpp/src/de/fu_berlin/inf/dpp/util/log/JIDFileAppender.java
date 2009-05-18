@@ -14,6 +14,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -28,10 +29,12 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author s-ziller
  */
+@Component(module = "logging")
 public class JIDFileAppender extends FileAppender {
 
     /**
-     * While there is no localJID known the LoggingEvents are cached in this list
+     * While there is no localJID known the LoggingEvents are cached in this
+     * list
      */
     protected List<LoggingEvent> cache = new LinkedList<LoggingEvent>();
 

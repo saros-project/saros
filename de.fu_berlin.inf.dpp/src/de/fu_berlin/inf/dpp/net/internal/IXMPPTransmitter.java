@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -10,6 +11,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * All other methods of sending just repackage their stuff and then call this
  * function.
  */
+@Component(module = "net")
 public interface IXMPPTransmitter {
 
     public void sendMessage(JID recipient, PacketExtension data);

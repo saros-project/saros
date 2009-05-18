@@ -13,10 +13,12 @@ import org.eclipse.core.runtime.Status;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
  * Appender which appends to the Eclipse log of our plug-in
  */
+@Component(module = "logging")
 public class EclipseLogAppender extends AppenderSkeleton {
 
     /**

@@ -6,6 +6,7 @@ package de.fu_berlin.inf.dpp.project;
 import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
  * The general contract of this listener is that the order of calls to these
@@ -24,6 +25,7 @@ import de.fu_berlin.inf.dpp.Saros;
  *            central plug-in class {@link Saros} to be automatically injected
  *            into the {@link ConnectionSessionManager}
  */
+@Component(module = "net")
 public interface ConnectionSessionListener {
 
     public void prepare(XMPPConnection connection);

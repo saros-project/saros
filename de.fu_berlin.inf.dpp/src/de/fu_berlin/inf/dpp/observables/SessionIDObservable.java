@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.observables;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 
 /**
@@ -12,6 +13,7 @@ import de.fu_berlin.inf.dpp.util.ObservableValue;
  * If in an shared project session the value of this Observable is the string
  * representation of a random integer.
  */
+@Component(module = "observables")
 public class SessionIDObservable extends ObservableValue<String> {
 
     public final static String NOT_IN_SESSION = "NOT_IN_SESSION";

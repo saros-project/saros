@@ -10,8 +10,10 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.Jingle;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 
+@Component(module = "net")
 public class JingleDiscoveryManager {
     HashMap<JID, Boolean> jingleSupport = new HashMap<JID, Boolean>();
 

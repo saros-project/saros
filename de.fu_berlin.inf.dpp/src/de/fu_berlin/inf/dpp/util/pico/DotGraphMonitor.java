@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
@@ -31,12 +32,9 @@ import org.picocontainer.Injector;
 import org.picocontainer.PicoContainer;
 import org.picocontainer.monitors.AbstractComponentMonitor;
 
-import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.concurrent.IJupiterActivityManager;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.util.Function;
+import de.fu_berlin.inf.dpp.util.Pair;
 
 /**
  * Component monitor which can be used to create a dependency graph of
@@ -59,6 +57,8 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
     protected IdentityHashMap<Object, Instantiation> allInstantiated = new IdentityHashMap<Object, Instantiation>();
 
+    public static boolean cluster = false;
+
     public DotGraphMonitor(final ComponentMonitor delegate) {
         super(delegate);
     }
@@ -67,7 +67,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
         try {
             String output = "digraph G {\n" + "  node [shape=box];\n"
-                + "  rank=source;\n" + "  rankdir=LR;\n"
+                + "  rank=source;\n" + "  rankdir=LR;\n  node[penwidth=2.0];\n"
                 + getClassDependencyGraph() + "\n" + "}";
 
             FileUtils.writeStringToFile(file, output);
@@ -117,55 +117,111 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
 
         Set<String> lines = new HashSet<String>();
 
+        Set<Class<?>> allComponentClasses = new HashSet<Class<?>>();
+
         for (Instantiation instantiation : allInstantiated.values()) {
 
             Object instantiated = instantiation.getInstantiated();
+            allComponentClasses.add(instantiated.getClass());
 
-            for (int j = 0; j < instantiation.getConstructorInjected().length; j++) {
-                Object injected = instantiation.getConstructorInjected()[j];
+            Object[] injects = instantiation.getConstructorInjected();
+            for (int j = 0; j < injects.length; j++) {
+                Object injected = injects[j];
+                allComponentClasses.add(injected.getClass());
                 lines.add("  '" + instantiated.getClass().getSimpleName()
                     + "' -> '" + injected.getClass().getSimpleName() + "';\n");
             }
 
             for (Class<?> invocationInjected : instantiation
                 .getInvocationInjected()) {
+                allComponentClasses.add(invocationInjected);
                 lines.add("  '" + instantiated.getClass().getSimpleName()
                     + "' -> '" + invocationInjected.getSimpleName() + "';\n");
             }
         }
 
         HashMap<String, String> colors = new HashMap<String, String>();
-        colors.put(Saros.class.getPackage().getName(), "red");
-        colors.put(JID.class.getPackage().getName(), "blue");
-        colors.put(Util.class.getPackage().getName(), "grey");
-        colors.put(ISharedProject.class.getPackage().getName(), "green");
-        colors.put(IJupiterActivityManager.class.getPackage().getName(),
-            "yellow");
-        colors.put(EditorManager.class.getPackage().getName(), "green");
+        colors.put("core", "red");
+        colors.put("net", "blue");
+        colors.put("util", "aquamarine");
+        colors.put("observables", "darkolivegreen1");
+        colors.put("logging", "yellow");
+        colors.put("consistency", "green");
+        colors.put("ui", "gold1");
+        colors.put("prefs", "blueviolet");
+        colors.put("integration", "deeppink");
+
+        int i = 0;
 
         StringBuilder sb = new StringBuilder();
-        atO: for (Object o : allInstantiated.keySet()) {
 
-            String name = o.getClass().getPackage().getName();
-
-            while (name != null && name.length() > 0) {
-
-                String color = colors.get(name);
-                if (color != null) {
-                    sb.append("  \"" + o.getClass().getSimpleName()
-                        + "\" [color=" + color + "];\n");
-                    continue atO;
-                }
-
-                int index = name.lastIndexOf('.');
-                if (index == -1)
-                    break;
-
-                name = name.substring(0, index);
+        if (!cluster) {
+            sb.append("subgraph cluster").append(i++).append("{\n");
+            sb.append("  style=rounded;  style=filled;"
+                + " bgcolor=white; fontsize=40;\n");
+            sb.append("  label=\"legend\";\n");
+            for (Entry<String, String> entry : colors.entrySet()) {
+                sb.append("\"").append(entry.getKey()).append("\" [color=")
+                    .append(entry.getValue()).append("];\n");
             }
+            sb.append("}\n");
+        }
+
+        for (Pair<String, List<Class<?>>> p : Pair.partition(
+            allComponentClasses, new ModuleFunction())) {
+
+            if (cluster) {
+                sb.append("subgraph cluster").append(i++).append("{\n");
+                sb
+                    .append("  style=rounded;  style=filled; color=gray92; fontsize=40;\n");
+                sb.append("  label=\"").append(p.p).append("\";\n");
+            }
+
+            String color = colors.get(p.p);
+            if (color == null) {
+                log.warn("No color found for Module " + p.p);
+                color = "black";
+            }
+
+            for (Class<?> clazz : p.v) {
+                sb.append("  \"" + clazz.getSimpleName() + "\"");
+                sb.append(" [color=" + color + "]");
+                sb.append(";\n");
+            }
+
+            if (cluster)
+                sb.append("}\n");
         }
 
         return sb.toString() + sortLines(lines);
+    }
+
+    public static String getColorOld(Class<?> clazz,
+        HashMap<String, String> colors) {
+        String name;
+        Package myPackage = clazz.getPackage();
+        if (myPackage == null) {
+            name = "misc";
+        } else {
+            name = myPackage.getName();
+        }
+
+        while (name != null && name.length() > 0) {
+
+            String color = colors.get(name);
+            if (color != null) {
+                return "  \"" + clazz.getSimpleName() + "\" [color=" + color
+                    + "];\n";
+            }
+
+            int index = name.lastIndexOf('.');
+            if (index == -1)
+                break;
+
+            name = name.substring(0, index);
+        }
+
+        return null;
     }
 
     private String sortLines(final Set<String> lines) {
@@ -219,6 +275,23 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
         return "'" + className.substring(className.lastIndexOf(".") + 1)
             + "\\n" + clazz.getPackage().getName() + "'";
 
+    }
+
+    public static final class ModuleFunction implements
+        Function<Class<?>, String> {
+        public String apply(Class<?> u) {
+            if (u.isArray()) {
+                u = u.getComponentType();
+            }
+            Component c = u.getAnnotation(Component.class);
+            if (c == null) {
+                log.warn("Injected component with no @Component annotation: "
+                    + u.getSimpleName());
+                return Component.DEFAULT_MODULE;
+            } else {
+                return c.module();
+            }
+        }
     }
 
     private static final class Instantiation {

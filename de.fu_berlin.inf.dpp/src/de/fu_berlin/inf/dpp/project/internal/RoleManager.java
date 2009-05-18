@@ -10,6 +10,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
@@ -24,10 +25,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * This manager is responsible for handling driver changes.
  * 
  * @author rdjemili
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "core")
 public class RoleManager implements IActivityProvider {
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();

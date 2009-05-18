@@ -33,6 +33,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -50,10 +51,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * reacting to invitations. The user can be only part of one session at most.
  * 
  * @author rdjemili
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "core")
 public class SessionManager implements IConnectionListener, ISessionManager {
 
     private static Logger log = Logger

@@ -6,6 +6,7 @@ package de.fu_berlin.inf.dpp.net.business;
 import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
@@ -13,6 +14,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
+@Component(module = "net")
 public class CancelInviteHandler extends CancelInviteExtension {
 
     private static final Logger log = Logger

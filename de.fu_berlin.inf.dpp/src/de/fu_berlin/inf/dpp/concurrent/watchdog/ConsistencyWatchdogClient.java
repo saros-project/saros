@@ -26,8 +26,8 @@ import org.picocontainer.annotations.Inject;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -54,9 +54,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * {@link IsInconsistentObservable}. This enables the {@link ConsistencyAction}
  * (a.k.a. the yellow triangle) in the {@link SessionView}.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "consistency")
 public class ConsistencyWatchdogClient {
 
     private static Logger log = Logger
@@ -192,9 +191,8 @@ public class ConsistencyWatchdogClient {
             return;
         }
 
-        log.trace(String.format(
-            "Received %d checksums for %d inconsistencies", checksums.size(),
-            pathsWithWrongChecksums.size()));
+        log.trace(String.format("Received %d checksums for %d inconsistencies",
+            checksums.size(), pathsWithWrongChecksums.size()));
 
         pathsWithWrongChecksums.clear();
 
@@ -228,8 +226,7 @@ public class ConsistencyWatchdogClient {
 
         // if doc is still null give up
         if (doc == null) {
-            log
-                .warn("Could not check checksum of file " + path.toOSString());
+            log.warn("Could not check checksum of file " + path.toOSString());
             return false;
         }
 

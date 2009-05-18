@@ -16,7 +16,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -37,9 +37,9 @@ import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
+ * This component is responsible for handling Consistency Errors and Checksums.
  */
+@Component(module = "consistency")
 public class ConsistencyWatchdogHandler {
 
     private static Logger log = Logger

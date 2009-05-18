@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -43,6 +44,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * 
  * @author rdjemili
  */
+@Component(module = "net")
 public interface ITransmitter {
 
     /* ---------- invitations --------- */

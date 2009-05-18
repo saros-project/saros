@@ -8,7 +8,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
@@ -24,9 +24,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * This class is responsible for parsing RequestForActivities and sending the
  * requested activities back.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class RequestForActivityHandler {
 
     private static final Logger log = Logger

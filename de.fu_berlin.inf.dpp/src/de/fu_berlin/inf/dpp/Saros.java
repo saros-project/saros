@@ -54,6 +54,7 @@ import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
 import org.picocontainer.injectors.Reinjector;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
@@ -108,6 +109,7 @@ import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
  * @author coezbek
  * 
  */
+@Component(module = "core")
 public class Saros extends AbstractUIPlugin {
 
     public static enum ConnectionState {
@@ -144,7 +146,7 @@ public class Saros extends AbstractUIPlugin {
      * 
      * <code>dotMonitor= new DotGraphMonitor();</code>
      */
-    protected DotGraphMonitor dotMonitor = null;
+    protected DotGraphMonitor dotMonitor = new DotGraphMonitor();
 
     /**
      * The reinjector used to inject dependencies for those objects that are

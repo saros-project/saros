@@ -12,9 +12,11 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
+@Component(module = "net")
 public class ChecksumErrorExtension extends SessionDefaultPacketExtension {
 
     public static final String FILE_PATH = "CE_FILE_PATH";

@@ -9,7 +9,7 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
@@ -19,9 +19,8 @@ import de.fu_berlin.inf.dpp.Saros;
  * objects appearing and old one's disappearing. Users can just register with
  * the XMPPChatReceiver for the whole application life-cycle.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class XMPPChatReceiver {
 
     protected Map<PacketListener, PacketFilter> listeners = Collections

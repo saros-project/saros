@@ -56,6 +56,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
@@ -88,9 +89,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * Hides the complexity of dealing with changing XMPPConnection objects and
  * provides convenience functions for sending messages.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {
 

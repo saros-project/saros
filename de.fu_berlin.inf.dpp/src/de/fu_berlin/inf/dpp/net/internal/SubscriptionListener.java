@@ -12,7 +12,7 @@ import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -31,9 +31,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author chjacob
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "net")
 public class SubscriptionListener implements ConnectionSessionListener {
 
     private static Logger log = Logger.getLogger(SubscriptionListener.class);

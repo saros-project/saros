@@ -38,6 +38,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.PreferenceUtils;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
@@ -53,10 +54,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Some helper functionality to interface with Eclipse.
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "ui")
 public class SarosUI {
 
     private static final Logger log = Logger.getLogger(SarosUI.class.getName());

@@ -22,6 +22,8 @@
  */
 package de.fu_berlin.inf.dpp.util;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -223,6 +225,21 @@ public class Pair<P, V> {
         } else if (!v.equals(other.v))
             return false;
         return true;
+    }
+
+    public static <P, V> List<Pair<P, V>> map(Collection<V> vs,
+        Function<V, P> function) {
+        List<Pair<P, V>> result = new ArrayList<Pair<P, V>>(vs.size());
+        for (V v : vs) {
+            result.add(new Pair<P, V>(function.apply(v), v));
+        }
+        return result;
+    }
+
+    public static <P extends Comparable<P>, V> List<Pair<P, List<V>>> partition(
+        Collection<V> input, Function<V, P> function) {
+
+        return disjointPartition(map(input, function));
     }
 
 }

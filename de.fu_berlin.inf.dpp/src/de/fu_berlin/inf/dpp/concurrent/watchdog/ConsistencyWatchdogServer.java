@@ -18,6 +18,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -42,10 +43,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  *         TODO Make ConsistencyWatchDog configurable => Timeout, Whether run or
  *         not, etc.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
- * 
  */
+@Component(module = "consistency")
 public class ConsistencyWatchdogServer extends Job {
 
     private static Logger log = Logger

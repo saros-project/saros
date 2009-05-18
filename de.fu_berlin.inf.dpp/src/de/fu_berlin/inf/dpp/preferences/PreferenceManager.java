@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator.IRestorePoint;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -24,10 +25,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * the user
  * 
  * d.) TODO Show proper warnings to the user
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "prefs")
 public class PreferenceManager {
 
     protected List<IPreferenceManipulator> manipulators = new ArrayList<IPreferenceManipulator>();

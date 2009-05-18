@@ -10,6 +10,7 @@ import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 
 /**
@@ -17,6 +18,7 @@ import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
  * receiving roster listener changes, if one is not interested in tracking
  * whether the connection is changed.
  */
+@Component(module = "net")
 public class RosterTracker implements ConnectionSessionListener {
 
     private static final Logger log = Logger.getLogger(RosterTracker.class

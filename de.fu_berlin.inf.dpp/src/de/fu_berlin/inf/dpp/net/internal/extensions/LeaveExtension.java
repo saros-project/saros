@@ -6,9 +6,11 @@ package de.fu_berlin.inf.dpp.net.internal.extensions;
 import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
+@Component(module = "net")
 public class LeaveExtension extends SessionDefaultPacketExtension {
 
     public LeaveExtension(SessionIDObservable sessionIDObservable) {

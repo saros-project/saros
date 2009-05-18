@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.observables;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 
@@ -15,9 +15,8 @@ import de.fu_berlin.inf.dpp.util.ObservableValue;
  * The proxy is set to null, after ISharedProject.stop() has been called but
  * before the ISessionListeners are notified that the Session is has ended.
  * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "observables")
 public class SharedProjectObservable extends ObservableValue<SharedProject> {
 
     public SharedProjectObservable() {

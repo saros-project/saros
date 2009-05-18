@@ -7,6 +7,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
@@ -20,6 +21,7 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
  * singleton instance which never changes and the {@link SharedProject} which
  * can change many times during the course of the plug-in life-cycle.
  */
+@Component(module = "net")
 public interface ISessionManager {
 
     /**

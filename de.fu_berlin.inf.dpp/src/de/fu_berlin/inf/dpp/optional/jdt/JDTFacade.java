@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 
@@ -23,10 +23,8 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * reflection is being used.
  * 
  * @author oezbek
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "integration")
 public class JDTFacade implements IJDTSupport {
 
     public static final Logger log = Logger

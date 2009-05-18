@@ -11,6 +11,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SkypeManager;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -19,6 +20,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  */
+@Component(module = "net")
 public class SkypeAction extends SelectionProviderAction {
 
     private static final Logger log = Logger.getLogger(SkypeAction.class

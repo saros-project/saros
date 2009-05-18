@@ -13,10 +13,12 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
+@Component(module = "net")
 public class ChecksumExtension extends SessionDefaultPacketExtension {
 
     public ChecksumExtension(SessionIDObservable sessionIDObservable) {
