@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype

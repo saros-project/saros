@@ -14,8 +14,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import de.fu_berlin.inf.dpp.PreferenceConstants;
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
  * A Wizard Page for entering the Port Configuration.
@@ -23,12 +23,12 @@ import de.fu_berlin.inf.dpp.Saros;
  * @author rdjemili
  * 
  */
-public class NetworkSettingsPage extends WizardPage implements IWizardPage2 {
+public class GeneralSettingsPage extends WizardPage implements IWizardPage2 {
 
     protected final Saros saros;
 
-    protected NetworkSettingsPage(Saros saros) {
-        super("networksettings");
+    protected GeneralSettingsPage(Saros saros) {
+        super("general settings");
         this.saros = saros;
     }
 

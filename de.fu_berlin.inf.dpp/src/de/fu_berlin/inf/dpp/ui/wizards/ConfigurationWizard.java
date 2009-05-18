@@ -43,7 +43,7 @@ public class ConfigurationWizard extends Wizard {
 
         Saros.reinject(this);
         this.wizards.add(new RegisterAccountPage(saros, false, false, true));
-        this.wizards.add(new NetworkSettingsPage(saros));
+        this.wizards.add(new GeneralSettingsPage(saros));
     }
 
     protected List<IWizardPage2> wizards = new LinkedList<IWizardPage2>();

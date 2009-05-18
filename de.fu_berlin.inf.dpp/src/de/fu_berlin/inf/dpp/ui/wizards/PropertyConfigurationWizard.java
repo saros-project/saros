@@ -15,11 +15,11 @@ public class PropertyConfigurationWizard extends Wizard {
         this.saros = saros;
     }
 
-    private NetworkSettingsPage firewallPage;
+    private GeneralSettingsPage firewallPage;
 
     @Override
     public void addPages() {
-        this.firewallPage = new NetworkSettingsPage(saros);
+        this.firewallPage = new GeneralSettingsPage(saros);
         addPage(this.firewallPage);
     }
 

@@ -1,9 +1,10 @@
-package de.fu_berlin.inf.dpp;
+package de.fu_berlin.inf.dpp.preferences;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 
