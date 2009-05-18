@@ -87,8 +87,7 @@ public class InviteAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sessionManager.getSharedProject()
-                    .startInvitation(getSelected());
+                sessionManager.openInviteDialog(getSelected());
             }
         });
     }

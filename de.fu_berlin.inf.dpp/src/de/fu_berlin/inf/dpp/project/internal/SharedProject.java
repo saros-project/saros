@@ -26,9 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.window.Window;
 import org.picocontainer.Disposable;
-import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -36,7 +34,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
@@ -47,7 +44,6 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
-import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -355,38 +351,6 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public User getLocalUser() {
         return localUser;
-    }
-
-    public void startInvitation(final @Nullable List<JID> toInvite) {
-
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-
-                /*
-                 * TODO Since we are going to invite people, we need to stop
-                 * changing the project
-                 */
-                if (!isDriver()) {
-                    setProjectReadonly(false);
-                }
-
-                if (!EditorAPI.saveProject(getProject())) {
-                    log.info("User canceled starting an invitation (as host)");
-                    return;
-                }
-
-                // TODO check if anybody is online, empty dialog feels
-                // strange
-                Window iw = new InvitationDialog(saros, SharedProject.this,
-                    EditorAPI.getShell(), toInvite);
-                iw.open();
-
-                if (!isDriver()) {
-                    setProjectReadonly(true);
-                }
-            }
-        });
-
     }
 
     public void setProjectReadonly(final boolean readonly) {

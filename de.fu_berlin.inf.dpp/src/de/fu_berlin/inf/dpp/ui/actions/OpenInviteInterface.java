@@ -50,7 +50,7 @@ public class OpenInviteInterface extends Action {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sessionManager.getSharedProject().startInvitation(null);
+                sessionManager.openInviteDialog(null);
             }
         });
     }

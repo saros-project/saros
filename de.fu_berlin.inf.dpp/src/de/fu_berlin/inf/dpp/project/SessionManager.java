@@ -26,13 +26,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.window.Window;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
@@ -41,9 +44,10 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -108,7 +112,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             listener.sessionStarted(sharedProject);
         }
 
-        sharedProject.startInvitation(preferenceUtils.getAutoInviteUsers());
+        openInviteDialog(preferenceUtils.getAutoInviteUsers());
 
         SessionManager.log.info("Session started");
     }
@@ -238,5 +242,37 @@ public class SessionManager implements IConnectionListener, ISessionManager {
          * were in an InvitationProcess.
          */
         sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
+    }
+
+    public void openInviteDialog(final @Nullable List<JID> toInvite) {
+        final SharedProject sharedProject = currentlySharedProject.getValue();
+
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+
+                /*
+                 * TODO Since we are going to invite people, we need to stop
+                 * changing the project
+                 */
+                if (!sharedProject.isDriver()) {
+                    sharedProject.setProjectReadonly(false);
+                }
+                if (!EditorAPI.saveProject(sharedProject.getProject())) {
+                    log.info("User canceled starting an invitation (as host)");
+                    return;
+                }
+
+                // TODO check if anybody is online, empty dialog feels
+                // strange
+                Window iw = new InvitationDialog(saros, sharedProject,
+                    EditorAPI.getShell(), toInvite);
+                iw.open();
+
+                if (!sharedProject.isDriver()) {
+                    sharedProject.setProjectReadonly(true);
+                }
+            }
+        });
+
     }
 }
