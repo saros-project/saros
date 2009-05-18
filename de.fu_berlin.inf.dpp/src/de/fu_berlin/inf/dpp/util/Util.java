@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,6 +36,8 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
@@ -661,5 +665,73 @@ public class Util {
             return false;
         } else
             return true;
+    }
+
+    /**
+     * Tries to open the given URL string in the default external browser. The
+     * Desktop API is deliberately not used for this because it only works with
+     * Java 1.6.
+     * 
+     * @param urlString
+     *            the URL to show as a String
+     * @return true if the browser could be opened, false otherwise
+     */
+    public static boolean openExternalBrowser(String urlString) {
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            log.error("Couldn't parse URL from string " + urlString, e);
+            return false;
+        }
+
+        IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
+            .getBrowserSupport();
+        IWebBrowser browser;
+        try {
+            browser = browserSupport.getExternalBrowser();
+            browser.openURL(url);
+            return true;
+        } catch (Exception e) {
+            log.error("Couldn't open external browser", e);
+            return false;
+        }
+
+    }
+
+    /**
+     * Tries to open the given URL string in Eclipse's internal browser. However
+     * if the user specified in the preferences to use an external browser
+     * instead, the external browser is tried to open.
+     * 
+     * @param urlString
+     *            the URL to show as a String
+     * @param title
+     *            a string displayed in the browsers title area
+     * @return true if the browser could be opened, false otherwise
+     */
+    public static boolean openInternalBrowser(String urlString, String title) {
+        URL url;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            log.error("Couldn't parse URL from string " + urlString, e);
+            return false;
+        }
+
+        IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench()
+            .getBrowserSupport();
+        IWebBrowser browser;
+        try {
+            browser = browserSupport.createBrowser(
+                IWorkbenchBrowserSupport.AS_EDITOR
+                    | IWorkbenchBrowserSupport.LOCATION_BAR
+                    | IWorkbenchBrowserSupport.NAVIGATION_BAR, null, title, "");
+            browser.openURL(url);
+            return true;
+        } catch (Exception e) {
+            log.error("Couldn't open internal Browser", e);
+            return false;
+        }
     }
 }
