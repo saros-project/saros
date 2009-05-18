@@ -14,12 +14,12 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @Component(module = "net")
-public class JingleDiscoveryManager {
+public class DiscoveryManager {
     HashMap<JID, Boolean> jingleSupport = new HashMap<JID, Boolean>();
 
     protected XMPPConnection connection;
 
-    public JingleDiscoveryManager(XMPPConnection connection) {
+    public DiscoveryManager(XMPPConnection connection) {
         this.connection = connection;
     }
 

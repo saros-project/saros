@@ -93,7 +93,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected Thread startingJingleThread;
 
-    protected JingleDiscoveryManager jingleDiscovery;
+    protected DiscoveryManager jingleDiscovery;
 
     protected List<IDataReceiver> receivers;
 
@@ -764,7 +764,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             handmadeDataTransferExtension.getFilter());
 
         // Create JingleDiscoveryManager
-        jingleDiscovery = new JingleDiscoveryManager(connection);
+        jingleDiscovery = new DiscoveryManager(connection);
 
         if (!Saros.getFileTransferModeViaChat()) {
             // Start Jingle Manager asynchronous
