@@ -26,6 +26,7 @@ import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.ITextViewerExtension5;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.TextUtilities;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.text.source.Annotation;
@@ -55,6 +56,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.IEditorStatusLine;
 import org.eclipse.ui.texteditor.ITextEditor;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -300,11 +302,16 @@ public class EditorAPI implements IEditorAPI {
 
             if (model != null) {
 
+                if (selection.isEmpty()) {
+                    setSelectionAnnotation(source, model, null, null);
+                    return;
+                }
+
                 if (following) {
                     reveal(editorPart, selection);
                 }
 
-                // If the selection's length is 0 it will be displayed as
+                // If the selection's length is 0 it will be displayed as a
                 // cursor. It is moved one character to the left if the offset
                 // is at the end of the line but not already at the start of the
                 // line.
@@ -322,37 +329,54 @@ public class EditorAPI implements IEditorAPI {
                         }
                     }
                 }
-                Position position = new Position(offset, length);
-                SarosAnnotation newAnnotation = new SelectionAnnotation(source,
-                    isCursor);
 
-                for (@SuppressWarnings("unchecked")
-                Iterator<Annotation> it = model.getAnnotationIterator(); it
-                    .hasNext();) {
-                    Annotation annotation = it.next();
-
-                    if (!(annotation instanceof SelectionAnnotation)) {
-                        continue;
-                    }
-
-                    SarosAnnotation oldAnnotation = (SarosAnnotation) annotation;
-                    if (oldAnnotation.getSource().equals(source)) {
-                        // If model supports IAnnotationModelExtension we can
-                        // just update the existing annotation.
-                        if (model instanceof IAnnotationModelExtension) {
-                            IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
-                            extension.replaceAnnotations(
-                                new Annotation[] { oldAnnotation }, Collections
-                                    .singletonMap(newAnnotation, position));
-                            return;
-                        }
-                        model.removeAnnotation(annotation);
-                    }
-                }
-
-                model.addAnnotation(newAnnotation, position);
+                setSelectionAnnotation(source, model, new SelectionAnnotation(
+                    source, isCursor), new Position(offset, length));
             }
         }
+    }
+
+    public static Iterable<Annotation> toIterable(final IAnnotationModel model) {
+        return new Iterable<Annotation>() {
+            @SuppressWarnings("unchecked")
+            public Iterator<Annotation> iterator() {
+                return model.getAnnotationIterator();
+            }
+        };
+    }
+
+    protected void setSelectionAnnotation(User source, IAnnotationModel model,
+        @Nullable SarosAnnotation newAnnotation, @Nullable Position position) {
+
+        if ((newAnnotation == null) != (position == null)) {
+            throw new IllegalArgumentException(
+                "Either both Annotation and Position must be null or non-null");
+        }
+
+        for (Annotation annotation : toIterable(model)) {
+
+            if (!(annotation instanceof SelectionAnnotation)) {
+                continue;
+            }
+
+            SarosAnnotation oldAnnotation = (SarosAnnotation) annotation;
+            if (oldAnnotation.getSource().equals(source)) {
+                // If model supports IAnnotationModelExtension we can
+                // just update the existing annotation.
+                if (newAnnotation != null
+                    && model instanceof IAnnotationModelExtension) {
+                    IAnnotationModelExtension extension = (IAnnotationModelExtension) model;
+                    extension.replaceAnnotations(
+                        new Annotation[] { oldAnnotation }, Collections
+                            .singletonMap(newAnnotation, position));
+                    return;
+                }
+                model.removeAnnotation(annotation);
+            }
+        }
+
+        if (newAnnotation != null)
+            model.addAnnotation(newAnnotation, position);
     }
 
     /**
@@ -472,14 +496,12 @@ public class EditorAPI implements IEditorAPI {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI#getSelection
+    /**
+     * {@inheritDoc}
      */
     public ITextSelection getSelection(IEditorPart editorPart) {
         if (!(editorPart instanceof ITextEditor)) {
-            return null;
+            return TextSelection.emptySelection();
         }
 
         ITextEditor textEditor = (ITextEditor) editorPart;
@@ -489,7 +511,7 @@ public class EditorAPI implements IEditorAPI {
             return (ITextSelection) selectionProvider.getSelection();
         }
 
-        return null;
+        return TextSelection.emptySelection();
     }
 
     /*
