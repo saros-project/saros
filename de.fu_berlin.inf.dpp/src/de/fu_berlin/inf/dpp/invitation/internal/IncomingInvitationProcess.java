@@ -296,7 +296,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     public void resourceReceived(JID from, IPath path, InputStream in) {
-        IncomingInvitationProcess.log.debug("new file received: " + path);
+        IncomingInvitationProcess.log.debug("New file received: " + path);
         if (this.localProject == null || this.progressMonitor.isCanceled()) {
             return; // we do not have started the new project yet, so received
             // resources are not welcomed
@@ -314,8 +314,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 // TODO Set ReadOnly again?
             } else {
                 file.create(in, true, new NullProgressMonitor());
-                IncomingInvitationProcess.log.debug("New File created: "
-                    + file.getName());
             }
 
         } catch (Exception e) {
@@ -331,7 +329,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             + this.filesLeftToSynchronize);
 
         this.filesLeftToSynchronize--;
-        IncomingInvitationProcess.log.debug("file counter: "
+        IncomingInvitationProcess.log.trace("File counter: "
             + this.filesLeftToSynchronize);
     }
 
