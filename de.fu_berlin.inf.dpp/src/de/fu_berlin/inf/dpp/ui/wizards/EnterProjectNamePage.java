@@ -1,7 +1,6 @@
 package de.fu_berlin.inf.dpp.ui.wizards;
 
 import org.apache.log4j.Logger;
-import org.eclipse.cdt.ui.templateengine.ProjectSelectionPage;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
@@ -26,7 +25,7 @@ import de.fu_berlin.inf.dpp.ui.SarosUI;
 
 /**
  * A wizard page that allows to enter the new project name or to choose to
- * overwrite the project selected by the {@link ProjectSelectionPage}.
+ * overwrite a project.
  */
 class EnterProjectNamePage extends WizardPage {
 
