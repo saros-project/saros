@@ -305,8 +305,20 @@ public class JoinSessionWizard extends Wizard {
                 }
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
-                        if (pageChangesAtStart == pageChanges && !disposed)
-                            wizardDialog.buttonPressed(buttonID);
+
+                        // User clicked next in the meantime
+                        if (pageChangesAtStart != pageChanges)
+                            return;
+
+                        // Dialog already closed
+                        if (disposed)
+                            return;
+
+                        // Button not enabled
+                        if (!wizardDialog.getWizardButton(buttonID).isEnabled())
+                            return;
+
+                        wizardDialog.buttonPressed(buttonID);
                     }
                 });
             }
