@@ -208,14 +208,19 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
         if (this.getLocal().getSymmetric() != null) {
 
+            // A Symmetric connection is one where a RTPBridge is used as a
+            // relay
+
             localIp = this.getLocal().getLocalIp();
             localPort = Util.getFreePort();
 
+            // Since we want to establish a TCP Connection, doing the relay
+            // would be impractical anyway
             remoteIp = this.getLocal().getIp();
             remotePort = this.getLocal().getSymmetric().getPort();
 
-            // TODO what does symmetric mean
-            log.info("Jingle [" + connectTo.getName()
+            log.warn("Symmetric Connection using RTPBridge is not supported!!"
+                + " Attempting anyway: Jingle [" + connectTo.getName()
                 + "] Symmetric IPs - local: " + localIp + ":" + localPort
                 + " -> remote: " + remoteIp + ":" + remotePort);
 
