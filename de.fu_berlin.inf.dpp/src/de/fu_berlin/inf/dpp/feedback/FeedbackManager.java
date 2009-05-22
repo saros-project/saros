@@ -13,6 +13,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -30,10 +31,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * interval.
  * 
  * @author Lisa Dohrmann
- * 
- * @component The single instance of this class per application is created by
- *            PicoContainer in the central plug-in class {@link Saros}
  */
+@Component(module = "feedback")
 public class FeedbackManager extends AbstractFeedbackManager {
     /** the URL to the website that contains our survey */
     public static final String SURVEY_URL = "https://www.inf.fu-berlin.de/w/SE/DPPSurveys"; //$NON-NLS-1$

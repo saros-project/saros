@@ -6,6 +6,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IStartup;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -24,6 +25,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author Lisa Dohrmann
  */
+@Component(module = "integration")
 public class StartupSaros implements IStartup {
 
     private Logger log = Logger.getLogger(StartupSaros.class.getName());

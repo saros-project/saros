@@ -144,12 +144,14 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
         colors.put("core", "red");
         colors.put("net", "blue");
         colors.put("util", "aquamarine");
+        colors.put("misc", "aquamarine");
         colors.put("observables", "darkolivegreen1");
         colors.put("logging", "yellow");
         colors.put("consistency", "green");
         colors.put("ui", "gold1");
         colors.put("prefs", "blueviolet");
         colors.put("integration", "deeppink");
+        colors.put("feedback", "blueviolet");
 
         int i = 0;
 
