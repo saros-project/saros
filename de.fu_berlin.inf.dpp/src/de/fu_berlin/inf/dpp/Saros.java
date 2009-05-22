@@ -153,7 +153,7 @@ public class Saros extends AbstractUIPlugin {
      * 
      * <code>dotMonitor= new DotGraphMonitor();</code>
      */
-    protected DotGraphMonitor dotMonitor = new DotGraphMonitor();
+    protected DotGraphMonitor dotMonitor;
 
     /**
      * The reinjector used to inject dependencies for those objects that are
@@ -191,6 +191,9 @@ public class Saros extends AbstractUIPlugin {
      * Create the shared instance.
      */
     public Saros() {
+
+        // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
+        assert (dotMonitor = new DotGraphMonitor()) != null;
 
         isInitialized = false;
         setDefault(this);
