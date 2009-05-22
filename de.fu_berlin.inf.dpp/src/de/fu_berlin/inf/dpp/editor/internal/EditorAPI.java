@@ -514,10 +514,8 @@ public class EditorAPI implements IEditorAPI {
         return TextSelection.emptySelection();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.editor.internal.IEditorAPI
+    /**
+     * {@inheritDoc}
      */
     public void setEditable(final IEditorPart editorPart,
         final boolean newIsEditable) {

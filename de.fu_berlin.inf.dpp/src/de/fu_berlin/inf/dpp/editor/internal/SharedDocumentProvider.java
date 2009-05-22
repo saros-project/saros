@@ -52,7 +52,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             if (sharedProject != null) {
                 isDriver = sharedProject.isDriver();
             } else {

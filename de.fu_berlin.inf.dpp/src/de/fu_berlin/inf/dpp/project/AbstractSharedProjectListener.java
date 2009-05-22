@@ -10,7 +10,7 @@ import de.fu_berlin.inf.dpp.User;
 public abstract class AbstractSharedProjectListener implements
     ISharedProjectListener {
 
-    public void roleChanged(User user, boolean replicated) {
+    public void roleChanged(User user) {
         // Do nothing.
     }
 

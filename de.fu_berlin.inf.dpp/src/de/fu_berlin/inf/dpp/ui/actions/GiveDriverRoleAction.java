@@ -30,7 +30,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             updateEnablement();
         }
     };
@@ -69,9 +69,8 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sessionManager.getSharedProject().setUserRole(
-                    GiveDriverRoleAction.this.selectedUser, UserRole.DRIVER,
-                    false);
+                sessionManager.getSharedProject().initiateRoleChange(
+                    GiveDriverRoleAction.this.selectedUser, UserRole.DRIVER);
             }
         });
     }

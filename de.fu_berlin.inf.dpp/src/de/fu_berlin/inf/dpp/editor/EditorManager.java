@@ -352,7 +352,7 @@ public class EditorManager implements IActivityProvider {
 
     protected ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
 
-        public void roleChanged(final User user, boolean replicated) {
+        public void roleChanged(final User user) {
 
             // Make sure we have the up-to-date facts about ourself
             isDriver = sharedProject.isDriver();

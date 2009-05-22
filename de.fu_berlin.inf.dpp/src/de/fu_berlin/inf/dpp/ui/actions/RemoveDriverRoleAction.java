@@ -26,7 +26,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             updateEnablement();
         }
     };
@@ -72,8 +72,8 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
     public void runRemoveDriver() {
         if (selectedUser.isDriver()) {
-            sessionManager.getSharedProject().setUserRole(selectedUser,
-                UserRole.OBSERVER, false);
+            sessionManager.getSharedProject().initiateRoleChange(selectedUser,
+                UserRole.OBSERVER);
         } else {
             log.warn("User is no driver: " + selectedUser);
         }

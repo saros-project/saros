@@ -35,15 +35,8 @@ public class RoleManager implements IActivityProvider {
 
     private ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
 
-        public void roleChanged(User user, boolean replicated) {
-            if (!replicated) {
-                IActivity activity = new RoleActivity(sharedProject
-                    .getLocalUser().getJID().toString(), user.getJID()
-                    .toString(), user.getUserRole());
-                for (IActivityListener listener : RoleManager.this.activityListeners) {
-                    listener.activityCreated(activity);
-                }
-            }
+        public void roleChanged(User user) {
+
             /*
              * Not nice to have GUI stuff here, but it can't be handled in
              * SessionView because it is not guaranteed there actually is a
@@ -121,7 +114,7 @@ public class RoleManager implements IActivityProvider {
             User user = this.sharedProject.getParticipant(roleActivity
                 .getAffectedUser());
             UserRole role = roleActivity.getRole();
-            this.sharedProject.setUserRole(user, role, true);
+            this.sharedProject.setUserRole(user, role);
         }
     }
 }

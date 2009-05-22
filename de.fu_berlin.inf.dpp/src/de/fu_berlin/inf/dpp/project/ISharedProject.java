@@ -50,18 +50,26 @@ public interface ISharedProject {
     public Collection<User> getParticipants();
 
     /**
-     * Set the role of the given user.
+     * Initiates a role change. This method is called when the user wants to
+     * change user roles via the UI.
      * 
+     * @swt This method needs to be called from the SWT UI thread
+     * @param user
+     *            the user which role has to be changed.
+     */
+    public void initiateRoleChange(User user, UserRole newRole);
+
+    /**
+     * Set the role of the given user. This is called on incoming activities
+     * from the network.
+     * 
+     * @swt This method needs to be called from the SWT UI thread
      * @param user
      *            the user which role has to be set.
      * @param role
      *            The new role of the user.
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
      */
-    public void setUserRole(User user, UserRole role, boolean replicated);
+    public void setUserRole(User user, UserRole role);
 
     /**
      * @return <code>true</code> if the local client is a current driver of this

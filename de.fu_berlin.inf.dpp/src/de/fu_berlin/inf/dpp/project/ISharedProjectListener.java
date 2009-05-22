@@ -32,30 +32,14 @@ public interface ISharedProjectListener {
     // TODO add some easy way to check if given driver is the client (you)
 
     /**
-     * The driver role of one participant has changed.
+     * The user role of the given participant has been changed. This is called
+     * after the role of the user has been updated to represent the new state.
      * 
      * @param user
      *            the user who's role changed.
-     * 
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
      */
-    public void roleChanged(User user, boolean replicated);
+    public void roleChanged(User user);
 
-    /**
-     * The driver role of one participant has changed.
-     * 
-     * @param driver
-     *            the new driver.
-     * 
-     * @param replicated
-     *            <code>false</code> if this event was created by this client.
-     *            <code>true</code> if it was created by another client and only
-     *            replicated to this client.
-     */
-    // public void driverAdded(JID driver, boolean replicated);
     /**
      * Is fired when an user joins the shared project.
      * 

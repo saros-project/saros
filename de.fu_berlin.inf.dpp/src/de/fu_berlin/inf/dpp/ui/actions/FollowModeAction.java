@@ -33,7 +33,7 @@ public class FollowModeAction extends Action implements Disposable {
 
     protected ISharedProjectListener roleChangeListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             updateEnablement();
         }
     };

@@ -86,7 +86,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
 
             updateDecorations(user);
         }

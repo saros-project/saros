@@ -32,6 +32,8 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
@@ -166,12 +168,30 @@ public class SharedProject implements ISharedProject, Disposable {
         return this.activitySequencer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
+    /**
+     * {@inheritDoc}
      */
-    public void setUserRole(User user, UserRole role, boolean replicated) {
+    public void initiateRoleChange(User user, UserRole newRole) {
+        assert localUser.isHost() : "Only the host can initiate role changes";
+
+        user.setUserRole(newRole);
+
+        if (user.isLocal()) {
+            setProjectReadonly(user.isObserver());
+        }
+        for (ISharedProjectListener listener : this.listeners) {
+            listener.roleChanged(user);
+        }
+        IActivity activity = new RoleActivity(getLocalUser().getJID()
+            .toString(), user.getJID().toString(), user.getUserRole());
+        activitySequencer.activityCreated(activity);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setUserRole(User user, UserRole role) {
 
         assert user != null;
 
@@ -181,7 +201,7 @@ public class SharedProject implements ISharedProject, Disposable {
         }
 
         for (ISharedProjectListener listener : this.listeners) {
-            listener.roleChanged(user, replicated);
+            listener.roleChanged(user);
         }
     }
 

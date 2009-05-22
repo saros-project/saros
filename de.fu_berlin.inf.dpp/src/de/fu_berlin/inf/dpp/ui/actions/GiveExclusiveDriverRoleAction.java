@@ -26,7 +26,7 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             updateEnablement();
         }
     };
@@ -79,13 +79,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         // set all participants other than the selected to observer
         for (User user : project.getParticipants()) {
             if ((user.isDriver() && !user.equals(this.selectedUser))) {
-                project.setUserRole(user, UserRole.OBSERVER, false);
+                project.initiateRoleChange(user, UserRole.OBSERVER);
             }
         }
 
         // if selected user is not already driver give him driver role
         if (this.selectedUser.isObserver())
-            project.setUserRole(this.selectedUser, UserRole.DRIVER, false);
+            project.initiateRoleChange(this.selectedUser, UserRole.DRIVER);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class RemoveAllDriverRoleAction extends Action {
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             updateEnablement();
         }
     };
@@ -101,7 +101,7 @@ public class RemoveAllDriverRoleAction extends Action {
         ISharedProject project = sessionManager.getSharedProject();
         for (User user : project.getParticipants()) {
             if (user.isDriver()) {
-                project.setUserRole(user, UserRole.OBSERVER, false);
+                project.initiateRoleChange(user, UserRole.OBSERVER);
             }
         }
         updateEnablement();

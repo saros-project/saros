@@ -160,7 +160,7 @@ public class ConcurrentDocumentManager implements Disposable {
     public class HostSideProjectListener extends AbstractSharedProjectListener {
 
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             JID jid = user.getJID();
 
             if (isHost(jid))
@@ -199,7 +199,7 @@ public class ConcurrentDocumentManager implements Disposable {
         AbstractSharedProjectListener {
 
         @Override
-        public void roleChanged(User user, boolean replicated) {
+        public void roleChanged(User user) {
             // Clear clientdocs
             if (user.getJID().equals(myJID)) {
                 clientDocs.clear();
