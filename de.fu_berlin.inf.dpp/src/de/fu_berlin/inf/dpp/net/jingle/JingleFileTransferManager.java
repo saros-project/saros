@@ -136,18 +136,16 @@ public class JingleFileTransferManager {
 
         @Override
         public JingleMediaSession createMediaSession(PayloadType payload,
-            TransportCandidate tc1, TransportCandidate tc2,
-            JingleSession jingleSession) {
+            TransportCandidate remoteCandidate,
+            TransportCandidate localCandidate, JingleSession jingleSession) {
 
             final JID remoteJID = isInitiator(jingleSession) ? new JID(
                 jingleSession.getResponder()) : new JID(jingleSession
                 .getInitiator());
 
-            log.debug("Jingle [" + remoteJID.getName()
-                + "] Media session - Start");
-
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
-                payload, tc1, tc2, null, jingleSession, listeners, remoteJID);
+                payload, remoteCandidate, localCandidate, null, jingleSession,
+                listeners, remoteJID);
 
             // TODO Make sure we don't need to do this asynchronously
             newSession.initialize();
@@ -177,6 +175,17 @@ public class JingleFileTransferManager {
         public List<PayloadType> getPayloads() {
             return payloads;
         }
+    }
+
+    public static String toString(TransportCandidate candidate) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(candidate.getIp()).append(":").append(candidate.getPort());
+        if (candidate.getSymmetric() != null) {
+            sb.append("[symmetric=").append(candidate.getSymmetric().getIp())
+                .append(":").append(candidate.getSymmetric().getPort()).append(
+                    "]");
+        }
+        return sb.toString();
     }
 
     private FileMediaManager mediaManager;
@@ -341,6 +350,12 @@ public class JingleFileTransferManager {
                     // do nothing, because we will be notified about an
                     // successfully established session by the
                     // SessionListener
+                    log.info("Jingle [" + jid.toString()
+                        + "] Transport candidate found - Local: "
+                        + JingleFileTransferManager.toString(local)
+                        + " -> Remote: "
+                        + JingleFileTransferManager.toString(remote));
+
                 }
             });
     }
