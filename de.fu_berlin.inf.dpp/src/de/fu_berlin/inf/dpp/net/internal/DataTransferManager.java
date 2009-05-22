@@ -285,7 +285,8 @@ public class DataTransferManager implements ConnectionSessionListener {
                 return;
             }
 
-            log.debug("Incoming file transfer via IBB: " + data.toString());
+            log.debug("Incoming file transfer via IBB: " + data.toString()
+                + ", size: " + request.getFileSize() + "kbyte");
 
             addIncomingFileTransfer(data);
 
@@ -417,7 +418,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             IFileTransferCallback callback) throws IOException {
 
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
-                + data.toString());
+                + data.toString() + ", size: " + content.length / 1000
+                + " kbyte");
 
             OutgoingFileTransfer
                 .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
