@@ -45,8 +45,17 @@ public class EditorPartListener implements IPartListener2 {
         }
     }
 
+    /**
+     * We need to catch partBroughtToTop events because partActivate events are
+     * missing if Editors are opened programmatically.
+     */
     public void partBroughtToTop(IWorkbenchPartReference partRef) {
-        // do nothing
+        IWorkbenchPart part = partRef.getPart(false);
+
+        if ((part != null) && (part instanceof IEditorPart)) {
+            IEditorPart editor = (IEditorPart) part;
+            editorManager.partActivated(editor);
+        }
     }
 
     public void partDeactivated(IWorkbenchPartReference partRef) {
@@ -62,8 +71,8 @@ public class EditorPartListener implements IPartListener2 {
     }
 
     /**
-     * Called for instance when a file was renamed. We just close and open
-     * the editor.
+     * Called for instance when a file was renamed. We just close and open the
+     * editor.
      */
     public void partInputChanged(IWorkbenchPartReference partRef) {
         IWorkbenchPart part = partRef.getPart(false);

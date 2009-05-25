@@ -481,13 +481,17 @@ public class EditorManager implements IActivityProvider {
 
                     editorAPI.removeEditorPartListener(EditorManager.this);
 
-                    editorPool.removeAllEditors();
-
+                    /*
+                     * First need to remove the annotations and then clear the
+                     * editorPool
+                     */
                     removeAllAnnotations(new Predicate<SarosAnnotation>() {
                         public boolean evaluate(SarosAnnotation annotation) {
                             return true;
                         }
                     });
+
+                    editorPool.removeAllEditors();
 
                     sharedProject.removeListener(sharedProjectListener);
                     sharedProject.getActivityManager().removeProvider(
@@ -640,6 +644,7 @@ public class EditorManager implements IActivityProvider {
      *            open.
      */
     public void generateEditorActivated(@Nullable IPath path) {
+
         this.locallyActiveEditor = path;
 
         if (path != null)
@@ -959,7 +964,15 @@ public class EditorManager implements IActivityProvider {
     }
 
     /**
-     * Called when the local user activated an shared editor
+     * Called when the local user activated an shared editor.
+     * 
+     * This can be called twice for a single IEditorPart, because it is called
+     * from partActivated and from partBroughtToTop.
+     * 
+     * We do not filter duplicate events, because it would be bad to miss events
+     * and is not too bad have duplicate one's. In particular we use IPath as an
+     * identifier to the IEditorPart which might not work for multiple editors
+     * based on the same file.
      */
     public void partActivated(IEditorPart editorPart) {
 
