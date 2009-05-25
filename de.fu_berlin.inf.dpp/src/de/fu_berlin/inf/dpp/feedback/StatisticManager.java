@@ -24,6 +24,8 @@ public class StatisticManager extends AbstractFeedbackManager {
     protected static final Logger log = Logger.getLogger(StatisticManager.class
         .getName());
 
+    public static final String INFO_URL = "https://www.inf.fu-berlin.de/w/SE/DPPFeedback"; //$NON-NLS-1$
+
     public static final int STATISTIC_UNKNOWN = 0;
     public static final int STATISTIC_ALLOW = 1;
     public static final int STATISTIC_FORBID = 2;
@@ -40,22 +42,10 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     public StatisticManager(Saros saros, SessionManager sessionManager) {
         super(saros);
-
-        ensureConsistentPreferences();
-
         sessionManager.addSessionListener(sessionListener);
     }
 
-    /**
-     * Ensures that the preferences the StatisticManager manages are consistent
-     * after plugin start, i.e. if they are not existing in the global scope,
-     * the value from the workspace (might be the default) is globally set. If
-     * there exists a different value in the workspace than in the global scope,
-     * then the local value is overwritten.<br>
-     * <br>
-     * 
-     * This must be done for all values kept both globally and per workspace.
-     */
+    @Override
     protected void ensureConsistentPreferences() {
         makePrefConsistent(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION);
     }
@@ -100,13 +90,23 @@ public class StatisticManager extends AbstractFeedbackManager {
         setStatisticSubmission(submission);
     }
 
+    /**
+     * Saves in the workspace and globally if the user wants to submit statistic
+     * data.<br>
+     * <br>
+     * Note: It must be set globally first, so the PropertyChangeListener for
+     * the local setting is working with latest global data.
+     * 
+     * @param submission
+     *            (see constants of StatisticManager)
+     */
     protected void setStatisticSubmission(int submission) {
-        // store in preference and configuration scope
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
+        // store in configuration and preference scope
         saros.getConfigPrefs().putInt(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
         saros.saveConfigPrefs();
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
     }
 
     /**

@@ -13,7 +13,20 @@ public abstract class AbstractFeedbackManager {
 
     public AbstractFeedbackManager(Saros saros) {
         this.saros = saros;
+        ensureConsistentPreferences();
     }
+
+    /**
+     * Ensures that the preferences the specific manager manages are consistent
+     * after plugin start, i.e. if they are not existing in the global scope,
+     * the value from the workspace (might be the default) is globally set. If
+     * there exists a different value in the workspace than in the global scope,
+     * then the local value is overwritten. <br>
+     * <br>
+     * 
+     * This must be done for all values kept both globally and per workspace.
+     */
+    abstract protected void ensureConsistentPreferences();
 
     /**
      * Sets the global value for the given preference key if it is undefined to

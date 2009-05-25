@@ -64,6 +64,8 @@ public class PreferenceConstants {
     /** Preference of the InvitationDialog */
     public static final String AUTO_CLOSE_DIALOG = "invitation.dialog.auto.close";
 
+    public static final String NEW_WORKSPACE = "eclipse.new.workspace";
+
     /**
      * Preferences of the feedback preferences page
      * 

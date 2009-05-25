@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 
 /**
@@ -59,8 +60,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         // InvitationDialog
         prefs.putBoolean(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
 
+        // its a new workspace per default, is set to false in earlyStartup()
+        prefs.putBoolean(PreferenceConstants.NEW_WORKSPACE, true);
+
         // Initialize Feedback Preferences
-        prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_DISABLED, 0);
+        prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_DISABLED,
+            FeedbackManager.FEEDBACK_ENABLED);
         prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, 5);
         prefs.putInt(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
             StatisticManager.STATISTIC_UNKNOWN);

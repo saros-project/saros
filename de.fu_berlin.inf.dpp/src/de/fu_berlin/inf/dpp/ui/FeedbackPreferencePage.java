@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -28,6 +29,8 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.util.LinkListener;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The preferences page for the settings concerning the user feedback. The user
@@ -98,6 +101,13 @@ public class FeedbackPreferencePage extends
         createStartSurveyGroup(composite);
         createIntervalGroup(composite);
         createStatisticGroup(composite);
+        createContactGroup(composite);
+
+        createSpacer(composite, 1);
+
+        Label label = new Label(composite, SWT.NONE);
+        label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        label.setText(Messages.getString("feedback.page.note")); //$NON-NLS-1$
 
         initialize();
 
@@ -115,11 +125,12 @@ public class FeedbackPreferencePage extends
         group.setLayout(new GridLayout(2, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        Label label = new Label(group, SWT.WRAP);
-        label.setText(Messages.getString("feedback.page.participate.now")); //$NON-NLS-1$
+        Link link = new Link(group, SWT.WRAP);
+        link.setText(Messages.getString("feedback.page.participate.now")); //$NON-NLS-1$
         GridData gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
         gd.widthHint = convertWidthInCharsToPixels(60);
-        label.setLayoutData(gd);
+        link.setLayoutData(gd);
+        link.addListener(SWT.Selection, new LinkListener());
 
         Button startSurveyButton = new Button(group, SWT.PUSH);
         startSurveyButton.setText(Messages
@@ -130,7 +141,14 @@ public class FeedbackPreferencePage extends
         startSurveyButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                feedbackManager.showSurvey();
+                feedbackManager.resetSessionsUntilNextToInterval();
+                int browserType = feedbackManager.showSurvey();
+                /*
+                 * close the preferences window if the internal browser is used
+                 * so the user can actually see the window
+                 */
+                if (browserType == FeedbackManager.BROWSER_INT)
+                    FeedbackPreferencePage.this.getShell().close();
             }
         });
     }
@@ -203,7 +221,7 @@ public class FeedbackPreferencePage extends
     protected void createStatisticGroup(Composite parent) {
         Group group = new Group(parent, SWT.NONE);
         group.setText(Messages.getString("feedback.page.group.statistic")); //$NON-NLS-1$
-        group.setLayout(new GridLayout(1, false));
+        group.setLayout(new GridLayout(2, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
         allowSubmission = new Button(group, SWT.CHECK);
@@ -216,6 +234,52 @@ public class FeedbackPreferencePage extends
                 isSubmissionAllowed = allowSubmission.getSelection();
             }
         });
+
+        Button infoButton = new Button(group, SWT.PUSH);
+        infoButton.setText(Messages.getString("feedback.page.button.more")); //$NON-NLS-1$
+        infoButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true,
+            false));
+        infoButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Util.openExternalBrowser(StatisticManager.INFO_URL);
+            }
+
+        });
+    }
+
+    protected void createContactGroup(Composite parent) {
+        Group group = new Group(parent, SWT.NONE);
+        group.setText(Messages.getString("feedback.page.group.contact")); //$NON-NLS-1$
+        group.setLayout(new GridLayout(1, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        Link linkMail = new Link(group, SWT.NONE);
+        linkMail.setText(Messages.getString("feedback.page.email")); //$NON-NLS-1$
+        GridData gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+        gd.widthHint = convertWidthInCharsToPixels(70);
+        linkMail.setLayoutData(gd);
+        /*
+         * TODO maybe use desktop api (java 1.6) here instead to open a new mail
+         * directly. right now the browser is first opened and he then opens a
+         * mail window.
+         */
+        linkMail.addListener(SWT.Selection, new LinkListener());
+
+        Link linkBug = new Link(group, SWT.NONE);
+        linkBug.setText(Messages.getString("feedback.page.bug.tracker")); //$NON-NLS-1$
+        gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+        gd.widthHint = convertWidthInCharsToPixels(70);
+        linkBug.setLayoutData(gd);
+        linkBug.addListener(SWT.Selection, new LinkListener());
+    }
+
+    protected void createSpacer(Composite composite, int columnSpan) {
+        Label label = new Label(composite, SWT.NONE);
+        GridData gd = new GridData();
+        gd.horizontalSpan = columnSpan;
+        label.setLayoutData(gd);
     }
 
     /**

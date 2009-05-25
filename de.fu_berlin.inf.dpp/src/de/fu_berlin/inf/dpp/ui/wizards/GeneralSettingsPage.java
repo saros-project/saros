@@ -49,12 +49,12 @@ public class GeneralSettingsPage extends WizardPage implements IWizardPage2 {
         Label autoConnectDesc = new Label(root, SWT.NONE);
         autoConnectDesc.setLayoutData(twoColumn);
         autoConnectDesc
-            .setText("Should Saros automatically connect on Eclipse startup?");
+            .setText("Should Saros automatically connect on Eclipse start-up?");
 
         new Label(root, SWT.NONE);
 
         this.autoButton = new Button(root, SWT.CHECK | SWT.LEFT);
-        this.autoButton.setText("Startup automatically.");
+        this.autoButton.setText("Connect automatically.");
 
         createSpacer(root, 2);
 

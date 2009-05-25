@@ -7,8 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -20,17 +18,18 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -108,13 +107,15 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             true, false));
         this.passwordText.setEchoChar('*');
 
-        Label rpwLabel = new Label(root, SWT.NONE);
-        rpwLabel.setText("Repeat Password");
+        if (this.createAccount) {
+            Label rpwLabel = new Label(root, SWT.NONE);
+            rpwLabel.setText("Repeat Password");
 
-        this.repeatPasswordText = new Text(root, SWT.BORDER);
-        this.repeatPasswordText.setLayoutData(new GridData(SWT.FILL,
-            SWT.CENTER, true, false));
-        this.repeatPasswordText.setEchoChar('*');
+            this.repeatPasswordText = new Text(root, SWT.BORDER);
+            this.repeatPasswordText.setLayoutData(new GridData(SWT.FILL,
+                SWT.CENTER, true, false));
+            this.repeatPasswordText.setEchoChar('*');
+        }
 
         if (this.showPrefButton) {
             this.prefButton = new Button(root, SWT.CHECK | SWT.SEPARATOR);
@@ -126,48 +127,36 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         }
 
         if (!this.createAccount) {
+            Group group = new Group(root, SWT.NONE);
+            group.setLayout(new GridLayout(2, false));
+            group.setText("Create new Jabber-Account");
+            GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+            gd.horizontalSpan = 2;
+            gd.verticalIndent = 30;
+            group.setLayoutData(gd);
 
-            Button createAccountButton = new Button(root, SWT.NONE);
-            createAccountButton.setText("Create Account");
+            Label createAccountLabel = new Label(group, SWT.WRAP);
+            createAccountLabel
+                .setText("If you don't have an existing Jabber account you can create one now");
+            gd = new GridData(SWT.FILL, SWT.CENTER, false, false);
+            gd.widthHint = 250;
+            createAccountLabel.setLayoutData(gd);
+
+            Button createAccountButton = new Button(group, SWT.PUSH);
+            createAccountButton.setLayoutData(new GridData(SWT.RIGHT,
+                SWT.CENTER, false, false));
+            createAccountButton.setText("Create new account...");
             createAccountButton.addSelectionListener(new SelectionAdapter() {
 
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            try {
-                                Shell shell = EditorAPI.getShell();
-
-                                CreateAccountWizard wizard = new CreateAccountWizard(
-                                    saros, preferenceUtils, true, false, false);
-                                boolean success = Window.OK == new WizardDialog(
-                                    shell, wizard).open();
-
-                                if (success) {
-                                    RegisterAccountPage.this.passwordText
-                                        .setText(wizard.getPassword());
-                                    RegisterAccountPage.this.repeatPasswordText
-                                        .setText(wizard.getPassword());
-                                    RegisterAccountPage.this.serverText
-                                        .setText(wizard.getServer());
-                                    RegisterAccountPage.this.userText
-                                        .setText(wizard.getUsername());
-                                }
-
-                            } catch (Exception e) {
-                                saros
-                                    .getLog()
-                                    .log(
-                                        new Status(
-                                            IStatus.ERROR,
-                                            Saros.SAROS,
-                                            IStatus.ERROR,
-                                            "Error while running enter account wizard",
-                                            e));
-                            }
+                            openCreateAccount();
                         }
                     });
                 }
+
             });
         }
 
@@ -177,6 +166,41 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         updateNextEnablement();
 
         setControl(root);
+    }
+
+    protected void openCreateAccount() {
+        try {
+            Point loc = this.getShell().getLocation();
+            Shell shell = new Shell(this.getShell());
+            shell.setLocation(loc.x - 250, loc.y - 50);
+
+            CreateAccountWizard wizard = new CreateAccountWizard(saros,
+                preferenceUtils, true, false, false);
+            WizardDialog dialog = new WizardDialog(shell, wizard);
+            dialog.create();
+
+            // init fields with input from this RegisterAccountPage
+            if (this.getServer().length() > 0) {
+                /*
+                 * only set the server string if it's not empty use the default
+                 * otherwise
+                 */
+                wizard.page.serverText.setText(this.getServer());
+            }
+            wizard.page.userText.setText(this.getUsername());
+            wizard.page.passwordText.setText(this.getPassword());
+
+            boolean success = Window.OK == dialog.open();
+
+            if (success) {
+                this.passwordText.setText(wizard.getPassword());
+                this.serverText.setText(wizard.getServer());
+                this.userText.setText(wizard.getUsername());
+            }
+
+        } catch (Exception e) {
+            log.error("Error while running enter account wizard", e);
+        }
     }
 
     public String getServer() {
@@ -208,7 +232,9 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         this.serverText.addModifyListener(listener);
         this.userText.addModifyListener(listener);
         this.passwordText.addModifyListener(listener);
-        this.repeatPasswordText.addModifyListener(listener);
+        if (this.createAccount)
+            this.repeatPasswordText.addModifyListener(listener);
+
         if (this.showPrefButton) {
             this.prefButton.addSelectionListener(new SelectionAdapter() {
 
@@ -229,17 +255,22 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
     }
 
     private void updateNextEnablement() {
-
-        boolean passwordsMatch = this.passwordText.getText().equals(
-            this.repeatPasswordText.getText());
+        // check if every field is not empty
         boolean done = (this.serverText.getText().length() > 0)
             && (this.userText.getText().length() > 0)
-            && (this.passwordText.getText().length() > 0) && passwordsMatch;
+            && (this.passwordText.getText().length() > 0);
 
-        if (passwordsMatch) {
-            setErrorMessage(null);
-        } else {
-            setErrorMessage("Passwords don't match.");
+        // check if passwords match only if a new account should be created
+        if (this.createAccount) {
+            boolean passwordsMatch = this.passwordText.getText().equals(
+                this.repeatPasswordText.getText());
+            done &= passwordsMatch;
+
+            if (passwordsMatch) {
+                setErrorMessage(null);
+            } else {
+                setErrorMessage("Passwords don't match.");
+            }
         }
 
         setPageComplete(done);

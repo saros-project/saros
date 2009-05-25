@@ -4,6 +4,7 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.Dialog;
@@ -50,6 +51,10 @@ public class FeedbackManager extends AbstractFeedbackManager {
     public static final int FEEDBACK_ENABLED = 1;
     public static final int FEEDBACK_DISABLED = 2;
 
+    public static final int BROWSER_EXT = 0;
+    public static final int BROWSER_INT = 1;
+    public static final int BROWSER_NONE = 2;
+
     protected static final Logger log = Logger.getLogger(FeedbackManager.class
         .getName());
 
@@ -62,9 +67,12 @@ public class FeedbackManager extends AbstractFeedbackManager {
 
         @Override
         public void sessionEnded(ISharedProject session) {
-            long sessionTime = (new Date().getTime() - startTime.getTime()) / 1000;
+            sessionTime = (new Date().getTime() - startTime.getTime()) / 1000;
             log.info(String.format("Session lasted %s min %s s",
                 sessionTime / 60, sessionTime % 60));
+
+            // If the -ea switch is enabled don't use MIN_SESSION_TIME
+            assert debugSessionTime();
 
             // don't show the survey if session was very short
             if (sessionTime < MIN_SESSION_TIME)
@@ -77,18 +85,8 @@ public class FeedbackManager extends AbstractFeedbackManager {
             if (!showNow())
                 return;
 
-            Util.runSafeSWTAsync(log, new Runnable() {
-                public void run() {
-                    // ask the user for feedback
-                    // TODO show different messages
-                    Dialog dialog = new FeedbackDialog(EditorAPI.getShell(),
-                        saros, FeedbackManager.this, FEEDBACK_REQUEST);
-                    int exitCode = dialog.open();
-                    if (exitCode == Window.OK) {
-                        showSurvey();
-                    }
-                }
-            });
+            if (showFeedbackDialog(FEEDBACK_REQUEST))
+                showSurvey();
         }
 
     };
@@ -98,17 +96,18 @@ public class FeedbackManager extends AbstractFeedbackManager {
         public void propertyChange(PropertyChangeEvent event) {
             if (event.getProperty().equals(
                 PreferenceConstants.FEEDBACK_SURVEY_INTERVAL)) {
-                // each time the interval changes, reset the number of
-                // sessions until the next request is shown
-                resetSessionsUntilNext();
+                /*
+                 * each time the interval changes, reset the number of sessions
+                 * until the next request is shown
+                 */
+                resetSessionsUntilNextToInterval();
             } else if (event.getProperty().equals(
                 PreferenceConstants.FEEDBACK_SURVEY_DISABLED)) {
                 Object value = event.getNewValue();
                 int disabled = ((Integer) value).intValue();
-                // if it changed to enabled, reset
-                // interval as well
+                // if it changed to enabled, reset interval as well
                 if (disabled == FEEDBACK_ENABLED) {
-                    resetSessionsUntilNext();
+                    resetSessionsUntilNextToInterval();
                 }
             }
         }
@@ -116,28 +115,17 @@ public class FeedbackManager extends AbstractFeedbackManager {
     };
 
     protected Date startTime;
+    protected long sessionTime;
 
     public FeedbackManager(final Saros saros, SessionManager sessionManager) {
         super(saros);
-
-        ensureConsistentPreferences();
-
         // listen for start and end of a session
         sessionManager.addSessionListener(sessionListener);
         // listen for feedback preference changes
         saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
     }
 
-    /**
-     * Ensures that the preferences the FeedbackManager manages are consistent
-     * after plugin start, i.e. if they are not existing in the global scope,
-     * the value from the workspace (might be the default) is globally set. If
-     * there exists a different value in the workspace than in the global scope,
-     * then the local value is overwritten. <br>
-     * <br>
-     * 
-     * This must be done for all values kept both globally and per workspace.
-     */
+    @Override
     protected void ensureConsistentPreferences() {
         makePrefConsistent(PreferenceConstants.FEEDBACK_SURVEY_DISABLED);
         makePrefConsistent(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL);
@@ -194,18 +182,22 @@ public class FeedbackManager extends AbstractFeedbackManager {
 
     /**
      * Saves in the global preferences and in the workspace if the feedback is
-     * disabled or not.
+     * disabled or not. <br>
+     * <br>
+     * Note: It must be set globally first, so the PropertyChangeListener for
+     * the local setting is working with latest global data.
      * 
      * @param disabled
      */
     public void setFeedbackDisabled(boolean disabled) {
         int status = disabled ? FEEDBACK_DISABLED : FEEDBACK_ENABLED;
 
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
         saros.getConfigPrefs().putInt(
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
         saros.saveConfigPrefs();
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.FEEDBACK_SURVEY_DISABLED, status);
+
     }
 
     /**
@@ -216,31 +208,29 @@ public class FeedbackManager extends AbstractFeedbackManager {
      * @return
      */
     public int getSurveyInterval() {
-        int interval = saros.getPreferenceStore().getInt(
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL);
-        return saros.getConfigPrefs().getInt(
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
-    }
+        int interval = saros.getConfigPrefs().getInt(
+            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, -1);
 
-    public void setSurveyInterval(int interval) {
-        saros.getPreferenceStore().setValue(
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
-        saros.getConfigPrefs().putInt(
-            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
-        saros.saveConfigPrefs();
+        if (interval == -1)
+            interval = saros.getPreferenceStore().getInt(
+                PreferenceConstants.FEEDBACK_SURVEY_INTERVAL);
+        return interval;
     }
 
     /**
-     * Resets the counter of sessions until the survey request is shown the next
-     * time. It is reset to 1, which means that the survey is shown after the
-     * next session. Only then the counter is set to the current interval
-     * length.<br>
-     * This ensures that the survey is shown at the beginning of the interval
-     * rather than at the end.
+     * Stores the interval globally and per workspace.<br>
+     * <br>
+     * Note: It must be set globally first, so the PropertyChangeListener for
+     * the local setting is working with latest global data.
      * 
+     * @param interval
      */
-    public void resetSessionsUntilNext() {
-        setSessionsUntilNext(1);
+    public void setSurveyInterval(int interval) {
+        saros.getConfigPrefs().putInt(
+            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
+        saros.saveConfigPrefs();
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, interval);
     }
 
     /**
@@ -252,18 +242,53 @@ public class FeedbackManager extends AbstractFeedbackManager {
     }
 
     /**
+     * Shows the FeedbackDialog with the given message and returns whether the
+     * user answered it with yes or no and resets the sessions until the next
+     * dialog is shown.
+     * 
+     * @param message
+     * @return true, if the user clicked yes, otherwise false
+     */
+    public boolean showFeedbackDialog(final String message) {
+        resetSessionsUntilNextToInterval();
+
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+
+                public Boolean call() {
+                    Dialog dialog = new FeedbackDialog(EditorAPI.getShell(),
+                        saros, FeedbackManager.this, message);
+                    return dialog.open() == Window.OK;
+                }
+
+            });
+        } catch (Exception e) {
+            log.error("Exception when trying to open FeedbackDialog.", e);
+            return false;
+        }
+    }
+
+    /**
      * Tries to open the survey in the default external browser. If this method
      * fails Eclipse's internal browser is tried to use. If both methods failed,
      * a message dialog that contains the survey URL is shown.<br>
      * <br>
      * The number of sessions until the next reminder is shown is reset to the
      * current interval length on every call.
+     * 
+     * @return which browser was used to open the survey as one of the
+     *         FeedbackManagers constants (BROWSER_EXT, BROWSER_INT or
+     *         BROWSER_NONE)
      */
-    public void showSurvey() {
+    public int showSurvey() {
+        int browserType = BROWSER_EXT;
 
         if (!Util.openExternalBrowser(SURVEY_URL)) {
+            browserType = BROWSER_INT;
+
             if (!Util.openInternalBrowser(SURVEY_URL, Messages
                 .getString("feedback.dialog.title"))) {
+                browserType = BROWSER_NONE;
                 // last resort: present a link to the survey
                 // TODO user should be able to copy&paste the link easily
                 MessageDialog.openWarning(EditorAPI.getShell(),
@@ -272,6 +297,7 @@ public class FeedbackManager extends AbstractFeedbackManager {
                         + SURVEY_URL + " yourself.");
             }
         }
+        return browserType;
     }
 
     /**
@@ -286,7 +312,17 @@ public class FeedbackManager extends AbstractFeedbackManager {
         if (getSessionsUntilNext() > 0) {
             return false;
         }
-        resetSessionsUntilNextToInterval();
+        return true;
+    }
+
+    /**
+     * Only for debugging.
+     * 
+     * @return
+     */
+    protected boolean debugSessionTime() {
+        sessionTime = MIN_SESSION_TIME + 1;
+        // Always returns true...
         return true;
     }
 

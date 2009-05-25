@@ -7,12 +7,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.util.LinkListener;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A WizardPage which lets the user specify whether he wants to submit statistic
@@ -36,7 +38,6 @@ public class AllowStatisticSubmissionPage extends WizardPage implements
         setTitle(Messages.getString("feedback.statistic.page.title")); //$NON-NLS-1$
         setDescription(Messages
             .getString("feedback.statistic.page.description")); //$NON-NLS-1$
-
         Saros.reinject(this);
     }
 
@@ -52,11 +53,12 @@ public class AllowStatisticSubmissionPage extends WizardPage implements
         composite
             .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        Label message = new Label(composite, SWT.WRAP);
+        Link message = new Link(composite, SWT.WRAP);
         GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
         gd.widthHint = composite.getClientArea().width;
         message.setLayoutData(gd);
         message.setText(Messages.getString("feedback.statistic.page.request")); //$NON-NLS-1$
+        message.addListener(SWT.Selection, new LinkListener());
 
         Group group = new Group(composite, SWT.NONE);
         group.setLayout(new GridLayout(1, false));
@@ -71,6 +73,11 @@ public class AllowStatisticSubmissionPage extends WizardPage implements
 
         setPageComplete(true);
         setControl(composite);
+    }
+
+    @Override
+    public void performHelp() {
+        Util.openExternalBrowser(StatisticManager.INFO_URL);
     }
 
     /**

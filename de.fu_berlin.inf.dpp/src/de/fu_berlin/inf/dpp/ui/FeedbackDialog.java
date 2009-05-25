@@ -5,16 +5,22 @@ package de.fu_berlin.inf.dpp.ui;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
+import de.fu_berlin.inf.dpp.util.LinkListener;
 
 /**
  * Implements a dialog that asks the user to participate in our Saros feedback
@@ -46,9 +52,41 @@ public class FeedbackDialog extends MessageDialog {
     }
 
     @Override
+    protected Control createMessageArea(Composite composite) {
+        // create image
+        Image image = getImage();
+        if (image != null) {
+            imageLabel = new Label(composite, SWT.NULL);
+            image.setBackground(imageLabel.getBackground());
+            imageLabel.setImage(image);
+            GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BEGINNING)
+                .applyTo(imageLabel);
+        }
+        // create link label to show a message with hyperlinks
+        if (message != null) {
+            Link messageLabel = new Link(composite, getMessageLabelStyle());
+            messageLabel.setText(message);
+            GridDataFactory
+                .fillDefaults()
+                .align(SWT.FILL, SWT.BEGINNING)
+                .grab(true, false)
+                .hint(
+                    convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH),
+                    SWT.DEFAULT).applyTo(messageLabel);
+            messageLabel.addListener(SWT.Selection, new LinkListener());
+        }
+        return composite;
+    }
+
+    @Override
     protected Control createCustomArea(Composite parent) {
         checkButton = new Button(parent, SWT.CHECK);
         checkButton.setText(Messages.getString("feedback.dialog.never")); //$NON-NLS-1$
+
+        GridData gd = new GridData();
+        gd.horizontalIndent = 26;
+        gd.verticalIndent = 15;
+        checkButton.setLayoutData(gd);
         return parent;
     }
 
