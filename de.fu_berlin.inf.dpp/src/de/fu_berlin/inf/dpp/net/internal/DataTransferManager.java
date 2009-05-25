@@ -93,8 +93,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected Thread startingJingleThread;
 
-    protected DiscoveryManager jingleDiscovery;
-
     protected List<IDataReceiver> receivers;
 
     protected XMPPConnection connection;
@@ -102,6 +100,9 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected XMPPChatTransmitter chatTransmitter;
 
     protected List<ITransferModeListener> transferModeListeners;
+
+    @Inject
+    protected DiscoveryManager discoveryManager;
 
     @Inject
     protected JingleFileTransferManagerObservable jingleManager;
@@ -504,7 +505,7 @@ public class DataTransferManager implements ConnectionSessionListener {
              * supports Jingle at this point in time - He might have left and
              * reconnected and changed his Jingle settings in between
              */
-            if (!jingleDiscovery.getCachedJingleSupport(jid))
+            if (!discoveryManager.isJingleSupported(jid))
                 return false;
 
             JingleFileTransferManager jftm = getJingleManager();
@@ -637,7 +638,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     public void awaitJingleManager(JID jid) {
 
-        if (jingleDiscovery.getCachedJingleSupport(jid)) {
+        if (discoveryManager.isJingleSupported(jid)) {
             getJingleManager();
         }
     }
@@ -765,9 +766,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         connection.addPacketListener(handmadeDataTransferExtension,
             handmadeDataTransferExtension.getFilter());
 
-        // Create JingleDiscoveryManager
-        jingleDiscovery = new DiscoveryManager(connection);
-
         if (!Saros.getFileTransferModeViaChat()) {
             // Start Jingle Manager asynchronous
             this.startingJingleThread = new Thread(new Runnable() {
@@ -872,7 +870,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
 
         fileTransferManager = null;
-        jingleDiscovery = null;
         startingJingleThread = null;
     }
 

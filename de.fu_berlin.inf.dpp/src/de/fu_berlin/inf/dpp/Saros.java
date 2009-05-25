@@ -77,6 +77,7 @@ import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
@@ -227,6 +228,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(ConsistencyWatchdogServer.class);
         this.container.addComponent(SharedProjectObservable.class);
         this.container.addComponent(DataTransferManager.class);
+        this.container.addComponent(DiscoveryManager.class);
         this.container.addComponent(EditorManager.class);
         this.container.addComponent(FeedbackManager.class);
         this.container.addComponent(IsInconsistentObservable.class);
