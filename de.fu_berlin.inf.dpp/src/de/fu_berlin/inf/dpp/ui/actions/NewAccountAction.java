@@ -31,6 +31,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.ui.wizards.CreateAccountWizard;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -44,6 +45,9 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
 
     @Inject
     protected Saros saros;
+
+    @Inject
+    protected SarosUI sarosUI;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -71,7 +75,13 @@ public class NewAccountAction implements IWorkbenchWindowActionDelegate {
         WizardDialog wd = new WizardDialog(shell, new CreateAccountWizard(
             saros, preferenceUtils, true, true, true));
         wd.setHelpAvailable(false);
+        // open() blocks until the user closed the dialog
         wd.open();
+        /*
+         * activate Roster and bring it to front (if not done already) to let
+         * user start inviting buddies
+         */
+        sarosUI.activateRosterView();
     }
 
     /*

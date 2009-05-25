@@ -20,14 +20,7 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -56,6 +49,7 @@ public class CreateAccountWizard extends Wizard {
         this.page = new RegisterAccountPage(saros, createAccount,
             showStoreInPrefsButton, storeInPrefsDefault, preferenceUtils);
         setNeedsProgressMonitor(true);
+        setHelpAvailable(false);
         this.saros = saros;
     }
 
@@ -85,22 +79,10 @@ public class CreateAccountWizard extends Wizard {
             this.username = this.page.getUsername();
             this.password = this.page.getPassword();
 
-            try {
-                // Open Roster so that a participant can be invited
-                IWorkbench workbench = PlatformUI.getWorkbench();
-                IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-                window.getActivePage().showView(
-                    "de.fu_berlin.inf.dpp.ui.RosterView", null,
-                    IWorkbenchPage.VIEW_ACTIVATE);
-            } catch (PartInitException e) {
-                saros.getLog().log(
-                    new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR,
-                        "Could not activate Roster View", e));
-            }
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
 
 }
