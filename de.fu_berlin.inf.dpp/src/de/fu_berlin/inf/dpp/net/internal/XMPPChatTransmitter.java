@@ -709,7 +709,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         });
     }
 
-    public void dispose() {
+    public void disposeConnection() {
         executor.shutdownNow();
         chats.clear();
         processes.clear();
@@ -717,7 +717,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         chatmanager = null;
     }
 
-    public void prepare(final XMPPConnection connection) {
+    public void prepareConnection(final XMPPConnection connection) {
 
         // Create Containers
         this.chats = new HashMap<JID, Chat>();
@@ -736,11 +736,11 @@ public class XMPPChatTransmitter implements ITransmitter,
             new XMPPChatTransmitterPacketListener(), null);
     }
 
-    public void start() {
+    public void startConnection() {
         // TODO start sending only now, queue otherwise
     }
 
-    public void stop() {
+    public void stopConnection() {
         // TODO stop sending, but queue rather
     }
 

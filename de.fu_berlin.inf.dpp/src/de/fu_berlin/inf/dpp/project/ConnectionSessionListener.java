@@ -28,12 +28,33 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 @Component(module = "net")
 public interface ConnectionSessionListener {
 
-    public void prepare(XMPPConnection connection);
+    /**
+     * Called when a new XMPPConnection is created and users of the connection
+     * may now add themselves as listeners to the connection. After being called
+     * with {@link #prepareConnection(XMPPConnection)} listeners should be ready
+     * to receive data, but should not send data themselves until
+     * {@link #startConnection()} has been called.
+     */
+    public void prepareConnection(XMPPConnection connection);
 
-    public void start();
+    /**
+     * Called when the listener to the connection may now start sending data.
+     */
+    public void startConnection();
 
-    public void stop();
+    /**
+     * Called when the listener to the connection should not send any more data
+     * to the connection. They still should be prepared to receive data.
+     */
+    public void stopConnection();
 
-    public void dispose();
+    /**
+     * This marks the end of the life-cycle of the current XMPPConnection (set
+     * via {@link #prepareConnection(XMPPConnection)}.
+     * 
+     * After the call to {@link #disposeConnection()}, the next call will be to
+     * {@link #prepareConnection(XMPPConnection)}.
+     */
+    public void disposeConnection();
 
 }

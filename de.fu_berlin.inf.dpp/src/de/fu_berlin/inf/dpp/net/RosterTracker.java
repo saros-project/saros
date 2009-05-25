@@ -96,28 +96,26 @@ public class RosterTracker implements ConnectionSessionListener {
         rosterListeners.remove(rosterListener);
     }
 
-    public void dispose() {
-        assert this.connection != null;
-
-        this.connection = null;
+    public void disposeConnection() {
+        if (this.connection != null) {
+            this.connection = null;
+        }
     }
 
-    public void prepare(XMPPConnection connection) {
-        assert this.connection == null;
-
+    public void prepareConnection(XMPPConnection connection) {
         this.connection = connection;
     }
 
-    public void start() {
+    public void startConnection() {
         assert this.connection != null;
         assert this.roster == null;
 
         this.roster = this.connection.getRoster();
-
+        // TODO This is too late, we might miss Roster events... reload?
         this.roster.addRosterListener(rosterListener);
     }
 
-    public void stop() {
+    public void stopConnection() {
         assert this.connection != null;
         assert this.roster != null;
 

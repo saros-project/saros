@@ -29,11 +29,11 @@ public class ConnectionSessionManager {
                 case CONNECTED:
 
                     for (ConnectionSessionListener listener : listeners) {
-                        listener.prepare(connection);
+                        listener.prepareConnection(connection);
                     }
 
                     for (ConnectionSessionListener listener : listeners) {
-                        listener.start();
+                        listener.startConnection();
                     }
 
                     break;
@@ -47,7 +47,7 @@ public class ConnectionSessionManager {
 
                     for (ConnectionSessionListener listener : Util
                         .reverse(listeners)) {
-                        listener.stop();
+                        listener.stopConnection();
                     }
                     break;
 
@@ -55,7 +55,7 @@ public class ConnectionSessionManager {
 
                     for (ConnectionSessionListener listener : Util
                         .reverse(listeners)) {
-                        listener.stop();
+                        listener.stopConnection();
                     }
 
                     for (ConnectionSessionListener listener : Util
@@ -65,7 +65,7 @@ public class ConnectionSessionManager {
                          * contract of the ConnectionSessionListener (dispose
                          * was called twice!)
                          */
-                        listener.dispose();
+                        listener.disposeConnection();
                     }
                     break;
                 }

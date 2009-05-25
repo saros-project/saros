@@ -171,24 +171,24 @@ public class SubscriptionListener implements ConnectionSessionListener {
         });
     }
 
-    public void dispose() {
+    public void disposeConnection() {
         if (connection != null) {
             connection.removePacketListener(packetListener);
             connection = null;
         }
     }
 
-    public void prepare(XMPPConnection connection) {
+    public void prepareConnection(XMPPConnection connection) {
         this.connection = connection;
         connection.addPacketListener(packetListener, new PacketTypeFilter(
             Presence.class));
     }
 
-    public void start() {
+    public void startConnection() {
         // ignore
     }
 
-    public void stop() {
+    public void stopConnection() {
         // ignore
     }
 }

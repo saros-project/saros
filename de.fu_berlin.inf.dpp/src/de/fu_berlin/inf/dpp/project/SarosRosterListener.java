@@ -60,11 +60,11 @@ public class SarosRosterListener implements ConnectionSessionListener {
         }
     };
 
-    public void dispose() {
+    public void disposeConnection() {
         connection = null;
     }
 
-    public void prepare(XMPPConnection connection) {
+    public void prepareConnection(XMPPConnection connection) {
         this.connection = connection;
     }
 
@@ -83,13 +83,13 @@ public class SarosRosterListener implements ConnectionSessionListener {
         }
     }
 
-    public void start() {
+    public void startConnection() {
         if (connection != null) {
             registerListener(connection.getRoster());
         }
     }
 
-    public void stop() {
+    public void stopConnection() {
         registerListener(null);
         connection = null;
     }

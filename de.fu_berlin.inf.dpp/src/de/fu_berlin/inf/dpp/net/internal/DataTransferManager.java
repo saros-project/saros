@@ -745,7 +745,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     };
 
-    public void prepare(final XMPPConnection connection) {
+    public void prepareConnection(final XMPPConnection connection) {
 
         // Create Containers
         this.connection = connection;
@@ -838,7 +838,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
-    public void dispose() {
+    public void disposeConnection() {
         incomingFiles.clear();
         fileTransferQueue.clear();
         receivers.clear();
@@ -873,13 +873,12 @@ public class DataTransferManager implements ConnectionSessionListener {
         startingJingleThread = null;
     }
 
-    public void start() {
-        // TODO Auto-generated method stub
-
+    public void startConnection() {
+        // TODO The data transfer manager does not support caching yet
     }
 
-    public void stop() {
-        // TODO Auto-generated method stub
+    public void stopConnection() {
+        // TODO The data transfer manager does not support caching yet
     }
 
     /**
