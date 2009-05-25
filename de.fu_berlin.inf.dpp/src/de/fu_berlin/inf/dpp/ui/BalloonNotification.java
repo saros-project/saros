@@ -40,11 +40,11 @@ public class BalloonNotification {
     public static void showNotification(Control pControl, String pTitle,
         String pText, int pTimeout) {
 
-        if (pControl.isDisposed()) {
+        if (pControl != null && pControl.isDisposed()) {
             return;
         }
 
-        Shell parentShell = pControl.getShell();
+        Shell parentShell = (pControl != null ? pControl.getShell() : null);
         final BalloonWindow window = new BalloonWindow(parentShell, SWT.ON_TOP
             | SWT.TOOL | SWT.CLOSE | SWT.TITLE);
 
