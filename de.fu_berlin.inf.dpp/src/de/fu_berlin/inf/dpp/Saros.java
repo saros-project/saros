@@ -493,6 +493,10 @@ public class Saros extends AbstractUIPlugin {
              * TODO It has to ask the user, if s/he wants to use non-TLS
              * connections with PLAIN SASL if TLS is not supported by the
              * server.
+             * 
+             * TODO use MessageDialog and Util.runSWTSync() to provide a
+             * password callback if the user has no password set in the
+             * preferences.
              */
             conConfig
                 .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
@@ -531,7 +535,7 @@ public class Saros extends AbstractUIPlugin {
              * 
              * http://www.igniterealtime.org/community/message/185601
              * 
-             * valid choices: PLAIN, DIGEST-MD5 or KERBEROS_V4
+             * valid choices include: PLAIN, DIGEST-MD5 or KERBEROS_V4
              * 
              * most significant choice: 0
              */
