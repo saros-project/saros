@@ -379,8 +379,7 @@ class EnterProjectNamePage extends WizardPage {
     protected void updatePageComplete() {
 
         if (isSyncSkippingSelected()) {
-            setMessage(
-                "Skipping Synchronisation will probably cause inconsistencies in the Saros session!",
+            setMessage("Skipping Synchronisation might cause inconsistencies!",
                 DialogPage.WARNING);
         } else {
             setMessage(null);
