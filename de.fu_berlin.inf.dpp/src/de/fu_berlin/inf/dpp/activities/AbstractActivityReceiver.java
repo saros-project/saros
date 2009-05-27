@@ -43,4 +43,9 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // empty implementation
         return false;
     }
+
+    public boolean receive(StopActivity stopActivity) {
+        // empty implementation
+        return false;
+    }
 }

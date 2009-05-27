@@ -65,7 +65,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * Should be set to <code>true</code> while executing resource changes to
      * avoid an infinite resource event loop.
      */
-    private boolean replicationInProgess = false;
+    private boolean replicationInProgress = false;
+
+    /**
+     * While paused the SharedResourcesManager doesn't fire activities
+     */
+    private boolean pause = false;
 
     private ISharedProject sharedProject;
 
@@ -234,7 +239,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     public void resourceChanged(IResourceChangeEvent event) {
 
-        if (replicationInProgess)
+        if (pause) {
+            if (event.getResource() != null)
+                log.warn("Resource changed while paused: "
+                    + event.getResource().getProjectRelativePath());
+            else
+                log.warn("Resource changed while paused.");
+            return;
+        }
+        if (replicationInProgress)
             return;
 
         try {
@@ -279,7 +292,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     public void exec(IActivity activity) {
         try {
-            this.replicationInProgess = true;
+            this.replicationInProgress = true;
 
             if (activity instanceof FileActivity) {
                 exec((FileActivity) activity);
@@ -291,7 +304,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             log.error("Failed to execute resource activity.", e);
 
         } finally {
-            this.replicationInProgess = false;
+            this.replicationInProgress = false;
         }
     }
 
@@ -335,5 +348,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
         }
 
+    }
+
+    public void setPause(boolean stop) {
+        this.pause = stop;
     }
 }

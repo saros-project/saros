@@ -106,6 +106,7 @@ import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -264,6 +265,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SharedResourcesManager.class);
         this.container.addComponent(SkypeManager.class);
         this.container.addComponent(StatisticManager.class);
+        this.container.addComponent(StopManager.class);
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);

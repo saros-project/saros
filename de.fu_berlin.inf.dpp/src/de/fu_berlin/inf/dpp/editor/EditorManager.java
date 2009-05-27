@@ -1708,4 +1708,20 @@ public class EditorManager implements IActivityProvider {
         return getDocumentProvider(input).getDocument(input);
     }
 
+    /**
+     * Locks/unlocks all Editors for writing operations. Locked means local
+     * keyboard inputs are not applied.
+     * 
+     * @param lock
+     *            if true then editors are locked, else they are unlocked
+     */
+    public void lockAllEditors(boolean lock) {
+        if (lock)
+            log.debug("Lock all editors");
+        else
+            log.debug("Unlock all editors");
+        editorPool.setDriverEnabled(!lock);
+        documentListener.setPause(lock);
+    }
+
 }

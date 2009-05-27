@@ -19,4 +19,6 @@ public interface IActivityReceiver {
     boolean receive(EditorActivity editorActivity);
 
     boolean receive(JupiterActivity jupiterActivity);
+
+    boolean receive(StopActivity stopActivity);
 }

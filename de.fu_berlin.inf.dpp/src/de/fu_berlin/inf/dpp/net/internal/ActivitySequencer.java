@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
@@ -515,6 +516,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (activity instanceof JupiterActivity) {
                 this.concurrentDocumentManager
                     .receiveJupiterActivity((JupiterActivity) activity);
+                return;
+            }
+            // StopActivities mustn't wait for the SWT thread monitor
+            if (activity instanceof StopActivity) {
+                for (IActivityProvider executor : ActivitySequencer.this.providers) {
+                    executor.exec(activity); // inform StopManager
+                }
                 return;
             }
         } catch (Exception e) {
