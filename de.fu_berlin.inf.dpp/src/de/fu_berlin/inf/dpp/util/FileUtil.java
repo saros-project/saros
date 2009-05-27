@@ -109,6 +109,8 @@ public class FileUtil {
      */
     public static void writeFile(InputStream input, IFile file) {
 
+        // FIXME Parent directories need to be created here!!!
+
         boolean wasReadOnly = false;
         if (file.isReadOnly()) {
             wasReadOnly = true;
