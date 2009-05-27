@@ -9,13 +9,16 @@ import java.util.zip.CheckedInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
@@ -109,7 +112,8 @@ public class FileUtil {
      */
     public static void writeFile(InputStream input, IFile file) {
 
-        // FIXME Parent directories need to be created here!!!
+        // Make sure directory exists
+        mkdirs(file);
 
         boolean wasReadOnly = false;
         if (file.isReadOnly()) {
@@ -136,6 +140,66 @@ public class FileUtil {
 
         if (wasReadOnly)
             setReadOnly(file, wasReadOnly);
+    }
+
+    /**
+     * Makes sure that the parent directories of the given IFile exist, possibly
+     * removing write protection.
+     */
+    public static boolean mkdirs(IFile file) {
+
+        if (file == null)
+            return true;
+
+        IFolder parent = getParentFolder(file);
+        if (parent == null || parent.exists())
+            return true;
+
+        IContainer root = parent;
+        while (!root.exists()) {
+            IContainer temp = root.getParent();
+            if (temp == null)
+                break;
+            root = temp;
+        }
+        boolean canWriteInParent = FileUtil.setReadOnly(root, false);
+
+        try {
+            if (!create(parent)) {
+                log.error("Could not create Dir: " + parent.getFullPath());
+                return false;
+            } else
+                return true;
+        } finally {
+            if (!canWriteInParent)
+                FileUtil.setReadOnly(root, true);
+        }
+    }
+
+    public static IFolder getParentFolder(IResource resource) {
+
+        if (resource == null) {
+            return null;
+        }
+        IContainer parent = resource.getParent();
+        if (parent == null || parent.getType() != IResource.FOLDER) {
+            return null;
+        }
+        return (IFolder) parent;
+    }
+
+    public static boolean create(final IFolder folder) {
+
+        if (folder == null || folder.exists()) {
+            return true;
+        }
+        create(getParentFolder(folder));
+        try {
+            folder.create(IResource.NONE, true, new NullProgressMonitor());
+            return true;
+        } catch (CoreException e) {
+            return false;
+        }
     }
 
     /**
