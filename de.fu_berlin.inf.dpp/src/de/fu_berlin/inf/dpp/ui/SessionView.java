@@ -19,21 +19,11 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableFontProvider;
@@ -52,28 +42,21 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
-import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -90,6 +73,7 @@ import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.pico.ChildContainer;
 
 /**
  * View responsible for showing who is in a SharedProject session using which
@@ -102,25 +86,16 @@ public class SessionView extends ViewPart {
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
 
+    @Component(module = "ui")
+    public static class SessionViewTableViewer extends TableViewer {
+        public SessionViewTableViewer(Composite parent, int style) {
+            super(parent, style);
+        }
+    }
+
     protected TableViewer viewer;
 
     protected ISharedProject sharedProject;
-
-    protected GiveDriverRoleAction giveDriverRoleAction;
-
-    protected GiveExclusiveDriverRoleAction giveExclusiveDriverRoleAction;
-
-    protected RemoveDriverRoleAction removeDriverRoleAction;
-
-    protected RemoveAllDriverRoleAction removeAllDriverRoleAction;
-
-    protected FollowModeAction followModeAction;
-
-    protected ConsistencyAction consistencyAction;
-
-    protected LeaveSessionAction leaveSessionAction;
-
-    protected OpenInviteInterface openInvitationInterfaceAction;
 
     protected class SessionContentProvider implements
         IStructuredContentProvider, ISharedProjectListener {
@@ -249,41 +224,7 @@ public class SessionView extends ViewPart {
         }
     };
 
-    protected IPropertyChangeListener multiDriverPrefsListener = new IPropertyChangeListener() {
-
-        public void propertyChange(PropertyChangeEvent event) {
-            if (event.getProperty().equals(PreferenceConstants.MULTI_DRIVER)) {
-                updateMultiDriverActions();
-            }
-        }
-
-        private void updateMultiDriverActions() {
-            IViewSite site = getViewSite();
-
-            // Check if the site exists (may be null when disposed or starting)
-            if (site == null)
-                return;
-
-            IActionBars bars = site.getActionBars();
-            IToolBarManager toolBar = bars.getToolBarManager();
-
-            if (isMultiDriverEnabled()) {
-                toolBar.insertBefore(FollowModeAction.ACTION_ID,
-                    removeAllDriverRoleAction);
-            } else {
-                toolBar.remove(RemoveAllDriverRoleAction.ACTION_ID);
-            }
-            toolBar.update(false);
-        }
-    };
-
-    protected JumpToDriverPositionAction jumpToAction;
-
-    protected FollowThisPersonAction followThisPersonAction;
-
-    private List<Disposable> disposables = new ArrayList<Disposable>();
-
-    private ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
+    protected ISharedEditorListener sharedEditorListener = new AbstractSharedEditorListener() {
         @Override
         public void followModeChanged(User user) {
             viewer.refresh();
@@ -300,7 +241,7 @@ public class SessionView extends ViewPart {
     protected SessionManager sessionManager;
 
     @Inject
-    protected ConsistencyWatchdogClient consistencyWatchdogClient;
+    protected ChildContainer container;
 
     public SessionView() {
 
@@ -314,13 +255,6 @@ public class SessionView extends ViewPart {
             editorPrefsListener);
 
         /**
-         * Register for our preference store, so we can be notified if the
-         * Multi-Driver setting changes
-         */
-        saros.getPreferenceStore().addPropertyChangeListener(
-            multiDriverPrefsListener);
-
-        /**
          * Listener responsible for refreshing the viewer if the follow mode
          * changed (because the followed user is shown in bold)
          */
@@ -332,17 +266,11 @@ public class SessionView extends ViewPart {
     public void dispose() {
         EditorsUI.getPreferenceStore().removePropertyChangeListener(
             editorPrefsListener);
-        saros.getPreferenceStore().removePropertyChangeListener(
-            multiDriverPrefsListener);
         editorManager.removeSharedEditorListener(sharedEditorListener);
-
-        // FIXME All actions need to be properly disposed, because they use
-        // Listeners
-        for (Disposable toDispose : disposables) {
-            toDispose.dispose();
-        }
-
         sessionManager.removeSessionListener(sessionListener);
+
+        // Stop container
+        container.dispose();
 
         super.dispose();
     }
@@ -355,8 +283,8 @@ public class SessionView extends ViewPart {
     public void createPartControl(Composite parent) {
 
         // TODO Add 5 pixels of padding
-        this.viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL
-            | SWT.V_SCROLL);
+        this.viewer = new SessionViewTableViewer(parent, SWT.MULTI
+            | SWT.H_SCROLL | SWT.V_SCROLL);
         this.viewer.setContentProvider(new SessionContentProvider());
 
         final SessionLabelProvider labelProvider = new SessionLabelProvider();
@@ -392,30 +320,30 @@ public class SessionView extends ViewPart {
 
         this.viewer.setInput(null);
 
-        this.giveExclusiveDriverRoleAction = new GiveExclusiveDriverRoleAction(
-            sessionManager, this.viewer, "Give exclusive driver role");
-        this.followModeAction = new FollowModeAction(saros, sessionManager,
-            editorManager);
-        this.disposables.add(followModeAction);
-        this.leaveSessionAction = new LeaveSessionAction(sessionManager);
-        this.consistencyAction = new ConsistencyAction(
-            consistencyWatchdogClient, sessionManager);
-        this.openInvitationInterfaceAction = new OpenInviteInterface(
-            sessionManager);
-        this.removeAllDriverRoleAction = new RemoveAllDriverRoleAction(
-            sessionManager);
-        this.giveDriverRoleAction = new GiveDriverRoleAction(this.viewer,
-            "Give driver role");
-        this.jumpToAction = new JumpToDriverPositionAction(saros,
-            sessionManager, editorManager, this.viewer);
-        this.followThisPersonAction = new FollowThisPersonAction(this.viewer,
-            saros, sessionManager, editorManager);
-        this.removeDriverRoleAction = new RemoveDriverRoleAction(
-            sessionManager, this.viewer);
+        container.addComponent(ConsistencyAction.class);
+        container.addComponent(GiveExclusiveDriverRoleAction.class);
+        container.addComponent(GiveDriverRoleAction.class);
+        container.addComponent(FollowModeAction.class);
+        container.addComponent(FollowThisPersonAction.class);
+        container.addComponent(JumpToDriverPositionAction.class);
+        container.addComponent(LeaveSessionAction.class);
+        container.addComponent(OpenInviteInterface.class);
+        container.addComponent(SessionViewTableViewer.class, this.viewer);
+        container.addComponent(RemoveAllDriverRoleAction.class);
+        container.addComponent(RemoveDriverRoleAction.class);
+        container.addComponent(SessionViewContextMenu.class);
+        container.addComponent(SessionViewToolBar.class);
+        container.addComponent(SessionView.class, this);
 
-        contributeToActionBars();
-        hookContextMenu();
-        attachSessionListener();
+        // Make sure all components are registered
+        container.getComponents(Object.class);
+
+        // Add Session Listener
+        sessionManager.addSessionListener(sessionListener);
+        if (sessionManager.getSharedProject() != null) {
+            this.viewer.setInput(sessionManager.getSharedProject());
+        }
+
         updateEnablement();
 
         setPartName("Shared Project Session");
@@ -442,7 +370,7 @@ public class SessionView extends ViewPart {
         public void sessionStarted(final ISharedProject project) {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    SessionView.this.viewer.setInput(project);
+                    viewer.setInput(project);
                 }
             });
         }
@@ -452,81 +380,12 @@ public class SessionView extends ViewPart {
             assert sharedProject == project;
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    SessionView.this.viewer.setInput(null);
+                    viewer.setInput(null);
                 }
             });
             sharedProject = null;
         }
     };
-
-    private void attachSessionListener() {
-        sessionManager.addSessionListener(sessionListener);
-        if (sessionManager.getSharedProject() != null) {
-            this.viewer.setInput(sessionManager.getSharedProject());
-        }
-    }
-
-    private void contributeToActionBars() {
-        IActionBars bars = getViewSite().getActionBars();
-        IToolBarManager toolBar = bars.getToolBarManager();
-
-        toolBar.add(consistencyAction);
-        toolBar.add(openInvitationInterfaceAction);
-        if (isMultiDriverEnabled()) {
-            toolBar.add(removeAllDriverRoleAction);
-        }
-        toolBar.add(followModeAction);
-        toolBar.add(leaveSessionAction);
-    }
-
-    private void hookContextMenu() {
-        MenuManager menuMgr = new MenuManager("#PopupMenu");
-        menuMgr.setRemoveAllWhenShown(true);
-        menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
-                fillContextMenu(manager);
-            }
-        });
-
-        Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
-        this.viewer.getControl().setMenu(menu);
-        getSite().registerContextMenu(menuMgr, this.viewer);
-
-        this.viewer.addDoubleClickListener(new IDoubleClickListener() {
-            public void doubleClick(DoubleClickEvent event) {
-                if (jumpToAction.isEnabled()) {
-                    jumpToAction.run();
-                }
-            }
-        });
-
-    }
-
-    private void fillContextMenu(IMenuManager manager) {
-
-        manager.add(this.giveExclusiveDriverRoleAction);
-
-        if (isMultiDriverEnabled()) {
-            manager.add(this.giveDriverRoleAction);
-            manager.add(this.removeDriverRoleAction);
-        }
-        manager.add(new Separator());
-        manager.add(this.followThisPersonAction);
-        manager.add(this.jumpToAction);
-
-        // Other plug-ins can contribute there actions here
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-    }
-
-    protected boolean isMultiDriverEnabled() {
-        return saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.MULTI_DRIVER);
-    }
-
-    public void runConsistencyActionIfEnabled() {
-        if (this.consistencyAction.isEnabled())
-            consistencyAction.run();
-    }
 
     public static void showNotification(final String title, final String text) {
         Util.runSafeSWTAsync(log, new Runnable() {

@@ -56,6 +56,7 @@ import org.picocontainer.PicoCompositionException;
 import org.picocontainer.injectors.AnnotatedFieldInjection;
 import org.picocontainer.injectors.CompositeInjection;
 import org.picocontainer.injectors.ConstructorInjection;
+import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -110,6 +111,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
 /**
@@ -218,7 +220,7 @@ public class Saros extends AbstractUIPlugin {
 
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
             new ConstructorInjection(), new AnnotatedFieldInjection()))
-            .withCaching();
+            .withCaching().withLifecycle();
 
         /*
          * If given, the dotMonitor is used to capture an architecture diagram
@@ -230,6 +232,10 @@ public class Saros extends AbstractUIPlugin {
 
         // Initialize our dependency injection container
         this.container = picoBuilder.build();
+
+        // Add Adapter which creates ChildContainers
+        this.container.addAdapter(new ProviderAdapter(
+            new ChildContainerProvider(this.container)));
 
         /*
          * All singletons which exist for the whole plug-in life-cycle are
@@ -392,6 +398,7 @@ public class Saros extends AbstractUIPlugin {
      */
     @Override
     public void stop(BundleContext context) throws Exception {
+
         // TODO Devise a general way to stop and dispose our components
         saveConfigPrefs();
 
@@ -404,9 +411,16 @@ public class Saros extends AbstractUIPlugin {
 
         try {
             disconnect();
+
+            /**
+             * This will cause dispose() to be called on all components managed
+             * by PicoContainer which implement {@link Disposable}.
+             */
+            container.dispose();
         } finally {
             super.stop(context);
         }
+
         isInitialized = false;
         setDefault(null);
     }

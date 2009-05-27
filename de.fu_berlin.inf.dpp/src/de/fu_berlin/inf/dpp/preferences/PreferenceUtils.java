@@ -84,6 +84,14 @@ public class PreferenceUtils {
             PreferenceConstants.SKYPE_USERNAME);
     }
 
+    /**
+     * Returns whether the (experimental) multi-driver mode is enabled.
+     */
+    public boolean isMultiDriverEnabled() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.MULTI_DRIVER);
+    }
+
     public boolean isSkipSyncSelectable() {
         return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.SKIP_SYNC_SELECTABLE);

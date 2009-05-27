@@ -24,6 +24,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -38,6 +39,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  * @author oezbek
  */
+@Component(module = "action")
 public class LeaveSessionAction extends Action {
 
     private static final Logger log = Logger.getLogger(LeaveSessionAction.class

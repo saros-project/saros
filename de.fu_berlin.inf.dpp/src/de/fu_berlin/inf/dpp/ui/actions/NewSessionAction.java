@@ -34,6 +34,7 @@ import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -41,11 +42,14 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * Start to share a project (a "session").
  * 
+ * This action is created by Eclipse!
+ *
  * @author rdjemili
  * 
- *         This action is created by Eclipse!
  * 
+ *
  */
+@Component(module = "action")
 public class NewSessionAction implements IObjectActionDelegate {
 
     private static final Logger log = Logger.getLogger(NewSessionAction.class
@@ -58,13 +62,6 @@ public class NewSessionAction implements IObjectActionDelegate {
 
     @Inject
     protected Saros saros;
-
-    /*
-     * (non-Javadoc) Defined in IActionDelegate
-     */
-    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-        // We deal with everything in selectionChanged
-    }
 
     public NewSessionAction() {
         super();
@@ -110,6 +107,10 @@ public class NewSessionAction implements IObjectActionDelegate {
         action.setEnabled(connected && !running
             && (this.selectedProject != null)
             && this.selectedProject.isAccessible());
+    }
+
+    public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+        // We deal with everything in selectionChanged
     }
 
     protected IProject getProject(ISelection selection) {

@@ -7,6 +7,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
@@ -23,6 +24,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author Christopher Oezbek
  * @author Edna Rosen
  */
+@Component(module = "action")
 public class FollowThisPersonAction extends SelectionProviderAction {
 
     public static final String ACTION_ID = FollowThisPersonAction.class
