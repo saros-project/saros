@@ -129,7 +129,9 @@ public class StopManager implements IActivityProvider {
                     // it has to be removed from the expected ack list
                     // because it already arrived
                     if (expectedAcknowledgments.remove(stopActivity)) {
+                        reentrantLock.lock();
                         acknowledged.signal();
+                        reentrantLock.unlock();
                         return true;
                     } else {
                         log
@@ -293,18 +295,14 @@ public class StopManager implements IActivityProvider {
 
     /**
      * Removes a StartHandle from startHandles. If the list for user is empty
-     * then the user is removed from startHandles. Equality is enough for a
-     * successful removing.
+     * then the user is removed from startHandles.
      */
     public void removeStartHandle(StartHandle startHandle) {
         User user = startHandle.getUser();
         List<StartHandle> handleList = startHandles.get(user);
         if (handleList == null)
             return; // nothing to do
-        for (StartHandle handle : handleList) {
-            if (startHandle.equals(handle))
-                handleList.remove(handle);
-        }
+        handleList.remove(startHandle);
         if (handleList.isEmpty())
             startHandles.remove(user);
     }
