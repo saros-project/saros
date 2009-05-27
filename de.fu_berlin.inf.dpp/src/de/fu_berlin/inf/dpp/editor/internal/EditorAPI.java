@@ -175,6 +175,13 @@ public class EditorAPI implements IEditorAPI {
      * {@inheritDoc}
      */
     public IEditorPart openEditor(IFile file) {
+
+        if (!file.exists()) {
+            log.error("EditorAPI cannot open file which does not exist: "
+                + file);
+            return null;
+        }
+
         IWorkbenchWindow window = EditorAPI.getActiveWindow();
         if (window != null) {
             try {
