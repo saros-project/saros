@@ -140,6 +140,22 @@ public class Saros extends AbstractUIPlugin {
      */
     public static final String SAROS = "de.fu_berlin.inf.dpp"; //$NON-NLS-1$
 
+    /**
+     * The name of the XMPP namespace used by Saros. At the moment it is only
+     * used to advertise the Saros feature in the Service Discovery.
+     * 
+     * TODO Add version information, so that only compatible versions of Saros
+     * can use each other.
+     */
+    public final static String NAMESPACE = SAROS;
+
+    /**
+     * The name of the resource identifier used by Saros when connecting to the
+     * XMPP Server (for instance when logging in as john@doe.com, Saros will
+     * connect using john@doe.com/Saros)
+     */
+    public final static String RESOURCE = "Saros";
+
     public String sarosVersion;
 
     public String sarosFeatureID;
@@ -333,7 +349,7 @@ public class Saros extends AbstractUIPlugin {
 
         sarosVersion = Util.getBundleVersion(getBundle(), "Unknown Version");
 
-        sarosFeatureID = plugin.toString() + "_" + sarosVersion;
+        sarosFeatureID = SAROS + "_" + sarosVersion;
 
         XMPPConnection.DEBUG_ENABLED = getPreferenceStore().getBoolean(
             PreferenceConstants.DEBUG);
@@ -520,7 +536,7 @@ public class Saros extends AbstractUIPlugin {
             /* add Saros as XMPP feature */
             ServiceDiscoveryManager sdm = ServiceDiscoveryManager
                 .getInstanceFor(connection);
-            sdm.addFeature(sarosFeatureID);
+            sdm.addFeature(Saros.NAMESPACE);
 
             // add Jingle feature to the supported extensions
             if (!prefStore
@@ -549,7 +565,7 @@ public class Saros extends AbstractUIPlugin {
              * so we might for instance receive subscription requests even
              * though we do not have a packet listener running yet!
              */
-            this.connection.login(username, password);
+            this.connection.login(username, password, Saros.RESOURCE);
             /* other people can now send invitations */
 
             this.myjid = new JID(this.connection.getUser());
