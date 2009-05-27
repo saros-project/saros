@@ -64,7 +64,7 @@ public class PreferenceConstants {
     /** Preference of the InvitationDialog */
     public static final String AUTO_CLOSE_DIALOG = "invitation.dialog.auto.close";
 
-    public static final String NEW_WORKSPACE = "eclipse.new.workspace";
+    public static final String SKIP_SYNC_SELECTABLE = "invitation.dialog.skip.enabled";
 
     /**
      * Preferences of the feedback preferences page
@@ -77,6 +77,8 @@ public class PreferenceConstants {
     public static final String FEEDBACK_SURVEY_INTERVAL = "feedback.survey.interval";
 
     public static final String STATISTIC_ALLOW_SUBMISSION = "statistic.allow.submission";
+
+    public static final String NEW_WORKSPACE = "eclipse.new.workspace";
 
     /**
      * Global preferences, not initialized i.e. no default values

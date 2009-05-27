@@ -175,13 +175,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IIncomingInvitationProcess
+    /**
+     * {@inheritDoc}
      */
     public void accept(final IProject baseProject, final String newProjectName,
-        IProgressMonitor monitor) {
+        boolean skipSync, IProgressMonitor monitor) {
 
         if ((newProjectName == null) && (baseProject == null)) {
             throw new IllegalArgumentException(
@@ -189,7 +187,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
 
         try {
-            if (acceptUnsafe(baseProject, newProjectName, monitor)) {
+            if (acceptUnsafe(baseProject, newProjectName, skipSync, monitor)) {
                 done();
             } else {
                 cancel(null, false);
@@ -212,7 +210,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     private boolean acceptUnsafe(final IProject baseProject,
-        final String newProjectName, IProgressMonitor monitor)
+        final String newProjectName, boolean skipSync, IProgressMonitor monitor)
         throws CoreException, IOException {
         assertState(State.HOST_FILELIST_SENT);
 
@@ -249,8 +247,12 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             this.localProject = baseProject;
         }
 
-        this.filesLeftToSynchronize = handleDiff(this.localProject,
-            this.remoteFileList);
+        if (skipSync) {
+            this.filesLeftToSynchronize = 0;
+        } else {
+            this.filesLeftToSynchronize = handleDiff(this.localProject,
+                this.remoteFileList);
+        }
 
         this.progressMonitor = monitor;
 
@@ -274,8 +276,25 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
 
         try {
-            this.transmitter.sendFileList(this.peer, new FileList(
-                this.localProject), this);
+            if (skipSync) {
+                this.transmitter.sendFileList(this.peer, remoteFileList, this);
+            } else {
+                this.transmitter.sendFileList(this.peer, new FileList(
+                    this.localProject), this);
+            }
+
+            if (filesLeftToSynchronize == 0) {
+                // HACK We need to sleep here, because if there are no files to
+                // wait for, we could finish the blockUntil... too fast.
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    log.warn(
+                        "Code not designed to handle InterruptedException", e);
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
+            }
 
             return blockUntilAllFilesSynchronized(monitor);
         } finally {

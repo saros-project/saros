@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -38,6 +39,7 @@ class EnterProjectNamePage extends WizardPage {
     protected Label newProjectNameLabel;
     protected Button projCopy;
     protected Text newProjectNameText;
+    protected Button skipCheckbox;
     protected Button copyCheckbox;
     protected Text copyToBeforeUpdateText;
 
@@ -289,6 +291,18 @@ class EnterProjectNamePage extends WizardPage {
         createUpdateProjectGroup(composite, joinSessionWizard
             .getUpdateProject());
 
+        if (preferenceUtils.isSkipSyncSelectable()) {
+            this.skipCheckbox = new Button(composite, SWT.CHECK);
+            this.skipCheckbox.setText("Skip synchronization");
+            this.skipCheckbox.setSelection(false);
+            this.skipCheckbox.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    updatePageComplete();
+                }
+            });
+        }
+
         attachListeners();
 
         updateConnectionStatus();
@@ -330,16 +344,13 @@ class EnterProjectNamePage extends WizardPage {
     public void setPageCompleteTargetProject(String newText) {
 
         if (newText.length() == 0) {
-            setMessage(null);
             setErrorMessage("Please set a project name");
             setPageComplete(false);
         } else {
             if (JoinSessionWizardUtils.projectIsUnique(newText)) {
-                setMessage(null);
                 setErrorMessage(null);
                 setPageComplete(true);
             } else {
-                setMessage(null);
                 setErrorMessage("A project with this name already exists");
                 setPageComplete(false);
             }
@@ -367,15 +378,20 @@ class EnterProjectNamePage extends WizardPage {
 
     protected void updatePageComplete() {
 
+        if (isSyncSkippingSelected()) {
+            setMessage(
+                "Skipping Synchronisation will probably cause inconsistencies in the Saros session!",
+                DialogPage.WARNING);
+        } else {
+            setMessage(null);
+        }
+
         if (!isUpdateSelected()) {
-
             setPageCompleteTargetProject(this.newProjectNameText.getText());
-
         } else {
             String newText = this.updateProjectText.getText();
 
             if (newText.length() == 0) {
-                setMessage(null);
                 setErrorMessage("Please set a project name to update from or press 'Scan Workspace' to find best matching existing project");
                 setPageComplete(false);
 
@@ -386,13 +402,11 @@ class EnterProjectNamePage extends WizardPage {
                         setPageCompleteTargetProject(this.copyToBeforeUpdateText
                             .getText());
                     } else {
-                        setMessage(null);
                         setErrorMessage(null);
                         setPageComplete(true);
                     }
 
                 } else {
-                    setMessage(null);
                     setErrorMessage("No project exists with this name to update from");
                     setPageComplete(false);
                 }
@@ -433,5 +447,15 @@ class EnterProjectNamePage extends WizardPage {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Returns whether the user has selected to skip synchronisation
+     */
+    public boolean isSyncSkippingSelected() {
+        if (preferenceUtils.isSkipSyncSelectable()) {
+            return this.skipCheckbox.getSelection();
+        }
+        return false;
     }
 }

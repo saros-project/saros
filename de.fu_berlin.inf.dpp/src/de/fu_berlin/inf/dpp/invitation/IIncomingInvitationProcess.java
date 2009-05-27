@@ -52,6 +52,9 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      *            the project name of the new project that is to be generated.
      *            If this is <code>null</code> the <code>baseProject</code> will
      *            be overwritten.
+     * @param skip
+     *            if set to true, the synchronisation will be skipped by sending
+     *            an empty file list to the host.
      * @param monitor
      *            a {@link IProgressMonitor} to report progress to and to check
      *            whether the user canceled via
@@ -63,7 +66,7 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      *             {@link IProgressMonitor#isCanceled()}
      */
     public void accept(IProject baseProject, String newProjectName,
-        IProgressMonitor monitor) throws InterruptedException;
+        boolean skip, IProgressMonitor monitor) throws InterruptedException;
 
     public void setInvitationUI(IInvitationUI inviteUI);
 

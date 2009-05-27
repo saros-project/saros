@@ -84,4 +84,9 @@ public class PreferenceUtils {
             PreferenceConstants.SKYPE_USERNAME);
     }
 
+    public boolean isSkipSyncSelectable() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.SKIP_SYNC_SELECTABLE);
+    }
+
 }

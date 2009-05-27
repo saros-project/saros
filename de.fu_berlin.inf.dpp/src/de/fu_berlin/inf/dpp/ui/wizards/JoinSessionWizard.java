@@ -226,13 +226,14 @@ public class JoinSessionWizard extends Wizard {
 
         final IProject source = this.namePage.getSourceProject();
         final String target = this.namePage.getTargetProjectName();
+        final boolean skip = this.namePage.isSyncSkippingSelected();
 
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
 
-                    JoinSessionWizard.this.process.accept(source, target,
+                    JoinSessionWizard.this.process.accept(source, target, skip,
                         monitor);
                 }
             });

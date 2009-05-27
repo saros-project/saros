@@ -40,6 +40,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         addField(new IntegerFieldEditor(PreferenceConstants.FILE_TRANSFER_PORT,
             "File transfer port (needs reconnect):", getFieldEditorParent()));
 
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.SKIP_SYNC_SELECTABLE,
+            "Offer possibility to skip synchronisation in Session Invitation dialog",
+            getFieldEditorParent()));
+
         addField(new BooleanFieldEditor(PreferenceConstants.DEBUG,
             "Show Jabber debug window (needs restart).", getFieldEditorParent()));
 

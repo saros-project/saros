@@ -59,6 +59,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         // InvitationDialog
         prefs.putBoolean(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
+        prefs.putBoolean(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
 
         // its a new workspace per default, is set to false in earlyStartup()
         prefs.putBoolean(PreferenceConstants.NEW_WORKSPACE, true);
