@@ -1,11 +1,13 @@
 package de.fu_berlin.inf.dpp.util.log;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.helpers.LogLog;
+import org.eclipse.core.runtime.Platform;
 
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -34,6 +36,8 @@ public class DateFormatFileAppender extends FileAppender {
     public synchronized void setFile(String fileName, boolean append,
         boolean bufferedIO, int bufferSize) throws IOException {
 
+        // directory of the Eclipse log
+        String directory = Platform.getLogFileLocation().toFile().getParent();
         /*
          * Make a back-up copy of the fileName, because it will be changed by us
          * and could not be reused.
@@ -42,7 +46,8 @@ public class DateFormatFileAppender extends FileAppender {
             this.fileBackup = fileName;
         }
         SimpleDateFormat sdf = new SimpleDateFormat(fileBackup);
-        String actualFileName = sdf.format(new Date());
+        String actualFileName = directory + File.separator
+            + sdf.format(new Date());
         if (!Util.mkdirs(actualFileName)) {
             LogLog.error("Could not create dirs for " + actualFileName);
         }

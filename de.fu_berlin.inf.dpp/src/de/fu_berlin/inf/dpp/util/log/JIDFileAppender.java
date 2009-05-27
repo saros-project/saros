@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.util.log;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.helpers.LogLog;
 import org.apache.log4j.spi.LoggingEvent;
+import org.eclipse.core.runtime.Platform;
 import org.jivesoftware.smack.XMPPConnection;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
@@ -115,12 +117,15 @@ public class JIDFileAppender extends FileAppender {
              */
             this.fileNameBackup = getFile();
         }
+        // directory of the Eclipse log
+        String directory = Platform.getLogFileLocation().toFile().getParent();
 
         String jidString = localJID.getBase();
 
         String format = String.format(this.fileNameBackup, jidString);
 
-        String actualFileName = new SimpleDateFormat(format).format(new Date());
+        String actualFileName = directory + File.separator
+            + new SimpleDateFormat(format).format(new Date());
 
         if (!Util.mkdirs(actualFileName)) {
             LogLog.error("Could not create dirs for " + actualFileName);
