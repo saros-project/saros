@@ -620,13 +620,13 @@ public class EditorManager implements IActivityProvider {
         if (result == null) {
 
             IFile file = sharedProject.getProject().getFile(path);
-
-            if (file == null) {
+            if (file == null || !file.exists()){
                 log.error("No file in project for path " + path,
                     new StackTrace());
-            } else {
-                connect(file);
+                return null;
             }
+
+            connect(file);
 
             // get Document from FileBuffer
             result = EditorUtils.getTextFileBuffer(file).getDocument();
