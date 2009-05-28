@@ -37,6 +37,10 @@ public class EditorUtils {
             return fileBuff;
         else {
             try {
+                /*
+                 * FIXME This call to connect never has a matching call to
+                 * disconnect
+                 */
                 tfbm.connect(fullPath, LocationKind.IFILE,
                     new NullProgressMonitor());
             } catch (CoreException e) {
