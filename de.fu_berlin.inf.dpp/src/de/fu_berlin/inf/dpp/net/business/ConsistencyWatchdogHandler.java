@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.jivesoftware.smack.PacketListener;
@@ -16,6 +17,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -214,19 +216,19 @@ public class ConsistencyWatchdogHandler {
         }
 
         ISharedProject project = sessionManager.getSharedProject();
+        JID myJID = project.getLocalUser().getJID();
 
         for (final IPath path : paths) {
 
+            IFile file = project.getProject().getFile(path);
+
             // Save document before sending to clients
-            try {
-                editorManager.saveLazy(path);
-            } catch (FileNotFoundException e) {
-                // TODO Handle case, when file does not exist locally any
-                // more
-                log.error("Currently we cannot deal with the situation"
-                    + " of files being deleted on the host: ", e);
-                return;
-            }
+            if (file.exists())
+                try {
+                    editorManager.saveLazy(path);
+                } catch (FileNotFoundException e) {
+                    log.error("File could not be found, despite existing: ", e);
+                }
 
             // Reset jupiter
             ConcurrentDocumentManager concurrentManager = project
@@ -234,37 +236,50 @@ public class ConsistencyWatchdogHandler {
             if (concurrentManager.isManagedByJupiterServer(from, path))
                 concurrentManager.resetJupiterServer(from, path);
 
-            // Send the file to client
-            try {
-                transmitter.sendFile(from, project.getProject(), path,
-                    TimedActivity.NO_SEQUENCE_NR,
-                    /*
-                     * TODO CO The Callback should be used to show progress to
-                     * the user
-                     */
-                    new IFileTransferCallback() {
-
-                        public void fileSent(IPath path) {
-                            // do nothing
-                        }
-
-                        public void fileTransferFailed(IPath path, Exception e) {
-                            // do nothing
-
-                        }
-
-                        public void transferProgress(int transfered) {
-                            // do nothing
-                        }
-
-                    });
-            } catch (IOException e) {
-                // TODO This means we were really unable to send
-                // this file. No more falling back.
-                log.error("Could not sent file for consistency resolution", e);
+            if (file.exists()) {
+                // Send the file to client
+                sendFile(from, project, path);
+            } else {
+                // TODO Warn the user...
+                // Tell the client to delete the file
+                project.getSequencer().sendActivities(
+                    from,
+                    new FileActivity(myJID.toString(),
+                        FileActivity.Type.Removed, path));
             }
         }
 
+    }
+
+    protected void sendFile(JID from, ISharedProject project, final IPath path) {
+        try {
+            transmitter.sendFile(from, project.getProject(), path,
+                TimedActivity.NO_SEQUENCE_NR,
+                /*
+                 * TODO CO The Callback should be used to show progress to the
+                 * user
+                 */
+                new IFileTransferCallback() {
+
+                    public void fileSent(IPath path) {
+                        // do nothing
+                    }
+
+                    public void fileTransferFailed(IPath path, Exception e) {
+                        // do nothing
+
+                    }
+
+                    public void transferProgress(int transfered) {
+                        // do nothing
+                    }
+
+                });
+        } catch (IOException e) {
+            // TODO This means we were really unable to send
+            // this file. No more falling back.
+            log.error("Could not sent file for consistency resolution", e);
+        }
     }
 
     PacketListener listener = new PacketListener() {

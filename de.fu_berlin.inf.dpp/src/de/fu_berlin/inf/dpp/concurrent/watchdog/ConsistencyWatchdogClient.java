@@ -218,6 +218,20 @@ public class ConsistencyWatchdogClient {
 
         ISharedProject sharedProject = sessionManager.getSharedProject();
         IFile file = sharedProject.getProject().getFile(path);
+
+        if (!checksum.existsFile()) {
+            /*
+             * If the checksum tells us that the file does not exist at the
+             * host, check whether we still have it. If it exists, we do have an
+             * inconsistency
+             */
+            return file.exists();
+        }
+
+        /*
+         * If the checksum tells us, that the file exists, but we do not have
+         * it, it is an inconsistency as well
+         */
         if (!file.exists()) {
             return true;
         }

@@ -137,22 +137,22 @@ public class ConsistencyWatchdogServer extends Job {
             if (monitor.isCanceled())
                 return Status.CANCEL_STATUS;
 
-            // Get document
+            // Get document (which might be null if file does not exist)
             IDocument doc = editorManager.getDocument(docPath);
-
-            // TODO CO Handle missing files correctly
-            if (doc == null) {
-                continue;
-            }
 
             // Update listener management
             missingDocuments.remove(docPath);
+
             DocumentChecksum checksum = docsChecksums.get(docPath);
             if (checksum == null) {
                 checksum = new DocumentChecksum(docPath);
                 docsChecksums.put(docPath, checksum);
             }
 
+            /*
+             * Potentially bind to null doc, which will set the Checksum to
+             * represent a missing file (existsFile() == false)
+             */
             checksum.bind(doc);
             checksum.update();
         }
@@ -164,7 +164,10 @@ public class ConsistencyWatchdogServer extends Job {
 
         // Send to all Clients
         // TODO Since this is done asynchronously a race condition might occur
-        if (docsChecksums.size() > 0 && saros.isConnected()) {
+        if (saros.isConnected()) {
+            // We will send a message, even if no file is open, because
+            // otherwise clients do not know that the consistency has been
+            // resolved.
             transmitter.sendDocChecksumsToClients(getOthers(), docsChecksums
                 .values());
         }
