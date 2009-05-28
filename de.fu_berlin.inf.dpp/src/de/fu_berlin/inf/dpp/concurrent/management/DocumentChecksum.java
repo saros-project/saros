@@ -13,6 +13,11 @@ import org.eclipse.jface.text.IDocumentListener;
  */
 public class DocumentChecksum {
 
+    /**
+     * Constant used for representing a missing file
+     */
+    public static final int NON_EXISTING_DOC = -1;
+
     protected IDocumentListener dirtyListener = new IDocumentListener() {
 
         public void documentAboutToBeChanged(DocumentEvent event) {
@@ -85,20 +90,40 @@ public class DocumentChecksum {
 
         this.document = doc;
 
-        doc.addDocumentListener(dirtyListener);
+        if (document != null)
+            doc.addDocumentListener(dirtyListener);
+
+        dirty = true;
     }
 
     public void update() {
-
-        assert document != null;
 
         // If document not changed, skip
         if (!dirty)
             return;
 
-        this.length = document.getLength();
-        this.hash = document.get().hashCode();
+        if (document == null) {
+            this.length = this.hash = NON_EXISTING_DOC;
+        } else {
+            this.length = document.getLength();
+            this.hash = document.get().hashCode();
+        }
 
         dirty = false;
+    }
+
+    /**
+     * Returns whether this checksum represents a file which exists at the host.
+     * 
+     * If false is returned, then this checksum indicates that the host has no
+     * file under the given path.
+     */
+    public boolean existsFile() {
+        return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
+    }
+
+    @Override
+    public String toString() {
+        return path.toOSString() + " [" + this.length + "," + this.hash + "]";
     }
 }
