@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
-@Component(module = "ui")
+@Component(module = "action")
 public class GiveDriverRoleAction extends SelectionProviderAction {
 
     private static final Logger log = Logger
@@ -52,8 +52,8 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     @Inject
     protected SessionManager sessionManager;
 
-    public GiveDriverRoleAction(ISelectionProvider provider, String text) {
-        super(provider, text);
+    public GiveDriverRoleAction(ISelectionProvider provider) {
+        super(provider, "Give driver role");
         setImageDescriptor(SarosUI.getImageDescriptor("icons/user_edit.png"));
         setToolTipText("Give the driver role to this user");
 
