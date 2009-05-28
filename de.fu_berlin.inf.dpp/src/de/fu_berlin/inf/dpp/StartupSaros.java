@@ -4,6 +4,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IStartup;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.intro.IIntroManager;
+import org.eclipse.ui.intro.IIntroPart;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -61,14 +64,27 @@ public class StartupSaros implements IStartup {
             currentVersion);
         saros.saveConfigPrefs();
 
-        // make Roster view visible and activated
+        showRoster();
+        showConfigurationWizard();
+    }
+
+    protected void showRoster() {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
+                IIntroManager m = PlatformUI.getWorkbench().getIntroManager();
+                IIntroPart i = m.getIntro();
+                /*
+                 * if there is a welcome screen, don't activate the Roster
+                 * because it would be maximized and hiding the workbench window
+                 */
+                if (i != null)
+                    return;
                 sarosUI.activateRosterView();
             }
         });
+    }
 
-        // show configuration wizard
+    protected void showConfigurationWizard() {
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 // determine which pages have to be shown
