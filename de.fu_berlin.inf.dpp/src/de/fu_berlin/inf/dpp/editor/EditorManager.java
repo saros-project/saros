@@ -1395,7 +1395,7 @@ public class EditorManager implements IActivityProvider {
             listener.driverEditorSaved(path, false);
         }
 
-        // TODO technically we can should mark the file as saved in the
+        // TODO technically we should mark the file as saved in the
         // editorPool, or?
 
         fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
