@@ -21,7 +21,9 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -591,7 +593,17 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     }
 
     /**
+     * Syntactic sugar for {@link #sendActivities(Collection, List)}
+     */
+    public void sendActivities(JID recipient, IActivity... activities) {
+        sendActivities(Collections.singletonList(recipient), Arrays
+            .asList(activities));
+    }
+
+    /**
      * Sends given activities to given recipients.
+     * 
+     * TODO From which thread can this method be called?
      */
     public void sendActivities(Collection<JID> recipients,
         List<IActivity> activities) {
