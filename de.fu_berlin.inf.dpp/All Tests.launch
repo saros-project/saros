@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.pde.ui.JunitLaunchConfig">
+<booleanAttribute key="append.args" value="true"/>
+<booleanAttribute key="askclear" value="false"/>
+<booleanAttribute key="automaticAdd" value="true"/>
+<booleanAttribute key="automaticValidate" value="false"/>
+<stringAttribute key="bad_container_name" value="\Saros\run-t"/>
+<stringAttribute key="bootstrap" value=""/>
+<stringAttribute key="checked" value="[NONE]"/>
+<booleanAttribute key="clearConfig" value="true"/>
+<booleanAttribute key="clearws" value="true"/>
+<booleanAttribute key="clearwslog" value="false"/>
+<stringAttribute key="configLocation" value="${workspace_loc}/.metadata/.plugins/org.eclipse.pde.core/pde-junit"/>
+<booleanAttribute key="default" value="false"/>
+<booleanAttribute key="includeOptional" value="true"/>
+<stringAttribute key="location" value="${workspace_loc}/../junit-workspace"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/Saros/test/src"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="2"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value="=Saros/test\/src"/>
+<booleanAttribute key="org.eclipse.jdt.junit.KEEPRUNNING_ATTR" value="false"/>
+<stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
+<stringAttribute key="org.eclipse.jdt.junit.TEST_KIND" value="org.eclipse.jdt.junit.loader.junit3"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value=""/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="Saros"/>
+<stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.pde.ui.workbenchClasspathProvider"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-ea"/>
+<stringAttribute key="pde.version" value="3.3"/>
+<stringAttribute key="product" value="org.eclipse.sdk.ide"/>
+<stringAttribute key="selected_target_plugins" value="org.eclipse.jface.text,org.eclipse.update.configurator,org.eclipse.jdt.core,org.eclipse.core.variables,org.eclipse.equinox.http.jetty,org.eclipse.jdt.launching,org.eclipse.cdt.core,org.eclipse.core.net.win32.x86,org.eclipse.debug.core,org.eclipse.core.resources,org.eclipse.ui.navigator.resources,org.eclipse.jdt.debug,org.eclipse.core.contenttype,org.eclipse.cdt.ui,org.eclipse.core.runtime.compatibility.registry,org.eclipse.core.jobs,org.mortbay.jetty,org.eclipse.ui.navigator,org.eclipse.ltk.core.refactoring,org.eclipse.core.filesystem,org.eclipse.equinox.common,org.eclipse.equinox.security,org.eclipse.cdt.core.win32,com.ibm.icu,org.eclipse.jface,org.eclipse.core.runtime.compatibility.auth,org.eclipse.swt,org.eclipse.ui.ide.application,org.eclipse.update.core,javax.servlet,org.eclipse.core.resources.win32.x86,org.eclipse.core.filebuffers,org.eclipse.equinox.security.win32.x86,org.eclipse.update.core.win32,org.eclipse.core.databinding,org.eclipse.osgi,org.apache.lucene,org.eclipse.ui.console,org.eclipse.core.net,org.eclipse.update.ui,org.eclipse.ui.win32,org.eclipse.jdt.compiler.apt,org.eclipse.core.expressions,org.eclipse.ui.editors,org.eclipse.core.resources.compatibility,org.apache.lucene.analysis,org.eclipse.compare,org.eclipse.core.runtime,org.eclipse.search,org.eclipse.equinox.app,org.eclipse.swt.win32.win32.x86,org.eclipse.jdt.compiler.tool,org.eclipse.jdt.core.manipulation,org.eclipse.team.ui,org.eclipse.osgi.services,org.eclipse.ui.forms,org.eclipse.equinox.registry,org.eclipse.text,org.eclipse.ui.cheatsheets,org.eclipse.ui.views.properties.tabbed,org.eclipse.jdt.ui,org.eclipse.ui,org.eclipse.equinox.preferences,org.eclipse.team.core,org.eclipse.help.base,org.eclipse.help,org.eclipse.debug.ui,org.eclipse.ant.core,org.eclipse.ui.workbench,org.eclipse.core.filesystem.win32.x86,org.eclipse.ui.workbench.texteditor,org.eclipse.ui.ide,org.eclipse.sdk,org.eclipse.help.ui,org.apache.commons.logging,org.eclipse.core.commands,org.eclipse.jface.databinding,org.eclipse.equinox.http.servlet,org.eclipse.ltk.ui.refactoring,org.eclipse.ui.views"/>
+<booleanAttribute key="show_selected_only" value="false"/>
+<booleanAttribute key="tracing" value="false"/>
+<booleanAttribute key="useDefaultConfig" value="true"/>
+<booleanAttribute key="useDefaultConfigArea" value="false"/>
+<booleanAttribute key="useProduct" value="true"/>
+</launchConfiguration>
