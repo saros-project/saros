@@ -310,7 +310,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                 IInvitationProcess process = chatTransmitter
                     .getInvitationProcess(new JID(request.getRequestor()));
                 if (process != null) {
-                    process.cancel(e.getMessage(), false);
+                    process.cancel(Util.getMessage(e), false);
                 }
                 return;
             } finally {

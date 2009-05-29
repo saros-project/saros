@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
@@ -733,5 +734,12 @@ public class Util {
             log.error("Couldn't open internal Browser", e);
             return false;
         }
+    }
+
+    public static String getMessage(Throwable e) {
+        if (e instanceof ExecutionException && e.getCause() != null) {
+            return getMessage(e.getCause());
+        }
+        return e.getMessage();
     }
 }
