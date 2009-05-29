@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
@@ -41,6 +42,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.osgi.framework.Bundle;
@@ -733,5 +735,15 @@ public class Util {
             log.error("Couldn't open internal Browser", e);
             return false;
         }
+    }
+
+    public static String getMessage(Throwable e) {
+        if (e instanceof XMPPException) {
+            return e.toString();
+        }
+        if (e instanceof ExecutionException && e.getCause() != null) {
+            return getMessage(e.getCause());
+        }
+        return e.getMessage();
     }
 }

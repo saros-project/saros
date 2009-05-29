@@ -410,7 +410,8 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
-            disconnect();
+            if (isConnected())
+                disconnect();
 
             /**
              * This will cause dispose() to be called on all components managed
@@ -605,18 +606,32 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Disconnects.
+     * Disconnects (if currently connected)
      * 
      * @blocking
+     * 
+     * @post this.myjid == null && this.connection == null &&
+     *       this.connectionState == ConnectionState.NOT_CONNECTED
      */
     public void disconnect() {
-        setConnectionState(ConnectionState.DISCONNECTING, null);
+        if (isConnected()) {
+            setConnectionState(ConnectionState.DISCONNECTING, null);
 
-        disconnectInternal();
+            disconnectInternal();
 
-        setConnectionState(ConnectionState.NOT_CONNECTED, null);
-
+            setConnectionState(ConnectionState.NOT_CONNECTED, null);
+        }
         this.myjid = null;
+
+        // Make a sanity check on the connection and connection state
+        if (this.connectionState != ConnectionState.NOT_CONNECTED) {
+            log.warn("Connection state is out of sync");
+            this.connectionState = ConnectionState.NOT_CONNECTED;
+        }
+        if (this.connection != null) {
+            log.warn("Connection has not been closed");
+            this.connection = null;
+        }
     }
 
     protected void disconnectInternal() {

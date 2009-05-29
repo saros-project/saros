@@ -161,11 +161,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             // Log debug message if there are queued activities.
             int size = queuedActivities.size();
             if (size > 0) {
-                log
-                    .debug("There are " + size + " activities queued for "
-                        + jid);
-                log.debug("first queued: " + queuedActivities.peek()
-                    + ", expected nr: " + expectedSequenceNumber);
+                log.debug("For " + jid + " there are " + size
+                    + " activities queued. First queued: "
+                    + queuedActivities.peek() + ", expected nr: "
+                    + expectedSequenceNumber);
             }
 
             queuedActivities.add(activity);
@@ -471,9 +470,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
                     queues.checkForMissingActivities();
                     // Maybe the check above has unblocked queued activities
                     // that can be executed now.
-                    for (TimedActivity activity : queues.removeActivities()) {
-                        exec(activity.getActivity());
-                    }
+                    execQueue();
                 }
             }
         }, 0, MILLIS_UPDATE);
@@ -576,9 +573,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             if (!started)
                 return;
 
-            for (TimedActivity activity : queues.removeActivities()) {
-                exec(activity.getActivity());
-            }
+            execQueue();
         }
     }
 
@@ -590,6 +585,16 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         List<IActivity> out = new ArrayList<IActivity>(this.activities);
         this.activities.clear();
         return optimize(out);
+    }
+
+    /**
+     * executes all activities that are currently in the queue
+     */
+    protected void execQueue() {
+        for (TimedActivity activity : queues.removeActivities()) {
+            log.debug("Executing untransformed activity: " + activity);
+            exec(activity.getActivity());
+        }
     }
 
     /**

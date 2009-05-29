@@ -108,12 +108,24 @@ public abstract class InvitationProcess implements IInvitationProcess {
             setState(State.CANCELED);
         }
 
-        if (errorMsg != null) {
-            InvitationProcess.log.error(
-                "Invitation was canceled because of an error: " + errorMsg,
-                new StackTrace());
+        if (replicated) {
+            if (errorMsg != null) {
+                InvitationProcess.log
+                    .error("Invitation was canceled by remote user because of an error on his/her side: "
+                        + errorMsg);
+            } else {
+                InvitationProcess.log
+                    .info("Invitation was canceled by remote user.");
+            }
         } else {
-            InvitationProcess.log.info("Invitation was canceled.");
+            if (errorMsg != null) {
+                InvitationProcess.log.error(
+                    "Invitation was canceled locally because of an error: "
+                        + errorMsg, new StackTrace());
+            } else {
+                InvitationProcess.log
+                    .info("Invitation was canceled by local user.");
+            }
         }
 
         if (!replicated) {

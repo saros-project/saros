@@ -112,9 +112,63 @@ public class FileUtil {
      */
     public static void writeFile(InputStream input, IFile file) {
 
+        if (file.exists()) {
+            replaceFileContent(input, file);
+        } else {
+            createFile(input, file);
+        }
+
+    }
+
+    /**
+     * Creates the given file and any missing parent directories.
+     * 
+     * This method will try to remove read-only settings on the parent
+     * directories and reset them at the end of the operation.
+     * 
+     * @pre the file must not exist. Use writeFile() for getting this cases
+     *      handled.
+     */
+    public static void createFile(InputStream input, IFile file) {
+
         // Make sure directory exists
         mkdirs(file);
 
+        // Make sure that parent is writable
+        IContainer parent = file.getParent();
+        boolean wasReadOnly = false;
+        if (parent != null) {
+            ResourceAttributes attributes = parent.getResourceAttributes();
+            if (attributes != null && attributes.isReadOnly()) {
+                wasReadOnly = true;
+                setReadOnly(parent, false);
+            }
+        }
+
+        try {
+            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+            file.create(input, true, monitor);
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
+                Thread.currentThread().interrupt();
+            }
+        } catch (CoreException e) {
+            log.error("Could not write file", e);
+        }
+
+        // Reset permissions on parent
+        if (parent != null && wasReadOnly)
+            setReadOnly(parent, wasReadOnly);
+    }
+
+    /**
+     * Replace the data in the file with the data from the given InputStream.
+     * 
+     * @pre the file must exist
+     */
+    public static void replaceFileContent(InputStream input, IFile file) {
         boolean wasReadOnly = false;
         if (file.isReadOnly()) {
             wasReadOnly = true;
@@ -123,11 +177,7 @@ public class FileUtil {
 
         try {
             BlockingProgressMonitor monitor = new BlockingProgressMonitor();
-            if (file.exists()) {
-                file.setContents(input, IResource.FORCE, monitor);
-            } else {
-                file.create(input, true, monitor);
-            }
+            file.setContents(input, IResource.FORCE, monitor);
             try {
                 monitor.await();
             } catch (InterruptedException e) {
