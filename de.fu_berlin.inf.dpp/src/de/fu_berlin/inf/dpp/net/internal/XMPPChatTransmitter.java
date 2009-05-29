@@ -347,8 +347,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
         XMPPChatTransmitter.log
-            .debug("Send request to cancel Invititation to [" + user.getBase()
-                + "] with error msg: " + errorMsg);
+            .debug("Send request to cancel Invititation to ["
+                + user.getBase()
+                + "] "
+                + (errorMsg == null ? "on user request" : "with message: "
+                    + errorMsg));
         sendMessage(user, cancelInviteExtension.create(sessionID.getValue(),
             errorMsg));
     }
@@ -710,11 +713,18 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void disposeConnection() {
+        if (connection == null) {
+            log.error("Contract violation: "
+                + "ConnectionSessionListener.disposeConnection()"
+                + " is called twice");
+            return;
+        }
         executor.shutdownNow();
         chats.clear();
         processes.clear();
         messageTransferQueue.clear();
         chatmanager = null;
+        connection = null;
     }
 
     public void prepareConnection(final XMPPConnection connection) {
