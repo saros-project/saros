@@ -36,7 +36,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "feedback")
 public class FeedbackManager extends AbstractFeedbackManager {
     /** the URL to the website that contains our survey */
-    public static final String SURVEY_URL = "https://www.inf.fu-berlin.de/w/SE/DPPSurveys"; //$NON-NLS-1$
+    public static final String SURVEY_URL = "http://survey.mi.fu-berlin.de/public/survey.php?name=SarosFastUserFeedback";
 
     /** the text to show in the first FeedbackDialog */
     public static final String FEEDBACK_REQUEST = Messages
