@@ -310,7 +310,8 @@ public class DataTransferManager implements ConnectionSessionListener {
                 IInvitationProcess process = chatTransmitter
                     .getInvitationProcess(new JID(request.getRequestor()));
                 if (process != null) {
-                    process.cancel(Util.getMessage(e), false);
+                    process.cancel("File Transfer via IBB failed:\n"
+                        + Util.getMessage(e), false);
                 }
                 return;
             } finally {

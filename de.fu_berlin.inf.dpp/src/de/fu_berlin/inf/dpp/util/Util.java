@@ -42,6 +42,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.osgi.framework.Bundle;
@@ -737,6 +738,9 @@ public class Util {
     }
 
     public static String getMessage(Throwable e) {
+        if (e instanceof XMPPException) {
+            return e.toString();
+        }
         if (e instanceof ExecutionException && e.getCause() != null) {
             return getMessage(e.getCause());
         }
