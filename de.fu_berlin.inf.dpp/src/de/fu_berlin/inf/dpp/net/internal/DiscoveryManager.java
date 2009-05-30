@@ -1,69 +1,120 @@
-/**
- * 
- */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.packet.Jingle;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * This class is responsible for performing ServiceDiscovery for features such
- * as Jingle and Saros.
- * 
- * TODO Invalidate Cache if presences or connection change
+ * as Jingle and Saros. It uses XEP-0030
+ * http://xmpp.org/extensions/xep-0030.html to ask a recipient for the
+ * particular used feature.
  */
 @Component(module = "net")
-public class DiscoveryManager {
+public class DiscoveryManager implements Disposable {
     private static final Logger log = Logger.getLogger(DiscoveryManager.class
         .getName());
 
-    protected Map<JID, DiscoverInfo> cache = new ConcurrentHashMap<JID, DiscoverInfo>();
+    protected Map<String, DiscoverInfo> cache = new ConcurrentHashMap<String, DiscoverInfo>();
 
     @Inject
     protected Saros saros;
 
+    @Inject
+    protected RosterTracker rosterTracker;
+
+    /**
+     * This RosterListener closure is added to the RosterTracker to get
+     * notifications if the roster is changed.
+     * 
+     * TODO invalidate cache selectively based on the JIDs provided
+     */
+    protected RosterListener rosterListener = new RosterListener() {
+
+        public void entriesAdded(final Collection<String> addresses) {
+            log.trace("entriesAdded");
+            cache.clear();
+        }
+
+        public void entriesDeleted(final Collection<String> addresses) {
+            log.trace("entriesDeleted");
+            cache.clear();
+        }
+
+        public void entriesUpdated(final Collection<String> addresses) {
+            log.trace("entriesUpdated");
+            cache.clear();
+        }
+
+        public void presenceChanged(final Presence presence) {
+            log.trace("presenceChanged");
+            cache.clear();
+        }
+
+    };
+
+    public DiscoveryManager(RosterTracker rosterTracker) {
+        rosterTracker.addRosterListener(rosterListener);
+    }
+
+    /**
+     * This must be called before finalization otherwise you will get NPE on
+     * RosterTracker.
+     */
+    public void dispose() {
+        rosterTracker.removeRosterListener(rosterListener);
+    }
+
     /**
      * This method returns true if {@link Jingle#NAMESPACE} is supported by the
-     * Jabber client connected under the given JID (including Resource)
+     * Jabber client connected under the given JID.
      * 
-     * @param recipient
-     *            The JID must have a resource identifier (user@host/resource),
-     *            otherwise you get a blame StackTrace in your logs.
+     * This method is syntactic sugar for
+     * 
+     * <code>getSupportingPresence(recipient, Jingle.NAMESPACE) != null;</code>
      * 
      * @blocking This method blocks until the ServiceDiscovery returns or until
      *           cache lock is available.
      * @reentrant This method can be called concurrently.
+     * @caching If results are available in the cache, they are used instead of
+     *          querying the server.
      */
-    public boolean isJingleSupported(JID recipient) {
-        return isFeatureSupported(recipient, Jingle.NAMESPACE);
+    public boolean isJingleSupported(final JID recipient) {
+        return getSupportingPresence(recipient, Jingle.NAMESPACE) != null;
     }
 
     /**
      * This method returns true if {@link Saros#NAMESPACE} is available on the
      * given JID.
      * 
-     * @param recipient
-     *            The JID must have a resource identifier (user@host/resource),
-     *            otherwise you get a blame StackTrace in your logs.
+     * This method is syntactic sugar for
+     * 
+     * <code>getSupportingPresence(recipient, Saros.NAMESPACE) != null;</code>
      * 
      * @blocking This method blocks until the ServiceDiscovery returns or until
      *           cache lock is available.
      * @reentrant This method can be called concurrently.
+     * @caching If results are available in the cache, they are used instead of
+     *          querying the server.
      */
-    public boolean isSarosSupported(JID recipient) {
-        return isFeatureSupported(recipient, Saros.NAMESPACE);
+    public boolean isSarosSupported(final JID recipient) {
+        return getSupportingPresence(recipient, Saros.NAMESPACE) != null;
     }
 
     /**
@@ -76,18 +127,51 @@ public class DiscoveryManager {
      * 
      * @blocking This method blocks until the ServiceDiscovery returns.
      * @reentrant This method can be called concurrently.
+     * @caching If results are available in the cache, they are used instead of
+     *          querying the server.
      */
-    public boolean isFeatureSupported(JID recipient, String feature) {
+    protected boolean isFeatureSupported(final JID recipient,
+        final String feature) {
+        if (recipient.getResource().equals(""))
+            log.warn("Resource missing: ", new StackTrace());
 
-        DiscoverInfo info = cache.get(recipient);
+        DiscoverInfo info = cache.get(recipient.toString());
         if (info == null) {
             // TODO block if a query for the recipient is already in progress
             info = querySupport(recipient);
             if (info == null)
                 return false;
-            cache.put(recipient, info);
+            log.debug("cached: " + recipient);
+            cache.put(recipient.toString(), info);
         }
         return info.containsFeature(feature);
+    }
+
+    /**
+     * Returns the JID of given recipient supporting the feature of the given
+     * namespace if available, otherwise null.
+     * 
+     * @blocking This method blocks until the ServiceDiscovery returns.
+     * @reentrant This method can be called concurrently.
+     * @caching If results are available in the cache, they are used instead of
+     *          querying the server.
+     */
+    public JID getSupportingPresence(final JID recipient, final String namespace) {
+        if (recipient == null)
+            throw new IllegalArgumentException("JID cannot be null");
+
+        for (Presence presence : rosterTracker.getPresences(recipient)) {
+            if (!presence.isAvailable())
+                continue;
+
+            JID jid = new JID(presence.getFrom());
+            if (isFeatureSupported(jid, namespace)) {
+                log.debug(jid + " provides " + namespace);
+                return jid;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -103,9 +187,11 @@ public class DiscoveryManager {
      * 
      * @blocking This method blocks until the ServiceDiscovery returns.
      * @reentrant This method can be called concurrently.
+     * @nonCaching This method does not use a cache, but queries the server
+     *             directly.
      */
-    protected DiscoverInfo querySupport(JID recipient) {
-        
+    protected DiscoverInfo querySupport(final JID recipient) {
+
         if (recipient.getResource().equals(""))
             log.warn("Service discovery is likely to "
                 + "fail because resource is missing: " + recipient.toString(),
@@ -114,6 +200,7 @@ public class DiscoveryManager {
         if (!saros.isConnected())
             throw new IllegalStateException("Not Connected");
 
+        log.debug("querySupport: " + recipient.toString());
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
             .getInstanceFor(saros.getConnection());
 
@@ -125,4 +212,5 @@ public class DiscoveryManager {
             return null;
         }
     }
+
 }

@@ -70,6 +70,7 @@ import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.ChecksumHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
@@ -262,6 +263,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(PreferenceUtils.class);
         this.container.addComponent(RoleManager.class);
+        this.container.addComponent(RosterTracker.class);
         this.container.addComponent(Saros.class, this);
         this.container.addComponent(SarosRosterListener.class);
         this.container.addComponent(SarosUI.class);
