@@ -72,12 +72,14 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.ArrayIterator;
 import de.fu_berlin.inf.dpp.util.MappingIterator;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -116,6 +118,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     protected SessionManager sessionManager;
 
     protected Saros saros;
+
+    protected DiscoveryManager discoveryManager;
 
     /**
      * Object representing a row in the {@link InvitationDialog#tableViewer}
@@ -172,11 +176,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     }
 
     public InvitationDialog(Saros saros, SharedProject project,
-        Shell parentShell, List<JID> autoInvite) {
+        Shell parentShell, List<JID> autoInvite, DiscoveryManager discoManager) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
         this.project = project;
         this.saros = saros;
+        this.discoveryManager = discoManager;
     }
 
     @Override
@@ -330,8 +335,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
             // Invite all selected users...
             for (InviterData invdat : getSelectedItems()) {
-                invdat.outgoingProcess = project.invite(invdat.jid, name, true,
-                    this, localFileList);
+                JID toInvite = discoveryManager.getSupportingPresence(
+                    invdat.jid, Saros.NAMESPACE);
+                if (toInvite != null)
+                    invdat.outgoingProcess = project.invite(toInvite, name,
+                        true, this, localFileList);
+                else
+                    log.error("Internal Error: ", new StackTrace());
             }
 
         } catch (RuntimeException e) {
@@ -527,7 +537,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     /**
      * Returns true if all users that are currently selected can be invited.
      * 
-     * Returns false if no user is selected.
+     * Returns false if no user is selected or Saros is not supported by one of
+     * the selected users.
      */
     protected boolean isSelectionInvitable() {
         if (table.getSelectionCount() == 0) {
@@ -535,8 +546,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
 
         for (InviterData data : getSelectedItems()) {
+
             if (data.outgoingProcess != null
                 && data.outgoingProcess.getState() != State.CANCELED) {
+                return false;
+            }
+            if (!discoveryManager.isSarosSupported(data.jid)) {
                 return false;
             }
         }

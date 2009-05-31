@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -64,6 +65,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     @Inject
     protected SharedProjectObservable currentlySharedProject;
+
+    @Inject
+    protected DiscoveryManager discoveryManager;
 
     @Inject
     protected XMPPChatReceiver xmppReceiver;
@@ -265,7 +269,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 // TODO check if anybody is online, empty dialog feels
                 // strange
                 Window iw = new InvitationDialog(saros, sharedProject,
-                    EditorAPI.getShell(), toInvite);
+                    EditorAPI.getShell(), toInvite, discoveryManager);
                 iw.open();
 
                 if (!sharedProject.isDriver()) {

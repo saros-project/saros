@@ -84,6 +84,27 @@ public class JID implements Serializable {
     }
 
     /**
+     * Returns true if this JID does not have a resource part.
+     */
+    public boolean isBareJID() {
+        return "".equals(getResource());
+    }
+
+    /**
+     * Returns true if this JID does have a resource part.
+     */
+    public boolean isResourceQualifiedJID() {
+        return !isBareJID();
+    }
+
+    /**
+     * Returns the JID without any resource qualifier.
+     */
+    public JID getBareJID() {
+        return new JID(getBase());
+    }
+
+    /**
      * @return <code>true</code> if the IDs have the same user and domain.
      *         Resource is ignored.
      */

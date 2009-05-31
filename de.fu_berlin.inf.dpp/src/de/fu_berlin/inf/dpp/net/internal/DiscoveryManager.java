@@ -151,14 +151,22 @@ public class DiscoveryManager implements Disposable {
      * Returns the JID of given recipient supporting the feature of the given
      * namespace if available, otherwise null.
      * 
+     * @param recipient
+     *            The JID of the user to find a supporting presence for. The JID
+     *            can be resource qualified in which case the resource is
+     *            stripped, before performing the look-up.
+     * 
      * @blocking This method blocks until the ServiceDiscovery returns.
      * @reentrant This method can be called concurrently.
      * @caching If results are available in the cache, they are used instead of
      *          querying the server.
      */
-    public JID getSupportingPresence(final JID recipient, final String namespace) {
+    public JID getSupportingPresence(JID recipient, String namespace) {
         if (recipient == null)
             throw new IllegalArgumentException("JID cannot be null");
+
+        // If the caller gave us a RQ-JID, strip the resource
+        recipient = recipient.getBareJID();
 
         for (Presence presence : rosterTracker.getPresences(recipient)) {
             if (!presence.isAvailable())

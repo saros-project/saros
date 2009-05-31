@@ -67,6 +67,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
@@ -118,6 +119,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
     private SkypeAction skypeAction;
 
     protected List<Disposable> disposables = new ArrayList<Disposable>();
+
+    @Inject
+    protected DiscoveryManager discoManager;
 
     @Inject
     protected JingleFileTransferManagerObservable jingleManager;
@@ -710,7 +714,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
     private void makeActions() {
         // this.messagingAction = new MessagingAction(this.viewer);
         this.skypeAction = new SkypeAction(this.viewer);
-        this.inviteAction = new InviteAction(sessionManager, saros, this.viewer);
+        this.inviteAction = new InviteAction(sessionManager, saros,
+            this.viewer, discoManager);
         this.renameContactAction = new RenameContactAction(saros, this.viewer);
         this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
     }

@@ -31,6 +31,7 @@ import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -49,6 +50,8 @@ public class InviteAction extends SelectionProviderAction {
     private static final Logger log = Logger.getLogger(InviteAction.class
         .getName());
 
+    protected DiscoveryManager discoManager;
+
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void sessionStarted(ISharedProject sharedProject) {
@@ -66,7 +69,7 @@ public class InviteAction extends SelectionProviderAction {
     protected Saros saros;
 
     public InviteAction(SessionManager sessionManager, Saros saros,
-        ISelectionProvider provider) {
+        ISelectionProvider provider, DiscoveryManager discoManager) {
         super(provider, "Invite user to shared project..");
         setToolTipText("Invite user to shared project..");
 
@@ -75,6 +78,7 @@ public class InviteAction extends SelectionProviderAction {
 
         this.sessionManager = sessionManager;
         this.saros = saros;
+        this.discoManager = discoManager;
         sessionManager.addSessionListener(sessionListener);
 
         updateEnablement();
@@ -135,12 +139,13 @@ public class InviteAction extends SelectionProviderAction {
 
             // Participant needs to be...
             // ...available
-            if (!saros.getRoster().getPresence(jid.toString()).isAvailable())
+            // ...not in a session already
+            // ...to have saros
+            if (!saros.getRoster().getPresence(jid.toString()).isAvailable()
+                || project.getParticipant(jid) != null
+                || !discoManager.isSarosSupported(jid))
                 return false;
 
-            // ...not in a session already
-            if (project.getParticipant(jid) != null)
-                return false;
         }
 
         return true;
