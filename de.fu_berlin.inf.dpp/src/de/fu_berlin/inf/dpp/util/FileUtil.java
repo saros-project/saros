@@ -300,6 +300,11 @@ public class FileUtil {
     }
 
     public static void deleteFile(IFile file) throws CoreException {
+        if (!file.exists()) {
+            log.warn("File not found for deletion: " + file);
+            return;
+        }
+
         setReadOnly(file, false);
         BlockingProgressMonitor monitor = new BlockingProgressMonitor();
         file.delete(false, monitor);
