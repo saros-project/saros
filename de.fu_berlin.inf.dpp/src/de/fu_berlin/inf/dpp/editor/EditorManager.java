@@ -54,6 +54,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
@@ -88,6 +89,8 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.synchronize.Blockable;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Predicate;
@@ -114,7 +117,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  *         activities, dirty state management,...
  */
 @Component(module = "core")
-public class EditorManager implements IActivityProvider {
+public class EditorManager implements IActivityProvider, Disposable {
 
     protected class EditorPool {
 
@@ -350,6 +353,16 @@ public class EditorManager implements IActivityProvider {
         }
     };
 
+    protected Blockable stopManagerListener = new Blockable() {
+        public void unblock() {
+            lockAllEditors(false);
+        }
+
+        public void block() {
+            lockAllEditors(true);
+        }
+    };
+
     protected ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
 
         public void roleChanged(final User user) {
@@ -520,12 +533,18 @@ public class EditorManager implements IActivityProvider {
 
     protected Saros saros;
 
-    public EditorManager(Saros saros, SessionManager sessionManager) {
+    protected StopManager stopManager;
+
+    public EditorManager(Saros saros, SessionManager sessionManager,
+        StopManager stopManager) {
 
         this.saros = saros;
 
         setEditorAPI(new EditorAPI(saros));
         sessionManager.addSessionListener(this.sessionListener);
+
+        stopManager.addBlockable(stopManagerListener);
+        this.stopManager = stopManager;
     }
 
     public boolean isConnected(IFile file) {
@@ -620,7 +639,7 @@ public class EditorManager implements IActivityProvider {
         if (result == null) {
 
             IFile file = sharedProject.getProject().getFile(path);
-            if (file == null || !file.exists()){
+            if (file == null || !file.exists()) {
                 log.error("No file in project for path " + path,
                     new StackTrace());
                 return null;
@@ -1715,13 +1734,15 @@ public class EditorManager implements IActivityProvider {
      * @param lock
      *            if true then editors are locked, else they are unlocked
      */
-    public void lockAllEditors(boolean lock) {
+    protected void lockAllEditors(boolean lock) {
         if (lock)
             log.debug("Lock all editors");
         else
             log.debug("Unlock all editors");
         editorPool.setDriverEnabled(!lock);
-        documentListener.setPause(lock);
     }
 
+    public void dispose() {
+        stopManager.removeBlockable(stopManagerListener);
+    }
 }

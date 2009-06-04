@@ -12,7 +12,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
-import org.picocontainer.annotations.Inject;
+import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
@@ -22,18 +22,16 @@ import de.fu_berlin.inf.dpp.activities.StopActivity;
 import de.fu_berlin.inf.dpp.activities.StopActivity.State;
 import de.fu_berlin.inf.dpp.activities.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
-import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.project.SessionManager;
-import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 @Component(module = "core")
-public class StopManager implements IActivityProvider {
+public class StopManager implements IActivityProvider, Disposable {
 
     private static Logger log = Logger.getLogger(StopManager.class.getName());
 
@@ -42,14 +40,11 @@ public class StopManager implements IActivityProvider {
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
-    // the following three dependencies are necessary to lock/unlock the project
+    protected List<Blockable> blockables = new LinkedList<Blockable>();
+
     protected ISharedProject sharedProject;
 
-    @Inject
-    protected EditorManager editorManager;
-
-    @Inject
-    protected SharedResourcesManager sharedResourcesManager;
+    SharedProjectObservable sharedProjectObservable;
 
     /**
      * Maps a User to a List of his StartHandles. Never touch this directly, use
@@ -68,24 +63,25 @@ public class StopManager implements IActivityProvider {
     protected Set<StopActivity> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivity>());
 
-    public StopManager(SessionManager sessionManager) {
+    protected ValueChangeListener<SharedProject> sharedProjectObserver = new ValueChangeListener<SharedProject>() {
+        public void setValue(SharedProject sharedProject) {
 
-        sessionManager.addSessionListener(new ISessionListener() {
-
-            public void invitationReceived(IIncomingInvitationProcess invitation) {
-                // do nothing
-            }
-
-            public void sessionEnded(ISharedProject sharedProject) {
+            if (sharedProject == null) {
+                StopManager.this.sharedProject.getSequencer().removeProvider(
+                    StopManager.this);
                 StopManager.this.sharedProject = null;
-                sharedProject.getSequencer().removeProvider(StopManager.this);
+                return;
             }
 
-            public void sessionStarted(ISharedProject sharedProject) {
-                StopManager.this.sharedProject = sharedProject;
-                sharedProject.getSequencer().addProvider(StopManager.this);
-            }
-        });
+            StopManager.this.sharedProject = sharedProject;
+            sharedProject.getSequencer().addProvider(StopManager.this);
+        }
+    };
+
+    public StopManager(SharedProjectObservable observable) {
+
+        this.sharedProjectObservable = observable;
+        observable.add(sharedProjectObserver);
     }
 
     protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
@@ -222,13 +218,19 @@ public class StopManager implements IActivityProvider {
      * editing activities (FileActivities and TextEditActivities).
      * 
      * @param lock
-     *            if true the project gets locked, else it gets unlocked
+     *            if true the project gets locked, else it gets unlocked (if
+     *            local user is driver)
      */
     protected void lockProject(boolean lock) {
-        sharedResourcesManager.setPause(lock);
-        sharedProject.setProjectReadonly(lock);
-        // TODO setting Readonly possibly confuses the consistency watchdog
-        editorManager.lockAllEditors(lock);
+        // don't unlock if local user is observer
+        if (!lock && !sharedProject.isDriver())
+            return;
+        for (Blockable blockable : blockables) {
+            if (lock)
+                blockable.block();
+            else
+                blockable.unblock();
+        }
     }
 
     /**
@@ -274,6 +276,10 @@ public class StopManager implements IActivityProvider {
     }
 
     public void fireActivity(IActivity stopActivity) {
+        /*
+         * TODO Now StopActivities are sent to everybody, it would be better if
+         * it was sent only to the affected participant.
+         */
         for (IActivityListener listener : activityListeners) {
             listener.activityCreated(stopActivity); // informs ActivitySequencer
         }
@@ -317,6 +323,18 @@ public class StopManager implements IActivityProvider {
     public StartHandle generateStartHandle(StopActivity stopActivity) {
         User user = sharedProject.getParticipant(stopActivity.getUser());
         return new StartHandle(user, this, stopActivity.getActivityID());
+    }
+
+    public void addBlockable(Blockable stoppable) {
+        blockables.add(stoppable);
+    }
+
+    public void removeBlockable(Blockable stoppable) {
+        blockables.remove(stoppable);
+    }
+
+    public void dispose() {
+        sharedProjectObservable.remove(sharedProjectObserver);
     }
 
 }

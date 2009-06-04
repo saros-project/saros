@@ -46,6 +46,9 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.synchronize.StartHandle;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -70,6 +73,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected IProject project;
 
+    protected StopManager stopManager;
+
     /* Instance fields */
     protected User localUser;
 
@@ -81,8 +86,21 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected FreeColors freeColors = null;
 
+    protected Blockable stopManagerListener = new Blockable() {
+
+        public void unblock() {
+            setProjectReadonly(false);
+        }
+
+        public void block() {
+            setProjectReadonly(true);
+            // TODO Setting readonly possibly confuses the consistency watchdog
+        }
+    };
+
     protected SharedProject(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager, IProject project) {
+        DataTransferManager transferManager, IProject project,
+        StopManager stopManager) {
 
         assert (transmitter != null);
 
@@ -92,15 +110,18 @@ public class SharedProject implements ISharedProject, Disposable {
         this.transferManager = transferManager;
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager);
+        this.stopManager = stopManager;
+        stopManager.addBlockable(stopManagerListener);
     }
 
     /**
      * Constructor called for SharedProject of the host
      */
     public SharedProject(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager, IProject project, JID myID) {
+        DataTransferManager transferManager, IProject project, JID myID,
+        StopManager stopManager) {
 
-        this(saros, transmitter, transferManager, project);
+        this(saros, transmitter, transferManager, project, stopManager);
         assert (myID != null);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
@@ -124,9 +145,9 @@ public class SharedProject implements ISharedProject, Disposable {
      */
     public SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager, IProject project, JID myID,
-        JID hostID, int myColorID) {
+        JID hostID, int myColorID, StopManager stopManager) {
 
-        this(saros, transmitter, transferManager, project);
+        this(saros, transmitter, transferManager, project, stopManager);
 
         this.host = new User(this, hostID, 0);
         this.host.setUserRole(UserRole.DRIVER);
@@ -171,38 +192,49 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * {@inheritDoc}
      */
-    public void initiateRoleChange(User user, UserRole newRole) {
+    public void initiateRoleChange(final User user, final UserRole newRole) {
         assert localUser.isHost() : "Only the host can initiate role changes";
 
-        user.setUserRole(newRole);
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                StartHandle startHandle = stopManager.stop(user);
 
-        if (user.isLocal()) {
-            setProjectReadonly(user.isObserver());
-        }
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.roleChanged(user);
-        }
-        IActivity activity = new RoleActivity(getLocalUser().getJID()
-            .toString(), user.getJID().toString(), user.getUserRole());
-        activitySequencer.activityCreated(activity);
+                if (startHandle == null) {
+                    log
+                        .error("Role change failed because StopActivity was not acknowledged");
+                    return;
+                }
 
+                IActivity activity = new RoleActivity(getLocalUser().getJID()
+                    .toString(), user.getJID().toString(), newRole);
+                activitySequencer.activityCreated(activity);
+
+                setUserRole(user, newRole);
+
+                startHandle.start();
+            }
+        });
     }
 
     /**
      * {@inheritDoc}
      */
-    public void setUserRole(User user, UserRole role) {
+    public void setUserRole(final User user, final UserRole role) {
 
         assert user != null;
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                user.setUserRole(role);
 
-        user.setUserRole(role);
-        if (user.isLocal()) {
-            setProjectReadonly(user.isObserver());
-        }
+                if (user.isLocal()) {
+                    setProjectReadonly(user.isObserver());
+                }
 
-        for (ISharedProjectListener listener : this.listeners) {
-            listener.roleChanged(user);
-        }
+                for (ISharedProjectListener listener : SharedProject.this.listeners) {
+                    listener.roleChanged(user);
+                }
+            }
+        });
     }
 
     /*
@@ -357,6 +389,7 @@ public class SharedProject implements ISharedProject, Disposable {
     }
 
     public void dispose() {
+        stopManager.removeBlockable(stopManagerListener);
         activitySequencer.dispose();
     }
 
@@ -380,7 +413,6 @@ public class SharedProject implements ISharedProject, Disposable {
                 FileUtil.setReadOnly(getProject(), readonly);
             }
         });
-
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {

@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -42,6 +43,8 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
@@ -56,7 +59,7 @@ import de.fu_berlin.inf.dpp.util.FileUtil;
  */
 @Component(module = "core")
 public class SharedResourcesManager implements IResourceChangeListener,
-    IActivityProvider {
+    IActivityProvider, Disposable {
 
     private static Logger log = Logger.getLogger(SharedResourcesManager.class
         .getName());
@@ -77,6 +80,18 @@ public class SharedResourcesManager implements IResourceChangeListener,
     private final ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
 
     private final List<IActivityListener> listeners = new LinkedList<IActivityListener>();
+
+    protected StopManager stopManager;
+
+    protected Blockable stopManagerListener = new Blockable() {
+        public void unblock() {
+            SharedResourcesManager.this.pause = false;
+        }
+
+        public void block() {
+            SharedResourcesManager.this.pause = true;
+        }
+    };
 
     /**
      * Listens for resource changes in shared project and fires activities.
@@ -186,9 +201,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     protected ISessionManager sessionManager;
 
-    public SharedResourcesManager(ISessionManager sessionManager) {
+    public SharedResourcesManager(ISessionManager sessionManager,
+        StopManager stopManager) {
         this.sessionManager = sessionManager;
         sessionManager.addSessionListener(sessionListener);
+        stopManager.addBlockable(stopManagerListener);
+        this.stopManager = stopManager;
     }
 
     public ISessionListener sessionListener = new AbstractSessionListener() {
@@ -350,7 +368,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     }
 
-    public void setPause(boolean stop) {
-        this.pause = stop;
+    public void dispose() {
+        stopManager.removeBlockable(stopManagerListener);
     }
 }

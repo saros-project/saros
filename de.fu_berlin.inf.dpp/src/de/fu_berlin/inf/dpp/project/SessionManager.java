@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -84,6 +85,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     @Inject
     protected PreferenceUtils preferenceUtils;
 
+    @Inject
+    protected StopManager stopManager;
+
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
     protected Saros saros;
@@ -106,7 +110,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             .abs(sessionRandom.nextInt())));
 
         SharedProject sharedProject = new SharedProject(saros,
-            this.transmitter, this.transferManager, project, myJID);
+            this.transmitter, this.transferManager, project, myJID, stopManager);
 
         this.currentlySharedProject.setValue(sharedProject);
 
@@ -128,7 +132,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         SharedProject sharedProject = new SharedProject(saros,
             this.transmitter, this.transferManager, project, saros.getMyJID(),
-            host, colorID);
+            host, colorID, stopManager);
         this.currentlySharedProject.setValue(sharedProject);
 
         for (ISessionListener listener : this.listeners) {
