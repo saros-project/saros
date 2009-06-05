@@ -188,7 +188,10 @@ public class FileList {
      */
     public int match(FileList other) {
         int nPaths = getPaths().size();
-        
+
+        if (nPaths == 0 && other.getPaths().size() == 0)
+            return 100; // both are empty -> perfect match
+
         if (nPaths == 0) {
             return 0;
         } else {
@@ -197,7 +200,7 @@ public class FileList {
             if (nPaths == nUnalteredPaths) {
                 return 100;
             } else {
-                return Math.min(99, nUnalteredPaths / nPaths);
+                return Math.min(99, nUnalteredPaths * 100 / nPaths);
             }
         }
     }
