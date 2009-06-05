@@ -45,6 +45,7 @@ public class FileListTest extends TestCase {
 
     private FileList fileList;
     private FileList otherFileList;
+    private FileList emptyFileList;
 
     @Override
     protected void setUp() throws Exception {
@@ -58,6 +59,8 @@ public class FileListTest extends TestCase {
             new FileStub("foo/bar/unit.java", "class Test {void foo(){}}"),
             new FileStub("foo/test.txt", "another test content") };
         otherFileList = new FileList(otherFiles);
+
+        emptyFileList = new FileList();
     }
 
     public void testGetFilePaths() {
@@ -133,19 +136,31 @@ public class FileListTest extends TestCase {
 
         assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
             "foo/test.txt" }, paths);
+
+        paths = emptyFileList.diff(fileList).getPaths();
+        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
+            "foo/bar/test.txt" }, paths);
+        paths = fileList.diff(emptyFileList).getRemovedPaths();
+        assertPaths(new String[] { "root.txt", "foo/bar/unit.java",
+            "foo/bar/test.txt" }, paths);
     }
 
     public void testMatch() {
         assertEquals(33, fileList.match(otherFileList));
         assertEquals(33, otherFileList.match(fileList));
         assertEquals(100, fileList.match(fileList));
+        assertEquals(0, fileList.match(emptyFileList));
+        assertEquals(0, emptyFileList.match(fileList));
+        assertEquals(100, emptyFileList.match(emptyFileList));
     }
 
     public void testEquals() throws CoreException {
         FileList sameFileList = new FileList(files);
         assertEquals(fileList, sameFileList);
+        assertEquals(emptyFileList, emptyFileList);
 
         assertFalse(fileList.equals(otherFileList));
+        assertFalse(emptyFileList.equals(otherFileList));
     }
 
     public void testRoundtripSerialization() throws XmlPullParserException,
