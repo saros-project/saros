@@ -108,7 +108,7 @@ public class RenameContactAction extends SelectionProviderAction {
         if (selected instanceof RosterEntry) {
             RosterEntry result = (RosterEntry) selected;
 
-            if (!result.getUser().equals(saros.getMyJID())) {
+            if (!result.getUser().equals(saros.getMyJID().toString())) {
                 return result;
             }
         }
