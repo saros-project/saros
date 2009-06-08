@@ -201,7 +201,7 @@ public class ConcurrentDocumentManager implements Disposable {
         @Override
         public void roleChanged(User user) {
             // Clear clientdocs
-            if (user.getJID().equals(myJID)) {
+            if (user.isLocal()) {
                 clientDocs.clear();
             }
         }
