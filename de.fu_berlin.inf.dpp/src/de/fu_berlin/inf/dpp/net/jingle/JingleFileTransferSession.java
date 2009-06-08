@@ -97,11 +97,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     try {
                         data = (TransferDescription) input.readUnshared();
                     } catch (IOException e) {
-                        log.error("JingleFileTransferSession crashed", e);
+                        log.error(prefix() + "Crashed", e);
                         return;
                     } catch (ClassNotFoundException e) {
-                        log.error(
-                            "Received unexpected object in ReceiveThread", e);
+                        log.error(prefix()
+                            + "Received unexpected object in ReceiveThread", e);
                         continue;
                     }
 
@@ -119,14 +119,14 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     try {
                         content = (byte[]) input.readUnshared();
                     } catch (IOException e) {
-                        log.error("JingleFileTransferSession crashed", e);
+                        log.error(prefix() + "Crashed", e);
                         for (IJingleFileTransferListener listener : listeners) {
                             listener.transferFailed(data, connectionType);
                         }
                         return;
                     } catch (ClassNotFoundException e) {
-                        log.error(
-                            "Received unexpected object in ReceiveThread", e);
+                        log.error(prefix()
+                            + "Received unexpected object in ReceiveThread", e);
                         for (IJingleFileTransferListener listener : listeners) {
                             listener.transferFailed(data, connectionType);
                         }
@@ -144,9 +144,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     }));
                 }
             } catch (RuntimeException e) {
-                log.error("Internal Error in Receive Thread: ", e);
+                log.error(prefix() + "Internal Error in Receive Thread: ", e);
             }
         }
+    }
+
+    protected String prefix() {
+        return "Jingle " + Util.prefix(connectTo);
     }
 
     private ReceiverThread receiveThread;
@@ -463,11 +467,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         / delta + " kb/s)";
                 }
 
-                log.debug(Util.prefix(connectTo) + "Sent" + throughput + ": "
-                    + transferData);
+                log.debug(prefix() + "Sent" + throughput + ": " + transferData);
                 return connectionType;
             } catch (IOException e) {
-                throw new JingleSessionException(Util.prefix(connectTo)
+                throw new JingleSessionException(prefix()
                     + "Failed to send files");
             }
         }

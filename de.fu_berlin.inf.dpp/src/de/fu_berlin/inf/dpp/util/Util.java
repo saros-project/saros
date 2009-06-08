@@ -642,7 +642,7 @@ public class Util {
         if (jid == null) {
             return "[Unknown] ";
         } else {
-            return "[" + jid.getName() + "] ";
+            return "[" + jid.toString() + "] ";
         }
     }
 

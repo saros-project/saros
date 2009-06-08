@@ -226,6 +226,7 @@ public class SharedProject implements ISharedProject, Disposable {
             public void run() {
                 user.setUserRole(role);
 
+		        log.info("User " + user + " is now a " + role);
                 if (user.isLocal()) {
                     setProjectReadonly(user.isObserver());
                 }
@@ -407,7 +408,7 @@ public class SharedProject implements ISharedProject, Disposable {
     }
 
     public void setProjectReadonly(final boolean readonly) {
-        /* run project read only settings in progress monitor thread. */
+        /* TODO run project read only settings in progress monitor thread. */
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
                 FileUtil.setReadOnly(getProject(), readonly);
