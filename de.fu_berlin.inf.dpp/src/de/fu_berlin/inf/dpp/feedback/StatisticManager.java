@@ -30,6 +30,8 @@ public class StatisticManager extends AbstractFeedbackManager {
     public static final int STATISTIC_ALLOW = 1;
     public static final int STATISTIC_FORBID = 2;
 
+    protected FeedbackManager feedbackManager;
+
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
         @Override
@@ -40,9 +42,14 @@ public class StatisticManager extends AbstractFeedbackManager {
         }
     };
 
-    public StatisticManager(Saros saros, SessionManager sessionManager) {
+    public StatisticManager(Saros saros, SessionManager sessionManager,
+        FeedbackManager feedbackManager) {
         super(saros);
+        this.feedbackManager = feedbackManager;
+
         sessionManager.addSessionListener(sessionListener);
+
+        logFeedbackSettings();
     }
 
     @Override
@@ -140,5 +147,21 @@ public class StatisticManager extends AbstractFeedbackManager {
         saros.getConfigPrefs()
             .putLong(PreferenceConstants.SESSION_COUNT, count);
         saros.saveConfigPrefs();
+    }
+
+    /**
+     * Logs the current feedback settings (enabled/disabled, interval, statistic
+     * submission).
+     */
+    public void logFeedbackSettings() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Current feedback settings:\n");
+        sb.append("  Feedback disabled: "
+            + feedbackManager.isFeedbackDisabled() + "\n");
+        sb.append("  Feedback interval: " + feedbackManager.getSurveyInterval()
+            + "\n");
+        sb.append("  Statistic submission allowed: "
+            + this.isStatisticSubmissionAllowed());
+        log.info(sb.toString());
     }
 }

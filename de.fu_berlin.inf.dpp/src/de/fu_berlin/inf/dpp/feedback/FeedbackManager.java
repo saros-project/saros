@@ -78,15 +78,22 @@ public class FeedbackManager extends AbstractFeedbackManager {
             if (sessionTime < MIN_SESSION_TIME)
                 return;
 
+            // decrement session until next
             int sessionsUntilNext = getSessionsUntilNext() - 1;
             setSessionsUntilNext(sessionsUntilNext);
-            log.debug("Sessions until next survey: " + sessionsUntilNext);
 
-            if (!showNow())
+            if (!showNow()) {
+                log.info("Sessions until next survey: " + sessionsUntilNext);
                 return;
+            }
 
-            if (showFeedbackDialog(FEEDBACK_REQUEST))
-                showSurvey();
+            if (showFeedbackDialog(FEEDBACK_REQUEST)) {
+                int browserType = showSurvey();
+                log.info("Asking for feedback survey: User agreed ("
+                    + getBrowserTypeAsString(browserType) + ")");
+            } else {
+                log.info("Asking for feedback survey: User declined");
+            }
         }
 
     };
@@ -324,6 +331,28 @@ public class FeedbackManager extends AbstractFeedbackManager {
         sessionTime = MIN_SESSION_TIME + 1;
         // Always returns true...
         return true;
+    }
+
+    /**
+     * Convenience method to get a string that describes the given browser type.
+     * 
+     * @param browserType
+     * @return a string that describes the browser
+     */
+    protected String getBrowserTypeAsString(int browserType) {
+        String browser = "None";
+
+        switch (browserType) {
+        case FeedbackManager.BROWSER_EXT:
+            browser = "external browser";
+            break;
+        case FeedbackManager.BROWSER_INT:
+            browser = "internal browser";
+            break;
+        default:
+            browser = "no browser";
+        }
+        return browser;
     }
 
 }
