@@ -99,9 +99,12 @@ public class RosterTracker implements ConnectionSessionListener {
     }
 
     public void disposeConnection() {
-        if (this.connection != null) {
-            this.connection = null;
+        if (this.connection == null) {
+            log.warn("DisposeConnection called without "
+                + "previous call to prepare");
+            return;
         }
+        this.connection = null;
     }
 
     public void prepareConnection(XMPPConnection connection) {
@@ -109,17 +112,29 @@ public class RosterTracker implements ConnectionSessionListener {
     }
 
     public void startConnection() {
-        assert this.connection != null;
-        assert this.roster == null;
 
+        if (this.connection == null) {
+            log
+                .error("StartConnection called without previous call to prepare");
+            return;
+        }
+        if (this.roster != null) {
+            log.warn("StartConnection called without previous call to stop");
+            stopConnection();
+        }
         this.roster = this.connection.getRoster();
         // TODO This is too late, we might miss Roster events... reload?
         this.roster.addRosterListener(rosterListener);
     }
 
     public void stopConnection() {
-        assert this.connection != null;
-        assert this.roster != null;
+        if (this.connection == null) {
+            log.warn("StopConnection called without previous call to prepare");
+        }
+        if (this.roster == null) {
+            log.warn("StopConnection called without previous call to start");
+            return;
+        }
 
         this.roster.removeRosterListener(rosterListener);
         this.roster = null;
