@@ -151,7 +151,7 @@ public class StopActivity extends AbstractActivity {
         sb.append(", state: " + state);
         sb.append(", initiator: " + initiator.toString());
         sb.append(", affected user: " + user.toString());
-        sb.append("src: " + getSource() + ")");
+        sb.append(", src: " + getSource() + ")");
         return sb.toString();
     }
 }

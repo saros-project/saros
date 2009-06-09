@@ -36,7 +36,7 @@ public class StopManager implements IActivityProvider, Disposable {
     private static Logger log = Logger.getLogger(StopManager.class.getName());
 
     // waits MILLISTOWAIT ms until giving up waiting for expected acknowledgment
-    protected final int MILLISTOWAIT = 2000;
+    protected final int MILLISTOWAIT = 5000;
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
@@ -120,13 +120,17 @@ public class StopManager implements IActivityProvider, Disposable {
                 if (stopActivity.getState() == State.ACKNOWLEDGED
                     && sharedProject
                         .getParticipant(stopActivity.getInitiator()).isLocal()) {
-                    if (!expectedAcknowledgments.contains(stopActivity))
+                    if (!expectedAcknowledgments.contains(stopActivity)) {
+                        log.warn("received unexpected StopActivity: "
+                            + stopActivity);
                         return false;
+                    }
+
                     // it has to be removed from the expected ack list
                     // because it already arrived
                     if (expectedAcknowledgments.remove(stopActivity)) {
                         reentrantLock.lock();
-                        acknowledged.signal();
+                        acknowledged.signalAll();
                         reentrantLock.unlock();
                         return true;
                     } else {
@@ -180,27 +184,28 @@ public class StopManager implements IActivityProvider, Disposable {
         StopActivity stopActivity = new StopActivity(sharedProject
             .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
             .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
-        fireActivity(stopActivity);
 
         StopActivity expectedAck = stopActivity.generateAcknowledgment(user
             .getJID().toString());
         expectedAcknowledgments.add(expectedAck);
 
+        fireActivity(stopActivity);
+
         // block until user acknowledged
         reentrantLock.lock();
-        log.debug("waiting for acknowledgment");
+        log.debug("Waiting for acknowledgment");
         try {
             long startTime = System.currentTimeMillis();
             while (expectedAcknowledgments.contains(expectedAck)
-                || System.currentTimeMillis() - startTime < MILLISTOWAIT) {
+                && System.currentTimeMillis() - startTime < MILLISTOWAIT) {
                 acknowledged.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
             }
             if (expectedAcknowledgments.contains(expectedAck)) {
-                log.warn("no acknowlegment arrived, gave up waiting");
+                log.warn("No acknowlegment arrived, gave up waiting");
                 expectedAcknowledgments.remove(expectedAck);
                 return null;
             }
-            log.debug("acknowledgment arrived");
+            log.debug("Acknowledgment arrived");
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -264,7 +269,6 @@ public class StopManager implements IActivityProvider, Disposable {
      */
     public void exec(IActivity activity) {
         activity.dispatch(activityReceiver);
-
     }
 
     /**
