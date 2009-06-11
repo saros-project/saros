@@ -24,6 +24,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangingEvent;
@@ -233,8 +235,13 @@ public class JoinSessionWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
 
-                    JoinSessionWizard.this.process.accept(source, target, skip,
-                        monitor);
+                    try {
+                        JoinSessionWizard.this.process.accept(source, target,
+                            skip, SubMonitor.convert(monitor));
+                    } catch (OperationCanceledException e) {
+                        // Signal Cancellation to Container
+                        throw new InterruptedException();
+                    }
                 }
             });
         } catch (InvocationTargetException e) {

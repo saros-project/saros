@@ -2,6 +2,8 @@ package de.fu_berlin.inf.dpp.invitation;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 
@@ -53,20 +55,19 @@ public interface IIncomingInvitationProcess extends IInvitationProcess {
      *            If this is <code>null</code> the <code>baseProject</code> will
      *            be overwritten.
      * @param skip
-     *            if set to true, the synchronisation will be skipped by sending
+     *            if set to true, the synchronization will be skipped by sending
      *            an empty file list to the host.
      * @param monitor
-     *            a {@link IProgressMonitor} to report progress to and to check
-     *            whether the user canceled via
-     *            {@link IProgressMonitor#isCanceled()}. Can not be
-     *            <code>null</code>.
+     *            a {@link SubMonitor} to report progress to and to check
+     *            whether the user canceled via {@link SubMonitor#isCanceled()}.
+     *            Can not be <code>null</code>.
      * 
-     * @throws InterruptedException
+     * @throws OperationCanceledException
      *             if the user canceled the invitation via
      *             {@link IProgressMonitor#isCanceled()}
      */
     public void accept(IProject baseProject, String newProjectName,
-        boolean skip, IProgressMonitor monitor) throws InterruptedException;
+        boolean skip, SubMonitor monitor) throws OperationCanceledException;
 
     public void setInvitationUI(IInvitationUI inviteUI);
 

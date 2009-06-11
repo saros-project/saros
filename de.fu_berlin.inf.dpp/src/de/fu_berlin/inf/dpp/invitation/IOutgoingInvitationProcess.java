@@ -8,16 +8,10 @@ package de.fu_berlin.inf.dpp.invitation;
  */
 public interface IOutgoingInvitationProcess extends IInvitationProcess {
     /**
-     * Synchronizing is the state right before completing the invitation
-     * process, where the files of the shared project are
-     * replicated/synchronized with the local project of the invitee.
+     * Synchronizing is the state before completing the invitation process,
+     * where the files of the shared project are replicated/synchronized with
+     * the local project of the invited user.
      */
     public void startSynchronization();
-
-    public int getProgressCurrent();
-
-    public int getProgressMax();
-
-    public String getProgressInfo();
 
 }

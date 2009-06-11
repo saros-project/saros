@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
 import org.jivesoftware.smackx.jingle.media.PayloadType;
@@ -114,23 +116,33 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         }
                     }));
 
+                    // Read incoming chunks of data
                     final byte[] content;
-
                     try {
-                        content = (byte[]) input.readUnshared();
+                        int n = input.readInt();
+
+                        content = new byte[n];
+
+                        int count = input.readInt();
+                        int pos = 0;
+
+                        while (count > 0) {
+                            input.readFully(content, pos, count);
+                            pos += count;
+
+                            count = input.readInt();
+                        }
+
+                        if (count == -1)
+                            // canceled
+                            continue;
+
                     } catch (IOException e) {
                         log.error(prefix() + "Crashed", e);
                         for (IJingleFileTransferListener listener : listeners) {
                             listener.transferFailed(data, connectionType);
                         }
                         return;
-                    } catch (ClassNotFoundException e) {
-                        log.error(prefix()
-                            + "Received unexpected object in ReceiveThread", e);
-                        for (IJingleFileTransferListener listener : listeners) {
-                            listener.transferFailed(data, connectionType);
-                        }
-                        continue;
                     }
 
                     dispatch.submit(Util.wrapSafe(log, new Runnable() {
@@ -145,6 +157,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 }
             } catch (RuntimeException e) {
                 log.error(prefix() + "Internal Error in Receive Thread: ", e);
+                // If there is programming problem, close the socket
+                close();
             }
         }
     }
@@ -433,6 +447,21 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private int resetCounter = 0;
 
     /**
+     * Constant sent after the last chunk to indicate the end of the single file.
+     */
+    protected static final int DONE = 0;
+
+    /** 
+     * Constant indicating that the user has canceled the transfer. The peer will discard the file.
+     */
+    protected static final int CANCELED = -1;
+
+    /**
+     * Chunksize used for splitting the data to send into packets in between of which the sending of the file can be canceled.
+     */
+    protected static final int CHUNKSIZE = 32000;
+
+    /**
      * This method is called from the JingleFileTransferManager to send files
      * with this session.
      * 
@@ -440,42 +469,62 @@ public class JingleFileTransferSession extends JingleMediaSession {
      *             if sending failed.
      */
     public synchronized NetTransferMode send(TransferDescription transferData,
-        byte[] content) throws JingleSessionException {
+        byte[] content, SubMonitor progress) throws JingleSessionException {
 
-        if (objectOutputStream != null) {
-            try {
-                long startTime = System.currentTimeMillis();
-                objectOutputStream.writeUnshared(transferData);
-                // Prevent caching of byte[] data in the handle table of the OOS
-                objectOutputStream.writeUnshared(content);
-                objectOutputStream.flush();
-
-                if (resetCounter++ > 128) {
-                    // Reset periodically to flush stream handles to the data
-                    objectOutputStream.reset();
-                    resetCounter = 0;
-                }
-
-                long endTime = System.currentTimeMillis();
-                long delta = endTime - startTime;
-                String throughput;
-                if (delta == 0) {
-                    throughput = "";
-                } else {
-                    throughput = " (" + (content.length / 1024) + "kb in "
-                        + delta + " ms at " + (1000 * content.length / 1024)
-                        / delta + " kb/s)";
-                }
-
-                log.debug(prefix() + "Sent" + throughput + ": " + transferData);
-                return connectionType;
-            } catch (IOException e) {
-                throw new JingleSessionException(prefix()
-                    + "Failed to send files");
-            }
+        if (objectOutputStream == null) {
+            throw new JingleSessionException("Failed to send files with Jingle");
         }
 
-        throw new JingleSessionException("Failed to send files with Jingle");
+        progress.setWorkRemaining(content.length);
+        try {
+            long startTime = System.currentTimeMillis();
+            objectOutputStream.writeUnshared(transferData);
+            // Prevent caching of byte[] data in the handle table of the OOS
+
+            // Write Size:
+            objectOutputStream.writeInt(content.length);
+
+            int i = 0;
+            while (i < content.length) {
+                if (progress.isCanceled()) {
+                    objectOutputStream.writeInt(CANCELED);
+                    objectOutputStream.flush();
+                    throw new CancellationException();
+                }
+
+                int count = Math.min(CHUNKSIZE, content.length - i);
+                objectOutputStream.writeInt(count);
+                objectOutputStream.write(content, i, count);
+                progress.worked(count);
+                i += count;
+            }
+            objectOutputStream.writeInt(DONE);
+            objectOutputStream.flush();
+
+            if (resetCounter++ > 128) {
+                // Reset periodically to flush stream handles to the data
+                objectOutputStream.reset();
+                resetCounter = 0;
+            }
+
+            long endTime = System.currentTimeMillis();
+            long delta = endTime - startTime;
+            String throughput;
+            if (delta == 0) {
+                throughput = "";
+            } else {
+                throughput = " (" + (content.length / 1024) + "kb in " + delta
+                    + " ms at " + (1000 * content.length / 1024) / delta
+                    + " kb/s)";
+            }
+
+            log.debug(prefix() + "Sent" + throughput + ": " + transferData);
+            return connectionType;
+        } catch (IOException e) {
+            throw new JingleSessionException(prefix() + "Failed to send files");
+        } finally {
+            progress.done();
+        }
     }
 
     /**
@@ -513,7 +562,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         close();
     }
 
-    public void close() {
+    public synchronized void close() {
 
         if (receiveThread != null)
             receiveThread.interrupt();
@@ -529,7 +578,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         connectionType = null;
     }
 
-    public boolean isConnected() {
+    public synchronized boolean isConnected() {
         return objectInputStream != null && objectOutputStream != null;
     }
 

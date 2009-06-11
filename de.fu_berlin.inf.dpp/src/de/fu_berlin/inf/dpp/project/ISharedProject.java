@@ -22,6 +22,7 @@ package de.fu_berlin.inf.dpp.project;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -124,7 +125,8 @@ public interface ISharedProject {
      * @return the outgoing invitation process.
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-        boolean inactive, IInvitationUI inviteUI, FileList fileList);
+        boolean inactive, IInvitationUI inviteUI, FileList fileList,
+        SubMonitor monitor);
 
     /**
      * Adds the given shared project listener. This call is ignored if the

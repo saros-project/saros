@@ -19,6 +19,7 @@ import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
@@ -80,14 +81,21 @@ public class FileUtil {
      * @return The state before setting read-only to the given value.
      */
     public static boolean setReadOnly(IResource file, boolean readOnly) {
+
         ResourceAttributes attributes = file.getResourceAttributes();
+
         if (attributes == null) {
             // TODO Throw an FileNotFoundException and deal with it everywhere!
-            log.warn("File does not exist for setting readonly == " + readOnly
-                + ": " + file);
+            log.error("File does not exist for setting readOnly == " + readOnly
+                + ": " + file, new StackTrace());
             return false;
         }
         boolean result = attributes.isReadOnly();
+
+        // Already in desired state
+        if (result == readOnly)
+            return result;
+
         attributes.setReadOnly(readOnly);
         try {
             file.setResourceAttributes(attributes);
@@ -102,20 +110,26 @@ public class FileUtil {
     /**
      * Writes the given input stream to the given file.
      * 
-     * This operation will unset a possible readOnly flag and reset if after the
-     * operation.
+     * This operation will remove a possible readOnly flag and re-set if after
+     * the operation.
+     * 
+     * @blocking This operations blocks until the operation is reported as
+     *           finished by Eclipse.
      * 
      * @param input
-     *            the input stream
+     *            the input stream to write to the file
      * @param file
      *            the file to create/overwrite
+     * @throws CoreException
+     *             if the file could not be written.
      */
-    public static void writeFile(InputStream input, IFile file) {
+    public static void writeFile(InputStream input, IFile file,
+        SubMonitor monitor) throws CoreException {
 
         if (file.exists()) {
-            replaceFileContent(input, file);
+            replaceFileContent(input, file, monitor);
         } else {
-            createFile(input, file);
+            createFile(input, file, monitor);
         }
 
     }
@@ -129,7 +143,8 @@ public class FileUtil {
      * @pre the file must not exist. Use writeFile() for getting this cases
      *      handled.
      */
-    public static void createFile(InputStream input, IFile file) {
+    public static void createFile(InputStream input, IFile file,
+        SubMonitor monitor) throws CoreException {
 
         // Make sure directory exists
         mkdirs(file);
@@ -137,25 +152,17 @@ public class FileUtil {
         // Make sure that parent is writable
         IContainer parent = file.getParent();
         boolean wasReadOnly = false;
-        if (parent != null) {
-            ResourceAttributes attributes = parent.getResourceAttributes();
-            if (attributes != null && attributes.isReadOnly()) {
-                wasReadOnly = true;
-                setReadOnly(parent, false);
-            }
-        }
+        if (parent != null)
+            wasReadOnly = setReadOnly(parent, false);
 
+        BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(
+            monitor);
+        file.create(input, true, blockingMonitor);
         try {
-            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
-            file.create(input, true, monitor);
-            try {
-                monitor.await();
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-            }
-        } catch (CoreException e) {
-            log.error("Could not write file", e);
+            blockingMonitor.await();
+        } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
+            Thread.currentThread().interrupt();
         }
 
         // Reset permissions on parent
@@ -166,26 +173,24 @@ public class FileUtil {
     /**
      * Replace the data in the file with the data from the given InputStream.
      * 
+     * @blocking This operations blocks until the operation is reported as
+     *           finished by Eclipse.
+     * 
      * @pre the file must exist
      */
-    public static void replaceFileContent(InputStream input, IFile file) {
-        boolean wasReadOnly = false;
-        if (file.isReadOnly()) {
-            wasReadOnly = true;
-            setReadOnly(file, false);
-        }
+    public static void replaceFileContent(InputStream input, IFile file,
+        SubMonitor monitor) throws CoreException {
 
+        boolean wasReadOnly = setReadOnly(file, false);
+
+        BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(
+            monitor);
+        file.setContents(input, IResource.FORCE, blockingMonitor);
         try {
-            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
-            file.setContents(input, IResource.FORCE, monitor);
-            try {
-                monitor.await();
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-            }
-        } catch (CoreException e) {
-            log.error("Could not write file", e);
+            blockingMonitor.await();
+        } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
+            Thread.currentThread().interrupt();
         }
 
         if (wasReadOnly)

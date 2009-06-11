@@ -2,13 +2,18 @@ package de.fu_berlin.inf.dpp.net.business;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.graphics.Image;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
@@ -23,7 +28,6 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -40,6 +44,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This component is responsible for handling Consistency Errors and Checksums.
+ * 
+ * TODO Cancellation not handeled
  */
 @Component(module = "consistency")
 public class ConsistencyWatchdogHandler {
@@ -49,7 +55,7 @@ public class ConsistencyWatchdogHandler {
 
     protected long lastReceivedActivityTime;
 
-    protected HashMap<Pair<String, JID>, MessageDialog> actualChecksumErrorDialogs = new HashMap<Pair<String, JID>, MessageDialog>();
+    protected HashMap<Pair<String, JID>, ProgressMonitorDialog> actualChecksumErrorDialogs = new HashMap<Pair<String, JID>, ProgressMonitorDialog>();
 
     @Inject
     protected ITransmitter transmitter;
@@ -100,7 +106,7 @@ public class ConsistencyWatchdogHandler {
             final Set<IPath> paths, boolean resolved) {
 
             // Concatenate paths
-            String pathsOfInconsistencies = Util.toOSString(paths);
+            final String pathsOfInconsistencies = Util.toOSString(paths);
 
             if (resolved) {
                 log.info("Synchronisation completed, inconsistency resolved");
@@ -111,17 +117,13 @@ public class ConsistencyWatchdogHandler {
             log.debug("Checksum Error for " + pathsOfInconsistencies + " from "
                 + from.getBase());
 
-            showChecksumErrorMessage(pathsOfInconsistencies, from);
-
-            if (sessionManager.getSharedProject().isHost()) {
-                Util.runSafeAsync("ConsistencyWatchdog-Start", log,
-                    new Runnable() {
-                        public void run() {
-                            performConsistencyRecovery(from, paths);
-                        }
-                    });
-            }
+            showChecksumErrorMessage(pathsOfInconsistencies, from, paths);
         }
+    }
+
+    protected boolean inProgress(String pathsOfInconsistencies, JID from) {
+        return actualChecksumErrorDialogs.containsKey(new Pair<String, JID>(
+            pathsOfInconsistencies, from));
     }
 
     /**
@@ -134,39 +136,202 @@ public class ConsistencyWatchdogHandler {
      * 
      * @see #closeChecksumErrorMessage(String, JID)
      * 
-     * @param pathes
-     *            a string representation of the handled files.
-     * @param from
-     *            JID
-     * 
      */
-    protected void showChecksumErrorMessage(final String pathes, final JID from) {
+    protected void showChecksumErrorMessage(
+        final String pathsOfInconsistencies, final JID from,
+        final Set<IPath> paths) {
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                MessageDialog md = new MessageDialog(
-                    EditorAPI.getAWorkbenchWindow().getShell(),
-                    "Consistency Problem!",
-                    null,
-                    "Inconsitent file state has detected. File "
-                        + pathes
-                        + " from user "
-                        + from.getBase()
-                        + " has to be synchronized with project host. Please wait until the inconsistencies are resolved.",
-                    MessageDialog.WARNING, new String[0], 0);
-                actualChecksumErrorDialogs.put(new Pair<String, JID>(pathes,
-                    from), md);
+                createRecoveryProgressDialog(pathsOfInconsistencies, from);
             }
         });
 
+        // Run async, so we can continue to receive messages over the network...
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                MessageDialog md = actualChecksumErrorDialogs
-                    .get(new Pair<String, JID>(pathes, from));
-                if (md != null)
-                    md.open();
+                runRecoveryInProgressDialog(pathsOfInconsistencies, from, paths);
             }
         });
+    }
+
+    protected void createRecoveryProgressDialog(
+        final String pathsOfInconsistencies, final JID from) {
+
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
+            .getAWorkbenchWindow().getShell()) {
+            @Override
+            protected Image getImage() {
+                return getWarningImage();
+            }
+        };
+
+        //
+        // "Inconsitent file state has detected. File "
+        // + pathes
+        // + " from user "
+        // + from.getBase()
+        // +
+        // " has to be synchronized with project host. Please wait until the inconsistencies are resolved."
+        actualChecksumErrorDialogs.put(new Pair<String, JID>(
+            pathsOfInconsistencies, from), dialog);
+    }
+
+    protected void runRecoveryInProgressDialog(
+        final String pathsOfInconsistencies, final JID from,
+        final Set<IPath> paths) {
+
+        ProgressMonitorDialog md = actualChecksumErrorDialogs
+            .get(new Pair<String, JID>(pathsOfInconsistencies, from));
+
+        if (md == null)
+            return;
+
+        try {
+            md.run(true, true, new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) {
+
+                    SubMonitor progress = SubMonitor.convert(monitor);
+
+                    runRecovery(pathsOfInconsistencies, from, paths, progress);
+                }
+            });
+        } catch (InvocationTargetException e) {
+            log.error("Internal Error: ", e);
+        } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
+        }
+    }
+
+    protected void runRecovery(final String pathsOfInconsistencies,
+        final JID from, final Set<IPath> paths, SubMonitor progress) {
+        SubMonitor waiting;
+
+        if (sessionManager.getSharedProject().isHost()) {
+            progress.beginTask("Performing recovery", 1000);
+            progress.subTask("Send files to clients");
+            performConsistencyRecovery(from, paths, progress.newChild(700));
+
+            progress.subTask("Wait for peers");
+            waiting = progress.newChild(300);
+        } else {
+            waiting = progress;
+        }
+        waiting.beginTask("Waiting for peers", 500);
+
+        while (!waiting.isCanceled()
+            && inProgress(pathsOfInconsistencies, from)) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                assert false;
+            }
+        }
+    }
+
+    /**
+     * @host This is only called on the host
+     * 
+     * @nonSWT This method should not be called from the SWT Thread!
+     */
+    protected void performConsistencyRecovery(JID from, Set<IPath> paths,
+        SubMonitor progress) {
+
+        progress.beginTask("Performing Consistency Recovery", paths.size() + 3);
+
+        progress.subTask("Wait for clients to stop");
+        waitForIncomingActivities(progress.newChild(3));
+
+        progress.subTask("Sending files");
+        recoverFiles(from, paths, progress.newChild(paths.size()));
+
+        progress.done();
+    }
+
+    protected void waitForIncomingActivities(SubMonitor progress) {
+
+        progress.beginTask("Waiting for clients to stop", 20);
+
+        // wait until no more activities are received
+        while (System.currentTimeMillis() - lastReceivedActivityTime < 1500) {
+
+            // Grow logarithmically
+            progress.setWorkRemaining(20);
+            progress.worked(1);
+
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
+                Thread.currentThread().interrupt();
+            }
+        }
+        progress.done();
+    }
+
+    protected void recoverFiles(JID from, Set<IPath> paths, SubMonitor progress) {
+
+        ISharedProject project = sessionManager.getSharedProject();
+        JID myJID = project.getLocalUser().getJID();
+
+        progress.beginTask("Sending files", paths.size());
+
+        for (IPath path : paths) {
+            progress.subTask("Recovering file: " + path.lastSegment());
+            recoverFile(from, project, myJID, path, progress.newChild(1));
+        }
+        progress.done();
+    }
+
+    protected void recoverFile(JID from, ISharedProject project, JID myJID,
+        final IPath path, SubMonitor progress) {
+
+        progress.beginTask("Handling file: " + path.toOSString(), 10);
+
+        IFile file = project.getProject().getFile(path);
+
+        // Save document before sending to clients
+        if (file.exists())
+            try {
+                editorManager.saveLazy(path);
+            } catch (FileNotFoundException e) {
+                log.error("File could not be found, despite existing: ", e);
+            }
+        progress.worked(1);
+
+        // Reset jupiter
+        ConcurrentDocumentManager concurrentManager = project
+            .getConcurrentDocumentManager();
+        if (concurrentManager.isManagedByJupiterServer(from, path))
+            concurrentManager.resetJupiterServer(from, path);
+
+        progress.worked(1);
+
+        if (file.exists()) {
+            // Send the file to client
+            sendFile(from, project, path, progress.newChild(8));
+        } else {
+            // TODO Warn the user...
+            // Tell the client to delete the file
+            project.getSequencer().sendActivities(
+                from,
+                new FileActivity(myJID.toString(), FileActivity.Type.Removed,
+                    path));
+            progress.worked(8);
+        }
+        progress.done();
+    }
+
+    protected void sendFile(JID from, ISharedProject project, final IPath path,
+        SubMonitor progress) {
+        try {
+            transmitter.sendFile(from, project.getProject(), path,
+                TimedActivity.NO_SEQUENCE_NR, progress);
+        } catch (IOException e) {
+            // TODO This means we were really unable to send
+            // this file. No more falling back.
+            log.error("Could not sent file for consistency resolution", e);
+        }
     }
 
     /**
@@ -175,7 +340,7 @@ public class ConsistencyWatchdogHandler {
      * The string representation must be the same which are used to show the
      * message with <code>showChecksumErrorMessage</code>.
      * 
-     * @see #showChecksumErrorMessage(String, JID)
+     * @see #showChecksumErrorMessage(String, JID, Set)
      * 
      * @param from
      *            JID of user who had the inconsistencies
@@ -185,101 +350,11 @@ public class ConsistencyWatchdogHandler {
      */
     protected void closeChecksumErrorMessage(final String paths, final JID from) {
         Util.runSafeSWTAsync(log, new Runnable() {
-            Pair<String, JID> key = new Pair<String, JID>(paths, from);
-            MessageDialog md = actualChecksumErrorDialogs.get(key);
-
             public void run() {
-                if (md != null) {
-                    md.close();
-                    actualChecksumErrorDialogs.remove(key);
-                }
+                actualChecksumErrorDialogs.remove(new Pair<String, JID>(paths,
+                    from));
             }
         });
-    }
-
-    /**
-     * @host This is only called on the host
-     * 
-     * @nonSWT This method should not be called from the SWT Thread!
-     */
-    private void performConsistencyRecovery(JID from, Set<IPath> paths) {
-
-        // wait until no more activities are received
-        while (System.currentTimeMillis() - lastReceivedActivityTime < 1500) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }
-
-        ISharedProject project = sessionManager.getSharedProject();
-        JID myJID = project.getLocalUser().getJID();
-
-        for (final IPath path : paths) {
-
-            IFile file = project.getProject().getFile(path);
-
-            // Save document before sending to clients
-            if (file.exists())
-                try {
-                    editorManager.saveLazy(path);
-                } catch (FileNotFoundException e) {
-                    log.error("File could not be found, despite existing: ", e);
-                }
-
-            // Reset jupiter
-            ConcurrentDocumentManager concurrentManager = project
-                .getConcurrentDocumentManager();
-            if (concurrentManager.isManagedByJupiterServer(from, path))
-                concurrentManager.resetJupiterServer(from, path);
-
-            if (file.exists()) {
-                // Send the file to client
-                sendFile(from, project, path);
-            } else {
-                // TODO Warn the user...
-                // Tell the client to delete the file
-                project.getSequencer().sendActivities(
-                    from,
-                    new FileActivity(myJID.toString(),
-                        FileActivity.Type.Removed, path));
-            }
-        }
-
-    }
-
-    protected void sendFile(JID from, ISharedProject project, final IPath path) {
-        try {
-            transmitter.sendFile(from, project.getProject(), path,
-                TimedActivity.NO_SEQUENCE_NR,
-                /*
-                 * TODO CO The Callback should be used to show progress to the
-                 * user
-                 */
-                new IFileTransferCallback() {
-
-                    public void fileSent(IPath path) {
-                        // do nothing
-                    }
-
-                    public void fileTransferFailed(IPath path, Exception e) {
-                        // do nothing
-
-                    }
-
-                    public void transferProgress(int transfered) {
-                        // do nothing
-                    }
-
-                });
-        } catch (IOException e) {
-            // TODO This means we were really unable to send
-            // this file. No more falling back.
-            log.error("Could not sent file for consistency resolution", e);
-        }
     }
 
     PacketListener listener = new PacketListener() {

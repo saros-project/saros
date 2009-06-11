@@ -3,18 +3,33 @@ package de.fu_berlin.inf.dpp.util;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.ProgressMonitorWrapper;
 
-public class BlockingProgressMonitor extends NullProgressMonitor {
+/**
+ * A ProgressMonitor which can be waited upon.
+ */
+public class BlockingProgressMonitor extends ProgressMonitorWrapper {
 
     protected CountDownLatch latch;
 
     public BlockingProgressMonitor() {
+        this(new NullProgressMonitor());
+    }
+
+    /**
+     * Will delegate all calls to the given ProgressMonitor (can still maintain
+     * the possibility to wait on the completion of the task).
+     */
+    public BlockingProgressMonitor(IProgressMonitor delegate) {
+        super(delegate);
         this.latch = new CountDownLatch(1);
     }
 
     @Override
     public void done() {
+        super.done();
         this.latch.countDown();
     }
 

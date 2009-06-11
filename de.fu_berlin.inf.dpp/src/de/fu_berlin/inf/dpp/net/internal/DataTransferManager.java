@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -20,6 +21,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -37,7 +39,6 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
-import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -287,7 +288,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             }
 
             log.debug("Incoming file transfer via IBB: " + data.toString()
-                + ", size: " + request.getFileSize() + "kbyte");
+                + ", size: " + request.getFileSize() / 1024 + "kbyte");
 
             addIncomingFileTransfer(data);
 
@@ -349,7 +350,7 @@ public class DataTransferManager implements ConnectionSessionListener {
          *             if the send failed
          */
         public NetTransferMode send(TransferDescription data, byte[] content,
-            IFileTransferCallback callback) throws IOException;
+            SubMonitor callback) throws IOException;
 
     }
 
@@ -363,7 +364,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Transmitter handmade = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            IFileTransferCallback callback) throws IOException {
+            SubMonitor progress) throws IOException {
 
             final int maxMsgLen = saros.getPreferenceStore().getInt(
                 PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE);
@@ -385,6 +386,10 @@ public class DataTransferManager implements ConnectionSessionListener {
             int start = 0;
             try {
                 for (int i = 1; i <= pcount; i++) {
+
+                    if (progress.isCanceled())
+                        throw new CancellationException();
+
                     int psize = Math.min(tosend, maxMsgLen);
                     int end = start + psize;
 
@@ -397,7 +402,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                     start = end;
                     tosend -= psize;
-
                 }
             } catch (Exception e) {
                 throw new CausedIOException("Sending failed", e);
@@ -417,10 +421,10 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Transmitter ibb = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            IFileTransferCallback callback) throws IOException {
+            SubMonitor progress) throws IOException {
 
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
-                + data.toString() + ", size: " + content.length / 1000
+                + data.toString() + ", size: " + content.length / 1024
                 + " kbyte");
 
             OutgoingFileTransfer
@@ -428,19 +432,36 @@ public class DataTransferManager implements ConnectionSessionListener {
             OutgoingFileTransfer transfer = fileTransferManager
                 .createOutgoingFileTransfer(data.getRecipient().toString());
 
-            FileTransferProgressMonitor monitor = new FileTransferProgressMonitor(
-                transfer, callback, content.length);
-            monitor.start();
+            progress.setWorkRemaining(110);
+            progress.subTask("Negotiating file transfer");
 
             // The file path is irrelevant
             transfer.sendStream(new ByteArrayInputStream(content),
                 "Filename managed by Description", content.length, data
                     .toBase64());
 
+            progress.worked(10);
+
+            int worked = 0;
+
             InterruptedException interrupted = null;
 
-            /* wait for complete transfer. */
-            while (monitor.isRunning()) {
+            progress.subTask("Sending data");
+            while (!transfer.isDone()) {
+
+                if (progress.isCanceled()) {
+                    transfer.cancel();
+                    throw new CancellationException();
+                }
+                int newProgress = (int) (100.0 * (transfer.getAmountWritten()) / Math
+                    .min(1, content.length));
+                log.trace("Progress " + newProgress + "%");
+
+                if (worked < newProgress) {
+                    progress.worked(newProgress - worked);
+                    worked = newProgress;
+                }
+
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -451,12 +472,6 @@ public class DataTransferManager implements ConnectionSessionListener {
             if (interrupted != null) {
                 log.error("Code not designed to be interruptable", interrupted);
                 Thread.currentThread().interrupt();
-            }
-
-            if (monitor.getMonitoringException() != null) {
-                throw new CausedIOException(
-                    "RuntimeError in IBB-FileTransfer: ", monitor
-                        .getMonitoringException());
             }
 
             if (transfer.getStatus() == Status.error) {
@@ -484,13 +499,13 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Transmitter jingle = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            IFileTransferCallback callback) throws IOException {
+            SubMonitor progress) throws IOException {
             try {
                 JingleFileTransferManager jftm = getJingleManager();
                 if (jftm == null)
                     throw new IOException("Jingle is disabled");
 
-                return jftm.send(data, content);
+                return jftm.send(data, content, progress);
             } catch (JingleSessionException e) {
                 throw new CausedIOException(e);
             }
@@ -529,7 +544,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     };
 
     protected void sendData(TransferDescription transferData, byte[] content,
-        IFileTransferCallback callback) throws IOException {
+        SubMonitor progress) throws IOException {
 
         // TODO Buffer correctly when not connected....
         // this.fileTransferQueue.offer(transfer);
@@ -540,7 +555,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             if (transmitter.isSuitable(transferData.recipient)) {
                 try {
                     NetTransferMode mode = transmitter.send(transferData,
-                        content, callback);
+                        content, progress);
 
                     setTransferMode(transferData.recipient, mode, false);
                     return;
@@ -548,6 +563,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                     log.error(Util.prefix(transferData.recipient)
                         + "Failed to send file with " + transmitter.getName()
                         + ":", e);
+                    // Try other transport methods
                 }
             }
         }

@@ -33,7 +33,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -55,6 +54,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
+import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -77,7 +77,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     /** size of current transfered part of archive file. */
     protected int transferedFileSize = 0;
 
-    protected IProgressMonitor progressMonitor;
+    protected SubMonitor progressMonitor;
 
     protected String projectName;
 
@@ -179,7 +179,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * {@inheritDoc}
      */
     public void accept(final IProject baseProject, final String newProjectName,
-        boolean skipSync, IProgressMonitor monitor) {
+        boolean skipSync, SubMonitor monitor) {
 
         if ((newProjectName == null) && (baseProject == null)) {
             throw new IllegalArgumentException(
@@ -210,7 +210,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     private boolean acceptUnsafe(final IProject baseProject,
-        final String newProjectName, boolean skipSync, IProgressMonitor monitor)
+        final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws CoreException, IOException {
         assertState(State.HOST_FILELIST_SENT);
 
@@ -258,10 +258,10 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
             this.progressMonitor.beginTask("Synchronizing",
-                this.filesLeftToSynchronize);
+                10 + this.filesLeftToSynchronize);
         } else {
             this.progressMonitor.beginTask("Synchronizing",
-                100 + this.filesLeftToSynchronize);
+                10 + 100 + this.filesLeftToSynchronize);
             this.progressMonitor.subTask("Receiving Archive...");
         }
         setState(State.SYNCHRONIZING);
@@ -276,11 +276,14 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
 
         try {
+            SubMonitor fileListProgress = this.progressMonitor.newChild(10,
+                SubMonitor.SUPPRESS_NONE);
             if (skipSync) {
-                this.transmitter.sendFileList(this.peer, remoteFileList, this);
+                this.transmitter.sendFileList(this.peer, remoteFileList,
+                    fileListProgress);
             } else {
                 this.transmitter.sendFileList(this.peer, new FileList(
-                    this.localProject), this);
+                    this.localProject), fileListProgress);
             }
 
             if (filesLeftToSynchronize == 0) {
@@ -315,41 +318,38 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     }
 
     public void resourceReceived(JID from, IPath path, InputStream in) {
-        IncomingInvitationProcess.log.debug("New file received: " + path);
-        if (this.localProject == null || this.progressMonitor.isCanceled()) {
-            return; // we do not have started the new project yet, so received
-            // resources are not welcomed
+
+        // These files are still incoming, but now longer interesting, because
+        // the process was canceled.
+        if (this.progressMonitor.isCanceled()) {
+            return;
         }
 
+        // we do not have started the new project yet, so received
+        // resources are not welcome
+        if (this.localProject == null) {
+            log.warn("Resource received, but we have not requested them yet");
+            return;
+        }
+
+        progressMonitor.subTask("File received: " + path.lastSegment() + " ("
+            + this.filesLeftToSynchronize + " left)");
+        log.debug("New file received: " + path);
+
+        IFile file = this.localProject.getFile(path);
+
         try {
-            IFile file = this.localProject.getFile(path);
-            if (file.exists()) {
-                ResourceAttributes attributes = new ResourceAttributes();
-                attributes.setReadOnly(false);
-                file.setResourceAttributes(attributes);
-                file
-                    .setContents(in, IResource.FORCE, new NullProgressMonitor());
-
-                // TODO Set ReadOnly again?
-            } else {
-                file.create(in, true, new NullProgressMonitor());
-            }
-
-        } catch (Exception e) {
+            FileUtil.writeFile(in, file, progressMonitor.newChild(1));
+        } catch (CoreException e) {
             failed(e);
         }
 
         // Could have been canceled in the meantime
-        if (this.progressMonitor.isCanceled())
+        if (progressMonitor.isCanceled())
             return;
 
-        this.progressMonitor.worked(1);
-        this.progressMonitor.subTask("Files left: "
-            + this.filesLeftToSynchronize);
-
         this.filesLeftToSynchronize--;
-        IncomingInvitationProcess.log.trace("File counter: "
-            + this.filesLeftToSynchronize);
+        log.trace("File left to synchronize: " + this.filesLeftToSynchronize);
     }
 
     /*
@@ -436,17 +436,25 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                     try {
 
                         SubMonitor subMonitor = SubMonitor.convert(monitor,
-                            "Copy local resources ... ", 200);
+                            "Copy local resources ... ", 300);
 
-                        project.clearHistory(null);
-                        project.refreshLocal(IResource.DEPTH_INFINITE, null);
+                        subMonitor.subTask("Clearing History");
+                        project.clearHistory(subMonitor.newChild(100));
+
+                        subMonitor.subTask("Refreshing Project");
+                        project.refreshLocal(IResource.DEPTH_INFINITE,
+                            subMonitor.newChild(100));
 
                         if (baseProject == null) {
-                            project.create(subMonitor.newChild(100));
-                            project.open(subMonitor.newChild(100));
+                            subMonitor.subTask("Creating Project");
+                            project.create(subMonitor.newChild(50));
+
+                            subMonitor.subTask("Opening Project");
+                            project.open(subMonitor.newChild(50));
                         } else {
+                            subMonitor.subTask("Copying Project");
                             baseProject.copy(project.getFullPath(), true,
-                                subMonitor.newChild(200));
+                                subMonitor.newChild(100));
                         }
                     } catch (CoreException e) {
                         throw new InvocationTargetException(e);

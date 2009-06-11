@@ -37,7 +37,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
@@ -446,8 +446,13 @@ public class XMPPChatTransmitter implements ITransmitter,
             + timedActivities);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void sendFileList(JID recipient, FileList fileList,
-        IFileTransferCallback callback) throws IOException {
+        SubMonitor progress) throws IOException {
+
+        progress.beginTask("Sending FileList", 100);
 
         TransferDescription data = TransferDescription
             .createFileListTransferDescription(recipient, new JID(connection
@@ -456,11 +461,16 @@ public class XMPPChatTransmitter implements ITransmitter,
          * TODO [MR] Not portable because String#getBytes() uses the platform's
          * default encoding.
          */
-        dataManager.sendData(data, fileList.toXML().getBytes(), callback);
+        dataManager.sendData(data, fileList.toXML().getBytes(), progress
+            .newChild(100, SubMonitor.SUPPRESS_NONE));
+
+        progress.done();
     }
 
     public void sendFile(JID to, IProject project, IPath path,
-        int sequenceNumber, IFileTransferCallback callback) throws IOException {
+        int sequenceNumber, SubMonitor progress) throws IOException {
+
+        progress.beginTask("Sending " + path.lastSegment(), 100);
 
         TransferDescription transfer = TransferDescription
             .createFileTransferDescription(to, new JID(connection.getUser()),
@@ -468,31 +478,35 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
-        dataManager.sendData(transfer, FileUtils.readFileToByteArray(f),
-            callback);
+        progress.subTask("Reading file " + path.lastSegment());
+        byte[] content = FileUtils.readFileToByteArray(f);
+        progress.newChild(10, SubMonitor.SUPPRESS_NONE).done();
+
+        progress.subTask("Sending file " + path.lastSegment());
+        dataManager.sendData(transfer, content, progress.newChild(90,
+            SubMonitor.SUPPRESS_NONE));
+
+        progress.done();
     }
 
     public void sendProjectArchive(JID recipient, IProject project,
-        File archive, IFileTransferCallback callback) {
+        File archive, SubMonitor progress) throws IOException {
+
+        progress.beginTask("Sending Archive", 100);
 
         TransferDescription transfer = TransferDescription
             .createArchiveTransferDescription(recipient, new JID(connection
                 .getUser()), sessionID.getValue());
 
-        // TODO monitor progress
-        try {
-            dataManager.sendData(transfer, FileUtils
-                .readFileToByteArray(archive), callback);
-            if (callback != null) {
-                // TODO make sure that the callback passes a path the callee
-                // expects
-                callback.fileSent(new Path(archive.getName()));
-            }
+        progress.subTask("Reading archive");
+        byte[] content = FileUtils.readFileToByteArray(archive);
+        progress.newChild(10).done();
 
-        } catch (IOException e) {
-            if (callback != null)
-                callback.fileTransferFailed(null, e);
-        }
+        progress.subTask("Sending archive");
+        dataManager.sendData(transfer, content, progress.newChild(90,
+            SubMonitor.SUPPRESS_NONE));
+
+        progress.done();
     }
 
     public void sendUserListTo(JID to, Collection<User> participants) {
@@ -685,7 +699,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendFileAsync(JID recipient, IProject project,
         final IPath path, int sequenceNumber,
-        final IFileTransferCallback callback) throws IOException {
+        final IFileTransferCallback callback, final SubMonitor progress)
+        throws IOException {
 
         if (callback == null)
             throw new IllegalArgumentException();
@@ -703,7 +718,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 try {
                     // To test if asynchronously arriving file transfers work:
                     // Thread.sleep(10000);
-                    dataManager.sendData(transfer, content, callback);
+                    dataManager.sendData(transfer, content, progress);
                     callback.fileSent(path);
                 } catch (Exception e) {
                     callback.fileTransferFailed(path, e);

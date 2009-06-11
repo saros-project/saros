@@ -21,6 +21,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.picocontainer.annotations.Inject;
 
@@ -120,7 +122,16 @@ public class ConsistencyWatchdogClient {
             final InputStream toWrite = input;
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    FileUtil.writeFile(toWrite, file);
+
+                    // TODO should be reported to the user
+                    SubMonitor monitor = SubMonitor
+                        .convert(new NullProgressMonitor());
+                    try {
+                        FileUtil.writeFile(toWrite, file, monitor);
+                    } catch (CoreException e) {
+                        // TODO inform user
+                        log.error("Could not restore file: " + file);
+                    }
                 }
             });
 

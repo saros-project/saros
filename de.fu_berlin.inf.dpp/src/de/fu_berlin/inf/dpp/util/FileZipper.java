@@ -15,6 +15,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 
 /**
  * This class contains method to create a zip archive out of a list of files.
@@ -35,11 +37,26 @@ public class FileZipper {
      */
     public final static boolean calculateChecksum = false;
 
-    public static void createProjectZipArchive(List<IPath> files,
-        String descPath, IProject project) throws Exception {
+    /**
+     * Given a list of files belonging to the given project, this method will
+     * create a zip file at the given archive location (overwriting any existing
+     * content).
+     * 
+     * Progress is reported coarsely to the progress monitor.
+     * 
+     * @cancelable This operation can be canceled via the given progress
+     *             monitor. If the operation was canceled the zip file is
+     *             deleted prior to throwing an OperationCanceldException.
+     */
+    public static void createProjectZipArchive(List<IPath> files, File archive,
+        IProject project, SubMonitor progress) throws Exception {
+
+        long time = System.currentTimeMillis();
+
+        progress.beginTask("Creating Archive", files.size());
 
         OutputStream outputStream = new BufferedOutputStream(
-            new FileOutputStream(descPath));
+            new FileOutputStream(archive));
 
         CheckedOutputStream cos = null;
 
@@ -52,7 +69,13 @@ public class FileZipper {
 
         for (IPath path : files) {
 
-            FileZipper.log.debug("Compress file: " + path);
+            if (progress.isCanceled()) {
+                archive.delete();
+                throw new OperationCanceledException();
+            }
+
+            progress.subTask("Compressing: " + path);
+            log.debug("Compress file: " + path);
 
             File file = project.getFile(path).getLocation().toFile();
             if (file.exists()) {
@@ -62,17 +85,21 @@ public class FileZipper {
 
                 zipStream.closeEntry();
             } else {
-                FileZipper.log
-                    .warn("File given to Zip which does not exist: " + path);
+                log.warn("File given to Zip which does not exist: " + path);
             }
+            progress.worked(1);
         }
         zipStream.close();
 
         // Checksum
         if (calculateChecksum && cos != null) {
-            FileZipper.log
-                .debug("Checksum: " + cos.getChecksum().getValue());
+            FileZipper.log.debug("Checksum: " + cos.getChecksum().getValue());
         }
-    }
 
+        log.debug(String.format("Created project archive in %d s (%d KB): %s",
+            (System.currentTimeMillis() - time) / 1000,
+            archive.length() / 1024, archive.getAbsolutePath()));
+
+        progress.done();
+    }
 }

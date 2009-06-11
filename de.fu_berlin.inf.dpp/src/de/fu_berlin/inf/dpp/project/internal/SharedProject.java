@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -46,9 +47,9 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -195,25 +196,34 @@ public class SharedProject implements ISharedProject, Disposable {
     public void initiateRoleChange(final User user, final UserRole newRole) {
         assert localUser.isHost() : "Only the host can initiate role changes";
 
-        Util.runSafeAsync(log, new Runnable() {
-            public void run() {
-                StartHandle startHandle = stopManager.stop(user);
+        if (user.isHost()) {
+            IActivity activity = new RoleActivity(getLocalUser().getJID()
+                .toString(), user.getJID().toString(), newRole);
+            activitySequencer.activityCreated(activity);
 
-                if (startHandle == null) {
-                    log
-                        .error("Role change failed because StopActivity was not acknowledged");
-                    return;
+            setUserRole(user, newRole);
+        } else {
+
+            Util.runSafeAsync(log, new Runnable() {
+                public void run() {
+                    StartHandle startHandle = stopManager.stop(user);
+
+                    if (startHandle == null) {
+                        log.error("Role change failed because"
+                            + " StopActivity was not acknowledged");
+                        return;
+                    }
+
+                    IActivity activity = new RoleActivity(getLocalUser()
+                        .getJID().toString(), user.getJID().toString(), newRole);
+                    activitySequencer.activityCreated(activity);
+
+                    setUserRole(user, newRole);
+
+                    startHandle.start();
                 }
-
-                IActivity activity = new RoleActivity(getLocalUser().getJID()
-                    .toString(), user.getJID().toString(), newRole);
-                activitySequencer.activityCreated(activity);
-
-                setUserRole(user, newRole);
-
-                startHandle.start();
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -226,7 +236,7 @@ public class SharedProject implements ISharedProject, Disposable {
             public void run() {
                 user.setUserRole(role);
 
-		        log.info("User " + user + " is now a " + role);
+                log.info("User " + user + " is now a " + role);
                 if (user.isLocal()) {
                     setProjectReadonly(user.isObserver());
                 }
@@ -321,11 +331,12 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public IOutgoingInvitationProcess invite(JID jid, String description,
-        boolean inactive, IInvitationUI inviteUI, FileList filelist) {
+        boolean inactive, IInvitationUI inviteUI, FileList filelist,
+        SubMonitor monitor) {
 
         return new OutgoingInvitationProcess(saros, transmitter,
             transferManager, jid, this, description, inactive, inviteUI,
-            getFreeColor(), filelist);
+            getFreeColor(), filelist, monitor);
     }
 
     /*

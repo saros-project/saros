@@ -28,6 +28,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -66,9 +68,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     protected ISharedProject sharedProject;
 
     /* Fields */
-    protected int progress_done;
-    protected int progress_max;
-    protected String progress_info = "";
 
     protected boolean isP2P = false;
 
@@ -84,10 +83,13 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     /** size of current transfered part of archive file. */
     protected long transferedFileSize = 0;
 
+    protected SubMonitor monitor;
+
     public OutgoingInvitationProcess(Saros saros, ITransmitter transmitter,
         DataTransferManager dataTransferManager, JID to,
         ISharedProject sharedProject, String description, boolean startNow,
-        IInvitationUI inviteUI, int colorID, FileList localFileList) {
+        IInvitationUI inviteUI, int colorID, FileList localFileList,
+        SubMonitor monitor) {
 
         super(transmitter, to, description, colorID);
 
@@ -96,6 +98,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.saros = saros;
         this.sharedProject = sharedProject;
         this.dataTransferManager = dataTransferManager;
+        this.monitor = monitor;
+        this.monitor.beginTask("Performing Invitation", 100);
 
         if (startNow) {
             transmitter.sendInviteMessage(sharedProject, to, description,
@@ -104,27 +108,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         } else {
             setState(State.INITIALIZED);
         }
-    }
-
-    public int getProgressCurrent() {
-        // TODO SS Jingle File Transfer progress information
-        if (isP2P) {
-            return this.progress_done + 1;
-        } else {
-            return (int) (this.transferedFileSize);
-        }
-    }
-
-    public int getProgressMax() {
-        if (isP2P) {
-            return this.progress_max;
-        } else {
-            return (int) (this.fileSize);
-        }
-    }
-
-    public String getProgressInfo() {
-        return this.progress_info;
+        this.monitor.worked(5);
     }
 
     public void startSynchronization() {
@@ -143,9 +127,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             this.toSend.addAll(added);
             this.toSend.addAll(altered);
 
-            this.progress_max = this.toSend.size();
-            this.progress_done = 0;
-
             JingleFileTransferManager jingleManager = dataTransferManager
                 .getJingleManager();
 
@@ -153,13 +134,16 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             if (jingleManager != null
                 && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
                 isP2P = true;
-                sendFiles();
+                monitor.subTask("Sending Files...");
+                sendFiles(monitor.newChild(70));
             } else {
                 isP2P = false;
-                sendArchive();
+                monitor.subTask("Sending Archive...");
+                sendArchive(monitor.newChild(70));
             }
 
-            if (!blockUntilFilesSent() || !blockUntilJoinReceived()) {
+            monitor.subTask("Waiting for Peer to Join");
+            if (!blockUntilJoinReceived(monitor.newChild(5))) {
                 cancel(null, false);
             }
         } catch (RuntimeException e) {
@@ -177,6 +161,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     public void invitationAccepted(JID from) {
         assertState(State.INVITATION_SENT);
 
+        SubMonitor pmAccept = this.monitor.newChild(15);
+        this.monitor.subTask("Sending Filelist");
+        pmAccept.beginTask("Invitation Accepted", 100);
+
         // HACK add resource specifier to jid
         if (this.peer.equals(from)) {
             this.peer = from;
@@ -185,12 +173,15 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         try {
             // Wait for Jingle before we send the file list...
             this.transmitter.awaitJingleManager(this.peer);
+            pmAccept.worked(30);
 
             // Could have been canceled in between:
             if (this.state == State.CANCELED)
                 return;
 
-            this.transmitter.sendFileList(this.peer, this.localFileList, this);
+            this.transmitter.sendFileList(this.peer, this.localFileList,
+                SubMonitor.convert(new NullProgressMonitor()));
+            pmAccept.worked(70);
 
             // Could have been canceled in between:
             if (this.state == State.CANCELED)
@@ -233,6 +224,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
         this.sharedProject.addUser(new User(sharedProject, from, colorID));
         setState(State.DONE);
+        this.monitor.done();
 
         // TODO Find a more reliable way to remove InvitationProcess
         this.transmitter.removeInvitationProcess(this);
@@ -287,159 +279,123 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         failState();
     }
 
-    /*
-     * Methods for implementing IFileTransferCallback
-     */
-    public void fileTransferFailed(IPath path, Exception e) {
-        failed(e);
-    }
+    protected void sendFiles(SubMonitor monitor) {
 
-    public void fileSent(IPath path) {
-
-        this.setProgressInfo(path.toFile().getName());
-        progress_done++;
-        if (progress_done == progress_max && getState() == State.SYNCHRONIZING) {
-            setState(State.SYNCHRONIZING_DONE);
-        }
-    }
-
-    public void transferProgress(int transfered) {
-        transferedFileSize = transfered;
-
-        // Tell the UI to update itself
-        invitationUI.updateInvitationProgress(peer);
-    }
-
-    private void sendFiles() {
-
-        if (getState() == State.CANCELED) {
-            this.toSend.clear();
-            return;
-        }
-
-        if (this.toSend.size() == 0) {
-            setState(State.SYNCHRONIZING_DONE);
-            return;
-        }
-
-        this.setProgressInfo("Sending...");
-
-        while (this.toSend.size() > 0 && getState() != State.CANCELED) {
-
-            IPath path = this.toSend.remove(0);
-
-            try {
-                this.transmitter.sendFileAsync(this.peer, this.sharedProject
-                    .getProject(), path, TimedActivity.NO_SEQUENCE_NR, this);
-            } catch (IOException e) {
-                this.fileTransferFailed(path, e);
+        try {
+            if (getState() == State.CANCELED) {
+                this.toSend.clear();
+                return;
             }
+
+            if (this.toSend.size() == 0) {
+                setState(State.SYNCHRONIZING_DONE);
+                return;
+            }
+
+            monitor.beginTask("Sending...", this.toSend.size());
+
+            while (this.toSend.size() > 0 && getState() != State.CANCELED) {
+
+                IPath path = this.toSend.remove(0);
+
+                try {
+                    monitor.subTask("Sending: " + path.lastSegment());
+                    this.transmitter.sendFile(this.peer, this.sharedProject
+                        .getProject(), path, TimedActivity.NO_SEQUENCE_NR,
+                        monitor.newChild(1));
+                } catch (IOException e) {
+                    failed(e);
+                }
+            }
+
+            if (getState() == State.SYNCHRONIZING) {
+                setState(State.SYNCHRONIZING_DONE);
+            }
+
+        } finally {
+            monitor.done();
         }
     }
 
     /**
      * send all project data with archive file.
      */
-    private void sendArchive() {
-        if (getState() == State.CANCELED) {
-            this.toSend.clear();
-            return;
-        }
-
-        if (this.toSend.size() == 0) {
-            setState(State.SYNCHRONIZING_DONE);
-            return;
-        }
-
-        // TODO The "./" prefix should be unnecessary and is not cross platform.
-        // TODO Use a $TEMP directory here.
-        File archive = new File("./" + getPeer().getName() + "_Project.zip");
+    private void sendArchive(SubMonitor monitor) {
 
         try {
-            this.setProgressInfo("Creating Archive");
-
-            long time = System.currentTimeMillis();
-
-            // Create project archive.
-            // TODO Track Progress and provide possibility to cancel
-            FileZipper.createProjectZipArchive(this.toSend, archive
-                .getAbsolutePath(), this.sharedProject.getProject());
-
-            log.debug(String.format(
-                "Created project archive in %d s (%d KB): %s", (System
-                    .currentTimeMillis() - time) / 1000,
-                archive.length() / 1024, archive.getAbsolutePath()));
-
-            this.setProgressInfo("Sending project archive");
-
-            // Send data.
-            // TODO Track Progress and provide possibility to cancel
-            this.transmitter.sendProjectArchive(this.peer, this.sharedProject
-                .getProject(), archive, this);
-        } catch (Exception e) {
-            failed(e);
-        } finally {
-            if (!archive.delete()) {
-                log.warn("Could not delete archive: "
-                    + archive.getAbsolutePath());
-            }
-        }
-    }
-
-    /**
-     * Blocks until all files have been sent or the operation was canceled by
-     * the user.
-     * 
-     * @return <code>true</code> if all files have been synchronized.
-     *         <code>false</code> if the user chose to cancel
-     */
-    private boolean blockUntilFilesSent() {
-        while ((this.state != State.SYNCHRONIZING_DONE)
-            && (this.state != State.DONE)) {
             if (getState() == State.CANCELED) {
-                return false;
+                this.toSend.clear();
+                return;
             }
+
+            if (this.toSend.size() == 0) {
+                setState(State.SYNCHRONIZING_DONE);
+                return;
+            }
+
+            monitor.beginTask("Sending as archive", 100);
+
+            // TODO The "./" prefix should be unnecessary and is not cross
+            // platform.
+            // TODO Use a $TEMP directory here.
+            File archive = new File("./" + getPeer().getName() + "_Project.zip");
 
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                log.error("Code not designed to handle "
-                    + "InterruptedException", e);
-                Thread.currentThread().interrupt();
-                return false;
-            }
-        }
+                monitor.subTask("Zipping archive");
+                FileZipper.createProjectZipArchive(this.toSend, archive,
+                    this.sharedProject.getProject(), monitor.newChild(30));
 
-        return true;
+                monitor.subTask("Sending archive");
+                transmitter.sendProjectArchive(this.peer, this.sharedProject
+                    .getProject(), archive, monitor.newChild(70));
+
+            } catch (Exception e) {
+                failed(e);
+            } finally {
+                if (!archive.delete()) {
+                    log.warn("Could not delete archive: "
+                        + archive.getAbsolutePath());
+                }
+            }
+        } finally {
+            monitor.done();
+        }
     }
 
     /**
      * Blocks until the join message has been received or the user cancelled.
      * 
+     * @param subMonitor
+     * 
      * @return <code>true</code> if the join message has been received.
      *         <code>false</code> if the user chose to cancel
      */
-    private boolean blockUntilJoinReceived() {
+    private boolean blockUntilJoinReceived(SubMonitor subMonitor) {
 
-        this.setProgressInfo("Waiting for confirmation");
+        subMonitor.beginTask("Waiting for Peer to Join", 1000);
 
-        while (this.state != State.DONE) {
-            if (getState() == State.CANCELED) {
-                return false;
+        try {
+            while (this.state != State.DONE) {
+                if (getState() == State.CANCELED) {
+                    return false;
+                }
+
+                try {
+                    Thread.sleep(100);
+                    // Grow but never finish monitor...
+                    subMonitor.setWorkRemaining(1000);
+                    subMonitor.worked(1);
+                } catch (InterruptedException e) {
+                    log.error("Code not designed to be interruptable", e);
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
             }
 
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-                return false;
-            }
+            return true;
+        } finally {
+            subMonitor.done();
         }
-
-        this.setProgressInfo("");
-
-        return true;
     }
 
     public String getProjectName() {
@@ -451,10 +407,4 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         super.cancel(errorMsg, replicated);
         sharedProject.returnColor(this.colorID);
     }
-
-    public void setProgressInfo(String progress_info) {
-        this.progress_info = progress_info;
-        this.invitationUI.updateInvitationProgress(this.peer);
-    }
-
 }

@@ -27,6 +27,8 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -103,9 +105,24 @@ public interface ITransmitter {
      *            sent.
      * @param fileList
      *            the file list that is to be sent.
+     * 
+     * @param monitor
+     *            a monitor to which progress will be reported and which is
+     *            queried for cancellation.
+     * 
+     * @throws OperationCanceledException
+     *             if the operation was canceled via the given progress monitor
+     *             an OperationCanceledException is thrown. If the operation was
+     *             canceled via the monitor and the exception is not received,
+     *             the operation completed successfully, before noticing the
+     *             cancellation.
+     * 
+     * @throws IOException
+     *             if the operation fails because of a problem with the XMPP
+     *             Connection.
      */
-    public void sendFileList(JID jid, FileList fileList,
-        IFileTransferCallback callback) throws IOException;
+    public void sendFileList(JID jid, FileList fileList, SubMonitor monitor)
+        throws IOException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -129,13 +146,26 @@ public interface ITransmitter {
      *            the sequence number that will be associated with this
      *            activity.
      * @param callback
-     *            an callback for the file transfer state. CANNOT be null.
+     *            an call-back for the file transfer state. CANNOT be null.
+     * 
+     * @param monitor
+     *            a monitor to which progress will be reported and which is
+     *            queried for cancellation.
+     * 
      * @throws IOException
-     *             If we file could not be read, other errors are reported to
-     *             the callback.
+     *             If the file could not be read, other errors are reported to
+     *             the call-back.
+     * 
+     * @throws OperationCanceledException
+     *             if the operation was canceled via the given progress monitor
+     *             an OperationCanceledException is thrown. If the operation was
+     *             canceled via the monitor and the exception is not received,
+     *             the operation completed successfully, before noticing the
+     *             cancellation.
      */
     public void sendFileAsync(JID recipient, IProject project, IPath path,
-        int sequenceNumber, IFileTransferCallback callback) throws IOException;
+        int sequenceNumber, IFileTransferCallback callback, SubMonitor monitor)
+        throws IOException;
 
     /**
      * Sends given file to given recipient with given sequence number
@@ -152,12 +182,24 @@ public interface ITransmitter {
      *            the project-relative path of the resource that is to be sent.
      * @param sequenceNumber
      *            the time that will be associated with this activity.
+     * 
+     * @param monitor
+     *            a monitor to which progress will be reported and which is
+     *            queried for cancellation.
+     * 
+     * @throws OperationCanceledException
+     *             if the operation was canceled via the given progress monitor
+     *             an OperationCanceledException is thrown. If the operation was
+     *             canceled via the monitor and the exception is not received,
+     *             the operation completed successfully, before noticing the
+     *             cancellation.
+     * 
      * @throws IOException
-     *             If we file could not be read or an error occurred while
+     *             If the file could not be read or an error occurred while
      *             sending
      */
     public void sendFile(JID to, IProject project, IPath path,
-        int sequenceNumber, IFileTransferCallback callback) throws IOException;
+        int sequenceNumber, SubMonitor monitor) throws IOException;
 
     /**
      * Sends given archive file to given recipient.
@@ -171,12 +213,23 @@ public interface ITransmitter {
      *            sent.
      * @param archive
      *            the project-relative path of the resource that is to be sent.
-     * @param callback
-     *            a callback for the file transfer state. Can be
-     *            <code>null</code>.
+     * @param monitor
+     *            a monitor to which progress will be reported and which is
+     *            queried for cancellation.
+     * 
+     * @throws OperationCanceledException
+     *             if the operation was canceled via the given progress monitor
+     *             an OperationCanceledException is thrown. If the operation was
+     *             canceled via the monitor and the exception is not received,
+     *             the operation completed successfully, before noticing the
+     *             cancellation.
+     * 
+     * @throws IOException
+     *             If the file could not be read or an error occurred while
+     *             sending
      */
     public void sendProjectArchive(JID recipient, IProject project,
-        File archive, IFileTransferCallback callback);
+        File archive, SubMonitor monitor) throws IOException;
 
     /**
      * Sends queued file transfers.

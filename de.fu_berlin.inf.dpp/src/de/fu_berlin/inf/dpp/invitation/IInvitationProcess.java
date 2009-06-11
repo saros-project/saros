@@ -5,7 +5,6 @@ import java.io.InputStream;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.FileList;
-import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -18,7 +17,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * 
  * @author rdjemili
  */
-public interface IInvitationProcess extends IFileTransferCallback {
+public interface IInvitationProcess {
 
     /**
      * This class contains UI code which is needed by the invitation process.

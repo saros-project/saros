@@ -34,6 +34,8 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
@@ -43,8 +45,8 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
@@ -309,6 +311,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
     public void exec(IActivity activity) {
+
+        if (!(activity instanceof FileActivity || activity instanceof FolderActivity))
+            return;
+
         try {
             this.replicationInProgress = true;
 
@@ -320,7 +326,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         } catch (CoreException e) {
             log.error("Failed to execute resource activity.", e);
-
         } finally {
             this.replicationInProgress = false;
         }
@@ -331,7 +336,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
         IFile file = project.getFile(activity.getPath());
 
         if (activity.getType() == FileActivity.Type.Created) {
-            FileUtil.writeFile(activity.getContents(), file);
+
+            // TODO should be reported to the user
+            SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
+            try {
+                FileUtil.writeFile(activity.getContents(), file, monitor);
+            } catch (Exception e) {
+                log.error("Could not write file: " + file);
+            }
         } else if (activity.getType() == FileActivity.Type.Removed) {
             FileUtil.deleteFile(file);
         }

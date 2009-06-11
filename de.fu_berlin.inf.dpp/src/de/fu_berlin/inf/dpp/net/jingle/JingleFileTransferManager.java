@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -368,7 +369,8 @@ public class JingleFileTransferManager {
      * Note that only one JingleSession can be created at the same time.
      */
     public NetTransferMode send(final TransferDescription transferDescription,
-        final byte[] content) throws JingleSessionException {
+        final byte[] content, SubMonitor progress)
+        throws JingleSessionException {
 
         JID toJID = transferDescription.getRecipient();
 
@@ -412,7 +414,8 @@ public class JingleFileTransferManager {
         }
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
-            return connection.fileTransfer.send(transferDescription, content);
+            return connection.fileTransfer.send(transferDescription, content,
+                progress);
         } else {
             // If we want to reconnect, then we should not set this to ERROR
             connection.setState(JingleConnectionState.ERROR);

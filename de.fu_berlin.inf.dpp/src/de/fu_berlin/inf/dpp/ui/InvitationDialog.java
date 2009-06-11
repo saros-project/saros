@@ -26,9 +26,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -129,6 +132,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         String name;
         String error = "";
         IOutgoingInvitationProcess outgoingProcess;
+        InvitationProgressMonitor progress;
     }
 
     /**
@@ -159,9 +163,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
                     switch (item.outgoingProcess.getState()) {
                     case SYNCHRONIZING:
-                        return "" + (item.outgoingProcess.getProgressCurrent())
-                            + " of " + item.outgoingProcess.getProgressMax()
-                            + ": " + item.outgoingProcess.getProgressInfo();
+                        return "" + (item.progress.worked / 10.0) + "% "
+                            + item.progress.getSubTask();
                     case CANCELED:
                         return item.error;
                     default:
@@ -322,6 +325,68 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         performInvitation();
     }
 
+    /**
+     * A Progress Monitor which tracks the progress of the invitation to a
+     * single user.
+     * 
+     * Whenever the value of work ticks done, the taskName or the subTask
+     * changes, the InvitationDialog is notified of the change.
+     * 
+     * The current state of the three types of information can be retrieved
+     * using getWorked(), getTaskName(), getSubTask().
+     */
+    public class InvitationProgressMonitor extends NullProgressMonitor {
+
+        JID toInvite;
+        int worked = 0;
+        String subTask = "";
+        String taskName = "";
+
+        public InvitationProgressMonitor(JID toInvite) {
+            this.toInvite = toInvite;
+        }
+
+        /**
+         * Returns the work ticks done such that 1000 represents the full task
+         * of inviting a user.
+         */
+        public int getWorked() {
+            return worked;
+        }
+
+        public String getTaskName() {
+            return taskName;
+        }
+
+        public String getSubTask() {
+            return subTask;
+        }
+
+        @Override
+        public void setTaskName(String name) {
+            if (ObjectUtils.equals(name, taskName))
+                return;
+            this.taskName = name;
+            updateInvitationProgress(toInvite);
+        }
+
+        @Override
+        public void worked(int work) {
+            if (work <= 0)
+                return;
+            this.worked += work;
+            updateInvitationProgress(toInvite);
+        }
+
+        @Override
+        public void subTask(String name) {
+            if (ObjectUtils.equals(name, subTask))
+                return;
+            this.subTask = name;
+            updateInvitationProgress(toInvite);
+        }
+    }
+
     protected void performInvitation() {
 
         makeSureFileListIsAvailable();
@@ -335,12 +400,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
             // Invite all selected users...
             for (InviterData invdat : getSelectedItems()) {
-                JID toInvite = discoveryManager.getSupportingPresence(
+                final JID toInvite = discoveryManager.getSupportingPresence(
                     invdat.jid, Saros.NAMESPACE);
-                if (toInvite != null)
+                if (toInvite != null) {
+                    invdat.progress = new InvitationProgressMonitor(toInvite);
                     invdat.outgoingProcess = project.invite(toInvite, name,
-                        true, this, localFileList);
-                else
+                        true, this, localFileList, SubMonitor.convert(
+                            invdat.progress, 1000));
+                } else
                     log.error("Internal Error: ", new StackTrace());
             }
 

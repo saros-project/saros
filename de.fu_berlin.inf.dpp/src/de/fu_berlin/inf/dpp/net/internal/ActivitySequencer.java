@@ -36,6 +36,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
@@ -674,7 +676,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
                                 Exception e) {
                                 log.error("File could not be send:", e);
                             }
-                        });
+                        }, SubMonitor.convert(new NullProgressMonitor()));
                 } catch (IOException e) {
                     log.error("File could not be send:", e);
                     // TODO This means we were really unable to send
