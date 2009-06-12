@@ -25,9 +25,13 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * as Jingle and Saros. It uses XEP-0030
  * http://xmpp.org/extensions/xep-0030.html to ask a recipient for the
  * particular used feature.
+ * 
+ * DiscoveryManager caches for each JID a DiscoverInfo entry, so it can be asked
+ * which features the different XMPP clients of a particular JID supports.
  */
 @Component(module = "net")
 public class DiscoveryManager implements Disposable {
+
     private static final Logger log = Logger.getLogger(DiscoveryManager.class
         .getName());
 
@@ -42,31 +46,50 @@ public class DiscoveryManager implements Disposable {
     /**
      * This RosterListener closure is added to the RosterTracker to get
      * notifications if the roster is changed.
-     * 
-     * TODO invalidate cache selectively based on the JIDs provided
      */
     protected RosterListener rosterListener = new RosterListener() {
 
-        public void entriesAdded(final Collection<String> addresses) {
+        protected void clearCache(Presence presence) {
+            String rjid = presence.getFrom();
+            if (rjid == null) {
+                log.error("presence.getFrom() is null");
+                return;
+            }
+            cache.remove(rjid);
+        }
+
+        protected void clearCache(Collection<String> addresses) {
+            for (String pjid : addresses) {
+                /*
+                 * TODO We should remove all presences kept for the given
+                 * addresses
+                 */
+                for (Presence presence : rosterTracker.getPresences(new JID(
+                    pjid))) {
+                    clearCache(presence);
+                }
+            }
+        }
+
+        public void entriesAdded(Collection<String> addresses) {
             log.trace("entriesAdded");
-            cache.clear();
+            clearCache(addresses);
         }
 
-        public void entriesDeleted(final Collection<String> addresses) {
+        public void entriesDeleted(Collection<String> addresses) {
             log.trace("entriesDeleted");
-            cache.clear();
+            clearCache(addresses);
         }
 
-        public void entriesUpdated(final Collection<String> addresses) {
+        public void entriesUpdated(Collection<String> addresses) {
             log.trace("entriesUpdated");
-            cache.clear();
+            clearCache(addresses);
         }
 
-        public void presenceChanged(final Presence presence) {
+        public void presenceChanged(Presence presence) {
             log.trace("presenceChanged");
-            cache.clear();
+            clearCache(presence);
         }
-
     };
 
     public DiscoveryManager(RosterTracker rosterTracker) {
@@ -83,7 +106,8 @@ public class DiscoveryManager implements Disposable {
 
     /**
      * This method returns true if {@link Jingle#NAMESPACE} is supported by the
-     * Jabber client connected under the given JID.
+     * Jabber client connected under the given plain JID (a RQ-JID is stripped
+     * of its resource)
      * 
      * This method is syntactic sugar for
      * 
@@ -101,7 +125,7 @@ public class DiscoveryManager implements Disposable {
 
     /**
      * This method returns true if {@link Saros#NAMESPACE} is available on the
-     * given JID.
+     * given plain JID (a RQ-JID is stripped of its resource).
      * 
      * This method is syntactic sugar for
      * 
@@ -118,38 +142,47 @@ public class DiscoveryManager implements Disposable {
     }
 
     /**
-     * Perform a ServiceDiscovery and check if the given feature is among the
-     * features supported by the given recipient.
+     * Returns true if there is an available presence which supports the given
+     * feature. Returns false if all available presences do not support the
+     * given feature. Returns null if there is no available presences supporting
+     * the feature, but not all presences have been queried for support yet.
      * 
-     * @param recipient
-     *            The JID must have a resource identifier (user@host/resource),
-     *            otherwise you get a blame StackTrace in your logs.
+     * This method will not trigger any updates or block but rather just use the
+     * cache and return quickly.
      * 
-     * @blocking This method blocks until the ServiceDiscovery returns.
-     * @reentrant This method can be called concurrently.
-     * @caching If results are available in the cache, they are used instead of
-     *          querying the server.
+     * @reentrant
+     * @nonBlocking
      */
-    protected boolean isFeatureSupported(final JID recipient,
-        final String feature) {
-        if (recipient.getResource().equals(""))
-            log.warn("Resource missing: ", new StackTrace());
+    public Boolean isSupportedNonBlock(JID jid, String namespace) {
 
-        DiscoverInfo info = cache.get(recipient.toString());
-        if (info == null) {
-            // TODO block if a query for the recipient is already in progress
-            info = querySupport(recipient);
-            if (info == null)
-                return false;
-            log.debug("cached: " + recipient);
-            cache.put(recipient.toString(), info);
+        jid = jid.getBareJID();
+
+        boolean allCached = true;
+
+        for (JID rqJID : rosterTracker.getAvailablePresences(jid)) {
+
+            DiscoverInfo disco = cache.get(rqJID.toString());
+            if (disco == null) {
+                allCached = false;
+                continue;
+            }
+
+            if (disco.containsFeature(Saros.NAMESPACE))
+                return true;
         }
-        return info.containsFeature(feature);
+
+        if (allCached) {
+            return false;
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Returns the JID of given recipient supporting the feature of the given
-     * namespace if available, otherwise null.
+     * Returns the RQ-JID of given plain JID supporting the feature of the given
+     * name-space if available, otherwise null.
+     * 
+     * If not in the cache then a blocking cache update is performed.
      * 
      * @param recipient
      *            The JID of the user to find a supporting presence for. The JID
@@ -172,14 +205,51 @@ public class DiscoveryManager implements Disposable {
             if (!presence.isAvailable())
                 continue;
 
-            JID jid = new JID(presence.getFrom());
-            if (isFeatureSupported(jid, namespace)) {
-                log.debug(jid + " provides " + namespace);
-                return jid;
+            String rjid = presence.getFrom();
+            if (rjid == null) {
+                log.error("presence.getFrom() is null");
+                continue;
+            }
+
+            JID jidToCheck = new JID(rjid);
+            if (isFeatureSupported(jidToCheck, namespace)) {
+                return jidToCheck;
             }
         }
 
         return null;
+    }
+
+    /**
+     * Perform a ServiceDiscovery and check if the given feature is among the
+     * features supported by the given recipient.
+     * 
+     * @param recipient
+     *            A RQ-JID (user@host/resource) of the user to query support
+     *            for.
+     * 
+     * @blocking This method blocks until the ServiceDiscovery returns.
+     * @reentrant This method can be called concurrently.
+     * @caching If results are available in the cache, they are used instead of
+     *          querying the server.
+     */
+    protected boolean isFeatureSupported(JID recipient, String feature) {
+
+        if (recipient.getResource().equals(""))
+            log.warn("Resource missing: ", new StackTrace());
+
+        DiscoverInfo info = cache.get(recipient.toString());
+        if (info == null) {
+            // TODO block if a query for the recipient is already in progress
+            info = querySupport(recipient);
+
+            if (info == null)
+                return false;
+
+            log.debug("Inserting DiscoveryInfo into Cache for: " + recipient);
+            cache.put(recipient.toString(), info);
+        }
+        return info.containsFeature(feature);
     }
 
     /**
@@ -191,7 +261,8 @@ public class DiscoveryManager implements Disposable {
      * @param recipient
      *            The JID must have a resource identifier (user@host/resource),
      *            otherwise you get a blame StackTrace in your logs.
-     * @return DiscoverInfo from recipient or null if XMPPException was thrown.
+     * @return DiscoverInfo from recipient or null if an XMPPException was
+     *         thrown.
      * 
      * @blocking This method blocks until the ServiceDiscovery returns.
      * @reentrant This method can be called concurrently.
@@ -208,17 +279,17 @@ public class DiscoveryManager implements Disposable {
         if (!saros.isConnected())
             throw new IllegalStateException("Not Connected");
 
-        log.debug("querySupport: " + recipient.toString());
         ServiceDiscoveryManager sdm = ServiceDiscoveryManager
             .getInstanceFor(saros.getConnection());
 
         try {
             return sdm.discoverInfo(recipient.toString());
         } catch (XMPPException e) {
+
             log.warn("Service Discovery failed on recipient "
-                + recipient.toString() + ":", e);
+                + recipient.toString() + " server:"
+                + saros.getConnection().getHost() + ":", e);
             return null;
         }
     }
-
 }

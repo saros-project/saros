@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
@@ -34,6 +36,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -82,7 +85,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.ArrayIterator;
 import de.fu_berlin.inf.dpp.util.MappingIterator;
-import de.fu_berlin.inf.dpp.util.StackTrace;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -152,13 +155,22 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             switch (columnIndex) {
             case 0:
                 return item.name;
-            case 1:
+            case 1: {
+                Boolean supported = discoveryManager.isSupportedNonBlock(
+                    item.jid, Saros.NAMESPACE);
+                if (supported == null) {
+                    updateSarosSupportLater(item.jid);
+                    return "?";
+                }
+                return supported.booleanValue() ? "Yes" : "No";
+            }
+            case 2:
                 if (item.outgoingProcess != null) {
                     return getStateDesc(item.outgoingProcess.getState());
                 } else {
                     return "";
                 }
-            case 2:
+            case 3:
                 if (item.outgoingProcess != null) {
 
                     switch (item.outgoingProcess.getState()) {
@@ -171,7 +183,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                         return "";
                     }
                 } else {
-                    return "";
+                    Boolean supported = discoveryManager.isSupportedNonBlock(
+                        item.jid, Saros.NAMESPACE);
+                    if (supported == null) {
+                        return "Discovery is in progress";
+                    } else {
+                        return "";
+                    }
                 }
             }
             return "";
@@ -187,11 +205,30 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.discoveryManager = discoManager;
     }
 
+    protected ExecutorService worker = Executors
+        .newSingleThreadExecutor(new NamedThreadFactory(
+            "InvitationDialog-AsyncDiscovery-"));
+
+    public void updateSarosSupportLater(final JID jid) {
+
+        worker.execute(new Runnable() {
+            public void run() {
+
+                // Perform blocking Disco update
+                discoveryManager.isSarosSupported(jid);
+
+                // Update UI with the new information
+                updateInvitationProgress(jid);
+            }
+        });
+    }
+
     @Override
     protected Control createContents(Composite parent) {
 
         getShell().addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
+                worker.shutdown();
                 setRoster(null);
             }
         });
@@ -224,6 +261,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         TableColumn column = new TableColumn(this.table, SWT.NONE);
         column.setText("User");
         column.setWidth(150);
+        column = new TableColumn(this.table, SWT.NONE);
+        column.setText("Saros-Enabled");
+        column.setWidth(100);
         column = new TableColumn(this.table, SWT.NONE);
         column.setText("Status");
         column.setWidth(300);
@@ -400,15 +440,26 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
             // Invite all selected users...
             for (InviterData invdat : getSelectedItems()) {
-                final JID toInvite = discoveryManager.getSupportingPresence(
+                JID toInvite = discoveryManager.getSupportingPresence(
                     invdat.jid, Saros.NAMESPACE);
-                if (toInvite != null) {
-                    invdat.progress = new InvitationProgressMonitor(toInvite);
-                    invdat.outgoingProcess = project.invite(toInvite, name,
-                        true, this, localFileList, SubMonitor.convert(
-                            invdat.progress, 1000));
-                } else
-                    log.error("Internal Error: ", new StackTrace());
+                if (toInvite == null) {
+                    if (MessageDialog
+                        .openConfirm(
+                            this.getShell(),
+                            "Invite user who does not support Saros?",
+                            "User "
+                                + invdat.jid
+                                + " does not seem to use Saros "
+                                + "(but rather a normal Instant Messaging client), invite anyway?")) {
+                        toInvite = invdat.jid;
+                    } else {
+                        continue;
+                    }
+                }
+                invdat.progress = new InvitationProgressMonitor(toInvite);
+                invdat.outgoingProcess = project.invite(toInvite, name, true,
+                    this, localFileList, SubMonitor.convert(invdat.progress,
+                        1000));
             }
 
         } catch (RuntimeException e) {
@@ -616,9 +667,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
             if (data.outgoingProcess != null
                 && data.outgoingProcess.getState() != State.CANCELED) {
-                return false;
-            }
-            if (!discoveryManager.isSarosSupported(data.jid)) {
                 return false;
             }
         }
