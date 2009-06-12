@@ -349,6 +349,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 transmitter.sendProjectArchive(this.peer, this.sharedProject
                     .getProject(), archive, monitor.newChild(70));
 
+                if (getState() == State.SYNCHRONIZING) {
+                    setState(State.SYNCHRONIZING_DONE);
+                }
+
             } catch (Exception e) {
                 failed(e);
             } finally {
