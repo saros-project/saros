@@ -854,9 +854,9 @@ public class Saros extends AbstractUIPlugin {
                             .openError(
                                 EditorAPI.getShell(),
                                 "Connection error",
-                                "There is a conflict with the jabber connection."
-                                    + "The reason for this is mostly that another saros "
-                                    + "instance have connected with the same login.");
+                                "You have been disconnected from Jabber, because of a resource conflict.\n"
+                                    + "This indicates that you might have logged on again using the same Jabber account"
+                                    + " and XMPP resource, for instance using Saros or an other instant messaging client.");
                     }
                 });
                 return;
