@@ -154,4 +154,33 @@ public class RosterTracker implements ConnectionSessionListener {
 
         return Util.asIterable(roster.getPresences(from.toString()));
     }
+
+    /**
+     * Returns the RQ-JIDs of all presences of the given (plain) 
+     * JID which are available.
+     * 
+     * An empty list is returned if no presence for the given JID is online.
+     */
+    public Iterable<JID> getAvailablePresences(JID from) {
+        if (from == null)
+            throw new IllegalArgumentException("JID cannot be null");
+
+        if (roster == null)
+            return Collections.emptyList();
+
+        List<JID> result = new ArrayList<JID>(10);
+        for (Presence presence : getPresences(from)) {
+            if (!presence.isAvailable())
+                continue;
+
+            String rjid = presence.getFrom();
+            if (rjid == null) {
+                log.error("presence.getFrom() is null");
+                continue;
+            }
+            result.add(new JID(rjid));
+        }
+
+        return result;
+    }
 }
