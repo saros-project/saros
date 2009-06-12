@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import org.apache.commons.codec.BinaryDecoder;
 import org.apache.commons.codec.BinaryEncoder;
@@ -30,6 +33,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -745,5 +749,62 @@ public class Util {
             return getMessage(e.getCause());
         }
         return e.getMessage();
+    }
+
+    public static final int CHUNKSIZE = 16 * 1024;
+
+    /**
+     * Compresses the given byte array using a Java Deflater.
+     */
+    public static byte[] deflate(byte[] input, SubMonitor subMonitor) {
+
+        subMonitor.beginTask("Deflate bytearray", input.length / CHUNKSIZE + 1);
+
+        Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION);
+        compressor.setInput(input);
+        compressor.finish();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+
+        byte[] buf = new byte[CHUNKSIZE];
+        while (!compressor.finished() && !subMonitor.isCanceled()) {
+            int count = compressor.deflate(buf);
+            bos.write(buf, 0, count);
+            subMonitor.worked(1);
+        }
+        IOUtils.closeQuietly(bos);
+
+        subMonitor.done();
+
+        return bos.toByteArray();
+    }
+
+    /**
+     * Uncompresses the given byte array using a Java Inflater.
+     * 
+     * If the operation fails (because the given byte array does not contain
+     * data accepted by the inflater), null is returned.
+     */
+    public static byte[] inflate(byte[] input, SubMonitor subMonitor) {
+        subMonitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
+        try {
+            Inflater decompressor = new Inflater();
+            decompressor.setInput(input, 0, input.length);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
+            byte[] buf = new byte[CHUNKSIZE];
+
+            while (!decompressor.finished() && !subMonitor.isCanceled()) {
+                int count = decompressor.inflate(buf);
+                bos.write(buf, 0, count);
+                subMonitor.worked(1);
+            }
+
+            IOUtils.closeQuietly(bos);
+            subMonitor.done();
+
+            return bos.toByteArray();
+        } catch (java.util.zip.DataFormatException ex) {
+            log.error("Failed to inflate bytearray", ex);
+        }
+        return null;
     }
 }
