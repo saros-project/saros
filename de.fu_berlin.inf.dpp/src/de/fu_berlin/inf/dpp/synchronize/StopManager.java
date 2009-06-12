@@ -180,10 +180,23 @@ public class StopManager implements IActivityProvider, Disposable {
             throw new IllegalStateException(
                 "stop cannot be called without a shared project");
 
-        // ask user to stop
+        // creating StopActivity for asking user to stop
         StopActivity stopActivity = new StopActivity(sharedProject
             .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
             .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
+
+        StartHandle handle = generateStartHandle(stopActivity);
+
+        // short cut if affected user is local
+        if (user.isLocal()) {
+            addStartHandle(handle);
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    lockProject(true);
+                }
+            });
+            return handle;
+        }
 
         StopActivity expectedAck = stopActivity.generateAcknowledgment(user
             .getJID().toString());
@@ -212,9 +225,8 @@ public class StopManager implements IActivityProvider, Disposable {
         } finally {
             reentrantLock.unlock();
         }
-        StartHandle handle = generateStartHandle(stopActivity);
-        addStartHandle(handle);
 
+        addStartHandle(handle);
         return handle;
     }
 
