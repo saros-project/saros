@@ -881,7 +881,11 @@ public class Saros extends AbstractUIPlugin {
                             .getExpectedSequenceNumbers();
                     }
 
-                    while (!isConnected()) {
+                    // HACK Improve this hack to stop an infinite reconnect
+                    int i = 0;
+                    final int CONNECTION_RETRIES = 15;
+
+                    while (!isConnected() && i++ < CONNECTION_RETRIES) {
 
                         log.info("Reconnecting...");
 
