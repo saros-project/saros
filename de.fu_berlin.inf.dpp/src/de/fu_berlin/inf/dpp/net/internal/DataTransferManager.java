@@ -287,24 +287,30 @@ public class DataTransferManager implements ConnectionSessionListener {
                 return;
             }
 
-            log.debug("Incoming file transfer via IBB: " + data.toString()
-                + ", size: " + request.getFileSize() / 1024 + "kbyte");
+            log.debug("[IBB] Starting incoming file transfer: "
+                + data.toString() + ", size: " + request.getFileSize() / 1024
+                + "kbyte");
 
             addIncomingFileTransfer(data);
 
             byte[] content;
 
+            long time = System.currentTimeMillis();
             try {
                 IncomingFileTransfer accept = request.accept();
 
                 InputStream in = accept.recieveFile();
 
-                try {
-                    content = IOUtils.toByteArray(in);
-                } finally {
-                    IOUtils.closeQuietly(in);
+                if (data.emptyFile) {
+                    // file is meant to be empty
+                    content = new byte[0];
+                } else {
+                    try {
+                        content = IOUtils.toByteArray(in);
+                    } finally {
+                        IOUtils.closeQuietly(in);
+                    }
                 }
-
             } catch (Exception e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
 
@@ -318,6 +324,11 @@ public class DataTransferManager implements ConnectionSessionListener {
             } finally {
                 removeIncomingFileTransfer(data);
             }
+
+            log.debug("[IBB] Finished incoming file transfer: "
+                + data.toString() + ", size: " + request.getFileSize() / 1024
+                + "kbyte received in "
+                + ((System.currentTimeMillis() - time) / 100) / 10.0 + "s");
 
             setTransferMode(data.getSender(), NetTransferMode.IBB, true);
             receiveData(data, new ByteArrayInputStream(content));
@@ -423,6 +434,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         public NetTransferMode send(TransferDescription data, byte[] content,
             SubMonitor progress) throws IOException {
 
+            long startTime = System.currentTimeMillis();
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
                 + data.toString() + ", size: " + content.length / 1024
                 + " kbyte");
@@ -434,6 +446,11 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             progress.setWorkRemaining(110);
             progress.subTask("Negotiating file transfer");
+
+            if (content.length == 0) {
+                content = new byte[] { 0 };
+                data.setEmptyFile(true);
+            }
 
             // The file path is irrelevant
             transfer.sendStream(new ByteArrayInputStream(content),
@@ -453,8 +470,8 @@ public class DataTransferManager implements ConnectionSessionListener {
                     transfer.cancel();
                     throw new CancellationException();
                 }
-                int newProgress = (int) (100.0 * (transfer.getAmountWritten()) / Math
-                    .min(1, content.length));
+                int newProgress = (int) ((100.0 * transfer.getAmountWritten()) / Math
+                    .max(1, content.length));
                 log.trace("Progress " + newProgress + "%");
 
                 if (worked < newProgress) {
@@ -476,13 +493,19 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             if (transfer.getStatus() == Status.error) {
                 throw new IOException("XMPPError in IBB-FileTransfer: "
-                    + transfer.getError());
+                    + transfer.getError(), transfer.getException());
             }
 
             if (transfer.getStatus() != Status.complete) {
                 throw new IOException("Error in IBB-FileTransfer wrong state: "
                     + transfer.getStatus());
             }
+
+            log.debug("[IBB] Finished sending to " + data.getRecipient() + ": "
+                + data.toString() + ", size: " + content.length / 1024
+                + " kbyte in "
+                + (((System.currentTimeMillis() - startTime) / 100) / 1.0)
+                + "s");
 
             return NetTransferMode.IBB;
         }

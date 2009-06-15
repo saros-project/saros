@@ -56,6 +56,12 @@ public class TransferDescription implements Serializable {
 
     public String file_project_path;
 
+    /**
+     * Field used to indicate that the file is to be interpreted as being empty,
+     * if the transfer method does not support empty files.
+     */
+    public boolean emptyFile = false;
+
     @Override
     public String toString() {
 
@@ -166,5 +172,9 @@ public class TransferDescription implements Serializable {
 
     public JID getSender() {
         return sender;
+    }
+
+    public void setEmptyFile(boolean b) {
+        emptyFile = true;
     }
 }
