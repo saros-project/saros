@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -63,11 +64,9 @@ public class ConsistencyWatchdogClient {
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
 
-    protected final Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+    protected Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
     protected boolean executingChecksumErrorHandling;
-
-    protected Set<IPath> pathsOfHandledFiles;
 
     protected ISharedProject sharedProject;
 
@@ -202,17 +201,19 @@ public class ConsistencyWatchdogClient {
             return;
         }
 
-        log.trace(String.format("Received %d checksums for %d inconsistencies",
-            checksums.size(), pathsWithWrongChecksums.size()));
+        log.trace(String.format(
+            "Received %d checksums for %d existing inconsistencies", checksums
+                .size(), pathsWithWrongChecksums.size()));
 
-        pathsWithWrongChecksums.clear();
+        Set<IPath> newInconsistencies = new CopyOnWriteArraySet<IPath>();
 
         for (DocumentChecksum checksum : checksums) {
             if (isInconsistent(checksum)) {
-                pathsWithWrongChecksums.add(checksum.getPath());
+                newInconsistencies.add(checksum.getPath());
             }
         }
 
+        pathsWithWrongChecksums = newInconsistencies;
         if (pathsWithWrongChecksums.isEmpty()) {
             if (inconsistencyToResolve.getValue()) {
                 log.info("All Inconsistencies are resolved");
@@ -295,65 +296,6 @@ public class ConsistencyWatchdogClient {
         return this.pathsWithWrongChecksums;
     }
 
-    /**
-     * This method starts or stops the error-handling when an inconsistency are
-     * detected.
-     * 
-     * @param newState
-     *            If <code>true</code> the method starts the error handling. If
-     *            <code>false</code> the watchdog unregister his
-     *            {@link IDataReceiver} and finish the error handling.
-     */
-    public void setChecksumErrorHandling(boolean newState) {
-
-        if (executingChecksumErrorHandling && newState) {
-            log.warn("Restarting Checksum Error Handling"
-                + " while another operation is running");
-            // HACK If we programmed correctly this should not happen
-            executingChecksumErrorHandling = false;
-        }
-
-        if (newState != executingChecksumErrorHandling) {
-
-            executingChecksumErrorHandling = newState;
-
-            if (newState) {
-
-                pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>(
-                    pathsWithWrongChecksums);
-
-                // Register as a receiver of incoming files...
-                dataTransferManager.addDataReceiver(receiver);
-
-                for (final IPath path : pathsOfHandledFiles) {
-
-                    // Save document before asking host to resend
-                    try {
-                        editorManager.saveLazy(path);
-                    } catch (FileNotFoundException e) {
-                        // Sending the checksum error message should recreate
-                        // this file
-                    }
-                }
-
-                // Send checksumErrorMessage to host
-                transmitter.sendFileChecksumErrorMessage(getParticipants(),
-                    pathsOfHandledFiles, false);
-
-            } else {
-
-                // Unregister from dataTransferManager
-                dataTransferManager.removeDataReceiver(receiver);
-
-                // Send message to host that inconsistency are handled
-                transmitter.sendFileChecksumErrorMessage(getParticipants(),
-                    pathsOfHandledFiles, true);
-
-                pathsOfHandledFiles.clear();
-            }
-        }
-    }
-
     public List<JID> getParticipants() {
         ArrayList<JID> result = new ArrayList<JID>();
         for (User user : sharedProject.getParticipants()) {
@@ -380,19 +322,7 @@ public class ConsistencyWatchdogClient {
     }
 
     private void setSharedProject(ISharedProject newSharedProject) {
-
-        // Unregister from previous project
-        if (sharedProject != null) {
-            this.pathsOfHandledFiles.clear();
-
-        }
-
         sharedProject = newSharedProject;
-
-        // Register to new project
-        if (sharedProject != null) {
-            this.pathsOfHandledFiles = new CopyOnWriteArraySet<IPath>();
-        }
     }
 
     public static InputStream logDiff(Logger log, JID from, IPath path,
@@ -437,5 +367,81 @@ public class ConsistencyWatchdogClient {
             log.error("Can't convert file content to String", e);
         }
         return input;
+    }
+
+    Object lock;
+
+    /**
+     * Start a consistency recovery by sending a checksum error to the host and
+     * waiting for his reply.
+     * 
+     * @blocking This method returns after the recovery has finished
+     */
+    public void runRecovery() {
+
+        final Object myLock;
+
+        synchronized (this) {
+
+            lock = myLock = new Object();
+
+            if (executingChecksumErrorHandling == true) {
+                log.error("Restarting Checksum Error Handling"
+                    + " while another operation is running");
+                while (executingChecksumErrorHandling == true) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        return;
+                    }
+                }
+            }
+
+            // Raise flag, so we know that we are currently performing a
+            // recovery
+            executingChecksumErrorHandling = true;
+        }
+
+        Set<IPath> pathsOfHandledFiles = new HashSet<IPath>(
+            pathsWithWrongChecksums);
+
+        // Register as a receiver of incoming files...
+        dataTransferManager.addDataReceiver(receiver);
+
+        for (final IPath path : pathsOfHandledFiles) {
+
+            // Save document before asking host to resend
+            try {
+                editorManager.saveLazy(path);
+            } catch (FileNotFoundException e) {
+                // Sending the checksum error message should recreate
+                // this file
+            }
+        }
+
+        // Send checksumErrorMessage to host
+        transmitter.sendFileChecksumErrorMessage(getParticipants(),
+            pathsOfHandledFiles, false);
+
+        // block until all inconsistencies are resolved
+        Set<IPath> remainingFiles = new HashSet<IPath>(pathsOfHandledFiles);
+        while (remainingFiles.size() > 0 && lock == myLock) {
+            remainingFiles.retainAll(pathsWithWrongChecksums);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                return;
+            }
+        }
+
+        // Unregister from dataTransferManager
+        dataTransferManager.removeDataReceiver(receiver);
+
+        // Send message to host that inconsistency are handled
+        transmitter.sendFileChecksumErrorMessage(getParticipants(),
+            pathsOfHandledFiles, true);
+
+        // Clear-flag indicating recovery is done
+        executingChecksumErrorHandling = false;
     }
 }

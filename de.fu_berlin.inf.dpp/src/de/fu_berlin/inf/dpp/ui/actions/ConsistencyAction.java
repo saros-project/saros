@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -76,11 +76,11 @@ public class ConsistencyAction extends Action {
 
         public void setValue(Boolean newValue) {
 
-            ConsistencyAction.this.setEnabled(newValue);
+            setEnabled(newValue);
 
             if (newValue) {
-                final Set<IPath> paths = new CopyOnWriteArraySet<IPath>(
-                    watchdogClient.getPathsWithWrongChecksums());
+                final Set<IPath> paths = new HashSet<IPath>(watchdogClient
+                    .getPathsWithWrongChecksums());
 
                 Util.runSafeSWTAsync(log, new Runnable() {
                     public void run() {
@@ -106,8 +106,6 @@ public class ConsistencyAction extends Action {
 
             } else {
                 setToolTipText("No inconsistencies");
-                log.debug("All Inconsistencies are resolved");
-                watchdogClient.setChecksumErrorHandling(false);
             }
         }
 
@@ -117,7 +115,7 @@ public class ConsistencyAction extends Action {
     public void run() {
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
-                watchdogClient.setChecksumErrorHandling(true);
+                watchdogClient.runRecovery();
             }
         });
     }
