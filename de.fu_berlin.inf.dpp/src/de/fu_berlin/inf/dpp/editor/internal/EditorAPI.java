@@ -42,6 +42,7 @@ import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -64,6 +65,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
+import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -171,6 +173,8 @@ public class EditorAPI implements IEditorAPI {
             partListeners.remove(editorManager));
     }
 
+    private boolean warnOnceExternalEditor = true;
+
     /**
      * {@inheritDoc}
      */
@@ -197,6 +201,37 @@ public class EditorAPI implements IEditorAPI {
                  * separate opening from activating, which save us duplicate
                  * sending of activated events.
                  */
+
+                IEditorDescriptor descriptor = IDE.getEditorDescriptor(file);
+                if (descriptor.isOpenExternal()) {
+                    /*
+                     * WORK-AROUND for #2807684: Editors are opened externally
+                     * erroneously
+                     * 
+                     * <a href=
+                     * "https://sourceforge.net/tracker/?func=detail&aid=2807684&group_id=167540&atid=843359"
+                     * ></a>
+                     * 
+                     * TODO Open as an internal editor
+                     */
+                    log.warn("Editor for file " + file.getName()
+                        + " is configured to be opened externally,"
+                        + " which is not supported by Saros");
+
+                    if (warnOnceExternalEditor) {
+                        warnOnceExternalEditor = false;
+                        WarningMessageDialog
+                            .showWarningMessage(
+                                "Unsupported Editor Settings",
+                                "Eclipse is configured to open this file externally, "
+                                    + "which is not supported by Saros.\n\nPlease change the configuration"
+                                    + " (Right Click on File -> Open With...) so that the file is opened in Eclipse."
+                                    + "\n\nAll further "
+                                    + "warnings of this type will be shown in the error "
+                                    + "log.");
+                    }
+                    return null;
+                }
                 return IDE.openEditor(page, file);
             } catch (PartInitException e) {
                 log.error("Could not initialize part: ", e);
