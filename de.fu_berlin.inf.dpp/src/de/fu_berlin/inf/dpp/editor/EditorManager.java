@@ -375,12 +375,38 @@ public class EditorManager implements IActivityProvider, Disposable {
                 editorPool.setDriverEnabled(isDriver);
             }
 
-            if (userToFollow != null) {
-                if (saros.getPreferenceStore().getBoolean(
-                    PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
-                    if (userToFollow.isObserver() && user.isDriver()
-                        && user.isRemote()) {
-                        setFollowing(user);
+            if (saros.getPreferenceStore().getBoolean(
+                PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER)) {
+
+                if (isDriver) {
+                    // If I became a driver, then I stop following
+                    if (user.isLocal() && userToFollow != null)
+                        setFollowing(null);
+
+                } else {
+                    // If I am not yet following anybody, or following an
+                    // observer
+                    if (userToFollow == null || userToFollow.isObserver()) {
+                        // If most recent change made somebody a driver
+                        if (user.isDriver() && user.isRemote()) {
+                            // start following...
+                            setFollowing(user);
+                        } else {
+                            // Find another driver to follow...
+                            boolean foundUser = false;
+                            for (User aUser : sharedProject.getParticipants()) {
+                                if (aUser.isDriver() && aUser.isRemote()) {
+                                    setFollowing(aUser);
+                                    foundUser = true;
+                                    break;
+                                }
+                            }
+                            // Did not find anybody, stopping to follow
+                            if (!foundUser) {
+                                if (userToFollow != null)
+                                    setFollowing(null);
+                            }
+                        }
                     }
                 }
             }
