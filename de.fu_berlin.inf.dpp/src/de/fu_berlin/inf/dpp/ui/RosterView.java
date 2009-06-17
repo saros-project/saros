@@ -66,8 +66,11 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
@@ -120,6 +123,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     protected List<Disposable> disposables = new ArrayList<Disposable>();
 
+    protected RosterViewTransferModeListener transferModeListener = new RosterViewTransferModeListener();
+
     @Inject
     protected DiscoveryManager discoManager;
 
@@ -140,6 +145,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
     @Inject
     protected PreferenceUtils preferenceUtils;
+
+    @Inject
+    protected DataTransferManager dataTransferManager;
 
     public RosterView() {
 
@@ -174,6 +182,20 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 }
             });
 
+        dataTransferManager.addTransferModeListener(transferModeListener);
+
+    }
+
+    private final class RosterViewTransferModeListener implements
+        ITransferModeListener {
+        public void clear() {
+            refreshRosterTree(true);
+        }
+
+        public void setTransferMode(JID jid, NetTransferMode newMode,
+            boolean incoming) {
+            refreshRosterTree(jid);
+        }
     }
 
     /**
@@ -400,11 +422,19 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 // Append DataTransfer State information
                 if (presence != null && presence.isAvailable()) {
 
+                    JID jid = new JID(entry.getUser());
+
+                    result.append(" "
+                        + dataTransferManager.getIncomingTransferMode(jid)
+                            .toString(), StyledString.QUALIFIER_STYLER);
+                    result.append(" <--> "
+                        + dataTransferManager.getOutgoingTransferMode(jid)
+                            .toString(), StyledString.QUALIFIER_STYLER);
+
                     JingleFileTransferManager manager = jingleManager
                         .getValue();
 
                     if (manager != null) {
-                        JID jid = new JID(entry.getUser());
 
                         FileTransferConnection connection = manager
                             .getConnection(jid);
@@ -525,6 +555,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
         for (Disposable disposable : disposables) {
             disposable.dispose();
         }
+
+        dataTransferManager.removeTransferModeListener(transferModeListener);
 
         saros.removeListener(this);
     }
