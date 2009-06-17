@@ -276,8 +276,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
 
         try {
-            SubMonitor fileListProgress = this.progressMonitor.newChild(10,
-                SubMonitor.SUPPRESS_NONE);
+            SubMonitor fileListProgress = this.progressMonitor.newChild(10);
             if (skipSync) {
                 this.transmitter.sendFileList(this.peer, remoteFileList,
                     fileListProgress);

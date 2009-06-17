@@ -26,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.window.Window;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -92,6 +93,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     protected Saros saros;
 
+    protected List<IResource> partialProjectResources;
+
     public SessionManager(Saros saros) {
         this.saros = saros;
         saros.addListener(this);
@@ -100,7 +103,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected static final Random sessionRandom = new Random(System
         .currentTimeMillis());
 
-    public void startSession(IProject project) throws XMPPException {
+    public void startSession(IProject project,
+        List<IResource> partialProjectResources) throws XMPPException {
         if (!saros.isConnected()) {
             throw new XMPPException("No connection");
         }
@@ -108,6 +112,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         JID myJID = saros.getMyJID();
         this.sessionID.setValue(String.valueOf(Math
             .abs(sessionRandom.nextInt())));
+        this.partialProjectResources = partialProjectResources;
 
         SharedProject sharedProject = new SharedProject(saros,
             this.transmitter, this.transferManager, project, myJID, stopManager);
@@ -273,7 +278,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 // TODO check if anybody is online, empty dialog feels
                 // strange
                 Window iw = new InvitationDialog(saros, sharedProject,
-                    EditorAPI.getShell(), toInvite, discoveryManager);
+                    EditorAPI.getShell(), toInvite, discoveryManager,
+                    partialProjectResources);
                 iw.open();
 
                 if (!sharedProject.isDriver()) {

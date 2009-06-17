@@ -1,8 +1,10 @@
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
@@ -38,7 +40,8 @@ public interface ISessionManager {
      * @throws XMPPException
      *             if this method is called with no established XMPP-connection.
      */
-    public void startSession(IProject project) throws XMPPException;
+    public void startSession(IProject project, List<IResource> resources)
+        throws XMPPException;
 
     /**
      * Creates a shared project for a session hosted remotely. The returned

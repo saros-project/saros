@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -127,6 +128,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     protected DiscoveryManager discoveryManager;
 
+    private List<IResource> resources;
+
     /**
      * Object representing a row in the {@link InvitationDialog#tableViewer}
      */
@@ -197,12 +200,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     }
 
     public InvitationDialog(Saros saros, SharedProject project,
-        Shell parentShell, List<JID> autoInvite, DiscoveryManager discoManager) {
+        Shell parentShell, List<JID> autoInvite, DiscoveryManager discoManager,
+        List<IResource> resources) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
         this.project = project;
         this.saros = saros;
         this.discoveryManager = discoManager;
+        this.resources = resources;
     }
 
     protected ExecutorService worker = Executors
@@ -472,7 +477,12 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
                 try {
-                    localFileList = new FileList(project.getProject());
+                    if (resources != null) {
+                        localFileList = new FileList(resources
+                            .toArray(new IResource[resources.size()]));
+                    } else {
+                        localFileList = new FileList(project.getProject());
+                    }
                 } catch (CoreException e) {
                     fileListCreationError = e;
                 }

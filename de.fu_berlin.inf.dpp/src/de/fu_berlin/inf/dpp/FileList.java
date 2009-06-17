@@ -128,7 +128,7 @@ public class FileList {
      */
     public FileList(IResource[] resources) throws CoreException {
 
-        addMembers(resources, this.all, false);
+        addMembers(resources, this.all, true);
         this.unaltered.putAll(this.all);
     }
 

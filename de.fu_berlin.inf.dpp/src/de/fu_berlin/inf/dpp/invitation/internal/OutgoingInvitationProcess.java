@@ -409,6 +409,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     @Override
     public void cancel(String errorMsg, boolean replicated) {
         super.cancel(errorMsg, replicated);
+
+        if (!this.monitor.isCanceled())
+            this.monitor.setCanceled(true);
+
         sharedProject.returnColor(this.colorID);
     }
 }
