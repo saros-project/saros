@@ -77,4 +77,11 @@ public class NoOperation implements Operation {
     public List<ITextOperation> getTextOperations() {
         return Collections.emptyList();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Operation invert() {
+        return new NoOperation();
+    }
 }

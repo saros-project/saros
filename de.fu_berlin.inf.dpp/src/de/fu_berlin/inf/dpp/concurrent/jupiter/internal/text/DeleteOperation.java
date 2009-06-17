@@ -128,4 +128,11 @@ public class DeleteOperation implements ITextOperation {
     public List<ITextOperation> getTextOperations() {
         return Collections.singletonList((ITextOperation) this);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ITextOperation invert() {
+        return new InsertOperation(getPosition(), getText());
+    }
 }

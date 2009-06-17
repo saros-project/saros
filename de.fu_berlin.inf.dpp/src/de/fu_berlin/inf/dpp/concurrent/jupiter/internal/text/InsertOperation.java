@@ -115,9 +115,7 @@ public class InsertOperation implements ITextOperation {
     }
 
     /**
-     * Returns the text to be deleted.
-     * 
-     * @return the text to be deleted
+     * @return the text to be inserted
      */
     public String getText() {
         return this.text;
@@ -128,8 +126,6 @@ public class InsertOperation implements ITextOperation {
     }
 
     /**
-     * Returns the origin position.
-     * 
      * @return the origin position
      */
     public int getOrigin() {
@@ -185,4 +181,10 @@ public class InsertOperation implements ITextOperation {
         return Collections.singletonList((ITextOperation) this);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public ITextOperation invert() {
+        return new DeleteOperation(getPosition(), getText());
+    }
 }

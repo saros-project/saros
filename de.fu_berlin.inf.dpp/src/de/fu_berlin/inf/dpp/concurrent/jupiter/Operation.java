@@ -31,4 +31,11 @@ public interface Operation {
      */
     List<ITextOperation> getTextOperations();
 
+    /**
+     * @return the Operation that reverts the effect of this Operation if it is
+     *         executed afterwards; e.g. if this is a DeleteOperation(5,"abc")
+     *         the inverted Operation is InsertOperation(5,"abc")
+     */
+    public Operation invert();
+
 }

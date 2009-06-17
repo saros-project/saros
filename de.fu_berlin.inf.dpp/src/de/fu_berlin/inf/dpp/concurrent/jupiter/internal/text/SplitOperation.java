@@ -222,6 +222,13 @@ public class SplitOperation implements Operation {
                     .getText()
                     + delete2.getText());
             }
+            // Del(8,"c") + Del(6,"ab") -> Del(6,"abc")
+            if (delete1.getPosition() == delete2.getPosition()
+                + delete2.getTextLength()) {
+                return new DeleteOperation(delete2.getPosition(), delete2
+                    .getText()
+                    + delete1.getText());
+            }
         }
         // Nothing can be combined
         return null;
@@ -249,5 +256,11 @@ public class SplitOperation implements Operation {
                 return true;
         }
         return false;
+    }
+
+    public Operation invert() {
+        Operation inverseOperation = new SplitOperation(getSecond().invert(),
+            getFirst().invert());
+        return inverseOperation;
     }
 }
