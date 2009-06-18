@@ -67,6 +67,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -299,6 +300,9 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(LeaveExtension.class);
         this.container.addComponent(RequestForFileListExtension.class);
 
+        // Statistic collectors
+        this.container.addComponent(SessionDataCollector.class);
+        
         /*
          * The following classes are initialized by the re-injector because they
          * are created by Eclipse:
