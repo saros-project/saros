@@ -377,6 +377,8 @@ public class DataTransferManager implements ConnectionSessionListener {
         public NetTransferMode send(TransferDescription data, byte[] content,
             SubMonitor progress) throws IOException {
 
+            log.error("handmade Transmitter was used");
+
             final int maxMsgLen = saros.getPreferenceStore().getInt(
                 PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE);
 
@@ -493,7 +495,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             if (transfer.getStatus() == Status.error) {
                 throw new IOException("XMPPError in IBB-FileTransfer: "
-                    + transfer.getError(), transfer.getException());
+                    + transfer.getError() + " caused by: "
+                    + transfer.getException());
             }
 
             if (transfer.getStatus() != Status.complete) {
@@ -539,11 +542,6 @@ public class DataTransferManager implements ConnectionSessionListener {
             if (Saros.getFileTransferModeViaChat())
                 return false;
 
-            /*
-             * TODO This is not a safe way to determine whether the user really
-             * supports Jingle at this point in time - He might have left and
-             * reconnected and changed his Jingle settings in between
-             */
             if (!discoveryManager.isJingleSupported(jid))
                 return false;
 
@@ -727,6 +725,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             String fileListAsString;
             try {
+                // TODO: ZipInflaterStream benutzen
                 fileListAsString = Util.read(input);
             } catch (IOException e) {
                 log.error("Error receiving FileList", e);

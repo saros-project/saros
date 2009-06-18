@@ -1,7 +1,7 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -112,18 +112,18 @@ public class SessionStatistic {
     public File toFile(IPath path, String filename) {
         String pathString = path.append(filename).toString();
         File file = new File(pathString);
-        FileWriter writer = null;
+        FileOutputStream fos = null;
         log.debug("Writing statistic data to " + pathString);
 
         try {
-            writer = new FileWriter(file);
-            data.store(writer, "Saros session data");
+            fos = new FileOutputStream(file);
+            data.store(fos, "Saros session data");
         } catch (IOException e) {
             log.error("Couldn't write session data to file " + path, e);
             return null;
         } finally {
             try {
-                writer.close();
+                fos.close();
             } catch (IOException e) {
                 log.warn("An IOException occurred while trying to"
                     + " close FileWriter.");
