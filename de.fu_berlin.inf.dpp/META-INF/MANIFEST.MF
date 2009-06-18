@@ -39,7 +39,8 @@ Bundle-ClassPath: bin/,
  lib/picocontainer-gems-2.7.jar,
  lib/cglib-nodep-2.1_3.jar,
  lib/easymock-2.0.jar,
- lib/easymockclassextension-2.0-pre-release.jar
+ lib/easymockclassextension-2.0-pre-release.jar,
+ lib/commons-httpclient-3.1.jar
 Export-Package: de.fu_berlin.inf.dpp;
   uses:="org.eclipse.core.runtime,
    org.jivesoftware.smack.packet,
