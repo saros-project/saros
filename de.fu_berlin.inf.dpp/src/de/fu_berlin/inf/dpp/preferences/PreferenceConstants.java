@@ -89,4 +89,6 @@ public class PreferenceConstants {
 
     public static final String SAROS_VERSION = "saros.version";
 
+    public static final String RANDOM_USER_ID = "user.id";
+
 }
