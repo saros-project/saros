@@ -628,7 +628,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendMessage(JID jid, PacketExtension extension) {
 
         // TODO Also queue like in sendMessageToAll if user is offline
-        if (!this.connection.isConnected()) {
+        if (this.connection == null || !this.connection.isConnected()) {
             queueMessage(jid, extension);
             return;
         }
