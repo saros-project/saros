@@ -507,7 +507,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             log.debug("[IBB] Finished sending to " + data.getRecipient() + ": "
                 + data.toString() + ", size: " + content.length / 1024
                 + " kbyte in "
-                + (((System.currentTimeMillis() - startTime) / 100) / 1.0)
+                + (((System.currentTimeMillis() - startTime) / 100) / 10.0)
                 + "s");
 
             return NetTransferMode.IBB;
