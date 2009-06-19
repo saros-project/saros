@@ -183,8 +183,10 @@ class EnterProjectNamePage extends WizardPage {
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    EnterProjectNamePage.this.updateProjectText
-                        .setText(getProjectDialog("Select project for update."));
+                    String projectName = getProjectDialog("Select project for update.");
+                    if (projectName != null)
+                        EnterProjectNamePage.this.updateProjectText
+                            .setText(projectName);
                 }
             });
 
@@ -251,6 +253,8 @@ class EnterProjectNamePage extends WizardPage {
 
     /**
      * Browse dialog to select project for copy.
+     * 
+     * Returns null if the dialog was canceled.
      */
     public String getProjectDialog(String title) {
         ContainerSelectionDialog dialog = new ContainerSelectionDialog(
