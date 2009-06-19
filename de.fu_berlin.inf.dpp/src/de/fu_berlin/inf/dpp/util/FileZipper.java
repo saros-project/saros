@@ -38,7 +38,7 @@ public class FileZipper {
     public final static boolean calculateChecksum = false;
 
     /**
-     * Given a list of files belonging to the given project, this method will
+     * Given a list of *files* belonging to the given project, this method will
      * create a zip file at the given archive location (overwriting any existing
      * content).
      * 
@@ -47,6 +47,9 @@ public class FileZipper {
      * @cancelable This operation can be canceled via the given progress
      *             monitor. If the operation was canceled the zip file is
      *             deleted prior to throwing an OperationCanceldException.
+     * 
+     * @throws IllegalArgumentException
+     *             if the list of files contains a directory
      */
     public static void createProjectZipArchive(List<IPath> files, File archive,
         IProject project, SubMonitor progress) throws Exception {
@@ -78,6 +81,13 @@ public class FileZipper {
             log.debug("Compress file: " + path);
 
             File file = project.getFile(path).getLocation().toFile();
+
+            if (file.isDirectory()) {
+                archive.delete();
+                throw new IllegalArgumentException(
+                    "Zipping directories is not supported: " + path);
+            }
+
             if (file.exists()) {
                 zipStream.putNextEntry(new ZipEntry(path.toPortableString()));
 
