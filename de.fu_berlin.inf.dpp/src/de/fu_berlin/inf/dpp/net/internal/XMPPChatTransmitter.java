@@ -462,7 +462,7 @@ public class XMPPChatTransmitter implements ITransmitter,
          * default encoding.
          */
         dataManager.sendData(data, fileList.toXML().getBytes(), progress
-            .newChild(100, SubMonitor.SUPPRESS_NONE));
+            .newChild(100));
 
         progress.done();
     }
