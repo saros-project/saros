@@ -424,13 +424,20 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
                     JID jid = new JID(entry.getUser());
 
-                    result.append(" "
-                        + dataTransferManager.getIncomingTransferMode(jid)
-                            .toString(), StyledString.QUALIFIER_STYLER);
-                    result.append(" <--> "
-                        + dataTransferManager.getOutgoingTransferMode(jid)
-                            .toString(), StyledString.QUALIFIER_STYLER);
-
+                    NetTransferMode in = dataTransferManager.getIncomingTransferMode(jid);
+                    NetTransferMode out = dataTransferManager.getOutgoingTransferMode(jid);
+                    
+                    if (in !=  NetTransferMode.UNKNOWN || out != NetTransferMode.UNKNOWN ){
+                        result.append(" Last Data Transfer - ", StyledString.QUALIFIER_STYLER);
+                    }
+                    if (in != NetTransferMode.UNKNOWN){
+                        result.append("In: " + in.toString() + " ", StyledString.QUALIFIER_STYLER);
+                    }
+                    if (out != NetTransferMode.UNKNOWN){
+                        result.append("Out: "
+                        + out.toString(), StyledString.QUALIFIER_STYLER);
+                    }
+                    
                     JingleFileTransferManager manager = jingleManager
                         .getValue();
 
@@ -442,9 +449,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
                         if (connection != null) {
                             JingleConnectionState state = connection.getState();
                             if (state == JingleConnectionState.ESTABLISHED) {
-                                result.append(" ["
+                                /*result.append(" ["
                                     + connection.getTransferMode().toString()
-                                    + "]", StyledString.QUALIFIER_STYLER);
+                                    + "]", StyledString.QUALIFIER_STYLER); */
                             } else {
                                 result.append(" [" + state.toString() + "]",
                                     StyledString.QUALIFIER_STYLER);
