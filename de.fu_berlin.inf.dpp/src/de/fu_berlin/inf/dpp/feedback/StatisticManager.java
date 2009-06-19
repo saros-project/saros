@@ -291,7 +291,8 @@ public class StatisticManager extends AbstractFeedbackManager {
     }
 
     /**
-     * Saves the statistic in a file and submits it to our Tomcat server.
+     * Saves the statistic in a file and submits it to our Tomcat server if the
+     * user has permitted statistic submission.
      * 
      * @nonblocking Because the upload might take some time, it is executed
      *              asynchronously in a new thread.
@@ -302,7 +303,15 @@ public class StatisticManager extends AbstractFeedbackManager {
             public void run() {
                 File file = statistic.toFile(saros.getStateLocation(),
                     createFileName());
-                FileSubmitter.uploadStatisticFile(file);
+                // only submit, if user permitted submission
+                if (isStatisticSubmissionAllowed()) {
+                    FileSubmitter.uploadStatisticFile(file);
+                } else {
+                    log.info(String.format(
+                        "Statistic was gathered and saved to %s,"
+                            + " but the submission is forbidden by the user",
+                        file.getAbsolutePath()));
+                }
             }
 
         });
@@ -330,8 +339,8 @@ public class StatisticManager extends AbstractFeedbackManager {
         }
 
         /*
-         * write statistic to file, if all data has arrived and send it to our
-         * server
+         * write statistic to file, if all data has arrived; send it to our
+         * server, if user permitted submission
          */
         if (activeCollectors.isEmpty()) {
             saveAndSubmitStatistic();
