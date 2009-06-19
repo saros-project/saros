@@ -195,8 +195,8 @@ public interface ITransmitter {
      *             cancellation.
      * 
      * @throws IOException
-     *             If the file could not be read or an error occurred while
-     *             sending
+     *             If the given path identifies no file (but a directory), the
+     *             file could not be read or an error occurred while sending
      */
     public void sendFile(JID to, IProject project, IPath path,
         int sequenceNumber, SubMonitor monitor) throws IOException;

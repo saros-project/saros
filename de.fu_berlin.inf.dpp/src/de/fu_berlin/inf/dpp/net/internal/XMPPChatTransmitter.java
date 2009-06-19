@@ -477,8 +477,12 @@ public class XMPPChatTransmitter implements ITransmitter,
                 path, sequenceNumber, sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
-
+        if (!f.isFile())
+            throw new IOException("No file found for given path: " + path);
+        
         progress.subTask("Reading file " + path.lastSegment());
+        
+        // TODO Use Eclipse to read file?
         byte[] content = FileUtils.readFileToByteArray(f);
         progress.newChild(10, SubMonitor.SUPPRESS_NONE).done();
 
