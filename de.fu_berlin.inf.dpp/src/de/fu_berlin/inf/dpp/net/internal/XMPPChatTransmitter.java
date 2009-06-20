@@ -479,9 +479,9 @@ public class XMPPChatTransmitter implements ITransmitter,
         File f = new File(project.getFile(path).getLocation().toOSString());
         if (!f.isFile())
             throw new IOException("No file found for given path: " + path);
-        
+
         progress.subTask("Reading file " + path.lastSegment());
-        
+
         // TODO Use Eclipse to read file?
         byte[] content = FileUtils.readFileToByteArray(f);
         progress.newChild(10, SubMonitor.SUPPRESS_NONE).done();
@@ -522,8 +522,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendFileChecksumErrorMessage(List<JID> recipients,
         Set<IPath> paths, boolean resolved) {
 
-        XMPPChatTransmitter.log.debug("Sending checksum "
-            + (resolved ? "resolved" : "error") + " message of files "
+        XMPPChatTransmitter.log.debug("Sending checksum message ("
+            + (resolved ? "resolved" : "error") + ") message of files "
             + Util.toOSString(paths) + " to " + recipients);
 
         for (JID recipient : recipients) {
