@@ -44,6 +44,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -201,6 +202,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
     @Inject
     protected EditorManager editorManager;
 
+    @Inject
+    protected IsInconsistentObservable isInconsistent;
+
     protected ISessionManager sessionManager;
 
     public SharedResourcesManager(ISessionManager sessionManager,
@@ -267,7 +271,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 log.warn("Resource changed while paused.");
             return;
         }
-        if (replicationInProgress)
+
+        /*
+         * HACK Rather than checking whether there is an inconsistency, the
+         * SharedResourcesManager should be stopped.
+         */
+        if (replicationInProgress || isInconsistent.getValue())
             return;
 
         try {
