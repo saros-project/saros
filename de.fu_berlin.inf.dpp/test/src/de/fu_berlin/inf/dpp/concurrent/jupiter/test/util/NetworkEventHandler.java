@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.NetworkRequest;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
