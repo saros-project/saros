@@ -22,13 +22,12 @@ package de.fu_berlin.inf.dpp.invitation.internal;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -49,7 +48,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * An outgoing invitation process.
  * 
  * TODO FIXME The whole invitation procedure needs to be completely redone,
- * because it can cause race conditions. In particular cancelation is not
+ * because it can cause race conditions. In particular cancellation is not
  * possible at arbitrary times (something like an CANCEL_ACK is needed)
  * 
  * @author rdjemili
@@ -118,15 +117,10 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         setState(State.SYNCHRONIZING);
 
         try {
-            FileList diff = this.remoteFileList.diff(localFileList);
-
-            List<IPath> added = diff.getAddedPaths();
-            List<IPath> altered = diff.getAlteredPaths();
-            // TODO A linked list might be more efficient. See #sendNext().
-            this.toSend = new ArrayList<IPath>(added.size() + altered.size());
-            this.toSend.addAll(added);
-            this.toSend.addAll(altered);
-
+            this.toSend = new LinkedList<IPath>();
+            this.toSend.addAll(this.remoteFileList.getAddedPaths());
+            this.toSend.addAll(this.remoteFileList.getAlteredPaths());
+            
             JingleFileTransferManager jingleManager = dataTransferManager
                 .getJingleManager();
 
@@ -179,15 +173,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             if (this.state == State.CANCELED)
                 return;
 
+            setState(State.HOST_FILELIST_SENT);
             this.transmitter.sendFileList(this.peer, this.localFileList,
-                SubMonitor.convert(new NullProgressMonitor()));
-            pmAccept.worked(70);
+                pmAccept.newChild(70));
 
             // Could have been canceled in between:
             if (this.state == State.CANCELED)
                 return;
-
-            setState(State.HOST_FILELIST_SENT);
+            
         } catch (Exception e) {
             failed(e);
         }
@@ -297,7 +290,12 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             while (this.toSend.size() > 0 && getState() != State.CANCELED) {
 
                 IPath path = this.toSend.remove(0);
-
+                if (!this.sharedProject.getProject().getFile(path).exists()){
+                    log.error("File to send to " + this.peer + " does not exist: " + path);
+                    cancel("Requested file does not exist at host: " + path, false);
+                    return;
+                }
+                
                 try {
                     monitor.subTask("Sending: " + path.lastSegment());
                     this.transmitter.sendFile(this.peer, this.sharedProject
@@ -305,6 +303,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                         monitor.newChild(1));
                 } catch (IOException e) {
                     failed(e);
+                    return;
                 }
             }
 

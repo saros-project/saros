@@ -31,10 +31,12 @@ import java.util.Set;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.SubMonitor;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -344,4 +346,95 @@ public class FileList {
             }
         }
     }
+
+    /**
+     * Removes all resources marked as removed in this FileList from the given
+     * project.
+     * 
+     * @param localProject
+     *            the local project were the shared project will be replicated.
+     * @throws CoreException
+     */
+    public FileList removeUnneededResources(IProject localProject,
+        SubMonitor monitor) throws CoreException {
+
+        // TODO don't throw CoreException
+        // TODO check if this triggers the resource listener
+
+        List<IPath> toDelete = this.getRemovedPaths();
+        monitor.beginTask("Removing resources", toDelete.size());
+
+        for (IPath path : toDelete) {
+
+            monitor.subTask("Deleting " + path.lastSegment());
+            if (path.hasTrailingSeparator()) {
+                IFolder folder = localProject.getFolder(path);
+
+                if (folder.exists()) {
+                    folder.delete(true, monitor.newChild(1));
+                }
+
+            } else {
+                IFile file = localProject.getFile(path);
+
+                // check if file exists because it might have already been
+                // deleted when deleting its folder
+                if (file.exists()) {
+                    file.delete(true, monitor.newChild(1));
+                }
+            }
+        }
+
+        FileList result = new FileList();
+        result.added.putAll(this.added);
+        result.altered.putAll(this.altered);
+        // Removed is empty now
+        result.unaltered.putAll(this.unaltered);
+        result.readResolve();
+
+        monitor.done();
+
+        return result;
+    }
+
+    /**
+     * Will create all folders contained in this FileList for the given project
+     * and return a FileList which does not contain these folders.
+     * 
+     * Note: All parent folders of any folder contained in the FileList must be
+     * contained as well.
+     * 
+     * @throws CoreException
+     */
+    public FileList addAllFolders(IProject localProject, SubMonitor monitor)
+        throws CoreException {
+
+        List<IPath> toCheck = this.getAddedPaths();
+        monitor.beginTask("Adding folders", toCheck.size());
+
+        FileList result = new FileList();
+        result.altered.putAll(this.altered);
+        result.removed.putAll(this.removed);
+        result.unaltered.putAll(this.unaltered);
+
+        for (IPath path : toCheck) {
+
+            if (path.hasTrailingSeparator()) {
+                IFolder folder = localProject.getFolder(path);
+                if (!folder.exists()) {
+                    monitor.subTask("Creating folder " + path.lastSegment());
+                    folder.create(true, true, monitor.newChild(1));
+                    continue;
+                }
+            } else {
+                result.added.put(path, added.get(path));
+            }
+            monitor.worked(1);
+        }
+        result.readResolve();
+
+        monitor.done();
+        return result;
+    }
+
 }
