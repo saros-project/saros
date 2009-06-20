@@ -144,7 +144,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     /**
      * Class for providing labels of the {@link InvitationDialog#tableViewer}
      */
-    private class MyLabelProvider extends LabelProvider implements
+    private class InvitationDialogLabelProvider extends LabelProvider implements
         ITableLabelProvider {
 
         public Image getColumnImage(Object element, int columnIndex) {
@@ -152,7 +152,16 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
 
         public String getColumnText(Object element, int columnIndex) {
+            try {
+                return getColumnTextUnsafe(element, columnIndex);
+            } catch (RuntimeException e) {
+                log.error("An internal error occurred "
+                    + "in the LabelProvider:", e);
+                return "error";
+            }
+        }
 
+        private String getColumnTextUnsafe(Object element, int columnIndex) {
             InviterData item = (InviterData) element;
 
             switch (columnIndex) {
@@ -216,7 +225,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
     public void updateSarosSupportLater(final JID jid) {
 
-        worker.execute(new Runnable() {
+        worker.execute(Util.wrapSafe(log, new Runnable() {
             public void run() {
 
                 // Perform blocking Disco update
@@ -225,7 +234,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 // Update UI with the new information
                 updateInvitationProgress(jid);
             }
-        });
+        }));
     }
 
     @Override
@@ -260,7 +269,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.table = this.tableViewer.getTable();
         this.table.setLinesVisible(true);
         this.tableViewer.setContentProvider(new ArrayContentProvider());
-        this.tableViewer.setLabelProvider(new MyLabelProvider());
+        this.tableViewer.setLabelProvider(new InvitationDialogLabelProvider());
         this.table.setHeaderVisible(true);
         this.table.setLayoutData(gd);
         TableColumn column = new TableColumn(this.table, SWT.NONE);
@@ -524,7 +533,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     /**
      * Triggers the update of the given user in the table in a GUI thread.
      * 
-     * If jig == null then the whole table is refreshed.
+     * If jid == null then the whole table is refreshed.
      * 
      */
     public void updateInvitationProgress(final JID jid) {
