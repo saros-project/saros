@@ -92,12 +92,13 @@ public class UserListHandler {
                     // This user is not part of our project
                     user = new User(project, receivedUser.getJID(),
                         receivedUser.getColorID());
+                    user.setUserRole(receivedUser.getUserRole());
 
                     // Add him and send him a message, and tell him our
                     // color
                     project.addUser(user);
 
-                    // TODO This needs to be
+                    // TODO This needs to be synchronized
                     transmitter.sendMessage(user.getJID(), joinExtension
                         .create(project.getLocalUser().getColorID()));
                 } else {
