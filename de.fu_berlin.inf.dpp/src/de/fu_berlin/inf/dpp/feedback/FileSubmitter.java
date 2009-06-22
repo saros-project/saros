@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.httpclient.ConnectTimeoutException;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
@@ -11,9 +12,12 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+
+import de.fu_berlin.inf.dpp.util.CausedIOException;
 
 /**
  * The FileSubmitter class provides static methods to upload a file to a server.
@@ -43,20 +47,37 @@ public class FileSubmitter {
      * {@link #SERVER_URL_TEMP}. <br>
      * <br>
      * Because the statistic file upload is supposed to take place behind the
-     * scenes, no user feedback is reported back.
+     * scenes, no user feedback is reported back at this time <br>
+     * <br>
+     * TODO Some progress feedback is actually desirable, so the
+     * NullProgressMonitor should be replaced. Progress of the statistic
+     * submission should be shown in the workbench window's status bar (see
+     * IWorkbenchWindow#run()).
      * 
      * @param file
      *            the file to upload
-     * @return true, if the upload was successful, false otherwise
+     * @throws IOException
+     *             is thrown, if the upload failed; the exception wraps the
+     *             target exception that contains the main cause for the failure
      * 
      * @blocking
      */
-    public static boolean uploadStatisticFile(File file) {
-        boolean success = uploadFile(file, SERVER_URL + SERVLET_NAME,
-            SubMonitor.convert(new NullProgressMonitor()));
-        if (success)
-            return true;
-        return uploadFile(file, SERVER_URL_TEMP + SERVLET_NAME, SubMonitor
+    public static void uploadStatisticFile(File file) throws IOException {
+        /*
+         * TODO this first call is expected to fail at the moment, because the
+         * tomcat server isn't yet installed on projects.mi.fu-berlin.de/saros
+         */
+        try {
+            uploadFile(file, SERVER_URL + SERVLET_NAME, SubMonitor
+                .convert(new NullProgressMonitor()));
+            return;
+        } catch (IOException e) {
+            log.debug(String.format(
+                "Because the real server is not running right now, "
+                    + "the following message is expected: %s. %s", e
+                    .getMessage(), e.getCause().getMessage()));
+        }
+        uploadFile(file, SERVER_URL_TEMP + SERVLET_NAME, SubMonitor
             .convert(new NullProgressMonitor()));
     }
 
@@ -69,22 +90,29 @@ public class FileSubmitter {
      *            the URL of the server, that is supposed to handle the file
      * @param progress
      *            a SubMonitor to report progress to
-     * @return true, if the upload was successful, false otherwise
+     * @throws IOException
+     *             is thrown, if the upload failed; the exception wraps the
+     *             target exception that contains the main cause for the failure
      * 
      * @blocking
      */
-    public static boolean uploadFile(File file, String server,
-        SubMonitor progress) {
+    public static void uploadFile(File file, String server, SubMonitor progress)
+        throws IOException {
         if (file == null || !file.exists()) {
-            log.error("The file that should be uploaded was"
-                + " either null or nonexistent.");
-            return false;
+            throw new CausedIOException("Upload not possible",
+                new IllegalArgumentException(
+                    "The file that should be uploaded was"
+                        + " either null or nonexistent"));
         }
+
+        // TODO report progress to the SubMonitor
 
         // begin task of unknown length
         progress.beginTask("Uploading file " + file.getName(), 10000);
 
         PostMethod post = new PostMethod(server);
+        // holds the status response after the method was executed
+        int status = 0;
 
         post.getParams().setBooleanParameter(
             HttpMethodParams.USE_EXPECT_CONTINUE, true);
@@ -111,31 +139,32 @@ public class FileSubmitter {
                 TIMEOUT);
 
             log.info("Trying to upload file " + file.getName() + " to "
-                + server + "...");
+                + server + " ...");
 
             // try to upload the file
-            int status = client.executeMethod(post);
+            status = client.executeMethod(post);
 
             // examine status response
             if (status == HttpStatus.SC_OK) {
-                log.info("Upload successfull. Server response="
-                    + post.getResponseBodyAsString());
-                return true;
+                log.info("Upload successfull. Server response: "
+                    + IOUtils.toString(post.getResponseBodyAsStream()));
+                return;
             }
 
-            log.error("Upload failed. Server response=" + status + " "
-                + HttpStatus.getStatusText(status));
         } catch (ConnectTimeoutException e) {
             // couldn't connect within the timeout
-            log.warn(e.getMessage());
+            throw new CausedIOException("Couldn't connect to host " + server, e);
         } catch (Exception e) {
-            log.error("An internal error occurred while trying to upload file "
-                + file.getName(), e);
+            throw new CausedIOException(
+                "An internal error occurred while trying to upload file "
+                    + file.getName(), e);
         } finally {
             post.releaseConnection();
             progress.done();
         }
         // upload failed
-        return false;
+        throw new CausedIOException("Upload failed", new RuntimeException(
+            "Server response: " + status + " "
+                + HttpStatus.getStatusText(status)));
     }
 }

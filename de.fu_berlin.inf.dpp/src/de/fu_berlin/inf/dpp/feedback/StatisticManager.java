@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -303,9 +304,15 @@ public class StatisticManager extends AbstractFeedbackManager {
             public void run() {
                 File file = statistic.toFile(saros.getStateLocation(),
                     createFileName());
+
                 // only submit, if user permitted submission
                 if (isStatisticSubmissionAllowed()) {
-                    FileSubmitter.uploadStatisticFile(file);
+                    try {
+                        FileSubmitter.uploadStatisticFile(file);
+                    } catch (IOException e) {
+                        log.error(String.format("Couldn't upload file: %s. %s",
+                            e.getMessage(), e.getCause().getMessage()));
+                    }
                 } else {
                     log.info(String.format(
                         "Statistic was gathered and saved to %s,"
