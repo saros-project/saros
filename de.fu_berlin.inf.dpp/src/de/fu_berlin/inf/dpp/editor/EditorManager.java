@@ -812,13 +812,10 @@ public class EditorManager implements IActivityProvider, Disposable {
             replacedText = sb.toString();
         }
 
-        TextEditActivity activity = new TextEditActivity(sharedProject
-            .getLocalUser().getJID().toString(), offset, text, replacedText,
-            path);
-
         EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
-        fireActivity(activity);
+        fireActivity(new TextEditActivity(sharedProject.getLocalUser().getJID()
+            .toString(), offset, text, replacedText, path));
 
         /*
          * TODO Investigate if this is really needed here

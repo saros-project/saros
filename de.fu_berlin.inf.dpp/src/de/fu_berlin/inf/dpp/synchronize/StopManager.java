@@ -262,11 +262,10 @@ public class StopManager implements IActivityProvider, Disposable {
             throw new IllegalStateException(
                 "cannot initiate unlock without a shared project");
 
-        IActivity stopActivity = new StopActivity(sharedProject.getLocalUser()
-            .getJID().toString(), sharedProject.getLocalUser().getJID(), handle
+        fireActivity(new StopActivity(sharedProject.getLocalUser().getJID()
+            .toString(), sharedProject.getLocalUser().getJID(), handle
             .getUser().getJID(), Type.UNLOCKREQUEST, State.INITIATED, handle
-            .getHandleID());
-        fireActivity(stopActivity);
+            .getHandleID()));
     }
 
     /**

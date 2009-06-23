@@ -607,6 +607,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     public void sendActivities(Collection<JID> recipients,
         List<IActivity> activities) {
 
+        if (recipients.contains(null) || activities.contains(null))
+            throw new IllegalArgumentException();
+
         setSenderOnTextEditActivities(activities);
 
         // Send the activities to each user.
@@ -708,6 +711,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     public void activityCreated(IActivity activity) {
 
+        if (activity == null)
+            throw new IllegalArgumentException("Activity cannot be null");
+
         /* Let ConcurrentDocumentManager have a look at the activities first */
         boolean consumed = this.concurrentDocumentManager
             .activityCreated(activity);
@@ -791,6 +797,8 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             result.add(entry.getValue());
         }
 
+        assert !result.contains(null);
+
         return result;
     }
 
@@ -844,6 +852,9 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * @swt Must be called from the SWT Thread
      */
     public void execTransformedActivity(IActivity activity) {
+
+        if (activity == null)
+            throw new IllegalArgumentException("Activity cannot be null");
 
         assert Util.isSWT();
 

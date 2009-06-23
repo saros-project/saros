@@ -190,7 +190,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         private void fireActivity(IActivity activity) {
-            for (IActivityListener listener : SharedResourcesManager.this.listeners) {
+            for (IActivityListener listener : listeners) {
                 listener.activityCreated(activity);
             }
         }

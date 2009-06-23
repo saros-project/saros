@@ -159,7 +159,7 @@ public class SplitOperation implements Operation {
                 lastOp = null;
                 continue;
             } else {
-                // Cannot combine to operations to a replace
+                // Cannot combine two operations to a replace
                 result.addAll(lastOp.toTextEdit(path, source));
                 lastOp = operation;
             }

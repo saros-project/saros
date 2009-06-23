@@ -33,7 +33,6 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
@@ -197,9 +196,8 @@ public class SharedProject implements ISharedProject, Disposable {
         assert localUser.isHost() : "Only the host can initiate role changes";
 
         if (user.isHost()) {
-            IActivity activity = new RoleActivity(getLocalUser().getJID()
-                .toString(), user.getJID().toString(), newRole);
-            activitySequencer.activityCreated(activity);
+            activitySequencer.activityCreated(new RoleActivity(getLocalUser()
+                .getJID().toString(), user.getJID().toString(), newRole));
 
             setUserRole(user, newRole);
         } else {
@@ -214,9 +212,9 @@ public class SharedProject implements ISharedProject, Disposable {
                         return;
                     }
 
-                    IActivity activity = new RoleActivity(getLocalUser()
-                        .getJID().toString(), user.getJID().toString(), newRole);
-                    activitySequencer.activityCreated(activity);
+                    activitySequencer.activityCreated(new RoleActivity(
+                        getLocalUser().getJID().toString(), user.getJID()
+                            .toString(), newRole));
 
                     setUserRole(user, newRole);
 
