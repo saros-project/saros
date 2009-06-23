@@ -38,6 +38,8 @@ public class AllowStatisticSubmissionPage extends WizardPage implements
         setTitle(Messages.getString("feedback.statistic.page.title")); //$NON-NLS-1$
         setDescription(Messages
             .getString("feedback.statistic.page.description")); //$NON-NLS-1$
+
+        // HACK Do not use pico container directly in a dynamic context
         Saros.reinject(this);
     }
 

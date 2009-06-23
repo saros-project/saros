@@ -9,6 +9,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 
 /**
@@ -17,6 +18,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
  * 
  * @author rdjemili
  */
+@Component(module = "prefs")
 public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
 

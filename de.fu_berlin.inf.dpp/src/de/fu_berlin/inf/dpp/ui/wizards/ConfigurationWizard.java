@@ -57,6 +57,10 @@ public class ConfigurationWizard extends Wizard {
         setDefaultPageImageDescriptor(SarosUI
             .getImageDescriptor("icons/saros-logo.png"));
 
+        /*
+         * HACK Changing UI components like the configuration wizard should not
+         * use PicoContainer directly.
+         */
         Saros.reinject(this);
 
         if (askForAccount) {

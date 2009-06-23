@@ -8,11 +8,17 @@ import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
+/**
+ * Action which triggers the viewport of the local user to be changed to a local
+ * user's one.
+ */
+@Component(module = "action")
 public class JumpToDriverPositionAction extends SelectionProviderAction
     implements Disposable {
 

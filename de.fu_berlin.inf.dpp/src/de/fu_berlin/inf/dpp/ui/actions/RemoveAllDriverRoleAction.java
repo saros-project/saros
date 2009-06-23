@@ -24,6 +24,7 @@ import org.eclipse.jface.action.Action;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -40,6 +41,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author orieger
  * 
  */
+@Component(module = "action")
 public class RemoveAllDriverRoleAction extends Action {
 
     public static final String ACTION_ID = RemoveAllDriverRoleAction.class
