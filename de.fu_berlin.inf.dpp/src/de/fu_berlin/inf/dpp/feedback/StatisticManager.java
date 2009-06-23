@@ -273,7 +273,7 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     /**
      * Creates a name for the statistic file, based on a static prefix, the
-     * session ID, the user ID and the static file extension. <br>
+     * session ID, the user ID, the current time and the static file extension. <br>
      * <br>
      * NOTE: Should only be called on session end, after information gathering
      * is complete. Otherwise the session ID doesn't yet exist and thus a new
@@ -287,8 +287,8 @@ public class StatisticManager extends AbstractFeedbackManager {
         if (sessionID == null) {
             sessionID = String.valueOf(random.nextInt(Integer.MAX_VALUE));
         }
-        return STATISTIC_FILE_NAME + "_" + sessionID + "_" + getUserID()
-            + STATISTIC_FILE_EXTENSION;
+        return STATISTIC_FILE_NAME + "_" + sessionID + "_" + getUserID() + "_"
+            + System.currentTimeMillis() + STATISTIC_FILE_EXTENSION;
     }
 
     /**
