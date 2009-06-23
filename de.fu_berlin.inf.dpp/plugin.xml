@@ -67,7 +67,7 @@
                class="de.fu_berlin.inf.dpp.ui.actions.PartialNewSessionAction"
                icon="icons/transmit.png"
                id="Saros.action2"
-               label="Share project partially...">
+               label="Share project partially (experimental)...">
          </action>
          <visibility>
                <objectClass name="org.eclipse.core.resources.IProject"/>

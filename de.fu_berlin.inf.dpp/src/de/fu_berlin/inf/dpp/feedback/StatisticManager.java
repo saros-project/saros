@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.feedback;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -272,7 +273,7 @@ public class StatisticManager extends AbstractFeedbackManager {
 
     /**
      * Creates a name for the statistic file, based on a static prefix, the
-     * session ID, the user ID and the static file extension. <br>
+     * session ID, the user ID, the current time and the static file extension. <br>
      * <br>
      * NOTE: Should only be called on session end, after information gathering
      * is complete. Otherwise the session ID doesn't yet exist and thus a new
@@ -286,12 +287,13 @@ public class StatisticManager extends AbstractFeedbackManager {
         if (sessionID == null) {
             sessionID = String.valueOf(random.nextInt(Integer.MAX_VALUE));
         }
-        return STATISTIC_FILE_NAME + "_" + sessionID + "_" + getUserID()
-            + STATISTIC_FILE_EXTENSION;
+        return STATISTIC_FILE_NAME + "_" + sessionID + "_" + getUserID() + "_"
+            + System.currentTimeMillis() + STATISTIC_FILE_EXTENSION;
     }
 
     /**
-     * Saves the statistic in a file and submits it to our Tomcat server.
+     * Saves the statistic in a file and submits it to our Tomcat server if the
+     * user has permitted statistic submission.
      * 
      * @nonblocking Because the upload might take some time, it is executed
      *              asynchronously in a new thread.
@@ -302,7 +304,21 @@ public class StatisticManager extends AbstractFeedbackManager {
             public void run() {
                 File file = statistic.toFile(saros.getStateLocation(),
                     createFileName());
-                FileSubmitter.uploadStatisticFile(file);
+
+                // only submit, if user permitted submission
+                if (isStatisticSubmissionAllowed()) {
+                    try {
+                        FileSubmitter.uploadStatisticFile(file);
+                    } catch (IOException e) {
+                        log.error(String.format("Couldn't upload file: %s. %s",
+                            e.getMessage(), e.getCause().getMessage()));
+                    }
+                } else {
+                    log.info(String.format(
+                        "Statistic was gathered and saved to %s,"
+                            + " but the submission is forbidden by the user",
+                        file.getAbsolutePath()));
+                }
             }
 
         });
@@ -330,8 +346,8 @@ public class StatisticManager extends AbstractFeedbackManager {
         }
 
         /*
-         * write statistic to file, if all data has arrived and send it to our
-         * server
+         * write statistic to file, if all data has arrived; send it to our
+         * server, if user permitted submission
          */
         if (activeCollectors.isEmpty()) {
             saveAndSubmitStatistic();

@@ -87,13 +87,26 @@ public class FeedbackManager extends AbstractFeedbackManager {
                 return;
             }
 
-            if (showFeedbackDialog(FEEDBACK_REQUEST)) {
-                int browserType = showSurvey();
-                log.info("Asking for feedback survey: User agreed ("
-                    + getBrowserTypeAsString(browserType) + ")");
-            } else {
-                log.info("Asking for feedback survey: User declined");
-            }
+            /*
+             * The following is executed asynchronously, because
+             * showFeedbackDialog() is blocking, and other SessionListeners
+             * would be blocked as long as the user doesn't answer the dialog.
+             * NOTE: If one ever wants to count the number of declined dialogs,
+             * threading problems must be newly considered.
+             */
+            Util.runSafeAsync(log, new Runnable() {
+
+                public void run() {
+                    if (showFeedbackDialog(FEEDBACK_REQUEST)) {
+                        int browserType = showSurvey();
+                        log.info("Asking for feedback survey: User agreed ("
+                            + getBrowserTypeAsString(browserType) + ")");
+                    } else {
+                        log.info("Asking for feedback survey: User declined");
+                    }
+                }
+
+            });
         }
 
     };
@@ -255,6 +268,8 @@ public class FeedbackManager extends AbstractFeedbackManager {
      * 
      * @param message
      * @return true, if the user clicked yes, otherwise false
+     * 
+     * @blocking
      */
     public boolean showFeedbackDialog(final String message) {
         resetSessionsUntilNextToInterval();

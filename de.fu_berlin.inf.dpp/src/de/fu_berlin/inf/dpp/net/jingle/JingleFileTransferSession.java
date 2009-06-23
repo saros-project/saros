@@ -116,6 +116,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         }
                     }));
 
+                    long startTime = System.currentTimeMillis();
+
                     // Read incoming chunks of data
                     final byte[] content;
                     try {
@@ -145,12 +147,16 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         return;
                     }
 
+                    final long duration = Math.max(0, System
+                        .currentTimeMillis()
+                        - startTime);
+
                     dispatch.submit(Util.wrapSafe(log, new Runnable() {
                         public void run() {
                             for (IJingleFileTransferListener listener : listeners) {
                                 listener.incomingData(data,
                                     new ByteArrayInputStream(content),
-                                    connectionType);
+                                    connectionType, content.length, duration);
                             }
                         }
                     }));
@@ -447,17 +453,20 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private int resetCounter = 0;
 
     /**
-     * Constant sent after the last chunk to indicate the end of the single file.
+     * Constant sent after the last chunk to indicate the end of the single
+     * file.
      */
     protected static final int DONE = 0;
 
-    /** 
-     * Constant indicating that the user has canceled the transfer. The peer will discard the file.
+    /**
+     * Constant indicating that the user has canceled the transfer. The peer
+     * will discard the file.
      */
     protected static final int CANCELED = -1;
 
     /**
-     * Chunksize used for splitting the data to send into packets in between of which the sending of the file can be canceled.
+     * Chunksize used for splitting the data to send into packets in between of
+     * which the sending of the file can be canceled.
      */
     protected static final int CHUNKSIZE = 32000;
 

@@ -265,9 +265,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 // Change the input method to get the right chats
                 putIncomingChat(fromJID, message.getThread());
 
-                if (PacketExtensionUtils.getActvitiesExtension(message) != null) {
-                    processActivitiesExtension(message, fromJID);
-                }
+                processActivitiesExtension(message, fromJID);
 
                 joinExtension.processPacket(packet);
 
@@ -285,13 +283,15 @@ public class XMPPChatTransmitter implements ITransmitter,
             ActivitiesPacketExtension activitiesPacket = PacketExtensionUtils
                 .getActvitiesExtension(message);
 
-            List<TimedActivity> timedActivities = activitiesPacket
-                .getActivities();
+            if (activitiesPacket != null) {
+                List<TimedActivity> timedActivities = activitiesPacket
+                    .getActivities();
 
-            // FileActivities of type Create are sent via file transfer
-            assert containsNoFileCreationActivities(timedActivities);
+                // FileActivities of type Create are sent via file transfer
+                assert containsNoFileCreationActivities(timedActivities);
 
-            receiveActivities(fromJID, timedActivities);
+                receiveActivities(fromJID, timedActivities);
+            }
         }
     }
 
@@ -462,7 +462,7 @@ public class XMPPChatTransmitter implements ITransmitter,
          * default encoding.
          */
         dataManager.sendData(data, fileList.toXML().getBytes(), progress
-            .newChild(100, SubMonitor.SUPPRESS_NONE));
+            .newChild(100));
 
         progress.done();
     }
@@ -477,14 +477,17 @@ public class XMPPChatTransmitter implements ITransmitter,
                 path, sequenceNumber, sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
+        if (!f.isFile())
+            throw new IOException("No file found for given path: " + path);
 
         progress.subTask("Reading file " + path.lastSegment());
+
+        // TODO Use Eclipse to read file?
         byte[] content = FileUtils.readFileToByteArray(f);
-        progress.newChild(10, SubMonitor.SUPPRESS_NONE).done();
+        progress.newChild(10).done();
 
         progress.subTask("Sending file " + path.lastSegment());
-        dataManager.sendData(transfer, content, progress.newChild(90,
-            SubMonitor.SUPPRESS_NONE));
+        dataManager.sendData(transfer, content, progress.newChild(90));
 
         progress.done();
     }
@@ -503,8 +506,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         progress.newChild(10).done();
 
         progress.subTask("Sending archive");
-        dataManager.sendData(transfer, content, progress.newChild(90,
-            SubMonitor.SUPPRESS_NONE));
+        dataManager.sendData(transfer, content, progress.newChild(90));
 
         progress.done();
     }
@@ -518,8 +520,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendFileChecksumErrorMessage(List<JID> recipients,
         Set<IPath> paths, boolean resolved) {
 
-        XMPPChatTransmitter.log.debug("Sending checksum "
-            + (resolved ? "resolved" : "error") + " message of files "
+        XMPPChatTransmitter.log.debug("Sending checksum message ("
+            + (resolved ? "resolved" : "error") + ") message of files "
             + Util.toOSString(paths) + " to " + recipients);
 
         for (JID recipient : recipients) {

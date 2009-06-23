@@ -25,6 +25,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -40,6 +41,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author Lisa Dohrmann
  */
+@Component(module = "prefs")
 public class FeedbackPreferencePage extends
     org.eclipse.jface.preference.PreferencePage implements
     IWorkbenchPreferencePage {

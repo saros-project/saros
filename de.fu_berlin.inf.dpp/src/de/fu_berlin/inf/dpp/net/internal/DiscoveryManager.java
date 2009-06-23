@@ -1,8 +1,9 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.RosterListener;
@@ -35,7 +36,13 @@ public class DiscoveryManager implements Disposable {
     private static final Logger log = Logger.getLogger(DiscoveryManager.class
         .getName());
 
-    protected Map<String, DiscoverInfo> cache = new ConcurrentHashMap<String, DiscoverInfo>();
+    /**
+     * The cache contains the results of calls to querySupport indexed by the
+     * string value of a given JID. If the discovery failed, a null value is
+     * stored.
+     */
+    protected Map<String, DiscoverInfo> cache = Collections
+        .synchronizedMap(new HashMap<String, DiscoverInfo>());
 
     @Inject
     protected Saros saros;
@@ -161,13 +168,13 @@ public class DiscoveryManager implements Disposable {
 
         for (JID rqJID : rosterTracker.getAvailablePresences(jid)) {
 
-            DiscoverInfo disco = cache.get(rqJID.toString());
-            if (disco == null) {
+            if (!cache.containsKey(rqJID.toString())) {
                 allCached = false;
                 continue;
             }
 
-            if (disco.containsFeature(Saros.NAMESPACE))
+            DiscoverInfo disco = cache.get(rqJID.toString());
+            if (disco != null && disco.containsFeature(Saros.NAMESPACE))
                 return true;
         }
 
@@ -238,17 +245,21 @@ public class DiscoveryManager implements Disposable {
         if (recipient.getResource().equals(""))
             log.warn("Resource missing: ", new StackTrace());
 
-        DiscoverInfo info = cache.get(recipient.toString());
-        if (info == null) {
+        DiscoverInfo info;
+
+        if (cache.containsKey(recipient.toString())) {
+            info = cache.get(recipient.toString());
+        } else {
             // TODO block if a query for the recipient is already in progress
             info = querySupport(recipient);
-
-            if (info == null)
-                return false;
-
             log.debug("Inserting DiscoveryInfo into Cache for: " + recipient);
             cache.put(recipient.toString(), info);
         }
+
+        // Null means that the discovery failed
+        if (info == null)
+            return false;
+
         return info.containsFeature(feature);
     }
 

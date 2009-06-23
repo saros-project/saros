@@ -21,8 +21,10 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.IMenuListener;
@@ -182,19 +184,32 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 }
             });
 
-        dataTransferManager.addTransferModeListener(transferModeListener);
+        dataTransferManager.getTransferModeDispatch().add(transferModeListener);
 
     }
 
     private final class RosterViewTransferModeListener implements
         ITransferModeListener {
+
         public void clear() {
+            lastStateMap[0].clear();
+            lastStateMap[1].clear();
             refreshRosterTree(true);
         }
 
-        public void setTransferMode(JID jid, NetTransferMode newMode,
-            boolean incoming) {
-            refreshRosterTree(jid);
+        @SuppressWarnings("unchecked")
+        Map<JID, NetTransferMode>[] lastStateMap = new HashMap[] {
+            new HashMap<JID, NetTransferMode>(),
+            new HashMap<JID, NetTransferMode>() };
+
+        public void transferFinished(JID jid, NetTransferMode newMode,
+            boolean incoming, long size, long transmissionMillisecs) {
+
+            NetTransferMode lastState = lastStateMap[incoming ? 0 : 1].get(jid);
+            if (newMode != lastState) {
+                lastStateMap[incoming ? 0 : 1].put(jid, newMode);
+                refreshRosterTree(jid);
+            }
         }
     }
 
@@ -424,12 +439,24 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
                     JID jid = new JID(entry.getUser());
 
-                    result.append(" "
-                        + dataTransferManager.getIncomingTransferMode(jid)
-                            .toString(), StyledString.QUALIFIER_STYLER);
-                    result.append(" <--> "
-                        + dataTransferManager.getOutgoingTransferMode(jid)
-                            .toString(), StyledString.QUALIFIER_STYLER);
+                    NetTransferMode in = dataTransferManager
+                        .getIncomingTransferMode(jid);
+                    NetTransferMode out = dataTransferManager
+                        .getOutgoingTransferMode(jid);
+
+                    if (in != NetTransferMode.UNKNOWN
+                        || out != NetTransferMode.UNKNOWN) {
+                        result.append(" Last Data Transfer - ",
+                            StyledString.QUALIFIER_STYLER);
+                    }
+                    if (in != NetTransferMode.UNKNOWN) {
+                        result.append("In: " + in.toString() + " ",
+                            StyledString.QUALIFIER_STYLER);
+                    }
+                    if (out != NetTransferMode.UNKNOWN) {
+                        result.append("Out: " + out.toString(),
+                            StyledString.QUALIFIER_STYLER);
+                    }
 
                     JingleFileTransferManager manager = jingleManager
                         .getValue();
@@ -442,9 +469,11 @@ public class RosterView extends ViewPart implements IConnectionListener,
                         if (connection != null) {
                             JingleConnectionState state = connection.getState();
                             if (state == JingleConnectionState.ESTABLISHED) {
-                                result.append(" ["
-                                    + connection.getTransferMode().toString()
-                                    + "]", StyledString.QUALIFIER_STYLER);
+                                /*
+                                 * result.append(" [" +
+                                 * connection.getTransferMode().toString() +
+                                 * "]", StyledString.QUALIFIER_STYLER);
+                                 */
                             } else {
                                 result.append(" [" + state.toString() + "]",
                                     StyledString.QUALIFIER_STYLER);
@@ -556,7 +585,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
             disposable.dispose();
         }
 
-        dataTransferManager.removeTransferModeListener(transferModeListener);
+        dataTransferManager.getTransferModeDispatch().remove(
+            transferModeListener);
 
         saros.removeListener(this);
     }

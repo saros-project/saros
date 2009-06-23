@@ -109,13 +109,13 @@ public class ConsistencyWatchdogHandler {
             final String pathsOfInconsistencies = Util.toOSString(paths);
 
             if (resolved) {
-                log.info("Synchronisation completed, inconsistency resolved");
+                log.info("Inconsistency resolved for [" + from + "]");
                 closeChecksumErrorMessage(pathsOfInconsistencies, from);
                 return;
             }
 
-            log.debug("Checksum Error for " + pathsOfInconsistencies + " from "
-                + from.getBase());
+            log.debug("Received Checksum Error from [" + from + "] for "
+                + pathsOfInconsistencies);
 
             showChecksumErrorMessage(pathsOfInconsistencies, from, paths);
         }

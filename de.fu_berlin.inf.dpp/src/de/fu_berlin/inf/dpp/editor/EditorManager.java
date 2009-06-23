@@ -762,7 +762,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         int replaceLength, IDocument document) {
 
         /*
-         * TODO When Inconsistencies exists, all listeners should be stopped
+         * HACK When Inconsistencies exists, all listeners should be stopped
          * rather than catching events -> Think Start/Stop on the SharedProject
          */
         if (!this.isDriver || sharedProject == null

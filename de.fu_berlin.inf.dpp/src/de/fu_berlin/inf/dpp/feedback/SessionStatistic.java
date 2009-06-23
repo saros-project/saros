@@ -3,9 +3,14 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
@@ -34,19 +39,31 @@ public class SessionStatistic {
     protected static final String KEY_SESSION_COUNT = "session.count";
     protected static final String KEY_SESSION_TIME = "session.time";
     protected static final String KEY_SESSION_TIME_USERS = "session.time.users";
-    protected static final String KEY_SESSION_TIME_PERCENT_USERS = "session.time.percent.users";
     protected static final String KEY_SESSION_ID = "session.id";
     protected static final String KEY_SESSION_USERS_TOTAL = "session.users.total";
 
     protected static final String KEY_ROLE = "role";
-    protected static final String KEY_ROLE_TIME = "role.time";
-    protected static final String KEY_ROLE_TIME_PERCENT = "role.time.percent";
+    protected static final String KEY_ROLE_OBSERVER = "role.observer";
+    protected static final String KEY_ROLE_DRIVER = "role.driver";
     protected static final String KEY_ROLE_CHANGES = "role.changes";
+
+    protected static final String KEY_DURATION = "duration";
+    protected static final String KEY_PERCENT = "percent";
 
     protected static final String KEY_TEXTEDIT_CHARS = "textedit.chars";
     protected static final String KEY_TEXTEDIT_COUNT = "textedit.count";
     protected static final String KEY_PARALLEL_TEXT_EDITS = "textedits.parallel.chars.interval";
     protected static final String KEY_PARALLEL_TEXT_EDITS_PERCENT = "textedits.parallel.percent.interval";
+
+    // Keys for DataTransferCollector
+    protected static final String KEY_TRANSFER_STATS = "data_transfer";
+    protected static final Object TRANSFER_STATS_EVENT_SUFFIX = "number_of_events";
+    // Total size in KB
+    protected static final Object TRANSFER_STATS_SIZE_SUFFIX = "total_size_kb";
+    // Total size for transfers in milliseconds
+    protected static final Object TRANSFER_STATS_TIME_SUFFIX = "total_time_ms";
+    // Convenience value of total_size / total_time in KB/s
+    protected static final Object TRANSFER_STATS_THROUGHPUT_SUFFIX = "average_throughput_kbs";
 
     /**
      * This is the {@link Properties} object to hold our statistical data.
@@ -59,8 +76,13 @@ public class SessionStatistic {
         data = new Properties();
     }
 
-    protected String appendToKey(String key, Object suffix) {
-        return key + "." + suffix;
+    protected String appendToKey(String key, Object... suffixes) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(key);
+        for (Object suffix : suffixes) {
+            sb.append(".").append(suffix);
+        }
+        return sb.toString();
     }
 
     /**
@@ -91,18 +113,21 @@ public class SessionStatistic {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Session statistic:\n");
-        for (Entry<Object, Object> e : data.entrySet()) {
-            sb.append("  " + e.getKey() + "=" + e.getValue() + "\n");
-        }
-        return sb.toString();
+        ArrayList<String> lines = new ArrayList<String>();
 
+        for (Entry<Object, Object> e : data.entrySet()) {
+            lines.add("  " + e.getKey() + "=" + e.getValue());
+        }
+
+        Collections.sort(lines);
+
+        return "Session statistic:\n" + StringUtils.join(lines, '\n');
     }
 
     /**
      * Writes the session data to a file with the given filename in the given
-     * directory path.
+     * directory path with a subfolder of the current date (format:
+     * <code>statistic_yyyy-MM-dd</code>).
      * 
      * @param path
      * @param filename
@@ -110,11 +135,25 @@ public class SessionStatistic {
      *         writing
      */
     public File toFile(IPath path, String filename) {
-        String pathString = path.append(filename).toString();
-        File file = new File(pathString);
-        FileOutputStream fos = null;
-        log.debug("Writing statistic data to " + pathString);
+        // create a subfolder with the current date, if nonexistent
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dirName = "statistic_" + dateFormat.format(date);
+        File dir = new File(path.toString(), dirName);
 
+        if (!dir.exists()) {
+            if (!dir.mkdir()) {
+                log.error("Couldn't create subfolder " + dir.getPath());
+                // use parent instead
+                dir = dir.getParentFile();
+            }
+        }
+
+        File file = new File(dir, filename);
+        FileOutputStream fos = null;
+        log.debug("Writing statistic data to " + file.getPath());
+
+        // write the statistic to the file
         try {
             fos = new FileOutputStream(file);
             data.store(fos, "Saros session data");
@@ -223,7 +262,7 @@ public class SessionStatistic {
      */
     public int getSessionTimePrecentForUsers(int numberOfUsers) {
         return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_SESSION_TIME_PERCENT_USERS, numberOfUsers)));
+            KEY_SESSION_TIME_USERS, numberOfUsers, KEY_PERCENT)));
     }
 
     /**
@@ -231,8 +270,8 @@ public class SessionStatistic {
      * time they were together in the session.
      */
     public void setSessionTimePercentForUsers(int numberOfUsers, int percent) {
-        data.setProperty(appendToKey(KEY_SESSION_TIME_PERCENT_USERS,
-            numberOfUsers), String.valueOf(percent));
+        data.setProperty(appendToKey(KEY_SESSION_TIME_USERS, numberOfUsers,
+            KEY_PERCENT), String.valueOf(percent));
     }
 
     public String getSessionID() {
@@ -277,33 +316,17 @@ public class SessionStatistic {
     /**
      * Returns the time the user executed the n-th role.
      */
-    public double getRoleTime(int n) {
-        return Double.parseDouble(data
-            .getProperty(appendToKey(KEY_ROLE_TIME, n)));
+    public double getRoleDuration(int n) {
+        return Double.parseDouble(data.getProperty(appendToKey(KEY_ROLE, n,
+            KEY_DURATION)));
     }
 
     /**
      * Sets the time the user executed the n-th role.
      */
-    public void setRoleTime(int n, double time) {
-        data.setProperty(appendToKey(KEY_ROLE_TIME, n), String.valueOf(time));
-    }
-
-    /**
-     * Returns the percentage of the session time the user executed the n-th
-     * role.
-     */
-    public int getRoleTimePercent(int n) {
-        return Integer.parseInt(data.getProperty(appendToKey(
-            KEY_ROLE_TIME_PERCENT, n)));
-    }
-
-    /**
-     * Sets the percentage of the session time the user executed the n-th role.
-     */
-    public void setRoleTimePercent(int number, int percent) {
-        data.setProperty(appendToKey(KEY_ROLE_TIME_PERCENT, number), String
-            .valueOf(percent));
+    public void setRoleDuration(int n, double time) {
+        data.setProperty(appendToKey(KEY_ROLE, n, KEY_DURATION), String
+            .valueOf(time));
     }
 
     /**
@@ -318,6 +341,46 @@ public class SessionStatistic {
      */
     public void setRoleChanges(int changes) {
         data.setProperty(KEY_ROLE_CHANGES, String.valueOf(changes));
+    }
+
+    public double getTotalRoleDurationObserver() {
+        return Double.parseDouble(data.getProperty(appendToKey(
+            KEY_ROLE_OBSERVER, KEY_DURATION)));
+    }
+
+    public void setTotalRoleDurationObserver(double time) {
+        data.setProperty(appendToKey(KEY_ROLE_OBSERVER, KEY_DURATION), String
+            .valueOf(time));
+    }
+
+    public int getTotalRolePercentObserver() {
+        return Integer.parseInt(data.getProperty(appendToKey(KEY_ROLE_OBSERVER,
+            KEY_PERCENT)));
+    }
+
+    public void setTotalRolePercentObserver(int percent) {
+        data.setProperty(appendToKey(KEY_ROLE_OBSERVER, KEY_PERCENT), String
+            .valueOf(percent));
+    }
+
+    public double getTotalRoleDurationDriver() {
+        return Double.parseDouble(data.getProperty(appendToKey(KEY_ROLE_DRIVER,
+            KEY_DURATION)));
+    }
+
+    public void setTotalRoleDurationDriver(double time) {
+        data.setProperty(appendToKey(KEY_ROLE_DRIVER, KEY_DURATION), String
+            .valueOf(time));
+    }
+
+    public int getTotalRolePercentDriver() {
+        return Integer.parseInt(data.getProperty(appendToKey(KEY_ROLE_DRIVER,
+            KEY_PERCENT)));
+    }
+
+    public void setTotalRolePercentDriver(int percent) {
+        data.setProperty(appendToKey(KEY_ROLE_DRIVER, KEY_PERCENT), String
+            .valueOf(percent));
     }
 
     /**
@@ -391,5 +454,20 @@ public class SessionStatistic {
 
     public void setUserID(String userID) {
         data.setProperty(KEY_USER_ID, userID);
+    }
+
+    public void setTransferStatistic(String transferMode, int transferEvents,
+        long totalSize, long totalTransferTime, double throughput) {
+
+        String key = appendToKey(KEY_TRANSFER_STATS, transferMode);
+
+        data.setProperty(appendToKey(key, TRANSFER_STATS_EVENT_SUFFIX), String
+            .valueOf(transferEvents));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_SIZE_SUFFIX), String
+            .valueOf(totalSize));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_TIME_SUFFIX), String
+            .valueOf(totalTransferTime));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_THROUGHPUT_SUFFIX),
+            String.valueOf(Math.round(throughput * 10.0) / 10.0));
     }
 }

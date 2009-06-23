@@ -69,7 +69,8 @@ public class StopManager implements IActivityProvider, Disposable {
             if (sharedProject == null) {
                 StopManager.this.sharedProject.getSequencer().removeProvider(
                     StopManager.this);
-                StopManager.this.sharedProject = null;
+
+                reset();
                 return;
             }
 
@@ -205,8 +206,8 @@ public class StopManager implements IActivityProvider, Disposable {
         fireActivity(stopActivity);
 
         // block until user acknowledged
-        reentrantLock.lock();
         log.debug("Waiting for acknowledgment");
+        reentrantLock.lock();
         try {
             long startTime = System.currentTimeMillis();
             while (expectedAcknowledgments.contains(expectedAck)
@@ -351,6 +352,13 @@ public class StopManager implements IActivityProvider, Disposable {
 
     public void dispose() {
         sharedProjectObservable.remove(sharedProjectObserver);
+    }
+
+    protected void reset() {
+        blockables.clear();
+        StopManager.this.sharedProject = null;
+        startHandles.clear();
+        expectedAcknowledgments.clear();
     }
 
 }

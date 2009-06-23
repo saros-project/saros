@@ -66,7 +66,11 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
+import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
+import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -298,6 +302,12 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JoinExtension.class);
         this.container.addComponent(LeaveExtension.class);
         this.container.addComponent(RequestForFileListExtension.class);
+
+        // Statistic collectors
+        this.container.addComponent(DataTransferCollector.class);
+        this.container.addComponent(RoleChangeCollector.class);
+        this.container.addComponent(ParticipantCollector.class);
+        this.container.addComponent(SessionDataCollector.class);
 
         /*
          * The following classes are initialized by the re-injector because they

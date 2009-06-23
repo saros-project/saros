@@ -27,7 +27,6 @@ import java.util.concurrent.Callable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -38,11 +37,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -59,6 +58,10 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * An incoming invitation process.
+ * 
+ * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
+ * process, so that background activities such as autoBuilding do not interfere
+ * with the InvitationProcess
  * 
  * @author rdjemili
  */
@@ -178,7 +181,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     /**
      * {@inheritDoc}
      */
-    public void accept(final IProject baseProject, final String newProjectName,
+    public void accept(IProject baseProject, String newProjectName,
         boolean skipSync, SubMonitor monitor) {
 
         if ((newProjectName == null) && (baseProject == null)) {
@@ -187,11 +190,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
 
         try {
-            if (acceptUnsafe(baseProject, newProjectName, skipSync, monitor)) {
-                done();
-            } else {
-                cancel(null, false);
-            }
+
+            acceptUnsafeOuter(baseProject, newProjectName, skipSync, monitor);
+
         } catch (CoreException e) {
             ErrorMessageDialog.showErrorMessage(new Exception(
                 "Exception during create project.", e));
@@ -209,7 +210,61 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         }
     }
 
-    private boolean acceptUnsafe(final IProject baseProject,
+    /**
+     * This method contains the outer wrapper around accepting the invitation:
+     * 
+     * 1.) Disable auto-building
+     * 
+     * 2.) Accept the invitation by sending a list of files we need and waiting
+     * for the files to arrive.
+     * 
+     * 3.) Perform done or cancel depending on the result of the accepting.
+     * 
+     * 4.) Re-enabling auto-building.
+     */
+    protected void acceptUnsafeOuter(IProject baseProject,
+        String newProjectName, boolean skipSync, SubMonitor monitor)
+        throws CoreException, IOException {
+
+        /*
+         * Disable "auto building" while we receive files, becomes it confuses
+         * the invitation process and might cause inconsistent states with
+         * regards to file lists
+         * 
+         * Bug #2808839: Outgoing Invitation tries to send directories as files
+         * 
+         * was likely caused by this
+         * 
+         * https://sourceforge.net/tracker/index.php?func=detail&aid=2808839&
+         * group_id=167540&atid=843359
+         */
+        IWorkspace ws = ResourcesPlugin.getWorkspace();
+        IWorkspaceDescription desc = ws.getDescription();
+        boolean wasAutobuilding = desc.isAutoBuilding();
+        if (wasAutobuilding) {
+            desc.setAutoBuilding(false);
+            ws.setDescription(desc);
+        }
+
+        try {
+
+            if (acceptUnsafe(baseProject, newProjectName, skipSync, monitor)) {
+                done();
+            } else {
+                cancel(null, false);
+            }
+
+        } finally {
+            // Re-enable auto-building...
+            if (wasAutobuilding) {
+                desc.setAutoBuilding(true);
+                ws.setDescription(desc);
+            }
+        }
+
+    }
+
+    protected boolean acceptUnsafe(final IProject baseProject,
         final String newProjectName, boolean skipSync, SubMonitor monitor)
         throws CoreException, IOException {
         assertState(State.HOST_FILELIST_SENT);
@@ -236,7 +291,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
                 // Eclipse reported an error
                 throw e;
             } catch (InterruptedException e) {
-                // @InterrupteExceptionOK - Method uses IE to signal cancelation
+                // @InterrupteExceptionOK - Method uses IE to signal
+                // cancelation
                 return false;
             } catch (Exception e) {
                 // We are probably at fault!
@@ -247,65 +303,48 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             this.localProject = baseProject;
         }
 
-        if (skipSync) {
-            this.filesLeftToSynchronize = 0;
-        } else {
-            this.filesLeftToSynchronize = handleDiff(this.localProject,
-                this.remoteFileList);
-        }
-
         this.progressMonitor = monitor;
-
-        if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
-            this.progressMonitor.beginTask("Synchronizing",
-                10 + this.filesLeftToSynchronize);
-        } else {
-            this.progressMonitor.beginTask("Synchronizing",
-                10 + 100 + this.filesLeftToSynchronize);
-            this.progressMonitor.subTask("Receiving Archive...");
-        }
+        this.progressMonitor.beginTask("Synchronizing", 100);
         setState(State.SYNCHRONIZING);
 
-        // Disable Autobuilding while we receive files
-        IWorkspace ws = ResourcesPlugin.getWorkspace();
-        IWorkspaceDescription desc = ws.getDescription();
-        boolean wasAutobuilding = desc.isAutoBuilding();
-        if (wasAutobuilding) {
-            desc.setAutoBuilding(false);
-            ws.setDescription(desc);
+        FileList filesToSynchronize;
+        if (skipSync) {
+            filesToSynchronize = new FileList();
+        } else {
+            this.progressMonitor
+                .subTask("Preparing project for synchronisation");
+            filesToSynchronize = handleDiff(this.localProject,
+                this.remoteFileList, this.progressMonitor.newChild(5));
+        }
+        this.filesLeftToSynchronize = filesToSynchronize.getAddedPaths().size()
+            + filesToSynchronize.getAlteredPaths().size();
+
+        if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
+            this.progressMonitor
+                .setWorkRemaining(10 + this.filesLeftToSynchronize);
+        } else {
+            this.progressMonitor
+                .setWorkRemaining(10 + 100 + this.filesLeftToSynchronize);
+            this.progressMonitor.subTask("Receiving Archive...");
         }
 
-        try {
-            SubMonitor fileListProgress = this.progressMonitor.newChild(10);
-            if (skipSync) {
-                this.transmitter.sendFileList(this.peer, remoteFileList,
-                    fileListProgress);
-            } else {
-                this.transmitter.sendFileList(this.peer, new FileList(
-                    this.localProject), fileListProgress);
-            }
+        this.transmitter.sendFileList(this.peer, filesToSynchronize,
+            this.progressMonitor.newChild(10));
 
-            if (filesLeftToSynchronize == 0) {
-                // HACK We need to sleep here, because if there are no files to
-                // wait for, we could finish the blockUntil... too fast.
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    log.warn(
-                        "Code not designed to handle InterruptedException", e);
-                    Thread.currentThread().interrupt();
-                    return false;
-                }
-            }
-
-            return blockUntilAllFilesSynchronized(monitor);
-        } finally {
-            // Reenable Autobuilding...
-            if (wasAutobuilding) {
-                desc.setAutoBuilding(true);
-                ws.setDescription(desc);
+        if (filesLeftToSynchronize == 0) {
+            // HACK We need to sleep here, because if there are no files to
+            // wait for, we could finish the blockUntil... too fast.
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                log.warn("Code not designed to handle InterruptedException", e);
+                Thread.currentThread().interrupt();
+                return false;
             }
         }
+
+        return blockUntilAllFilesSynchronized(monitor);
+
     }
 
     public void invitationAccepted(JID from) {
@@ -485,75 +524,29 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      *            the project that is used for the base of the replication.
      * @param remoteFileList
      *            the file list of the remote project.
-     * @return the number of files that we need to receive to end the
-     *         synchronization.
+     * @return a FileList to request from the host. This list does not contain
+     *         any directories or files to remove, but just added and altered
+     *         files.
      * @throws CoreException
      *             is thrown when getting all files of the local project.
      */
-    private int handleDiff(IProject localProject, FileList remoteFileList)
-        throws CoreException {
+    private FileList handleDiff(IProject localProject, FileList remoteFileList,
+        SubMonitor monitor) throws CoreException {
 
+        monitor.beginTask("Preparing local project for incoming files", 100);
+
+        monitor.subTask("Calculating Diff");
         FileList diff = new FileList(localProject).diff(remoteFileList);
+        monitor.worked(20);
 
-        removeUnneededResources(localProject, diff);
-        int addedPaths = addAllFolders(localProject, diff);
+        monitor.subTask("Removing unneeded resources");
+        diff = diff.removeUnneededResources(localProject, monitor.newChild(40));
 
-        return diff.getAddedPaths().size() - addedPaths
-            + diff.getAlteredPaths().size();
-    }
+        monitor.subTask("Adding Folders");
+        diff = diff.addAllFolders(localProject, monitor.newChild(40));
 
-    /**
-     * Removes all local resources that aren't part of the shared project we're
-     * currently joining. This includes files and folders.
-     * 
-     * @param localProject
-     *            the local project were the shared project will be replicated.
-     * @param diff
-     *            the fileList which contains the diff information.
-     * @throws CoreException
-     */
-    private void removeUnneededResources(IProject localProject, FileList diff)
-        throws CoreException {
-
-        // TODO don't throw CoreException
-        // TODO check if this triggers the resource listener
-        for (IPath path : diff.getRemovedPaths()) {
-            if (path.hasTrailingSeparator()) {
-                IFolder folder = localProject.getFolder(path);
-
-                if (folder.exists()) {
-                    folder.delete(true, new NullProgressMonitor());
-                }
-
-            } else {
-                IFile file = localProject.getFile(path);
-
-                // check if file exists because it might have already been
-                // deleted when deleting its folder
-                if (file.exists()) {
-                    file.delete(true, new NullProgressMonitor());
-                }
-            }
-        }
-    }
-
-    private int addAllFolders(IProject localProject, FileList diff)
-        throws CoreException {
-
-        int addedFolders = 0;
-
-        for (IPath path : diff.getAddedPaths()) {
-            if (path.hasTrailingSeparator()) {
-                IFolder folder = localProject.getFolder(path);
-                if (!folder.exists()) {
-                    folder.create(true, true, new NullProgressMonitor());
-                }
-
-                addedFolders++;
-            }
-        }
-
-        return addedFolders;
+        monitor.done();
+        return diff;
     }
 
     /**

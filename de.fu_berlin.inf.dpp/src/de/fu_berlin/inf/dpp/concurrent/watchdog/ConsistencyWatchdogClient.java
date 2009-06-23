@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -84,8 +83,8 @@ public class ConsistencyWatchdogClient {
     @Inject
     protected DataTransferManager dataTransferManager;
 
-    protected ExecutorService executor = new ThreadPoolExecutor(1, 1, 0,
-        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(1),
+    protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0,
+        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2),
         new NamedThreadFactory("ChecksumCruncher-"));
 
     IDataReceiver receiver = new IDataReceiver() {
@@ -103,7 +102,7 @@ public class ConsistencyWatchdogClient {
         public boolean receivedResource(JID from, IPath path,
             InputStream input, int sequenceNumber) {
 
-            log.debug("Received consistency file [" + from.getName() + "] "
+            log.info("Received consistency file [" + from.getName() + "] "
                 + path.toString());
 
             ISharedProject project = sessionManager.getSharedProject();
@@ -143,7 +142,8 @@ public class ConsistencyWatchdogClient {
 
             // Trigger a new consistency check, so we don't have to wait for new
             // checksums from the host
-            checkConsistency();
+            if (executor.getQueue().size() == 0)
+                checkConsistency();
 
             return true;
         }
@@ -170,8 +170,8 @@ public class ConsistencyWatchdogClient {
              * Ignore Checksums that arrive before we are done processing the
              * last set of Checksums.
              */
-            log
-                .warn("Received Checksums before processing of previous checksums finished");
+            log.warn("Received Checksums before processing"
+                + " of previous checksums finished");
         }
 
     }
@@ -196,8 +196,8 @@ public class ConsistencyWatchdogClient {
     public void performCheck(List<DocumentChecksum> checksums) {
 
         if (checksums == null) {
-            log
-                .warn("Consistency Check triggered with out preceeding call to setChecksums()");
+            log.warn("Consistency Check triggered with out"
+                + " preceeding call to setChecksums()");
             return;
         }
 
