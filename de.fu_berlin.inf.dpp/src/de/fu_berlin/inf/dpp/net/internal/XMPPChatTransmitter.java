@@ -265,9 +265,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 // Change the input method to get the right chats
                 putIncomingChat(fromJID, message.getThread());
 
-                if (PacketExtensionUtils.getActvitiesExtension(message) != null) {
-                    processActivitiesExtension(message, fromJID);
-                }
+                processActivitiesExtension(message, fromJID);
 
                 joinExtension.processPacket(packet);
 
@@ -285,13 +283,15 @@ public class XMPPChatTransmitter implements ITransmitter,
             ActivitiesPacketExtension activitiesPacket = PacketExtensionUtils
                 .getActvitiesExtension(message);
 
-            List<TimedActivity> timedActivities = activitiesPacket
-                .getActivities();
+            if (activitiesPacket != null) {
+                List<TimedActivity> timedActivities = activitiesPacket
+                    .getActivities();
 
-            // FileActivities of type Create are sent via file transfer
-            assert containsNoFileCreationActivities(timedActivities);
+                // FileActivities of type Create are sent via file transfer
+                assert containsNoFileCreationActivities(timedActivities);
 
-            receiveActivities(fromJID, timedActivities);
+                receiveActivities(fromJID, timedActivities);
+            }
         }
     }
 
@@ -484,11 +484,10 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         // TODO Use Eclipse to read file?
         byte[] content = FileUtils.readFileToByteArray(f);
-        progress.newChild(10, SubMonitor.SUPPRESS_NONE).done();
+        progress.newChild(10).done();
 
         progress.subTask("Sending file " + path.lastSegment());
-        dataManager.sendData(transfer, content, progress.newChild(90,
-            SubMonitor.SUPPRESS_NONE));
+        dataManager.sendData(transfer, content, progress.newChild(90));
 
         progress.done();
     }
@@ -507,8 +506,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         progress.newChild(10).done();
 
         progress.subTask("Sending archive");
-        dataManager.sendData(transfer, content, progress.newChild(90,
-            SubMonitor.SUPPRESS_NONE));
+        dataManager.sendData(transfer, content, progress.newChild(90));
 
         progress.done();
     }

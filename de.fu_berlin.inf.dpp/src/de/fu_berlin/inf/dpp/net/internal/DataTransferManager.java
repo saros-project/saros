@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +15,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -24,7 +22,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
@@ -42,14 +39,12 @@ import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DataTransferExtension;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -67,6 +62,12 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Map<JID, NetTransferMode> outgoingTransferModes = Collections
         .synchronizedMap(new HashMap<JID, NetTransferMode>());
 
+    protected TransferModeDispatch transferModeDispatch = new TransferModeDispatch();
+
+    /**
+     * TransferModeListener which keeps track of the last type of transfer mode
+     * *started* in both incoming and outgoing directions.
+     */
     protected ITransferModeListener trackingTransferModeListener = new ITransferModeListener() {
 
         public void clear() {
@@ -74,8 +75,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             outgoingTransferModes.clear();
         }
 
-        public void setTransferMode(JID jid, NetTransferMode newMode,
-            boolean incoming) {
+        public void transferFinished(JID jid, NetTransferMode newMode,
+            boolean incoming, long size, long transmissionMillisecs) {
             if (incoming) {
                 incomingTransferModes.put(jid, newMode);
             } else {
@@ -84,13 +85,9 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     };
 
-    protected DataTransferExtension handmadeDataTransferExtension;
-
     protected FileTransferManager fileTransferManager;
 
     protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
-
-    protected Map<String, IncomingFile> incomingFiles;
 
     protected Thread startingJingleThread;
 
@@ -99,8 +96,6 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected XMPPConnection connection;
 
     protected XMPPChatTransmitter chatTransmitter;
-
-    protected List<ITransferModeListener> transferModeListeners;
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -115,9 +110,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     public DataTransferManager(SessionIDObservable sessionID) {
         this.sessionID = sessionID;
-        transferModeListeners = new ArrayList<ITransferModeListener>();
-        transferModeListeners.add(trackingTransferModeListener);
-        handmadeDataTransferExtension = new DataTransferHandler(sessionID);
+
+        transferModeDispatch.add(trackingTransferModeListener);
     }
 
     public JingleFileTransferManager getJingleManager() {
@@ -134,106 +128,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         return jingleManager.getValue();
     }
 
-    protected class DataTransferHandler extends DataTransferExtension {
-        protected DataTransferHandler(SessionIDObservable sessionIDObservable) {
-            super(sessionIDObservable);
-        }
-
-        /**
-         * Receives a data buffer sent by a chat message. The data will be
-         * decoded from base64 encoding. Splitted transfer will be buffered
-         * until all chunks are received. Then the file will be reconstructed
-         * and processed as a whole.
-         */
-        @Override
-        public void chunkReceived(JID fromJID, String sName, String desc,
-            int index, int maxIndex, String sData) {
-
-            setTransferMode(fromJID, NetTransferMode.HANDMADE, true);
-
-            TransferDescription transferDescription;
-            try {
-                transferDescription = TransferDescription.fromBase64(desc);
-            } catch (IOException e) {
-                log.error(
-                    "Error while decoding TransferDescription in ChatTransfer",
-                    e);
-                return;
-            }
-
-            // Is this a transfer with multiple parts?
-            if (maxIndex > 1) {
-
-                log.debug("Received chunk " + index + " of " + maxIndex
-                    + " of " + transferDescription.toString());
-
-                // check for previous chunks
-                IncomingFile ifile = incomingFiles.get(desc);
-                if (ifile == null) {
-                    /*
-                     * this is the first received chunk->create incoming file
-                     * object
-                     */
-                    addIncomingFileTransfer(transferDescription);
-
-                    ifile = new IncomingFile();
-                    ifile.receivedChunks++;
-                    ifile.chunkCount = maxIndex;
-                    ifile.name = sName;
-                    for (int i = 0; i < maxIndex; i++) {
-                        ifile.messageBuffer.add(null);
-                    }
-                    ifile.messageBuffer.set(index - 1, sData);
-                    incomingFiles.put(sName, ifile);
-                    return;
-                } else {
-                    // this is a following chunk
-                    ifile.receivedChunks++;
-                    ifile.messageBuffer.set(index - 1, sData);
-
-                    if (ifile.isComplete() == false) {
-                        return;
-                    } else {
-
-                        // join the buffers to restore the file from chunks
-                        sData = "";
-                        for (int i = 0; i < maxIndex; i++) {
-                            sData += ifile.messageBuffer.get(i);
-                        }
-                        incomingFiles.remove(ifile.name);
-
-                        removeIncomingFileTransfer(transferDescription);
-                    }
-                }
-            }
-
-            byte[] dataOrg = Base64.decodeBase64(sData.getBytes());
-            if (dataOrg == null)
-                return;
-
-            receiveData(transferDescription, new ByteArrayInputStream(dataOrg));
-        }
-    }
-
-    /**
-     * A simple struct that is used to manage incoming chunked files via
-     * chat-file transfer
-     */
-    protected static class IncomingFile {
-        String name;
-        int receivedChunks;
-        int chunkCount;
-        List<String> messageBuffer;
-
-        IncomingFile() {
-            this.messageBuffer = new LinkedList<String>();
-        }
-
-        boolean isComplete() {
-            return (this.receivedChunks == this.chunkCount);
-        }
-    }
-
     private final class JingleTransferListener implements
         IJingleFileTransferListener {
 
@@ -244,10 +138,11 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
 
         public void incomingData(TransferDescription data, InputStream input,
-            NetTransferMode mode) {
+            NetTransferMode mode, long size, long transferDuration) {
 
             removeIncomingFileTransfer(data);
-            setTransferMode(data.getSender(), mode, true);
+            transferModeDispatch.transferFinished(data.getSender(), mode, true,
+                size, transferDuration);
             receiveData(data, input);
 
         }
@@ -290,12 +185,11 @@ public class DataTransferManager implements ConnectionSessionListener {
             log.debug("[IBB] Starting incoming file transfer: "
                 + data.toString() + ", size: " + request.getFileSize() / 1024
                 + "kbyte");
+            long startTime = System.nanoTime();
 
             addIncomingFileTransfer(data);
 
             byte[] content;
-
-            long time = System.currentTimeMillis();
             try {
                 IncomingFileTransfer accept = request.accept();
 
@@ -325,12 +219,14 @@ public class DataTransferManager implements ConnectionSessionListener {
                 removeIncomingFileTransfer(data);
             }
 
+            long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
+
             log.debug("[IBB] Finished incoming file transfer: "
                 + data.toString() + ", size: " + request.getFileSize() / 1024
-                + "kbyte received in "
-                + ((System.currentTimeMillis() - time) / 100) / 10.0 + "s");
+                + "kbyte received in " + ((duration / 100) / 10.0) + "s");
 
-            setTransferMode(data.getSender(), NetTransferMode.IBB, true);
+            transferModeDispatch.transferFinished(data.getSender(),
+                NetTransferMode.IBB, true, content.length, duration);
             receiveData(data, new ByteArrayInputStream(content));
         }
 
@@ -365,78 +261,12 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     }
 
-    /**
-     * Sends a data buffer to a recipient using chat messages. The buffer is
-     * transmitted Base64 encoded and split into blocks of size MAX_MSG_LENGTH.
-     * 
-     * This is not IBB (XEP-96)!!
-     * 
-     */
-    protected Transmitter handmade = new Transmitter() {
-
-        public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor progress) throws IOException {
-
-            log.error("handmade Transmitter was used");
-
-            final int maxMsgLen = saros.getPreferenceStore().getInt(
-                PreferenceConstants.CHATFILETRANSFER_CHUNKSIZE);
-
-            // Convert byte array to base64 string
-            byte[] bytes64 = Base64.encodeBase64(content);
-
-            String data64;
-            try {
-                data64 = new String(bytes64, "UTF-8");
-            } catch (UnsupportedCharsetException e1) {
-                data64 = new String(bytes64);
-            }
-
-            // send large data sets in several messages
-            int tosend = data64.length();
-            int pcount = (tosend / maxMsgLen)
-                + ((tosend % maxMsgLen == 0) ? 0 : 1);
-            int start = 0;
-            try {
-                for (int i = 1; i <= pcount; i++) {
-
-                    if (progress.isCanceled())
-                        throw new CancellationException();
-
-                    int psize = Math.min(tosend, maxMsgLen);
-                    int end = start + psize;
-
-                    PacketExtension extension = handmadeDataTransferExtension
-                        .create("Filename managed by Description", data
-                            .toBase64(), i, pcount, data64
-                            .substring(start, end));
-
-                    chatTransmitter.sendMessage(data.getRecipient(), extension);
-
-                    start = end;
-                    tosend -= psize;
-                }
-            } catch (Exception e) {
-                throw new CausedIOException("Sending failed", e);
-            }
-            return NetTransferMode.HANDMADE;
-        }
-
-        public boolean isSuitable(JID jid) {
-            return true;
-        }
-
-        public String getName() {
-            return "ChatTransfer";
-        }
-    };
-
     protected Transmitter ibb = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
             SubMonitor progress) throws IOException {
 
-            long startTime = System.currentTimeMillis();
+            final long startTime = System.nanoTime();
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
                 + data.toString() + ", size: " + content.length / 1024
                 + " kbyte");
@@ -504,11 +334,11 @@ public class DataTransferManager implements ConnectionSessionListener {
                     + transfer.getStatus());
             }
 
+            long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
+
             log.debug("[IBB] Finished sending to " + data.getRecipient() + ": "
                 + data.toString() + ", size: " + content.length / 1024
-                + " kbyte in "
-                + (((System.currentTimeMillis() - startTime) / 100) / 10.0)
-                + "s");
+                + " kbyte in " + ((duration / 100) / 10.0) + "s");
 
             return NetTransferMode.IBB;
         }
@@ -575,10 +405,17 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             if (transmitter.isSuitable(transferData.recipient)) {
                 try {
+
+                    long startTime = System.nanoTime();
+
                     NetTransferMode mode = transmitter.send(transferData,
                         content, progress);
 
-                    setTransferMode(transferData.recipient, mode, false);
+                    long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
+
+                    transferModeDispatch.transferFinished(
+                        transferData.recipient, mode, false, content.length,
+                        duration);
                     return;
                 } catch (Exception e) {
                     log.error(Util.prefix(transferData.recipient)
@@ -660,17 +497,32 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
-    public void addTransferModeListener(ITransferModeListener listener) {
-        transferModeListeners.add(listener);
-    }
+    public class TransferModeDispatch implements ITransferModeListener {
 
-    public void removeTransferModeListener(ITransferModeListener listener) {
-        transferModeListeners.remove(listener);
-    }
+        protected List<ITransferModeListener> listeners = new ArrayList<ITransferModeListener>();
 
-    public void setTransferMode(JID from, NetTransferMode mode, boolean incoming) {
-        for (ITransferModeListener listener : transferModeListeners) {
-            listener.setTransferMode(from, mode, incoming);
+        public synchronized void add(ITransferModeListener listener) {
+            listeners.add(listener);
+        }
+
+        public synchronized void remove(ITransferModeListener listener) {
+            listeners.remove(listener);
+        }
+
+        public synchronized void clear() {
+            for (ITransferModeListener listener : listeners) {
+                listener.clear();
+            }
+        }
+
+        public synchronized void transferFinished(JID jid,
+            NetTransferMode newMode, boolean incoming, long size,
+            long transmissionMillisecs) {
+
+            for (ITransferModeListener listener : listeners) {
+                listener.transferFinished(jid, newMode, incoming, size,
+                    transmissionMillisecs);
+            }
         }
     }
 
@@ -752,7 +604,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             log.debug("Incoming archive [" + data.sender.getName() + "]");
 
-            long time = System.currentTimeMillis();
+            long startTime = System.currentTimeMillis();
 
             ZipInputStream zip = new ZipInputStream(input);
 
@@ -773,7 +625,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                 }
                 log.debug(String.format("Unpacked archive [%s] in %d s",
                     data.sender.getName(),
-                    (System.currentTimeMillis() - time) / 1000));
+                    (System.currentTimeMillis() - startTime) / 1000));
 
             } catch (IOException e) {
                 log.error("Failed to receive and unpack archive", e);
@@ -790,7 +642,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         this.connection = connection;
 
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-        this.incomingFiles = new HashMap<String, IncomingFile>();
         this.receivers = new LinkedList<IDataReceiver>();
         this.receivers.add(defaultReceiver);
         this.jingleManager.setValue(null);
@@ -801,9 +652,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         OutgoingFileTransfer
             .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
-
-        connection.addPacketListener(handmadeDataTransferExtension,
-            handmadeDataTransferExtension.getFilter());
 
         if (!Saros.getFileTransferModeViaChat()) {
             // Start Jingle Manager asynchronous
@@ -878,15 +726,9 @@ public class DataTransferManager implements ConnectionSessionListener {
     }
 
     public void disposeConnection() {
-        incomingFiles.clear();
         fileTransferQueue.clear();
         receivers.clear();
-        for (ITransferModeListener listener : transferModeListeners) {
-            listener.clear();
-        }
-
-        if (connection != null)
-            connection.removePacketListener(handmadeDataTransferExtension);
+        transferModeDispatch.clear();
 
         connection = null;
 
@@ -974,6 +816,10 @@ public class DataTransferManager implements ConnectionSessionListener {
             List<TransferDescription> transfers = getIncomingTransfers(from);
             transfers.add(transferDescription);
         }
+    }
+
+    public TransferModeDispatch getTransferModeDispatch() {
+        return transferModeDispatch;
     }
 
 }

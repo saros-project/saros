@@ -3,9 +3,12 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
@@ -47,6 +50,16 @@ public class SessionStatistic {
     protected static final String KEY_TEXTEDIT_COUNT = "textedit.count";
     protected static final String KEY_PARALLEL_TEXT_EDITS = "textedits.parallel.chars.interval";
     protected static final String KEY_PARALLEL_TEXT_EDITS_PERCENT = "textedits.parallel.percent.interval";
+
+    // Keys for DataTransferCollector
+    protected static final String KEY_TRANSFER_STATS = "data_transfer";
+    protected static final Object TRANSFER_STATS_EVENT_SUFFIX = "number_of_events";
+    // Total size in KB
+    protected static final Object TRANSFER_STATS_SIZE_SUFFIX = "total_size_kb";
+    // Total size for transfers in milliseconds
+    protected static final Object TRANSFER_STATS_TIME_SUFFIX = "total_time_ms";
+    // Convenience value of total_size / total_time in KB/s
+    protected static final Object TRANSFER_STATS_THROUGHPUT_SUFFIX = "average_throughput_kbs";
 
     /**
      * This is the {@link Properties} object to hold our statistical data.
@@ -91,13 +104,15 @@ public class SessionStatistic {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Session statistic:\n");
-        for (Entry<Object, Object> e : data.entrySet()) {
-            sb.append("  " + e.getKey() + "=" + e.getValue() + "\n");
-        }
-        return sb.toString();
+        ArrayList<String> lines = new ArrayList<String>();
 
+        for (Entry<Object, Object> e : data.entrySet()) {
+            lines.add("  " + e.getKey() + "=" + e.getValue());
+        }
+
+        Collections.sort(lines);
+
+        return "Session statistic:\n" + StringUtils.join(lines, '\n');
     }
 
     /**
@@ -133,9 +148,11 @@ public class SessionStatistic {
         return file;
     }
 
-    /*------------------------------------------------------*
-     * Access methods to get and set the value for each key *
-     *------------------------------------------------------*/
+    /*
+     * ------------------------------------------------------ Access methods to
+     * get and set the value for each key
+     * ------------------------------------------------------
+     */
 
     public String getSarosVersion() {
         return data.getProperty(SAROS_VERSION);
@@ -391,5 +408,20 @@ public class SessionStatistic {
 
     public void setUserID(String userID) {
         data.setProperty(KEY_USER_ID, userID);
+    }
+
+    public void setTransferStatistic(String transferMode, int transferEvents,
+        long totalSize, long totalTransferTime, double throughput) {
+
+        String key = appendToKey(KEY_TRANSFER_STATS, transferMode);
+
+        data.setProperty(appendToKey(key, TRANSFER_STATS_EVENT_SUFFIX), String
+            .valueOf(transferEvents));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_SIZE_SUFFIX), String
+            .valueOf(totalSize));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_TIME_SUFFIX), String
+            .valueOf(totalTransferTime));
+        data.setProperty(appendToKey(key, TRANSFER_STATS_THROUGHPUT_SUFFIX),
+            String.valueOf(Math.round(throughput * 10.0) / 10.0));
     }
 }

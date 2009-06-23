@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 public interface IJingleFileTransferListener {
 
     public void incomingData(TransferDescription data, InputStream input,
-        NetTransferMode mode);
+        NetTransferMode mode, long size, long transferDuration);
 
     public void transferFailed(TransferDescription data,
         NetTransferMode connectionType);

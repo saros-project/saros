@@ -5,16 +5,18 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 public interface ITransferModeListener {
 
     /**
-     * The TransferMode for the User with the given JID in either incoming or
-     * outgoing direction has changed.
+     * Informs a listener of a finished incoming or outgoing data transfer with
+     * the given user.
      * 
      * @param jid
-     *            The JID of the user for which the TransferMode has changed.
-     * @param newMode
-     * @param incoming
+     *            The JID of the user to which data was sent (outgoing) or from
+     *            which data was received (incoming)
+     * 
+     * @param size
+     *            The size of the received data in byte
      */
-    public void setTransferMode(JID jid, NetTransferMode newMode,
-        boolean incoming);
+    public void transferFinished(JID jid, NetTransferMode newMode,
+        boolean incoming, long size, long transmissionMillisecs);
 
     /**
      * Is called when the transferMode information is reset (probably because
