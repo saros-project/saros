@@ -107,8 +107,8 @@ public class UserListHandler {
                     // Check if the existing user has the color that we
                     // expect
                     if (user.getColorID() != receivedUser.getColorID()) {
-                        log
-                            .warn("Received color id doesn't match known color id");
+                        log.warn("Received color id doesn't"
+                            + " match known color id");
                     }
 
                     // Update his role
