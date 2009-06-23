@@ -27,13 +27,11 @@ public abstract class AbstractStatisticCollector {
 
     /**
      * The listener gets notified on session start and session end. It clears
-     * the previous data on session start end notifies the StatisticManager on
-     * session end.
+     * the previous data on session end and notifies the StatisticManager.
      */
     protected ISessionListener sessionListener = new AbstractSessionListener() {
         @Override
         public void sessionStarted(ISharedProject project) {
-            clearPreviousData();
             doOnSessionStart(project);
         }
 
@@ -41,6 +39,7 @@ public abstract class AbstractStatisticCollector {
         public void sessionEnded(ISharedProject project) {
             doOnSessionEnd(project);
             notifyCollectionCompleted();
+            clearPreviousData();
         }
     };
 
@@ -73,12 +72,23 @@ public abstract class AbstractStatisticCollector {
 
     /**
      * Ensures that all previously collected data is cleared. It is
-     * automatically called on session start. Clients can override this method
-     * to add their own data to be cleared. However they are supposed to call
-     * <code>super.clearPreviousData()</code>.
+     * automatically called on session end. After the collected data was handed
+     * to the StatisticManager. <br>
+     * Clients can override this method to add their own data to be cleared.
+     * However they are supposed to call <code>super.clearPreviousData()</code>.
      */
     protected void clearPreviousData() {
         data.clear();
+    }
+
+    /**
+     * Helper method that calculates the percentage of the given time from the
+     * sessionTime.
+     * 
+     * @return time / sessionTime * 100
+     */
+    protected int getPercentOfSessionTime(long time, long sessionTime) {
+        return (int) Math.round(((double) time / sessionTime) * 100);
     }
 
     /**

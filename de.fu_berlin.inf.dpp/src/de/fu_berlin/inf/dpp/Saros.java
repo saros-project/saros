@@ -305,6 +305,8 @@ public class Saros extends AbstractUIPlugin {
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);
+        this.container.addComponent(RoleChangeCollector.class);
+        this.container.addComponent(ParticipantCollector.class);
         this.container.addComponent(SessionDataCollector.class);
 
         /*
