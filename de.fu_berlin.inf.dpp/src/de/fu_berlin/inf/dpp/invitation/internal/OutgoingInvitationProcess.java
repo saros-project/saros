@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -38,8 +39,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
-import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
+import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -50,6 +50,10 @@ import de.fu_berlin.inf.dpp.util.Util;
  * TODO FIXME The whole invitation procedure needs to be completely redone,
  * because it can cause race conditions. In particular cancellation is not
  * possible at arbitrary times (something like an CANCEL_ACK is needed)
+ * 
+ * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
+ * process, so that background activities such as autoBuilding do not interfere
+ * with the InvitationProcess
  * 
  * @author rdjemili
  */
@@ -120,20 +124,18 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             this.toSend = new LinkedList<IPath>();
             this.toSend.addAll(this.remoteFileList.getAddedPaths());
             this.toSend.addAll(this.remoteFileList.getAlteredPaths());
-            
-            JingleFileTransferManager jingleManager = dataTransferManager
-                .getJingleManager();
 
             // If fast p2p connection send individual files, otherwise archive
-            if (jingleManager != null
-                && jingleManager.getState(getPeer()) == JingleConnectionState.ESTABLISHED) {
-                isP2P = true;
-                monitor.subTask("Sending Files...");
-                sendFiles(monitor.newChild(70));
-            } else {
+            NetTransferMode mode = dataTransferManager
+                .getOutgoingTransferMode(getPeer());
+            if (mode == null || !mode.isP2P()) {
                 isP2P = false;
                 monitor.subTask("Sending Archive...");
                 sendArchive(monitor.newChild(70));
+            } else {
+                isP2P = true;
+                monitor.subTask("Sending Files...");
+                sendFiles(monitor.newChild(70));
             }
 
             monitor.subTask("Waiting for Peer to Join");
@@ -180,7 +182,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             // Could have been canceled in between:
             if (this.state == State.CANCELED)
                 return;
-            
+
         } catch (Exception e) {
             failed(e);
         }
@@ -290,12 +292,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             while (this.toSend.size() > 0 && getState() != State.CANCELED) {
 
                 IPath path = this.toSend.remove(0);
-                if (!this.sharedProject.getProject().getFile(path).exists()){
-                    log.error("File to send to " + this.peer + " does not exist: " + path);
-                    cancel("Requested file does not exist at host: " + path, false);
+                if (!this.sharedProject.getProject().getFile(path).exists()) {
+                    log.error("File to send to " + this.peer
+                        + " does not exist: " + path);
+                    cancel("Requested file does not exist at host: " + path,
+                        false);
                     return;
                 }
-                
+
                 try {
                     monitor.subTask("Sending: " + path.lastSegment());
                     this.transmitter.sendFile(this.peer, this.sharedProject

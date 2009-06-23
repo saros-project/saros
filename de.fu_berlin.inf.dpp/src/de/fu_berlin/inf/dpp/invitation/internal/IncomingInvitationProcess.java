@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -57,6 +58,10 @@ import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * An incoming invitation process.
+ * 
+ * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
+ * process, so that background activities such as autoBuilding do not interfere
+ * with the InvitationProcess
  * 
  * @author rdjemili
  */
@@ -306,17 +311,20 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         if (skipSync) {
             filesToSynchronize = new FileList();
         } else {
-            this.progressMonitor.subTask("Preparing project for synchronisation");
+            this.progressMonitor
+                .subTask("Preparing project for synchronisation");
             filesToSynchronize = handleDiff(this.localProject,
                 this.remoteFileList, this.progressMonitor.newChild(5));
         }
         this.filesLeftToSynchronize = filesToSynchronize.getAddedPaths().size()
             + filesToSynchronize.getAlteredPaths().size();
-        
+
         if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
-            this.progressMonitor.setWorkRemaining(10 + this.filesLeftToSynchronize);
+            this.progressMonitor
+                .setWorkRemaining(10 + this.filesLeftToSynchronize);
         } else {
-            this.progressMonitor.setWorkRemaining(10 + 100 + this.filesLeftToSynchronize);
+            this.progressMonitor
+                .setWorkRemaining(10 + 100 + this.filesLeftToSynchronize);
             this.progressMonitor.subTask("Receiving Archive...");
         }
 
