@@ -321,9 +321,14 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     }
 
     /**
-     * send all project data with archive file.
+     * Send all files contained in {@link #toSend} as an archive file to the
+     * peer of this invitation process.
      */
-    private void sendArchive(SubMonitor monitor) {
+    protected void sendArchive(SubMonitor monitor) {
+
+        monitor.beginTask("Sending as archive", 100);
+
+        File archive = null;
 
         try {
             if (getState() == State.CANCELED) {
@@ -336,41 +341,33 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 return;
             }
 
-            monitor.beginTask("Sending as archive", 100);
+            archive = File.createTempFile(getPeer().getName(), ".zip");
 
-            // TODO The "./" prefix should be unnecessary and is not cross
-            // platform.
-            // TODO Use a $TEMP directory here.
-            File archive = new File("./" + getPeer().getName() + "_Project.zip");
+            monitor.subTask("Zipping archive");
+            FileZipper.createProjectZipArchive(this.toSend, archive,
+                this.sharedProject.getProject(), monitor.newChild(30));
 
-            try {
-                monitor.subTask("Zipping archive");
-                FileZipper.createProjectZipArchive(this.toSend, archive,
-                    this.sharedProject.getProject(), monitor.newChild(30));
+            monitor.subTask("Sending archive");
+            transmitter.sendProjectArchive(this.peer, this.sharedProject
+                .getProject(), archive, monitor.newChild(70));
 
-                monitor.subTask("Sending archive");
-                transmitter.sendProjectArchive(this.peer, this.sharedProject
-                    .getProject(), archive, monitor.newChild(70));
-
-                if (getState() == State.SYNCHRONIZING) {
-                    setState(State.SYNCHRONIZING_DONE);
-                }
-
-            } catch (Exception e) {
-                failed(e);
-            } finally {
-                if (!archive.delete()) {
-                    log.warn("Could not delete archive: "
-                        + archive.getAbsolutePath());
-                }
+            if (getState() == State.SYNCHRONIZING) {
+                setState(State.SYNCHRONIZING_DONE);
             }
+        } catch (Exception e) {
+            failed(e);
         } finally {
+            // Delete Archive
+            if (archive != null && !archive.delete()) {
+                log.warn("Could not delete archive: "
+                    + archive.getAbsolutePath());
+            }
             monitor.done();
         }
     }
 
     /**
-     * Blocks until the join message has been received or the user cancelled.
+     * Blocks until the join message has been received or the user canceled.
      * 
      * @param subMonitor
      * 
