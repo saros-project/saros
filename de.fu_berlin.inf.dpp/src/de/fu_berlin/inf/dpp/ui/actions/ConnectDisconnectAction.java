@@ -185,12 +185,6 @@ public class ConnectDisconnectAction extends Action implements Disposable {
         try {
             ConnectionState state = saros.getConnectionState();
 
-            /*
-             * FIXME The ConnectDisconnectAction should not be the one that is
-             * printing the logging messages
-             */
-            log.debug("New State == " + state);
-
             switch (state) {
             case CONNECTED:
                 String user = "";

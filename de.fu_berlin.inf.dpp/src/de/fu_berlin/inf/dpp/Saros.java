@@ -192,7 +192,7 @@ public class Saros extends AbstractUIPlugin {
 
     protected ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
-    protected String connectionError;
+    protected Exception connectionError;
 
     protected final List<IConnectionListener> listeners = new CopyOnWriteArrayList<IConnectionListener>();
 
@@ -602,7 +602,7 @@ public class Saros extends AbstractUIPlugin {
 
         } catch (final Exception e) {
 
-            setConnectionState(ConnectionState.ERROR, e.getMessage());
+            setConnectionState(ConnectionState.ERROR, e);
 
             if (!failSilently) {
                 Util.runSafeSWTSync(log, new Runnable() {
@@ -770,7 +770,7 @@ public class Saros extends AbstractUIPlugin {
      *         connection error if the state is {@link ConnectionState#ERROR} or
      *         <code>null</code> if there is another state set.
      */
-    public String getConnectionError() {
+    public Exception getConnectionError() {
         return this.connectionError;
     }
 
@@ -801,9 +801,16 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Sets a new connection state and notifies all connection listeners.
      */
-    protected void setConnectionState(ConnectionState state, String error) {
+    protected void setConnectionState(ConnectionState state, Exception error) {
+
         this.connectionState = state;
         this.connectionError = error;
+
+        if (error == null) {
+            log.debug("New Connection State == " + state);
+        } else {
+            log.error("New Connection State == " + state, error);
+        }
 
         for (IConnectionListener listener : this.listeners) {
             try {
@@ -876,7 +883,7 @@ public class Saros extends AbstractUIPlugin {
             if (getConnectionState() != ConnectionState.CONNECTED)
                 return;
 
-            setConnectionState(ConnectionState.ERROR, null);
+            setConnectionState(ConnectionState.ERROR, e);
 
             disconnectInternal();
 
@@ -913,9 +920,10 @@ public class Saros extends AbstractUIPlugin {
                         }
                     }
 
-                    sessionManager.onReconnect(expectedSequenceNumbers);
-                    setConnectionState(ConnectionState.CONNECTED, null);
-                    log.debug("XMPP reconnected");
+                    if (isConnected()) {
+                        sessionManager.onReconnect(expectedSequenceNumbers);
+                        log.debug("XMPP reconnected");
+                    }
                 }
             });
         }

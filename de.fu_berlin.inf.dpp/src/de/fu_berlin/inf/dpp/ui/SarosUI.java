@@ -219,7 +219,12 @@ public class SarosUI {
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:
-            return "Error (" + saros.getConnectionError() + ")";
+            Exception e = saros.getConnectionError();
+            if (e == null) {
+                return "Error";
+            } else {
+                return "Error (" + e.getMessage() + ")";
+            }
         }
 
         return "";
