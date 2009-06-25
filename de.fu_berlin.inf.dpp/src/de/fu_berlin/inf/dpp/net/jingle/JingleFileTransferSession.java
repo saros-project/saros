@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net.jingle;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -98,6 +99,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     final TransferDescription data;
                     try {
                         data = (TransferDescription) input.readUnshared();
+                    } catch (EOFException eof) {
+                        log.info(prefix() + "Connection was closed by peer.");
+                        close();
+                        return;
                     } catch (IOException e) {
                         log.error(prefix() + "Crashed", e);
                         return;
@@ -170,7 +175,14 @@ public class JingleFileTransferSession extends JingleMediaSession {
     }
 
     protected String prefix() {
-        return "Jingle " + Util.prefix(connectTo);
+        String connection = "";
+        if (connectionType == NetTransferMode.JINGLETCP) {
+            connection = "/TCP";
+        }
+        if (connectionType == NetTransferMode.JINGLEUDP) {
+            connection = "/UDP";
+        }
+        return "Jingle" + connection + " " + Util.prefix(connectTo);
     }
 
     private ReceiverThread receiveThread;
