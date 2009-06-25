@@ -319,14 +319,9 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         this.filesLeftToSynchronize = filesToSynchronize.getAddedPaths().size()
             + filesToSynchronize.getAlteredPaths().size();
 
-        if (dataTransferManager.getIncomingTransferMode(getPeer()).isP2P()) {
-            this.progressMonitor
-                .setWorkRemaining(10 + this.filesLeftToSynchronize);
-        } else {
-            this.progressMonitor
-                .setWorkRemaining(10 + 100 + this.filesLeftToSynchronize);
-            this.progressMonitor.subTask("Receiving Archive...");
-        }
+        this.progressMonitor
+            .setWorkRemaining(10 + 100 + this.filesLeftToSynchronize);
+        this.progressMonitor.subTask("Receiving Archive...");
 
         this.transmitter.sendFileList(this.peer, filesToSynchronize,
             this.progressMonitor.newChild(10));
@@ -357,7 +352,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
     public void resourceReceived(JID from, IPath path, InputStream in) {
 
-        // These files are still incoming, but now longer interesting, because
+        // These files are still incoming, but not longer interesting, because
         // the process was canceled.
         if (this.progressMonitor.isCanceled()) {
             return;

@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.invitation.internal;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -37,9 +36,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -71,9 +68,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
     protected ISharedProject sharedProject;
 
     /* Fields */
-
-    protected boolean isP2P = false;
-
     protected FileList remoteFileList;
 
     protected FileList localFileList;
@@ -125,18 +119,8 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
             this.toSend.addAll(this.remoteFileList.getAddedPaths());
             this.toSend.addAll(this.remoteFileList.getAlteredPaths());
 
-            // If fast p2p connection send individual files, otherwise archive
-            NetTransferMode mode = dataTransferManager
-                .getOutgoingTransferMode(getPeer());
-            if (mode == null || !mode.isP2P()) {
-                isP2P = false;
-                monitor.subTask("Sending Archive...");
-                sendArchive(monitor.newChild(70));
-            } else {
-                isP2P = true;
-                monitor.subTask("Sending Files...");
-                sendFiles(monitor.newChild(70));
-            }
+            monitor.subTask("Sending Archive...");
+            sendArchive(monitor.newChild(70));
 
             monitor.subTask("Waiting for Peer to Join");
             if (!blockUntilJoinReceived(monitor.newChild(5))) {
@@ -272,52 +256,6 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
      */
     public void resourceReceived(JID from, IPath path, InputStream in) {
         failState();
-    }
-
-    protected void sendFiles(SubMonitor monitor) {
-
-        try {
-            if (getState() == State.CANCELED) {
-                this.toSend.clear();
-                return;
-            }
-
-            if (this.toSend.size() == 0) {
-                setState(State.SYNCHRONIZING_DONE);
-                return;
-            }
-
-            monitor.beginTask("Sending...", this.toSend.size());
-
-            while (this.toSend.size() > 0 && getState() != State.CANCELED) {
-
-                IPath path = this.toSend.remove(0);
-                if (!this.sharedProject.getProject().getFile(path).exists()) {
-                    log.error("File to send to " + this.peer
-                        + " does not exist: " + path);
-                    cancel("Requested file does not exist at host: " + path,
-                        false);
-                    return;
-                }
-
-                try {
-                    monitor.subTask("Sending: " + path.lastSegment());
-                    this.transmitter.sendFile(this.peer, this.sharedProject
-                        .getProject(), path, TimedActivity.NO_SEQUENCE_NR,
-                        monitor.newChild(1));
-                } catch (IOException e) {
-                    failed(e);
-                    return;
-                }
-            }
-
-            if (getState() == State.SYNCHRONIZING) {
-                setState(State.SYNCHRONIZING_DONE);
-            }
-
-        } finally {
-            monitor.done();
-        }
     }
 
     /**
