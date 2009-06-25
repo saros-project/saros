@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -401,7 +402,11 @@ public class DataTransferManager implements ConnectionSessionListener {
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
 
-        for (Transmitter transmitter : new Transmitter[] { jingle, ibb }) {
+        Transmitter[] transmitters = saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT) ? new Transmitter[] { ibb }
+            : new Transmitter[] { jingle, ibb };
+
+        for (Transmitter transmitter : transmitters) {
 
             if (transmitter.isSuitable(transferData.recipient)) {
                 try {
