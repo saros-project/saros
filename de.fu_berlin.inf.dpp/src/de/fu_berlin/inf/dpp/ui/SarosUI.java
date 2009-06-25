@@ -199,7 +199,7 @@ public class SarosUI {
 
             window.getActivePage().showView(view, null, mode);
         } catch (PartInitException e) {
-            log.error("Could not create Session View", e);
+            log.error("Could not create View " + view, e);
         }
     }
 
