@@ -254,6 +254,9 @@ public class StatisticManager extends AbstractFeedbackManager {
                 userID);
             saros.saveConfigPrefs();
         }
+        // if we are a developer, add this info to our user ID
+        if (saros.getVersion().endsWith("DEVEL"))
+            return "sarosTeam-" + userID;
         return userID;
     }
 
