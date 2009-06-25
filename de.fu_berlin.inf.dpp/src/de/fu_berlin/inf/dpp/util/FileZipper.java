@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.Adler32;
@@ -46,13 +47,14 @@ public class FileZipper {
      * 
      * @cancelable This operation can be canceled via the given progress
      *             monitor. If the operation was canceled the zip file is
-     *             deleted prior to throwing an OperationCanceldException.
+     *             deleted prior to throwing an OperationCanceledException.
      * 
      * @throws IllegalArgumentException
      *             if the list of files contains a directory
      */
     public static void createProjectZipArchive(List<IPath> files, File archive,
-        IProject project, SubMonitor progress) throws Exception {
+        IProject project, SubMonitor progress) throws IOException,
+        OperationCanceledException {
 
         long time = System.currentTimeMillis();
 
