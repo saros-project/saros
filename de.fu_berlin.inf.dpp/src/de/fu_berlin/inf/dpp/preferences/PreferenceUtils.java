@@ -97,4 +97,9 @@ public class PreferenceUtils {
             PreferenceConstants.SKIP_SYNC_SELECTABLE);
     }
 
+    public boolean forceFileTranserByChat() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
+    }
+
 }

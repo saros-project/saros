@@ -20,6 +20,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
@@ -46,6 +48,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectio
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -86,6 +89,27 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     };
 
+    protected boolean forceFileTransferByChat;
+
+    protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+
+        public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(
+                PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT)) {
+                Object value = event.getNewValue();
+                // make sure the cast will work
+                if (value instanceof Boolean) {
+                    forceFileTransferByChat = ((Boolean) value).booleanValue();
+                } else {
+                    log.warn("Preference value FORCE_FILETRANSFER_BY_CHAT"
+                        + " is supposed to be a boolean, but it unexpectedly"
+                        + " changed to a different type!");
+                }
+            }
+        }
+
+    };
+
     protected FileTransferManager fileTransferManager;
 
     protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
@@ -104,13 +128,21 @@ public class DataTransferManager implements ConnectionSessionListener {
     @Inject
     protected JingleFileTransferManagerObservable jingleManager;
 
-    @Inject
     protected Saros saros;
 
     protected SessionIDObservable sessionID;
 
-    public DataTransferManager(SessionIDObservable sessionID) {
+    public DataTransferManager(Saros saros, SessionIDObservable sessionID,
+        PreferenceUtils prefUtils) {
         this.sessionID = sessionID;
+        this.saros = saros;
+        this.forceFileTransferByChat = prefUtils.forceFileTranserByChat();
+
+        /*
+         * register a property change listeners to keep forceFileTransferByChat
+         * up-to-date
+         */
+        saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
 
         transferModeDispatch.add(trackingTransferModeListener);
     }
@@ -402,8 +434,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
 
-        Transmitter[] transmitters = saros.getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT) ? new Transmitter[] { ibb }
+        Transmitter[] transmitters = forceFileTransferByChat ? new Transmitter[] { ibb }
             : new Transmitter[] { jingle, ibb };
 
         for (Transmitter transmitter : transmitters) {
