@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -99,8 +100,12 @@ public class JingleFileTransferSession extends JingleMediaSession {
                     final TransferDescription data;
                     try {
                         data = (TransferDescription) input.readUnshared();
-                    } catch (EOFException eof) {
-                        log.info(prefix() + "Connection was closed by peer.");
+                    } catch (SocketException e) {
+                        log.debug(prefix() + "Connection was closed by me.");
+                        close();
+                        return;
+                    } catch (EOFException e) {
+                        log.debug(prefix() + "Connection was closed by peer.");
                         close();
                         return;
                     } catch (IOException e) {
