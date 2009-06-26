@@ -25,10 +25,13 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
+// TODO: Actually the IFile interface is not intended to be implemented by clients.
 public class FileStub implements IFile {
 
     private IPath path;
     private String content;
+
+    private boolean derived = false;
 
     public FileStub(String path, String content) {
         this.path = new Path(path);
@@ -396,7 +399,7 @@ public class FileStub implements IFile {
     }
 
     public boolean isDerived() {
-        throw new RuntimeException("Unexpected call to Stub");
+        return derived;
 
     }
 
@@ -476,7 +479,7 @@ public class FileStub implements IFile {
     }
 
     public void setDerived(boolean isDerived) throws CoreException {
-        throw new RuntimeException("Unexpected call to Stub");
+        derived = isDerived;
 
     }
 
@@ -544,6 +547,14 @@ public class FileStub implements IFile {
     public boolean isConflicting(ISchedulingRule rule) {
         throw new RuntimeException("Unexpected call to Stub");
 
+    }
+
+    public boolean isHidden(int options) {
+        throw new RuntimeException("Unexpected call to Stub");
+    }
+
+    public boolean isTeamPrivateMember(int options) {
+        throw new RuntimeException("Unexpected call to Stub");
     }
 
 }
