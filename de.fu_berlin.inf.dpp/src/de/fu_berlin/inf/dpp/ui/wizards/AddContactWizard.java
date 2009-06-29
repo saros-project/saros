@@ -21,7 +21,9 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -42,6 +44,9 @@ import de.fu_berlin.inf.dpp.net.JID;
  * user.
  */
 public class AddContactWizard extends Wizard {
+
+    private static final Logger log = Logger.getLogger(AddContactWizard.class
+        .getName());
 
     public static final boolean allowToEnterNick = false;
 
@@ -169,23 +174,54 @@ public class AddContactWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
+
+        // FIXME This must be run in a progress context...
+
+        JID jidToAdd = this.page.getJID();
+
+        try {
+            if (!saros.isJIDonServer(jidToAdd)) {
+                if (!MessageDialog.openQuestion(this.getShell(),
+                    "Contact not found", "The contact " + jidToAdd
+                        + " could not be found on the server.\n"
+                        + "Do you want to add it anyway?")) {
+                    this.page.setErrorMessage("Contact " + jidToAdd
+                        + " not found on server!");
+                    return false;
+                }
+            }
+        } catch (XMPPException e) {
+
+            log.warn("XMPP Disco for user failed: ", e);
+
+            if (!MessageDialog.openConfirm(this.getShell(), "XMPP Error",
+                "The XMPP server did support a query for whether\n    "
+                    + jidToAdd + "\nis a valid JID.\n"
+                    + "Do you want to add it anyway?")) {
+                this.page
+                    .setErrorMessage("The XMPP server did support a query for whether "
+                        + jidToAdd + " is a valid JID");
+                return false;
+            }
+        }
+
         try {
             if (allowToEnterNick && !(page.getNickname().length() == 0)) {
-                saros.addContact(this.page.getJID(), this.page.getNickname(),
-                    null);
+                saros.addContact(jidToAdd, this.page.getNickname(), null);
             } else {
-                saros.addContact(this.page.getJID(), this.page.getJID()
-                    .toString(), null);
+                saros.addContact(jidToAdd, jidToAdd.toString(), null);
             }
             return true;
 
         } catch (XMPPException e) {
             // contact not found
             if (e.getMessage().contains("item-not-found"))
-                this.page.setMessage("Contact not found!",
-                    IMessageProvider.ERROR);
-            else
+                this.page.setMessage("Contact " + jidToAdd
+                    + " not found on server!", IMessageProvider.ERROR);
+            else {
+                log.error("Could not add contact " + jidToAdd + ": ", e);
                 this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
+            }
         }
 
         return false;

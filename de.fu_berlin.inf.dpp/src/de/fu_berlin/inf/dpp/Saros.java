@@ -707,36 +707,55 @@ public class Saros extends AbstractUIPlugin {
      *            the groups to which the new contact should belong to. This
      *            information will be saved on the server.
      * @throws XMPPException
-     *             is thrown if no connection is established or the contact
-     *             doesn't exist
+     *             is thrown if no connection is established or an error
+     *             occurred when adding the user to the roster (which does not
+     *             mean that the user really exists on the server)
      */
     public void addContact(JID jid, String nickname, String[] groups)
         throws XMPPException {
         assertConnection();
 
-        // if roster already contains user with this jid do nothing
+        // if roster already contains user with this jid, throw an exception
         if (connection.getRoster().contains(jid.toString())) {
-            return;
+            throw new XMPPException("RosterEntry for user " + jid
+                + " already exists");
         }
 
-        // if discovering user information is successful add contact to
-        // roster
+        connection.getRoster().createEntry(jid.toString(), nickname, groups);
+    }
+
+    /**
+     * Given an XMPP Exception this method will return whether the exception
+     * thrown by isJIDonServer indicates that the server does not support
+     * ServiceDisco.
+     * 
+     * In other words: If isJIDonServer throws an Exception and this method
+     * returns true on the exception, then we should call addContact anyway.
+     */
+    public static boolean isDiscoFailedException(XMPPException e) {
+
+        /* feature-not-implemented */
+        if (e.getMessage().contains("501"))
+            return true;
+
+        /* service-unavailable */
+        if (e.getMessage().contains("503"))
+            return true;
+
+        return false;
+    }
+
+    /**
+     * Returns whether the given JID can be found on the server.
+     * 
+     * @throws XMPPException
+     *             if the service disco failed. Use isDiscoFailedException to
+     *             figure out, whether this might mean that the server does not
+     *             support disco at all.
+     */
+    public boolean isJIDonServer(JID jid) throws XMPPException {
         ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(connection);
-        try {
-            if (sdm.discoverInfo(jid.toString()).getIdentities().hasNext()) {
-
-                connection.getRoster().createEntry(jid.toString(), nickname,
-                    groups);
-            }
-        } catch (XMPPException e) {
-            // if server doesn't support to get information add contact
-            // anyway (if entry would't exist it should be an error 404)
-            if (e.getMessage().contains("501"))/* feature-not-implemented */{
-                connection.getRoster().createEntry(jid.toString(), nickname,
-                    groups);
-            } else
-                throw e;
-        }
+        return sdm.discoverInfo(jid.toString()).getIdentities().hasNext();
     }
 
     /**
