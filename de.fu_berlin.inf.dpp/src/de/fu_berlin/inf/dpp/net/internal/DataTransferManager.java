@@ -701,7 +701,14 @@ public class DataTransferManager implements ConnectionSessionListener {
                             saros, connection, new JingleTransferListener()));
                         log.debug("Jingle Manager started");
                     } catch (Exception e) {
-                        log.error("Jingle Manager could not be started", e);
+
+                        if (saros.isConnected())
+                            log.error("Jingle Manager could not be started", e);
+                        else
+                            log.debug("Jingle Manager could not be started,"
+                                + " because Saros was disconnected from"
+                                + " XMPP server.");
+
                         jingleManager.setValue(null);
                     }
                 }
