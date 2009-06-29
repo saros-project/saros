@@ -71,7 +71,6 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
@@ -831,8 +830,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             if (presence == null || !presence.isAvailable())
                 continue;
 
-            User user = project.getParticipant(new JID(entry.getUser()));
-            if (user != null)
+            // Is there already a user with this bare-JID in the project
+            JID jid = project.getResourceQualifiedJID(new JID(entry.getUser()));
+            if (jid != null)
                 continue;
 
             InviterData invdat = new InviterData();

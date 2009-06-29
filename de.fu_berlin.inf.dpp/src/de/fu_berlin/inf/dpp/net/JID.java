@@ -21,9 +21,11 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.util.StringUtils;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * A Jabber ID which is used to identify the users of the Jabber network.
@@ -31,6 +33,8 @@ import de.fu_berlin.inf.dpp.User;
  * @author rdjemili
  */
 public class JID implements Serializable {
+
+    private static final Logger log = Logger.getLogger(JID.class.getName());
 
     private static final long serialVersionUID = 4830741516870940459L;
 
@@ -110,16 +114,27 @@ public class JID implements Serializable {
      */
     @Override
     public boolean equals(Object obj) {
+
+        if (obj == null)
+            return false;
+
         if (obj instanceof User) {
+            log.warn("Comparing a JID to a User is highly discouraged",
+                new StackTrace());
             obj = ((User) obj).getJID();
         }
         if (obj instanceof String) {
+            log.warn("Comparing a JID to a String is highly discouraged",
+                new StackTrace());
             obj = new JID((String) obj);
         }
         if (obj instanceof JID) {
             JID other = (JID) obj;
             return getBase().equals(other.getBase());
         }
+        log.warn(
+            "Comparing a JID to something other a JID is highly discouraged",
+            new StackTrace());
         return false;
     }
 
@@ -134,5 +149,13 @@ public class JID implements Serializable {
     @Override
     public String toString() {
         return this.jid;
+    }
+
+    /**
+     * Returns true if this JID and the given JID are completely identical (this
+     * includes the resource unlike equals)
+     */
+    public boolean strictlyEquals(JID other) {
+        return this.jid.equals(other.jid);
     }
 }

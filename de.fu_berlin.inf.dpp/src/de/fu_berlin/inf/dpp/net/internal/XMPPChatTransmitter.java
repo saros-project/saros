@@ -788,7 +788,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         final ISharedProject project = sharedProject.getValue();
 
-        if ((project == null) || (project.getParticipant(fromJID) == null)) {
+        if ((project == null) || (project.getUser(fromJID) == null)) {
             XMPPChatTransmitter.log.warn("Received activities from " + source
                 + " but User is no participant: " + timedActivities);
             return;

@@ -175,7 +175,37 @@ public interface ISharedProject {
      */
     public void stop();
 
+    /**
+     * Returns the User in this project for the given JID.
+     * 
+     * Returns null if the given user does not exist in the project.
+     * 
+     * Throws an IllegalArgumentException if the given JID is null.
+     * 
+     * @deprecated This method is deprecated, because it does not compare the
+     *             JID with considering the resource.
+     */
+    @Deprecated
     public User getParticipant(JID jid);
+
+    /**
+     * Given a resource qualified JID, this method will return the user which
+     * has the identical ID including resource.
+     * 
+     * Null is returned if no user is found with this JID (even if there is only
+     * a resource mismatch).
+     * 
+     * Use getResourceQualifiedJID(JID) in the case if you do not know the
+     * RQ-JID.
+     */
+    public User getUser(JID jid);
+
+    /**
+     * Given a JID (with resource or not), will return the resource qualified
+     * JID associated with a User in this project or null if no user for the
+     * given JID exists in this SharedProject.
+     */
+    public JID getResourceQualifiedJID(JID jid);
 
     public User getLocalUser();
 

@@ -50,6 +50,7 @@ import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -405,13 +406,74 @@ public class SharedProject implements ISharedProject, Disposable {
         activitySequencer.dispose();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
+     * @deprecated Use getUser and getResourceQualifiedJID instead.
      */
+    @Deprecated
     public User getParticipant(JID jid) {
-        return this.participants.get(jid);
+
+        if (jid == null)
+            throw new IllegalArgumentException();
+
+        if (jid.isBareJID()) {
+            log.error(
+                "JIDs used for the SharedProject should always be resource qualified: "
+                    + jid, new StackTrace());
+        }
+
+        User user = this.participants.get(jid);
+        if (user == null)
+            return null;
+
+        if (!user.getJID().strictlyEquals(jid)) {
+            log.error("getParticipant is deprecated and wrongly used:"
+                + " The given JID has a resource qualifier not found "
+                + "in the shared project");
+        }
+
+        return user;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public User getUser(JID jid) {
+
+        if (jid == null)
+            throw new IllegalArgumentException();
+
+        if (jid.isBareJID()) {
+            throw new IllegalArgumentException(
+                "JIDs used for the SharedProject should always be resource qualified: "
+                    + jid);
+        }
+
+        User user = this.participants.get(jid);
+
+        if (user == null || !user.getJID().strictlyEquals(jid))
+            return null;
+
+        return user;
+    }
+
+    /**
+     * Given a JID (with resource or not), will return the resource qualified
+     * JID associated with this user or null if no user for the given JID exists
+     * in this SharedProject.
+     */
+    public JID getResourceQualifiedJID(JID jid) {
+
+        if (jid == null)
+            throw new IllegalArgumentException();
+
+        User user = this.participants.get(jid);
+
+        if (user == null)
+            return null;
+
+        return user.getJID();
     }
 
     public User getLocalUser() {
