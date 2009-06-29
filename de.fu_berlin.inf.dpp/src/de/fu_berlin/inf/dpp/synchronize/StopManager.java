@@ -151,7 +151,9 @@ public class StopManager implements IActivityProvider, Disposable {
                      * unlocks project without acknowledgment if there don't
                      * exist any more startHandles
                      */
-                    removeStartHandle(generateStartHandle(stopActivity));
+                    if (!removeStartHandle(generateStartHandle(stopActivity)))
+                        log.warn("StartHandle for " + stopActivity
+                            + " couldn't be removed because it doesn't exist.");
                     if (!noStartHandlesFor(sharedProject.getLocalUser()))
                         return true;
                     Util.runSafeSWTSync(log, new Runnable() {
@@ -318,19 +320,23 @@ public class StopManager implements IActivityProvider, Disposable {
     /**
      * Removes a StartHandle from startHandles. If the list for user is empty
      * then the user is removed from startHandles.
+     * 
+     * @return false if the given startHandle didn't exist in Map, true
+     *         otherwise
      */
-    public void removeStartHandle(StartHandle startHandle) {
+    public boolean removeStartHandle(StartHandle startHandle) {
         User user = startHandle.getUser();
         List<StartHandle> handleList = startHandles.get(user);
         if (handleList == null)
-            return; // nothing to do
-        handleList.remove(startHandle);
+            return false; // nothing to do
+        boolean out = handleList.remove(startHandle);
         if (handleList.isEmpty())
             startHandles.remove(user);
+        return out;
     }
 
     /**
-     * @return true if there exist no StartHandles for the given user
+     * @return true if there don't exist any StartHandles for the given user
      */
     public boolean noStartHandlesFor(User user) {
         return !startHandles.containsKey(user);

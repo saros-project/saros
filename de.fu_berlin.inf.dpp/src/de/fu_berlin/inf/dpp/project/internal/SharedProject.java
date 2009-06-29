@@ -218,7 +218,9 @@ public class SharedProject implements ISharedProject, Disposable {
 
                     setUserRole(user, newRole);
 
-                    startHandle.start();
+                    if (!startHandle.start())
+                        log
+                            .warn("Didn't unblock. There still exist unstarted StartHandles.");
                 }
             });
         }
