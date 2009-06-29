@@ -211,7 +211,7 @@ public class Pair<P, V> {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof Pair))
+        if (!(obj instanceof Pair<?, ?>))
             return false;
         Pair<?, ?> other = (Pair<?, ?>) obj;
         if (p == null) {
