@@ -499,8 +499,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     protected void exec(final IActivity activity) {
 
-        log.debug("Executing untransformed activity: " + activity);
-
         // TODO Replace this with a single call to the ConcurrentDocumentManager
         // and use the ActivityReceiver to handle all cases.
         try {
