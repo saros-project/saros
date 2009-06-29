@@ -33,6 +33,8 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 /**
  * Contains the basic preferences for Saros.
  * 
+ * TODO Rename to GeneralPreferencePage or SarosPreferencePage
+ * 
  * @author rdjemili
  */
 @Component(module = "prefs")
