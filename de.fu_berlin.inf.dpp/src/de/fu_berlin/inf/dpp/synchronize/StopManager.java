@@ -64,18 +64,22 @@ public class StopManager implements IActivityProvider, Disposable {
         .synchronizedSet(new HashSet<StopActivity>());
 
     protected ValueChangeListener<SharedProject> sharedProjectObserver = new ValueChangeListener<SharedProject>() {
-        public void setValue(SharedProject sharedProject) {
+        public void setValue(SharedProject newSharedProject) {
 
-            if (sharedProject == null) {
+            if (newSharedProject == StopManager.this.sharedProject)
+                return;
+
+            if (StopManager.this.sharedProject != null) {
                 StopManager.this.sharedProject.getSequencer().removeProvider(
                     StopManager.this);
-
                 reset();
-                return;
             }
 
-            StopManager.this.sharedProject = sharedProject;
-            sharedProject.getSequencer().addProvider(StopManager.this);
+            StopManager.this.sharedProject = newSharedProject;
+
+            if (newSharedProject != null) {
+                newSharedProject.getSequencer().addProvider(StopManager.this);
+            }
         }
     };
 
@@ -104,8 +108,7 @@ public class StopManager implements IActivityProvider, Disposable {
                  * knows he is locked. Then he acknowledges
                  */
                 if (stopActivity.getState() == State.INITIATED
-                    && sharedProject.getParticipant(stopActivity.getUser())
-                        .isLocal()) {
+                    && sharedProject.getUser(stopActivity.getUser()).isLocal()) {
                     addStartHandle(generateStartHandle(stopActivity));
                     // locks project and acknowledges
                     Util.runSafeSWTSync(log, new Runnable() {
@@ -119,8 +122,8 @@ public class StopManager implements IActivityProvider, Disposable {
                     return true;
                 }
                 if (stopActivity.getState() == State.ACKNOWLEDGED
-                    && sharedProject
-                        .getParticipant(stopActivity.getInitiator()).isLocal()) {
+                    && sharedProject.getUser(stopActivity.getInitiator())
+                        .isLocal()) {
                     if (!expectedAcknowledgments.contains(stopActivity)) {
                         log.warn("received unexpected StopActivity: "
                             + stopActivity);
@@ -145,8 +148,7 @@ public class StopManager implements IActivityProvider, Disposable {
 
             if (stopActivity.getType() == Type.UNLOCKREQUEST) {
                 if (stopActivity.getState() == State.INITIATED
-                    && sharedProject.getParticipant(stopActivity.getUser())
-                        .isLocal()) {
+                    && sharedProject.getUser(stopActivity.getUser()).isLocal()) {
                     /*
                      * unlocks project without acknowledgment if there don't
                      * exist any more startHandles
@@ -154,8 +156,12 @@ public class StopManager implements IActivityProvider, Disposable {
                     if (!removeStartHandle(generateStartHandle(stopActivity)))
                         log.warn("StartHandle for " + stopActivity
                             + " couldn't be removed because it doesn't exist.");
-                    if (!noStartHandlesFor(sharedProject.getLocalUser()))
+                    if (!noStartHandlesFor(sharedProject.getLocalUser())) {
+                        log.debug(startHandles
+                            .get(sharedProject.getLocalUser()).size()
+                            + " startHandles remaining.");
                         return true;
+                    }
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             lockProject(false);
@@ -208,7 +214,7 @@ public class StopManager implements IActivityProvider, Disposable {
         fireActivity(stopActivity);
 
         // block until user acknowledged
-        log.debug("Waiting for acknowledgment");
+        log.debug("Waiting for acknowledgment " + Util.prefix(user.getJID()));
         reentrantLock.lock();
         try {
             long startTime = System.currentTimeMillis();
@@ -221,7 +227,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 expectedAcknowledgments.remove(expectedAck);
                 return null;
             }
-            log.debug("Acknowledgment arrived");
+            log.debug("Acknowledgment arrived " + Util.prefix(user.getJID()));
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -238,13 +244,9 @@ public class StopManager implements IActivityProvider, Disposable {
      * editing activities (FileActivities and TextEditActivities).
      * 
      * @param lock
-     *            if true the project gets locked, else it gets unlocked (if
-     *            local user is driver)
+     *            if true the project gets locked, else it gets unlocked
      */
     protected void lockProject(boolean lock) {
-        // don't unlock if local user is observer
-        if (!lock && !sharedProject.isDriver())
-            return;
         for (Blockable blockable : blockables) {
             if (lock)
                 blockable.block();
@@ -343,7 +345,7 @@ public class StopManager implements IActivityProvider, Disposable {
     }
 
     public StartHandle generateStartHandle(StopActivity stopActivity) {
-        User user = sharedProject.getParticipant(stopActivity.getUser());
+        User user = sharedProject.getUser(stopActivity.getUser());
         return new StartHandle(user, this, stopActivity.getActivityID());
     }
 
@@ -360,8 +362,7 @@ public class StopManager implements IActivityProvider, Disposable {
     }
 
     protected void reset() {
-        blockables.clear();
-        StopManager.this.sharedProject = null;
+        lockProject(false);
         startHandles.clear();
         expectedAcknowledgments.clear();
     }

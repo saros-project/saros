@@ -1762,7 +1762,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             log.debug("Lock all editors");
         else
             log.debug("Unlock all editors");
-        editorPool.setDriverEnabled(!lock);
+        editorPool.setDriverEnabled(!lock && sharedProject.isDriver());
     }
 
     public void dispose() {

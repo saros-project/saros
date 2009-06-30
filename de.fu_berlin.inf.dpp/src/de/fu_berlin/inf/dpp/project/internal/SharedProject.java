@@ -90,7 +90,8 @@ public class SharedProject implements ISharedProject, Disposable {
     protected Blockable stopManagerListener = new Blockable() {
 
         public void unblock() {
-            setProjectReadonly(false);
+            if (isDriver())
+                setProjectReadonly(false);
         }
 
         public void block() {
