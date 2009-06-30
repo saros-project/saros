@@ -295,7 +295,14 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             final boolean storeInPreferences = isStoreInPreferences();
 
             try {
-                getContainer().run(false, false, new IRunnableWithProgress() {
+                /*
+                 * TODO think about providing cancellation for this operation,
+                 * so that the users preferences are not overwritten, but keep
+                 * in mind that account creation can not be reverted
+                 */
+
+                // fork a new thread to prevent the GUI from hanging
+                getContainer().run(true, false, new IRunnableWithProgress() {
                     public void run(IProgressMonitor monitor)
                         throws InvocationTargetException {
                         try {
@@ -328,15 +335,21 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
                     s = "Account already exists";
                 }
 
-                setMessage(e.getCause().getMessage() + ": "
-                    + (s != null ? s : "No Explanation"),
-                    IMessageProvider.ERROR);
+                String errorMessage = e.getCause().getMessage();
+                s = (s == null) ? "No Explanation" : s;
+
+                if (s.equals(errorMessage)) {
+                    // don't repeat error message
+                    setErrorMessage(s);
+                } else {
+                    setErrorMessage(errorMessage + ": " + s);
+                }
                 return false;
 
             } catch (InterruptedException e) {
                 log.error("An internal error occurred: InterruptedException"
                     + " thrown from uninterruptable method", e);
-                setMessage(e.getCause().getMessage(), IMessageProvider.ERROR);
+                setErrorMessage(e.getCause().getMessage());
                 return false;
             }
 
@@ -358,5 +371,4 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             return true;
         }
     }
-
 }
