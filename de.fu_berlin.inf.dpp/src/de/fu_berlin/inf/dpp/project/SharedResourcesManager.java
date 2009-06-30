@@ -48,7 +48,6 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
 import de.fu_berlin.inf.dpp.util.FileUtil;
 
 /**
@@ -354,39 +353,24 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 log.error("Could not write file: " + file);
             }
         } else if (activity.getType() == FileActivity.Type.Removed) {
-            FileUtil.deleteFile(file);
+            FileUtil.delete(file);
         }
     }
 
     private void exec(FolderActivity activity) throws CoreException {
-        IProject project = this.sharedProject.getProject();
-        IFolder folder = project.getFolder(activity.getPath());
+        IFolder folder = this.sharedProject.getProject().getFolder(
+            activity.getPath());
 
-        BlockingProgressMonitor monitor = new BlockingProgressMonitor();
         if (activity.getType() == FolderActivity.Type.Created) {
-            folder.create(true, true, monitor);
-            try {
-                monitor.await();
-            } catch (InterruptedException e) {
-                log.error("Code not designed to handle InterruptedException");
-                Thread.currentThread().interrupt();
-            }
-            if (monitor.isCanceled()) {
+            if (!FileUtil.create(folder))
                 log.warn("Creating folder failed: " + folder);
-            }
         } else if (activity.getType() == FolderActivity.Type.Removed) {
-            folder.delete(true, monitor);
             try {
-                monitor.await();
-            } catch (InterruptedException e) {
-                log.error("Code not designed to handle InterruptedException");
-                Thread.currentThread().interrupt();
-            }
-            if (monitor.isCanceled()) {
-                log.warn("Deleting folder failed: " + folder);
+                FileUtil.delete(folder);
+            } catch (CoreException e) {
+                log.warn("Removing folder failed: " + folder);
             }
         }
-
     }
 
     public void dispose() {

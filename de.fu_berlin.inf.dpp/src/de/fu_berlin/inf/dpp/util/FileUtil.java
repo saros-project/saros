@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -250,7 +249,21 @@ public class FileUtil {
         }
         create(getParentFolder(folder));
         try {
-            folder.create(IResource.NONE, true, new NullProgressMonitor());
+            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+            // TODO Actually we have to perform this as Workspace Runnable
+
+            folder.create(IResource.NONE, true, monitor);
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                log.error("Code not designed to handle InterruptedException");
+                Thread.currentThread().interrupt();
+                return false;
+            }
+            if (monitor.isCanceled()) {
+                log.warn("Creating folder failed: " + folder);
+                return false;
+            }
             return true;
         } catch (CoreException e) {
             return false;
@@ -304,15 +317,17 @@ public class FileUtil {
         }
     }
 
-    public static void deleteFile(IFile file) throws CoreException {
-        if (!file.exists()) {
-            log.warn("File not found for deletion: " + file);
+    public static void delete(IResource resource) throws CoreException {
+        if (!resource.exists()) {
+            log.warn("File not found for deletion: " + resource);
             return;
         }
 
-        setReadOnly(file, false);
+        setReadOnly(resource, false);
         BlockingProgressMonitor monitor = new BlockingProgressMonitor();
-        file.delete(false, monitor);
+        // TODO Actually we have to perform this as Workspace Runnable
+
+        resource.delete(false, monitor);
         try {
             monitor.await();
         } catch (InterruptedException e) {
@@ -321,7 +336,7 @@ public class FileUtil {
         }
 
         if (monitor.isCanceled()) {
-            log.warn("Removing file failed: " + file);
+            log.warn("Removing resource failed: " + resource);
         }
     }
 
