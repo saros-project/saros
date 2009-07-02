@@ -817,6 +817,12 @@ public class EditorManager implements IActivityProvider, Disposable {
         fireActivity(new TextEditActivity(sharedProject.getLocalUser().getJID()
             .toString(), offset, text, replacedText, path));
 
+        // inform all registered ISharedEditorListeners about this text edit
+        for (ISharedEditorListener editorListener : this.editorListeners) {
+            editorListener.textEditRecieved(sharedProject.getLocalUser(), path,
+                text, replacedText, offset);
+        }
+
         /*
          * TODO Investigate if this is really needed here
          */
@@ -880,6 +886,12 @@ public class EditorManager implements IActivityProvider, Disposable {
             editorAPI.setSelection(editorPart, new TextSelection(
                 textEdit.offset + textEdit.text.length(), 0), user, user
                 .equals(getFollowedUser()));
+        }
+
+        // inform all registered ISharedEditorListeners about this text edit
+        for (ISharedEditorListener editorListener : this.editorListeners) {
+            editorListener.textEditRecieved(user, path, textEdit.text,
+                textEdit.replacedText, textEdit.offset);
         }
     }
 

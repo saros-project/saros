@@ -41,6 +41,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -118,10 +119,11 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
         }
     };
 
-    protected ISharedEditorListener editorListener = new ISharedEditorListener() {
+    protected ISharedEditorListener editorListener = new AbstractSharedEditorListener() {
 
         Map<User, IFile> oldActiveEditors = new HashMap<User, IFile>();
 
+        @Override
         public void activeEditorChanged(User user, IPath path) {
             try {
                 List<IFile> paths = new LinkedList<IFile>();
@@ -146,6 +148,7 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             }
         }
 
+        @Override
         public void editorRemoved(User user, IPath path) {
             try {
                 if (path != null && sharedProject != null) {
@@ -163,12 +166,9 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
             }
         }
 
-        public void driverEditorSaved(IPath path, boolean replicated) {
-            // ignore
-        }
-
         User oldUserFollowed = null;
 
+        @Override
         public void followModeChanged(User user) {
 
             if (ObjectUtils.equals(user, oldUserFollowed))

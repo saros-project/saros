@@ -55,4 +55,32 @@ public interface ISharedEditorListener {
      *            followed)
      */
     public void followModeChanged(@Nullable User user);
+
+    /**
+     * Is fired after a text edit has occurred locally and sent to remote peers
+     * (in which case the user is the local user) or has been received from a
+     * remote peer and applied locally.<br>
+     * <br>
+     * 
+     * In both cases does this event occur AFTER the change has been applied
+     * locally and should only be treated as a notification.
+     * 
+     * 
+     * @param user
+     *            the user who performed the text edit, may be local or remote
+     * @param editor
+     *            the path of the file which is altered
+     * @param text
+     *            the text which was inserted at the given offset, after the
+     *            replacedText had been removed
+     * @param replacedText
+     *            the text which will be removed at the given offset before the
+     *            given text will be inserted
+     * @param offset
+     *            the character based offset inside the document where this edit
+     *            happened
+     */
+    public void textEditRecieved(User user, IPath editor, String text,
+        String replacedText, int offset);
+
 }

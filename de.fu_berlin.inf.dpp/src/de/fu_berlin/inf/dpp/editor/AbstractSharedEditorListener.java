@@ -25,4 +25,9 @@ public abstract class AbstractSharedEditorListener implements
     public void followModeChanged(User user) {
         // does nothing
     }
+
+    public void textEditRecieved(User user, IPath editor, String text,
+        String replacedText, int offset) {
+        // does nothing
+    }
 }
