@@ -19,11 +19,16 @@
  */
 package de.fu_berlin.inf.dpp.ui.wizards;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
-import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -38,6 +43,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Wizard for adding a new contact to the roster of the currently connected
@@ -51,10 +57,15 @@ public class AddContactWizard extends Wizard {
     public static final boolean allowToEnterNick = false;
 
     protected Saros saros;
+    protected final AddContactPage page = new AddContactPage();
 
     public AddContactWizard(Saros saros) {
         setWindowTitle("New Contact");
         this.saros = saros;
+
+        this.addPage(page);
+        this.setNeedsProgressMonitor(true);
+        this.setHelpAvailable(false);
     }
 
     public static class AddContactPage extends WizardPage {
@@ -165,65 +176,129 @@ public class AddContactWizard extends Wizard {
         }
     }
 
-    private final AddContactPage page = new AddContactPage();
-
-    @Override
-    public void addPages() {
-        addPage(this.page);
-    }
-
     @Override
     public boolean performFinish() {
 
-        // FIXME This must be run in a progress context...
-
-        JID jidToAdd = this.page.getJID();
+        final JID jid = this.page.getJID();
+        final String nickname = allowToEnterNick ? page.getNickname() : "";
 
         try {
-            if (!saros.isJIDonServer(jidToAdd)) {
-                if (!MessageDialog.openQuestion(this.getShell(),
-                    "Contact not found", "The contact " + jidToAdd
-                        + " could not be found on the server.\n"
-                        + "Do you want to add it anyway?")) {
-                    this.page.setErrorMessage("Contact " + jidToAdd
-                        + " not found on server!");
-                    return false;
+            getContainer().run(true, true, new IRunnableWithProgress() {
+
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException, InterruptedException {
+                    try {
+                        doAddContact(jid, nickname, SubMonitor.convert(monitor));
+                    } catch (CancellationException e) {
+                        throw new InterruptedException();
+                    }
                 }
-            }
-        } catch (XMPPException e) {
-
-            log.warn("XMPP Disco for user failed: ", e);
-
-            if (!MessageDialog.openConfirm(this.getShell(), "XMPP Error",
-                "The XMPP server did support a query for whether\n    "
-                    + jidToAdd + "\nis a valid JID.\n"
-                    + "Do you want to add it anyway?")) {
-                this.page
-                    .setErrorMessage("The XMPP server did support a query for whether "
-                        + jidToAdd + " is a valid JID");
-                return false;
-            }
+            });
+        } catch (InvocationTargetException e) {
+            log.error(e.getCause().getMessage(), e.getCause());
+            page.setErrorMessage(e.getMessage());
+            // leave wizard open
+            return false;
+        } catch (InterruptedException e) {
+            log.debug("Adding contact " + jid.toString()
+                + " was canceled by the user.");
         }
+        // close the wizard
+        return true;
+    }
 
+    protected void doAddContact(JID jid, String nickname, SubMonitor monitor)
+        throws InvocationTargetException {
+
+        monitor.beginTask("Adding " + jid, 2);
         try {
-            if (allowToEnterNick && !(page.getNickname().length() == 0)) {
-                saros.addContact(jidToAdd, this.page.getNickname(), null);
-            } else {
-                saros.addContact(jidToAdd, jidToAdd.toString(), null);
-            }
-            return true;
+            try {
+                if (!saros.isJIDonServer(jid, monitor.newChild(1))) {
+                    if (!openQuestionDialog("Contact not found", "The contact "
+                        + jid + " could not be found on the server."
+                        + " Please make sure you spelled the name correctly.\n"
+                        + "It is also possible that the server didn't"
+                        + " return a correct answer for this contact."
+                        + " Do you want to add it anyway?")) {
+                        throw new InvocationTargetException(new XMPPException(
+                            "ServiceDiscovery returned no results."),
+                            "Contact " + jid + " couldn't be found on server.");
+                    }
+                    log.debug("The contact " + jid + " couldn't be found."
+                        + " The user chose to add it anyway.");
+                }
+            } catch (XMPPException e) {
+                // handle the different exceptions
+                if (e.getMessage().contains("item-not-found")) {
+                    throw new InvocationTargetException(e, "Contact " + jid
+                        + " couldn't be found on server.");
+                }
 
-        } catch (XMPPException e) {
-            // contact not found
-            if (e.getMessage().contains("item-not-found"))
-                this.page.setMessage("Contact " + jidToAdd
-                    + " not found on server!", IMessageProvider.ERROR);
-            else {
-                log.error("Could not add contact " + jidToAdd + ": ", e);
-                this.page.setMessage(e.getMessage(), IMessageProvider.ERROR);
+                if (e.getMessage().contains("remote-server-not-found")) {
+                    throw new InvocationTargetException(e, "The server "
+                        + jid.getDomain() + " couldn't be found.");
+                }
+
+                if (e.getMessage().contains("No response from the server")) {
+                    throw new InvocationTargetException(e,
+                        "Couldn't connect to server " + jid.getDomain());
+                }
+                // ask the user what to do
+                if (!openQuestionDialog("XMPP Error",
+                    "We weren't able to determine wether your contact's JID "
+                        + jid + " is valid because the XMPP server"
+                        + " seems to not support the query.\n"
+                        + "Do you want to add it anyway?")) {
+                    // don't add contact
+                    throw new InvocationTargetException(e,
+                        "The XMPP server did not support a query for whether "
+                            + jid + " is a valid JID.");
+                }
+                log.debug("The XMPP server did not support a query for"
+                    + " whether " + jid + " is a valid JID: " + e.getMessage()
+                    + ". The user chose to add it anyway.");
             }
+
+            // now add the contact to the Roster
+            try {
+                if (allowToEnterNick && !(nickname.length() == 0)) {
+                    saros.addContact(jid, nickname, null, monitor.newChild(1));
+                } else {
+                    saros.addContact(jid, jid.toString(), null, monitor
+                        .newChild(1));
+                }
+            } catch (XMPPException e) {
+                throw new InvocationTargetException(e, "Couldn't add contact "
+                    + jid + " to Roster.");
+            }
+        } finally {
+            monitor.done();
         }
+    }
 
-        return false;
+    /**
+     * Shows a QuestionDialog to the user and returns his answer.
+     * 
+     * @blocking
+     * @param title
+     *            the dialogs title
+     * @param message
+     *            the message to show to the user
+     * @return true, if he clicked Yes, false otherwise
+     */
+    protected boolean openQuestionDialog(final String title,
+        final String message) {
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    return MessageDialog.openQuestion(getShell(), title,
+                        message);
+                }
+            });
+        } catch (Exception e) {
+            log.error("An internal error ocurred while trying"
+                + " to open the question dialog.");
+            return false;
+        }
     }
 }

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,6 +35,7 @@ import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -768,14 +770,17 @@ public class Saros extends AbstractUIPlugin {
         XMPPConnection connection = new XMPPConnection(server);
         monitor.worked(1);
 
-        connection.connect();
-        monitor.worked(1);
+        try {
+            connection.connect();
+            monitor.worked(1);
 
-        connection.getAccountManager().createAccount(username, password);
-        monitor.worked(1);
+            connection.getAccountManager().createAccount(username, password);
+            monitor.worked(1);
 
-        connection.disconnect();
-        monitor.done();
+            connection.disconnect();
+        } finally {
+            monitor.done();
+        }
     }
 
     /**
@@ -791,31 +796,49 @@ public class Saros extends AbstractUIPlugin {
      * @param groups
      *            the groups to which the new contact should belong to. This
      *            information will be saved on the server.
+     * @param monitor
+     *            a SubMonitor to report progress to
      * @throws XMPPException
      *             is thrown if no connection is established or an error
      *             occurred when adding the user to the roster (which does not
      *             mean that the user really exists on the server)
      */
-    public void addContact(JID jid, String nickname, String[] groups)
-        throws XMPPException {
-        assertConnection();
+    public void addContact(JID jid, String nickname, String[] groups,
+        SubMonitor monitor) throws XMPPException {
 
-        // if roster already contains user with this jid, throw an exception
-        if (connection.getRoster().contains(jid.toString())) {
-            throw new XMPPException("RosterEntry for user " + jid
-                + " already exists");
+        monitor.beginTask("Adding contact " + jid + " to Roster..", 2);
+
+        try {
+            assertConnection();
+
+            monitor.worked(1);
+
+            // if roster already contains user with this jid, throw an exception
+            if (connection.getRoster().contains(jid.toString())) {
+                monitor.worked(1);
+
+                throw new XMPPException("RosterEntry for user " + jid
+                    + " already exists");
+            }
+            monitor.worked(1);
+
+            connection.getRoster()
+                .createEntry(jid.toString(), nickname, groups);
+        } finally {
+            monitor.done();
         }
-
-        connection.getRoster().createEntry(jid.toString(), nickname, groups);
     }
 
     /**
      * Given an XMPP Exception this method will return whether the exception
      * thrown by isJIDonServer indicates that the server does not support
-     * ServiceDisco.
-     * 
+     * ServiceDisco.<br>
+     * <br>
      * In other words: If isJIDonServer throws an Exception and this method
      * returns true on the exception, then we should call addContact anyway.
+     * 
+     * @return true, if the exception occurred because the server does not
+     *         support ServiceDiscovery
      */
     public static boolean isDiscoFailedException(XMPPException e) {
 
@@ -833,14 +856,39 @@ public class Saros extends AbstractUIPlugin {
     /**
      * Returns whether the given JID can be found on the server.
      * 
+     * @blocking
+     * @cancelable
+     * 
+     * @param monitor
+     *            a SubMonitor to report progress to
      * @throws XMPPException
      *             if the service disco failed. Use isDiscoFailedException to
      *             figure out, whether this might mean that the server does not
      *             support disco at all.
      */
-    public boolean isJIDonServer(JID jid) throws XMPPException {
+    public boolean isJIDonServer(JID jid, SubMonitor monitor)
+        throws XMPPException {
+        monitor.beginTask("", 2);
+
         ServiceDiscoveryManager sdm = new ServiceDiscoveryManager(connection);
-        return sdm.discoverInfo(jid.toString()).getIdentities().hasNext();
+        monitor.worked(1);
+
+        if (monitor.isCanceled())
+            throw new CancellationException();
+
+        try {
+            boolean discovered = sdm.discoverInfo(jid.toString())
+                .getIdentities().hasNext();
+            /*
+             * discovery does not change any state, if the user wanted to cancel
+             * it, we can do that even after the execution finished
+             */
+            if (monitor.isCanceled())
+                throw new CancellationException();
+            return discovered;
+        } finally {
+            monitor.done();
+        }
     }
 
     /**
