@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.util.Util;
+
 /**
  * The SessionStatistic class wraps a Properties object in which the gathered
  * statistical data can be stored as simple key/value pairs. This data can then
@@ -49,11 +51,13 @@ public class SessionStatistic {
 
     protected static final String KEY_DURATION = "duration";
     protected static final String KEY_PERCENT = "percent";
+    protected static final String KEY_CHARS = "chars";
+    protected static final String KEY_COUNT = "count";
 
-    protected static final String KEY_TEXTEDIT_CHARS = "textedit.chars";
-    protected static final String KEY_TEXTEDIT_COUNT = "textedit.count";
-    protected static final String KEY_PARALLEL_TEXT_EDITS = "textedits.parallel.chars.interval";
-    protected static final String KEY_PARALLEL_TEXT_EDITS_PERCENT = "textedits.parallel.percent.interval";
+    protected static final String KEY_TEXTEDIT_CHARS = "textedits.chars";
+    protected static final String KEY_TEXTEDIT_COUNT = "textedits.count";
+    protected static final String KEY_PARALLEL_TEXT_EDITS = "textedits.parallel.interval";
+    protected static final String KEY_NON_PARALLEL_TEXT_EDITS = "textedits.nonparallel";
 
     // Keys for DataTransferCollector
     protected static final String KEY_TRANSFER_STATS = "data_transfer";
@@ -136,20 +140,18 @@ public class SessionStatistic {
      */
     public File toFile(IPath path, String filename) {
         // create a subfolder with the current date, if nonexistent
-        Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String dirName = "statistic_" + dateFormat.format(date);
-        File dir = new File(path.toString(), dirName);
+        String dirName = "statistic_" + dateFormat.format(new Date());
+        IPath filePath = path.append(dirName).append(filename);
 
-        if (!dir.exists()) {
-            if (!dir.mkdir()) {
-                log.error("Couldn't create subfolder " + dir.getPath());
-                // use parent instead
-                dir = dir.getParentFile();
-            }
+        if (!Util.mkdirs(filePath.toOSString())) {
+            log.error("Could not create the necessary directories to save"
+                + " the statistic as a file. Therefore the statistic could"
+                + " not be saved.");
+            return null;
         }
 
-        File file = new File(dir, filename);
+        File file = filePath.toFile();
         FileOutputStream fos = null;
         log.debug("Writing statistic data to " + file.getPath());
 
@@ -417,7 +419,7 @@ public class SessionStatistic {
      */
     public long getParallelTextEdits(int interval) {
         return Long.parseLong(data.getProperty(appendToKey(
-            KEY_PARALLEL_TEXT_EDITS, interval)));
+            KEY_PARALLEL_TEXT_EDITS, interval, KEY_CHARS)));
     }
 
     /**
@@ -425,8 +427,8 @@ public class SessionStatistic {
      * given interval with other users.
      */
     public void setParallelTextEdits(int interval, long chars) {
-        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval), String
-            .valueOf(chars));
+        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval,
+            KEY_CHARS), String.valueOf(chars));
     }
 
     /**
@@ -434,8 +436,8 @@ public class SessionStatistic {
      * given interval.
      */
     public int getParallelTextEditsPercent(int interval) {
-        return Integer.parseInt(data
-            .getProperty(KEY_PARALLEL_TEXT_EDITS_PERCENT));
+        return Integer.parseInt(data.getProperty(appendToKey(
+            KEY_PARALLEL_TEXT_EDITS, interval, KEY_PERCENT)));
     }
 
     /**
@@ -443,9 +445,38 @@ public class SessionStatistic {
      * interval.
      */
     public void setParallelTextEditsPercent(int interval, int percent) {
-        data.setProperty(
-            appendToKey(KEY_PARALLEL_TEXT_EDITS_PERCENT, interval), String
-                .valueOf(percent));
+        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval,
+            KEY_PERCENT), String.valueOf(percent));
+    }
+
+    public int getParallelTextEditsCount(int interval) {
+        return Integer.parseInt(data.getProperty(appendToKey(
+            KEY_PARALLEL_TEXT_EDITS, interval, KEY_COUNT)));
+    }
+
+    public void setParallelTextEditsCount(int interval, int count) {
+        data.setProperty(appendToKey(KEY_PARALLEL_TEXT_EDITS, interval,
+            KEY_COUNT), String.valueOf(count));
+    }
+
+    public long getNonParallelTextEdits() {
+        return Long.parseLong(data.getProperty(appendToKey(
+            KEY_NON_PARALLEL_TEXT_EDITS, KEY_CHARS)));
+    }
+
+    public void setNonParallelTextEdits(long chars) {
+        data.setProperty(appendToKey(KEY_NON_PARALLEL_TEXT_EDITS, KEY_CHARS),
+            String.valueOf(chars));
+    }
+
+    public int getNonParallelTextEditsPercent() {
+        return Integer.parseInt(data.getProperty(appendToKey(
+            KEY_NON_PARALLEL_TEXT_EDITS, KEY_PERCENT)));
+    }
+
+    public void setNonParallelTextEditsPercent(int percent) {
+        data.setProperty(appendToKey(KEY_NON_PARALLEL_TEXT_EDITS, KEY_PERCENT),
+            String.valueOf(percent));
     }
 
     public String getUserID() {

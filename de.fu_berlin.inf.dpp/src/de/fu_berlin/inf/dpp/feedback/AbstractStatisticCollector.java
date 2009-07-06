@@ -82,13 +82,13 @@ public abstract class AbstractStatisticCollector {
     }
 
     /**
-     * Helper method that calculates the percentage of the given time from the
-     * sessionTime.
+     * Helper method that calculates the percentage of the given value from the
+     * given total value.
      * 
-     * @return time / sessionTime * 100
+     * @return value / totalValue * 100
      */
-    protected int getPercentOfSessionTime(long time, long sessionTime) {
-        return (int) Math.round(((double) time / sessionTime) * 100);
+    protected int getPercentage(long value, long totalValue) {
+        return (int) Math.round(((double) value / totalValue) * 100);
     }
 
     /**

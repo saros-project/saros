@@ -75,6 +75,7 @@ import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
 import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
 import de.fu_berlin.inf.dpp.feedback.SessionDataCollector;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
+import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
@@ -395,6 +396,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(RoleChangeCollector.class);
         this.container.addComponent(ParticipantCollector.class);
         this.container.addComponent(SessionDataCollector.class);
+        this.container.addComponent(TextEditCollector.class);
 
         /*
          * The following classes are initialized by the re-injector because they

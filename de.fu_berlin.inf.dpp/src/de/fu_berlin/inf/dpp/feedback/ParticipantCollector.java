@@ -114,7 +114,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
         // store the number of users and associated times
         for (Entry<Integer, Long> e : participantTimes.entrySet()) {
-            int percent = getPercentOfSessionTime(e.getValue(), sessionTime);
+            int percent = getPercentage(e.getValue(), sessionTime);
             data.setSessionTimeForUsers(e.getKey(), StatisticManager
                 .getTimeInMinutes(e.getValue()));
             data.setSessionTimePercentForUsers(e.getKey(), percent);
