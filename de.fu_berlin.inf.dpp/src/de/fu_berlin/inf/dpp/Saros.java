@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.jivesoftware.smack.AccountManager;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
@@ -48,6 +49,7 @@ import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
+import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.Jingle;
 import org.osgi.framework.BundleContext;
@@ -79,6 +81,7 @@ import de.fu_berlin.inf.dpp.feedback.TextEditCollector;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.XMPPUtil;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.ChecksumHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
@@ -769,14 +772,42 @@ public class Saros extends AbstractUIPlugin {
 
         monitor.beginTask("Registering account", 3);
 
-        XMPPConnection connection = new XMPPConnection(server);
-        monitor.worked(1);
-
         try {
+            XMPPConnection connection = new XMPPConnection(server);
+            monitor.worked(1);
+
             connection.connect();
             monitor.worked(1);
 
-            connection.getAccountManager().createAccount(username, password);
+            Registration registration = null;
+            try {
+                registration = XMPPUtil.getRegistrationInfo(username,
+                    connection);
+            } catch (XMPPException e) {
+                log.error("Server " + server + " does not support XEP-0077"
+                    + " (In-Band Registration) properly:", e);
+            }
+            if (registration != null) {
+                if (registration.getAttributes().containsKey("registered")) {
+                    throw new XMPPException("Account " + username
+                        + " already exists on server");
+                }
+                if (!registration.getAttributes().containsKey("username")) {
+                    String instructions = registration.getInstructions();
+                    if (instructions != null) {
+                        throw new XMPPException(
+                            "Registration via Saros not possible. Please follow these instructions:\n"
+                                + instructions);
+                    } else {
+                        throw new XMPPException(
+                            "Registration via Saros not supported by Server. Please see the server web site for informations for how to create an account");
+                    }
+                }
+            }
+            monitor.worked(1);
+
+            AccountManager manager = connection.getAccountManager();
+            manager.createAccount(username, password);
             monitor.worked(1);
 
             connection.disconnect();

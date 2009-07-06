@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.XMPPError;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -287,88 +288,92 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
     public boolean performFinish() {
 
+        String server = getServer();
+        String username = getUsername();
+        String password = getPassword();
+
+        /*
+         * TODO think about providing cancellation for this operation, so that
+         * the users preferences are not overwritten, but keep in mind that
+         * account creation can not be reverted
+         */
+
         if (this.createAccount) {
-
-            final String server = getServer();
-            final String username = getUsername();
-            final String password = getPassword();
-            final boolean storeInPreferences = isStoreInPreferences();
-
-            try {
-                /*
-                 * TODO think about providing cancellation for this operation,
-                 * so that the users preferences are not overwritten, but keep
-                 * in mind that account creation can not be reverted
-                 */
-
-                // fork a new thread to prevent the GUI from hanging
-                getContainer().run(true, false, new IRunnableWithProgress() {
-                    public void run(IProgressMonitor monitor)
-                        throws InvocationTargetException {
-                        try {
-                            saros.createAccount(server, username, password,
-                                monitor);
-
-                            if (storeInPreferences) {
-                                IPreferenceStore preferences = saros
-                                    .getPreferenceStore();
-                                preferences.setValue(
-                                    PreferenceConstants.SERVER, server);
-                                preferences.setValue(
-                                    PreferenceConstants.USERNAME, username);
-                                preferences.setValue(
-                                    PreferenceConstants.PASSWORD, password);
-                            }
-
-                        } catch (final XMPPException e) {
-                            throw new InvocationTargetException(e);
-                        }
-                    }
-                });
-
-            } catch (InvocationTargetException e) {
-                String s = ((XMPPException) e.getCause()).getXMPPError()
-                    .getMessage();
-
-                if ((s == null)
-                    && (((XMPPException) e.getCause()).getXMPPError().getCode() == 409)) {
-                    s = "Account already exists";
-                }
-
-                String errorMessage = e.getCause().getMessage();
-                s = (s == null) ? "No Explanation" : s;
-
-                if (s.equals(errorMessage)) {
-                    // don't repeat error message
-                    setErrorMessage(s);
-                } else {
-                    setErrorMessage(errorMessage + ": " + s);
-                }
+            if (!createAccount(server, username, password))
                 return false;
-
-            } catch (InterruptedException e) {
-                log.error("An internal error occurred: InterruptedException"
-                    + " thrown from uninterruptable method", e);
-                setErrorMessage(e.getCause().getMessage());
-                return false;
-            }
-
-            return true;
         }
 
-        else {
-            if (isStoreInPreferences()) {
+        if (isStoreInPreferences()) {
+            IPreferenceStore preferences = saros.getPreferenceStore();
+            preferences.setValue(PreferenceConstants.SERVER, server);
+            preferences.setValue(PreferenceConstants.USERNAME, username);
+            preferences.setValue(PreferenceConstants.PASSWORD, password);
+        }
 
-                final String server = getServer();
-                final String username = getUsername();
-                final String password = getPassword();
+        return true;
+    }
 
-                IPreferenceStore preferences = saros.getPreferenceStore();
-                preferences.setValue(PreferenceConstants.SERVER, server);
-                preferences.setValue(PreferenceConstants.USERNAME, username);
-                preferences.setValue(PreferenceConstants.PASSWORD, password);
+    protected boolean createAccount(final String server, final String username,
+        final String password) {
+
+        try {
+            // fork a new thread to prevent the GUI from hanging
+            getContainer().run(true, false, new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException {
+
+                    try {
+                        saros
+                            .createAccount(server, username, password, monitor);
+                    } catch (final XMPPException e) {
+                        throw new InvocationTargetException(e);
+                    }
+                }
+            });
+
+        } catch (InvocationTargetException e) {
+            setErrorMessage(extractErrorMessage(e).trim());
+            return false;
+        } catch (InterruptedException e) {
+            log.error("An internal error occurred: InterruptedException"
+                + " thrown from uninterruptable method", e);
+            setErrorMessage(e.getCause().getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    protected String extractErrorMessage(InvocationTargetException e) {
+        try {
+            // Unpack wrapped exception
+            throw e.getCause();
+        } catch (XMPPException x) {
+
+            String errorMessage = x.getMessage();
+
+            XMPPError error = x.getXMPPError();
+            if (error != null) {
+
+                String errorCode = error.getMessage();
+
+                if (errorCode == null) {
+                    if (error.getCode() == 409) {
+                        errorCode = "Account already exists\n(or possibly the server does not support direct registration)";
+                    } else {
+                        errorCode = "No Explanation";
+                    }
+                }
+
+                // Don't repeat error message
+                if (!errorCode.equals(errorMessage)) {
+                    errorMessage = errorMessage + ": " + errorCode;
+                }
             }
-            return true;
+            return errorMessage;
+        } catch (Throwable t) {
+            log.error("An internal error occurred: ", t);
+            return t.getMessage();
         }
     }
 }
