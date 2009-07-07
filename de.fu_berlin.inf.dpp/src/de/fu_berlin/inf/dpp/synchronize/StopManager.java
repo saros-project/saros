@@ -5,13 +5,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
@@ -35,8 +41,8 @@ public class StopManager implements IActivityProvider, Disposable {
 
     private static Logger log = Logger.getLogger(StopManager.class.getName());
 
-    // waits MILLISTOWAIT ms until giving up waiting for expected acknowledgment
-    protected final int MILLISTOWAIT = 5000;
+    // waits MILLISTOWAIT ms until the next test for progress cancellation
+    protected final int MILLISTOWAIT = 100;
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
@@ -50,7 +56,8 @@ public class StopManager implements IActivityProvider, Disposable {
      * Maps a User to a List of his StartHandles. Never touch this directly, use
      * the add and remove methods.
      */
-    private HashMap<User, List<StartHandle>> startHandles = new HashMap<User, List<StartHandle>>();
+    private Map<User, List<StartHandle>> startHandles = Collections
+        .synchronizedMap(new HashMap<User, List<StartHandle>>());
 
     // blocking mechanism
     protected Lock reentrantLock = new ReentrantLock();
@@ -175,15 +182,94 @@ public class StopManager implements IActivityProvider, Disposable {
     };
 
     /**
-     * Blocking method that asks the given user to halt all user-input and
-     * returns a handle to be used when the user can start again.
+     * Blocking method that asks the given users to halt all user-input and
+     * returns a list of handles to be used when the users can start again.
+     * 
+     * TODO This method is not tested for more than one user since it is not
+     * used yet.
+     * 
+     * @param users
+     *            the participants who has to stop
+     * @param cause
+     *            the cause for stopping as it is displayed in the progress
+     *            monitor
+     * 
+     * @param monitor
+     *            The caller is expected to call beginTask and done on the given
+     *            SubMonitor
      * 
      * @noSWT This method mustn't be called from the SWT thread.
      * 
+     * @cancelable This method can be canceled by the user
+     * 
+     * @throws CancellationException
+     */
+    public List<StartHandle> stop(final List<User> users, final String cause,
+        final SubMonitor monitor) throws CancellationException {
+
+        final List<StartHandle> resultingHandles = Collections
+            .synchronizedList(new LinkedList<StartHandle>());
+        final CountDownLatch doneSignal = new CountDownLatch(users.size());
+
+        for (final User user : users) {
+            Util.runSafeAsync(log, new Runnable() {
+                public void run() {
+                    try {
+                        StartHandle startHandle = stop(user, cause, SubMonitor
+                            .convert(new NullProgressMonitor()));
+                        resultingHandles.add(startHandle);
+                        doneSignal.countDown();
+                    } catch (CancellationException e) {
+                        log.debug("User canceled the Stopping");
+                        monitor.setCanceled(true);
+                    }
+                }
+            });
+        }
+        while (resultingHandles.size() != users.size() && !monitor.isCanceled()) {
+            try {
+                // waiting for all startHandles
+                doneSignal.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                log
+                    .error("Stopping was interrupted. Not all users could successfully be stopped.");
+            }
+        }
+        if (monitor.isCanceled()) {
+            // TODO SZ What about users that were stopped but have not returned
+            // a startHandle (because of cancellation before receiving the
+            // acknowledgment)
+
+            // restart the already stopped users
+            for (StartHandle startHandle : resultingHandles)
+                startHandle.start();
+            throw new CancellationException();
+        }
+        return resultingHandles;
+    }
+
+    /**
+     * Blocking method that asks the given user to halt all user-input and
+     * returns a handle to be used when the user can start again.
+     * 
      * @param user
      *            the participant who has to stop
+     * @param cause
+     *            the cause for stopping as it is displayed in the progress
+     *            monitor
+     * 
+     * @param progress
+     *            The caller is expected to call beginTask and done on the given
+     *            SubMonitor
+     * 
+     * @noSWT This method mustn't be called from the SWT thread.
+     * 
+     * @cancelable This method can be canceled by the user
+     * 
+     * @throws CancellationException
      */
-    public StartHandle stop(User user) {
+    public StartHandle stop(User user, String cause, final SubMonitor progress)
+        throws CancellationException {
 
         if (sharedProject == null)
             throw new IllegalStateException(
@@ -212,29 +298,28 @@ public class StopManager implements IActivityProvider, Disposable {
         expectedAcknowledgments.add(expectedAck);
 
         fireActivity(stopActivity);
+        progress.setBlocked(Status.OK_STATUS);
 
         // block until user acknowledged
         log.debug("Waiting for acknowledgment " + Util.prefix(user.getJID()));
         reentrantLock.lock();
         try {
-            long startTime = System.currentTimeMillis();
             while (expectedAcknowledgments.contains(expectedAck)
-                && System.currentTimeMillis() - startTime < MILLISTOWAIT) {
+                && !progress.isCanceled()) {
                 acknowledged.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
             }
             if (expectedAcknowledgments.contains(expectedAck)) {
                 log.warn("No acknowlegment arrived, gave up waiting");
                 expectedAcknowledgments.remove(expectedAck);
-                return null;
+                throw new CancellationException();
             }
             log.debug("Acknowledgment arrived " + Util.prefix(user.getJID()));
-
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } finally {
             reentrantLock.unlock();
+            progress.clearBlocked();
         }
-
         addStartHandle(handle);
         return handle;
     }
