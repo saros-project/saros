@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
@@ -55,6 +57,7 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -488,6 +491,28 @@ public class Util {
      */
     public static void runSafeSync(Logger log, Runnable runnable) {
         wrapSafe(log, runnable).run();
+    }
+
+    /**
+     * Utility method to obtain a suitable runnable context to run a long
+     * running operation in.
+     * 
+     * @return an IRunnableContext suitable to run an IRunnableWithProgress in,
+     *         its progress is either reported to the active windows status bar
+     *         or shown in an ProgressMonitorDialog, if no active window could
+     *         be determined, e.g. on start or stop of the plugin
+     * @SWT
+     */
+    public static IRunnableContext getRunnableContext() {
+
+        IWorkbenchWindow window = EditorAPI.getAWorkbenchWindow();
+        if (window != null) {
+            return window;
+        }
+        log.warn("The active workbench window couldn't"
+            + " be determined, running in Progress Monitor Dialog.");
+
+        return new ProgressMonitorDialog(EditorAPI.getShell());
     }
 
     /**
