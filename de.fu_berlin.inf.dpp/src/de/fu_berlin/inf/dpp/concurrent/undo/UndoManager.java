@@ -61,16 +61,12 @@ import de.fu_berlin.inf.dpp.util.Util;
  * only listens to the internal Eclipse UndoManager, catches every Typing
  * Operation about to be undone and calls instead this.undo().
  * 
- * FIXME: The undo steps can differ from the Eclipse Undo steps (e.g. Eclipse:
- * "abc", "def"; here: "a", "bcd", "ef"). Possible solution: 2-level-cache
- * instead of 1 level.
- * 
  * Warning: After the first Undo the Undo button stays activated, even if there
  * is nothing to undo. This is caused by design because we cancel the regular
  * Eclipse Undo operation. So there is always something to undo in the Eclipse
  * History and the button is never deactivated.
  * 
- * TODO This UndoManager is switched off currently. To activate it is has to be
+ * TODO This UndoManager is switched off currently. To activate it it has to be
  * added to the PicoContainer in Saros.class.
  */
 @Component(module = "undo")
@@ -120,16 +116,23 @@ public class UndoManager implements IActivityManager, Disposable,
     protected boolean enabled;
 
     /**
-     * To avoid splitting local operations in too many pieces, the current local
-     * operation is cached until the Eclipse UndoManager thinks it is time to
-     * begin the next one (triggered by OperationHistoryEvent.OPERATION_ADDED).
+     * To avoid splitting local operations in too many pieces, the local
+     * operations that are added to the history are combined with the subsequent
+     * ones. A combined operation begins when Eclipse triggered the
+     * OPERATION_ADDED history event and ends right before the next one.
      */
-    protected Operation currentLocalOperation = null;
+    protected Operation currentLocalCompositeOperation = null;
+
+    /**
+     * The currentLocalAtomicOperation is the latest operation that was applied
+     * locally.
+     */
+    protected Operation currentLocalAtomicOperation = null;
 
     /**
      * The most important part of the undo integration. If an Undo/Redo is
      * triggered the Eclipse history consults all of its IOperationApprover
-     * wether the Undo / Redo may be applied. We veto it and call this.undo() /
+     * whether the Undo / Redo may be applied. We veto it and call this.undo() /
      * this.redo() instead.
      */
     protected IOperationApprover operationBlocker = new IOperationApprover() {
@@ -140,6 +143,9 @@ public class UndoManager implements IActivityManager, Disposable,
 
         public IStatus proceedRedoing(final IUndoableOperation operation,
             IOperationHistory history, IAdaptable info) {
+
+            if (!enabled)
+                return Status.OK_STATUS;
 
             if (currentActiveEditor == null) {
                 log.info("Redo called on an unknown editor");
@@ -152,6 +158,7 @@ public class UndoManager implements IActivityManager, Disposable,
             if (operation.getLabel().equals(TYPING_LABEL)
                 || operation.getLabel().equals(NullOperation.LABEL)) {
 
+                updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
 
                 Util.runSafeSWTSync(log, new Runnable() {
@@ -176,6 +183,9 @@ public class UndoManager implements IActivityManager, Disposable,
         public IStatus proceedUndoing(final IUndoableOperation operation,
             IOperationHistory history, IAdaptable info) {
 
+            if (!enabled)
+                return Status.OK_STATUS;
+
             if (currentActiveEditor == null) {
                 log.info("Undo called on an unknown editor");
                 return Status.OK_STATUS;
@@ -185,7 +195,7 @@ public class UndoManager implements IActivityManager, Disposable,
                 log.debug(opInfo(operation));
 
             if (operation.getLabel().equals(TYPING_LABEL)) {
-
+                updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
 
                 Util.runSafeSWTSync(log, new Runnable() {
@@ -265,6 +275,8 @@ public class UndoManager implements IActivityManager, Disposable,
             enabled = false;
             eclipseHistory.removeOperationApprover(operationBlocker);
             sharedProject = null;
+            currentLocalCompositeOperation = null;
+            currentLocalAtomicOperation = null;
         }
     };
 
@@ -276,11 +288,11 @@ public class UndoManager implements IActivityManager, Disposable,
 
         @Override
         public void activeEditorChanged(User user, IPath newActiveEditor) {
-            if (!user.isLocal())
+
+            if (!user.isLocal() || currentActiveEditor == newActiveEditor)
                 return;
 
-            if (currentActiveEditor == newActiveEditor)
-                return;
+            updateCurrentLocalAtomicOperation(null);
             storeCurrentLocalOperation();
             currentActiveEditor = newActiveEditor;
         }
@@ -288,6 +300,7 @@ public class UndoManager implements IActivityManager, Disposable,
         @Override
         public void editorRemoved(User user, IPath closedEditor) {
             if (currentActiveEditor == closedEditor) {
+                updateCurrentLocalAtomicOperation(null);
                 storeCurrentLocalOperation();
                 currentActiveEditor = null;
             }
@@ -332,9 +345,14 @@ public class UndoManager implements IActivityManager, Disposable,
             Operation operation = textEditActivity.toOperation();
 
             if (!local(textEditActivity)) {
-                if (currentLocalOperation != null)
-                    currentLocalOperation = transformation.transform(
-                        currentLocalOperation, operation, Boolean.FALSE);
+                if (currentLocalCompositeOperation != null)
+                    currentLocalCompositeOperation = transformation.transform(
+                        currentLocalCompositeOperation, operation,
+                        Boolean.FALSE);
+                if (currentLocalAtomicOperation != null) {
+                    currentLocalAtomicOperation = transformation.transform(
+                        currentLocalAtomicOperation, operation, Boolean.FALSE);
+                }
                 log.debug("adding remote " + operation + " to history");
                 undoHistory.add(textEditActivity.getEditor(), Type.REMOTE,
                     operation);
@@ -346,13 +364,7 @@ public class UndoManager implements IActivityManager, Disposable,
                             + " up to date.");
                     return false;
                 }
-                // Integrate new text edit in currentOperation.
-                if (currentLocalOperation == null) {
-                    currentLocalOperation = operation;
-                } else {
-                    currentLocalOperation = new SplitOperation(
-                        currentLocalOperation, operation);
-                }
+                updateCurrentLocalAtomicOperation(operation);
             }
             return false;
         }
@@ -371,6 +383,20 @@ public class UndoManager implements IActivityManager, Disposable,
              */
             if (event.getEventType() == OperationHistoryEvent.OPERATION_ADDED) {
                 storeCurrentLocalOperation();
+                updateCurrentLocalAtomicOperation(null);
+            }
+
+            /*
+             * OPERATION_CHANGED is triggered when Eclipse changes the operation
+             * that is recently added to its history.
+             * 
+             * For example: Eclipse adds Insert(3,"A") to its operation and
+             * later on the user enters B at position 4. If Eclipse decides not
+             * to add a new Undo step it changes the most recent operation in
+             * history to Insert(3, "AB")
+             */
+            if (event.getEventType() == OperationHistoryEvent.OPERATION_CHANGED) {
+                updateCurrentLocalAtomicOperation(null);
             }
         }
     };
@@ -467,13 +493,13 @@ public class UndoManager implements IActivityManager, Disposable,
 
         // don't waste the network
         if (op instanceof NoOperation) {
-            log.debug("nothing to undo");
+            log.debug("nothing to undo in " + editor);
             return;
         }
 
         for (TextEditActivity activity : op.toTextEdit(editor, saros.getMyJID()
             .toString())) {
-            log.debug("undone: " + activity);
+            log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
         }
     }
@@ -484,7 +510,7 @@ public class UndoManager implements IActivityManager, Disposable,
 
         for (TextEditActivity activity : op.toTextEdit(editor, saros.getMyJID()
             .toString())) {
-            log.debug("redone: " + activity);
+            log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
         }
     }
@@ -574,19 +600,34 @@ public class UndoManager implements IActivityManager, Disposable,
     }
 
     /**
-     * Adds the current local operation to the undo history (if not null) and
-     * resets it afterwards.
+     * Adds the current local composite operation to the undo history (if not
+     * null) and resets it afterwards.
      */
     protected void storeCurrentLocalOperation() {
-        if (currentLocalOperation == null)
+        if (currentLocalCompositeOperation == null)
             return;
         if (currentActiveEditor == null) {
             log
                 .warn("Cannot store current local operation. Current active editor is unknown");
             return;
         }
-        undoHistory.add(currentActiveEditor, Type.LOCAL, currentLocalOperation);
-        currentLocalOperation = null;
+        undoHistory.add(currentActiveEditor, Type.LOCAL,
+            currentLocalCompositeOperation);
+        currentLocalCompositeOperation = null;
         log.debug("stored current local operation");
+    }
+
+    /**
+     * Integrates the current local atomic operation in the current local
+     * composite operation and replaces the atomic operation by the given
+     * operation.
+     */
+    protected void updateCurrentLocalAtomicOperation(Operation newMRO) {
+        if (currentLocalCompositeOperation == null) {
+            currentLocalCompositeOperation = currentLocalAtomicOperation;
+        } else if (currentLocalAtomicOperation != null)
+            currentLocalCompositeOperation = new SplitOperation(
+                currentLocalCompositeOperation, currentLocalAtomicOperation);
+        currentLocalAtomicOperation = newMRO;
     }
 }
