@@ -278,7 +278,6 @@ public class FileList {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((added == null) ? 0 : added.hashCode());
-        result = prime * result + ((all == null) ? 0 : all.hashCode());
         result = prime * result + ((altered == null) ? 0 : altered.hashCode());
         result = prime * result + ((removed == null) ? 0 : removed.hashCode());
         result = prime * result
@@ -297,7 +296,7 @@ public class FileList {
         }
 
         FileList other = (FileList) obj;
-        return this.all.equals(other.all) && this.added.equals(other.added)
+        return this.added.equals(other.added)
             && this.removed.equals(other.removed)
             && this.altered.equals(other.altered)
             && this.unaltered.equals(other.unaltered);
