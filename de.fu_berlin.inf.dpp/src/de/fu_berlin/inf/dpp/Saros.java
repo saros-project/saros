@@ -65,6 +65,7 @@ import org.picocontainer.injectors.ProviderAdapter;
 import org.picocontainer.injectors.Reinjector;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.concurrent.undo.UndoManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogServer;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
@@ -370,6 +371,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(StatisticManager.class);
         this.container.addComponent(StopManager.class);
         this.container.addComponent(SubscriptionListener.class);
+        this.container.addComponent(UndoManager.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);
 
