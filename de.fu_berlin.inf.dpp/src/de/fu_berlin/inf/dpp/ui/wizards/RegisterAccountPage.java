@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.jivesoftware.smack.XMPPException;
@@ -33,12 +34,15 @@ import org.jivesoftware.smack.packet.XMPPError;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.util.LinkListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
 
     private static final Logger log = Logger
         .getLogger(RegisterAccountPage.class.getName());
+
+    public static final String LIST_OF_XMPP_SERVERS = "https://www.inf.fu-berlin.de/w/SE/DPP#PublicServers";
 
     protected Text serverText;
 
@@ -84,6 +88,16 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
             setTitle("Enter User Account");
             setDescription("Enter your account information and Jabber server");
         }
+        // present a link to a list of public XMPP servers
+        Link link = new Link(root, SWT.NONE);
+        link.setText("For a list of public XMPP servers click <a href=\""
+            + LIST_OF_XMPP_SERVERS + "\">here</a>");
+        GridData gdLayout = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        gdLayout.horizontalSpan = 2;
+        link.setLayoutData(gdLayout);
+        link.addListener(SWT.Selection, new LinkListener());
+
+        createSpacer(root, 2);
 
         Label serverLabel = new Label(root, SWT.NONE);
         serverLabel.setText("Jabber Server");
@@ -167,6 +181,13 @@ public class RegisterAccountPage extends WizardPage implements IWizardPage2 {
         updateNextEnablement();
 
         setControl(root);
+    }
+
+    protected void createSpacer(Composite composite, int columnSpan) {
+        Label label = new Label(composite, SWT.NONE);
+        GridData gd = new GridData();
+        gd.horizontalSpan = columnSpan;
+        label.setLayoutData(gd);
     }
 
     protected void openCreateAccount() {
