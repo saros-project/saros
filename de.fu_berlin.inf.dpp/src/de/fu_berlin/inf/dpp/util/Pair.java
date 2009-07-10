@@ -242,4 +242,29 @@ public class Pair<P, V> {
         return disjointPartition(map(input, function));
     }
 
+    public static <P, V> List<V> expand(Collection<P> input,
+        Function<P, ? extends Collection<V>> function) {
+        List<V> result = new ArrayList<V>(input.size());
+        for (P p : input) {
+            result.addAll(function.apply(p));
+        }
+        return result;
+    }
+
+    public static <P, V> Collection<Pair<P, V>> cross(P p, Collection<V> vs) {
+        List<Pair<P, V>> result = new ArrayList<Pair<P, V>>(vs.size());
+        for (V v : vs) {
+            result.add(new Pair<P, V>(p, v));
+        }
+        return result;
+    }
+
+    public static <P, V> Collection<Pair<V, P>> cross(Collection<V> vs, P p) {
+        List<Pair<V, P>> result = new ArrayList<Pair<V, P>>(vs.size());
+        for (V v : vs) {
+            result.add(new Pair<V, P>(v, p));
+        }
+        return result;
+    }
+
 }
