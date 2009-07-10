@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -55,7 +54,7 @@ public class ConcurrentDocumentManager implements Disposable {
      */
     private final HashMap<IPath, Jupiter> clientDocs = new HashMap<IPath, Jupiter>();
 
-    private final JID host;
+    private final User host;
 
     private final JID myJID;
 
@@ -117,13 +116,11 @@ public class ConcurrentDocumentManager implements Disposable {
                  */
                 return false;
             } else {
-
-                // TODO ConcurrentDocumentManager should not depend on
-                // ActivitySequencer.
-
-                // Send to host
-                sequencer.sendActivities(Collections.singletonList(host),
-                    Collections.singletonList((IActivity) jupiterActivity));
+                /*
+                 * TODO ConcurrentDocumentManager should not depend on
+                 * ActivitySequencer.
+                 */
+                sequencer.sendActivity(host, jupiterActivity);
                 return true;
             }
         }
@@ -133,7 +130,7 @@ public class ConcurrentDocumentManager implements Disposable {
         final ISharedProject sharedProject, ActivitySequencer sequencer) {
 
         this.side = side;
-        this.host = host.getJID();
+        this.host = host;
         this.myJID = myJID;
         this.sharedProject = sharedProject;
         this.sequencer = sequencer;
@@ -161,11 +158,10 @@ public class ConcurrentDocumentManager implements Disposable {
 
         @Override
         public void roleChanged(User user) {
-            JID jid = user.getJID();
 
-            if (isHost(jid))
+            if (user.isHost()) {
                 return;
-
+            }
             /* if driver changed to observer */
             if (user.isObserver()) {
                 /*
@@ -239,16 +235,12 @@ public class ConcurrentDocumentManager implements Disposable {
     }
 
     public boolean shouldBeManagedByJupiter(JID jid) {
-        return sharedProject.getHost().getJID().equals(jid)
-            || sharedProject.getParticipant(jid).isDriver();
+        User user = sharedProject.getParticipant(jid);
+        return user.isHost() || user.isDriver();
     }
 
     public boolean isHostSide() {
         return this.side == Side.HOST_SIDE;
-    }
-
-    public boolean isHost(JID jid) {
-        return jid != null && jid.equals(this.host);
     }
 
     public void execFileActivity(IActivity activity) {
@@ -393,7 +385,7 @@ public class ConcurrentDocumentManager implements Disposable {
             docServer = new JupiterDocumentServer(path);
 
             /* create new local host document client. */
-            docServer.addProxyClient(this.host);
+            docServer.addProxyClient(this.host.getJID());
 
             this.concurrentDocuments.put(path, docServer);
         }
@@ -436,14 +428,13 @@ public class ConcurrentDocumentManager implements Disposable {
 
         for (Entry<JID, JupiterActivity> entry : outgoing.entrySet()) {
 
-            JID to = entry.getKey();
+            User to = sharedProject.getUser(entry.getKey());
             JupiterActivity transformed = entry.getValue();
 
             if (to.equals(host)) {
                 execTextEditActivity(transformed);
             } else {
-                sequencer.sendActivities(Collections.singletonList(to),
-                    Collections.singletonList((IActivity) transformed));
+                sequencer.sendActivity(to, transformed);
             }
         }
     }

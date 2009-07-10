@@ -167,29 +167,25 @@ public class SharedProject implements ISharedProject, Disposable {
                 Side.CLIENT_SIDE, this.host, myID, this, activitySequencer));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
     public Collection<User> getParticipants() {
         return this.participants.values();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.ISharedProject
-     */
+    public List<User> getRemoteUsers() {
+        Collection<User> users = getParticipants();
+        List<User> result = new ArrayList<User>(users.size() - 1);
+        for (User user : users) {
+            if (user.isRemote()) {
+                result.add(user);
+            }
+        }
+        return result;
+    }
+
     public ActivitySequencer getSequencer() {
         return this.activitySequencer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public IActivityManager getActivityManager() {
         return this.activitySequencer;
     }

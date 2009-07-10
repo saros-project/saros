@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
@@ -45,10 +46,15 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 public interface ISharedProject {
 
     /**
-     * @return a list of all participants of the shared project. This list
-     *         includes yourself.
+     * @return a collection of all participants of the shared project. This
+     *         collection includes the local user.
      */
     public Collection<User> getParticipants();
+
+    /**
+     * @return a list of remote users.
+     */
+    public List<User> getRemoteUsers();
 
     /**
      * Initiates a role change. This method is called when the user wants to

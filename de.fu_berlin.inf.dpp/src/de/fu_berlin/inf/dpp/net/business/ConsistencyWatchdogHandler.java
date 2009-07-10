@@ -22,6 +22,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
@@ -286,6 +287,8 @@ public class ConsistencyWatchdogHandler {
     protected void recoverFile(JID from, ISharedProject project, JID myJID,
         final IPath path, SubMonitor progress) {
 
+        User fromUser = project.getUser(from);
+
         progress.beginTask("Handling file: " + path.toOSString(), 10);
 
         IFile file = project.getProject().getFile(path);
@@ -313,8 +316,8 @@ public class ConsistencyWatchdogHandler {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            project.getSequencer().sendActivities(
-                from,
+            project.getSequencer().sendActivity(
+                fromUser,
                 new FileActivity(myJID.toString(), FileActivity.Type.Removed,
                     path));
             progress.worked(8);
