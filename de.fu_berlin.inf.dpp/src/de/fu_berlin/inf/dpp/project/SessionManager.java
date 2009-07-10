@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -154,7 +155,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      */
     public void stopSharedProject() {
 
-        assert !Util.isSWT();
+        if (Util.isSWT()) {
+            log.warn("StopSharedProject should not be called from SWT",
+                new StackTrace());
+        }
 
         SharedProject project = currentlySharedProject.getValue();
 
