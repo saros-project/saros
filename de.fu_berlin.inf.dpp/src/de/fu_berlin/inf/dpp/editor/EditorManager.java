@@ -319,7 +319,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         @Override
         public boolean receive(EditorActivity editorActivity) {
 
-            User sender = sharedProject.getParticipant(new JID(editorActivity
+            User sender = sharedProject.getUser(new JID(editorActivity
                 .getSource()));
 
             if (editorActivity.getType().equals(Type.Activated)) {
@@ -696,8 +696,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             this.locallyOpenEditors.add(path);
 
         for (ISharedEditorListener listener : this.editorListeners) {
-            listener.activeEditorChanged(sharedProject.getLocalUser(),
-                this.locallyActiveEditor);
+            listener.activeEditorChanged(sharedProject.getLocalUser(), path);
         }
 
         fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
@@ -858,8 +857,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execTextEdit(TextEditActivity textEdit) {
 
-        String source = textEdit.getSource();
-        User user = sharedProject.getParticipant(new JID(source));
+        User user = sharedProject.getUser(new JID(textEdit.getSource()));
 
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);
@@ -907,8 +905,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         TextSelection textSelection = new TextSelection(selection.getOffset(),
             selection.getLength());
 
-        User user = sharedProject
-            .getParticipant(new JID(selection.getSource()));
+        User user = sharedProject.getUser(new JID(selection.getSource()));
 
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
@@ -920,8 +917,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execViewport(ViewportActivity viewport) {
 
-        String source = viewport.getSource();
-        User user = sharedProject.getParticipant(new JID(source));
+        User user = sharedProject.getUser(new JID(viewport.getSource()));
         boolean following = user.equals(getFollowedUser());
 
         {
@@ -1043,6 +1039,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             if (getFollowedUser() != null) {
                 setFollowing(null);
             }
+            generateEditorActivated(null);
             return;
         }
 
@@ -1133,8 +1130,14 @@ public class EditorManager implements IActivityProvider, Disposable {
         fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
             .toString(), Type.Closed, path));
 
-        if (newActiveEditor)
-            generateEditorActivated(editorAPI.getActiveEditorPath());
+        /**
+         * TODO We need a reliable way to communicate editors which are outside
+         * the shared project scope and a way to deal with closing the active
+         * editor
+         */
+        if (newActiveEditor) {
+            partActivated(editorAPI.getActiveEditor());
+        }
     }
 
     /**
@@ -1182,7 +1185,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (resource == null)
             return false;
 
-        return (resource.getProject() == this.sharedProject.getProject());
+        return ObjectUtils.equals(resource.getProject(), this.sharedProject
+            .getProject());
     }
 
     /**
