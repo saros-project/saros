@@ -540,6 +540,14 @@ public class Util {
         return null;
     }
 
+    public static String getDisplayableName(RosterEntry entry) {
+        String nickName = entry.getName();
+        if (nickName != null && nickName.trim().length() > 0) {
+            return nickName.trim();
+        }
+        return entry.getUser();
+    }
+
     /**
      * Gets the name for a {@link User} for displaying.
      * 
