@@ -103,7 +103,7 @@ public class SarosRosterListener implements ConnectionSessionListener {
             // Update all presences
             for (RosterEntry rosterEntry : roster.getEntries()) {
                 for (Presence presence : Util.asIterable(roster
-                    .getPresences(rosterEntry.getName()))) {
+                    .getPresences(rosterEntry.getUser()))) {
                     listener.presenceChanged(presence);
                 }
             }
