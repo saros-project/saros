@@ -41,7 +41,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IEclipsePreferences prefs = new DefaultScope().getNode(Saros.SAROS);
 
-        prefs.put(PreferenceConstants.SERVER, "jabber.org");
+        prefs.put(PreferenceConstants.SERVER, "");
         prefs.put(PreferenceConstants.USERNAME, "");
         prefs.put(PreferenceConstants.PASSWORD, "");
         prefs.putBoolean(PreferenceConstants.AUTO_CONNECT, false);
