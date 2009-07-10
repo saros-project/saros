@@ -21,8 +21,6 @@ package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -32,7 +30,10 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Map.Entry;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -57,6 +58,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -81,8 +83,19 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     protected static final int MILLIS_UPDATE = 500;
 
+    protected static class QueueItem {
+
+        public final List<User> recipients;
+        public final IActivity activity;
+
+        public QueueItem(List<User> recipients, IActivity activity) {
+            this.recipients = recipients;
+            this.activity = activity;
+        }
+    }
+
     /** Buffer for outgoing activities. */
-    protected final List<IActivity> activities = new LinkedList<IActivity>();
+    protected final BlockingQueue<QueueItem> outgoingQueue = new LinkedBlockingQueue<QueueItem>();
 
     protected final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
@@ -378,7 +391,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         }
     }
 
-    protected final ActivityQueuesManager queues = new ActivityQueuesManager();
+    protected final ActivityQueuesManager incomingQueues = new ActivityQueuesManager();
 
     /*
      * TODO The AS should not know the ConcurrentDocumentManager but rather pass
@@ -456,19 +469,25 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
                 if (!started)
                     return;
 
-                List<IActivity> activities = flush();
-                int participantsNumber = sharedProject.getParticipants().size();
-                if (activities.size() > 0 && participantsNumber > 1) {
-                    List<JID> participantJIDs = new ArrayList<JID>(
-                        participantsNumber);
-                    for (User participant : sharedProject.getParticipants()) {
-                        participantJIDs.add(participant.getJID());
+                List<QueueItem> activities = new ArrayList<QueueItem>(
+                    outgoingQueue.size());
+                outgoingQueue.drainTo(activities);
+
+                Map<User, List<IActivity>> toSend = AutoHashMap
+                    .getListHashMap();
+
+                for (QueueItem item : activities) {
+                    for (User recipient : item.recipients) {
+                        toSend.get(recipient).add(item.activity);
                     }
-                    sendActivities(participantJIDs, activities);
+                }
+
+                for (Entry<User, List<IActivity>> e : toSend.entrySet()) {
+                    sendActivities(e.getKey(), optimize(e.getValue()));
                 }
 
                 synchronized (execLock) {
-                    queues.checkForMissingActivities();
+                    incomingQueues.checkForMissingActivities();
                     // Maybe the check above has unblocked queued activities
                     // that can be executed now.
                     execQueue();
@@ -560,7 +579,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
          * the host.
          */
         synchronized (execLock) {
-            queues.add(nextActivity);
+            incomingQueues.add(nextActivity);
 
             if (!started)
                 return;
@@ -570,73 +589,52 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     }
 
     /**
-     * @return List of activities that can be executed. The list is empty if
-     *         there are no activities to execute.
-     */
-    protected List<IActivity> flush() {
-        List<IActivity> out = new ArrayList<IActivity>(this.activities);
-        this.activities.clear();
-        return optimize(out);
-    }
-
-    /**
      * executes all activities that are currently in the queue
      */
     protected void execQueue() {
-        for (TimedActivity activity : queues.removeActivities()) {
+        for (TimedActivity activity : incomingQueues.removeActivities()) {
             log.debug("Executing untransformed activity: " + activity);
             exec(activity.getActivity());
         }
     }
 
     /**
-     * Syntactic sugar for {@link #sendActivities(Collection, List)}
-     */
-    public void sendActivities(JID recipient, IActivity... activities) {
-        sendActivities(Collections.singletonList(recipient), Arrays
-            .asList(activities));
-    }
-
-    /**
-     * Sends given activities to given recipients.
+     * Sends given activities to given recipient.
      * 
-     * TODO From which thread can this method be called?
+     * @throws IllegalArgumentException
+     *             if the recipient is the local user or the activities contain
+     *             <code>null</code>.
+     * 
+     *             TODO From which thread can this method be called?
      */
-    public void sendActivities(Collection<JID> recipients,
-        List<IActivity> activities) {
+    protected void sendActivities(User recipient, List<IActivity> activities) {
 
-        if (recipients.contains(null) || activities.contains(null))
+        if (recipient.isLocal() || activities.contains(null)) {
             throw new IllegalArgumentException();
+        }
 
         setSenderOnTextEditActivities(activities);
 
-        // Send the activities to each user.
-        JID myJID = sharedProject.getLocalUser().getJID();
-        for (JID recipientJID : recipients) {
+        JID recipientJID = recipient.getJID();
+        ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
+            activities.size());
+        List<TimedActivity> timedActivities = createTimedActivities(
+            recipientJID, activities);
+        for (TimedActivity timedActivity : timedActivities) {
 
-            if (recipientJID.equals(myJID)) {
-                continue;
+            // Check each activity if it is a file creation which will be
+            // send asynchronous, and collect all others in stillToSend.
+            // TODO boolean methods with side effects are bad style
+            if (!ifFileCreateSendAsync(recipientJID, timedActivity)) {
+                stillToSend.add(timedActivity);
             }
-
-            ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
-                activities.size());
-            List<TimedActivity> timedActivities = createTimedActivities(
-                recipientJID, activities);
-            for (TimedActivity timedActivity : timedActivities) {
-
-                // Check each activity if it is a file creation which will be
-                // send asynchronous, and collect all others in stillToSend.
-                // TODO boolean methods with side effects are bad style
-                if (!ifFileCreateSendAsync(recipientJID, timedActivity)) {
-                    stillToSend.add(timedActivity);
-                }
-            }
-            if (stillToSend.size() > 0) {
-                transmitter.sendTimedActivities(recipientJID, stillToSend);
-            }
-            log.debug("Sent Activities to " + recipientJID + ": "
-                + timedActivities);
         }
+        if (!stillToSend.isEmpty()) {
+            transmitter.sendTimedActivities(recipientJID, stillToSend);
+        }
+        log
+            .debug("Sent Activities to " + recipientJID + ": "
+                + timedActivities);
     }
 
     /**
@@ -717,8 +715,24 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             .activityCreated(activity);
 
         if (!consumed) {
-            this.activities.add(activity);
+            sendActivity(sharedProject.getRemoteUsers(), activity);
         }
+    }
+
+    /**
+     * Sends the given activity to the given recipients.
+     */
+    public void sendActivity(List<User> recipients, IActivity activity) {
+        this.outgoingQueue.add(new QueueItem(recipients, activity));
+    }
+
+    /**
+     * Convenience method to address a single recipient.
+     * 
+     * @see #sendActivity(List, IActivity)
+     */
+    public void sendActivity(User recipient, IActivity activity) {
+        sendActivity(Collections.singletonList(recipient), activity);
     }
 
     /**
@@ -731,7 +745,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     protected List<TimedActivity> createTimedActivities(JID recipient,
         List<IActivity> activities) {
-        return queues.createTimedActivities(recipient, activities);
+        return incomingQueues.createTimedActivities(recipient, activities);
     }
 
     /**
@@ -746,7 +760,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     public List<TimedActivity> getActivityHistory(JID user,
         int fromSequenceNumber, boolean andUp) {
 
-        return queues.getHistory(user, fromSequenceNumber, andUp);
+        return incomingQueues.getHistory(user, fromSequenceNumber, andUp);
     }
 
     /**
@@ -754,7 +768,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * activities to the first missing sequence number.
      */
     public Map<JID, Integer> getExpectedSequenceNumbers() {
-        return queues.getExpectedSequenceNumbers();
+        return incomingQueues.getExpectedSequenceNumbers();
     }
 
     /**
@@ -849,7 +863,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * 
      * @swt Must be called from the SWT Thread
      */
-    public void execTransformedActivity(IActivity activity) {
+    public void execTransformedActivity(TextEditActivity activity) {
 
         if (activity == null)
             throw new IllegalArgumentException("Activity cannot be null");
@@ -869,10 +883,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
              * as a Activity)
              */
 
-            // send activity to everybody
+            // Queue activity for every remote user.
             if (this.concurrentDocumentManager.isHostSide()) {
-                // log.debug("send transformed activity: " + activity);
-                this.activities.add(activity);
+                this.outgoingQueue.add(new QueueItem(sharedProject
+                    .getRemoteUsers(), activity));
             }
         } catch (Exception e) {
             log.error("Error while executing activity.", e);
@@ -882,11 +896,13 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     /**
      * Removes queued activities from given user.
      * 
+     * TODO Maybe remove outgoing activities from {@link #outgoingQueue} too!?
+     * 
      * @param jid
      *            of the user that left.
      */
     public void userLeft(JID jid) {
-        queues.removeQueue(jid);
+        incomingQueues.removeQueue(jid);
     }
 
     public void dispose() {
