@@ -562,8 +562,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         synchronized (execLock) {
             queues.add(nextActivity);
 
-            if (!started)
+            if (!started) {
+                log.warn("Received activity but activity"
+                    + " sequencer has not yet been started: " + nextActivity);
                 return;
+            }
 
             execQueue();
         }
