@@ -1,6 +1,5 @@
 package de.fu_berlin.inf.dpp.util;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +7,7 @@ import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -35,14 +35,12 @@ public class FileUtil {
     private static Logger log = Logger.getLogger(FileUtil.class);
 
     /**
-     * calculate checksum for given file
+     * Calculate Adler32 checksum for given file.
      * 
-     * @param file
      * @return checksum of file or -1 if checksum calculation has been failed.
      */
-    public static Long checksum(IFile file) {
+    public static long checksum(IFile file) {
 
-        // Adler-32 checksum
         InputStream contents;
         try {
             contents = file.getContents();
@@ -51,21 +49,16 @@ public class FileUtil {
             return -1L;
         }
 
-        CheckedInputStream cis = new CheckedInputStream(contents, new Adler32());
-        InputStream in = new BufferedInputStream(cis);
-        byte[] tempBuf = new byte[8192];
+        CheckedInputStream in = new CheckedInputStream(contents, new Adler32());
         try {
-            while (in.read(tempBuf) >= 0) {
-                // continue until buffer empty
-            }
-            return Long.valueOf(cis.getChecksum().getValue());
+            IOUtils.copy(in, new NullOutputStream());
         } catch (IOException e) {
             log.error("Failed to calculate checksum:", e);
+            return -1L;
         } finally {
             IOUtils.closeQuietly(in);
         }
-
-        return -1L;
+        return in.getChecksum().getValue();
     }
 
     /**

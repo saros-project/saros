@@ -327,8 +327,8 @@ public class FileList {
                     continue;
                 }
 
-                Long checksum = FileUtil.checksum(file);
-                if (checksum != -1) {
+                long checksum = FileUtil.checksum(file);
+                if (checksum != -1L) {
                     members.put(file.getProjectRelativePath(), checksum);
                 }
 
