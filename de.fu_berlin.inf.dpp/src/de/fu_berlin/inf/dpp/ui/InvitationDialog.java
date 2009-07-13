@@ -134,7 +134,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
      */
     protected static class InviterData {
         JID jid;
-        String name;
+        String nickname;
         String error = "";
         IOutgoingInvitationProcess outgoingProcess;
         InvitationProgressMonitor progress;
@@ -165,7 +165,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
             switch (columnIndex) {
             case 0:
-                return item.name;
+                return item.nickname;
             case 1: {
                 Boolean supported = discoveryManager.isSupportedNonBlock(
                     item.jid, Saros.NAMESPACE);
@@ -837,8 +837,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
             InviterData invdat = new InviterData();
             invdat.jid = new JID(entry.getUser());
-            invdat.name = (entry.getName() == null) ? entry.getUser() : entry
-                .getName();
+            invdat.nickname = Util.getDisplayableName(entry);
             // Check if we have a running invitation for the user
             invdat.outgoingProcess = currentInvitations.remove(invdat.jid);
 

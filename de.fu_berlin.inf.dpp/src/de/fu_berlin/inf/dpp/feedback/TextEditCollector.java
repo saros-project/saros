@@ -244,7 +244,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
                  */
                 int intervalSeconds = (int) Math.round(intervalWidth / 1000.0);
                 addToMap(parallelTextEdits, intervalSeconds, local.chars);
-                addToMap(parallelTextEditsCount, intervalSeconds, local.chars);
+                addToMap(parallelTextEditsCount, intervalSeconds, 1);
                 localIterator.remove();
             }
             /*

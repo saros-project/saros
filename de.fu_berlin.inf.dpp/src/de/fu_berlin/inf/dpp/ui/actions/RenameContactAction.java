@@ -30,6 +30,7 @@ import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -108,7 +109,8 @@ public class RenameContactAction extends SelectionProviderAction {
         if (selected instanceof RosterEntry) {
             RosterEntry result = (RosterEntry) selected;
 
-            if (!result.getUser().equals(saros.getMyJID().toString())) {
+            // Compare the plain-JID portion of the XMPP address
+            if (!new JID(result.getUser()).equals(saros.getMyJID())) {
                 return result;
             }
         }

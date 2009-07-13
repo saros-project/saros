@@ -40,7 +40,7 @@ public class RemoteEditorManager {
         @Override
         public boolean receive(EditorActivity editorActivity) {
 
-            User sender = sharedProject.getParticipant(new JID(editorActivity
+            User sender = sharedProject.getUser(new JID(editorActivity
                 .getSource()));
 
             switch (editorActivity.getType()) {
@@ -60,7 +60,7 @@ public class RemoteEditorManager {
         @Override
         public boolean receive(ViewportActivity viewportActivity) {
 
-            User sender = sharedProject.getParticipant(new JID(viewportActivity
+            User sender = sharedProject.getUser(new JID(viewportActivity
                 .getSource()));
 
             getEditorState(sender).setViewport(viewportActivity.getEditor(),
@@ -72,8 +72,8 @@ public class RemoteEditorManager {
         @Override
         public boolean receive(TextSelectionActivity textSelectionActivity) {
 
-            User sender = sharedProject.getParticipant(new JID(
-                textSelectionActivity.getSource()));
+            User sender = sharedProject.getUser(new JID(textSelectionActivity
+                .getSource()));
 
             getEditorState(sender).setSelection(
                 textSelectionActivity.getEditor(),
@@ -210,7 +210,7 @@ public class RemoteEditorManager {
             }
 
             if (remoteEditor == activeEditor) {
-                activeEditor = getLastEditor();
+                activeEditor = null;
             }
         }
 

@@ -280,7 +280,11 @@ public class Saros extends AbstractUIPlugin {
 
     protected XMPPConnection connection;
 
-    protected JID myjid;
+    /**
+     * The RQ-JID of the local user or null if the user is
+     * {@link ConnectionState#NOT_CONNECTED}.
+     */
+    protected JID myJID;
 
     protected ConnectionState connectionState = ConnectionState.NOT_CONNECTED;
 
@@ -537,8 +541,11 @@ public class Saros extends AbstractUIPlugin {
 
     }
 
+    /**
+     * The RQ-JID of the local user
+     */
     public JID getMyJID() {
-        return this.myjid;
+        return this.myJID;
     }
 
     public Roster getRoster() {
@@ -691,7 +698,7 @@ public class Saros extends AbstractUIPlugin {
             this.connection.login(username, password, Saros.RESOURCE);
             /* other people can now send invitations */
 
-            this.myjid = new JID(this.connection.getUser());
+            this.myJID = new JID(this.connection.getUser());
             setConnectionState(ConnectionState.CONNECTED, null);
 
         } catch (final Exception e) {
@@ -727,7 +734,7 @@ public class Saros extends AbstractUIPlugin {
 
             setConnectionState(ConnectionState.NOT_CONNECTED, null);
         }
-        this.myjid = null;
+        this.myJID = null;
 
         // Make a sanity check on the connection and connection state
         if (this.connectionState != ConnectionState.NOT_CONNECTED) {

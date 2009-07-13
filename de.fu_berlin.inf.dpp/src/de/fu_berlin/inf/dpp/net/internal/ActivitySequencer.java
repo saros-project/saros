@@ -81,7 +81,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      * Number of milliseconds between each flushing and sending of outgoing
      * activities, and testing for too old queued incoming activities.
      */
-    protected static final int MILLIS_UPDATE = 500;
+    protected static final int MILLIS_UPDATE = 1000;
 
     protected static class QueueItem {
 
@@ -581,8 +581,11 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
         synchronized (execLock) {
             incomingQueues.add(nextActivity);
 
-            if (!started)
+            if (!started) {
+                log.warn("Received activity but activity"
+                    + " sequencer has not yet been started: " + nextActivity);
                 return;
+            }
 
             execQueue();
         }

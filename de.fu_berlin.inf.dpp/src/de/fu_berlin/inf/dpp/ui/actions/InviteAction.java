@@ -142,7 +142,7 @@ public class InviteAction extends SelectionProviderAction {
             // ...not in a session already
             // ...to have saros
             if (!saros.getRoster().getPresence(jid.toString()).isAvailable()
-                || project.getParticipant(jid) != null
+                || project.getResourceQualifiedJID(jid) != null
                 || !discoManager.isSarosSupported(jid))
                 return false;
 

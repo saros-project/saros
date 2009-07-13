@@ -417,7 +417,8 @@ public class SharedProject implements ISharedProject, Disposable {
     /**
      * {@inheritDoc}
      * 
-     * @deprecated Use getUser and getResourceQualifiedJID instead.
+     * @deprecated Use {@link #getUser(JID)} and
+     *             {@link #getResourceQualifiedJID(JID)} instead.
      */
     @Deprecated
     public User getParticipant(JID jid) {

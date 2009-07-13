@@ -362,12 +362,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
             if (obj instanceof RosterEntry) {
                 RosterEntry entry = (RosterEntry) obj;
 
-                String label = entry.getName();
-
-                // show JID if entry has no nickname
-                if (label == null) {
-                    label = entry.getUser();
-                }
+                String label = Util.getDisplayableName(entry);
 
                 // append presence information if available
                 Presence presence = RosterView.this.roster.getPresence(entry
@@ -409,14 +404,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
                 StyledString result = new StyledString();
 
-                String label = entry.getName();
-
-                // show JID if entry has no nickname
-                if (label == null) {
-                    result.append(entry.getUser());
-                } else {
-                    result.append(label);
-                }
+                result.append(Util.getDisplayableName(entry));
 
                 // append presence information if available
                 Presence presence = RosterView.this.roster.getPresence(entry
