@@ -32,6 +32,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
+import org.eclipse.core.net.proxy.IProxyData;
+import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -50,9 +52,11 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
 import org.jivesoftware.smack.packet.Registration;
+import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.Jingle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 import org.picocontainer.MutablePicoContainer;
@@ -630,8 +634,11 @@ public class Saros extends AbstractUIPlugin {
                 disconnect();
             }
 
-            ConnectionConfiguration conConfig = new ConnectionConfiguration(
-                server);
+            ProxyInfo proxyInfo = getProxyInfo(server);
+
+            ConnectionConfiguration conConfig = proxyInfo == null ? new ConnectionConfiguration(
+                server)
+                : new ConnectionConfiguration(server, proxyInfo);
 
             /*
              * TODO: require TLS, because we only support PLAIN SASL (see below)
@@ -716,6 +723,49 @@ public class Saros extends AbstractUIPlugin {
                 });
             }
         }
+    }
+
+    /**
+     * Returns @link{IProxyService} if there is a registered service otherwise
+     * null.
+     */
+    protected IProxyService getProxyService() {
+        BundleContext bundleContext = getBundle().getBundleContext();
+        ServiceReference serviceReference = bundleContext
+            .getServiceReference(IProxyService.class.getName());
+        return (IProxyService) bundleContext.getService(serviceReference);
+    }
+
+    /**
+     * Returns a @link{ProxyInfo}, if a configuration of a proxy for the given
+     * host is available. If @link{IProxyData} is of type
+     * 
+     * @link{IProxyData.HTTP_PROXY_TYPE it tries to use Smacks
+     * @link{ProxyInfo.forHttpProxy and if it is of type
+     * @link{IProxyData.SOCKS_PROXY_TYPE then it tries to use Smacks
+     * @link{ProxyInfo.forSocks5Proxy otherwise it returns null.
+     * 
+     * @param host
+     *            The host to which you want to connect to.
+     * 
+     * @return Returns a @link{ProxyInfo} if available otherwise null.
+     */
+    protected ProxyInfo getProxyInfo(String host) {
+        IProxyService ips = getProxyService();
+        if (ips == null)
+            return null;
+        for (IProxyData pd : ips.getProxyDataForHost(host)) {
+            if (pd.getType() == IProxyData.HTTP_PROXY_TYPE) {
+                return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(), pd
+                    .getUserId(), pd.getPassword());
+            } else if (pd.getType() == IProxyData.SOCKS_PROXY_TYPE) {
+                return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(), pd
+                    .getUserId(), pd.getPassword());
+
+            }
+        }
+
+        return null;
     }
 
     /**
