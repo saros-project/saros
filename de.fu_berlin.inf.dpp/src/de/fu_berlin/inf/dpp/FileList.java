@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -53,6 +55,8 @@ import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
  */
 @XStreamAlias("fileList")
 public class FileList {
+
+    private static Logger log = Logger.getLogger(FileList.class);
 
     /**
      * {@link XStream} instance to serialize {@link FileList} objects to and
@@ -323,13 +327,15 @@ public class FileList {
 
             if (resource instanceof IFile) {
                 IFile file = (IFile) resource;
-                if (file.exists() == false) {
+                if (!file.exists()) {
                     continue;
                 }
 
-                long checksum = FileUtil.checksum(file);
-                if (checksum != -1L) {
-                    members.put(file.getProjectRelativePath(), checksum);
+                try {
+                    members.put(file.getProjectRelativePath(), FileUtil
+                        .checksum(file));
+                } catch (IOException e) {
+                    log.error(e);
                 }
 
             } else if (resource instanceof IFolder) {

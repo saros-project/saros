@@ -37,24 +37,25 @@ public class FileUtil {
     /**
      * Calculate Adler32 checksum for given file.
      * 
-     * @return checksum of file or -1 if checksum calculation has been failed.
+     * @return checksum of file
+     * 
+     * @throws CausedIOException
+     *             if checksum calculation has been failed.
      */
-    public static long checksum(IFile file) {
+    public static long checksum(IFile file) throws IOException {
 
         InputStream contents;
         try {
             contents = file.getContents();
         } catch (CoreException e) {
-            log.error("Failed to calculate checksum:", e);
-            return -1L;
+            throw new CausedIOException("Failed to calculate checksum.", e);
         }
 
         CheckedInputStream in = new CheckedInputStream(contents, new Adler32());
         try {
             IOUtils.copy(in, new NullOutputStream());
         } catch (IOException e) {
-            log.error("Failed to calculate checksum:", e);
-            return -1L;
+            throw new CausedIOException("Failed to calculate checksum.", e);
         } finally {
             IOUtils.closeQuietly(in);
         }
