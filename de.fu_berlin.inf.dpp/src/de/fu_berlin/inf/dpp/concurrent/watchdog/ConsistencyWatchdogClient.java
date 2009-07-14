@@ -385,10 +385,10 @@ public class ConsistencyWatchdogClient {
 
             lock = myLock = new Object();
 
-            if (executingChecksumErrorHandling == true) {
+            if (executingChecksumErrorHandling) {
                 log.error("Restarting Checksum Error Handling"
                     + " while another operation is running");
-                while (executingChecksumErrorHandling == true) {
+                while (executingChecksumErrorHandling) {
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
