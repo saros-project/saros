@@ -39,6 +39,8 @@ public class PreferenceConstants {
 
     public static final String SKYPE_USERNAME = "skypename";
 
+    public static final String CONCURRENT_UNDO = "concurrent_undo";
+
     public static final String DEBUG = "debug";
 
     public static final String FILE_TRANSFER_PORT = "port";

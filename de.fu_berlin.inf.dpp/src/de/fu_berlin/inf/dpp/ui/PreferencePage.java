@@ -75,6 +75,11 @@ public class PreferencePage extends FieldEditorPreferencePage implements
             PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER,
             "On role changes follow exclusive driver automatically.",
             getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(
+            PreferenceConstants.CONCURRENT_UNDO,
+            "Enable concurrent undo (only local changes are undone, session restart necessary).",
+            getFieldEditorParent()));
     }
 
     /*

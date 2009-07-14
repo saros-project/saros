@@ -47,6 +47,7 @@ import de.fu_berlin.inf.dpp.concurrent.undo.OperationHistory.Type;
 import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityManager;
@@ -85,6 +86,9 @@ public class UndoManager implements IActivityManager, Disposable,
 
     @Inject
     protected Saros saros;
+
+    @Inject
+    protected PreferenceUtils preferences;
 
     protected SessionManager sessionManager;
 
@@ -262,7 +266,7 @@ public class UndoManager implements IActivityManager, Disposable,
             undoHistory.clear();
             project.getSequencer().addProvider(UndoManager.this);
             addActivityListener(project.getSequencer());
-            enabled = true;
+            enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
             sharedProject = project;
         }

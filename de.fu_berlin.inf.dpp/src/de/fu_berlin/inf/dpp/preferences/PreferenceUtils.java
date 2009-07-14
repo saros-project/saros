@@ -102,4 +102,8 @@ public class PreferenceUtils {
             PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
 
+    public boolean isConcurrentUndoActivated() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.CONCURRENT_UNDO);
+    }
 }
