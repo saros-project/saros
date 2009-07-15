@@ -535,16 +535,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
             long endTime = System.currentTimeMillis();
             long delta = endTime - startTime;
-            String throughput;
-            if (delta == 0) {
-                throughput = "";
-            } else {
-                throughput = " (" + (content.length / 1024) + "kb in " + delta
-                    + " ms at " + (1000 * content.length / 1024) / delta
-                    + " kb/s)";
-            }
-
-            log.debug(prefix() + "Sent" + throughput + ": " + transferData);
+            log.debug(prefix() + "Sent"
+                + Util.throughput(content.length, delta) + ": " + transferData);
             return connectionType;
         } catch (IOException e) {
             throw new JingleSessionException(prefix() + "Failed to send files");

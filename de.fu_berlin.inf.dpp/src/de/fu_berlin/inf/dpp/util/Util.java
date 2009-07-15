@@ -840,4 +840,14 @@ public class Util {
         }
         return null;
     }
+
+    public static String throughput(long length, long delta) {
+
+        if (delta == 0) {
+            return "";
+        } else {
+            return " (" + (length / 1024L) + "kb in " + delta + " ms at "
+                + (1000L * length / 1024L) / delta + " kb/s)";
+        }
+    }
 }

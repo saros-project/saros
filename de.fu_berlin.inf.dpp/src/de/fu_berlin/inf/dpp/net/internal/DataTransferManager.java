@@ -255,9 +255,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
             log.debug("[IBB] Finished incoming file transfer: "
-                + data.toString() + ", size: " + request.getFileSize() / 1024
-                + "kbyte received in " + ((duration / 100) / 10.0) + "s");
-
+                + data.toString() + ", size: "
+                + Util.throughput(request.getFileSize(), duration));
             transferModeDispatch.transferFinished(data.getSender(),
                 NetTransferMode.IBB, true, content.length, duration);
             receiveData(data, new ByteArrayInputStream(content));
@@ -370,8 +369,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
 
             log.debug("[IBB] Finished sending to " + data.getRecipient() + ": "
-                + data.toString() + ", size: " + content.length / 1024
-                + " kbyte in " + ((duration / 100) / 10.0) + "s");
+                + data.toString() + ", "
+                + Util.throughput(content.length, duration));
 
             return NetTransferMode.IBB;
         }
