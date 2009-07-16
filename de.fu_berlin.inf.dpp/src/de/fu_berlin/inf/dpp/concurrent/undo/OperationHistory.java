@@ -220,7 +220,13 @@ public class OperationHistory {
         return getLatestLocal(editor) != null;
     }
 
+    /**
+     * Redo should only be possible if there was executed an undo and after the
+     * undo no local operation was executed.
+     */
     public boolean canRedo(IPath editor) {
-        return getLatestRedoable(editor) != null;
+        return getLatestRedoable(editor) != null
+            && entriesToLatestRedoable(editor).size() < entriesToLatestLocal(
+                editor).size();
     }
 }

@@ -437,10 +437,13 @@ public class UndoManager implements IActivityManager, Disposable,
      *         in the given editor
      */
     protected Operation calcUndoOperation(IPath editor) {
+
+        if (!undoHistory.canUndo(editor))
+            return new NoOperation(); // nothing to undo
+
         Operation lastLocal = undoHistory.getLatestLocal(editor);
 
-        if (lastLocal == null)
-            return new NoOperation(); // nothing to undo
+        assert lastLocal != null;
 
         Operation undoOperation = lastLocal.invert();
 
@@ -468,10 +471,13 @@ public class UndoManager implements IActivityManager, Disposable,
      *         editor
      */
     protected Operation calcRedoOperation(IPath editor) {
+
+        if (!undoHistory.canRedo(editor))
+            return new NoOperation(); // nothing to redo
+
         Operation lastUndo = undoHistory.getLatestRedoable(editor);
 
-        if (lastUndo == null)
-            return new NoOperation(); // nothing to redo
+        assert lastUndo != null;
 
         Operation redoOperation = lastUndo.invert();
 
