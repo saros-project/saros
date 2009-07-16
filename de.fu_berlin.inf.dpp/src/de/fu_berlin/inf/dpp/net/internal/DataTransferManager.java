@@ -332,7 +332,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                 if (progress.isCanceled()) {
                     transfer.cancel();
-                    throw new CancellationException();
+                    throw new CancellationException(
+                        "Transfer was canceled by user");
                 }
                 int newProgress = (int) ((100.0 * transfer.getAmountWritten()) / Math
                     .max(1, content.length));
@@ -452,6 +453,10 @@ public class DataTransferManager implements ConnectionSessionListener {
                         transferData.recipient, mode, false, content.length,
                         duration);
                     return;
+                } catch (CausedIOException e) {
+                    log.error(Util.prefix(transferData.recipient)
+                        + "Failed to send " + transferData + " with "
+                        + transmitter.getName() + ":", e.getCause());
                 } catch (Exception e) {
                     log.error(Util.prefix(transferData.recipient)
                         + "Failed to send " + transferData + " with "
