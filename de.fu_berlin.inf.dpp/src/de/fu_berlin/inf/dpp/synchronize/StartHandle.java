@@ -1,18 +1,21 @@
 package de.fu_berlin.inf.dpp.synchronize;
 
+import org.apache.log4j.Logger;
+
 import de.fu_berlin.inf.dpp.User;
 
 public class StartHandle {
 
+    private static Logger log = Logger.getLogger(StartHandle.class.getName());
+
     protected User user;
     protected StopManager stopManager;
-    protected boolean startCalled;
+    protected boolean startCalled = false;
     protected String id;
 
     public StartHandle(User user, StopManager stopManager, String id) {
         this.user = user;
         this.stopManager = stopManager;
-        this.startCalled = false;
         this.id = id;
     }
 
@@ -28,6 +31,8 @@ public class StartHandle {
      *         handle.
      */
     public boolean start() {
+
+        log.debug("Called start on " + user);
 
         if (startCalled)
             throw new IllegalStateException(
@@ -80,5 +85,13 @@ public class StartHandle {
         } else if (!user.equals(other.user))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        String out = "StartHandle (" + user + ", " + id + ", ";
+        if (startCalled)
+            out += "not ";
+        return out + "startable)";
     }
 }
