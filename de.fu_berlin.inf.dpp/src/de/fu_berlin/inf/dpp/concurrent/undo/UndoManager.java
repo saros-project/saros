@@ -265,7 +265,6 @@ public class UndoManager implements IActivityManager, Disposable,
         public void sessionStarted(ISharedProject project) {
             undoHistory.clear();
             project.getSequencer().addProvider(UndoManager.this);
-            addActivityListener(project.getSequencer());
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
             sharedProject = project;
@@ -274,7 +273,6 @@ public class UndoManager implements IActivityManager, Disposable,
         @Override
         public void sessionEnded(ISharedProject project) {
             project.getSequencer().removeProvider(UndoManager.this);
-            removeActivityListener(project.getSequencer());
             undoHistory.clear();
             enabled = false;
             eclipseHistory.removeOperationApprover(operationBlocker);
