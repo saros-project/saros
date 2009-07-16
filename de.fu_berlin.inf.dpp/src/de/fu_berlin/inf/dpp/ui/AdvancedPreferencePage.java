@@ -66,10 +66,6 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
         addField(new IntegerFieldEditor(PreferenceConstants.STUN_PORT,
             "STUN server port (needs restart)", getFieldEditorParent()));
 
-        addField(new BooleanFieldEditor(PreferenceConstants.MULTI_DRIVER,
-            "Enable multi driver support (EXPERIMENTAL)",
-            getFieldEditorParent()));
-
         addField(new BooleanFieldEditor(
             PreferenceConstants.AUTO_ACCEPT_INVITATION,
             "Automatically accept incoming invitation (for debugging)",

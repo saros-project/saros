@@ -22,6 +22,11 @@ package de.fu_berlin.inf.dpp.ui;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -49,37 +54,80 @@ public class PreferencePage extends FieldEditorPreferencePage implements
         Saros.reinject(this);
 
         setPreferenceStore(saros.getPreferenceStore());
-        setDescription("Your settings for Jabber.");
     }
 
     @Override
     public void createFieldEditors() {
+        Composite composite = new Composite(getFieldEditorParent(), SWT.NONE);
+        GridLayout layout = new GridLayout(1, true);
+        layout.verticalSpacing = 15;
+        composite.setLayout(layout);
+        composite
+            .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        createJabberPreferences(composite);
+        createFollowModePreferences(composite);
+        createMultiDriverPreferences(composite);
+
+    }
+
+    protected void createJabberPreferences(Composite composite) {
+        Composite group = createGroup("Jabber settings", composite);
+
         addField(new StringFieldEditor(PreferenceConstants.SERVER, "Server:",
-            getFieldEditorParent()));
+            group));
 
         addField(new StringFieldEditor(PreferenceConstants.USERNAME,
-            "Username:", getFieldEditorParent()));
+            "Username:", group));
 
         StringFieldEditor passwordField = new StringFieldEditor(
-            PreferenceConstants.PASSWORD, "Password:", getFieldEditorParent());
-        passwordField.getTextControl(getFieldEditorParent()).setEchoChar('*');
+            PreferenceConstants.PASSWORD, "Password:", group);
+        passwordField.getTextControl(group).setEchoChar('*');
         addField(passwordField);
 
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_CONNECT,
-            "Automatically connect on startup.", getFieldEditorParent()));
+            "Automatically connect on startup.", group));
+    }
+
+    protected void createFollowModePreferences(Composite composite) {
+        Composite group = createGroup("Follow Mode", composite);
 
         addField(new BooleanFieldEditor(PreferenceConstants.AUTO_FOLLOW_MODE,
-            "Start in Follow Mode.", getFieldEditorParent()));
+            "Start in Follow Mode.", group));
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.FOLLOW_EXCLUSIVE_DRIVER,
-            "On role changes follow exclusive driver automatically.",
-            getFieldEditorParent()));
+            "On role changes follow exclusive driver automatically.", group));
+    }
+
+    protected void createMultiDriverPreferences(Composite composite) {
+        Composite group = createGroup("Multi Driver", composite);
+
+        addField(new BooleanFieldEditor(PreferenceConstants.MULTI_DRIVER,
+            "Enable multi driver support.", group));
 
         addField(new BooleanFieldEditor(
             PreferenceConstants.CONCURRENT_UNDO,
             "Enable concurrent undo (only local changes are undone, session restart necessary).",
-            getFieldEditorParent()));
+            group));
+    }
+
+    /**
+     * @return a composite containing a group in the given composite with the
+     *         given text
+     */
+    protected Composite createGroup(String text, Composite parent) {
+        Group group = new Group(parent, SWT.NONE);
+        group.setText(text);
+        group.setLayout(new GridLayout(1, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        Composite composite = new Composite(group, SWT.NONE);
+        composite.setLayout(new GridLayout(1, false));
+        composite
+            .setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        return composite;
     }
 
     /*
