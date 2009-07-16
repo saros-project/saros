@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.synchronize;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,25 +157,8 @@ public class StopManager implements IActivityProvider, Disposable {
             if (stopActivity.getType() == Type.UNLOCKREQUEST) {
                 if (stopActivity.getState() == State.INITIATED
                     && sharedProject.getUser(stopActivity.getUser()).isLocal()) {
-                    /*
-                     * unlocks project without acknowledgment if there don't
-                     * exist any more startHandles
-                     */
-                    if (!removeStartHandle(generateStartHandle(stopActivity)))
-                        log.warn("StartHandle for " + stopActivity
-                            + " couldn't be removed because it doesn't exist.");
-                    if (!noStartHandlesFor(sharedProject.getLocalUser())) {
-                        log.debug(startHandles
-                            .get(sharedProject.getLocalUser()).size()
-                            + " startHandles remaining.");
-                        return true;
-                    }
-                    Util.runSafeSWTSync(log, new Runnable() {
-                        public void run() {
-                            lockProject(false);
-                        }
-                    });
-                    return true;
+
+                    return executeUnlock(generateStartHandle(stopActivity));
                 }
             }
             return false;
@@ -200,12 +184,15 @@ public class StopManager implements IActivityProvider, Disposable {
      * 
      * @noSWT This method mustn't be called from the SWT thread.
      * 
+     * @blocking returning when the given users acknowledged the stop
+     * 
      * @cancelable This method can be canceled by the user
      * 
      * @throws CancellationException
      */
-    public List<StartHandle> stop(final List<User> users, final String cause,
-        final SubMonitor monitor) throws CancellationException {
+    public List<StartHandle> stop(final Collection<User> users,
+        final String cause, final SubMonitor monitor)
+        throws CancellationException {
 
         final List<StartHandle> resultingHandles = Collections
             .synchronizedList(new LinkedList<StartHandle>());
@@ -218,6 +205,8 @@ public class StopManager implements IActivityProvider, Disposable {
                         StartHandle startHandle = stop(user, cause, SubMonitor
                             .convert(new NullProgressMonitor()));
                         resultingHandles.add(startHandle);
+                        log.debug("Added " + startHandle
+                            + " to resulting handles.");
                         doneSignal.countDown();
                     } catch (CancellationException e) {
                         log.debug("User canceled the Stopping");
@@ -241,6 +230,8 @@ public class StopManager implements IActivityProvider, Disposable {
             // acknowledgment)
 
             // restart the already stopped users
+            log
+                .debug("Monitor was canceled. Restarting already stopped users.");
             for (StartHandle startHandle : resultingHandles)
                 startHandle.start();
             throw new CancellationException();
@@ -263,6 +254,8 @@ public class StopManager implements IActivityProvider, Disposable {
      *            SubMonitor
      * 
      * @noSWT This method mustn't be called from the SWT thread.
+     * 
+     * @blocking returning when the given user acknowledged the stop
      * 
      * @cancelable This method can be canceled by the user
      * 
@@ -341,6 +334,33 @@ public class StopManager implements IActivityProvider, Disposable {
     }
 
     /**
+     * Unlocks project without sending an acknowledgment if there don't exist
+     * any more startHandles.
+     */
+    protected boolean executeUnlock(StartHandle startHandle) {
+
+        if (!startHandle.getUser().isLocal())
+            throw new IllegalArgumentException(
+                "ExecuteUnlock may only be called with a StartHandle for the local user");
+
+        if (!removeStartHandle(startHandle))
+            log.debug(startHandle
+                + " couldn't be removed because it doesn't exist any more.");
+
+        if (!noStartHandlesFor(sharedProject.getLocalUser())) {
+            log.debug(startHandles.get(sharedProject.getLocalUser()).size()
+                + " startHandles remaining.");
+            return true;
+        }
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                lockProject(false);
+            }
+        });
+        return true;
+    }
+
+    /**
      * sends an initiated unlock request
      * 
      * @param handle
@@ -350,6 +370,12 @@ public class StopManager implements IActivityProvider, Disposable {
         if (sharedProject == null)
             throw new IllegalStateException(
                 "cannot initiate unlock without a shared project");
+
+        // short cut for local user
+        if (handle.getUser().isLocal()) {
+            executeUnlock(handle);
+            return;
+        }
 
         fireActivity(new StopActivity(sharedProject.getLocalUser().getJID()
             .toString(), sharedProject.getLocalUser().getJID(), handle
@@ -362,7 +388,6 @@ public class StopManager implements IActivityProvider, Disposable {
      */
     public void addActivityListener(IActivityListener listener) {
         activityListeners.add(listener);
-
     }
 
     /**
@@ -377,7 +402,6 @@ public class StopManager implements IActivityProvider, Disposable {
      */
     public void removeActivityListener(IActivityListener listener) {
         activityListeners.remove(listener);
-
     }
 
     public void fireActivity(IActivity stopActivity) {
@@ -451,5 +475,4 @@ public class StopManager implements IActivityProvider, Disposable {
         startHandles.clear();
         expectedAcknowledgments.clear();
     }
-
 }
