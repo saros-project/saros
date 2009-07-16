@@ -42,7 +42,7 @@ public class StopManager implements IActivityProvider, Disposable {
 
     private static Logger log = Logger.getLogger(StopManager.class.getName());
 
-    // waits MILLISTOWAIT ms until the next test for progress cancellation
+    // Waits MILLISTOWAIT ms until the next test for progress cancellation
     protected final int MILLISTOWAIT = 100;
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
@@ -65,8 +65,8 @@ public class StopManager implements IActivityProvider, Disposable {
     protected final Condition acknowledged = reentrantLock.newCondition();
 
     /**
-     * for every initiated StopActivity (type: LockRequest) there is one
-     * acknowledgment expected
+     * For every initiated StopActivity (type: LockRequest) there is one
+     * acknowledgment expected.
      */
     protected Set<StopActivity> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivity>());
@@ -107,7 +107,7 @@ public class StopManager implements IActivityProvider, Disposable {
 
             if (sharedProject == null)
                 throw new IllegalStateException(
-                    "cannot receive StopActivities without a shared project");
+                    "Cannot receive StopActivities without a shared project");
 
             if (stopActivity.getType() == Type.LOCKREQUEST) {
 
@@ -133,7 +133,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     && sharedProject.getUser(stopActivity.getInitiator())
                         .isLocal()) {
                     if (!expectedAcknowledgments.contains(stopActivity)) {
-                        log.warn("received unexpected StopActivity: "
+                        log.warn("Received unexpected StopActivity: "
                             + stopActivity);
                         return false;
                     }
@@ -147,7 +147,7 @@ public class StopManager implements IActivityProvider, Disposable {
                         return true;
                     } else {
                         log
-                            .warn("received unexpected StopActivity acknowledgement: "
+                            .warn("Received unexpected StopActivity acknowledgement: "
                                 + stopActivity);
                         return false;
                     }
@@ -184,7 +184,7 @@ public class StopManager implements IActivityProvider, Disposable {
      * 
      * @noSWT This method mustn't be called from the SWT thread.
      * 
-     * @blocking returning when the given users acknowledged the stop
+     * @blocking returning after the given users acknowledged the stop
      * 
      * @cancelable This method can be canceled by the user
      * 
@@ -227,9 +227,9 @@ public class StopManager implements IActivityProvider, Disposable {
         if (monitor.isCanceled()) {
             // TODO SZ What about users that were stopped but have not returned
             // a startHandle (because of cancellation before receiving the
-            // acknowledgment)
+            // acknowledgment)?
 
-            // restart the already stopped users
+            // Restart the already stopped users
             log
                 .debug("Monitor was canceled. Restarting already stopped users.");
             for (StartHandle startHandle : resultingHandles)
@@ -255,7 +255,7 @@ public class StopManager implements IActivityProvider, Disposable {
      * 
      * @noSWT This method mustn't be called from the SWT thread.
      * 
-     * @blocking returning when the given user acknowledged the stop
+     * @blocking returning when after the given user acknowledged the stop
      * 
      * @cancelable This method can be canceled by the user
      * 
@@ -266,16 +266,16 @@ public class StopManager implements IActivityProvider, Disposable {
 
         if (sharedProject == null)
             throw new IllegalStateException(
-                "stop cannot be called without a shared project");
+                "Stop cannot be called without a shared project");
 
-        // creating StopActivity for asking user to stop
+        // Creating StopActivity for asking user to stop
         StopActivity stopActivity = new StopActivity(sharedProject
             .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
             .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
 
         StartHandle handle = generateStartHandle(stopActivity);
 
-        // short cut if affected user is local
+        // Short cut if affected user is local
         if (user.isLocal()) {
             addStartHandle(handle);
             Util.runSafeSWTSync(log, new Runnable() {
@@ -293,7 +293,7 @@ public class StopManager implements IActivityProvider, Disposable {
         fireActivity(stopActivity);
         progress.setBlocked(Status.OK_STATUS);
 
-        // block until user acknowledged
+        // Block until user acknowledged
         log.debug("Waiting for acknowledgment " + Util.prefix(user.getJID()));
         reentrantLock.lock();
         try {
@@ -343,9 +343,14 @@ public class StopManager implements IActivityProvider, Disposable {
             throw new IllegalArgumentException(
                 "ExecuteUnlock may only be called with a StartHandle for the local user");
 
-        if (!removeStartHandle(startHandle))
+        if (!removeStartHandle(startHandle)) {
+            /*
+             * Ok if the local user was the initiator of the stop. If not
+             * something is wrong.
+             */
             log.debug(startHandle
                 + " couldn't be removed because it doesn't exist any more.");
+        }
 
         if (!noStartHandlesFor(sharedProject.getLocalUser())) {
             log.debug(startHandles.get(sharedProject.getLocalUser()).size()
@@ -369,7 +374,7 @@ public class StopManager implements IActivityProvider, Disposable {
     public void initiateUnlock(StartHandle handle) {
         if (sharedProject == null)
             throw new IllegalStateException(
-                "cannot initiate unlock without a shared project");
+                "Cannot initiate unlock without a shared project");
 
         // short cut for local user
         if (handle.getUser().isLocal()) {
@@ -410,7 +415,7 @@ public class StopManager implements IActivityProvider, Disposable {
          * it was sent only to the affected participant.
          */
         for (IActivityListener listener : activityListeners) {
-            listener.activityCreated(stopActivity); // informs ActivitySequencer
+            listener.activityCreated(stopActivity); // Informs ActivitySequencer
         }
     }
 
