@@ -113,7 +113,7 @@ public class ConsistencyWatchdogClient {
 
             final IFile file = project.getProject().getFile(path);
 
-            if (log.isDebugEnabled()) {
+            if (log.isInfoEnabled()) {
                 input = logDiff(log, from, path, input, file);
             }
 
@@ -359,7 +359,7 @@ public class ConsistencyWatchdogClient {
                 log.error("No inconsistency found in file [" + from.getName()
                     + "] " + path.toString());
             } else {
-                log.debug("Diff of inconsistency: \n" + writer);
+                log.info("Diff of inconsistency: \n" + writer);
             }
         } catch (CoreException e) {
             log.error("Can't read file content", e);
