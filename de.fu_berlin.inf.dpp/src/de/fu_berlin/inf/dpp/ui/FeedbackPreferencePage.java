@@ -7,6 +7,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -42,8 +43,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author Lisa Dohrmann
  */
 @Component(module = "prefs")
-public class FeedbackPreferencePage extends
-    org.eclipse.jface.preference.PreferencePage implements
+public class FeedbackPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
 
     @Inject

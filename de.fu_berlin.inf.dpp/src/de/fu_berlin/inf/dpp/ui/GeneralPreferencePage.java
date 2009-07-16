@@ -38,18 +38,16 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 /**
  * Contains the basic preferences for Saros.
  * 
- * TODO Rename to GeneralPreferencePage or SarosPreferencePage
- * 
  * @author rdjemili
  */
 @Component(module = "prefs")
-public class PreferencePage extends FieldEditorPreferencePage implements
+public class GeneralPreferencePage extends FieldEditorPreferencePage implements
     IWorkbenchPreferencePage {
 
     @Inject
     Saros saros;
 
-    public PreferencePage() {
+    public GeneralPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
         Saros.reinject(this);
 
