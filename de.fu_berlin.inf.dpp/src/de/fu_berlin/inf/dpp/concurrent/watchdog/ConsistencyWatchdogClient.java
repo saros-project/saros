@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -420,7 +421,8 @@ public class ConsistencyWatchdogClient {
         }
 
         // Send checksumErrorMessage to host
-        transmitter.sendFileChecksumErrorMessage(getParticipants(),
+        transmitter.sendFileChecksumErrorMessage(Collections
+            .singletonList(sharedProject.getHost().getJID()),
             pathsOfHandledFiles, false);
 
         // block until all inconsistencies are resolved
@@ -438,7 +440,8 @@ public class ConsistencyWatchdogClient {
         dataTransferManager.removeDataReceiver(receiver);
 
         // Send message to host that inconsistency are handled
-        transmitter.sendFileChecksumErrorMessage(getParticipants(),
+        transmitter.sendFileChecksumErrorMessage(Collections
+            .singletonList(sharedProject.getHost().getJID()),
             pathsOfHandledFiles, true);
 
         // Clear-flag indicating recovery is done
