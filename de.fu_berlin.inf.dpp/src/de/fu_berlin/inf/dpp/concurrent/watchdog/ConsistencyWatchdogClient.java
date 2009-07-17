@@ -329,16 +329,16 @@ public class ConsistencyWatchdogClient {
     public static InputStream logDiff(Logger log, JID from, IPath path,
         InputStream input, IFile file) {
         try {
+            if (!file.exists()) {
+                log.info("Missing file detected: " + file);
+                return input;
+            }
+
             // save input in a byte[] for later
             byte[] inputBytes = IOUtils.toByteArray(input);
 
             // reset input
             input = new ByteArrayInputStream(inputBytes);
-
-            if (!file.exists()) {
-                log.info("Missing file detected: " + file);
-                return input;
-            }
 
             // get stream from old file
             InputStream oldStream = file.getContents();
