@@ -227,6 +227,9 @@ public class SharedProject implements ISharedProject, Disposable {
                     } catch (CancellationException e) {
                         log
                             .warn("Role change failed because user canceled the role change");
+                    } catch (InterruptedException e) {
+                        log
+                            .warn("Role change failed because of an InterruptedException");
                     } finally {
                         progress.done();
                     }

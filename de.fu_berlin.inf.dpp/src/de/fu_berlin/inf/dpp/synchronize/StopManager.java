@@ -211,6 +211,10 @@ public class StopManager implements IActivityProvider, Disposable {
                     } catch (CancellationException e) {
                         log.debug("User canceled the Stopping");
                         monitor.setCanceled(true);
+                    } catch (InterruptedException e) {
+                        log
+                            .debug("Canceling because of an InterruptedException");
+                        monitor.setCanceled(true);
                     }
                 }
             });
@@ -225,10 +229,6 @@ public class StopManager implements IActivityProvider, Disposable {
             }
         }
         if (monitor.isCanceled()) {
-            // TODO SZ What about users that were stopped but have not returned
-            // a startHandle (because of cancellation before receiving the
-            // acknowledgment)?
-
             // Restart the already stopped users
             log
                 .debug("Monitor was canceled. Restarting already stopped users.");
@@ -255,14 +255,15 @@ public class StopManager implements IActivityProvider, Disposable {
      * 
      * @noSWT This method mustn't be called from the SWT thread.
      * 
-     * @blocking returning when after the given user acknowledged the stop
+     * @blocking returning after the given user acknowledged the stop
      * 
      * @cancelable This method can be canceled by the user
      * 
      * @throws CancellationException
+     * @throws InterruptedException
      */
     public StartHandle stop(User user, String cause, final SubMonitor progress)
-        throws CancellationException {
+        throws CancellationException, InterruptedException {
 
         if (sharedProject == null)
             throw new IllegalStateException(
@@ -274,10 +275,10 @@ public class StopManager implements IActivityProvider, Disposable {
             .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
 
         StartHandle handle = generateStartHandle(stopActivity);
+        addStartHandle(handle);
 
         // Short cut if affected user is local
         if (user.isLocal()) {
-            addStartHandle(handle);
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     lockProject(true);
@@ -304,16 +305,17 @@ public class StopManager implements IActivityProvider, Disposable {
             if (expectedAcknowledgments.contains(expectedAck)) {
                 log.warn("No acknowlegment arrived, gave up waiting");
                 expectedAcknowledgments.remove(expectedAck);
+                handle.start();
                 throw new CancellationException();
             }
             log.debug("Acknowledgment arrived " + Util.prefix(user.getJID()));
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            handle.start();
+            throw new InterruptedException();
         } finally {
             reentrantLock.unlock();
             progress.clearBlocked();
         }
-        addStartHandle(handle);
         return handle;
     }
 
@@ -366,7 +368,7 @@ public class StopManager implements IActivityProvider, Disposable {
     }
 
     /**
-     * sends an initiated unlock request
+     * Sends an initiated unlock request.
      * 
      * @param handle
      *            the startHandle whose start() initiated the unlocking
