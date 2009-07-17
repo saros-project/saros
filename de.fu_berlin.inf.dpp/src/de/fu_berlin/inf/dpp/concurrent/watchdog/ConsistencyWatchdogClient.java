@@ -335,6 +335,11 @@ public class ConsistencyWatchdogClient {
             // reset input
             input = new ByteArrayInputStream(inputBytes);
 
+            if (!file.exists()) {
+                log.info("Missing file detected: " + file);
+                return input;
+            }
+
             // get stream from old file
             InputStream oldStream = file.getContents();
             InputStream newStream = new ByteArrayInputStream(inputBytes);
