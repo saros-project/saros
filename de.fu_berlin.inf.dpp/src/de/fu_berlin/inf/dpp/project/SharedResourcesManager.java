@@ -219,8 +219,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         @Override
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
-            sharedProject.getActivityManager().addProvider(
-                SharedResourcesManager.this);
+            sharedProject.addActivityProvider(SharedResourcesManager.this);
             ResourcesPlugin.getWorkspace().addResourceChangeListener(
                 SharedResourcesManager.this);
         }
@@ -231,8 +230,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 SharedResourcesManager.this);
 
             assert sharedProject == project;
-            sharedProject.getActivityManager().removeProvider(
-                SharedResourcesManager.this);
+            sharedProject.removeActivityProvider(SharedResourcesManager.this);
             sharedProject = null;
         }
     };

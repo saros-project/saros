@@ -73,14 +73,14 @@ public class RoleManager implements IActivityProvider {
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
             sharedProject.addListener(sharedProjectListener);
-            sharedProject.getActivityManager().addProvider(RoleManager.this);
+            sharedProject.addActivityProvider(RoleManager.this);
         }
 
         @Override
         public void sessionEnded(ISharedProject project) {
             assert sharedProject == project;
             sharedProject.removeListener(sharedProjectListener);
-            sharedProject.getActivityManager().removeProvider(RoleManager.this);
+            sharedProject.removeActivityProvider(RoleManager.this);
             sharedProject = null;
         }
     };

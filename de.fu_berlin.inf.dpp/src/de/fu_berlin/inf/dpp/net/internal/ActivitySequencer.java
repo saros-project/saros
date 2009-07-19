@@ -39,24 +39,17 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityManager;
-import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -71,8 +64,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * @author rdjemili
  * @author coezbek
  */
-public class ActivitySequencer implements IActivityListener, IActivityManager,
-    Disposable {
+public class ActivitySequencer {
 
     private static Logger log = Logger.getLogger(ActivitySequencer.class
         .getName());
@@ -96,8 +88,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
     /** Buffer for outgoing activities. */
     protected final BlockingQueue<QueueItem> outgoingQueue = new LinkedBlockingQueue<QueueItem>();
-
-    protected final List<IActivityProvider> providers = new LinkedList<IActivityProvider>();
 
     /**
      * A priority queue for timed activities.
@@ -393,12 +383,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
 
     protected final ActivityQueuesManager incomingQueues = new ActivityQueuesManager();
 
-    /*
-     * TODO The AS should not know the ConcurrentDocumentManager but rather pass
-     * all calls up into the SharedProject.
-     */
-    protected ConcurrentDocumentManager concurrentDocumentManager;
-
     /**
      * Whether this AS currently sends or receives events
      */
@@ -442,11 +426,10 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      *             method is called.
      * 
      * @see #stop()
-     * @see #setConcurrentManager(ConcurrentDocumentManager)
      */
     public void start() {
 
-        if (started || concurrentDocumentManager == null) {
+        if (started) {
             throw new IllegalStateException();
         }
 
@@ -514,52 +497,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     }
 
     /**
-     * TODO This should be pushed up into the SharedProject
-     */
-    protected void exec(final IActivity activity) {
-
-        // TODO Replace this with a single call to the ConcurrentDocumentManager
-        // and use the ActivityReceiver to handle all cases.
-        try {
-            if (activity instanceof EditorActivity) {
-                this.concurrentDocumentManager.execEditorActivity(activity);
-            }
-            if (activity instanceof FileActivity) {
-                this.concurrentDocumentManager.execFileActivity(activity);
-            }
-            if (activity instanceof FolderActivity) {
-                // TODO [FileOps] Does not handle FolderActivity
-            }
-            if (activity instanceof JupiterActivity) {
-                this.concurrentDocumentManager
-                    .receiveJupiterActivity((JupiterActivity) activity);
-                return;
-            }
-        } catch (Exception e) {
-            log.error("Error while executing activity.", e);
-        }
-
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-
-                if (activity instanceof TextEditActivity) {
-                    if (concurrentDocumentManager.isHostSide()
-                        || concurrentDocumentManager
-                            .isManagedByJupiter(activity)) {
-                        return;
-                    }
-                }
-
-                // Execute all other activities
-                for (IActivityProvider executor : ActivitySequencer.this.providers) {
-                    executor.exec(activity);
-                }
-            }
-        });
-
-    }
-
-    /**
      * The central entry point for receiving Activities from the Network
      * component (either via message or data transfer, thus the following is
      * synchronized on the queue).
@@ -597,7 +534,7 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     protected void execQueue() {
         for (TimedActivity activity : incomingQueues.removeActivities()) {
             log.debug("Executing untransformed activity: " + activity);
-            exec(activity.getActivity());
+            sharedProject.exec(activity.getActivity());
         }
     }
 
@@ -688,38 +625,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
             }
         }
         return false;
-    }
-
-    public void addProvider(IActivityProvider provider) {
-        this.providers.add(provider);
-        provider.addActivityListener(this);
-    }
-
-    public void removeProvider(IActivityProvider provider) {
-        this.providers.remove(provider);
-        provider.removeActivityListener(this);
-    }
-
-    /**
-     * All the ActivityProviders will call this method when new events occurred
-     * in the UI.
-     * 
-     * TODO This method should be pushed up into SharedProject
-     * 
-     * @see IActivityListener
-     */
-    public void activityCreated(IActivity activity) {
-
-        if (activity == null)
-            throw new IllegalArgumentException("Activity cannot be null");
-
-        /* Let ConcurrentDocumentManager have a look at the activities first */
-        boolean consumed = this.concurrentDocumentManager
-            .activityCreated(activity);
-
-        if (!consumed) {
-            sendActivity(sharedProject.getRemoteUsers(), activity);
-        }
     }
 
     /**
@@ -843,60 +748,6 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
     }
 
     /**
-     * Sets the {@link ConcurrentDocumentManager}.
-     * 
-     * Must be called before {@link #start()}.
-     */
-    public void setConcurrentManager(
-        ConcurrentDocumentManager concurrentDocumentManager) {
-
-        this.concurrentDocumentManager = concurrentDocumentManager;
-    }
-
-    public ConcurrentDocumentManager getConcurrentDocumentManager() {
-        return this.concurrentDocumentManager;
-    }
-
-    /**
-     * Execute activity after jupiter transforming process.
-     * 
-     * @param activity
-     * 
-     *            TODO Push this method into SharedProject
-     * 
-     * @swt Must be called from the SWT Thread
-     */
-    public void execTransformedActivity(TextEditActivity activity) {
-
-        if (activity == null)
-            throw new IllegalArgumentException("Activity cannot be null");
-
-        assert Util.isSWT();
-
-        try {
-            log.debug("Executing   transformed activity: " + activity);
-
-            for (IActivityProvider exec : this.providers) {
-                exec.exec(activity);
-            }
-
-            /*
-             * FIXME The following will send the activities to everybody, so all
-             * drivers will receive the message twice (once through Jupiter once
-             * as a Activity)
-             */
-
-            // Queue activity for every remote user.
-            if (this.concurrentDocumentManager.isHostSide()) {
-                this.outgoingQueue.add(new QueueItem(sharedProject
-                    .getRemoteUsers(), activity));
-            }
-        } catch (Exception e) {
-            log.error("Error while executing activity.", e);
-        }
-    }
-
-    /**
      * Removes queued activities from given user.
      * 
      * TODO Maybe remove outgoing activities from {@link #outgoingQueue} too!?
@@ -906,9 +757,5 @@ public class ActivitySequencer implements IActivityListener, IActivityManager,
      */
     public void userLeft(JID jid) {
         incomingQueues.removeQueue(jid);
-    }
-
-    public void dispose() {
-        concurrentDocumentManager.dispose();
     }
 }

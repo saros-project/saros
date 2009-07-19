@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
@@ -41,9 +43,11 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
  * with usual Eclipse projects and make them available for synchronous/real-time
  * collaboration.
  * 
+ * TODO Is this interface really necessary?
+ * 
  * @author rdjemili
  */
-public interface ISharedProject {
+public interface ISharedProject extends IActivityListener {
 
     /**
      * @return a collection of all participants of the shared project. This
@@ -165,12 +169,6 @@ public interface ISharedProject {
     public ActivitySequencer getSequencer();
 
     /**
-     * @return the activity manager that is responsible for all activity
-     *         providers.
-     */
-    public IActivityManager getActivityManager();
-
-    /**
      * Activates sending of activities. The reason that this isn't done
      * automatically are unit tests.
      */
@@ -263,4 +261,38 @@ public interface ISharedProject {
      */
     public void returnColor(int colorID);
 
+    /**
+     * Execute activity after jupiter transforming process.
+     * 
+     * @swt Must be called from the SWT Thread
+     */
+    public void execTransformedActivity(TextEditActivity activity);
+
+    /**
+     * Excutes the given activity locally.
+     */
+    public void exec(IActivity activity);
+
+    /**
+     * All the ActivityProviders will call this method when new events occurred
+     * in the UI.
+     * 
+     * @see IActivityListener
+     */
+    public void activityCreated(IActivity activity);
+
+    /**
+     * Adds an {@link IActivityProvider} and also registers itself as
+     * {@link IActivityListener} at the given provider.
+     * 
+     * If the given provider was already added this method does not add it again
+     * but silently returns.
+     */
+    public void addActivityProvider(IActivityProvider provider);
+
+    /**
+     * Removes the given provider and deregisters itself as
+     * {@link IActivityListener} on that provider.
+     */
+    public void removeActivityProvider(IActivityProvider provider);
 }

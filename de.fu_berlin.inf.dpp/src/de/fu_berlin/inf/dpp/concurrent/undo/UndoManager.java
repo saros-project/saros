@@ -50,7 +50,6 @@ import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
-import de.fu_berlin.inf.dpp.project.IActivityManager;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -71,8 +70,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * added to the PicoContainer in Saros.class.
  */
 @Component(module = "undo")
-public class UndoManager implements IActivityManager, Disposable,
-    IActivityProvider {
+public class UndoManager implements Disposable, IActivityProvider {
 
     private static Logger log = Logger.getLogger(UndoManager.class.getName());
 
@@ -264,7 +262,7 @@ public class UndoManager implements IActivityManager, Disposable,
         @Override
         public void sessionStarted(ISharedProject project) {
             undoHistory.clear();
-            project.getSequencer().addProvider(UndoManager.this);
+            project.addActivityProvider(UndoManager.this);
             enabled = preferences.isConcurrentUndoActivated();
             eclipseHistory.addOperationApprover(operationBlocker);
             sharedProject = project;
@@ -272,7 +270,7 @@ public class UndoManager implements IActivityManager, Disposable,
 
         @Override
         public void sessionEnded(ISharedProject project) {
-            project.getSequencer().removeProvider(UndoManager.this);
+            project.removeActivityProvider(UndoManager.this);
             undoHistory.clear();
             enabled = false;
             eclipseHistory.removeOperationApprover(operationBlocker);

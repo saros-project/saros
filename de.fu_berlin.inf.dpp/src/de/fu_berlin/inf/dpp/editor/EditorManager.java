@@ -478,7 +478,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             isDriver = sharedProject.isDriver();
             sharedProject.addListener(sharedProjectListener);
 
-            sharedProject.getActivityManager().addProvider(EditorManager.this);
+            sharedProject.addActivityProvider(EditorManager.this);
             contributionAnnotationManager = new ContributionAnnotationManager(
                 project);
             remoteEditorManager = new RemoteEditorManager(sharedProject);
@@ -533,8 +533,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                     editorPool.removeAllEditors();
 
                     sharedProject.removeListener(sharedProjectListener);
-                    sharedProject.getActivityManager().removeProvider(
-                        EditorManager.this);
+                    sharedProject.removeActivityProvider(EditorManager.this);
                     sharedProject = null;
                     lastEditTimes.clear();
                     lastRemoteEditTimes.clear();

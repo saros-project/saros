@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,7 +37,13 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
@@ -46,7 +53,7 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.project.IActivityManager;
+import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
@@ -72,6 +79,10 @@ public class SharedProject implements ISharedProject, Disposable {
     protected ITransmitter transmitter;
 
     protected ActivitySequencer activitySequencer;
+
+    protected ConcurrentDocumentManager concurrentDocumentManager;
+
+    protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
 
     protected DataTransferManager transferManager;
 
@@ -138,9 +149,8 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(this.host.getJID(), this.host);
 
         /* add host to driver list. */
-        this.activitySequencer
-            .setConcurrentManager(new ConcurrentDocumentManager(Side.HOST_SIDE,
-                this.host, myID, this, activitySequencer));
+        this.concurrentDocumentManager = new ConcurrentDocumentManager(
+            Side.HOST_SIDE, this.host, myID, this, activitySequencer);
 
         setProjectReadonly(false);
     }
@@ -162,9 +172,8 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(hostID, host);
         this.participants.put(myID, localUser);
 
-        this.activitySequencer
-            .setConcurrentManager(new ConcurrentDocumentManager(
-                Side.CLIENT_SIDE, this.host, myID, this, activitySequencer));
+        this.concurrentDocumentManager = new ConcurrentDocumentManager(
+            Side.CLIENT_SIDE, this.host, myID, this, activitySequencer);
     }
 
     public Collection<User> getParticipants() {
@@ -186,10 +195,6 @@ public class SharedProject implements ISharedProject, Disposable {
         return this.activitySequencer;
     }
 
-    public IActivityManager getActivityManager() {
-        return this.activitySequencer;
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -201,8 +206,9 @@ public class SharedProject implements ISharedProject, Disposable {
             .convert(new NullProgressMonitor());
 
         if (user.isHost()) {
-            activitySequencer.activityCreated(new RoleActivity(getLocalUser()
-                .getJID().toString(), user.getJID().toString(), newRole));
+            activityCreated(new RoleActivity(
+                getLocalUser().getJID().toString(), user.getJID().toString(),
+                newRole));
 
             setUserRole(user, newRole);
         } else {
@@ -215,9 +221,9 @@ public class SharedProject implements ISharedProject, Disposable {
                         StartHandle startHandle = stopManager.stop(user,
                             "Performing role change", progress);
 
-                        activitySequencer.activityCreated(new RoleActivity(
-                            getLocalUser().getJID().toString(), user.getJID()
-                                .toString(), newRole));
+                        activityCreated(new RoleActivity(getLocalUser()
+                            .getJID().toString(), user.getJID().toString(),
+                            newRole));
 
                         setUserRole(user, newRole);
 
@@ -414,7 +420,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public void dispose() {
         stopManager.removeBlockable(stopManagerListener);
-        activitySequencer.dispose();
+        concurrentDocumentManager.dispose();
     }
 
     /**
@@ -502,7 +508,7 @@ public class SharedProject implements ISharedProject, Disposable {
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
-        return this.activitySequencer.getConcurrentDocumentManager();
+        return concurrentDocumentManager;
     }
 
     public ITransmitter getTransmitter() {
@@ -519,5 +525,113 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public void returnColor(int colorID) {
         freeColors.add(colorID);
+    }
+
+    public void execTransformedActivity(TextEditActivity activity) {
+
+        if (activity == null)
+            throw new IllegalArgumentException("Activity cannot be null");
+
+        assert Util.isSWT();
+
+        try {
+            log.debug("Executing   transformed activity: " + activity);
+
+            for (IActivityProvider exec : this.activityProviders) {
+                exec.exec(activity);
+            }
+
+            /*
+             * FIXME The following will send the activities to everybody, so all
+             * drivers will receive the message twice (once through Jupiter once
+             * as a Activity)
+             */
+
+            // Send activity to every remote user.
+            if (this.concurrentDocumentManager.isHostSide()) {
+                activitySequencer.sendActivity(getRemoteUsers(), activity);
+            }
+        } catch (Exception e) {
+            log.error("Error while executing activity.", e);
+        }
+    }
+
+    public void exec(final IActivity activity) {
+
+        /*
+         * TODO Replace this with a single call to the ConcurrentDocumentManager
+         * and use the ActivityReceiver to handle all cases.
+         * 
+         * TODO Check all this for problems with concurrency.
+         * 
+         * TODO Idea for a changed API: Receive a list of activities and call
+         * the ConcurrentDocumentManager to produce lists of activities to
+         * execute locally and one to send to remote users.
+         */
+        try {
+            if (activity instanceof EditorActivity) {
+                this.concurrentDocumentManager.execEditorActivity(activity);
+            }
+            if (activity instanceof FileActivity) {
+                this.concurrentDocumentManager.execFileActivity(activity);
+            }
+            if (activity instanceof FolderActivity) {
+                // TODO [FileOps] Does not handle FolderActivity
+            }
+            if (activity instanceof JupiterActivity) {
+                this.concurrentDocumentManager
+                    .receiveJupiterActivity((JupiterActivity) activity);
+                return;
+            }
+        } catch (Exception e) {
+            log.error("Error while executing activity.", e);
+        }
+        /*
+         * TODO Maybe this one Runnable per activity handed over to the SWT
+         * thread is one reason why the characters appear so slowly.
+         */
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+
+                if (activity instanceof TextEditActivity) {
+                    if (concurrentDocumentManager.isHostSide()
+                        || concurrentDocumentManager
+                            .isManagedByJupiter(activity)) {
+                        return;
+                    }
+                }
+
+                // Execute all other activities
+                for (IActivityProvider executor : activityProviders) {
+                    executor.exec(activity);
+                }
+            }
+        });
+    }
+
+    public void activityCreated(IActivity activity) {
+
+        if (activity == null)
+            throw new IllegalArgumentException("Activity cannot be null");
+
+        /* Let ConcurrentDocumentManager have a look at the activities first */
+        boolean consumed = this.concurrentDocumentManager
+            .activityCreated(activity);
+
+        if (!consumed) {
+            activitySequencer.sendActivity(getRemoteUsers(), activity);
+        }
+    }
+
+    public void addActivityProvider(IActivityProvider provider) {
+        if (!activityProviders.contains(provider)) {
+            this.activityProviders.add(provider);
+            provider.addActivityListener(this);
+        }
+    }
+
+    public void removeActivityProvider(IActivityProvider provider) {
+        this.activityProviders.remove(provider);
+        provider.removeActivityListener(this);
     }
 }

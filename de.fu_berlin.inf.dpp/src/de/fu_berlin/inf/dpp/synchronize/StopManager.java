@@ -77,16 +77,15 @@ public class StopManager implements IActivityProvider, Disposable {
             if (newSharedProject == StopManager.this.sharedProject)
                 return;
 
-            if (StopManager.this.sharedProject != null) {
-                StopManager.this.sharedProject.getSequencer().removeProvider(
-                    StopManager.this);
+            if (sharedProject != null) {
+                sharedProject.removeActivityProvider(StopManager.this);
                 reset();
             }
 
-            StopManager.this.sharedProject = newSharedProject;
+            sharedProject = newSharedProject;
 
             if (newSharedProject != null) {
-                newSharedProject.getSequencer().addProvider(StopManager.this);
+                newSharedProject.addActivityProvider(StopManager.this);
             }
         }
     };

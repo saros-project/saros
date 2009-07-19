@@ -312,7 +312,7 @@ public class ConcurrentDocumentManager implements Disposable {
                 for (TextEditActivity textEdit : op.toTextEdit(jupiterActivity
                     .getEditorPath(), jupiterActivity.getSource())) {
 
-                    sequencer.execTransformedActivity(textEdit);
+                    sharedProject.execTransformedActivity(textEdit);
                 }
             }
         });
