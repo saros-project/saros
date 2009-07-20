@@ -34,6 +34,7 @@ public class SessionStatistic {
     protected static final String ECLIPSE_VERSION = "eclipse.version";
 
     protected static final String KEY_USER_ID = "random.user.id";
+    protected static final String KEY_USER_IS_HOST = "user.is.host";
 
     protected static final String KEY_FEEDBACK_DISABLED = "feedback.disabled";
     protected static final String KEY_FEEDBACK_INTERVAL = "feedback.survey.interval";
@@ -485,6 +486,14 @@ public class SessionStatistic {
 
     public void setUserID(String userID) {
         data.setProperty(KEY_USER_ID, userID);
+    }
+
+    public boolean getIsHost() {
+        return Boolean.parseBoolean(data.getProperty(KEY_USER_IS_HOST));
+    }
+
+    public void setIsHost(boolean isHost) {
+        data.setProperty(KEY_USER_IS_HOST, String.valueOf(isHost));
     }
 
     public void setTransferStatistic(String transferMode, int transferEvents,

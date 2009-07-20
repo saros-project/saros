@@ -23,6 +23,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     protected String currentSessionID;
     protected long sessionStart;
     protected long sessionTime;
+    protected boolean isHost;
 
     public SessionDataCollector(StatisticManager statisticManager,
         SessionManager sessionManager, SessionIDObservable sessionID,
@@ -38,6 +39,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
         data.setSessionID(currentSessionID);
         data.setSessionTime(StatisticManager.getTimeInMinutes(sessionTime));
         data.setSessionCount(statisticManager.getSessionCount());
+        data.setIsHost(isHost);
 
         storeGeneralInfos();
     }
@@ -45,6 +47,7 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     @Override
     protected void doOnSessionEnd(ISharedProject project) {
         sessionTime = System.currentTimeMillis() - sessionStart;
+        isHost = project.getLocalUser().isHost();
     }
 
     @Override
