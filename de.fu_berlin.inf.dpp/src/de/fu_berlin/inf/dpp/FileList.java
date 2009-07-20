@@ -56,7 +56,7 @@ import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 @XStreamAlias("fileList")
 public class FileList {
 
-    private static Logger log = Logger.getLogger(FileList.class);
+    private static final Logger log = Logger.getLogger(FileList.class);
 
     /**
      * {@link XStream} instance to serialize {@link FileList} objects to and
@@ -195,7 +195,7 @@ public class FileList {
     public int match(FileList other) {
         int nPaths = getPaths().size();
 
-        if (nPaths == 0 && other.getPaths().size() == 0)
+        if (nPaths == 0 && other.getPaths().isEmpty())
             return 100; // both are empty -> perfect match
 
         if (nPaths == 0) {
@@ -211,7 +211,7 @@ public class FileList {
         }
     }
 
-    protected static XStream getXStream() {
+    protected static synchronized XStream getXStream() {
         if (xstream == null) {
             xstream = new XStream();
             xstream.registerConverter(new IPathConverter());
