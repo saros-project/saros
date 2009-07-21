@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -1098,8 +1096,6 @@ public class Saros extends AbstractUIPlugin {
             // self inflicted, controlled disconnect
             setConnectionState(ConnectionState.NOT_CONNECTED, null);
         }
-
-        Lock errorLock = new ReentrantLock();
 
         public void connectionClosedOnError(Exception e) {
 

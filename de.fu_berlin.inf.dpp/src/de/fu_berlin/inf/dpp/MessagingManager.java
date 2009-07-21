@@ -50,9 +50,10 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * MessagingManager handles all instant messaging related communications.
  * 
- * @author rdjemili
+ * TODO This class is currently unused and broken (uses uninitialized fields).
+ * It will be used (again) when the chat will be (re)implemented.
  * 
- *         TODO Needs Review and Clean-up
+ * @author rdjemili
  */
 @Component(module = "net")
 public class MessagingManager implements PacketListener, MessageListener,
