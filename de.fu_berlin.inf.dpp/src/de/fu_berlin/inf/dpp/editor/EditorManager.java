@@ -69,7 +69,6 @@ import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.watchdog.IsInconsistentObservable;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
@@ -548,9 +547,6 @@ public class EditorManager implements IActivityProvider, Disposable {
     };
 
     @Inject
-    protected IsInconsistentObservable isInconsistent;
-
-    @Inject
     protected JDTFacade jdtFacade;
 
     @Inject
@@ -759,12 +755,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     public void textAboutToBeChanged(int offset, String text,
         int replaceLength, IDocument document) {
 
-        /*
-         * HACK When Inconsistencies exists, all listeners should be stopped
-         * rather than catching events -> Think Start/Stop on the SharedProject
-         */
-        if (!this.isDriver || sharedProject == null
-            || isInconsistent.getValue()) {
+        if (!this.isDriver || sharedProject == null) {
 
             /**
              * TODO If we are not a driver, then receiving this event might
@@ -774,8 +765,7 @@ public class EditorManager implements IActivityProvider, Disposable {
              * But watch out for changes because of a consistency check!
              */
             log.warn("Received text changes without being"
-                + " driver, while shared project has ended "
-                + "or an inconsistency was detected");
+                + " driver, while shared project has ended.");
 
             return;
         }

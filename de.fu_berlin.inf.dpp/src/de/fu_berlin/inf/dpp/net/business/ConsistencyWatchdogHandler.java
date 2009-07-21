@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,8 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.synchronize.StartHandle;
+import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.Pair;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -69,6 +72,9 @@ public class ConsistencyWatchdogHandler {
 
     @Inject
     protected ConsistencyWatchdogClient watchdogClient;
+
+    @Inject
+    protected StopManager stopManager;
 
     protected SessionIDObservable sessionIDObservable;
 
@@ -208,8 +214,12 @@ public class ConsistencyWatchdogHandler {
         final JID from, final Set<IPath> paths, SubMonitor progress) {
         SubMonitor waiting;
 
+        List<StartHandle> startHandles = null;
+
         if (sessionManager.getSharedProject().isHost()) {
             progress.beginTask("Performing recovery", 1000);
+            startHandles = stopManager.stop(sessionManager.getSharedProject()
+                .getParticipants(), "Consistency recovery", progress);
             progress.subTask("Send files to clients");
             performConsistencyRecovery(from, paths, progress.newChild(700));
 
@@ -228,6 +238,9 @@ public class ConsistencyWatchdogHandler {
                 assert false;
             }
         }
+        if (startHandles != null)
+            for (StartHandle startHandle : startHandles)
+                startHandle.start();
     }
 
     /**
