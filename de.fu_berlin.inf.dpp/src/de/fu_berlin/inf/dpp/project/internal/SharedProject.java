@@ -37,13 +37,9 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
@@ -69,7 +65,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class SharedProject implements ISharedProject, Disposable {
 
-    public static Logger log = Logger.getLogger(SharedProject.class.getName());
+    public static final Logger log = Logger.getLogger(SharedProject.class);
 
     public static final int MAX_USERCOLORS = 5;
 
@@ -556,54 +552,21 @@ public class SharedProject implements ISharedProject, Disposable {
         }
     }
 
-    public void exec(final IActivity activity) {
+    public void exec(List<IActivity> activities) {
+        // TODO Check all this for problems with concurrency.
 
-        /*
-         * TODO Replace this with a single call to the ConcurrentDocumentManager
-         * and use the ActivityReceiver to handle all cases.
-         * 
-         * TODO Check all this for problems with concurrency.
-         * 
-         * TODO Idea for a changed API: Receive a list of activities and call
-         * the ConcurrentDocumentManager to produce lists of activities to
-         * execute locally and one to send to remote users.
-         */
-        try {
-            if (activity instanceof EditorActivity) {
-                this.concurrentDocumentManager.execEditorActivity(activity);
-            }
-            if (activity instanceof FileActivity) {
-                this.concurrentDocumentManager.execFileActivity(activity);
-            }
-            if (activity instanceof FolderActivity) {
-                // TODO [FileOps] Does not handle FolderActivity
-            }
-            if (activity instanceof JupiterActivity) {
-                this.concurrentDocumentManager
-                    .receiveJupiterActivity((JupiterActivity) activity);
-                return;
-            }
-        } catch (Exception e) {
-            log.error("Error while executing activity.", e);
+        final List<IActivity> stillToExecute = concurrentDocumentManager
+            .exec(activities);
+        if (stillToExecute.isEmpty()) {
+            return;
         }
-        /*
-         * TODO Maybe this one Runnable per activity handed over to the SWT
-         * thread is one reason why the characters appear so slowly.
-         */
+
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-
-                if (activity instanceof TextEditActivity) {
-                    if (concurrentDocumentManager.isHostSide()
-                        || concurrentDocumentManager
-                            .isManagedByJupiter(activity)) {
-                        return;
+                for (IActivity activity : stillToExecute) {
+                    for (IActivityProvider executor : activityProviders) {
+                        executor.exec(activity);
                     }
-                }
-
-                // Execute all other activities
-                for (IActivityProvider executor : activityProviders) {
-                    executor.exec(activity);
                 }
             }
         });

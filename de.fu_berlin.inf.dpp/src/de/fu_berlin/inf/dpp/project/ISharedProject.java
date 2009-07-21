@@ -269,9 +269,9 @@ public interface ISharedProject extends IActivityListener {
     public void execTransformedActivity(TextEditActivity activity);
 
     /**
-     * Excutes the given activity locally.
+     * Excutes the given activities locally.
      */
-    public void exec(IActivity activity);
+    public void exec(List<IActivity> activities);
 
     /**
      * All the ActivityProviders will call this method when new events occurred

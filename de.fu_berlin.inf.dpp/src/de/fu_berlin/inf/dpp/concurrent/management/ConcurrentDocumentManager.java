@@ -1,6 +1,8 @@
 package de.fu_berlin.inf.dpp.concurrent.management;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Map.Entry;
@@ -14,10 +16,10 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
@@ -27,6 +29,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -58,6 +61,7 @@ public class ConcurrentDocumentManager implements Disposable {
 
     private final JID myJID;
 
+    // TODO [MR] Remove.
     private final Side side;
 
     private final ActivitySequencer sequencer;
@@ -65,6 +69,106 @@ public class ConcurrentDocumentManager implements Disposable {
     private final ISharedProject sharedProject;
 
     private final ISharedProjectListener projectListener;
+
+    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+        @Override
+        public boolean receive(EditorActivity editorActivity) {
+            execEditorActivity(editorActivity);
+            return false;
+        }
+
+        @Override
+        public boolean receive(FileActivity fileActivity) {
+            if (fileActivity.getType() == FileActivity.Type.Removed) {
+                IPath path = fileActivity.getPath();
+                if (isHostSide()) {
+                    /* remove jupiter document server */
+                    concurrentDocuments.remove(path);
+                }
+                clientDocs.remove(path);
+            }
+            return false;
+        }
+
+        @Override
+        public boolean receive(FolderActivity folderActivity) {
+            /*
+             * TODO Folder activities like deleting a folder are not handled
+             * yet. Then all affected documents managed by the
+             * ConcurrentDocumentManager have to be deleted too.
+             */
+            return false;
+        }
+
+        /**
+         * This is called (only) from the JupiterHandler (the network layer)
+         * when a remote activity has been received.
+         * 
+         * Synchronizes the given JupiterActivity with the jupiter server
+         * document (if host) and local clients (if host or client) and applies
+         * the JupiterActivity locally.
+         * 
+         * @host and @client
+         */
+        @Override
+        public boolean receive(JupiterActivity jupiterActivity) {
+            if (isHostSide()) {
+                receiveJupiterActivityHostSide(jupiterActivity);
+            } else {
+                receiveJupiterActivityClientSide(jupiterActivity);
+            }
+            return true;
+        }
+
+        @Override
+        public boolean receive(TextEditActivity textEditActivity) {
+            return isHostSide() || isManagedByJupiter(textEditActivity);
+        }
+
+        /**
+         * Create or remove proxies on the JupiterDocumentServer depending on
+         * the activity.
+         * 
+         * @host
+         */
+        protected void execEditorActivity(EditorActivity editorActivity) {
+
+            if (!isHostSide())
+                return;
+
+            JID sourceJID = new JID(editorActivity.getSource());
+
+            if (!shouldBeManagedByJupiter(sourceJID))
+                return;
+
+            EditorActivity.Type type = editorActivity.getType();
+            if (!(type == EditorActivity.Type.Activated || type == EditorActivity.Type.Closed))
+                return;
+
+            // Now: We are on the host, and a driver closed or activated an
+            // editor
+
+            JupiterDocumentServer server = getJupiterServer(editorActivity
+                .getPath());
+
+            if (!server.isExist(sourceJID)) {
+                // add proxy for this combination of editor and client
+                if (type == EditorActivity.Type.Activated) {
+                    server.addProxyClient(sourceJID);
+                }
+            } else {
+                // remove proxy for this combination of editor and client
+                if (type == EditorActivity.Type.Closed) {
+                    /*
+                     * TODO Currently we still keep this ProxyClient, because
+                     * creating ProxyClients is asynchronous to the edit
+                     * operations
+                     */
+                    // server.removeProxyClient(sourceJID);
+                }
+            }
+        }
+    };
 
     /**
      * Queue containing the JupiterActivity to be executed locally strictly in
@@ -216,48 +320,37 @@ public class ConcurrentDocumentManager implements Disposable {
         return activity.dispatch(activityCreatedReceiver);
     }
 
-    /**
-     * This is called (only) from the JupiterHandler (the network layer) when a
-     * remote activity has been received.
-     * 
-     * Synchronizes the given JupiterActivity with the jupiter server document
-     * (if host) and local clients (if host or client) and applies the
-     * JupiterActivity locally.
-     * 
-     * @host and @client
-     */
-    public void receiveJupiterActivity(JupiterActivity jupiterActivity) {
-        if (isHostSide()) {
-            receiveJupiterActivityHostSide(jupiterActivity);
-        } else {
-            receiveJupiterActivityClientSide(jupiterActivity);
-        }
-    }
-
     public boolean shouldBeManagedByJupiter(JID jid) {
         User user = sharedProject.getParticipant(jid);
         return user.isHost() || user.isDriver();
     }
 
+    /*
+     * TODO Is this ever different from #sharedProject.isHost()!?
+     */
     public boolean isHostSide() {
         return this.side == Side.HOST_SIDE;
     }
 
-    public void execFileActivity(IActivity activity) {
-        if (activity instanceof FileActivity) {
-
-            FileActivity file = (FileActivity) activity;
-            if (file.getType() == FileActivity.Type.Created) {
-                // Do nothing
-            }
-            if (file.getType() == FileActivity.Type.Removed) {
-                if (isHostSide()) {
-                    /* remove jupiter document server */
-                    this.concurrentDocuments.remove(file.getPath());
+    /**
+     * Executes the given activities and returns a list of activities that still
+     * must be executed by other {@link IActivityProvider}s.
+     * 
+     * Must be executed in the Saros thread.
+     */
+    public List<IActivity> exec(List<IActivity> activities) {
+        List<IActivity> result = new ArrayList<IActivity>();
+        for (IActivity activity : activities) {
+            try {
+                boolean consumed = activity.dispatch(activityReceiver);
+                if (!consumed) {
+                    result.add(activity);
                 }
-                this.clientDocs.remove(file.getPath());
+            } catch (Exception e) {
+                log.error("Error while executing activity.", e);
             }
         }
+        return result;
     }
 
     /**
@@ -316,53 +409,6 @@ public class ConcurrentDocumentManager implements Disposable {
                 }
             }
         });
-    }
-
-    /**
-     * Create or remove proxies on the JupiterDocumentServer depending on the
-     * activity.
-     * 
-     * @host
-     */
-    public void execEditorActivity(IActivity activity) {
-
-        if (!isHostSide())
-            return;
-
-        if (!(activity instanceof EditorActivity))
-            return;
-
-        EditorActivity editorActivity = (EditorActivity) activity;
-
-        JID sourceJID = new JID(editorActivity.getSource());
-
-        if (!shouldBeManagedByJupiter(sourceJID))
-            return;
-
-        if (!(editorActivity.getType() == Type.Activated || editorActivity
-            .getType() == Type.Closed))
-            return;
-
-        // Now: We are on the host, and a driver closed or activated an editor
-
-        JupiterDocumentServer server = getJupiterServer(editorActivity
-            .getPath());
-
-        if (!server.isExist(sourceJID)) {
-            // add proxy for this combination of editor and client
-            if (editorActivity.getType() == Type.Activated) {
-                server.addProxyClient(sourceJID);
-            }
-        } else {
-            // remove proxy for this combination of editor and client
-            if (editorActivity.getType() == Type.Closed) {
-                /*
-                 * TODO Currently we still keep this ProxyClient, because
-                 * creating ProxyClients is asynchronous to the edit operations
-                 */
-                // server.removeProxyClient(sourceJID);
-            }
-        }
     }
 
     protected synchronized Jupiter getClientDoc(IPath path) {
@@ -558,8 +604,7 @@ public class ConcurrentDocumentManager implements Disposable {
 
         if (activity instanceof TextEditActivity) {
             TextEditActivity textEdit = (TextEditActivity) activity;
-
-            return clientDocs.containsKey(textEdit.getEditor());
+            return isManagedByJupiter(textEdit.getEditor());
         }
         return false;
     }

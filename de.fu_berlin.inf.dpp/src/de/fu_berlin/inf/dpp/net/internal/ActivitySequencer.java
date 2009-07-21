@@ -532,10 +532,11 @@ public class ActivitySequencer {
      * executes all activities that are currently in the queue
      */
     protected void execQueue() {
-        for (TimedActivity activity : incomingQueues.removeActivities()) {
-            log.debug("Executing untransformed activity: " + activity);
-            sharedProject.exec(activity.getActivity());
+        List<IActivity> activities = new ArrayList<IActivity>();
+        for (TimedActivity timedActivity : incomingQueues.removeActivities()) {
+            activities.add(timedActivity.getActivity());
         }
+        sharedProject.exec(activities);
     }
 
     /**
