@@ -228,15 +228,14 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                 InputStream in = accept.recieveFile();
 
+                try {
+                    content = IOUtils.toByteArray(in);
+                } finally {
+                    IOUtils.closeQuietly(in);
+                }
                 if (data.emptyFile) {
                     // file is meant to be empty
                     content = new byte[0];
-                } else {
-                    try {
-                        content = IOUtils.toByteArray(in);
-                    } finally {
-                        IOUtils.closeQuietly(in);
-                    }
                 }
             } catch (Exception e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
@@ -300,8 +299,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             final long startTime = System.nanoTime();
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
-                + data.toString() + ", size: " + content.length / 1024
-                + " kbyte");
+                + data.toString() + ", size: "
+                + Util.formatByte(content.length));
 
             OutgoingFileTransfer
                 .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);

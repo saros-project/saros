@@ -34,6 +34,19 @@ public class ErrorMessageDialog {
     }
 
     /**
+     * Show error message for the given exception with the given window title
+     */
+    public static void showErrorMessage(final String windowTitle,
+        final Exception exception) {
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                MessageDialog.openError(EditorAPI.getShell(), windowTitle,
+                    exception.toString());
+            }
+        });
+    }
+
+    /**
      * Opens a modal dialog which displays the given error message to the user.
      * 
      * @param exceptionMessage

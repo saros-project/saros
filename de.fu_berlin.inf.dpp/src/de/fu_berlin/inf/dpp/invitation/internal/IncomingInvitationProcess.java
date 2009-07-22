@@ -194,16 +194,16 @@ public class IncomingInvitationProcess extends InvitationProcess implements
             acceptUnsafeOuter(baseProject, newProjectName, skipSync, monitor);
 
         } catch (CoreException e) {
-            ErrorMessageDialog.showErrorMessage(new Exception(
-                "Exception during create project.", e));
+            ErrorMessageDialog.showErrorMessage(
+                "An error occurred while synchronising the project", e);
             failed(e);
         } catch (IOException e) {
-            ErrorMessageDialog.showErrorMessage(new Exception(
-                "Exception during create project.", e));
+            ErrorMessageDialog.showErrorMessage(
+                "An error occurred while synchronising the project", e);
             failed(e);
         } catch (RuntimeException e) {
-            ErrorMessageDialog.showErrorMessage(new Exception(
-                "Exception during create project.", e));
+            ErrorMessageDialog.showErrorMessage(
+                "An error occurred while synchronising the project", e);
             failed(e);
         } finally {
             monitor.done();

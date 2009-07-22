@@ -850,4 +850,18 @@ public class Util {
                 + (1000L * length / 1024L) / delta + " kb/s)";
         }
     }
+
+    /**
+     * Turn an integer representing a file size into a human readable
+     * representation. For instance 573 becomes 573byte, 16787 becomes 16KB.
+     */ 
+    public static String formatByte(long length) {
+        if (length < 1 << 13) {
+            return length + "byte";
+        }
+        if (length < 1 << 23) {
+            return (length / 1024) + "KB";
+        }
+        return length / 1024 / 1024 + "MB";
+    }
 }

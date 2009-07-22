@@ -62,6 +62,9 @@ public class LeaveHandler {
                 return;
             }
 
+            // FIXME LeaveEvents need to be Activities, otherwise 
+            // RaceConditions can occur when two users leave a the "same" time
+
             if (user.isHost()) {
                 sessionManager.stopSharedProject();
 

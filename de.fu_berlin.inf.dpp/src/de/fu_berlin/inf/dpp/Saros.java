@@ -1048,10 +1048,18 @@ public class Saros extends AbstractUIPlugin {
         this.connectionState = state;
         this.connectionError = error;
 
+        // Prefix the name of the user for which the state changed
+        String prefix = "";
+        if (connection != null) {
+            String user = connection.getUser();
+            if (user != null)
+                prefix = Util.prefix(new JID(user));
+        }
+
         if (error == null) {
-            log.debug("New Connection State == " + state);
+            log.debug(prefix + "New Connection State == " + state);
         } else {
-            log.error("New Connection State == " + state, error);
+            log.error(prefix + "New Connection State == " + state, error);
         }
 
         for (IConnectionListener listener : this.listeners) {
