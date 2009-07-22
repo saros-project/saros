@@ -841,20 +841,24 @@ public class Util {
         return null;
     }
 
-    public static String throughput(long length, long delta) {
+    /**
+     * Returns a string representation of the throughput when processing the
+     * given number of bytes in the given time in milliseconds.
+     */
+    public static String throughput(long length, long deltaMs) {
 
-        if (delta == 0) {
-            return "";
+        if (deltaMs == 0) {
+            return " (" + (length / 1024L) + "kb in < 1 ms)";
         } else {
-            return " (" + (length / 1024L) + "kb in " + delta + " ms at "
-                + (1000L * length / 1024L) / delta + " kb/s)";
+            return " (" + (length / 1024L) + "kb in " + deltaMs + " ms at "
+                + (1000L * length / 1024L) / deltaMs + " kb/s)";
         }
     }
 
     /**
      * Replaces all white-space by spaces and trims white-spaces from the
      * borders of the string
-     *
+     * 
      * Returns null if null is given as a string.
      */
     public static String singleLineString(@Nullable String string) {
@@ -867,7 +871,7 @@ public class Util {
     /**
      * Turn an integer representing a file size into a human readable
      * representation. For instance 573 becomes 573byte, 16787 becomes 16KB.
-     */ 
+     */
     public static String formatByte(long length) {
         if (length < 1 << 13) {
             return length + "byte";
