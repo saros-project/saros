@@ -433,40 +433,63 @@ public class DataTransferManager implements ConnectionSessionListener {
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
 
-        Transmitter[] transmitters = forceFileTransferByChat ? new Transmitter[] { ibb }
-            : new Transmitter[] { jingle, ibb };
-
-        for (Transmitter transmitter : transmitters) {
-
-            if (transmitter.isSuitable(transferData.recipient)) {
-                try {
-
-                    long startTime = System.nanoTime();
-
-                    NetTransferMode mode = transmitter.send(transferData,
-                        content, progress);
-
-                    long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
-
-                    transferModeDispatch.transferFinished(
-                        transferData.recipient, mode, false, content.length,
-                        duration);
-                    return;
-                } catch (CausedIOException e) {
-                    log.error(Util.prefix(transferData.recipient)
-                        + "Failed to send " + transferData + " with "
-                        + transmitter.getName() + ":", e.getCause());
-                } catch (Exception e) {
-                    log.error(Util.prefix(transferData.recipient)
-                        + "Failed to send " + transferData + " with "
-                        + transmitter.getName() + ":", e);
-                    // Try other transport methods
-                }
-            }
+        Transmitter[] transmitters;
+        if (forceFileTransferByChat) {
+            transmitters = new Transmitter[] { ibb };
+        } else {
+            transmitters = new Transmitter[] { jingle, ibb };
         }
 
-        throw new IOException(Util.prefix(transferData.recipient)
-            + "Exhausted all options to send " + transferData);
+        progress.beginTask("Sending Data", transmitters.length);
+
+        try {
+            // Try all transmitters
+            for (Transmitter transmitter : transmitters) {
+                if (sendData(transmitter, transferData, content, progress
+                    .newChild(1))) {
+                    // Successfully sent!
+                    return;
+                }
+            }
+            // No transmitter worked! :-(
+            throw new IOException(Util.prefix(transferData.recipient)
+                + "Exhausted all options to send " + transferData);
+        } finally {
+            progress.done();
+        }
+    }
+
+    /**
+     * Tries to send the given data using the given transmitter returning true
+     * if the transfer was successfully completed, false otherwise.
+     */
+    protected boolean sendData(Transmitter transmitter,
+        TransferDescription transferData, byte[] content, SubMonitor progress) {
+
+        if (!transmitter.isSuitable(transferData.recipient))
+            return false;
+
+        try {
+            long startTime = System.nanoTime();
+
+            NetTransferMode mode = transmitter.send(transferData, content,
+                progress);
+
+            long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
+
+            transferModeDispatch.transferFinished(transferData.recipient, mode,
+                false, content.length, duration);
+            return true;
+        } catch (CausedIOException e) {
+            log.error(Util.prefix(transferData.recipient) + "Failed to send "
+                + transferData + " with " + transmitter.getName() + ":", e
+                .getCause());
+        } catch (Exception e) {
+            log.error(Util.prefix(transferData.recipient) + "Failed to send "
+                + transferData + " with " + transmitter.getName() + ":", e);
+            // Try other transport methods
+        }
+        return false;
     }
 
     /**

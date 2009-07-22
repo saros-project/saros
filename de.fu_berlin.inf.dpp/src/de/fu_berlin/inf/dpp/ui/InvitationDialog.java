@@ -187,7 +187,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                     switch (item.outgoingProcess.getState()) {
                     case SYNCHRONIZING:
                         return "" + (item.progress.worked / 10.0) + "% "
-                            + item.progress.getSubTask();
+                            + Util.singleLineString(item.progress.getSubTask());
                     case CANCELED:
                         return item.error;
                     default:

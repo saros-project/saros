@@ -852,6 +852,19 @@ public class Util {
     }
 
     /**
+     * Replaces all white-space by spaces and trims white-spaces from the
+     * borders of the string
+     *
+     * Returns null if null is given as a string.
+     */
+    public static String singleLineString(@Nullable String string) {
+        if (string == null)
+            return null;
+
+        return string.trim().replaceAll("\\s+", " ");
+    }
+
+    /**
      * Turn an integer representing a file size into a human readable
      * representation. For instance 573 becomes 573byte, 16787 becomes 16KB.
      */ 
