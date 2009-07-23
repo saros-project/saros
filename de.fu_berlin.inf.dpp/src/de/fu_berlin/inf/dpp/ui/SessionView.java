@@ -19,6 +19,9 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.apache.log4j.Logger;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -102,6 +105,24 @@ public class SessionView extends ViewPart {
 
         private TableViewer tableViewer;
 
+        /**
+         * Comparator for comparing users. The host has a lower rank than any
+         * client (compare(host, client) = -1, compare(client, host) = 1.
+         * Clients are compared alphabetically by JID (not case sensitive).
+         */
+        protected Comparator<User> alphabeticalUserComparator = new Comparator<User>() {
+            public int compare(User user1, User user2) {
+                if (user1.equals(user2))
+                    return 0;
+                if (user1.isHost())
+                    return -1;
+                if (user2.isHost())
+                    return +1;
+                return user1.getJID().toString().toLowerCase().compareTo(
+                    user2.getJID().toString().toLowerCase());
+            }
+        };
+
         public void inputChanged(Viewer v, Object oldInput, Object newInput) {
 
             if (oldInput != null) {
@@ -122,12 +143,14 @@ public class SessionView extends ViewPart {
         }
 
         public Object[] getElements(Object parent) {
-            if (SessionView.this.sharedProject != null) {
-                return SessionView.this.sharedProject.getParticipants()
-                    .toArray();
-            }
+            if (SessionView.this.sharedProject == null)
+                return new Object[] {};
 
-            return new Object[] {};
+            User[] participants = SessionView.this.sharedProject
+                .getParticipants().toArray(new User[] {});
+            Arrays.sort(participants, alphabeticalUserComparator);
+
+            return participants;
         }
 
         public void roleChanged(User user) {
