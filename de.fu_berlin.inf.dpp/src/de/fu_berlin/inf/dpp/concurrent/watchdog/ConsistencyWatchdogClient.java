@@ -444,11 +444,6 @@ public class ConsistencyWatchdogClient {
         // Unregister from dataTransferManager
         dataTransferManager.removeDataReceiver(receiver);
 
-        // Send message to host that inconsistency are handled
-        transmitter.sendFileChecksumErrorMessage(Collections
-            .singletonList(sharedProject.getHost().getJID()),
-            pathsOfHandledFiles, true);
-
         // Clear-flag indicating recovery is done
         executingChecksumErrorHandling = false;
     }

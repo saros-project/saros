@@ -230,17 +230,32 @@ public class ConsistencyWatchdogHandler {
         }
         waiting.beginTask("Waiting for peers", 500);
 
-        while (!waiting.isCanceled()
-            && inProgress(pathsOfInconsistencies, from)) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                assert false;
-            }
-        }
-        if (startHandles != null)
+        if (startHandles != null) {
+            /*
+             * We have to start the StartHandle of the inconsistent user first
+             * (blocking!) because otherwise the other participants can be
+             * started before the inconsistent user completely processed the
+             * consistency recovery.
+             */
+            // find the StartHandle of the inconsistent user
+            StartHandle inconsistentStartHandle = null;
+            for (StartHandle startHandle : startHandles)
+                if (from.equals(startHandle.getUser().getJID())) {
+                    inconsistentStartHandle = startHandle;
+                    break;
+                }
+            if (inconsistentStartHandle == null)
+                log
+                    .error("Could not find the StartHandle of the inconsistent user");
+
+            // starting all StartHandles
+            startHandles.remove(inconsistentStartHandle);
+            inconsistentStartHandle.startAndAwait(progress);
             for (StartHandle startHandle : startHandles)
                 startHandle.start();
+
+            closeChecksumErrorMessage(pathsOfInconsistencies, from);
+        }
     }
 
     /**

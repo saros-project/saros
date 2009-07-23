@@ -42,7 +42,7 @@ public class StopManager implements IActivityProvider, Disposable {
     private static Logger log = Logger.getLogger(StopManager.class.getName());
 
     // Waits MILLISTOWAIT ms until the next test for progress cancellation
-    protected final int MILLISTOWAIT = 100;
+    public final int MILLISTOWAIT = 100;
 
     private final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
 
@@ -58,6 +58,13 @@ public class StopManager implements IActivityProvider, Disposable {
      */
     private Map<User, List<StartHandle>> startHandles = Collections
         .synchronizedMap(new HashMap<User, List<StartHandle>>());
+
+    /**
+     * For every initiated unlock (identified by its StopActivity id) there is
+     * one acknowledgment expected.
+     */
+    private Map<String, StartHandle> startsToBeAcknowledged = Collections
+        .synchronizedMap(new HashMap<String, StartHandle>());
 
     // blocking mechanism
     protected Lock reentrantLock = new ReentrantLock();
@@ -156,9 +163,27 @@ public class StopManager implements IActivityProvider, Disposable {
                 if (stopActivity.getState() == State.INITIATED
                     && sharedProject.getUser(stopActivity.getUser()).isLocal()) {
 
-                    return executeUnlock(generateStartHandle(stopActivity));
+                    boolean result = executeUnlock(generateStartHandle(stopActivity));
+                    // sends an acknowledgment
+                    fireActivity(stopActivity
+                        .generateAcknowledgment(sharedProject.getLocalUser()
+                            .getJID().toString()));
+                    return result;
+                }
+
+                if (stopActivity.getState() == State.ACKNOWLEDGED
+                    && sharedProject.getUser(stopActivity.getInitiator())
+                        .isLocal()) {
+                    StartHandle handle = startsToBeAcknowledged
+                        .remove(stopActivity.getActivityID());
+                    if (handle == null) {
+                        log.error("StartHandle for " + stopActivity
+                            + " could not be found.");
+                    }
+                    handle.acknowledge();
                 }
             }
+
             return false;
         }
     };
@@ -379,6 +404,8 @@ public class StopManager implements IActivityProvider, Disposable {
             executeUnlock(handle);
             return;
         }
+
+        startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
         fireActivity(new StopActivity(sharedProject.getLocalUser().getJID()
             .toString(), sharedProject.getLocalUser().getJID(), handle
