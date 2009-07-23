@@ -17,7 +17,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
@@ -291,7 +290,6 @@ public class StopManager implements IActivityProvider, Disposable {
         expectedAcknowledgments.add(expectedAck);
 
         fireActivity(stopActivity);
-        progress.setBlocked(Status.OK_STATUS);
 
         // Block until user acknowledged
         log.debug("Waiting for acknowledgment " + Util.prefix(user.getJID()));
@@ -313,7 +311,6 @@ public class StopManager implements IActivityProvider, Disposable {
             throw new InterruptedException();
         } finally {
             reentrantLock.unlock();
-            progress.clearBlocked();
         }
         return handle;
     }
