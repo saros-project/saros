@@ -25,6 +25,7 @@ import java.util.concurrent.CancellationException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -298,6 +299,15 @@ public class SarosUI {
                     } catch (CancellationException e) {
                         log
                             .warn("Role change failed because user canceled the role change");
+                        Util.runSafeSWTSync(log, new Runnable() {
+                            public void run() {
+                                MessageDialog.openInformation(EditorAPI
+                                    .getAWorkbenchWindow().getShell(),
+                                    "Role change failed",
+                                    "The role change was canceled. "
+                                        + Util.getUserDescription(user));
+                            }
+                        });
                     } catch (InterruptedException e) {
                         log.error("Code not designed to be interruptable", e);
                     } finally {
@@ -307,6 +317,10 @@ public class SarosUI {
             });
         } catch (InvocationTargetException e) {
             log.error("Internal Error: ", e);
+            MessageDialog.openError(EditorAPI.getAWorkbenchWindow().getShell(),
+                "Role change failed",
+                "Role change failed because of an internal error. "
+                    + Util.getUserDescription(user) + " Please try again.");
         } catch (InterruptedException e) {
             log.error("Code not designed to be interruptable", e);
         }

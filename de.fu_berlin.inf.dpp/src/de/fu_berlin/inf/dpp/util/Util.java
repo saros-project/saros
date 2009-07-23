@@ -572,6 +572,17 @@ public class Util {
     }
 
     /**
+     * @return a full sentence which describes the role of the given user, e.g.
+     *         "You are driver."
+     */
+    public static String getUserDescription(User user) {
+        if (user.isLocal())
+            return ("You are " + user.getUserRole().toString().toLowerCase() + ".");
+        return (user.getHumanReadableName() + " is "
+            + user.getUserRole().toString().toLowerCase() + ".");
+    }
+
+    /**
      * @swt Needs to be called from the SWT-UI thread, otherwise
      *      <code>null</code> is returned.
      */
