@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
@@ -64,11 +65,18 @@ public interface ISharedProject extends IActivityListener {
      * Initiates a role change. This method is called when the user wants to
      * change user roles via the UI.
      * 
-     * @swt This method needs to be called from the SWT UI thread
+     * @host This method may only called by the host.
+     * @noSWT This method mustn't be called from the SWT UI thread
      * @param user
-     *            the user which role has to be changed.
+     *            The user which role has to be changed.
+     * @blocking Returning after the role change is complete
+     * @cancelable
+     * 
+     * @Throws CancellationException
+     * @Throws InterruptedException
      */
-    public void initiateRoleChange(User user, UserRole newRole);
+    public void initiateRoleChange(User user, UserRole newRole,
+        SubMonitor progress) throws CancellationException, InterruptedException;
 
     /**
      * Set the role of the given user. This is called on incoming activities

@@ -27,6 +27,9 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
 
     protected User selectedUser;
 
+    @Inject
+    protected SarosUI sarosUI;
+
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
         @Override
@@ -69,7 +72,7 @@ public class GiveDriverRoleAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sessionManager.getSharedProject().initiateRoleChange(
+                sarosUI.performRoleChange(
                     GiveDriverRoleAction.this.selectedUser, UserRole.DRIVER);
             }
         });

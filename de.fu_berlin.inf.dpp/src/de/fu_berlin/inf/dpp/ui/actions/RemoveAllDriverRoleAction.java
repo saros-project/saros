@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.ui.actions;
 
 import org.apache.log4j.Logger;
 import org.eclipse.jface.action.Action;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
@@ -49,6 +50,9 @@ public class RemoveAllDriverRoleAction extends Action {
 
     private static final Logger log = Logger
         .getLogger(RemoveAllDriverRoleAction.class.getName());
+
+    @Inject
+    protected SarosUI sarosUI;
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
         @Override
@@ -103,7 +107,7 @@ public class RemoveAllDriverRoleAction extends Action {
         ISharedProject project = sessionManager.getSharedProject();
         for (User user : project.getParticipants()) {
             if (user.isDriver()) {
-                project.initiateRoleChange(user, UserRole.OBSERVER);
+                sarosUI.performRoleChange(user, UserRole.OBSERVER);
             }
         }
         updateEnablement();

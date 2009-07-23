@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
@@ -24,6 +25,9 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         .getLogger(GiveExclusiveDriverRoleAction.class.getName());
 
     protected User selectedUser;
+
+    @Inject
+    protected SarosUI sarosUI;
 
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
@@ -81,13 +85,13 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
         // set all participants other than the selected to observer
         for (User user : project.getParticipants()) {
             if ((user.isDriver() && !user.equals(this.selectedUser))) {
-                project.initiateRoleChange(user, UserRole.OBSERVER);
+                sarosUI.performRoleChange(user, UserRole.OBSERVER);
             }
         }
 
         // if selected user is not already driver give him driver role
         if (this.selectedUser.isObserver())
-            project.initiateRoleChange(this.selectedUser, UserRole.DRIVER);
+            sarosUI.performRoleChange(this.selectedUser, UserRole.DRIVER);
     }
 
     @Override

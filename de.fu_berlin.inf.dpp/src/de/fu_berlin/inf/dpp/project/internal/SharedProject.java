@@ -28,8 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
@@ -193,13 +191,13 @@ public class SharedProject implements ISharedProject, Disposable {
 
     /**
      * {@inheritDoc}
+     * 
+     * @throws InterruptedException
+     * @throws CancellationException
      */
-    public void initiateRoleChange(final User user, final UserRole newRole) {
-        assert localUser.isHost() : "Only the host can initiate role changes";
-
-        // TODO open a progress dialog for offering the possibility to cancel
-        final SubMonitor progress = SubMonitor
-            .convert(new NullProgressMonitor());
+    public void initiateRoleChange(final User user, final UserRole newRole,
+        SubMonitor progress) throws CancellationException, InterruptedException {
+        assert localUser.isHost() : "Only the host can initiate role changes.";
 
         if (user.isHost()) {
             activityCreated(new RoleActivity(
@@ -208,35 +206,18 @@ public class SharedProject implements ISharedProject, Disposable {
 
             setUserRole(user, newRole);
         } else {
+            StartHandle startHandle = stopManager.stop(user,
+                "Performing role change", progress);
 
-            Util.runSafeAsync(log, new Runnable() {
-                public void run() {
-                    try {
-                        progress.beginTask("Performing role change",
-                            IProgressMonitor.UNKNOWN);
-                        StartHandle startHandle = stopManager.stop(user,
-                            "Performing role change", progress);
+            activityCreated(new RoleActivity(
+                getLocalUser().getJID().toString(), user.getJID().toString(),
+                newRole));
 
-                        activityCreated(new RoleActivity(getLocalUser()
-                            .getJID().toString(), user.getJID().toString(),
-                            newRole));
+            setUserRole(user, newRole);
 
-                        setUserRole(user, newRole);
-
-                        if (!startHandle.start())
-                            log
-                                .warn("Didn't unblock. There still exist unstarted StartHandles.");
-                    } catch (CancellationException e) {
-                        log
-                            .warn("Role change failed because user canceled the role change");
-                    } catch (InterruptedException e) {
-                        log
-                            .warn("Role change failed because of an InterruptedException");
-                    } finally {
-                        progress.done();
-                    }
-                }
-            });
+            if (!startHandle.start())
+                log
+                    .error("Didn't unblock. There still exist unstarted StartHandles.");
         }
     }
 

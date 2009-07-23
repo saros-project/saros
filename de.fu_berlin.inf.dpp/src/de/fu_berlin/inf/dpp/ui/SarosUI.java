@@ -19,7 +19,14 @@
  */
 package de.fu_berlin.inf.dpp.ui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CancellationException;
+
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -36,7 +43,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
+import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -73,8 +82,12 @@ public class SarosUI {
     @Inject
     protected Saros saros;
 
+    protected SessionManager sessionManager;
+
     public SarosUI(SessionManager sessionManager, JDTFacade jdtFacade,
         CDTFacade cdtFacade) {
+
+        this.sessionManager = sessionManager;
 
         // It would be nice to eliminate these, because they cause dependencies
         // to the JDT and CDT, but they are necessary to prevent Observers
@@ -261,4 +274,41 @@ public class SarosUI {
             "de.fu_berlin.inf.dpp", path);
     }
 
+    /**
+     * @swt
+     */
+    public void performRoleChange(final User user, final UserRole newRole) {
+        ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
+            .getAWorkbenchWindow().getShell());
+
+        try {
+            dialog.run(true, true, new IRunnableWithProgress() {
+                public void run(final IProgressMonitor monitor) {
+
+                    final SubMonitor progress = SubMonitor.convert(monitor);
+
+                    try {
+
+                        progress.beginTask("Performing role change",
+                            IProgressMonitor.UNKNOWN);
+
+                        sessionManager.getSharedProject().initiateRoleChange(
+                            user, newRole, progress);
+
+                    } catch (CancellationException e) {
+                        log
+                            .warn("Role change failed because user canceled the role change");
+                    } catch (InterruptedException e) {
+                        log.error("Code not designed to be interruptable", e);
+                    } finally {
+                        progress.done();
+                    }
+                }
+            });
+        } catch (InvocationTargetException e) {
+            log.error("Internal Error: ", e);
+        } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
+        }
+    }
 }

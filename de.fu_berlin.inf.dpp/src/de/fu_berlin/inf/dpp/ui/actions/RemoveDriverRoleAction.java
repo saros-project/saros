@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
+import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
@@ -24,6 +25,9 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
         .getLogger(RemoveDriverRoleAction.class.getName());
 
     protected User selectedUser;
+
+    @Inject
+    protected SarosUI sarosUI;
 
     protected ISharedProjectListener projectListener = new AbstractSharedProjectListener() {
 
@@ -74,8 +78,7 @@ public class RemoveDriverRoleAction extends SelectionProviderAction {
 
     public void runRemoveDriver() {
         if (selectedUser.isDriver()) {
-            sessionManager.getSharedProject().initiateRoleChange(selectedUser,
-                UserRole.OBSERVER);
+            sarosUI.performRoleChange(selectedUser, UserRole.OBSERVER);
         } else {
             log.warn("User is no driver: " + selectedUser);
         }
