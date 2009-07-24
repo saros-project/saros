@@ -19,7 +19,6 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This manager is responsible for handling driver changes.
@@ -43,19 +42,20 @@ public class RoleManager implements IActivityProvider {
              * session view open.
              */
             SessionView.showNotification("Role changed", String.format(
-                "%s %s now %s of this session.", Util.getName(saros, user),
+                "%s %s now %s of this session.", user.getHumanReadableName(),
                 user.isLocal() ? "are" : "is", user.isDriver() ? "a driver"
                     : "an observer"));
         }
 
         public void userJoined(User user) {
-            SessionView.showNotification("User joined", Util.getName(saros,
-                user)
+            SessionView.showNotification("User joined", user
+                .getHumanReadableName()
                 + " joined the session.");
         }
 
         public void userLeft(User user) {
-            SessionView.showNotification("User left", Util.getName(saros, user)
+            SessionView.showNotification("User left", user
+                .getHumanReadableName()
                 + " left the session.");
         }
     };

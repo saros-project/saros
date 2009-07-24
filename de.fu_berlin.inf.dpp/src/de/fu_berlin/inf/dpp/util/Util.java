@@ -549,29 +549,6 @@ public class Util {
     }
 
     /**
-     * Gets the name for a {@link User} for displaying.
-     * 
-     * If <i>participant</i> is the local user "You" is returned, otherwise the
-     * nickname, if available, and the JID. If no nickname is known, only the
-     * JID is returned.
-     */
-    public static String getName(Saros saros, User participant) {
-
-        if (participant.isLocal()) {
-            return "You";
-        }
-
-        String nickName = getNickname(saros, participant.getJID());
-        String jidBase = participant.getJID().getBase();
-
-        if (nickName != null && nickName.trim().length() > 0) {
-            return nickName + " (" + jidBase + ")";
-        }
-
-        return jidBase;
-    }
-
-    /**
      * @return a full sentence which describes the role of the given user, e.g.
      *         "You are driver."
      */

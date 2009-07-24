@@ -224,6 +224,13 @@ public class User {
         return !isHost();
     }
 
+    /**
+     * Gets the name for a {@link User} for displaying.
+     * 
+     * If <i>participant</i> is the local user "You" is returned, otherwise the
+     * nickname, if available, and the JID. If no nickname is known, only the
+     * JID is returned.
+     */
     public String getHumanReadableName() {
 
         if (isLocal()) {

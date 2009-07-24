@@ -190,7 +190,7 @@ public class SessionView extends ViewPart {
 
             User participant = (User) obj;
 
-            return Util.getName(saros, participant)
+            return participant.getHumanReadableName()
                 + (participant.isDriver() ? " (Driver)" : "");
         }
 
