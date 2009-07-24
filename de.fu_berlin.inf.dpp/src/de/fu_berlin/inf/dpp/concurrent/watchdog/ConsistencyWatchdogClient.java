@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +28,6 @@ import org.picocontainer.annotations.Inject;
 
 import bmsi.util.Diff;
 import bmsi.util.DiffPrint;
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
@@ -295,14 +293,6 @@ public class ConsistencyWatchdogClient {
      */
     public Set<IPath> getPathsWithWrongChecksums() {
         return this.pathsWithWrongChecksums;
-    }
-
-    public List<JID> getParticipants() {
-        ArrayList<JID> result = new ArrayList<JID>();
-        for (User user : sharedProject.getParticipants()) {
-            result.add(user.getJID());
-        }
-        return result;
     }
 
     public ConsistencyWatchdogClient(SessionManager sessionManager) {
