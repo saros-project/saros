@@ -12,12 +12,12 @@
             icon="icons/group.png"
             id="de.fu_berlin.inf.dpp.ui.RosterView"
             name="Roster"/>
-      <view
+     <!--<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.SessionView"
             icon="icons/transmit.png"
             id="de.fu_berlin.inf.dpp.ui.SessionView"
-            name="Saros Session"/>
+            name="Saros Session"/>-->
 	 <!--<view
             category="Saros"
             class="de.fu_berlin.inf.dpp.ui.NetworkView"
