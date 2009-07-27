@@ -485,6 +485,47 @@ public class ActivitySequencer {
                     execQueue();
                 }
             }
+
+            /**
+             * Sends given activities to given recipient.
+             * 
+             * @private because this method must not be called from somewhere
+             *          else than this TimerTask.
+             * 
+             * @throws IllegalArgumentException
+             *             if the recipient is the local user or the activities
+             *             contain <code>null</code>.
+             */
+            private void sendActivities(User recipient,
+                List<IActivity> activities) {
+
+                if (recipient.isLocal() || activities.contains(null)) {
+                    throw new IllegalArgumentException();
+                }
+
+                setSenderOnTextEditActivities(activities);
+
+                JID recipientJID = recipient.getJID();
+                ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
+                    activities.size());
+                List<TimedActivity> timedActivities = createTimedActivities(
+                    recipientJID, activities);
+                for (TimedActivity timedActivity : timedActivities) {
+
+                    // Check each activity if it is a file creation which will
+                    // be
+                    // send asynchronous, and collect all others in stillToSend.
+                    // TODO boolean methods with side effects are bad style
+                    if (!ifFileCreateSendAsync(recipientJID, timedActivity)) {
+                        stillToSend.add(timedActivity);
+                    }
+                }
+                if (!stillToSend.isEmpty()) {
+                    transmitter.sendTimedActivities(recipientJID, stillToSend);
+                }
+                log.debug("Sent Activities to " + recipientJID + ": "
+                    + timedActivities);
+            }
         }, 0, MILLIS_UPDATE);
     }
 
@@ -546,45 +587,6 @@ public class ActivitySequencer {
             activities.add(timedActivity.getActivity());
         }
         sharedProject.exec(activities);
-    }
-
-    /**
-     * Sends given activities to given recipient.
-     * 
-     * @throws IllegalArgumentException
-     *             if the recipient is the local user or the activities contain
-     *             <code>null</code>.
-     * 
-     *             TODO From which thread can this method be called?
-     */
-    protected void sendActivities(User recipient, List<IActivity> activities) {
-
-        if (recipient.isLocal() || activities.contains(null)) {
-            throw new IllegalArgumentException();
-        }
-
-        setSenderOnTextEditActivities(activities);
-
-        JID recipientJID = recipient.getJID();
-        ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
-            activities.size());
-        List<TimedActivity> timedActivities = createTimedActivities(
-            recipientJID, activities);
-        for (TimedActivity timedActivity : timedActivities) {
-
-            // Check each activity if it is a file creation which will be
-            // send asynchronous, and collect all others in stillToSend.
-            // TODO boolean methods with side effects are bad style
-            if (!ifFileCreateSendAsync(recipientJID, timedActivity)) {
-                stillToSend.add(timedActivity);
-            }
-        }
-        if (!stillToSend.isEmpty()) {
-            transmitter.sendTimedActivities(recipientJID, stillToSend);
-        }
-        log
-            .debug("Sent Activities to " + recipientJID + ": "
-                + timedActivities);
     }
 
     /**
