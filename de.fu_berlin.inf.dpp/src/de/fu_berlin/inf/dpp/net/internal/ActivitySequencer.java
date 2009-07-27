@@ -100,18 +100,26 @@ public class ActivitySequencer {
         /** How long to wait until ignore missing activities in milliseconds. */
         protected static final long ACTIVITY_TIMEOUT = 30 * 1000;
 
+        /**
+         * Sequence numbers for outgoing and incoming activities start with this
+         * value.
+         */
+        protected static final int FIRST_SEQUENCE_NUMBER = 0;
+
         /** This {@link ActivityQueue} is for this user. */
         protected final JID jid;
 
         /** Sequence number this user sends next. */
-        protected int nextSequenceNumber = 0;
+        protected int nextSequenceNumber = FIRST_SEQUENCE_NUMBER;
 
         /** Sequence number expected from the next activity. */
-        protected int expectedSequenceNumber = 0;
+        protected int expectedSequenceNumber = FIRST_SEQUENCE_NUMBER;
 
         /**
          * Oldest local timestamp for the queued activities or 0 if there are no
          * activities queued.
+         * 
+         * TODO Is this documentation correct?
          */
         protected long oldestLocalTimestamp = Long.MAX_VALUE;
 
@@ -193,7 +201,7 @@ public class ActivitySequencer {
          *         sequence number, otherwise <code>null</code>.
          */
         public TimedActivity removeNext() {
-            if (queuedActivities.size() > 0
+            if (!queuedActivities.isEmpty()
                 && queuedActivities.peek().getSequenceNumber() == expectedSequenceNumber) {
 
                 expectedSequenceNumber++;
@@ -211,12 +219,13 @@ public class ActivitySequencer {
          * expected sequence number.
          */
         public void checkForMissingActivities() {
-            if (queuedActivities.size() == 0) {
+            if (queuedActivities.isEmpty()) {
                 return;
             }
             int firstQueuedSequenceNumber = queuedActivities.peek()
                 .getSequenceNumber();
-            if (expectedSequenceNumber >= firstQueuedSequenceNumber) {
+            if (expectedSequenceNumber != FIRST_SEQUENCE_NUMBER
+                && expectedSequenceNumber >= firstQueuedSequenceNumber) {
 
                 log.error("Expected activity #" + expectedSequenceNumber
                     + " >= first queued #" + firstQueuedSequenceNumber);
