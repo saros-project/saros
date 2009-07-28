@@ -191,15 +191,15 @@ public class FileUtil {
     }
 
     /**
-     * Makes sure that the parent directories of the given IFile exist, possibly
-     * removing write protection.
+     * Makes sure that the parent directories of the given IResource exist,
+     * possibly removing write protection.
      */
-    public static boolean mkdirs(IFile file) {
+    public static boolean mkdirs(IResource resource) {
 
-        if (file == null)
+        if (resource == null)
             return true;
 
-        IFolder parent = getParentFolder(file);
+        IFolder parent = getParentFolder(resource);
         if (parent == null || parent.exists())
             return true;
 
