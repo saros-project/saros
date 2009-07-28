@@ -11,7 +11,7 @@ import com.thoughtworks.xstream.annotations.XStreamOmitField;
 @XStreamAlias("fileActivity")
 public class FileActivity extends AbstractActivity {
     public static enum Type {
-        Created, Removed
+        Created, Removed, Moved
     }
 
     @XStreamAsAttribute
@@ -19,6 +19,9 @@ public class FileActivity extends AbstractActivity {
 
     @XStreamAsAttribute
     private final IPath path;
+
+    @XStreamAsAttribute
+    private IPath oldPath;
 
     @XStreamOmitField
     private InputStream inputStream;
@@ -44,8 +47,25 @@ public class FileActivity extends AbstractActivity {
         this.inputStream = in;
     }
 
+    /**
+     * Constructor for moved files.
+     * 
+     * @param oldPath
+     *            path where the file moved from
+     * @param newPath
+     *            path where the file moved to
+     */
+    public FileActivity(String source, IPath oldPath, IPath newPath) {
+        this(source, Type.Moved, newPath);
+        this.oldPath = oldPath;
+    }
+
     public IPath getPath() {
         return this.path;
+    }
+
+    public IPath getOldPath() {
+        return this.oldPath;
     }
 
     public Type getType() {
@@ -62,13 +82,17 @@ public class FileActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "FileActivity(type:" + this.type + ",path:" + this.path + ")";
+        if (type == Type.Moved)
+            return "FileActivity(type: Moved, old path: " + this.oldPath
+                + ", new path: " + this.path + ")";
+        return "FileActivity(type: " + this.type + ", path: " + this.path + ")";
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
+        result = prime * result + ((oldPath == null) ? 0 : oldPath.hashCode());
         result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
@@ -80,9 +104,14 @@ public class FileActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof FileActivity))
+        if (getClass() != obj.getClass())
             return false;
         FileActivity other = (FileActivity) obj;
+        if (oldPath == null) {
+            if (other.oldPath != null)
+                return false;
+        } else if (!oldPath.equals(other.oldPath))
+            return false;
         if (path == null) {
             if (other.path != null)
                 return false;
