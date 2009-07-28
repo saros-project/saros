@@ -227,9 +227,9 @@ public class User {
     /**
      * Gets the name for a {@link User} for displaying.
      * 
-     * If <i>participant</i> is the local user "You" is returned, otherwise the
-     * nickname, if available, and the JID. If no nickname is known, only the
-     * JID is returned.
+     * If this is the local user "You" is returned, otherwise the nickname, if
+     * available and distinct from the JID, and the JID. If no nickname is
+     * known, only the JID is returned.
      */
     public String getHumanReadableName() {
 
@@ -245,7 +245,7 @@ public class User {
             getJID());
         String jidBase = getJID().getBase();
 
-        if (nickName != null && nickName.trim().length() > 0) {
+        if (nickName != null && !nickName.equals(jidBase)) {
             return nickName + " (" + jidBase + ")";
         }
 
