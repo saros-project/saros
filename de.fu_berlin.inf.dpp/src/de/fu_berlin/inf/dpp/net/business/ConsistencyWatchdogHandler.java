@@ -57,8 +57,6 @@ public class ConsistencyWatchdogHandler {
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogHandler.class.getName());
 
-    protected long lastReceivedActivityTime;
-
     protected HashMap<Pair<String, JID>, ProgressMonitorDialog> actualChecksumErrorDialogs = new HashMap<Pair<String, JID>, ProgressMonitorDialog>();
 
     @Inject
@@ -266,35 +264,11 @@ public class ConsistencyWatchdogHandler {
     protected void performConsistencyRecovery(JID from, Set<IPath> paths,
         SubMonitor progress) {
 
-        progress.beginTask("Performing Consistency Recovery", paths.size() + 3);
-
-        progress.subTask("Wait for clients to stop");
-        waitForIncomingActivities(progress.newChild(3));
-
+        progress.beginTask("Performing Consistency Recovery", paths.size());
         progress.subTask("Sending files");
+
         recoverFiles(from, paths, progress.newChild(paths.size()));
 
-        progress.done();
-    }
-
-    protected void waitForIncomingActivities(SubMonitor progress) {
-
-        progress.beginTask("Waiting for clients to stop", 20);
-
-        // wait until no more activities are received
-        while (System.currentTimeMillis() - lastReceivedActivityTime < 1500) {
-
-            // Grow logarithmically
-            progress.setWorkRemaining(20);
-            progress.worked(1);
-
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                log.error("Code not designed to be interruptable", e);
-                Thread.currentThread().interrupt();
-            }
-        }
         progress.done();
     }
 
@@ -391,13 +365,7 @@ public class ConsistencyWatchdogHandler {
     PacketListener listener = new PacketListener() {
 
         public void processPacket(Packet packet) {
-            Message message = (Message) packet;
-
             handler.processPacket(packet);
-
-            if (PacketExtensionUtils.containsJupiterActivity(message)) {
-                lastReceivedActivityTime = System.currentTimeMillis();
-            }
         }
     };
 
