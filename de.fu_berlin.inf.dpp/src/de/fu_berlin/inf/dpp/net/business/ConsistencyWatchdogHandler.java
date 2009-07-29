@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.net.business;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -122,7 +123,7 @@ public class ConsistencyWatchdogHandler {
             log.debug("Received Checksum Error from [" + from + "] for "
                 + pathsOfInconsistencies);
 
-            showChecksumErrorMessage(pathsOfInconsistencies, from, paths);
+            startRecovery(pathsOfInconsistencies, from, paths);
         }
     }
 
@@ -142,9 +143,8 @@ public class ConsistencyWatchdogHandler {
      * @see #closeChecksumErrorMessage(String, JID)
      * 
      */
-    protected void showChecksumErrorMessage(
-        final String pathsOfInconsistencies, final JID from,
-        final Set<IPath> paths) {
+    protected void startRecovery(final String pathsOfInconsistencies,
+        final JID from, final Set<IPath> paths) {
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -345,7 +345,7 @@ public class ConsistencyWatchdogHandler {
      * The string representation must be the same which are used to show the
      * message with <code>showChecksumErrorMessage</code>.
      * 
-     * @see #showChecksumErrorMessage(String, JID, Set)
+     * @see #startRecovery(String, JID, Set)
      * 
      * @param from
      *            JID of user who had the inconsistencies
@@ -369,4 +369,21 @@ public class ConsistencyWatchdogHandler {
         }
     };
 
+    /**
+     * Runs a consistency recovery for the given IPath and the given JID
+     * 
+     * @param inconsistentJID
+     *            JID of the user having inconsistencies
+     * @param path
+     *            of the inconsistent resource
+     * 
+     * @host
+     */
+    public void runRecoveryForPath(final JID inconsistentJID, final IPath path) {
+
+        Set<IPath> paths = Collections.singleton(path);
+        final String pathsOfInconsistencies = Util.toOSString(paths);
+
+        startRecovery(pathsOfInconsistencies, inconsistentJID, paths);
+    }
 }
