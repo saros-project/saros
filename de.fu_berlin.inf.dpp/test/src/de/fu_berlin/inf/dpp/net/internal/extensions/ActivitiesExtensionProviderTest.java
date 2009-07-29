@@ -122,8 +122,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             EditorActivity.Type.Activated, null);
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>(2);
-        timedActivities.add(new TimedActivity(activity, 20));
-        timedActivities.add(new TimedActivity(activity, 22));
+        timedActivities.add(new TimedActivity(activity, jid, 20));
+        timedActivities.add(new TimedActivity(activity, jid, 22));
 
         ActivitiesPacketExtension extension = new ActivitiesPacketExtension(
             "Session-ID", timedActivities);
@@ -138,7 +138,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected ActivitiesPacketExtension createPacketExtension(IActivity activity) {
         return new ActivitiesPacketExtension("4711", Collections
-            .singletonList(new TimedActivity(activity, 42)));
+            .singletonList(new TimedActivity(activity, new JID(activity
+                .getSource()), 42)));
     }
 
     protected PacketExtension parseExtension(String xml)

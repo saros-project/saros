@@ -24,14 +24,12 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * An immutable text activity.
@@ -56,20 +54,8 @@ public class TextEditActivity extends AbstractActivity {
     @XStreamAsAttribute
     protected final IPath editor;
 
-    @XStreamAsAttribute
-    @XStreamConverter(UrlEncodingStringConverter.class)
-    protected String sender;
-
     public IPath getEditor() {
         return this.editor;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
-    }
-
-    public String getSender() {
-        return this.sender;
     }
 
     /**

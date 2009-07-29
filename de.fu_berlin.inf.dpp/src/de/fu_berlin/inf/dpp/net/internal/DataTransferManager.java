@@ -613,7 +613,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             // Otherwise
             TimedActivity timedActivity = new TimedActivity(new FileActivity(
-                from.toString(), path, input), sequenceNumber);
+                from.toString(), path, input), from, sequenceNumber);
 
             try {
                 chatTransmitter.receiveActivities(from, Collections

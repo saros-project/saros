@@ -86,12 +86,12 @@ public class Jupiter implements Algorithm {
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateJupiterActivity(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation,
      *      de.fu_berlin.inf.dpp.net.JID, IPath)
      */
-    public JupiterActivity generateJupiterActivity(Operation op, JID jid,
+    public JupiterActivity generateJupiterActivity(Operation op, JID originator,
         IPath editor) {
 
         // send(op, myMsgs, otherMsgs);
         JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime,
-            op, jid, editor);
+            op, originator, editor);
 
         // add(op, myMsgs) to outgoing;
         this.ackJupiterActivityList.add(new OperationWrapper(op,

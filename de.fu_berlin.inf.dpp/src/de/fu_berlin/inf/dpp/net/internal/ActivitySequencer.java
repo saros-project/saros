@@ -144,7 +144,7 @@ public class ActivitySequencer {
          */
         public TimedActivity createTimedActivity(IActivity activity) {
 
-            TimedActivity result = new TimedActivity(activity,
+            TimedActivity result = new TimedActivity(activity, localJID,
                 nextSequenceNumber++);
             history.add(result);
             return result;
@@ -302,24 +302,7 @@ public class ActivitySequencer {
          *             if the source of the activity is <code>null</code>.
          */
         public void add(TimedActivity timedActivity) {
-            String source;
-
-            // HACK In TextEditActivities the source and the sender differ if
-            // they are gone through Jupiter on the host side.
-            IActivity activity = timedActivity.getActivity();
-            if (activity instanceof TextEditActivity) {
-                TextEditActivity textEditActivity = (TextEditActivity) activity;
-                source = textEditActivity.getSender();
-            } else {
-                source = timedActivity.getSource();
-            }
-
-            if (source == null) {
-                throw new IllegalArgumentException(
-                    "Source of activity must not be null");
-            }
-
-            getActivityQueue(new JID(source)).add(timedActivity);
+            getActivityQueue(timedActivity.getSender()).add(timedActivity);
         }
 
         /**
@@ -402,6 +385,8 @@ public class ActivitySequencer {
 
     protected final ITransmitter transmitter;
 
+    protected final JID localJID;
+
     protected final DataTransferManager transferManager;
 
     /**
@@ -421,6 +406,8 @@ public class ActivitySequencer {
         this.sharedProject = sharedProject;
         this.transmitter = transmitter;
         this.transferManager = transferManager;
+
+        this.localJID = sharedProject.getLocalUser().getJID();
     }
 
     /**
@@ -500,8 +487,6 @@ public class ActivitySequencer {
                     throw new IllegalArgumentException();
                 }
 
-                setSenderOnTextEditActivities(activities);
-
                 JID recipientJID = recipient.getJID();
                 ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
                     activities.size());
@@ -517,11 +502,11 @@ public class ActivitySequencer {
                         stillToSend.add(timedActivity);
                     }
                 }
+                log.trace("Sending Activities to " + recipientJID + ": "
+                    + timedActivities);
                 if (!stillToSend.isEmpty()) {
                     transmitter.sendTimedActivities(recipientJID, stillToSend);
                 }
-                log.debug("Sent Activities to " + recipientJID + ": "
-                    + timedActivities);
             }
         }, 0, MILLIS_UPDATE);
     }
@@ -584,20 +569,6 @@ public class ActivitySequencer {
             activities.add(timedActivity.getActivity());
         }
         sharedProject.exec(activities);
-    }
-
-    /**
-     * Sets sender on {@link TextEditActivity}s.
-     */
-    private void setSenderOnTextEditActivities(List<IActivity> activities) {
-        String sender = sharedProject.getLocalUser().getJID().toString();
-        for (IActivity activity : activities) {
-            if (activity instanceof TextEditActivity) {
-                TextEditActivity textEditActivity = (TextEditActivity) activity;
-                textEditActivity.setSender(sender);
-                assert textEditActivity.getSource() != null;
-            }
-        }
     }
 
     /**

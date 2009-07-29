@@ -110,17 +110,22 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager, IProject project,
-        StopManager stopManager) {
+        StopManager stopManager, JID myJID, int myColorID) {
 
-        assert (transmitter != null);
+        assert transmitter != null;
+
+        assert myJID != null;
 
         this.saros = saros;
         this.transmitter = transmitter;
         this.project = project;
         this.transferManager = transferManager;
+        this.stopManager = stopManager;
+
+        this.localUser = new User(this, myJID, myColorID);
         this.activitySequencer = new ActivitySequencer(this, transmitter,
             transferManager);
-        this.stopManager = stopManager;
+
         stopManager.addBlockable(stopManagerListener);
     }
 
@@ -131,13 +136,10 @@ public class SharedProject implements ISharedProject, Disposable {
         DataTransferManager transferManager, IProject project, JID myID,
         StopManager stopManager) {
 
-        this(saros, transmitter, transferManager, project, stopManager);
-        assert (myID != null);
+        this(saros, transmitter, transferManager, project, stopManager, myID, 0);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
-
-        this.localUser = new User(this, myID, 0);
-        localUser.setUserRole(UserRole.DRIVER);
+        this.localUser.setUserRole(UserRole.DRIVER);
         this.host = localUser;
 
         this.participants.put(this.host.getJID(), this.host);
@@ -156,12 +158,11 @@ public class SharedProject implements ISharedProject, Disposable {
         DataTransferManager transferManager, IProject project, JID myID,
         JID hostID, int myColorID, StopManager stopManager) {
 
-        this(saros, transmitter, transferManager, project, stopManager);
+        this(saros, transmitter, transferManager, project, stopManager, myID,
+            myColorID);
 
         this.host = new User(this, hostID, 0);
         this.host.setUserRole(UserRole.DRIVER);
-
-        this.localUser = new User(this, myID, myColorID);
 
         this.participants.put(hostID, host);
         this.participants.put(myID, localUser);

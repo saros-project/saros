@@ -32,6 +32,11 @@ public class TimedActivity implements Comparable<TimedActivity> {
     protected long localTimestamp = 0;
 
     /**
+     * The JID of the user who sent this TimedActivity
+     */
+    protected final JID sender;
+
+    /**
      * Constructs a new TimedActivity.
      * 
      * @param activity
@@ -43,8 +48,11 @@ public class TimedActivity implements Comparable<TimedActivity> {
      *             if activity is <code>null</code> or the sequence number is
      *             {@link TimedActivity#UNKNOWN_SEQUENCE_NR}.
      */
-    public TimedActivity(IActivity activity, int sequenceNumber) {
+    public TimedActivity(IActivity activity, JID sender, int sequenceNumber) {
 
+        if (sender == null) {
+            throw new IllegalArgumentException("Source cannot be null");
+        }
         if (activity == null) {
             throw new IllegalArgumentException("Activity cannot be null");
         }
@@ -54,6 +62,7 @@ public class TimedActivity implements Comparable<TimedActivity> {
         }
 
         this.activity = activity;
+        this.sender = sender;
         this.sequenceNumber = sequenceNumber;
     }
 
@@ -65,10 +74,13 @@ public class TimedActivity implements Comparable<TimedActivity> {
     }
 
     /**
-     * @return the source of the activity.
+     * @return the user who sent this time activity
+     * 
+     *         CAUTION: The Source of the activity contained in this timed
+     *         activity might be somebody else.
      */
-    public String getSource() {
-        return this.activity.getSource();
+    public JID getSender() {
+        return this.sender;
     }
 
     /**

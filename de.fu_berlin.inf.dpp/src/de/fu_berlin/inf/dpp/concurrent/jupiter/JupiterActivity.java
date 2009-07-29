@@ -27,9 +27,9 @@ public class JupiterActivity extends AbstractActivity {
     @XStreamAsAttribute
     private IPath editor;
 
-    public JupiterActivity(Timestamp timestamp, Operation operation, JID jid,
+    public JupiterActivity(Timestamp timestamp, Operation operation, JID source,
         IPath editor) {
-        super(jid.toString());
+        super(source.toString());
         this.timestamp = timestamp;
         this.operation = operation;
         this.editor = editor;
