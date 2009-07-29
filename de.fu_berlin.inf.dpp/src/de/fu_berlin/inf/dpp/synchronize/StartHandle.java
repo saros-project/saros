@@ -55,6 +55,7 @@ public class StartHandle {
         stopManager.removeStartHandle(this);
 
         if (stopManager.noStartHandlesFor(user)) {
+            // FIXME Race Condition: What happens if stop is called in this time?
             stopManager.initiateUnlock(this);
             return true;
         }
@@ -85,6 +86,7 @@ public class StartHandle {
         stopManager.removeStartHandle(this);
 
         if (stopManager.noStartHandlesFor(user)) {
+            // same Race Condition as in start
             stopManager.initiateUnlock(this);
 
             lock.lock();

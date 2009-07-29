@@ -215,9 +215,9 @@ public class ConsistencyWatchdogHandler {
         List<StartHandle> startHandles = null;
 
         if (sessionManager.getSharedProject().isHost()) {
-            progress.beginTask("Performing recovery", 1000);
+            progress.beginTask("Performing recovery", 1200);
             startHandles = stopManager.stop(sessionManager.getSharedProject()
-                .getParticipants(), "Consistency recovery", progress);
+                .getParticipants(), "Consistency recovery", progress.newChild(200));
             progress.subTask("Send files to clients");
             performConsistencyRecovery(from, paths, progress.newChild(700));
 
@@ -245,10 +245,11 @@ public class ConsistencyWatchdogHandler {
             if (inconsistentStartHandle == null)
                 log
                     .error("Could not find the StartHandle of the inconsistent user");
-
-            // starting all StartHandles
-            startHandles.remove(inconsistentStartHandle);
-            inconsistentStartHandle.startAndAwait(progress);
+            else {
+                inconsistentStartHandle.startAndAwait(progress);
+                startHandles.remove(inconsistentStartHandle);
+            }
+                       
             for (StartHandle startHandle : startHandles)
                 startHandle.start();
 

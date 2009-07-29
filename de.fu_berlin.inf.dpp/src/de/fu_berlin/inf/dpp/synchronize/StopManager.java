@@ -227,6 +227,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     try {
                         StartHandle startHandle = stop(user, cause, SubMonitor
                             .convert(new NullProgressMonitor()));
+                        //FIXME Race Condition: startHandle was not added yet in case of cancellation
                         resultingHandles.add(startHandle);
                         log.debug("Added " + startHandle
                             + " to resulting handles.");
@@ -359,6 +360,8 @@ public class StopManager implements IActivityProvider, Disposable {
     /**
      * Unlocks project without sending an acknowledgment if there don't exist
      * any more startHandles.
+     * 
+     * @return true if the affected user is unlocked afterwards
      */
     protected boolean executeUnlock(StartHandle startHandle) {
 
@@ -378,7 +381,7 @@ public class StopManager implements IActivityProvider, Disposable {
         if (!noStartHandlesFor(sharedProject.getLocalUser())) {
             log.debug(startHandles.get(sharedProject.getLocalUser()).size()
                 + " startHandles remaining.");
-            return true;
+            return false;
         }
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -440,7 +443,7 @@ public class StopManager implements IActivityProvider, Disposable {
          * it was sent only to the affected participant.
          */
         for (IActivityListener listener : activityListeners) {
-            listener.activityCreated(stopActivity); // Informs ActivitySequencer
+            listener.activityCreated(stopActivity); // Informs SharedProject for sending the activity
         }
     }
 
