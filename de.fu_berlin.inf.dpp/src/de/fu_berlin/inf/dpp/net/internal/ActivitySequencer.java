@@ -46,7 +46,6 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -430,9 +429,7 @@ public class ActivitySequencer {
      * 
      * @throws IllegalStateException
      *             if this method is called on an already started
-     *             {@link ActivitySequencer} or if the
-     *             {@link ConcurrentDocumentManager} was not set before this
-     *             method is called.
+     *             {@link ActivitySequencer}
      * 
      * @see #stop()
      */
