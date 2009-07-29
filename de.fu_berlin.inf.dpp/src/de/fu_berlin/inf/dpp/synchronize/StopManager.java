@@ -83,6 +83,16 @@ public class StopManager implements IActivityProvider, Disposable {
             if (newSharedProject == StopManager.this.sharedProject)
                 return;
 
+            // session ended, start all local start handles
+            if (newSharedProject == null && sharedProject != null) {
+                List<StartHandle> localStartHandles = startHandles
+                    .get(sharedProject.getLocalUser());
+                for (StartHandle startHandle : localStartHandles) {
+                    startHandle.start();
+                }
+                lockProject(false);
+            }
+
             if (sharedProject != null) {
                 sharedProject.removeActivityProvider(StopManager.this);
                 reset();
@@ -227,7 +237,8 @@ public class StopManager implements IActivityProvider, Disposable {
                     try {
                         StartHandle startHandle = stop(user, cause, SubMonitor
                             .convert(new NullProgressMonitor()));
-                        //FIXME Race Condition: startHandle was not added yet in case of cancellation
+                        // FIXME Race Condition: startHandle was not added yet
+                        // in case of cancellation
                         resultingHandles.add(startHandle);
                         log.debug("Added " + startHandle
                             + " to resulting handles.");
@@ -443,7 +454,8 @@ public class StopManager implements IActivityProvider, Disposable {
          * it was sent only to the affected participant.
          */
         for (IActivityListener listener : activityListeners) {
-            listener.activityCreated(stopActivity); // Informs SharedProject for sending the activity
+            listener.activityCreated(stopActivity); // Informs SharedProject for
+            // sending the activity
         }
     }
 
