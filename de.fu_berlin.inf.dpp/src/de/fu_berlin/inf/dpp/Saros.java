@@ -45,7 +45,6 @@ import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.Roster.SubscriptionMode;
@@ -679,18 +678,6 @@ public class Saros extends AbstractUIPlugin {
                 // add Jingle Support for the current connection
                 sdm.addFeature(Jingle.NAMESPACE);
             }
-
-            /*
-             * We only support PLAIN SASL for now, because SASL support is
-             * broken in SMACK 3.1, see:
-             * 
-             * http://www.igniterealtime.org/community/message/185601
-             * 
-             * valid choices include: PLAIN, DIGEST-MD5 or KERBEROS_V4
-             * 
-             * most significant choice: 0
-             */
-            SASLAuthentication.supportSASLMechanism("PLAIN", 0);
 
             Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
