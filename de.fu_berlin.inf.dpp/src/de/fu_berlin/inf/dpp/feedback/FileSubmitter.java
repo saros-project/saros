@@ -37,7 +37,7 @@ public class FileSubmitter {
     public static final String SERVLET_NAME = "SarosStatisticServer/fileupload";
 
     /** Value for connection timeout */
-    protected static final int TIMEOUT = 5000;
+    protected static final int TIMEOUT = 30000;
 
     /**
      * Convenience wrapper method for
