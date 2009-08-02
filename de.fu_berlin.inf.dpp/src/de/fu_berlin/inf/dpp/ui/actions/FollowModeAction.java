@@ -38,6 +38,16 @@ public class FollowModeAction extends Action implements Disposable {
         public void roleChanged(User user) {
             updateEnablement();
         }
+
+        @Override
+        public void userLeft(User user) {
+            updateEnablement();
+        }
+
+        @Override
+        public void userJoined(User user) {
+            updateEnablement();
+        }
     };
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
@@ -163,7 +173,7 @@ public class FollowModeAction extends Action implements Disposable {
                     return user;
                 }
             }
-            log.error("no driver to follow but action was enabled");
+            log.error("No driver to follow but action was enabled");
             return null;
         }
     }
