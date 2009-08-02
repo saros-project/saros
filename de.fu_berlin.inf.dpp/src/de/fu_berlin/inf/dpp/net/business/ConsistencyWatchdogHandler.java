@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -202,14 +203,21 @@ public class ConsistencyWatchdogHandler {
                 }
             });
         } catch (InvocationTargetException e) {
-            log.error("Internal Error: ", e);
+            try {
+                throw e.getCause();
+            } catch (CancellationException c) {
+                log.info("Recovery was cancelled by local user");
+            } catch (Throwable t) {
+                log.error("Internal Error: ", t);
+            }
         } catch (InterruptedException e) {
             log.error("Code not designed to be interruptable", e);
         }
     }
 
     protected void runRecovery(final String pathsOfInconsistencies,
-        final JID from, final Set<IPath> paths, SubMonitor progress) {
+        final JID from, final Set<IPath> paths, SubMonitor progress)
+        throws CancellationException {
         SubMonitor waiting;
 
         List<StartHandle> startHandles = null;
@@ -217,7 +225,8 @@ public class ConsistencyWatchdogHandler {
         if (sessionManager.getSharedProject().isHost()) {
             progress.beginTask("Performing recovery", 1200);
             startHandles = stopManager.stop(sessionManager.getSharedProject()
-                .getParticipants(), "Consistency recovery", progress.newChild(200));
+                .getParticipants(), "Consistency recovery", progress
+                .newChild(200));
             progress.subTask("Send files to clients");
             performConsistencyRecovery(from, paths, progress.newChild(700));
 
@@ -249,7 +258,7 @@ public class ConsistencyWatchdogHandler {
                 inconsistentStartHandle.startAndAwait(progress);
                 startHandles.remove(inconsistentStartHandle);
             }
-                       
+
             for (StartHandle startHandle : startHandles)
                 startHandle.start();
 
