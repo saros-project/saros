@@ -456,6 +456,11 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         public void userLeft(final User user) {
+
+            // If the user left which I am following, then stop following...
+            if (user.equals(userToFollow))
+                setFollowing(null);
+
             removeAllAnnotations(new Predicate<SarosAnnotation>() {
                 public boolean evaluate(SarosAnnotation annotation) {
                     return annotation.getSource().equals(
@@ -755,8 +760,13 @@ public class EditorManager implements IActivityProvider, Disposable {
     public void textAboutToBeChanged(int offset, String text,
         int replaceLength, IDocument document) {
 
-        if (!this.isDriver || sharedProject == null) {
+        if (sharedProject == null) {
+            log.error("Shared Project has ended, but text edits"
+                + " are received from local user.");
+            return;
+        }
 
+        if (!this.isDriver) {
             /**
              * TODO If we are not a driver, then receiving this event might
              * indicate that the user somehow achieved to change his document.
@@ -764,9 +774,7 @@ public class EditorManager implements IActivityProvider, Disposable {
              * 
              * But watch out for changes because of a consistency check!
              */
-            log.warn("Received text changes without being"
-                + " driver, while shared project has ended.");
-
+            log.warn("Local user caused text changes as an observer");
             return;
         }
 
