@@ -87,9 +87,10 @@ public class StopManager implements IActivityProvider, Disposable {
             if (newSharedProject == null && sharedProject != null) {
                 List<StartHandle> localStartHandles = startHandles
                     .get(sharedProject.getLocalUser());
-                for (StartHandle startHandle : localStartHandles) {
-                    startHandle.start();
-                }
+                if (localStartHandles != null)
+                    for (StartHandle startHandle : localStartHandles) {
+                        startHandle.start();
+                    }
                 lockProject(false);
             }
 
