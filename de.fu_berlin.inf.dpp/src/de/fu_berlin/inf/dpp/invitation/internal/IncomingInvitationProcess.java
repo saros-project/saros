@@ -401,7 +401,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @return <code>true</code> if all files were synchronized.
      *         <code>false</code> if operation was canceled by user.
      */
-    private boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
+    protected boolean blockUntilAllFilesSynchronized(IProgressMonitor monitor) {
 
         // Make sure that cancelation by the user is at least checked once
         do {
@@ -444,7 +444,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * 
      * @swt Needs to be run from the SWT UI Thread
      */
-    private static IProject createNewProject(String newProjectName,
+    protected static IProject createNewProject(String newProjectName,
         final IProject baseProject) throws CoreException, InterruptedException {
 
         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -525,8 +525,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      * @throws CoreException
      *             is thrown when getting all files of the local project.
      */
-    private FileList handleDiff(IProject localProject, FileList remoteFileList,
-        SubMonitor monitor) throws CoreException {
+    protected FileList handleDiff(IProject localProject,
+        FileList remoteFileList, SubMonitor monitor) throws CoreException {
 
         monitor.beginTask("Preparing local project for incoming files", 100);
 
@@ -547,7 +547,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     /**
      * Ends the incoming invitation process.
      */
-    private void done() {
+    protected void done() {
         JID host = this.peer;
 
         ISharedProject sharedProject = sessionManager.joinSession(
