@@ -56,6 +56,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
+import org.picocontainer.Characteristics;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoBuilder;
 import org.picocontainer.PicoCompositionException;
@@ -336,9 +337,8 @@ public class Saros extends AbstractUIPlugin {
         this.container = picoBuilder.build();
 
         // Add Adapter which creates ChildContainers
-        this.container.addAdapter(new ProviderAdapter(
-            new ChildContainerProvider(this.container)));
-
+        this.container.as(Characteristics.NO_CACHE).addAdapter(
+            new ProviderAdapter(new ChildContainerProvider(this.container)));
         /*
          * All singletons which exist for the whole plug-in life-cycle are
          * managed by PicoContainer for us.
