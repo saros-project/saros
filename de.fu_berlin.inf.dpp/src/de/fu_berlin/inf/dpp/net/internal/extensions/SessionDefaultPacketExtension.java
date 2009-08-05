@@ -8,7 +8,8 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
  * Abstract base class for all DefaultPacketExtension that need to include the
  * current SessionID.
  * 
- * This class does not return a filter that makes sure that we are in a Session.
+ * CAUTION: This class does not return a filter that makes sure that we are in a
+ * Session.
  */
 public abstract class SessionDefaultPacketExtension extends
     SarosDefaultPacketExtension {

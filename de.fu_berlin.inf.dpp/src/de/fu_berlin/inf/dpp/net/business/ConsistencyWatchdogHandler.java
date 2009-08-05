@@ -92,7 +92,7 @@ public class ConsistencyWatchdogHandler {
 
         receiver.addPacketListener(listener, new AndFilter(
             new MessageTypeFilter(Message.Type.chat), PacketExtensionUtils
-                .getInSessionFilter(sessionManager), Util.orFilter(handler
+                .getSessionIDPacketFilter(sessionID), Util.orFilter(handler
                 .getFilter(), ActivitiesPacketExtension.getFilter())));
     }
 
