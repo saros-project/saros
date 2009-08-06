@@ -20,6 +20,8 @@
 package de.fu_berlin.inf.dpp;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -625,40 +627,17 @@ public class Saros extends AbstractUIPlugin {
     public void connect(boolean failSilently) {
 
         IPreferenceStore prefStore = getPreferenceStore();
+
         final String server = prefStore.getString(PreferenceConstants.SERVER);
         final String username = prefStore
             .getString(PreferenceConstants.USERNAME);
-        String password = prefStore.getString(PreferenceConstants.PASSWORD);
 
         try {
             if (isConnected()) {
                 disconnect();
             }
 
-            ProxyInfo proxyInfo = getProxyInfo(server);
-
-            ConnectionConfiguration conConfig = proxyInfo == null ? new ConnectionConfiguration(
-                server)
-                : new ConnectionConfiguration(server, proxyInfo);
-
-            /*
-             * TODO: require TLS, because we only support PLAIN SASL (see below)
-             * 
-             * TODO It has to ask the user, if s/he wants to use non-TLS
-             * connections with PLAIN SASL if TLS is not supported by the
-             * server.
-             * 
-             * TODO use MessageDialog and Util.runSWTSync() to provide a
-             * password callback if the user has no password set in the
-             * preferences.
-             */
-            conConfig
-                .setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
-            /*
-             * We handle reconnecting ourselves
-             */
-            conConfig.setReconnectionAllowed(false);
-            this.connection = new XMPPConnection(conConfig);
+            this.connection = new XMPPConnection(getConnectionConfiguration());
 
             setConnectionState(ConnectionState.CONNECTING, null);
 
@@ -685,6 +664,7 @@ public class Saros extends AbstractUIPlugin {
 
             Roster.setDefaultSubscriptionMode(Roster.SubscriptionMode.manual);
 
+            String password = prefStore.getString(PreferenceConstants.PASSWORD);
             /*
              * TODO SS Possible race condition, as our packet listeners are
              * registered only after the login (in CONNECTED Connection State),
@@ -712,6 +692,66 @@ public class Saros extends AbstractUIPlugin {
                 });
             }
         }
+    }
+
+    /**
+     * Returns a @link{ConnectionConfiguration} representing the settings stored
+     * in the Eclipse preferences.
+     * 
+     * This methods will fall back to use DNS SRV to get the XMPP port of the
+     * server if the SERVER configured in the preferences does not have an
+     * explicit port set.
+     * 
+     * Also this method configures the SecurityMode and the reconnection
+     * attribute.
+     * 
+     * @throws URISyntaxException
+     *             If the server string in the preferences cannot be transformed
+     *             into an URI
+     */
+    protected ConnectionConfiguration getConnectionConfiguration()
+        throws URISyntaxException {
+
+        IPreferenceStore prefStore = getPreferenceStore();
+
+        String serverString = prefStore.getString(PreferenceConstants.SERVER);
+
+        URI uri = new URI("jabber://" + serverString);
+
+        String server = uri.getHost();
+        if (server == null) {
+            throw new URISyntaxException(prefStore
+                .getString(PreferenceConstants.SERVER),
+                "The XMPP server address is invalid: " + server);
+        }
+
+        ProxyInfo proxyInfo = getProxyInfo(uri.getHost());
+        ConnectionConfiguration conConfig = null;
+
+        if (uri.getPort() < 0) {
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
+                .getHost()) : new ConnectionConfiguration(uri.getHost(),
+                proxyInfo);
+        } else {
+            conConfig = proxyInfo == null ? new ConnectionConfiguration(uri
+                .getHost(), uri.getPort()) : new ConnectionConfiguration(uri
+                .getHost(), uri.getPort(), proxyInfo);
+        }
+
+        /*
+         * TODO It has to ask the user, if s/he wants to use non-TLS connections
+         * with PLAIN SASL if TLS is not supported by the server.
+         * 
+         * TODO use MessageDialog and Util.runSWTSync() to provide a password
+         * call-back if the user has no password set in the preferences.
+         */
+        conConfig.setSecurityMode(ConnectionConfiguration.SecurityMode.enabled);
+        /*
+         * We handle reconnecting ourselves
+         */
+        conConfig.setReconnectionAllowed(false);
+
+        return conConfig;
     }
 
     /**
@@ -1145,17 +1185,16 @@ public class Saros extends AbstractUIPlugin {
 
                         log.info("Reconnecting...");
 
-                        connect(true);
-
-                        if (!isConnected()) {
-                            try {
+                        try {
+                            connect(true);
+                            if (!isConnected())
                                 Thread.sleep(5000);
-                            } catch (InterruptedException e) {
-                                log.error(
-                                    "Code not designed to be interruptable", e);
-                                Thread.currentThread().interrupt();
-                                return;
-                            }
+
+                        } catch (InterruptedException e) {
+                            log.error("Code not designed to be interruptable",
+                                e);
+                            Thread.currentThread().interrupt();
+                            return;
                         }
                     }
 
