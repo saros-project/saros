@@ -23,6 +23,7 @@ import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -58,7 +59,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected static final IActivity[] activities = new IActivity[] {
         new EditorActivity(source, EditorActivity.Type.Activated, path),
-        new FileActivity(source, FileActivity.Type.Created, path),
+        new FileActivity(source, FileActivity.Type.Created, path, null,
+            new byte[] { 34, 72 }, Purpose.ACTIVITY),
         new FolderActivity(source, FolderActivity.Type.Created, path),
         new RoleActivity(source, "user@server", UserRole.DRIVER),
         new TextEditActivity(source, 23, "foo", "bar", path),

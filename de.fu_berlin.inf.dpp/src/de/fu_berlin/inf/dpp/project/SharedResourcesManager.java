@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,11 +45,17 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This manager is responsible for handling all resource changes that aren't
@@ -66,12 +74,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
         .getName());
 
     /**
-     * Should be set to <code>true</code> while executing resource changes to
-     * avoid an infinite resource event loop.
-     */
-    private boolean replicationInProgress = false;
-
-    /**
      * While paused the SharedResourcesManager doesn't fire activities
      */
     private boolean pause = false;
@@ -83,6 +85,32 @@ public class SharedResourcesManager implements IResourceChangeListener,
     private final List<IActivityListener> listeners = new LinkedList<IActivityListener>();
 
     protected StopManager stopManager;
+
+    /**
+     * Should return <code>true</code> while executing resource changes to avoid
+     * an infinite resource event loop.
+     */
+    @Inject
+    protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
+
+    @Inject
+    protected Saros saros;
+
+    @Inject
+    protected EditorManager editorManager;
+
+    @Inject
+    protected ConsistencyWatchdogClient consistencyWatchdogClient;
+
+    protected ISessionManager sessionManager;
+
+    public SharedResourcesManager(ISessionManager sessionManager,
+        StopManager stopManager) {
+        this.sessionManager = sessionManager;
+        this.sessionManager.addSessionListener(sessionListener);
+        this.stopManager = stopManager;
+        this.stopManager.addBlockable(stopManagerListener);
+    }
 
     protected Blockable stopManagerListener = new Blockable() {
         public void unblock() {
@@ -175,12 +203,16 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     // TODO Think about if this is needed...
                     return null;
                 }
-                return new FileActivity(saros.getMyJID().toString(),
-                    FileActivity.Type.Created, path);
-
+                try {
+                    return FileActivity.created(sharedProject.getProject(),
+                        saros.getMyJID().toString(), path, Purpose.ACTIVITY);
+                } catch (IOException e) {
+                    log.warn("Resource could not be read for sending to peers:"
+                        + path, e);
+                }
             case IResourceDelta.REMOVED:
-                return new FileActivity(saros.getMyJID().toString(),
-                    FileActivity.Type.Removed, path);
+                return FileActivity.removed(saros.getMyJID().toString(), path,
+                    Purpose.ACTIVITY);
 
             default:
                 return null;
@@ -192,22 +224,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 listener.activityCreated(activity);
             }
         }
-    }
-
-    @Inject
-    protected Saros saros;
-
-    @Inject
-    protected EditorManager editorManager;
-
-    protected ISessionManager sessionManager;
-
-    public SharedResourcesManager(ISessionManager sessionManager,
-        StopManager stopManager) {
-        this.sessionManager = sessionManager;
-        sessionManager.addSessionListener(sessionListener);
-        stopManager.addBlockable(stopManagerListener);
-        this.stopManager = stopManager;
     }
 
     public ISessionListener sessionListener = new AbstractSessionListener() {
@@ -256,7 +272,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
      */
     public void resourceChanged(IResourceChangeEvent event) {
 
+        if (fileReplacementInProgressObservable.isReplacementInProgress())
+            return;
+
         if (pause) {
+            /*
+             * TODO This warning is misleading! The consistency recovery process
+             * might cause IResourceChangeEvents (which do not need to be
+             * replicated)
+             */
             if (event.getResource() != null)
                 log.warn("Resource changed while paused: "
                     + event.getResource().getProjectRelativePath());
@@ -264,9 +288,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 log.warn("Resource changed while paused.");
             return;
         }
-
-        if (replicationInProgress)
-            return;
 
         try {
 
@@ -303,10 +324,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.IActivityProvider
+    /**
+     * {@inheritDoc}
      */
     public void exec(IActivity activity) {
 
@@ -314,7 +333,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             return;
 
         try {
-            this.replicationInProgress = true;
+            fileReplacementInProgressObservable.startReplacement();
 
             if (activity instanceof FileActivity) {
                 exec((FileActivity) activity);
@@ -325,25 +344,53 @@ public class SharedResourcesManager implements IResourceChangeListener,
         } catch (CoreException e) {
             log.error("Failed to execute resource activity.", e);
         } finally {
-            this.replicationInProgress = false;
+            fileReplacementInProgressObservable.replacementDone();
         }
     }
 
     private void exec(FileActivity activity) throws CoreException {
+
+        if (this.sharedProject == null) {
+            log.warn("Project has ended for FileActivity " + activity);
+            return;
+        }
+
         IProject project = this.sharedProject.getProject();
-        IFile file = project.getFile(activity.getPath());
+        IPath path = activity.getPath();
+        IFile file = project.getFile(path);
 
+        if (activity.isRecovery()) {
+            log.info("Received consistency file: " + activity);
+
+            if (log.isInfoEnabled()) {
+                Util.logDiff(log, new JID(activity.getSource()), path, activity
+                    .getContents(), file);
+            }
+        }
+
+        // Create or remove file
         if (activity.getType() == FileActivity.Type.Created) {
-
             // TODO should be reported to the user
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
             try {
-                FileUtil.writeFile(activity.getContents(), file, monitor);
+                FileUtil.writeFile(new ByteArrayInputStream(activity
+                    .getContents()), file, monitor);
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }
         } else if (activity.getType() == FileActivity.Type.Removed) {
             FileUtil.delete(file);
+        }
+
+        if (activity.isRecovery()) {
+            ConcurrentDocumentManager concurrentManager = this.sharedProject
+                .getConcurrentDocumentManager();
+
+            // The file contents has been replaced, now reset Jupiter
+            if (concurrentManager.isManagedByJupiter(path))
+                concurrentManager.resetJupiterClient(path);
+
+            consistencyWatchdogClient.queueConsistencyCheck();
         }
     }
 

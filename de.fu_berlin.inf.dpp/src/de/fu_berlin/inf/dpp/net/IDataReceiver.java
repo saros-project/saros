@@ -22,11 +22,15 @@ public interface IDataReceiver {
     /**
      * @return true if the input stream has been consumed by the receiver
      */
-    boolean receivedResource(JID from, IPath path, InputStream input,
-        int sequenceNumber);
+    boolean receivedResource(JID from, IPath path, InputStream input);
 
     /**
      * @return true if the input stream has been consumed by the receiver
      */
     boolean receivedFileList(TransferDescription data, InputStream input);
+
+    /**
+     * @return true if the input stream has been consumed by the receiver
+     */
+    boolean receiveActivity(JID sender, InputStream input);
 }

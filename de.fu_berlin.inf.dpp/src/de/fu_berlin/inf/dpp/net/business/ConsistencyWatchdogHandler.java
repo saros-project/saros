@@ -27,6 +27,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -310,7 +311,8 @@ public class ConsistencyWatchdogHandler {
             try {
                 editorManager.saveLazy(path);
             } catch (FileNotFoundException e) {
-                log.error("File could not be found, despite existing: ", e);
+                log.error("File could not be found, despite existing: " + path,
+                    e);
             }
         progress.worked(1);
 
@@ -323,15 +325,22 @@ public class ConsistencyWatchdogHandler {
         progress.worked(1);
 
         if (file.exists()) {
-            // Send the file to client
-            sendFile(from, project, path, progress.newChild(8));
+
+            try {
+                // Send the file to client
+                project.getSequencer().sendActivity(
+                    fromUser,
+                    FileActivity.created(project.getProject(),
+                        myJID.toString(), path, Purpose.RECOVERY));
+            } catch (IOException e) {
+                log.error("File could not be read, despite existing: " + path,
+                    e);
+            }
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            project.getSequencer().sendActivity(
-                fromUser,
-                new FileActivity(myJID.toString(), FileActivity.Type.Removed,
-                    path));
+            project.getSequencer().sendActivity(fromUser,
+                FileActivity.removed(myJID.toString(), path, Purpose.RECOVERY));
             progress.worked(8);
         }
         progress.done();

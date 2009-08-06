@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -34,13 +35,13 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
@@ -545,12 +546,17 @@ public class DataTransferManager implements ConnectionSessionListener {
             case RESOURCE_TRANSFER:
                 for (IDataReceiver receiver : receivers) {
                     boolean consumed = receiver.receivedResource(data.sender,
-                        Path.fromPortableString(data.file_project_path), input,
-                        data.sequenceNumber);
+                        Path.fromPortableString(data.file_project_path), input);
                     if (consumed)
                         return;
                 }
-
+            case ACTIVITY_TRANSFER:
+                for (IDataReceiver receiver : receivers) {
+                    boolean consumed = receiver.receiveActivity(data.sender,
+                        input);
+                    if (consumed)
+                        return;
+                }
                 break;
             }
         } finally {
@@ -596,8 +602,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected IDataReceiver defaultReceiver = new IDataReceiver() {
 
-        public boolean receivedResource(JID from, IPath path,
-            InputStream input, int sequenceNumber) {
+        public boolean receivedResource(JID from, IPath path, InputStream input) {
 
             log
                 .debug("Incoming resource from " + from.toString() + ": "
@@ -611,17 +616,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                 return true;
             }
 
-            // Otherwise
-            TimedActivity timedActivity = new TimedActivity(new FileActivity(
-                from.toString(), path, input), from, sequenceNumber);
-
-            try {
-                chatTransmitter.receiveActivities(from, Collections
-                    .singletonList(timedActivity));
-            } catch (RuntimeException e) {
-                log.error("Internal error", e);
-            }
-
+            log.error("Failed to receive resource (nobody wanted it!)");
             return true;
         }
 
@@ -680,7 +675,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                                 // don't close the ZipInputStream, we close the
                                 // entry ourselves...
                             }
-                        }, data.sequenceNumber);
+                        });
 
                     zip.closeEntry();
                 }
@@ -693,6 +688,27 @@ public class DataTransferManager implements ConnectionSessionListener {
             } finally {
                 IOUtils.closeQuietly(zip);
             }
+            return true;
+        }
+
+        public boolean receiveActivity(final JID sender, InputStream input) {
+
+            final Content content;
+            try {
+                content = (Content) ActivitiesPacketExtension.getXStream()
+                    .fromXML(
+                        IOUtils.toString(new GZIPInputStream(input), "UTF-8"));
+            } catch (IOException e) {
+                log.error("Could not parse incoming activity:", e);
+                return true;
+            }
+
+            chatTransmitter.executeAsDispatch(new Runnable() {
+                public void run() {
+                    chatTransmitter.receiveActivities(sender, content
+                        .getTimedActivities());
+                }
+            });
             return true;
         }
     };

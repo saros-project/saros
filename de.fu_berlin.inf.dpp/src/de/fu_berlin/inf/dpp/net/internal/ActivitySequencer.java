@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,11 +36,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
@@ -223,11 +219,21 @@ public class ActivitySequencer {
             }
             int firstQueuedSequenceNumber = queuedActivities.peek()
                 .getSequenceNumber();
-            if (expectedSequenceNumber != FIRST_SEQUENCE_NUMBER
-                && expectedSequenceNumber >= firstQueuedSequenceNumber) {
 
-                log.error("Expected activity #" + expectedSequenceNumber
-                    + " >= first queued #" + firstQueuedSequenceNumber);
+            if (expectedSequenceNumber == firstQueuedSequenceNumber) {
+                // Next Activity is ready to be executed
+                return;
+            }
+
+            if (expectedSequenceNumber != FIRST_SEQUENCE_NUMBER
+                && firstQueuedSequenceNumber < expectedSequenceNumber) {
+
+                TimedActivity activity = queuedActivities.remove();
+                log
+                    .error("Expected activity #"
+                        + expectedSequenceNumber
+                        + " but an older activity is still in the queue and will be dropped (#"
+                        + firstQueuedSequenceNumber + "): " + activity);
                 return;
             }
             long age = System.currentTimeMillis() - oldestLocalTimestamp;
@@ -480,25 +486,13 @@ public class ActivitySequencer {
                 }
 
                 JID recipientJID = recipient.getJID();
-                ArrayList<TimedActivity> stillToSend = new ArrayList<TimedActivity>(
-                    activities.size());
                 List<TimedActivity> timedActivities = createTimedActivities(
                     recipientJID, activities);
-                for (TimedActivity timedActivity : timedActivities) {
 
-                    // Check each activity if it is a file creation which will
-                    // be
-                    // send asynchronous, and collect all others in stillToSend.
-                    // TODO boolean methods with side effects are bad style
-                    if (!ifFileCreateSendAsync(recipientJID, timedActivity)) {
-                        stillToSend.add(timedActivity);
-                    }
-                }
                 log.trace("Sending Activities to " + recipientJID + ": "
                     + timedActivities);
-                if (!stillToSend.isEmpty()) {
-                    transmitter.sendTimedActivities(recipientJID, stillToSend);
-                }
+
+                transmitter.sendTimedActivities(recipientJID, timedActivities);
             }
         }, 0, MILLIS_UPDATE);
     }
@@ -554,42 +548,6 @@ public class ActivitySequencer {
             activities.add(timedActivity.getActivity());
         }
         sharedProject.exec(activities);
-    }
-
-    /**
-     * Sends given {@link TimedActivity} asynchronous to the given recipient,
-     * iff the activity is a {@link TextEditActivity}.
-     * 
-     * @return <code>true</code> if the activity was a file creation, otherwise
-     *         <code>false</code>.
-     */
-    private boolean ifFileCreateSendAsync(JID recipientJID,
-        TimedActivity timedActivity) {
-
-        IActivity activity = timedActivity.getActivity();
-        if (activity instanceof FileActivity) {
-            FileActivity fileActivity = (FileActivity) activity;
-            if (fileActivity.getType().equals(FileActivity.Type.Created)) {
-                try {
-                    transmitter.sendFileAsync(recipientJID, sharedProject
-                        .getProject(), fileActivity.getPath(), timedActivity
-                        .getSequenceNumber(),
-                        new AbstractFileTransferCallback() {
-                            @Override
-                            public void fileTransferFailed(IPath path,
-                                Exception e) {
-                                log.error("File could not be send:", e);
-                            }
-                        }, SubMonitor.convert(new NullProgressMonitor()));
-                } catch (IOException e) {
-                    log.error("File could not be send:", e);
-                    // TODO This means we were really unable to send
-                    // this file. No more falling back.
-                }
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

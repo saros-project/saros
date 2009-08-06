@@ -109,6 +109,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
@@ -379,6 +380,9 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);
+
+        // Observables
+        this.container.addComponent(FileReplacementInProgressObservable.class);
 
         // Handlers
         this.container.addComponent(CancelInviteHandler.class);

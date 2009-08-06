@@ -78,6 +78,7 @@ import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -557,6 +558,9 @@ public class EditorManager implements IActivityProvider, Disposable {
     @Inject
     protected CDTFacade cdtFacade;
 
+    @Inject
+    protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
+
     protected Saros saros;
 
     protected StopManager stopManager;
@@ -760,6 +764,9 @@ public class EditorManager implements IActivityProvider, Disposable {
     public void textAboutToBeChanged(int offset, String text,
         int replaceLength, IDocument document) {
 
+        if (fileReplacementInProgressObservable.isReplacementInProgress())
+            return;
+
         if (sharedProject == null) {
             log.error("Shared Project has ended, but text edits"
                 + " are received from local user.");
@@ -787,7 +794,11 @@ public class EditorManager implements IActivityProvider, Disposable {
                 break;
             }
         }
-        assert changedEditor != null;
+
+        if (changedEditor == null) {
+            log.error("Could not find editor for changed document " + document);
+            return;
+        }
 
         IPath path = editorAPI.getEditorPath(changedEditor);
         if (path == null) {

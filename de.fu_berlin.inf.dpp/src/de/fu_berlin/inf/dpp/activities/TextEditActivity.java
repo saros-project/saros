@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.activities;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -88,10 +89,14 @@ public class TextEditActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "TextEditActivity(" + this.offset + ",new:'"
-            + Util.escapeForLogging(this.text) + "',old:'"
-            + Util.escapeForLogging(this.replacedText) + "',path:"
-            + this.editor.toString() + ",src:" + this.source + ")";
+        return "TextEditActivity("
+            + this.offset
+            + ",new:'"
+            + Util.escapeForLogging(StringUtils.abbreviate(this.text, 150))
+            + "',old:'"
+            + Util.escapeForLogging(StringUtils.abbreviate(this.replacedText,
+                150)) + "',path:" + this.editor.toString() + ",src:"
+            + this.source + ")";
     }
 
     @Override

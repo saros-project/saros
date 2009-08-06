@@ -41,7 +41,7 @@ public class TransferDescription implements Serializable {
         /**
          * Transfer of several resources in a ZIP-File
          */
-        ARCHIVE_TRANSFER
+        ARCHIVE_TRANSFER, ACTIVITY_TRANSFER
     }
 
     public FileTransferType type;
@@ -51,8 +51,6 @@ public class TransferDescription implements Serializable {
     public JID recipient;
 
     public JID sender;
-
-    public int sequenceNumber;
 
     public String file_project_path;
 
@@ -73,6 +71,8 @@ public class TransferDescription implements Serializable {
         case RESOURCE_TRANSFER:
             return "Resource from " + getSender() + ": " + file_project_path
                 + " [SID=" + sessionID + "]";
+        case ACTIVITY_TRANSFER:
+            return "Activity from " + getSender() + ": [SID=" + sessionID + "]";
         default:
             return "Not a valid FileTransferType";
         }
@@ -89,15 +89,13 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createFileTransferDescription(
-        JID recipient, JID sender, IPath path, int sequenceNumber,
-        String sessionID) {
+        JID recipient, JID sender, IPath path, String sessionID) {
 
         TransferDescription result = new TransferDescription();
         result.recipient = recipient;
         result.sender = sender;
         result.type = FileTransferType.RESOURCE_TRANSFER;
         result.file_project_path = path.toPortableString();
-        result.sequenceNumber = sequenceNumber;
         result.sessionID = sessionID;
         return result;
     }
@@ -109,6 +107,18 @@ public class TransferDescription implements Serializable {
         result.recipient = recipient2;
         result.sender = jid;
         result.type = FileTransferType.ARCHIVE_TRANSFER;
+        result.sessionID = sessionID;
+
+        return result;
+    }
+
+    public static TransferDescription createActivityTransferDescription(
+        JID recipient, JID sender, String sessionID) {
+
+        TransferDescription result = new TransferDescription();
+        result.recipient = recipient;
+        result.sender = sender;
+        result.type = FileTransferType.ACTIVITY_TRANSFER;
         result.sessionID = sessionID;
 
         return result;
@@ -177,4 +187,5 @@ public class TransferDescription implements Serializable {
     public void setEmptyFile(boolean b) {
         emptyFile = true;
     }
+
 }

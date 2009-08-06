@@ -1,11 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
-import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -16,33 +11,22 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.picocontainer.annotations.Inject;
 
-import bmsi.util.Diff;
-import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -86,68 +70,18 @@ public class ConsistencyWatchdogClient {
         TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2),
         new NamedThreadFactory("ChecksumCruncher-"));
 
-    IDataReceiver receiver = new IDataReceiver() {
+    /**
+     * Method for queuing another consistency check, which does not print a
+     * warning if there are already checks queued.
+     */
+    public void queueConsistencyCheck() {
+        // If there is already a consistency recovery waiting to be executed,
+        // we do not need to append another one
+        if (executor.getQueue().size() > 1)
+            return;
 
-        public boolean receivedArchive(TransferDescription data,
-            InputStream input) {
-            return false;
-        }
-
-        public boolean receivedFileList(TransferDescription data,
-            InputStream input) {
-            return false;
-        }
-
-        public boolean receivedResource(JID from, IPath path,
-            InputStream input, int sequenceNumber) {
-
-            log.info("Received consistency file [" + from.getName() + "] "
-                + path.toString());
-
-            ISharedProject project = sessionManager.getSharedProject();
-
-            // Project might have ended in between
-            if (project == null)
-                return false;
-
-            final IFile file = project.getProject().getFile(path);
-
-            if (log.isInfoEnabled()) {
-                input = logDiff(log, from, path, input, file);
-            }
-
-            final InputStream toWrite = input;
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-
-                    // TODO should be reported to the user
-                    SubMonitor monitor = SubMonitor
-                        .convert(new NullProgressMonitor());
-                    try {
-                        FileUtil.writeFile(toWrite, file, monitor);
-                    } catch (CoreException e) {
-                        // TODO inform user
-                        log.error("Could not restore file: " + file);
-                    }
-                }
-            });
-
-            ConcurrentDocumentManager concurrentManager = project
-                .getConcurrentDocumentManager();
-
-            // The file contents has been replaced, now reset Jupiter
-            if (concurrentManager.isManagedByJupiter(path))
-                concurrentManager.resetJupiterClient(path);
-
-            // Trigger a new consistency check, so we don't have to wait for new
-            // checksums from the host
-            if (executor.getQueue().size() == 0)
-                checkConsistency();
-
-            return true;
-        }
-
-    };
+        checkConsistency();
+    }
 
     /**
      * Starts a new Consistency Check.
@@ -219,7 +153,10 @@ public class ConsistencyWatchdogClient {
                 inconsistencyToResolve.setValue(false);
             }
         } else {
-            inconsistencyToResolve.setValue(true);
+            if (!inconsistencyToResolve.getValue()) {
+                log.info("Inconsistencies have been detected");
+                inconsistencyToResolve.setValue(true);
+            }
         }
 
     }
@@ -316,55 +253,6 @@ public class ConsistencyWatchdogClient {
         sharedProject = newSharedProject;
     }
 
-    public static InputStream logDiff(Logger log, JID from, IPath path,
-        InputStream input, IFile file) {
-        try {
-            if (!file.exists()) {
-                log.info("Missing file detected: " + file);
-                return input;
-            }
-
-            // save input in a byte[] for later
-            byte[] inputBytes = IOUtils.toByteArray(input);
-
-            // reset input
-            input = new ByteArrayInputStream(inputBytes);
-
-            // get stream from old file
-            InputStream oldStream = file.getContents();
-            InputStream newStream = new ByteArrayInputStream(inputBytes);
-
-            // read Lines from
-            Object[] oldContent = IOUtils.readLines(oldStream).toArray();
-            Object[] newContent = IOUtils.readLines(newStream).toArray();
-
-            // Calculate diff of the two files
-            Diff diff = new Diff(oldContent, newContent);
-            Diff.Change script = diff.diff_2(false);
-
-            // log diff
-            DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
-                oldContent, newContent);
-            Writer writer = new StringWriter();
-            print.setOutput(writer);
-            print.print_script(script);
-
-            String diffAsString = writer.toString();
-
-            if (diffAsString == null || diffAsString.trim().length() == 0) {
-                log.error("No inconsistency found in file [" + from.getName()
-                    + "] " + path.toString());
-            } else {
-                log.info("Diff of inconsistency: \n" + writer);
-            }
-        } catch (CoreException e) {
-            log.error("Can't read file content", e);
-        } catch (IOException e) {
-            log.error("Can't convert file content to String", e);
-        }
-        return input;
-    }
-
     Object lock;
 
     /**
@@ -401,9 +289,6 @@ public class ConsistencyWatchdogClient {
         Set<IPath> pathsOfHandledFiles = new HashSet<IPath>(
             pathsWithWrongChecksums);
 
-        // Register as a receiver of incoming files...
-        dataTransferManager.addDataReceiver(receiver);
-
         for (final IPath path : pathsOfHandledFiles) {
 
             // Save document before asking host to resend
@@ -430,9 +315,6 @@ public class ConsistencyWatchdogClient {
                 return;
             }
         }
-
-        // Unregister from dataTransferManager
-        dataTransferManager.removeDataReceiver(receiver);
 
         // Clear-flag indicating recovery is done
         executingChecksumErrorHandling = false;

@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -103,13 +104,20 @@ public class ActivitiesPacketExtension implements PacketExtension {
         }
     }
 
+    /**
+     * Constructor for creating a ActivitiesPacketExtension from the given list
+     * of activities.
+     * 
+     * A snapshot copy is made of the given list, so that it is safe to modify
+     * the list afterwards.
+     */
     public ActivitiesPacketExtension(String sessionID,
         List<TimedActivity> activities) {
         if (activities.size() == 0) {
             throw new IllegalArgumentException("activities are empty");
         }
         this.sessionID = sessionID;
-        this.activities = activities;
+        this.activities = new ArrayList<TimedActivity>(activities);
     }
 
     public static synchronized XStream getXStream() {

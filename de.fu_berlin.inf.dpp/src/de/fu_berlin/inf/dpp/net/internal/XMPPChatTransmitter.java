@@ -19,8 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,11 +34,14 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
@@ -100,6 +105,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     public static final int MAX_PARALLEL_SENDS = 10;
     public static final int MAX_TRANSFER_RETRIES = 5;
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
+
+    private static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
     protected XMPPConnection connection;
 
@@ -287,9 +294,6 @@ public class XMPPChatTransmitter implements ITransmitter,
                 List<TimedActivity> timedActivities = activitiesPacket
                     .getActivities();
 
-                // FileActivities of type Create are sent via file transfer
-                assert containsNoFileCreationActivities(timedActivities);
-
                 receiveActivities(fromJID, timedActivities);
             }
         }
@@ -425,25 +429,65 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessageToAll(sharedProject, leaveExtension.create());
     }
 
+    /**
+     * Send the given list of timed activities to the given recipient.
+     * 
+     * If the total size in byte of the timedActivities exceeds
+     * MAX_XMPP_MESSAGE_SIZE, the message is not send using XMPP Chat Messages
+     * but rather using the DataTransferManager.
+     * 
+     * TODO: Add Progress
+     * 
+     * TODO: Add some heuristics for splitting very large lists of
+     * timeActivities
+     */
     public void sendTimedActivities(JID recipient,
         List<TimedActivity> timedActivities) {
 
         if (recipient == null || recipient.equals(saros.getMyJID())) {
             throw new IllegalArgumentException(
-                "recipient may not be null or equal the local user");
+                "Recipient may not be null or equal to the local user");
         }
         if (timedActivities == null || timedActivities.size() == 0) {
             throw new IllegalArgumentException(
-                "timedActivities may not be null or null");
+                "TimedActivities may not be null or empty");
         }
 
-        assert containsNoFileCreationActivities(timedActivities);
+        String sID = sessionID.getValue();
 
-        sendMessage(recipient, new ActivitiesPacketExtension(sessionID
-            .getValue(), timedActivities));
+        ActivitiesPacketExtension extensionToSend = new ActivitiesPacketExtension(
+            sID, timedActivities);
+        byte[] data = null;
+        try {
+            data = extensionToSend.toXML().getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            log.error("UTF-8 is unsupported", e); // send as XMPP Message
+        }
 
-        XMPPChatTransmitter.log.debug("Sent Activities to " + recipient + ": "
-            + timedActivities);
+        if (data == null || data.length < MAX_XMPP_MESSAGE_SIZE) {
+            sendMessage(recipient, extensionToSend);
+        } else {
+            try {
+                TransferDescription transferData = TransferDescription
+                    .createActivityTransferDescription(recipient, new JID(
+                        connection.getUser()), sID);
+
+                // TODO Move to Utils and/or switch to Util.deflate/inflate
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                GZIPOutputStream gos = new GZIPOutputStream(bos);
+                IOUtils.write(data, gos);
+                gos.finish();
+                IOUtils.closeQuietly(gos);
+
+                dataManager.sendData(transferData, bos.toByteArray(),
+                    SubMonitor.convert(new NullProgressMonitor()));
+            } catch (IOException e) {
+                log.error("Failed to sent activities:" + timedActivities, e);
+                return;
+            }
+        }
+
+        log.debug("Sent Activities to " + recipient + ": " + timedActivities);
     }
 
     /**
@@ -474,7 +518,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         TransferDescription transfer = TransferDescription
             .createFileTransferDescription(to, new JID(connection.getUser()),
-                path, sequenceNumber, sessionID.getValue());
+                path, sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
         if (!f.isFile())
@@ -697,8 +741,15 @@ public class XMPPChatTransmitter implements ITransmitter,
         return chat;
     }
 
-    protected ExecutorService executor;
+    /**
+     * Executor service used by sendFileAsync to queue the sending of files.
+     */
+    protected ExecutorService sendAsyncExecutor;
 
+    /**
+     * Utility method for #sendFile() which makes a copy of the file and returns
+     * immediately while sending in the background.
+     */
     public void sendFileAsync(JID recipient, IProject project,
         final IPath path, int sequenceNumber,
         final IFileTransferCallback callback, final SubMonitor progress)
@@ -709,13 +760,13 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         final TransferDescription transfer = TransferDescription
             .createFileTransferDescription(recipient, new JID(connection
-                .getUser()), path, sequenceNumber, sessionID.getValue());
+                .getUser()), path, sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
         final byte[] content = FileUtils.readFileToByteArray(f);
 
-        executor.execute(new Runnable() {
+        sendAsyncExecutor.execute(new Runnable() {
             public void run() {
                 try {
                     // To test if asynchronously arriving file transfers work:
@@ -736,7 +787,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 + " is called twice");
             return;
         }
-        executor.shutdownNow();
+        sendAsyncExecutor.shutdownNow();
         chats.clear();
         processes.clear();
         messageTransferQueue.clear();
@@ -753,7 +804,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.messageTransferQueue = Collections
             .synchronizedList(new LinkedList<MessageTransfer>());
 
-        this.executor = Executors.newFixedThreadPool(MAX_PARALLEL_SENDS);
+        this.sendAsyncExecutor = Executors
+            .newFixedThreadPool(MAX_PARALLEL_SENDS);
 
         this.connection = connection;
         this.chatmanager = connection.getChatManager();

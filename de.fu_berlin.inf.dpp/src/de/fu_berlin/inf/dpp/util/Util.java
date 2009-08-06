@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InterruptedIOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,6 +34,8 @@ import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SubMonitor;
@@ -53,8 +58,11 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
+import org.osgi.framework.Version;
 import org.picocontainer.annotations.Nullable;
 
+import bmsi.util.Diff;
+import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -642,6 +650,34 @@ public class Util {
         }
     }
 
+    /**
+     * From the given {@link Bundle} this method will extract the Bundle Version
+     * as a {@link Version} object.
+     * 
+     * This method will return {@link Version#emptyVersion} in case of any
+     * error.
+     */
+    public static Version getBundleVersion(Bundle bundle) {
+        return parseBundleVersion(getBundleVersion(bundle, null));
+    }
+
+    /**
+     * Will turn a given Version string (in the form "9.7.31.r1343") into a
+     * Version object.
+     * 
+     * This method will return {@link Version#emptyVersion} in case of any
+     * error.
+     */
+    public static Version parseBundleVersion(String bundleVersion) {
+        try {
+            return Version.parseVersion(bundleVersion);
+        } catch (IllegalArgumentException e) {
+            log.warn("Bundle Version string is illegally formatted: "
+                + bundleVersion);
+            return Version.emptyVersion;
+        }
+    }
+
     public static String getPlatformInfo() {
 
         String javaVersion = System.getProperty("java.version",
@@ -827,6 +863,52 @@ public class Util {
             log.error("Failed to inflate bytearray", ex);
         }
         return null;
+    }
+
+    /**
+     * Print the difference between the contents of the given file and the given
+     * inputBytes to the given log.
+     */
+    public static void logDiff(Logger log, JID from, IPath path,
+        byte[] inputBytes, IFile file) {
+        try {
+            if (!file.exists()) {
+                log.info("Missing file detected: " + file);
+                return;
+            }
+
+            // get stream from old file
+            InputStream oldStream = file.getContents();
+            InputStream newStream = new ByteArrayInputStream(inputBytes);
+
+            // read Lines from
+            Object[] oldContent = IOUtils.readLines(oldStream).toArray();
+            Object[] newContent = IOUtils.readLines(newStream).toArray();
+
+            // Calculate diff of the two files
+            Diff diff = new Diff(oldContent, newContent);
+            Diff.Change script = diff.diff_2(false);
+
+            // log diff
+            DiffPrint.UnifiedPrint print = new DiffPrint.UnifiedPrint(
+                oldContent, newContent);
+            Writer writer = new StringWriter();
+            print.setOutput(writer);
+            print.print_script(script);
+
+            String diffAsString = writer.toString();
+
+            if (diffAsString == null || diffAsString.trim().length() == 0) {
+                log.error("No inconsistency found in file [" + from.getName()
+                    + "] " + path.toString());
+            } else {
+                log.info("Diff of inconsistency: \n" + writer);
+            }
+        } catch (CoreException e) {
+            log.error("Can't read file content", e);
+        } catch (IOException e) {
+            log.error("Can't convert file content to String", e);
+        }
     }
 
     /**
