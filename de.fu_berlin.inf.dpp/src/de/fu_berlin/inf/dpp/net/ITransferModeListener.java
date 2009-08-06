@@ -2,6 +2,15 @@ package de.fu_berlin.inf.dpp.net;
 
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
+/**
+ * This interface can be implemented to be informed about file transfers being
+ * finished by the DataTransferManager (for instance to collect statistics about
+ * incoming file transfers).
+ * 
+ * CAUTION 1: This listener is not informed if a file transfer fails!
+ * 
+ * CAUTION 2: transmissionMillisecs includes unpacking/de-compressing of data.
+ */
 public interface ITransferModeListener {
 
     /**
