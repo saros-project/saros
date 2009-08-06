@@ -8,6 +8,8 @@ import org.eclipse.ui.texteditor.IElementStateListener;
 
 /**
  * Listener registered on Editors to be informed about their dirty state.
+ * 
+ * There is one global DirtyStateListener for all editors!
  */
 public class DirtyStateListener implements IElementStateListener {
 
