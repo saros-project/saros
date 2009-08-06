@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.IOException;
 import java.util.Random;
 
 import junit.framework.TestCase;
@@ -8,7 +9,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 
 public class UtilTest extends TestCase {
-    public void testInflateDeflate() {
+    public void testInflateDeflate() throws IOException {
         String shortString = "foobar";
         StringBuilder sb = new StringBuilder();
         Random rand = new Random();

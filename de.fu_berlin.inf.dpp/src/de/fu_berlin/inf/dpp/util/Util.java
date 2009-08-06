@@ -814,10 +814,9 @@ public class Util {
      * Compresses the given byte array using a Java Deflater.
      */
     public static byte[] deflate(byte[] input, SubMonitor subMonitor) {
-
         subMonitor.beginTask("Deflate bytearray", input.length / CHUNKSIZE + 1);
 
-        Deflater compressor = new Deflater(Deflater.BEST_COMPRESSION);
+        Deflater compressor = new Deflater(Deflater.DEFLATED);
         compressor.setInput(input);
         compressor.finish();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
@@ -838,31 +837,35 @@ public class Util {
     /**
      * Uncompresses the given byte array using a Java Inflater.
      * 
-     * If the operation fails (because the given byte array does not contain
-     * data accepted by the inflater), null is returned.
+     * @throws IOException
+     *             If the operation fails (because the given byte array does not
+     *             contain data accepted by the inflater)
      */
-    public static byte[] inflate(byte[] input, SubMonitor subMonitor) {
-        subMonitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
-        try {
-            Inflater decompressor = new Inflater();
-            decompressor.setInput(input, 0, input.length);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(input.length);
-            byte[] buf = new byte[CHUNKSIZE];
+    public static byte[] inflate(byte[] input, SubMonitor subMonitor)
+        throws IOException {
 
+        subMonitor.beginTask("Inflate bytearray", input.length / CHUNKSIZE + 1);
+
+        ByteArrayOutputStream bos;
+        Inflater decompressor = new Inflater();
+        decompressor.setInput(input, 0, input.length);
+        bos = new ByteArrayOutputStream(input.length);
+        byte[] buf = new byte[CHUNKSIZE];
+
+        try {
             while (!decompressor.finished() && !subMonitor.isCanceled()) {
                 int count = decompressor.inflate(buf);
                 bos.write(buf, 0, count);
                 subMonitor.worked(1);
             }
-
-            IOUtils.closeQuietly(bos);
-            subMonitor.done();
-
             return bos.toByteArray();
         } catch (java.util.zip.DataFormatException ex) {
             log.error("Failed to inflate bytearray", ex);
+            throw new CausedIOException(ex);
+        } finally {
+            IOUtils.closeQuietly(bos);
+            subMonitor.done();
         }
-        return null;
     }
 
     /**

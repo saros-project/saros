@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.net.jingle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
@@ -32,6 +32,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -121,7 +122,7 @@ public class JingleFileTransferManager {
     private Map<JID, FileTransferConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, FileTransferConnection>());
 
-    private Set<IJingleFileTransferListener> listeners = new HashSet<IJingleFileTransferListener>();
+    protected DispatchingJingleFileTransferListener fileTransferListener;
 
     /**
      * The FileMediaManager manages all FileTransferSessions. When a Jingle
@@ -146,7 +147,7 @@ public class JingleFileTransferManager {
 
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, remoteCandidate, localCandidate, null, jingleSession,
-                listeners, remoteJID);
+                fileTransferListener, remoteJID);
 
             // TODO Make sure we don't need to do this asynchronously
             newSession.initialize();
@@ -189,6 +190,15 @@ public class JingleFileTransferManager {
         return sb.toString();
     }
 
+    /**
+     * This executor is used to decouple the reading from the ObjectInputStream
+     * and the notification of the listeners. Thus we can continue reading, even
+     * while the DataTransferManager is handling our data.
+     */
+    ExecutorService dispatch = Executors
+        .newSingleThreadExecutor(new NamedThreadFactory(
+            "JingleFileTransferManager-Dispatch-"));
+
     private FileMediaManager mediaManager;
 
     protected Saros saros;
@@ -198,11 +208,12 @@ public class JingleFileTransferManager {
         this.xmppConnection = connection;
         this.saros = saros;
 
+        // Add another layer of indirection
+        this.fileTransferListener = new DispatchingJingleFileTransferListener(dispatch);
+        this.fileTransferListener.add(listener);
+
         log.debug("Starting to initialize jingle file transfer manager.");
-
-        this.listeners.add(listener);
         initialize();
-
         log.debug("Initialized jingle file transfer manager.");
     }
 
@@ -513,16 +524,6 @@ public class JingleFileTransferManager {
      */
     public FileTransferConnection getConnection(JID jid) {
         return connections.get(jid);
-    }
-
-    /**
-     * To add a JingleFileTransferListener
-     * 
-     * @param listener
-     */
-    public void addJingleFileTransferListener(
-        IJingleFileTransferListener listener) {
-        listeners.add(listener);
     }
 
     public interface IJingleStateListener {

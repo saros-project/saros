@@ -871,4 +871,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
+    /**
+     * Get the ExecutorService under which all incoming activities should be
+     * executed.
+     * 
+     * @return
+     */
+    public ExecutorService getDispatchExecutor() {
+        return dispatch;
+    }
+
 }

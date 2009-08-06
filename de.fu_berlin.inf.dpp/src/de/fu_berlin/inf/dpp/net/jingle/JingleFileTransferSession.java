@@ -2,7 +2,6 @@ package de.fu_berlin.inf.dpp.net.jingle;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,17 +15,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smackx.jingle.JingleSession;
 import org.jivesoftware.smackx.jingle.media.JingleMediaSession;
@@ -71,23 +69,15 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     public static final int TIMEOUTSECONDS = 15;
 
-    private class ReceiverThread extends Thread {
+    protected IJingleFileTransferListener fileTransferListener;
+
+    protected class ReceiverThread extends Thread {
 
         private ObjectInputStream input;
 
         public ReceiverThread(ObjectInputStream ii) {
             this.input = ii;
         }
-
-        /**
-         * This executor is used to decouple the reading from the
-         * ObjectInputStream and the notification of the listeners. Thus we can
-         * continue reading, even while the DataTransferManager is handling our
-         * data.
-         */
-        ExecutorService dispatch = Executors
-            .newSingleThreadExecutor(new NamedThreadFactory(
-                "JingleFileTransferSession-Dispatch-"));
 
         /**
          * @review runSafe OK
@@ -117,19 +107,21 @@ public class JingleFileTransferSession extends JingleMediaSession {
                         continue;
                     }
 
-                    dispatch.submit(Util.wrapSafe(log, new Runnable() {
-                        public void run() {
-                            for (IJingleFileTransferListener listener : listeners) {
-                                listener.incomingDescription(data,
-                                    connectionType);
-                            }
-                        }
-                    }));
+                    /*
+                     * TODO: ask GUI if user wants to get the data. It should
+                     * return a ProgressMonitor with Util#getRunnableContext(),
+                     * that we can use here.
+                     */
+                    SubMonitor monitor = SubMonitor
+                        .convert(new NullProgressMonitor());
+
+                    fileTransferListener.incomingDescription(data,
+                        connectionType);
 
                     long startTime = System.currentTimeMillis();
 
                     // Read incoming chunks of data
-                    final byte[] content;
+                    byte[] content;
                     try {
                         int n = input.readInt();
 
@@ -145,31 +137,29 @@ public class JingleFileTransferSession extends JingleMediaSession {
                             count = input.readInt();
                         }
 
-                        if (count == -1)
+                        if (count == -1) {
                             // canceled
+                            fileTransferListener.transferFailed(data,
+                                connectionType, null);
                             continue;
+                        }
+
+                        if (data.compressInDataTransferManager()) {
+                            content = Util.inflate(content, monitor);
+                        }
 
                     } catch (IOException e) {
                         log.error(prefix() + "Crashed", e);
-                        for (IJingleFileTransferListener listener : listeners) {
-                            listener.transferFailed(data, connectionType);
-                        }
+                        fileTransferListener.transferFailed(data,
+                            connectionType, e);
+                        close();
                         return;
                     }
 
-                    final long duration = Math.max(0, System
-                        .currentTimeMillis()
+                    long duration = Math.max(0, System.currentTimeMillis()
                         - startTime);
-
-                    dispatch.submit(Util.wrapSafe(log, new Runnable() {
-                        public void run() {
-                            for (IJingleFileTransferListener listener : listeners) {
-                                listener.incomingData(data,
-                                    new ByteArrayInputStream(content),
-                                    connectionType, content.length, duration);
-                            }
-                        }
-                    }));
+                    fileTransferListener.incomingData(data, connectionType,
+                        content, content.length, duration);
                 }
             } catch (RuntimeException e) {
                 log.error(prefix() + "Internal Error in Receive Thread: ", e);
@@ -191,7 +181,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
     }
 
     private ReceiverThread receiveThread;
-    private Set<IJingleFileTransferListener> listeners;
+
     private UDPSelectorProvider udpSelectorProvider;
 
     private NetTransferMode connectionType = NetTransferMode.UNKNOWN;
@@ -222,8 +212,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * @param jingleSession
      *            may be null, the existing JingleSession which we are a part
      *            of.
-     * @param listeners
-     *            We will notify these listeners if we receive files from the
+     * @param fileTransferListener
+     *            We will notify this listeners if we receive files from the
      *            remote side.
      * @param connectTo
      *            The JID of the user we are connecting to via this transfer
@@ -232,11 +222,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public JingleFileTransferSession(PayloadType payloadType,
         TransportCandidate remote, TransportCandidate local,
         String mediaLocator, JingleSession jingleSession,
-        Set<IJingleFileTransferListener> listeners, JID connectTo) {
+        IJingleFileTransferListener fileTransferListener, JID connectTo) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
 
         this.connectTo = connectTo;
-        this.listeners = listeners;
+        this.fileTransferListener = fileTransferListener;
     }
 
     /**

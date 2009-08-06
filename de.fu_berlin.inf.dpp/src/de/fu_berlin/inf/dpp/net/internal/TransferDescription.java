@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -29,6 +30,29 @@ public class TransferDescription implements Serializable {
 
     private static final long serialVersionUID = -4063208452619555716L;
 
+    /**
+     * File extensions which we take to be already compressed so that Saros does
+     * not attempt to compress them again.
+     */
+    protected static final HashSet<String> compressedSet = new HashSet<String>();
+    static {
+        compressedSet.add("zip");
+        compressedSet.add("jar");
+        compressedSet.add("jpg");
+        compressedSet.add("jpeg");
+        compressedSet.add("png");
+        compressedSet.add("gif");
+        compressedSet.add("war");
+        compressedSet.add("ear");
+        compressedSet.add("gz");
+        compressedSet.add("gzip");
+        compressedSet.add("bz");
+        compressedSet.add("bz2");
+        compressedSet.add("tgz");
+        compressedSet.add("pkg");
+        compressedSet.add("7z");
+    }
+
     public static enum FileTransferType {
         /**
          * Transfer of a FileList
@@ -41,7 +65,12 @@ public class TransferDescription implements Serializable {
         /**
          * Transfer of several resources in a ZIP-File
          */
-        ARCHIVE_TRANSFER, ACTIVITY_TRANSFER
+        ARCHIVE_TRANSFER,
+        /**
+         * Transfer of an ActivityExtension as XML that was serialized using
+         * UTF-8 and GZIPped
+         */
+        ACTIVITY_TRANSFER
     }
 
     public FileTransferType type;
@@ -56,9 +85,15 @@ public class TransferDescription implements Serializable {
 
     /**
      * Field used to indicate that the file is to be interpreted as being empty,
-     * if the transfer method does not support empty files.
+     * if the transfer method does not support files of length 0.
      */
     public boolean emptyFile = false;
+
+    /**
+     * Field used to indicate that the file is compressed already, like in
+     * ARCHIVE_TRANSFER or RESOURCE_TRANSFER with a File like a jar, jpeg, ....
+     */
+    public boolean compressed;
 
     @Override
     public String toString() {
@@ -85,6 +120,7 @@ public class TransferDescription implements Serializable {
         result.recipient = recipient;
         result.type = FileTransferType.FILELIST_TRANSFER;
         result.sessionID = sessionID;
+        result.compressed = false;
         return result;
     }
 
@@ -97,6 +133,10 @@ public class TransferDescription implements Serializable {
         result.type = FileTransferType.RESOURCE_TRANSFER;
         result.file_project_path = path.toPortableString();
         result.sessionID = sessionID;
+
+        // Only compress if not a file-type which is already commonly compressed
+        result.compressed = compressedSet.contains(path.getFileExtension());
+
         return result;
     }
 
@@ -108,6 +148,7 @@ public class TransferDescription implements Serializable {
         result.sender = jid;
         result.type = FileTransferType.ARCHIVE_TRANSFER;
         result.sessionID = sessionID;
+        result.compressed = true;
 
         return result;
     }
@@ -120,6 +161,7 @@ public class TransferDescription implements Serializable {
         result.sender = sender;
         result.type = FileTransferType.ACTIVITY_TRANSFER;
         result.sessionID = sessionID;
+        result.compressed = true; // Already GZIPPED
 
         return result;
     }
@@ -186,6 +228,10 @@ public class TransferDescription implements Serializable {
 
     public void setEmptyFile(boolean b) {
         emptyFile = true;
+    }
+
+    public boolean compressInDataTransferManager() {
+        return !compressed;
     }
 
 }

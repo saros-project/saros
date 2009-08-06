@@ -1,7 +1,5 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
-import java.io.InputStream;
-
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 
@@ -10,11 +8,11 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
  */
 public interface IJingleFileTransferListener {
 
-    public void incomingData(TransferDescription data, InputStream input,
-        NetTransferMode mode, long size, long transferDuration);
+    public void incomingData(TransferDescription data, NetTransferMode mode,
+        byte[] input, long size, long transferDuration);
 
     public void transferFailed(TransferDescription data,
-        NetTransferMode connectionType);
+        NetTransferMode connectionType, Exception e);
 
     public void incomingDescription(TransferDescription data,
         NetTransferMode connectionType);

@@ -19,6 +19,8 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -42,6 +44,7 @@ import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
+import de.fu_berlin.inf.dpp.net.jingle.DispatchingJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
@@ -111,6 +114,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     };
 
+    protected DispatchingJingleFileTransferListener jingleListener;
+
     protected FileTransferManager fileTransferManager;
 
     protected ConcurrentLinkedQueue<TransferData> fileTransferQueue;
@@ -171,20 +176,37 @@ public class DataTransferManager implements ConnectionSessionListener {
             addIncomingFileTransfer(data);
         }
 
-        public void incomingData(TransferDescription data, InputStream input,
-            NetTransferMode mode, long size, long transferDuration) {
+        public void incomingData(TransferDescription data,
+            NetTransferMode mode, byte[] content, long size,
+            long transferDuration) {
 
             removeIncomingFileTransfer(data);
             transferModeDispatch.transferFinished(data.getSender(), mode, true,
                 size, transferDuration);
-            receiveData(data, input);
 
+            receiveData(data, new ByteArrayInputStream(content));
         }
 
         public void transferFailed(TransferDescription data,
-            NetTransferMode connectionType) {
+            NetTransferMode connectionType, Exception e) {
 
-            removeIncomingFileTransfer(data);
+            try {
+                IInvitationProcess process = chatTransmitter
+                    .getInvitationProcess(data.sender);
+                if (process != null) {
+                    /*
+                     * if e == null this means that the other side canceled, we
+                     * just drop the file transfer then, because a cancelation
+                     * will arrive as a extension
+                     */
+                    if (e != null) {
+                        process.cancel("File Transfer via Jingle failed:\n"
+                            + Util.getMessage(e), false);
+                    }
+                }
+            } finally {
+                removeIncomingFileTransfer(data);
+            }
         }
     }
 
@@ -201,6 +223,10 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
 
         protected void receiveIBB(FileTransferRequest request) {
+            // TODO: ask GUI if user wants to get the data. It should return a
+            // ProgressMonitor with Util#getRunnableContext(), that we can use
+            // here.
+            IProgressMonitor monitor = new NullProgressMonitor();
 
             TransferDescription data;
             try {
@@ -228,16 +254,22 @@ public class DataTransferManager implements ConnectionSessionListener {
                 IncomingFileTransfer accept = request.accept();
 
                 InputStream in = accept.recieveFile();
-
                 try {
                     content = IOUtils.toByteArray(in);
                 } finally {
                     IOUtils.closeQuietly(in);
                 }
+
+                // File is meant to be empty
                 if (data.emptyFile) {
-                    // file is meant to be empty
                     content = new byte[0];
                 }
+
+                if (data.compressInDataTransferManager()) {
+                    content = Util
+                        .inflate(content, SubMonitor.convert(monitor));
+                }
+
             } catch (Exception e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
 
@@ -257,8 +289,10 @@ public class DataTransferManager implements ConnectionSessionListener {
             log.debug("[IBB] Finished incoming file transfer: "
                 + data.toString() + ", size: "
                 + Util.throughput(request.getFileSize(), duration));
+
             transferModeDispatch.transferFinished(data.getSender(),
                 NetTransferMode.IBB, true, content.length, duration);
+
             receiveData(data, new ByteArrayInputStream(content));
         }
 
@@ -427,7 +461,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     };
 
-    protected void sendData(TransferDescription transferData, byte[] content,
+    protected void sendData(TransferDescription transferData, byte[] input,
         SubMonitor progress) throws IOException {
 
         // TODO Buffer correctly when not connected....
@@ -441,13 +475,17 @@ public class DataTransferManager implements ConnectionSessionListener {
             transmitters = new Transmitter[] { jingle, ibb };
         }
 
-        progress.beginTask("Sending Data", transmitters.length);
+        progress.beginTask("Sending Data", transmitters.length * 70 + 15);
+
+        if (transferData.compressInDataTransferManager()) {
+            input = Util.deflate(input, progress.newChild(15));
+        }
 
         try {
             // Try all transmitters
             for (Transmitter transmitter : transmitters) {
-                if (sendData(transmitter, transferData, content, progress
-                    .newChild(1))) {
+                if (sendData(transmitter, transferData, input, progress
+                    .newChild(70))) {
                     // Successfully sent!
                     return;
                 }
@@ -633,7 +671,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             String fileListAsString;
             try {
-                // TODO: ZipInflaterStream benutzen
                 fileListAsString = Util.read(input);
             } catch (IOException e) {
                 log.error("Error receiving FileList", e);
@@ -718,6 +755,12 @@ public class DataTransferManager implements ConnectionSessionListener {
         // Create Containers
         this.connection = connection;
 
+        if (jingleListener == null) {
+            jingleListener = new DispatchingJingleFileTransferListener(
+                chatTransmitter.getDispatchExecutor());
+            jingleListener.add(new JingleTransferListener());
+        }
+
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
         this.receivers = new LinkedList<IDataReceiver>();
         this.receivers.add(defaultReceiver);
@@ -739,7 +782,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                 public void run() {
                     try {
                         jingleManager.setValue(new JingleFileTransferManager(
-                            saros, connection, new JingleTransferListener()));
+                            saros, connection, jingleListener));
                         log.debug("Jingle Manager started");
                     } catch (Exception e) {
 
