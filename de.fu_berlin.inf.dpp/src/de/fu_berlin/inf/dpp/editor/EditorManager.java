@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentExtension4;
+import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.TextSelection;
@@ -54,6 +55,7 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.IElementStateListener;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
@@ -76,6 +78,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.SelectionAnnotation;
 import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.editor.internal.EditorListener;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
@@ -119,17 +122,53 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "core")
 public class EditorManager implements IActivityProvider, Disposable {
 
+    /**
+     * The EditorPool manages the IEditorParts of the local user. Currently only
+     * those parts are supported by Saros (and thus managed in the EditorPool)
+     * which can be traced to an {@link IFile} and an {@link ITextViewer}.
+     */
     protected class EditorPool {
 
+        /**
+         * The editorParts-map will return all EditorParts associated with a
+         * given IPath. This can be potentielly many because a IFile (which can
+         * be identified using a IPath) can be opened in multiple editors.
+         */
         protected Map<IPath, HashSet<IEditorPart>> editorParts = new HashMap<IPath, HashSet<IEditorPart>>();
 
         /**
-         * The EditorPool only managed those IEditorParts whose IEditorInput can
-         * be traced to a file with a viewer.
+         * The editorInputMap contains all IEditorParts which are managed by the
+         * EditorPool and stores the associated IEditorInput (the EditorInput
+         * could also actually be retrieved directly from the IEditorPart).
          */
         protected Map<IEditorPart, IEditorInput> editorInputMap = new HashMap<IEditorPart, IEditorInput>();
 
+        /**
+         * Tries to add an {@link IEditorPart} to the {@link EditorPool}. This
+         * method also connects the editorPart with its data source (identified
+         * by associated {@link IFile}), makes it editable for driver, and
+         * registers listeners:
+         * <ul>
+         * <li>{@link IElementStateListener} on {@link IDocumentProvider} -
+         * listens for the changes in the file connected with the editor (e.g.
+         * file gets 'dirty')</li>
+         * <li>{@link IDocumentListener} on {@link IDocument} - listens for
+         * changes in the document (e.g. documents text gets changed)</li>
+         * <li>{@link EditorListener} on {@link IEditorPart} - listens for basic
+         * events needed for tracking of text selection and viewport changes
+         * (e.g. mouse events, keyboard events)</li>
+         * </ul>
+         * 
+         * This method will print a warning and return without any effect if the
+         * given IEditorPart does not a.) represent an IFile, b.) which can be
+         * referred to using an IPath and c.) the IEditorPart can be mapped to
+         * an ITextViewer.
+         * 
+         * The method is robust against adding the same IEditorPart twice.
+         */
         public void add(IEditorPart editorPart) {
+
+            wpLog.trace("EditorPool.add invoked");
 
             IPath path = editorAPI.getEditorPath(editorPart);
             if (path == null) {
@@ -181,7 +220,28 @@ public class EditorManager implements IActivityProvider, Disposable {
             lastRemoteEditTimes.put(path, System.currentTimeMillis());
         }
 
+        /**
+         * Tries to remove an {@link IEditorPart} from {@link EditorPool}. This
+         * Method also disconnects the editorPart from its data source
+         * (identified by associated {@link IFile}) and removes registered
+         * listeners:
+         * <ul>
+         * <li>{@link IElementStateListener} from {@link IDocumentProvider}</li>
+         * <li>{@link IDocumentListener} from {@link IDocument}</li>
+         * <li>{@link EditorListener} from {@link IEditorPart}</li>
+         * </ul>
+         * 
+         * This method also makes the Editor editable.
+         * 
+         * @param editorPart
+         *            editorPart to be removed
+         * 
+         * @return {@link IPath} of the Editor that was removed from the Pool,
+         *         or <code>null</code> on error.
+         */
         public IPath remove(IEditorPart editorPart) {
+
+            wpLog.trace("EditorPool.remove invoked");
 
             IEditorInput input = editorInputMap.remove(editorPart);
             if (input == null) {
@@ -228,8 +288,20 @@ public class EditorManager implements IActivityProvider, Disposable {
             return path;
         }
 
+        /**
+         * Returns all IEditorParts which have been added to this IEditorPool
+         * which display a file using the given path.
+         * 
+         * @param path
+         *            {@link IPath} of the Editor
+         * 
+         * @return set of relating IEditorPart
+         * 
+         */
         public Set<IEditorPart> getEditors(IPath path) {
 
+            wpLog.trace("EditorPool.getEditors(" + path.toString()
+                + ") invoked");
             if (!editorParts.containsKey(path)) {
                 HashSet<IEditorPart> result = new HashSet<IEditorPart>();
                 editorParts.put(path, result);
@@ -238,7 +310,16 @@ public class EditorManager implements IActivityProvider, Disposable {
             return editorParts.get(path);
         }
 
+        /**
+         * Returns all IEditorParts actually managed in the EditorPool.
+         * 
+         * @return set of all {@link IEditorPart} from the {@link EditorPool}.
+         * 
+         */
         public Set<IEditorPart> getAllEditors() {
+
+            wpLog.trace("EditorPool.getAllEditors invoked");
+
             Set<IEditorPart> result = new HashSet<IEditorPart>();
 
             for (Set<IEditorPart> parts : this.editorParts.values()) {
@@ -247,7 +328,12 @@ public class EditorManager implements IActivityProvider, Disposable {
             return result;
         }
 
+        /**
+         * Removes all {@link IEditorPart} from the EditorPool.
+         */
         public void removeAllEditors() {
+
+            wpLog.trace("EditorPool.removeAllEditors invoked");
 
             for (IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) {
                 remove(part);
@@ -256,19 +342,34 @@ public class EditorManager implements IActivityProvider, Disposable {
             assert getAllEditors().size() == 0;
         }
 
+        /**
+         * Will set all IEditorParts in the EditorPool to be editable by the
+         * local user if isDriver == true. The editors will be locked if
+         * isDriver == false.
+         */
         public void setDriverEnabled(boolean isDriver) {
+
+            wpLog.trace("EditorPool.setDriverEnabled");
 
             for (IEditorPart editorPart : getAllEditors()) {
                 editorAPI.setEditable(editorPart, isDriver);
             }
         }
 
+        /**
+         * Returns true iff the given IEditorPart is managed by the
+         * {@link EditorPool}. See EditorPool for a description of which
+         * IEditorParts are managed.
+         */
         public boolean isManaged(IEditorPart editor) {
             return editorInputMap.containsKey(editor);
         }
     }
 
     protected static Logger log = Logger.getLogger(EditorManager.class
+        .getName());
+
+    protected static Logger wpLog = Logger.getLogger(EditorManager.class
         .getName());
 
     protected static EditorManager instance;
@@ -568,6 +669,8 @@ public class EditorManager implements IActivityProvider, Disposable {
     public EditorManager(Saros saros, SessionManager sessionManager,
         StopManager stopManager) {
 
+        wpLog.trace("EditorManager initialised");
+
         this.saros = saros;
 
         setEditorAPI(new EditorAPI(saros));
@@ -581,9 +684,18 @@ public class EditorManager implements IActivityProvider, Disposable {
         return connectedFiles.contains(file);
     }
 
+    /**
+     * Tries to add the given {@link IFile} to a set of locally opened files.
+     * The file gets connected to its {@link IDocumentProvider} (e.g.
+     * CompilationUnitDocumentProvider for Java-Files) This Method also converts
+     * the line delimiters of the document. Already connected files will not be
+     * connected twice.
+     * 
+     */
+
     public void connect(IFile file) {
 
-        // TODO Check that file exists...
+        wpLog.trace("EditorManager.connect(" + file.getName() + ") invoked");
 
         if (!isConnected(file)) {
             FileEditorInput input = new FileEditorInput(file);
@@ -598,6 +710,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             connectedFiles.add(file);
 
             IDocument document = documentProvider.getDocument(input);
+
+            wpLog.trace("EditorManager.connect: IDocument loaded");
 
             // if line delimiters are not in unix style convert them
             if (document instanceof IDocumentExtension4) {
@@ -684,8 +798,8 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     /**
-     * Sets the editor open by the local user and fires an EditorActivity of
-     * type Activated.
+     * Sets the local editor 'opened' and fires an {@link EditorActivity} of
+     * type <code>Activated</code>.
      * 
      * @param path
      *            the project-relative path to the resource that the editor is
@@ -707,6 +821,25 @@ public class EditorManager implements IActivityProvider, Disposable {
             .toString(), Type.Activated, path));
     }
 
+    /**
+     * Fires an update of the given viewport for the given {@link IEditorPart}
+     * so that all remote parties know that the user is now positioned at the
+     * given viewport in the given part.
+     * 
+     * A viewport activity not necessarily indicates that the given IEditorPart
+     * is currently active. If it is (the given IEditorPart matches the
+     * locallyActiveEditor) then the {@link #localViewport} is updated to
+     * reflect this.
+     * 
+     * 
+     * @param part
+     *            The IEditorPart for which to generate a ViewportActivity.
+     * 
+     * @param viewport
+     *            The ILineRange in the given part which represents the
+     *            currently visible portion of the editor. (again visible does
+     *            not mean that this editor is actually the active one)
+     */
     public void generateViewport(IEditorPart part, ILineRange viewport) {
 
         if (this.sharedProject == null) {
@@ -727,6 +860,18 @@ public class EditorManager implements IActivityProvider, Disposable {
             .toString(), viewport, path));
     }
 
+    /**
+     * Fires an update of the given {@link ITextSelection} for the given
+     * {@link IEditorPart} so that all remote parties know that the user
+     * selected some text in the given part.
+     * 
+     * @param part
+     *            The IEditorPart for which to generate a TextSelectionActivity
+     * 
+     * @param newSelection
+     *            The ITextSelection in the given part which represents the
+     *            currently selected text in editor.
+     */
     public void generateSelection(IEditorPart part, ITextSelection newSelection) {
 
         IPath path = editorAPI.getEditorPath(part);
@@ -866,6 +1011,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execTextEdit(TextEditActivity textEdit) {
 
+        wpLog.trace("EditorManager.execTextEdit invoked");
+
         User user = sharedProject.getUser(new JID(textEdit.getSource()));
 
         IPath path = textEdit.getEditor();
@@ -907,6 +1054,9 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     protected void execTextSelection(TextSelectionActivity selection) {
+
+        wpLog.trace("EditorManager.execTextSelection invoked");
+
         IPath path = selection.getEditor();
 
         if (path == null) {
@@ -929,6 +1079,8 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     protected void execViewport(ViewportActivity viewport) {
+
+        wpLog.trace("EditorManager.execViewport invoked");
 
         User user = sharedProject.getUser(new JID(viewport.getSource()));
         boolean following = user.equals(getFollowedUser());
@@ -971,6 +1123,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected void execActivated(final User user, final IPath path) {
 
+        wpLog.trace("EditorManager.execActivated invoked");
+
         for (ISharedEditorListener listener : editorListeners) {
             listener.activeEditorChanged(user, path);
         }
@@ -982,6 +1136,8 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     protected void execClosed(final User user, final IPath path) {
+
+        wpLog.trace("EditorManager.execClosed invoked");
 
         for (ISharedEditorListener listener : editorListeners) {
             listener.editorRemoved(user, path);
@@ -1004,6 +1160,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      * Called when the local user opened an editor part.
      */
     public void partOpened(IEditorPart editorPart) {
+
+        wpLog.trace("EditorManager.partOpened invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;
@@ -1038,6 +1196,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      * based on the same file.
      */
     public void partActivated(IEditorPart editorPart) {
+
+        wpLog.trace("EditorManager.partActiveted invoked");
 
         // First check for last editor being closed (which is a null editorPart)
         if (editorPart == null) {
@@ -1112,6 +1272,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      * Called if the local user closed a part
      */
     public void partClosed(IEditorPart editorPart) {
+
+        wpLog.trace("EditorManager.partClosed invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;
@@ -1284,7 +1446,11 @@ public class EditorManager implements IActivityProvider, Disposable {
      * @swt Needs to be called from a UI thread.
      */
     private void resetText(IFile file) {
+
+        wpLog.trace("EditorManager.resetText(" + file.getName() + ") invoked.");
         if (!file.exists()) {
+            log.warn("EditorManager.resetText :" + file.getName()
+                + "does not exist. Exit.");
             return;
         }
 
@@ -1293,6 +1459,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             IDocumentProvider provider = getDocumentProvider(input);
             provider.disconnect(input);
             this.connectedFiles.remove(file);
+            wpLog.trace("EditorManager.resetText file " + file.getName()
+                + " disconnencted.");
         }
     }
 
@@ -1369,6 +1537,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         IFile file = this.sharedProject.getProject().getFile(path);
 
+        wpLog.trace("EditorManager.saveText (" + file.getName() + ") invoked");
+
         if (!file.exists()) {
             log.error(
                 "Cannot save file that does not exist:" + path.toString(),
@@ -1381,17 +1551,25 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         FileEditorInput input = new FileEditorInput(file);
+        wpLog.trace("EditorManager.saveText EditorInput created ");
 
         IDocumentProvider provider = getDocumentProvider(input);
+        wpLog.trace("EditorManager.saveText IDocumentProvider craeted ");
 
         if (isConnected(file)) {
+            wpLog.trace("EditorManager.saveText File " + file.getName()
+                + " is connected");
             if (provider.canSaveDocument(input)) {
+                wpLog.trace("EditorManager.saveText File " + file.getName()
+                    + " can be saved");
                 // Everything okay! Provider and EditorManager agree
             } else {
                 log.warn("File is not modified, but "
                     + "EditorManager thinks it is: " + file.toString());
             }
         } else {
+            wpLog.trace("EditorManager.saveText File " + file.getName()
+                + "is NOT connected");
             if (provider.canSaveDocument(input)) {
                 log.warn("File is modified, but "
                     + "EditorManager does not know about it: "
@@ -1412,10 +1590,16 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
         boolean wasReadonly = FileUtil.setReadOnly(file, false);
 
+        wpLog.trace("EditorManager.saveText File " + file.getName()
+            + " was Read-Only?: " + wasReadonly);
+
         IDocument doc = provider.getDocument(input);
 
         IAnnotationModel model = provider.getAnnotationModel(input);
         model.connect(doc);
+
+        wpLog.trace("EditorManager.saveText Annotations on the IDocument "
+            + "are set");
 
         dirtyStateListener.enabled = false;
 
@@ -1446,6 +1630,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         model.disconnect(doc);
 
+        wpLog.trace("EditorManager.saveText File " + file.getName()
+            + " will be reseted");
         resetText(file);
 
         // Reset readonly state
@@ -1466,6 +1652,9 @@ public class EditorManager implements IActivityProvider, Disposable {
             listener.driverEditorSaved(path, false);
         }
 
+        wpLog.trace("EditorManager.sendEditorActivitySaved started for "
+            + path.toString());
+
         // TODO technically we should mark the file as saved in the
         // editorPool, or?
 
@@ -1478,6 +1667,9 @@ public class EditorManager implements IActivityProvider, Disposable {
      * importantly the ActivitySequencer).
      */
     protected void fireActivity(IActivity activity) {
+        wpLog.trace("EditorManager.fireActivity invoked");
+        // activity.
+
         for (IActivityListener listener : this.activityListeners) {
             listener.activityCreated(activity);
         }
@@ -1740,8 +1932,24 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     /**
      * TODO Review and document the purpose of this
+     * 
+     * Returns the {@link IDocumentProvider} of the given {@link IEditorInput}.
+     * This method analyzes the file extension of the {@link IFile} associated
+     * with the given {@link IEditorInput}. Depending on the file extension it
+     * returns file-types responsible {@link IDocumentProvider}.
+     * 
+     * 
+     * @param input
+     *            the {@link IEditorInput} for which {@link IDocumentProvider}
+     *            is needed
+     * 
+     * @return IDocumentProvider of the given input
+     * 
+     * 
      */
     public IDocumentProvider getDocumentProvider(IEditorInput input) {
+
+        wpLog.trace("EditorManager.getDocumentProvider invoked");
 
         Object adapter = input.getAdapter(IFile.class);
         if (adapter != null) {
@@ -1784,7 +1992,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * keyboard inputs are not applied.
      * 
      * @param lock
-     *            if true then editors are locked, else they are unlocked
+     *            if true then editors are locked, otherwise they are unlocked
      */
     protected void lockAllEditors(boolean lock) {
         if (lock)
