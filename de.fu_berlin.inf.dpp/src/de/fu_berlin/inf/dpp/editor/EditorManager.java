@@ -787,6 +787,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         IEditorPart changedEditor = null;
 
+        // FIXME: This is potentially slow and definitely ugly
         // search editor which changed
         for (IEditorPart editor : editorPool.getAllEditors()) {
             if (ObjectUtils.equals(getDocument(editor), document)) {
@@ -888,6 +889,10 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         documentListener.enabled = true;
 
+        /*
+         * TODO Performance optimization in case of batch operation might make
+         * sense
+         */
         for (IEditorPart editorPart : editorPool.getEditors(path)) {
             editorAPI.setSelection(editorPart, new TextSelection(
                 textEdit.offset + textEdit.text.length(), 0), user, user
