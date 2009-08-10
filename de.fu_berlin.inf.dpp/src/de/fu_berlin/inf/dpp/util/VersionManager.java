@@ -89,6 +89,13 @@ public class VersionManager {
     }
 
     /**
+     * Returns the Version of the locally running Saros plugin
+     */
+    public Version getVersion() {
+        return Util.getBundleVersion(bundle);
+    }
+
+    /**
      * Will compare the two given Versions for compatibility. The result
      * indicates whether the localVersion passed first is compatible with the
      * remoteVersion.
