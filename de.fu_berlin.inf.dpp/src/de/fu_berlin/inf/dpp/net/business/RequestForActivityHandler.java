@@ -59,7 +59,7 @@ public class RequestForActivityHandler {
         @Override
         public PacketFilter getFilter() {
             return new AndFilter(super.getFilter(), PacketExtensionUtils
-                .getInSessionFilter(sessionManager));
+                .getSessionIDPacketFilter(sessionID));
         }
 
         @Override
