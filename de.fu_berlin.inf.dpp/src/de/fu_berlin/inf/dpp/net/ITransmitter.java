@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
+import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -38,6 +39,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * An humble interface that is responsible for network functionality. The idea
@@ -51,23 +53,6 @@ public interface ITransmitter {
 
     /* ---------- invitations --------- */
 
-    // TODO move aggregation of pending invitation to sessionManager
-    /**
-     * Adds given invitation to the list of pending invitations.
-     * 
-     * @param invitation
-     *            the invitation that to be added.
-     */
-    public void addInvitationProcess(IInvitationProcess invitation);
-
-    /**
-     * Removes given invitation from the list of pending invitations.
-     * 
-     * @param invitation
-     *            the invitation that is to be removed.
-     */
-    public void removeInvitationProcess(IInvitationProcess invitation);
-
     /**
      * Sends an invitation message for given shared project to given user.
      * 
@@ -78,9 +63,14 @@ public interface ITransmitter {
      * @param description
      *            a informal description text that can be provided with the
      *            invitation. Can not be <code>null</code>.
+     * @param sarosVersion
+     *            The version of Saros installed locally. The invited user can
+     *            use this version information to check whether his/her version
+     *            is compatible. See {@link VersionManager}.
+     * 
      */
     public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-        String description, int colorID);
+        String description, int colorID, Version sarosVersion);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation

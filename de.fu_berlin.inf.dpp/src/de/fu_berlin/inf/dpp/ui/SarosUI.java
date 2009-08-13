@@ -61,6 +61,7 @@ import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * Some helper functionality to interface with Eclipse.
@@ -82,6 +83,9 @@ public class SarosUI {
 
     @Inject
     protected Saros saros;
+
+    @Inject
+    VersionManager manager;
 
     protected SessionManager sessionManager;
 
@@ -127,7 +131,7 @@ public class SarosUI {
     protected void showIncomingInvitationUI(IIncomingInvitationProcess process) {
 
         JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
-            dataTransferManager, preferenceUtils);
+            dataTransferManager, preferenceUtils, manager);
         WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), sessionWizard);
 

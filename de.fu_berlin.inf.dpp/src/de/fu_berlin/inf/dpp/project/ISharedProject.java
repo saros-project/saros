@@ -26,15 +26,12 @@ import java.util.concurrent.CancellationException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
-import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
@@ -127,26 +124,6 @@ public interface ISharedProject extends IActivityListener {
     public void removeUser(User user);
 
     /**
-     * Invites a user to the shared project.
-     * 
-     * @param jid
-     *            the JID of the user that is to be invited.
-     * @param description
-     *            a description that will be shown to the invited user before he
-     *            makes the decision to accept or decline the invitation.
-     * @param inviteUI
-     *            user interface of the invitation for feedback calls.
-     * 
-     * @param fileList
-     *            a list of all files currently present in the project
-     * 
-     * @return the outgoing invitation process.
-     */
-    public IOutgoingInvitationProcess invite(JID jid, String description,
-        boolean inactive, IInvitationUI inviteUI, FileList fileList,
-        SubMonitor monitor);
-
-    /**
      * Adds the given shared project listener. This call is ignored if the
      * listener is all a listener of this shared project.
      * 
@@ -186,19 +163,6 @@ public interface ISharedProject extends IActivityListener {
      * Deactivates sending of activities.
      */
     public void stop();
-
-    /**
-     * Returns the User in this project for the given JID.
-     * 
-     * Returns null if the given user does not exist in the project.
-     * 
-     * Throws an IllegalArgumentException if the given JID is null.
-     * 
-     * @deprecated This method is deprecated, because it does not compare the
-     *             JID with considering the resource.
-     */
-    @Deprecated
-    public User getParticipant(JID jid);
 
     /**
      * Given a resource qualified JID, this method will return the user which

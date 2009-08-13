@@ -51,13 +51,14 @@ public class InvitationHandler {
 
         @Override
         public void invitationReceived(JID sender, String sessionID,
-            String projectName, String description, int colorID) {
+            String projectName, String description, int colorID,
+            String sarosVersion) {
             if (sessionIDObservable.getValue().equals(
                 SessionIDObservable.NOT_IN_SESSION)) {
                 log.debug("Received invitation with session id " + sessionID
                     + " and ColorID: " + colorID);
                 sessionManager.invitationReceived(sender, sessionID,
-                    projectName, description, colorID);
+                    projectName, description, colorID, sarosVersion);
             } else {
                 transmitter
                     .sendMessage(

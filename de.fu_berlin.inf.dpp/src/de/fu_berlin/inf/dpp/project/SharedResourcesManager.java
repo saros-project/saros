@@ -55,6 +55,7 @@ import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -283,9 +284,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
              */
             if (event.getResource() != null)
                 log.warn("Resource changed while paused: "
-                    + event.getResource().getProjectRelativePath());
+                    + event.getResource().getProjectRelativePath(),
+                    new StackTrace());
             else
-                log.warn("Resource changed while paused.");
+                log.warn("Resource changed while paused", new StackTrace());
             return;
         }
 

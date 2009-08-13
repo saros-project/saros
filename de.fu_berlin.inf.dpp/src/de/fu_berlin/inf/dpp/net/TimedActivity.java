@@ -1,9 +1,12 @@
 package de.fu_berlin.inf.dpp.net;
 
+import java.util.List;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
+import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 
 /**
@@ -134,5 +137,25 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
     public long getLocalTimestamp() {
         return localTimestamp;
+    }
+
+    /**
+     * Used for asserting that the given list contains no FileActivities which
+     * create files
+     */
+    public static boolean containsNoFileCreationActivities(
+        List<TimedActivity> timedActivities) {
+
+        for (TimedActivity timedActivity : timedActivities) {
+
+            IActivity activity = timedActivity.getActivity();
+
+            if (activity instanceof FileActivity
+                && ((FileActivity) activity).getType().equals(
+                    FileActivity.Type.Created)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

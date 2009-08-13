@@ -31,7 +31,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
@@ -40,9 +39,6 @@ import de.fu_berlin.inf.dpp.activities.RoleActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
-import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
-import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
@@ -54,7 +50,6 @@ import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.FileUtil;
-import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -326,20 +321,6 @@ public class SharedProject implements ISharedProject, Disposable {
      * 
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
-    public IOutgoingInvitationProcess invite(JID jid, String description,
-        boolean inactive, IInvitationUI inviteUI, FileList filelist,
-        SubMonitor monitor) {
-
-        return new OutgoingInvitationProcess(saros, transmitter,
-            transferManager, jid, this, description, inactive, inviteUI,
-            getFreeColor(), filelist, monitor);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.project.ISharedProject
-     */
     public void addListener(ISharedProjectListener listener) {
         if (!this.listeners.contains(listener)) {
             this.listeners.add(listener);
@@ -399,37 +380,6 @@ public class SharedProject implements ISharedProject, Disposable {
     public void dispose() {
         stopManager.removeBlockable(stopManagerListener);
         concurrentDocumentManager.dispose();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @deprecated Use {@link #getUser(JID)} and
-     *             {@link #getResourceQualifiedJID(JID)} instead.
-     */
-    @Deprecated
-    public User getParticipant(JID jid) {
-
-        if (jid == null)
-            throw new IllegalArgumentException();
-
-        if (jid.isBareJID()) {
-            log.error(
-                "JIDs used for the SharedProject should always be resource qualified: "
-                    + jid, new StackTrace());
-        }
-
-        User user = this.participants.get(jid);
-        if (user == null)
-            return null;
-
-        if (!user.getJID().strictlyEquals(jid)) {
-            log.error("getParticipant is deprecated and wrongly used:"
-                + " The given JID has a resource qualifier not found "
-                + "in the shared project");
-        }
-
-        return user;
     }
 
     /**

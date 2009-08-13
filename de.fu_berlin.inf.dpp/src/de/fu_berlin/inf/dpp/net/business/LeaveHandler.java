@@ -46,7 +46,7 @@ public class LeaveHandler {
         @Override
         public PacketFilter getFilter() {
             return new AndFilter(super.getFilter(), PacketExtensionUtils
-                .getInSessionFilter(sessionManager));
+                .getSessionIDPacketFilter(sessionID));
         }
 
         @Override
@@ -54,10 +54,9 @@ public class LeaveHandler {
 
             ISharedProject project = sessionManager.getSharedProject();
 
-            User user = project.getParticipant(fromJID);
-
+            User user = project.getUser(fromJID);
             if (user == null) {
-                log.warn("Received leave Message from user which"
+                log.warn("Received leave message from user which"
                     + " is not part of our shared project session: " + fromJID);
                 return;
             }

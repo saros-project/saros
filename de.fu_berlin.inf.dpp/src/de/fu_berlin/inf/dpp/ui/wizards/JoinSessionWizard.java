@@ -41,6 +41,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * A wizard that guides the user through an incoming invitation process.
@@ -79,11 +80,15 @@ public class JoinSessionWizard extends Wizard {
 
     protected PreferenceUtils preferenceUtils;
 
+    protected VersionManager manager;
+
     public JoinSessionWizard(IIncomingInvitationProcess process,
-        DataTransferManager dataTransferManager, PreferenceUtils preferenceUtils) {
+        DataTransferManager dataTransferManager,
+        PreferenceUtils preferenceUtils, VersionManager manager) {
         this.process = process;
         this.dataTransferManager = dataTransferManager;
         this.preferenceUtils = preferenceUtils;
+        this.manager = manager;
 
         setWindowTitle("Session Invitation");
         setHelpAvailable(false);
@@ -211,7 +216,7 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.descriptionPage = new ShowDescriptionPage(this);
+        this.descriptionPage = new ShowDescriptionPage(this, manager);
         this.namePage = new EnterProjectNamePage(this, dataTransferManager,
             preferenceUtils);
 

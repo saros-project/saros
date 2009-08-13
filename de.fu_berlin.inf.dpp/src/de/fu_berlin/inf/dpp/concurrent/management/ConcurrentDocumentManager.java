@@ -321,7 +321,7 @@ public class ConcurrentDocumentManager implements Disposable {
     }
 
     public boolean shouldBeManagedByJupiter(JID jid) {
-        User user = sharedProject.getParticipant(jid);
+        User user = sharedProject.getUser(jid);
         return user.isHost() || user.isDriver();
     }
 

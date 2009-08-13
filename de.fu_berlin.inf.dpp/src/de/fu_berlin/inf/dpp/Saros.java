@@ -54,6 +54,7 @@ import org.jivesoftware.smack.packet.Registration;
 import org.jivesoftware.smack.proxy.ProxyInfo;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.Jingle;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.prefs.BackingStoreException;
@@ -87,12 +88,15 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.XMPPUtil;
+import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.ChecksumHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
+import de.fu_berlin.inf.dpp.net.business.JoinHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
+import de.fu_berlin.inf.dpp.net.business.RequestForFileListHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
@@ -112,6 +116,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
@@ -129,6 +134,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 import de.fu_berlin.inf.dpp.util.pico.ChildContainerProvider;
 import de.fu_berlin.inf.dpp.util.pico.DotGraphMonitor;
 
@@ -350,6 +356,8 @@ public class Saros extends AbstractUIPlugin {
          * first argument. This makes it easier to search for a class without
          * tool support.
          */
+        this.container.addComponent(Saros.class, this);
+
         this.container.addComponent(CDTFacade.class);
         this.container.addComponent(ConnectionSessionManager.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
@@ -368,7 +376,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(PreferenceUtils.class);
         this.container.addComponent(RoleManager.class);
         this.container.addComponent(RosterTracker.class);
-        this.container.addComponent(Saros.class, this);
         this.container.addComponent(SarosRosterListener.class);
         this.container.addComponent(SarosUI.class);
         this.container.addComponent(SessionIDObservable.class);
@@ -382,9 +389,11 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);
+        this.container.addComponent(VersionManager.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);
+        this.container.addComponent(InvitationProcessObservable.class);
 
         // Handlers
         this.container.addComponent(CancelInviteHandler.class);
@@ -394,6 +403,9 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(RequestForActivityHandler.class);
         this.container.addComponent(ConsistencyWatchdogHandler.class);
         this.container.addComponent(ChecksumHandler.class);
+        this.container.addComponent(JoinHandler.class);
+        this.container.addComponent(RequestForFileListHandler.class);
+        this.container.addComponent(ActivitiesHandler.class);
 
         // Extensions
         this.container.addComponent(ChecksumErrorExtension.class);
@@ -483,6 +495,10 @@ public class Saros extends AbstractUIPlugin {
         log.info("Starting Saros " + sarosVersion + " running:\n"
             + Util.getPlatformInfo());
 
+        // Remove the Bundle if an instance of it was already registered
+        container.removeComponent(Bundle.class);
+        container.addComponent(Bundle.class, getBundle());
+
         // Make sure that all components in the container are
         // instantiated
         container.getComponents(Object.class);
@@ -527,8 +543,22 @@ public class Saros extends AbstractUIPlugin {
         }
 
         try {
-            if (isConnected())
-                disconnect();
+            if (isConnected()) {
+                /*
+                 * Need to fork because disconnect should not be run in the SWT
+                 * thread.
+                 */
+
+                /*
+                 * FIXME Provide a unique thread context in which all
+                 * connecting/disconnecting is done.
+                 */
+                Util.runSafeSyncFork(log, new Runnable() {
+                    public void run() {
+                        disconnect();
+                    }
+                });
+            }
 
             /**
              * This will cause dispose() to be called on all components managed

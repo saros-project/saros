@@ -403,15 +403,19 @@ public class Util {
      * Run the given runnable in a new thread (with the given name) and log any
      * RuntimeExceptions to the given log.
      * 
+     * @return The Thread which has been created and started to run the given
+     *         runnable
+     * 
      * @nonBlocking
      */
-    public static void runSafeAsync(@Nullable String name, final Logger log,
+    public static Thread runSafeAsync(@Nullable String name, final Logger log,
         final Runnable runnable) {
 
         Thread t = new Thread(wrapSafe(log, runnable));
         if (name != null)
             t.setName(name);
         t.start();
+        return t;
     }
 
     /**
@@ -492,13 +496,29 @@ public class Util {
     }
 
     /**
-     * Run the given runnable and log any RuntimeExceptions to the given log and
-     * block until the runnable returns.
+     * Run the given runnable (in the current thread!) and log any
+     * RuntimeExceptions to the given log and block until the runnable returns.
      * 
      * @blocking
      */
     public static void runSafeSync(Logger log, Runnable runnable) {
         wrapSafe(log, runnable).run();
+    }
+
+    /**
+     * Run the given runnable (in the current thread!) and log any
+     * RuntimeExceptions to the given log and block until the runnable returns.
+     * 
+     * @blocking
+     */
+    public static void runSafeSyncFork(Logger log, Runnable runnable) {
+        Thread t = runSafeAsync(null, log, runnable);
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            log.warn("Waiting for the forked thread in runSafeSyncFork was"
+                + " interrupted unexpectedly");
+        }
     }
 
     /**

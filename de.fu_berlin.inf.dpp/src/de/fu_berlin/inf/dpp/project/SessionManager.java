@@ -27,24 +27,30 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.window.Window;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -53,6 +59,7 @@ import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -89,6 +96,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     @Inject
     protected StopManager stopManager;
+
+    @Inject
+    protected InvitationProcessObservable invitationProcesses;
+
+    @Inject
+    protected VersionManager versionManager;
 
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
@@ -208,20 +221,21 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     public IIncomingInvitationProcess invitationReceived(JID from,
-        String sessionID, String projectName, String description, int colorID) {
+        String sessionID, String projectName, String description, int colorID,
+        String sarosVersion) {
 
         this.sessionID.setValue(sessionID);
 
         IIncomingInvitationProcess process = new IncomingInvitationProcess(
             this, this.transmitter, transferManager, from, projectName,
-            description, colorID);
+            description, colorID, sarosVersion, invitationProcesses);
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);
         }
 
         SessionManager.log.info("Received invitation from [" + from.getBase()
-            + "]");
+            + "] with Saros version " + sarosVersion);
 
         return process;
     }
@@ -281,9 +295,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
                 // TODO check if anybody is online, empty dialog feels
                 // strange
-                Window iw = new InvitationDialog(saros, sharedProject,
-                    EditorAPI.getShell(), toInvite, discoveryManager,
-                    partialProjectResources);
+                Window iw = new InvitationDialog(saros, versionManager,
+                    sharedProject, EditorAPI.getShell(), toInvite,
+                    discoveryManager, partialProjectResources,
+                    SessionManager.this);
                 iw.open();
 
                 if (!sharedProject.isDriver()) {
@@ -292,5 +307,35 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             }
         });
 
+    }
+
+    /**
+     * Invites a user to the shared project.
+     * 
+     * @param toInvite
+     *            the JID of the user that is to be invited.
+     * @param description
+     *            a description that will be shown to the invited user before he
+     *            makes the decision to accept or decline the invitation.
+     * @param inviteUI
+     *            user interface of the invitation for feedback calls.
+     * 
+     * @param localFileList
+     *            a list of all files currently present in the project
+     * 
+     * @return the outgoing invitation process.
+     */
+    public IOutgoingInvitationProcess invite(ISharedProject project,
+        JID toInvite, String description, IInvitationUI inviteUI,
+        FileList localFileList, SubMonitor monitor) {
+
+        OutgoingInvitationProcess result = new OutgoingInvitationProcess(saros,
+            transmitter, transferManager, toInvite, project, description,
+            inviteUI, project.getFreeColor(), localFileList, monitor,
+            invitationProcesses, versionManager);
+
+        result.start();
+
+        return result;
     }
 }

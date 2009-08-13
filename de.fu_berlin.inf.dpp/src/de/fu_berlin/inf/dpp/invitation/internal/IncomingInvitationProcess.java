@@ -50,6 +50,7 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.ErrorMessageDialog;
@@ -90,16 +91,17 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
     public IncomingInvitationProcess(SessionManager sessionManager,
         ITransmitter transmitter, DataTransferManager dataTransferManager,
-        JID from, String projectName, String description, int colorID) {
+        JID from, String projectName, String description, int colorID,
+        String peersSarosVersion, InvitationProcessObservable invitationProcesses) {
 
-        super(transmitter, from, description, colorID);
+        super(transmitter, from, description, colorID, peersSarosVersion,
+            invitationProcesses);
 
         this.sessionManager = sessionManager;
         this.projectName = projectName;
         this.dataTransferManager = dataTransferManager;
 
         setState(State.INVITATION_SENT);
-
     }
 
     /*
@@ -559,7 +561,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         // TODO Will block 1000 ms to ensure something...
         this.transmitter.sendJoinMessage(sharedProject);
-        this.transmitter.removeInvitationProcess(this);
+        this.invitationProcesses.removeInvitationProcess(this);
 
         sharedProject.setProjectReadonly(!sharedProject.isDriver());
 

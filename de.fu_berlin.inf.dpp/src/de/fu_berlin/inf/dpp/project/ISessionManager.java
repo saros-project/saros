@@ -99,7 +99,8 @@ public interface ISessionManager {
      *         further interaction with the invitation.
      */
     public IIncomingInvitationProcess invitationReceived(JID from,
-        String sessionID, String projectName, String description, int colorID);
+        String sessionID, String projectName, String description, int colorID,
+        String sarosVersion);
 
     /*
      * @see IConnectionListener

@@ -145,11 +145,29 @@ public class JoinSessionWizardUtils {
         return ResourcesPlugin.getWorkspace().getRoot().getProject(name);
     }
 
-    public static boolean projectIsUnique(String name, IProject[] projects) {
+    public static boolean projectIsUnique(String name, IProject... projects) {
+
+        if (name == null)
+            throw new IllegalArgumentException("Illegal project name given");
+
+        if (new File(ResourcesPlugin.getWorkspace().getRoot().getLocation()
+            .toFile(), name).exists()) {
+            if (!getProjectForName(name).exists()) {
+                log.warn("Eclipse does not think there is a project "
+                    + "already for the given name " + name
+                    + " but on the file system there is");
+            }
+            return false;
+        }
 
         // Use File to compare so the comparison is case-sensitive depending on
         // the underlying platform
         File newProjectName = new File(name);
+        //
+        // if (ResourcesPlugin.getWorkspace().getRoot().getFolder(new
+        // Path(name))
+        // .exists())
+        // return false;
 
         for (IProject project : projects) {
             if (new File(project.getName()).equals(newProjectName)) {

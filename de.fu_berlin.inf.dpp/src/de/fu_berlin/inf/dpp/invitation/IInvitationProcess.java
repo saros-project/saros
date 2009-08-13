@@ -80,6 +80,16 @@ public interface IInvitationProcess {
     public String getDescription();
 
     /**
+     * @return the saros version of the peer that was provided with the
+     *         invitation
+     * 
+     *         CAUTION: At the moment this returns null for an
+     *         OutgoingInvitationProcess, as we have not implemented the client
+     *         to report back to the host his version.
+     */
+    public String getPeersSarosVersion();
+
+    /**
      * 
      * @return the name of the project that is shared by the peer.
      */

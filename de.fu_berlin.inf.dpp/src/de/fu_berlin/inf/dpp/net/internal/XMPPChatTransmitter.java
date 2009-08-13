@@ -53,14 +53,13 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
+import org.osgi.framework.Version;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
@@ -87,13 +86,13 @@ import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
  * 
  * Hides the complexity of dealing with changing XMPPConnection objects and
  * provides convenience functions for sending messages.
- * 
  */
 @Component(module = "net")
 public class XMPPChatTransmitter implements ITransmitter,
@@ -105,8 +104,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     public static final int MAX_PARALLEL_SENDS = 10;
     public static final int MAX_TRANSFER_RETRIES = 5;
     public static final int FORCEDPART_OFFLINEUSER_AFTERSECS = 60;
-
-    private static final int MAX_XMPP_MESSAGE_SIZE = 16378;
+    public static final int MAX_XMPP_MESSAGE_SIZE = 16378;
 
     protected XMPPConnection connection;
 
@@ -117,6 +115,9 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected Map<JID, IInvitationProcess> processes;
 
     protected List<MessageTransfer> messageTransferQueue;
+
+    @Inject
+    protected VersionManager versionManager;
 
     @Inject
     protected XMPPChatReceiver receiver;
@@ -143,6 +144,9 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected LeaveExtension leaveExtension;
 
     @Inject
+    protected JoinExtension joinExtension;
+
+    @Inject
     protected RequestActivityExtension requestActivityExtension;
 
     @Inject
@@ -151,217 +155,49 @@ public class XMPPChatTransmitter implements ITransmitter,
     @Inject
     protected CancelInviteExtension cancelInviteExtension;
 
-    protected DataTransferManager dataManager;
-
+    @Inject
     protected RequestForFileListExtension requestForFileListExtension;
 
-    protected JoinExtension joinExtension;
+    protected DataTransferManager dataManager;
 
     public XMPPChatTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager) {
-        // TODO Use DI better
+
         this.dataManager = dataManager;
         this.sessionID = sessionID;
 
-        this.requestForFileListExtension = new RequestForFileListHandler(
-            sessionID);
-        this.joinExtension = new JoinHandler(sessionID);
-
+        // TODO Use DI better
         dataManager.chatTransmitter = this;
     }
 
-    ExecutorService dispatch = Executors
+    protected ExecutorService dispatch = Executors
         .newSingleThreadExecutor(new NamedThreadFactory(
             "XMPPChatTransmitter-Dispatch-"));
-
-    protected class JoinHandler extends JoinExtension {
-        protected JoinHandler(SessionIDObservable sessionIDObservable) {
-            super(sessionIDObservable);
-        }
-
-        @Override
-        public void joinReceived(final JID sender, final int colorID) {
-
-            XMPPChatTransmitter.log.debug("[" + sender.getName()
-                + "] Join: ColorID=" + colorID);
-
-            Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList", log,
-                new Runnable() {
-                    public void run() {
-                        IInvitationProcess process = getInvitationProcess(sender);
-                        if (process != null) {
-                            process.joinReceived(sender);
-                            return;
-                        }
-
-                        ISharedProject project = sharedProject.getValue();
-
-                        if (project != null) {
-                            // a new user joined this session
-                            project.addUser(new User(project, sender, colorID));
-                        }
-                    }
-                });
-        }
-    }
-
-    protected class RequestForFileListHandler extends
-        RequestForFileListExtension {
-        protected RequestForFileListHandler(
-            SessionIDObservable sessionIDObservable) {
-            super(sessionIDObservable);
-        }
-
-        @Override
-        public void requestForFileListReceived(final JID sender) {
-
-            XMPPChatTransmitter.log.debug("[" + sender.getName()
-                + "] Request for FileList");
-
-            Util.runSafeAsync("XMPPChatTransmitter-RequestForFileList", log,
-                new Runnable() {
-                    public void run() {
-                        IInvitationProcess process = getInvitationProcess(sender);
-                        if (process != null) {
-                            process.invitationAccepted(sender);
-                        } else {
-                            log
-                                .warn("Received Invitation Acceptance from unknown user ["
-                                    + sender.getBase() + "]");
-                        }
-                    }
-                });
-        }
-    }
-
-    public class XMPPChatTransmitterPacketListener implements PacketListener {
-
-        GodPacketListener godListener = new GodPacketListener();
-
-        PacketFilter sessionFilter = PacketExtensionUtils
-            .getSessionIDPacketFilter(sessionID);
-
-        public void processPacket(final Packet packet) {
-            executeAsDispatch(new Runnable() {
-                public void run() {
-                    if (sessionFilter.accept(packet)) {
-                        godListener.processPacket(packet);
-                    }
-                    receiver.processPacket(packet);
-                }
-            });
-        }
-    }
 
     public void executeAsDispatch(Runnable runnable) {
         dispatch.submit(Util.wrapSafe(log, runnable));
     }
 
     /**
-     * TODO break this up into many individually registered Listeners
-     */
-    public final class GodPacketListener implements PacketListener {
-
-        public void processPacket(Packet packet) {
-
-            try {
-                Message message = (Message) packet;
-
-                JID fromJID = new JID(message.getFrom());
-
-                // Change the input method to get the right chats
-                putIncomingChat(fromJID, message.getThread());
-
-                processActivitiesExtension(message, fromJID);
-
-                joinExtension.processPacket(packet);
-
-                requestForFileListExtension.processPacket(packet);
-
-            } catch (Exception e) {
-                XMPPChatTransmitter.log.error(
-                    "An internal error occurred while processing packets", e);
-            }
-        }
-
-        private void processActivitiesExtension(final Message message,
-            JID fromJID) {
-
-            ActivitiesPacketExtension activitiesPacket = PacketExtensionUtils
-                .getActvitiesExtension(message);
-
-            if (activitiesPacket != null) {
-                List<TimedActivity> timedActivities = activitiesPacket
-                    .getActivities();
-
-                receiveActivities(fromJID, timedActivities);
-            }
-        }
-    }
-
-    /**
-     * Used for asserting that the given list contains no FileActivities which
-     * create files
-     */
-    public static boolean containsNoFileCreationActivities(
-        List<TimedActivity> timedActivities) {
-
-        for (TimedActivity timedActivity : timedActivities) {
-
-            IActivity activity = timedActivity.getActivity();
-
-            if (activity instanceof FileActivity
-                && ((FileActivity) activity).getType().equals(
-                    FileActivity.Type.Created)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * A simple struct that is used to queue message transfers.
      */
-    private static class MessageTransfer {
+    protected static class MessageTransfer {
         public JID receipient;
         public PacketExtension packetextension;
     }
 
-    public IInvitationProcess getInvitationProcess(JID jid) {
-        return this.processes.get(jid);
-    }
-
-    public void addInvitationProcess(IInvitationProcess process) {
-        IInvitationProcess oldProcess = this.processes.put(process.getPeer(),
-            process);
-        if (oldProcess != null) {
-            log.error("An internal error occurred:"
-                + " An existing invititation process with "
-                + oldProcess.getPeer() + " was replace by a new one");
-        }
-    }
-
-    public void removeInvitationProcess(IInvitationProcess process) {
-        if (this.processes.remove(process.getPeer()) == null) {
-            log.error("An internal error occurred:"
-                + " No invititation process with " + process.getPeer()
-                + " could be found");
-        }
-    }
-
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        XMPPChatTransmitter.log
-            .debug("Send request to cancel Invititation to ["
-                + user.getBase()
-                + "] "
-                + (errorMsg == null ? "on user request" : "with message: "
-                    + errorMsg));
+        log.debug("Send request to cancel Invititation to ["
+            + user.getBase()
+            + "] "
+            + (errorMsg == null ? "on user request" : "with message: "
+                + errorMsg));
         sendMessage(user, cancelInviteExtension.create(sessionID.getValue(),
             errorMsg));
     }
 
     public void sendRequestForFileListMessage(JID toJID) {
-        XMPPChatTransmitter.log.debug("Send request for FileList to " + toJID);
+        log.debug("Send request for FileList to " + toJID);
 
         sendMessage(toJID, requestForFileListExtension.create());
     }
@@ -397,11 +233,12 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
-        String description, int colorID) {
-        XMPPChatTransmitter.log.debug("Send invitation to [" + guest.getBase()
-            + "] with description: " + description);
+        String description, int colorID, Version sarosVersion) {
+        log.debug("Send invitation to [" + guest.getBase()
+            + "] with description '" + description + "' and Saros version "
+            + versionManager.getVersion());
         sendMessage(guest, inviteExtension.create(sharedProject.getProject()
-            .getName(), description, colorID));
+            .getName(), description, colorID, sarosVersion));
     }
 
     public void sendJoinMessage(ISharedProject sharedProject) {
@@ -714,31 +551,36 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     private void putIncomingChat(JID jid, String thread) {
-        if (!this.chats.containsKey(jid)) {
-            Chat chat = this.chatmanager.getThreadChat(thread);
-            this.chats.put(jid, chat);
+
+        synchronized (this.chats) {
+            if (!this.chats.containsKey(jid)) {
+                Chat chat = this.chatmanager.getThreadChat(thread);
+                this.chats.put(jid, chat);
+            }
         }
     }
 
-    private Chat getChat(JID jid) {
+    protected Chat getChat(JID jid) {
+
         if (this.connection == null) {
             throw new NullPointerException("Connection can't be null.");
         }
 
-        Chat chat = this.chats.get(jid);
+        synchronized (this.chats) {
+            Chat chat = this.chats.get(jid);
 
-        if (chat == null) {
-            chat = this.chatmanager.createChat(jid.toString(),
-                new MessageListener() {
-                    public void processMessage(Chat arg0, Message arg1) {
-                        // We don't care about the messages here, because we
-                        // are registered as a PacketListener
-                    }
-                });
-            this.chats.put(jid, chat);
+            if (chat == null) {
+                chat = this.chatmanager.createChat(jid.toString(),
+                    new MessageListener() {
+                        public void processMessage(Chat arg0, Message arg1) {
+                            // We don't care about the messages here, because we
+                            // are registered as a PacketListener
+                        }
+                    });
+                this.chats.put(jid, chat);
+            }
+            return chat;
         }
-
-        return chat;
     }
 
     /**
@@ -808,11 +650,38 @@ public class XMPPChatTransmitter implements ITransmitter,
             .newFixedThreadPool(MAX_PARALLEL_SENDS);
 
         this.connection = connection;
+
         this.chatmanager = connection.getChatManager();
 
-        // Register PacketListeners
-        this.connection.addPacketListener(
-            new XMPPChatTransmitterPacketListener(), null);
+        // Register a packetlistener which takes care of decoupling the
+        // processing of Packets from the Smack thread
+        this.connection.addPacketListener(new PacketListener() {
+
+            protected PacketFilter sessionFilter = PacketExtensionUtils
+                .getSessionIDPacketFilter(sessionID);
+
+            public void processPacket(final Packet packet) {
+                executeAsDispatch(new Runnable() {
+                    public void run() {
+                        if (sessionFilter.accept(packet)) {
+                            try {
+                                Message message = (Message) packet;
+
+                                JID fromJID = new JID(message.getFrom());
+
+                                // Change the input method to get the right
+                                // chats
+                                putIncomingChat(fromJID, message.getThread());
+                            } catch (Exception e) {
+                                log.error("An internal error occurred "
+                                    + "while processing packets", e);
+                            }
+                        }
+                        receiver.processPacket(packet);
+                    }
+                });
+            }
+        }, null);
     }
 
     public void startConnection() {
@@ -821,54 +690,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void stopConnection() {
         // TODO stop sending, but queue rather
-    }
-
-    /**
-     * This method is called from all the different transfer methods, when an
-     * activity arrives. This method puts the activity into the
-     * ActivitySequencer which will execute it.
-     * 
-     * @param fromJID
-     *            The JID which sent these activities (the source in the
-     *            activities might be different!)
-     * @param timedActivities
-     *            The received activities including sequence numbers.
-     */
-    protected void receiveActivities(JID fromJID,
-        List<TimedActivity> timedActivities) {
-        String source = fromJID.toString();
-
-        final ISharedProject project = sharedProject.getValue();
-
-        if ((project == null) || (project.getUser(fromJID) == null)) {
-            XMPPChatTransmitter.log.warn("Received activities from " + source
-                + " but User is no participant: " + timedActivities);
-            return;
-        } else {
-            XMPPChatTransmitter.log.debug("Rcvd [" + fromJID.getName() + "]: "
-                + timedActivities);
-        }
-
-        for (TimedActivity timedActivity : timedActivities) {
-
-            IActivity activity = timedActivity.getActivity();
-
-            /*
-             * Some activities save space in the message by not setting the
-             * source and the XML parser needs to provide the source
-             */
-            assert activity.getSource() != null : "Received activity without source:"
-                + activity;
-
-            try {
-                // Ask sequencer to execute or queue until missing activities
-                // arrive
-                project.getSequencer().exec(timedActivity);
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                log.error("Internal error", e);
-            }
-        }
     }
 
     /**

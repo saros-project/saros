@@ -37,9 +37,11 @@ import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * An outgoing invitation process.
@@ -82,29 +84,33 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
 
     protected SubMonitor monitor;
 
+    protected VersionManager versionManager;
+
     public OutgoingInvitationProcess(Saros saros, ITransmitter transmitter,
         DataTransferManager dataTransferManager, JID to,
-        ISharedProject sharedProject, String description, boolean startNow,
+        ISharedProject sharedProject, String description,
         IInvitationUI inviteUI, int colorID, FileList localFileList,
-        SubMonitor monitor) {
+        SubMonitor monitor, InvitationProcessObservable invitationProcesses,
+        VersionManager versionManager) {
 
-        super(transmitter, to, description, colorID);
+        super(transmitter, to, description, colorID, null, invitationProcesses);
 
         this.localFileList = localFileList;
         this.invitationUI = inviteUI;
         this.saros = saros;
         this.sharedProject = sharedProject;
         this.dataTransferManager = dataTransferManager;
+        this.versionManager = versionManager;
+
         this.monitor = monitor;
         this.monitor.beginTask("Performing Invitation", 100);
+        setState(State.INITIALIZED);
+    }
 
-        if (startNow) {
-            transmitter.sendInviteMessage(sharedProject, to, description,
-                colorID);
-            setState(State.INVITATION_SENT);
-        } else {
-            setState(State.INITIALIZED);
-        }
+    public void start() {
+        setState(State.INVITATION_SENT);
+        transmitter.sendInviteMessage(sharedProject, peer, description,
+            colorID, versionManager.getVersion());
         this.monitor.worked(5);
     }
 
@@ -206,7 +212,7 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
         this.monitor.done();
 
         // TODO Find a more reliable way to remove InvitationProcess
-        this.transmitter.removeInvitationProcess(this);
+        this.invitationProcesses.removeInvitationProcess(this);
 
         this.transmitter.sendUserListTo(from, this.sharedProject
             .getParticipants());

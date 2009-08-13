@@ -111,8 +111,13 @@ public class RoleManager implements IActivityProvider {
     public void exec(IActivity activity) {
         if (activity instanceof RoleActivity) {
             RoleActivity roleActivity = (RoleActivity) activity;
-            User user = this.sharedProject.getParticipant(roleActivity
+            User user = this.sharedProject.getUser(roleActivity
                 .getAffectedUser());
+            if (user == null) {
+                throw new IllegalArgumentException("User "
+                    + roleActivity.getAffectedUser()
+                    + " is not a participant in this shared project");
+            }
             UserRole role = roleActivity.getRole();
             this.sharedProject.setUserRole(user, role);
         }

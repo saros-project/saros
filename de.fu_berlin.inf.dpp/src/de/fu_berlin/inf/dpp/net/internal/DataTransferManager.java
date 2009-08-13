@@ -42,6 +42,7 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
 import de.fu_berlin.inf.dpp.net.jingle.DispatchingJingleFileTransferListener;
@@ -49,6 +50,7 @@ import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -132,7 +134,13 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected DiscoveryManager discoveryManager;
 
     @Inject
+    protected InvitationProcessObservable invitationProcesses;
+
+    @Inject
     protected JingleFileTransferManagerObservable jingleManager;
+
+    @Inject
+    protected ActivitiesHandler activitiesHandler;
 
     protected Saros saros;
 
@@ -191,7 +199,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             NetTransferMode connectionType, Exception e) {
 
             try {
-                IInvitationProcess process = chatTransmitter
+                IInvitationProcess process = invitationProcesses
                     .getInvitationProcess(data.sender);
                 if (process != null) {
                     /*
@@ -234,7 +242,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             } catch (IOException e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
 
-                IInvitationProcess process = chatTransmitter
+                IInvitationProcess process = invitationProcesses
                     .getInvitationProcess(new JID(request.getRequestor()));
                 if (process != null) {
                     process.cancel(e.getMessage(), false);
@@ -273,7 +281,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             } catch (Exception e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
 
-                IInvitationProcess process = chatTransmitter
+                IInvitationProcess process = invitationProcesses
                     .getInvitationProcess(new JID(request.getRequestor()));
                 if (process != null) {
                     process.cancel("File Transfer via IBB failed:\n"
@@ -647,7 +655,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                     + path);
 
             // TODO CJ: move this to business logic
-            IInvitationProcess process = chatTransmitter
+            IInvitationProcess process = invitationProcesses
                 .getInvitationProcess(from);
             if (process != null) {
                 process.resourceReceived(from, path, input);
@@ -661,7 +669,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         public boolean receivedFileList(TransferDescription data,
             InputStream input) {
 
-            IInvitationProcess process = chatTransmitter
+            IInvitationProcess process = invitationProcesses
                 .getInvitationProcess(data.sender);
             if (process == null) {
                 log.warn("Received FileList from unknown user ["
@@ -742,7 +750,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             chatTransmitter.executeAsDispatch(new Runnable() {
                 public void run() {
-                    chatTransmitter.receiveActivities(sender, content
+                    activitiesHandler.receiveActivities(sender, content
                         .getTimedActivities());
                 }
             });

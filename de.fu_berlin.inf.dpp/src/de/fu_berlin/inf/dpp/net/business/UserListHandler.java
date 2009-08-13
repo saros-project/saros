@@ -73,7 +73,7 @@ public class UserListHandler {
 
             assert project != null;
 
-            User fromUser = project.getParticipant(fromJID);
+            User fromUser = project.getUser(fromJID);
 
             if (fromUser == null || !fromUser.isHost()) {
                 log.error("Received UserList from user which "
@@ -86,7 +86,7 @@ public class UserListHandler {
             for (UserListEntry receivedUser : userList) {
 
                 // Check if we already know this user
-                User user = project.getParticipant(receivedUser.getJID());
+                User user = project.getUser(receivedUser.getJID());
 
                 if (user == null) {
                     // This user is not part of our project

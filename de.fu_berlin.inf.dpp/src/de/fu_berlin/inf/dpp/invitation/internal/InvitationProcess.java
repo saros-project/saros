@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -45,16 +46,22 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
     protected String description;
 
+    protected String peersSarosVersion;
+
     protected final int colorID;
 
+    protected InvitationProcessObservable invitationProcesses;
+
     public InvitationProcess(ITransmitter transmitter, JID peer,
-        String description, int colorID) {
+        String description, int colorID, String peersSarosVersion,
+        InvitationProcessObservable invitationProcesses) {
         this.transmitter = transmitter;
         this.peer = peer;
         this.description = description;
+        this.peersSarosVersion = peersSarosVersion;
         this.colorID = colorID;
-
-        transmitter.addInvitationProcess(this);
+        this.invitationProcesses = invitationProcesses;
+        this.invitationProcesses.addInvitationProcess(this);
     }
 
     /**
@@ -84,6 +91,10 @@ public abstract class InvitationProcess implements IInvitationProcess {
      */
     public JID getPeer() {
         return this.peer;
+    }
+
+    public String getPeersSarosVersion() {
+        return this.peersSarosVersion;
     }
 
     /**
@@ -134,7 +145,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
         this.invitationUI.cancel(this.peer, errorMsg, replicated);
 
-        this.transmitter.removeInvitationProcess(this);
+        this.invitationProcesses.removeInvitationProcess(this);
     }
 
     @Override

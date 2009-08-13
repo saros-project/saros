@@ -87,6 +87,7 @@ import de.fu_berlin.inf.dpp.util.ArrayIterator;
 import de.fu_berlin.inf.dpp.util.MappingIterator;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * Dialog by which the hosts can invite clients to a shared project session.
@@ -207,20 +208,25 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
     }
 
-    public InvitationDialog(Saros saros, SharedProject project,
-        Shell parentShell, List<JID> autoInvite, DiscoveryManager discoManager,
-        List<IResource> resources) {
+    public InvitationDialog(Saros saros, VersionManager versionManager,
+        SharedProject project, Shell parentShell, List<JID> autoInvite,
+        DiscoveryManager discoManager, List<IResource> resources,
+        SessionManager sessionManager) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
         this.project = project;
         this.saros = saros;
         this.discoveryManager = discoManager;
         this.resources = resources;
+        this.versionManager = versionManager;
+        this.sessionManager = sessionManager;
     }
 
     protected ExecutorService worker = Executors
         .newSingleThreadExecutor(new NamedThreadFactory(
             "InvitationDialog-AsyncDiscovery-"));
+
+    protected VersionManager versionManager;
 
     public void updateSarosSupportLater(final JID jid) {
 
@@ -470,9 +476,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                     }
                 }
                 invdat.progress = new InvitationProgressMonitor(toInvite);
-                invdat.outgoingProcess = project.invite(toInvite, name, true,
-                    this, localFileList, SubMonitor.convert(invdat.progress,
-                        1000));
+                invdat.outgoingProcess = sessionManager.invite(project,
+                    toInvite, name, InvitationDialog.this, localFileList,
+                    SubMonitor.convert(invdat.progress, 1000));
             }
 
         } catch (RuntimeException e) {

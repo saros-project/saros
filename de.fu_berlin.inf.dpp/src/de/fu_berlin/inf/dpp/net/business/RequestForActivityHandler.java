@@ -68,8 +68,9 @@ public class RequestForActivityHandler {
 
             ISharedProject sharedProject = sessionManager.getSharedProject();
 
-            if (sharedProject == null
-                || sharedProject.getParticipant(fromJID) == null) {
+            if (sharedProject.getUser(fromJID) == null) {
+                log.warn("Received Request for activity from user which"
+                    + " is not part of our shared project session: " + fromJID);
                 return;
             }
 
