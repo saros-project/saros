@@ -808,11 +808,16 @@ public class Saros extends AbstractUIPlugin {
      *            The host to which you want to connect to.
      * 
      * @return Returns a @link{ProxyInfo} if available otherwise null.
+     * 
+     * @SuppressWarnings("deprecation") -> getProxyDataForHost replacement is
+     *                                  only available in Eclipse 3.5
      */
+    @SuppressWarnings("deprecation")
     protected ProxyInfo getProxyInfo(String host) {
         IProxyService ips = getProxyService();
         if (ips == null)
             return null;
+
         for (IProxyData pd : ips.getProxyDataForHost(host)) {
             if (pd.getType() == IProxyData.HTTP_PROXY_TYPE) {
                 return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(), pd
