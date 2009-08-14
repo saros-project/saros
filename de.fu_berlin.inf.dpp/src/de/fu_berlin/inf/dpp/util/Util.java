@@ -639,17 +639,7 @@ public class Util {
             }
             return platformSWT;
         } catch (SWTException e) {
-            try {
-                boolean defaultSWT = Display.getDefault().getThread() == Thread
-                    .currentThread();
-                if (defaultSWT) {
-                    log.warn("Running in Display.getDefault() but"
-                        + " PlatformUI Display is already disposed.");
-                }
-                return defaultSWT;
-            } catch (SWTException e2) {
-                return false;
-            }
+            return false;
         }
     }
 
