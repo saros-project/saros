@@ -114,8 +114,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         saros.addListener(this);
     }
 
-    protected static final Random sessionRandom = new Random(System
-        .currentTimeMillis());
+    protected static final Random sessionRandom = new Random();
 
     public void startSession(IProject project,
         List<IResource> partialProjectResources) throws XMPPException {
