@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IPageChangingListener;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.PageChangingEvent;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -40,6 +39,7 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
+import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -101,7 +101,6 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public IWizardPage getNextPage(IWizardPage page) {
-
         if (page.equals(descriptionPage) && !requested) {
             /*
              * Increment pages for auto-next, because the request will block too
@@ -109,8 +108,10 @@ public class JoinSessionWizard extends Wizard {
              */
             pageChanges++;
             if (!requestHostFileList()) {
+                getShell().forceActive();
                 return null;
             }
+            getShell().forceActive();
         }
         return super.getNextPage(page);
     }
@@ -157,15 +158,15 @@ public class JoinSessionWizard extends Wizard {
     }
 
     public void showCancelMessage(JID jid, String errorMsg, boolean replicated) {
-
         if (errorMsg != null) {
-            MessageDialog.openError(getShell(), "Invitation aborted",
-                "Could not complete invitation with " + jid.getBase()
-                    + " because an error occurred:\n\n" + errorMsg);
+            EclipseUtils.openErrorMessageDialog(getShell(),
+                "Invitation aborted", "Could not complete invitation with "
+                    + jid.getBase() + " because an error occurred:\n\n"
+                    + errorMsg);
         } else {
             // errorMsg == null means canceled either by us or peer
             if (replicated) {
-                MessageDialog.openInformation(getShell(),
+                EclipseUtils.openInformationMessageDialog(getShell(),
                     "Invitation cancelled",
                     "Invitation was cancelled by inviter (" + jid.getBase()
                         + ").");
@@ -226,7 +227,6 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-
         if (this.process.getState() == State.CANCELED) {
             return false;
         }
@@ -258,6 +258,7 @@ public class JoinSessionWizard extends Wizard {
             return false;
         }
 
+        getShell().forceActive();
         return true;
     }
 

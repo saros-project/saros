@@ -625,12 +625,17 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
         updateButtons();
 
+        if (isAllDoneOrCanceled()) {
+            getShell().forceActive();
+        }
+
         // Are all invites done and did the user want to close the dialog
         // automatically?
         if (isAtLeastOneInvitationStarted() && isAllSuccessfullyDone()
             && autoCloseDialog()) {
             this.close();
         }
+
     }
 
     @Override
