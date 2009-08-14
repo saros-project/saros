@@ -285,7 +285,9 @@ public class OutgoingInvitationProcess extends InvitationProcess implements
                 return;
             }
 
-            archive = File.createTempFile(getPeer().getName(), ".zip");
+            // FIX #2836964: Prefix string too short
+            archive = File.createTempFile("SarosSyncArchive-"
+                + getPeer().getName(), ".zip");
 
             monitor.subTask("Zipping archive");
             FileZipper.createProjectZipArchive(this.toSend, archive,
