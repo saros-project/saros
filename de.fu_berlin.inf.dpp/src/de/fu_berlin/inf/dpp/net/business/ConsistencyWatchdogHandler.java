@@ -17,12 +17,10 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.graphics.Image;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
@@ -37,7 +35,6 @@ import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -91,10 +88,7 @@ public class ConsistencyWatchdogHandler {
 
         this.handler = new Handler(sessionID);
 
-        receiver.addPacketListener(listener, new AndFilter(
-            new MessageTypeFilter(Message.Type.chat), PacketExtensionUtils
-                .getSessionIDPacketFilter(sessionID), Util.orFilter(handler
-                .getFilter(), ActivitiesPacketExtension.getFilter())));
+        receiver.addPacketListener(handler, handler.getFilter());
     }
 
     protected class Handler extends ChecksumErrorExtension {
@@ -105,8 +99,9 @@ public class ConsistencyWatchdogHandler {
 
         @Override
         public PacketFilter getFilter() {
-            return new AndFilter(super.getFilter(), PacketExtensionUtils
-                .getInSessionFilter(sessionManager));
+            return new AndFilter(new MessageTypeFilter(Message.Type.chat),
+                PacketExtensionUtils.getSessionIDPacketFilter(sessionID), super
+                    .getFilter());
         }
 
         @Override
@@ -380,13 +375,6 @@ public class ConsistencyWatchdogHandler {
             }
         });
     }
-
-    PacketListener listener = new PacketListener() {
-
-        public void processPacket(Packet packet) {
-            handler.processPacket(packet);
-        }
-    };
 
     /**
      * Runs a consistency recovery for the given IPath and the given JID

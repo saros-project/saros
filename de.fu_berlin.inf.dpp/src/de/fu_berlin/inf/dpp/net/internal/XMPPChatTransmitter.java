@@ -46,10 +46,13 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketIDFilter;
+import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
@@ -67,7 +70,6 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
@@ -86,7 +88,6 @@ import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.VersionManager;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -115,9 +116,6 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected Map<JID, IInvitationProcess> processes;
 
     protected List<MessageTransfer> messageTransferQueue;
-
-    @Inject
-    protected VersionManager versionManager;
 
     @Inject
     protected XMPPChatReceiver receiver;
@@ -158,6 +156,9 @@ public class XMPPChatTransmitter implements ITransmitter,
     @Inject
     protected RequestForFileListExtension requestForFileListExtension;
 
+    @Inject
+    protected ActivitiesExtensionProvider activitiesProvider;
+
     protected DataTransferManager dataManager;
 
     public XMPPChatTransmitter(SessionIDObservable sessionID,
@@ -183,7 +184,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     protected static class MessageTransfer {
         public JID receipient;
-        public PacketExtension packetextension;
+        public Message message;
     }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
@@ -236,7 +237,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         String description, int colorID, Version sarosVersion) {
         log.debug("Send invitation to [" + guest.getBase()
             + "] with description '" + description + "' and Saros version "
-            + versionManager.getVersion());
+            + sarosVersion.toString());
         sendMessage(guest, inviteExtension.create(sharedProject.getProject()
             .getName(), description, colorID, sarosVersion));
     }
@@ -292,8 +293,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         String sID = sessionID.getValue();
 
-        ActivitiesPacketExtension extensionToSend = new ActivitiesPacketExtension(
-            sID, timedActivities);
+        PacketExtension extensionToSend = activitiesProvider.create(sID,
+            timedActivities);
         byte[] data = null;
         try {
             data = extensionToSend.toXML().getBytes("UTF-8");
@@ -424,8 +425,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         for (JID jid : recipients) {
             try {
-                sendMessageWithoutQueueing(jid, checksumExtension
-                    .create(checksums));
+                Message message = new Message();
+                message.addExtension(checksumExtension.create(checksums));
+                sendMessageWithoutQueueing(jid, message);
             } catch (IOException e) {
                 // If checksums are failed to be sent, this is not a big problem
                 log.warn("Sending Checksum to " + jid + " failed: ", e);
@@ -452,7 +454,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
 
         for (MessageTransfer pex : toTransfer) {
-            sendMessage(pex.receipient, pex.packetextension);
+            sendMessage(pex.receipient, pex.message);
         }
     }
 
@@ -469,9 +471,11 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         for (User participant : sharedProject.getParticipants()) {
 
-            if (participant.getJID().equals(myJID)) {
+            if (participant.getJID().equals(myJID))
                 continue;
-            }
+
+            Message message = new Message();
+            message.addExtension(extension);
 
             // TODO Why is this here and not in sendMessage()!?
             if (participant.getPresence() == UserConnectionState.OFFLINE) {
@@ -489,7 +493,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                         .info("Removing offline user from session...");
                     sharedProject.removeUser(participant);
                 } else {
-                    queueMessage(participant.getJID(), extension);
+                    queueMessage(participant.getJID(), message);
                     XMPPChatTransmitter.log
                         .info("User known as offline - Message queued!");
                 }
@@ -497,30 +501,79 @@ public class XMPPChatTransmitter implements ITransmitter,
                 continue;
             }
 
-            sendMessage(participant.getJID(), extension);
+            sendMessage(participant.getJID(), message);
         }
     }
 
-    private void queueMessage(JID jid, PacketExtension extension) {
+    private void queueMessage(JID jid, Message message) {
         MessageTransfer msg = new MessageTransfer();
         msg.receipient = jid;
-        msg.packetextension = extension;
+        msg.message = message;
         this.messageTransferQueue.add(msg);
     }
 
     public void sendMessage(JID jid, PacketExtension extension) {
+        Message message = new Message();
+        message.addExtension(extension);
+        sendMessage(jid, message);
+    }
+
+    public void sendMessage(JID jid, Message message) {
 
         // TODO Also queue like in sendMessageToAll if user is offline
         if (this.connection == null || !this.connection.isConnected()) {
-            queueMessage(jid, extension);
+            queueMessage(jid, message);
             return;
         }
 
         try {
-            sendMessageWithoutQueueing(jid, extension);
+            sendMessageWithoutQueueing(jid, message);
         } catch (IOException e) {
             log.info("Could not send message, thus queuing", e);
-            queueMessage(jid, extension);
+            queueMessage(jid, message);
+        }
+    }
+
+    /**
+     * Sends a query, a {@link IQ.Type} GET, to the user with given {@link JID}.
+     * 
+     * Example using provider:
+     * <p>
+     * <code>XStreamExtensionProvider<VersionInfo> versionProvider = new
+     * XStreamExtensionProvider<VersionInfo>( "sarosVersion", VersionInfo.class,
+     * Version.class, Compatibility.class);<br>
+     * sendQuery(jid, versionProvider, 5000);
+     * </code>
+     * </p>
+     * This call sends a request to the user with jid and waits 5 seconds for an
+     * answer. If it arrives in time, a payload of type VersionInfo will be
+     * returned, else the result is null.
+     * 
+     */
+    public <T> T sendQuery(JID rqJID, XStreamExtensionProvider<T> provider,
+        long timeout) {
+        
+        if (connection == null || !connection.isConnected())
+            return null;
+
+        // Request the version from a remote user
+        IQ request = provider.createIQ(null);
+
+        request.setType(IQ.Type.GET);
+        request.setTo(rqJID.toString());
+
+        // Create a packet collector to listen for a response.
+        PacketCollector collector = connection
+            .createPacketCollector(new PacketIDFilter(request.getPacketID()));
+
+        try {
+            connection.sendPacket(request);
+
+            // Wait up to 5 seconds for a result.
+            return provider.getPayload(collector.nextResult(timeout));
+
+        } finally {
+            collector.cancel();
         }
     }
 
@@ -529,11 +582,8 @@ public class XMPPChatTransmitter implements ITransmitter,
      * 
      * If no connection is set or sending fails, this method fails by throwing
      * an IOException
-     * 
-     * @param jid
-     * @param extension
      */
-    protected void sendMessageWithoutQueueing(JID jid, PacketExtension extension)
+    protected void sendMessageWithoutQueueing(JID jid, Message message)
         throws IOException {
 
         if (!this.connection.isConnected()) {
@@ -542,8 +592,6 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         try {
             Chat chat = getChat(jid);
-            Message message = new Message();
-            message.addExtension(extension);
             chat.sendMessage(message);
         } catch (XMPPException e) {
             throw new CausedIOException("Failed to send message", e);

@@ -43,10 +43,4 @@ public interface IActivity {
      *         otherwise <code>false</code>.
      */
     public boolean dispatch(IActivityReceiver receiver);
-
-    /**
-     * Implementors should return an XML representation of themselves.
-     */
-    public String toXML();
-
 }

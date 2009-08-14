@@ -5,15 +5,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.PacketExtension;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -32,7 +31,10 @@ public class RequestForActivityHandler {
         .getLogger(RequestForActivityHandler.class.getName());
 
     @Inject
-    protected IXMPPTransmitter transmitter;
+    protected XMPPChatTransmitter transmitter;
+
+    @Inject
+    protected ActivitiesExtensionProvider activitiesProvider;
 
     protected SessionIDObservable sessionID;
 
@@ -82,11 +84,9 @@ public class RequestForActivityHandler {
                 andUp ? "s" : "", sequenceNumber, andUp ? " (andup)" : ""));
 
             if (activities.size() > 0) {
-                PacketExtension extension = new ActivitiesPacketExtension(
-                    sessionID.getValue(), activities);
-
-                transmitter.sendMessage(fromJID, extension);
-                log.info("I sent back " + activities.size() + " activities.");
+                log.info("I am sending back " + activities.size()
+                    + " activities.");
+                transmitter.sendTimedActivities(fromJID, activities);
             } else {
                 log.error("No matching activities found");
             }

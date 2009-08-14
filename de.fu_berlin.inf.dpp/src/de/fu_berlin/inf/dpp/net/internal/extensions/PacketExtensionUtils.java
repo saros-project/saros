@@ -26,12 +26,8 @@ import org.jivesoftware.smack.packet.DefaultPacketExtension;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.jivesoftware.smack.provider.ProviderManager;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -54,35 +50,6 @@ public class PacketExtensionUtils {
 
     public static final String COLOR_ID = "ColorID";
 
-    public static void hookExtensionProviders() {
-
-        ProviderManager providermanager = ProviderManager.getInstance();
-        providermanager.addExtensionProvider(ActivitiesPacketExtension.ELEMENT,
-            PacketExtensionUtils.NAMESPACE, new ActivitiesExtensionProvider());
-    }
-
-    public static ActivitiesPacketExtension getActvitiesExtension(
-        Message message) {
-        return (ActivitiesPacketExtension) message.getExtension(
-            ActivitiesPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
-    }
-
-    /**
-     * @return true if message contains a JupiterActivity
-     */
-    public static boolean containsJupiterActivity(Message message) {
-        ActivitiesPacketExtension extension = (ActivitiesPacketExtension) message
-            .getExtension(ActivitiesPacketExtension.ELEMENT,
-                PacketExtensionUtils.NAMESPACE);
-        if (extension != null) {
-            for (TimedActivity timedActivity : extension.getActivities()) {
-                if (timedActivity.getActivity() instanceof JupiterActivity)
-                    return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Retrieves the SessionID from the given message by checking all supported
      * PacketExtensions-types.
@@ -90,12 +57,8 @@ public class PacketExtensionUtils {
      * Returns null if no SessionID is found.
      */
     public static String getSessionID(Message message) {
-        PacketExtension extension = message.getExtension(
-            ActivitiesPacketExtension.ELEMENT, PacketExtensionUtils.NAMESPACE);
-        if (extension != null) {
-            return ((ActivitiesPacketExtension) extension).getSessionID();
-        }
-        extension = message.getExtension(PacketExtensionUtils.NAMESPACE);
+        PacketExtension extension = message
+            .getExtension(PacketExtensionUtils.NAMESPACE);
         if (extension != null && extension instanceof DefaultPacketExtension) {
             return ((DefaultPacketExtension) extension).getValue(SESSION_ID);
         }

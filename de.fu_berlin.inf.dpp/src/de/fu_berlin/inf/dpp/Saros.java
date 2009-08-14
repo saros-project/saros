@@ -98,6 +98,7 @@ import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForFileListHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
@@ -111,7 +112,6 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.DataTransferExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
@@ -315,7 +315,6 @@ public class Saros extends AbstractUIPlugin {
     protected Logger log;
 
     static {
-        PacketExtensionUtils.hookExtensionProviders();
         Roster.setDefaultSubscriptionMode(SubscriptionMode.accept_all);
     }
 
@@ -387,9 +386,9 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(StopManager.class);
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(UndoManager.class);
+        this.container.addComponent(VersionManager.class);
         this.container.addComponent(XMPPChatReceiver.class);
         this.container.addComponent(XMPPChatTransmitter.class);
-        this.container.addComponent(VersionManager.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);
@@ -418,6 +417,9 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(JoinExtension.class);
         this.container.addComponent(LeaveExtension.class);
         this.container.addComponent(RequestForFileListExtension.class);
+
+        // Extension Providers
+        this.container.addComponent(ActivitiesExtensionProvider.class);
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);

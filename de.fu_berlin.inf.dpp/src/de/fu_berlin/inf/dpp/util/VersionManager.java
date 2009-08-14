@@ -7,10 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Packet;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 
 /**
  * Component for figuring out whether two Saros plug-in instances with known
@@ -27,6 +36,17 @@ public class VersionManager {
 
     private static final Logger log = Logger.getLogger(VersionManager.class
         .getName());
+
+    /**
+     * Data Object for sending version information
+     */
+    public static class VersionInfo {
+
+        public Version version;
+
+        public Compatibility compatibility;
+
+    }
 
     /**
      * Enumeration to describe whether a local version is compatible with a
@@ -82,10 +102,71 @@ public class VersionManager {
             .asList(new Version("9.8.21.DEVEL")));
     }
 
+    /**
+     * @Inject
+     */
     protected Bundle bundle;
 
-    public VersionManager(Bundle bundle) {
+    /**
+     * @Inject
+     */
+    protected Saros saros;
+
+    /**
+     * @Inject
+     */
+    protected XMPPChatTransmitter transmitter;
+
+    protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
+        "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
+
+    public VersionManager(Bundle bundle, final Saros saros,
+        final XMPPChatReceiver receiver, XMPPChatTransmitter transmitter) {
+
         this.bundle = bundle;
+        this.saros = saros;
+        this.transmitter = transmitter;
+
+        receiver.addPacketListener(new PacketListener() {
+            public void processPacket(Packet packet) {
+                @SuppressWarnings("unchecked")
+                XStreamIQPacket<VersionInfo> iq = (XStreamIQPacket<VersionInfo>) packet;
+
+                if (iq.getType() == IQ.Type.GET) {
+                    VersionInfo remote = iq.getPayload();
+
+                    VersionInfo local = new VersionInfo();
+                    local.version = getVersion();
+                    local.compatibility = determineCompatbility(local.version,
+                        remote.version);
+
+                    IQ reply = versionProvider.createIQ(local);
+                    reply.setType(IQ.Type.RESULT);
+                    reply.setPacketID(iq.getPacketID());
+                    reply.setTo(iq.getFrom());
+                    saros.getConnection().sendPacket(reply);
+                }
+            }
+        }, versionProvider.getIQFilter());
+    }
+
+    /**
+     * Will query the given user for his Version and whether s/he thinks that
+     * her/his remote version is compatible with our local version.
+     * 
+     * The resulting VersionInfo represents what the remote peer knows about
+     * compatibility with our version.
+     * 
+     * If the resulting {@link VersionInfo#compatibility} is TOO_NEW (meaning
+     * the remote version is too new), then the remote peer does not know
+     * whether his version is compatible with ours. We must then check by
+     * ourselves.
+     * 
+     * @blocking If the request times out (5s) or an error occurs null is
+     *           returned.
+     */
+    public VersionInfo queryVersion(JID rqJID) {
+        return transmitter.sendQuery(rqJID, versionProvider, 5000);
     }
 
     /**

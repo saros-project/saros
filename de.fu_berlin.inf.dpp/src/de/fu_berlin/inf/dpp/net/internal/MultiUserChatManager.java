@@ -1,12 +1,10 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -14,10 +12,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 @Component(module = "net")
 public class MultiUserChatManager {
@@ -31,9 +26,6 @@ public class MultiUserChatManager {
 
     /* host name of jabber-server on which the muc room is created */
     private final String server = "conference.jabber.org";
-
-    // TODO really needed as field?
-    private static String JID_PROPERTY = "jid";
 
     /* current muc connection. */
     private MultiUserChat muc;
@@ -119,30 +111,6 @@ public class MultiUserChatManager {
      */
     public MultiUserChat getMUC() {
         return this.muc;
-    }
-
-    @Deprecated
-    public void sendActivities(ISharedProject sharedProject,
-        List<TimedActivity> activities) {
-
-        // log.info("Sent muc activities: " + activities);
-        try {
-            /* create new message for multi chat. */
-            Message newMessage = this.muc.createMessage();
-            /* add packet extension. */
-            newMessage.addExtension(new ActivitiesPacketExtension(sessionID
-                .getValue(), activities));
-            /* add jid property */
-            newMessage.setProperty(MultiUserChatManager.JID_PROPERTY, saros
-                .getMyJID().toString());
-
-            // newMessage.setBody("test");
-            this.muc.sendMessage(newMessage);
-
-        } catch (XMPPException e) {
-            log.error("Could not send message, message queued", e);
-        }
-
     }
 
     public String getRoomName() {

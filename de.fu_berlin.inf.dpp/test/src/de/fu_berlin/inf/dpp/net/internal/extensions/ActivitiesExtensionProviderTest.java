@@ -67,6 +67,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         new TextSelectionActivity(source, 1, 2, path),
         new ViewportActivity(source, 5, 10, path) };
 
+    protected ActivitiesExtensionProvider aProvider = new ActivitiesExtensionProvider();
+
     public void testJupiterActivities() throws XmlPullParserException,
         IOException {
         assertRoundtrip(timestamp);
@@ -110,12 +112,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testEmptyExtension() throws XmlPullParserException, IOException {
         List<TimedActivity> activities = Collections.emptyList();
-        try {
-            new ActivitiesPacketExtension("Session-ID", activities);
-            fail();
-        } catch (IllegalArgumentException e) {
-            // Expected exception.
-        }
+        aProvider.create("Session-ID", activities);
     }
 
     public void testGapInSequenceNumbers() throws XmlPullParserException,
@@ -127,19 +124,20 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         timedActivities.add(new TimedActivity(activity, jid, 20));
         timedActivities.add(new TimedActivity(activity, jid, 22));
 
-        ActivitiesPacketExtension extension = new ActivitiesPacketExtension(
-            "Session-ID", timedActivities);
+        PacketExtension extension = aProvider.create("Session-ID",
+            timedActivities);
 
         assertRoundtrip(extension);
     }
 
-    protected void assertRoundtrip(ActivitiesPacketExtension extension)
+    protected void assertRoundtrip(PacketExtension extension)
         throws XmlPullParserException, IOException {
-        assertEquals(extension, parseExtension(extension.toXML()));
+        assertEquals(aProvider.getPayload(extension), aProvider
+            .getPayload(parseExtension(extension.toXML())));
     }
 
-    protected ActivitiesPacketExtension createPacketExtension(IActivity activity) {
-        return new ActivitiesPacketExtension("4711", Collections
+    protected PacketExtension createPacketExtension(IActivity activity) {
+        return aProvider.create("4711", Collections
             .singletonList(new TimedActivity(activity, new JID(activity
                 .getSource()), 42)));
     }

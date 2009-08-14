@@ -43,8 +43,6 @@ import de.fu_berlin.inf.dpp.net.IDataReceiver;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
 import de.fu_berlin.inf.dpp.net.jingle.DispatchingJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
@@ -141,6 +139,9 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     @Inject
     protected ActivitiesHandler activitiesHandler;
+
+    @Inject
+    protected ActivitiesExtensionProvider activitiesProvider;
 
     protected Saros saros;
 
@@ -738,11 +739,10 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         public boolean receiveActivity(final JID sender, InputStream input) {
 
-            final Content content;
+            final TimedActivities content;
             try {
-                content = (Content) ActivitiesPacketExtension.getXStream()
-                    .fromXML(
-                        IOUtils.toString(new GZIPInputStream(input), "UTF-8"));
+                content = activitiesProvider.parseString(IOUtils.toString(
+                    new GZIPInputStream(input), "UTF-8"));
             } catch (IOException e) {
                 log.error("Could not parse incoming activity:", e);
                 return true;

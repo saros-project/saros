@@ -12,18 +12,18 @@ import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketIDFilter;
-import org.jivesoftware.smack.filter.PacketTypeFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.provider.ProviderManager;
 
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.SkypeIQ;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A manager class that allows to discover if a given XMPP entity supports Skype
@@ -39,6 +39,9 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 @Component(module = "net")
 public class SkypeManager implements IConnectionListener {
 
+    protected XStreamExtensionProvider<String> skypeProvider = new XStreamExtensionProvider<String>(
+        "skypeInfo");
+
     protected final Map<JID, String> skypeNames = new HashMap<JID, String>();
 
     protected Saros saros;
@@ -46,9 +49,6 @@ public class SkypeManager implements IConnectionListener {
     public SkypeManager(Saros saros) {
         this.saros = saros;
         saros.addListener(this);
-        ProviderManager providermanager = ProviderManager.getInstance();
-        providermanager
-            .addIQProvider("query", "jabber:iq:skype", SkypeIQ.class);
 
         /**
          * Register for our preference store, so we can be notified if the Skype
@@ -68,29 +68,76 @@ public class SkypeManager implements IConnectionListener {
     }
 
     /**
-     * Returns the Skype-URL for given roster entry.
+     * Returns the Skype-URL for given roster entry. This method will query all
+     * presences associated with the given roster entry and return the first
+     * valid Skype url (if any).
+     * 
+     * The order in which the presences are queried is undefined. If you need
+     * more control use getSkypeURL(JID).
      * 
      * @return the skype url for given roster entry or <code>null</code> if
      *         roster entry has no skype name.
      * 
+     *         This method will return previously cached results.
+     * 
      * @blocking This method is potentially long-running
      */
     public String getSkypeURL(RosterEntry rosterEntry) {
-        XMPPConnection connection = saros.getConnection();
-        JID jid = new JID(rosterEntry.getUser());
 
-        String name;
-        if (this.skypeNames.containsKey(jid)) {
-            name = this.skypeNames.get(jid);
-        } else {
-            name = SkypeManager.requestSkypeName(connection, jid);
-            if (name != null) {
-                // Only cache if we found something
-                this.skypeNames.put(jid, name);
+        XMPPConnection connection = saros.getConnection();
+        if (connection == null)
+            return null;
+
+        Roster roster = connection.getRoster();
+        if (roster == null)
+            return null;
+
+        for (Presence presence : Util.asIterable(roster
+            .getPresences(rosterEntry.getUser()))) {
+            if (presence.isAvailable()) {
+                JID jid = new JID(presence.getFrom());
+
+                String result = getSkypeURL(jid);
+                if (result != null)
+                    return result;
             }
         }
 
-        return name == null ? null : "skype:" + name;
+        return null;
+    }
+
+    /**
+     * Returns the Skype-URL for user identified by the given RQ-JID.
+     * 
+     * @return the skype url for given JID or <code>null</code> if the user has
+     *         no skype name set for this client.
+     * 
+     *         This method will return previously cached results.
+     * 
+     * @blocking This method is potentially long-running
+     */
+    public String getSkypeURL(JID rqJID) {
+
+        XMPPConnection connection = saros.getConnection();
+        if (connection == null)
+            return null;
+
+        String skypeName;
+
+        if (this.skypeNames.containsKey(rqJID)) {
+            skypeName = this.skypeNames.get(rqJID);
+        } else {
+            skypeName = requestSkypeName(connection, rqJID);
+            if (skypeName != null) {
+                // Only cache if we found something
+                this.skypeNames.put(rqJID, skypeName);
+            }
+        }
+
+        if (skypeName == null)
+            return null;
+
+        return "skype:" + skypeName;
     }
 
     /**
@@ -108,16 +155,15 @@ public class SkypeManager implements IConnectionListener {
         if (roster == null)
             return;
 
-        for (RosterEntry entry : roster.getEntries()) {
-            String username = entry.getUser();
-            Presence presence = roster.getPresence(username);
-
-            if (presence != null && presence.isAvailable()) {
-                SkypeIQ result = new SkypeIQ();
-                result.setType(IQ.Type.SET);
-                result.setTo(username + "/Smack");
-                result.setName(newSkypeName);
-                connection.sendPacket(result);
+        for (RosterEntry rosterEntry : roster.getEntries()) {
+            for (Presence presence : Util.asIterable(roster
+                .getPresences(rosterEntry.getUser()))) {
+                if (presence.isAvailable()) {
+                    IQ result = skypeProvider.createIQ(newSkypeName);
+                    result.setType(IQ.Type.SET);
+                    result.setTo(presence.getFrom());
+                    connection.sendPacket(result);
+                }
             }
         }
     }
@@ -130,22 +176,22 @@ public class SkypeManager implements IConnectionListener {
 
         if (newState == ConnectionState.CONNECTED) {
             connection.addPacketListener(new PacketListener() {
+
                 public void processPacket(Packet packet) {
-                    SkypeIQ iq = (SkypeIQ) packet;
+
+                    @SuppressWarnings("unchecked")
+                    XStreamIQPacket<String> iq = (XStreamIQPacket<String>) packet;
 
                     if (iq.getType() == IQ.Type.GET) {
-                        SkypeIQ result = new SkypeIQ();
-                        result.setType(IQ.Type.RESULT);
-                        result.setPacketID(iq.getPacketID());
-                        // HACK because we have rigged the JID to evade
-                        // detection by Smack
-                        result.setTo(iq.getFrom());
-                        result.setName(getLocalSkypeName());
+                        IQ reply = skypeProvider.createIQ(getLocalSkypeName());
+                        reply.setType(IQ.Type.RESULT);
+                        reply.setPacketID(iq.getPacketID());
+                        reply.setTo(iq.getFrom());
 
-                        connection.sendPacket(result);
+                        connection.sendPacket(reply);
                     }
                     if (iq.getType() == IQ.Type.SET) {
-                        String skypeName = iq.getName();
+                        String skypeName = iq.getPayload();
                         if (skypeName != null && skypeName.length() > 0) {
                             skypeNames.put(new JID(iq.getFrom()), skypeName);
                         } else {
@@ -153,7 +199,7 @@ public class SkypeManager implements IConnectionListener {
                         }
                     }
                 }
-            }, new PacketTypeFilter(SkypeIQ.class));
+            }, skypeProvider.getIQFilter());
         } else {
             // Otherwise clear our cache
             skypeNames.clear();
@@ -172,23 +218,22 @@ public class SkypeManager implements IConnectionListener {
      * Requests the Skype user name of given user. This method blocks up to 5
      * seconds to receive the value.
      * 
-     * @param user
-     *            the user for which the Skype name is requested.
+     * @param rqJID
+     *            the rqJID of the user for which the Skype name is requested.
      * @return the Skype user name of given user or <code>null</code> if the
      *         user doesn't respond in time (5s) or has no Skype name.
      */
-    protected static String requestSkypeName(XMPPConnection connection, JID user) {
+    protected String requestSkypeName(XMPPConnection connection, JID rqJID) {
 
         if ((connection == null) || !connection.isConnected()) {
             return null;
         }
 
         // Request the time from a remote user.
-        SkypeIQ request = new SkypeIQ();
+        IQ request = skypeProvider.createIQ(null);
 
         request.setType(IQ.Type.GET);
-        // HACK because Smack does not support IQ.Type.SET
-        request.setTo(user.toString() + "/Smack");
+        request.setTo(rqJID.toString());
 
         // Create a packet collector to listen for a response.
         PacketCollector collector = connection
@@ -198,17 +243,15 @@ public class SkypeManager implements IConnectionListener {
             connection.sendPacket(request);
 
             // Wait up to 5 seconds for a result.
-            IQ result = (IQ) collector.nextResult(5000);
-            if ((result != null) && (result.getType() == IQ.Type.RESULT)) {
-                SkypeIQ skypeResult = (SkypeIQ) result;
+            String skypeName = skypeProvider.getPayload(collector
+                .nextResult(5000));
 
-                return skypeResult.getName().length() == 0 ? null : skypeResult
-                    .getName();
-            }
+            if (skypeName == null || skypeName.trim().length() == 0)
+                return null;
+            else
+                return skypeName.trim();
         } finally {
             collector.cancel();
         }
-
-        return null;
     }
 }

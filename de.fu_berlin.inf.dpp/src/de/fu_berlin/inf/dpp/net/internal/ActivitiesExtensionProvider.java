@@ -19,31 +19,45 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.jivesoftware.smack.provider.PacketExtensionProvider;
-import org.xmlpull.v1.XmlPullParser;
 
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DropSilentlyPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension.Content;
-import de.fu_berlin.inf.dpp.util.xstream.XppReader;
+import de.fu_berlin.inf.dpp.activities.AbstractActivity;
+import de.fu_berlin.inf.dpp.activities.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
+import de.fu_berlin.inf.dpp.net.TimedActivity;
 
-public class ActivitiesExtensionProvider implements PacketExtensionProvider {
+public class ActivitiesExtensionProvider extends
+    XStreamExtensionProvider<TimedActivities> {
 
-    private static final Logger log = Logger
-        .getLogger(ActivitiesExtensionProvider.class.getName());
+    public ActivitiesExtensionProvider() {
+        super("activities", TimedActivities.class, AbstractActivity.class,
+            EditorActivity.class, FileActivity.class, FolderActivity.class,
+            RoleActivity.class, TextEditActivity.class,
+            TextSelectionActivity.class, ViewportActivity.class,
+            TimedActivity.class, JupiterActivity.class,
+            JupiterVectorTime.class, DeleteOperation.class,
+            InsertOperation.class, NoOperation.class, SplitOperation.class,
+            TimestampOperation.class);
+    }
 
-    public PacketExtension parseExtension(XmlPullParser parser) {
-        Content content;
-        try {
-            content = (Content) ActivitiesPacketExtension.getXStream()
-                .unmarshal(new XppReader(parser));
-        } catch (RuntimeException e) {
-            log.error("Malformed data received!", e);
-            return new DropSilentlyPacketExtension();
-        }
-        return new ActivitiesPacketExtension(content.getSessionID(), content
-            .getTimedActivities());
+    public PacketExtension create(String sessionID,
+        List<TimedActivity> activities) {
+        return create(new TimedActivities(sessionID,
+            new ArrayList<TimedActivity>(activities)));
     }
 }

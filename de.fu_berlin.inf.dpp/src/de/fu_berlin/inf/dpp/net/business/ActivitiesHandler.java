@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.net.business;
 
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
@@ -12,15 +12,15 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.ActivitiesPacketExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
- * Handler for all {@link ActivitiesPacketExtension}s
+ * Handler for all {@link TimedActivities}
  */
 @Component(module = "net")
 public class ActivitiesHandler {
@@ -32,22 +32,29 @@ public class ActivitiesHandler {
     protected SharedProjectObservable sharedProject;
 
     public ActivitiesHandler(XMPPChatReceiver receiver,
-        SessionIDObservable sessionID) {
+        final ActivitiesExtensionProvider provider,
+        final SessionIDObservable sessionID) {
 
         receiver.addPacketListener(new PacketListener() {
             public void processPacket(Packet packet) {
                 try {
-                    Message message = (Message) packet;
+                    TimedActivities payload = provider.getPayload(packet);
 
-                    JID fromJID = new JID(message.getFrom());
-
-                    ActivitiesPacketExtension activitiesPacket = PacketExtensionUtils
-                        .getActvitiesExtension(message);
-
-                    if (activitiesPacket == null) {
+                    if (payload == null) {
+                        log.warn("Invalid ActivitiesExtensionPacket"
+                            + " does not contain a payload: " + packet);
                         return;
                     }
-                    receiveActivities(fromJID, activitiesPacket.getActivities());
+
+                    if (!ObjectUtils.equals(sessionID.getValue(), payload
+                        .getSessionID())) {
+                        log.warn("Received ActivitiesExtensionPacket"
+                            + " from an old/unknown session: " + packet);
+                        return;
+                    }
+
+                    receiveActivities(new JID(packet.getFrom()), payload
+                        .getTimedActivities());
 
                 } catch (Exception e) {
                     log.error(
@@ -55,7 +62,7 @@ public class ActivitiesHandler {
                         e);
                 }
             }
-        }, PacketExtensionUtils.getSessionIDPacketFilter(sessionID));
+        }, provider.getPacketFilter());
     }
 
     /**
@@ -77,7 +84,7 @@ public class ActivitiesHandler {
 
         final ISharedProject project = sharedProject.getValue();
 
-        if ((project == null) || (project.getUser(fromJID) == null)) {
+        if (project == null || project.getUser(fromJID) == null) {
             log.warn("Received activities from " + source
                 + " but User is no participant: " + timedActivities);
             return;
