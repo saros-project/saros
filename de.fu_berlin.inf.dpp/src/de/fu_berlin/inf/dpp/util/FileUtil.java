@@ -160,7 +160,7 @@ public class FileUtil {
 
         // Reset permissions on parent
         if (parent != null && wasReadOnly)
-            setReadOnly(parent, wasReadOnly);
+            setReadOnly(parent, true);
     }
 
     /**
@@ -187,7 +187,7 @@ public class FileUtil {
         }
 
         if (wasReadOnly)
-            setReadOnly(file, wasReadOnly);
+            setReadOnly(file, true);
     }
 
     /**
@@ -210,7 +210,7 @@ public class FileUtil {
                 break;
             root = temp;
         }
-        boolean canWriteInParent = FileUtil.setReadOnly(root, false);
+        boolean wasReadOnly = FileUtil.setReadOnly(root, false);
 
         try {
             if (!create(parent)) {
@@ -219,7 +219,7 @@ public class FileUtil {
             } else
                 return true;
         } finally {
-            if (!canWriteInParent)
+            if (wasReadOnly)
                 FileUtil.setReadOnly(root, true);
         }
     }
