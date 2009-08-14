@@ -54,6 +54,12 @@ public class LeaveHandler {
 
             ISharedProject project = sessionManager.getSharedProject();
 
+            if (project == null) {
+                log.warn("Received leave message but shared"
+                    + " project has already ended: " + fromJID);
+                return;
+            }
+
             User user = project.getUser(fromJID);
             if (user == null) {
                 log.warn("Received leave message from user which"
