@@ -56,7 +56,7 @@ public class EditorUtils {
 
         EditorManager.log.debug("Converting line delimiters...");
 
-        boolean makeReadable = FileUtil.setReadOnly(file, false);
+        boolean wasReadOnly = FileUtil.setReadOnly(file, false);
 
         // Now run the conversion operation
         IPath[] paths = new IPath[] { file.getFullPath() };
@@ -82,7 +82,7 @@ public class EditorUtils {
             EditorManager.log.error("Can't convert line delimiters:", e);
         }
 
-        if (makeReadable) {
+        if (wasReadOnly) {
             FileUtil.setReadOnly(file, true);
         }
     }
