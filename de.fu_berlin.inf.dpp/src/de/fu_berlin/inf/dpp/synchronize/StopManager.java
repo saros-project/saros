@@ -190,6 +190,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     if (handle == null) {
                         log.error("StartHandle for " + stopActivity
                             + " could not be found.");
+                        return false;
                     }
                     handle.acknowledge();
                 }
@@ -335,7 +336,12 @@ public class StopManager implements IActivityProvider, Disposable {
         try {
             while (expectedAcknowledgments.contains(expectedAck)
                 && !progress.isCanceled()) {
-                acknowledged.await(MILLISTOWAIT, TimeUnit.MILLISECONDS);
+                if (acknowledged.await(MILLISTOWAIT, TimeUnit.MILLISECONDS)) {
+                    continue; /*
+                               * Used to make FindBugs happy that we don't do
+                               * anything if we are woken up
+                               */
+                }
             }
             if (expectedAcknowledgments.contains(expectedAck)) {
                 log.warn("No acknowlegment arrived, gave up waiting");
