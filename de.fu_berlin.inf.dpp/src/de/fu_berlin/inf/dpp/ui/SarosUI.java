@@ -219,7 +219,7 @@ public class SarosUI {
         case CONNECTING:
             return "Connecting...";
         case CONNECTED:
-            return "Connected (as " + saros.getConnection().getUser() + ")";
+            return "Connected as " + saros.getConnection().getUser();
         case DISCONNECTING:
             return "Disconnecting...";
         case ERROR:

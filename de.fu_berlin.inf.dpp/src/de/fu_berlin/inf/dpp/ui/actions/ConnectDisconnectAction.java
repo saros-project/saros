@@ -227,7 +227,12 @@ public class ConnectDisconnectAction extends Action implements Disposable {
                 || state == ConnectionState.NOT_CONNECTED
                 || state == ConnectionState.ERROR);
 
-            setText(sarosUI.getDescription(state));
+            if (saros.isConnected()) {
+                setText("Disconnect (current state is: "
+                    + sarosUI.getDescription(state) + ")");
+            } else {
+                setText("Connect");
+            }
         } catch (RuntimeException e) {
             log.error("Internal error in ConnectDisconnectAction:", e);
         }
