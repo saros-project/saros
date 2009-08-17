@@ -84,7 +84,7 @@ public class StartHandle {
 
         log.debug("Called startAndAwait on " + user);
 
-        if (startCalled.compareAndSet(false, true))
+        if (!startCalled.compareAndSet(false, true))
             throw new IllegalStateException(
                 "start can only be called once per StartHandle");
 
