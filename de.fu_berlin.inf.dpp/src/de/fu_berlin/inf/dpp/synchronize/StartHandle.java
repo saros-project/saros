@@ -1,28 +1,33 @@
 package de.fu_berlin.inf.dpp.synchronize;
 
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 public class StartHandle {
 
     private static Logger log = Logger.getLogger(StartHandle.class.getName());
 
-    protected User user;
     protected StopManager stopManager;
-    protected boolean startCalled = false;
+
+    protected User user;
+
     protected String id;
 
-    protected Lock lock = new ReentrantLock();
-    protected Condition acknowledgeCondition = lock.newCondition();
-    protected boolean acknowledged = false;
+    /**
+     * Each start handle may be only started once. This boolean guards this.
+     */
+    protected AtomicBoolean startCalled = new AtomicBoolean(false);
+
+    /**
+     * Each start handle may be acknowledged once to have been started.
+     */
+    protected AtomicBoolean acknowledged = new AtomicBoolean(false);
 
     public StartHandle(User user, StopManager stopManager, String id) {
         this.user = user;
@@ -47,15 +52,15 @@ public class StartHandle {
 
         log.debug("Called start on " + user);
 
-        if (startCalled)
+        if (!startCalled.compareAndSet(false, true))
             throw new IllegalStateException(
                 "start can only be called once per StartHandle");
-        startCalled = true;
 
         stopManager.removeStartHandle(this);
 
         if (stopManager.noStartHandlesFor(user)) {
-            // FIXME Race Condition: What happens if stop is called in this time?
+            // FIXME Race Condition: What happens if stop is called in this
+            // time?
             stopManager.initiateUnlock(this);
             return true;
         }
@@ -76,12 +81,12 @@ public class StartHandle {
      * @Throws CancellationException
      */
     public boolean startAndAwait(final SubMonitor progress) {
+
         log.debug("Called startAndAwait on " + user);
 
-        if (startCalled)
+        if (startCalled.compareAndSet(false, true))
             throw new IllegalStateException(
                 "start can only be called once per StartHandle");
-        startCalled = true;
 
         stopManager.removeStartHandle(this);
 
@@ -89,21 +94,17 @@ public class StartHandle {
             // same Race Condition as in start
             stopManager.initiateUnlock(this);
 
-            lock.lock();
             try {
-                while (!acknowledged && !progress.isCanceled())
-                    acknowledgeCondition.await(stopManager.MILLISTOWAIT,
-                        TimeUnit.MILLISECONDS);
+                while (!acknowledged.get() && !progress.isCanceled())
+                    Thread.sleep(stopManager.MILLISTOWAIT);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 log.error("Code not designed to be interruptable", e);
-            } finally {
-                lock.unlock();
             }
             if (progress.isCanceled())
                 throw new CancellationException();
 
-            return acknowledged;
+            return acknowledged.get();
         }
         return false;
     }
@@ -117,10 +118,10 @@ public class StartHandle {
     }
 
     public void acknowledge() {
-        acknowledged = true;
-        lock.lock();
-        acknowledgeCondition.signalAll();
-        lock.unlock();
+        if (!acknowledged.compareAndSet(false, true)) {
+            log.warn("Acknowledge should only be called once per handle",
+                new StackTrace());
+        }
     }
 
     @Override
@@ -157,7 +158,7 @@ public class StartHandle {
     @Override
     public String toString() {
         String out = "StartHandle (" + user + ", " + id + ", ";
-        if (startCalled)
+        if (startCalled.get())
             out += "not ";
         return out + "startable)";
     }
