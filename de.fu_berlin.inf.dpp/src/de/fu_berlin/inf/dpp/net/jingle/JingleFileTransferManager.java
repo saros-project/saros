@@ -209,7 +209,8 @@ public class JingleFileTransferManager {
         this.saros = saros;
 
         // Add another layer of indirection
-        this.fileTransferListener = new DispatchingJingleFileTransferListener(dispatch);
+        this.fileTransferListener = new DispatchingJingleFileTransferListener(
+            dispatch);
         this.fileTransferListener.add(listener);
 
         log.debug("Starting to initialize jingle file transfer manager.");
@@ -385,44 +386,7 @@ public class JingleFileTransferManager {
 
         JID toJID = transferDescription.getRecipient();
 
-        FileTransferConnection connection;
-
-        synchronized (this) {
-
-            connection = connections.get(toJID);
-
-            if (connection == null
-                || connection.state == JingleConnectionState.CLOSED) {
-                connection = startJingleSession(toJID);
-            }
-
-            int i = 0;
-
-            if (connection.state == JingleConnectionState.INIT) {
-
-                InterruptedException interrupted = null;
-
-                // TODO observe state rather than sleep
-                while (connection.state == JingleConnectionState.INIT && i < 60) {
-                    try {
-                        if (i % 2 == 0)
-                            log.debug(Util.prefix(toJID)
-                                + "Waiting for Init since " + (i * 500) / 1000
-                                + "s");
-                        i++;
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        interrupted = e;
-                    }
-                }
-
-                if (interrupted != null) {
-                    log.error("Code not designed to be interruptable",
-                        interrupted);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
+        FileTransferConnection connection = initialize(toJID);
 
         if (connection.state == JingleConnectionState.ESTABLISHED) {
             return connection.fileTransfer.send(transferDescription, content,
@@ -432,6 +396,50 @@ public class JingleFileTransferManager {
             connection.setState(JingleConnectionState.ERROR);
             throw new JingleSessionException(Util.prefix(toJID)
                 + "Could not establish connection when trying to send");
+        }
+    }
+
+    protected synchronized FileTransferConnection initialize(JID toJID)
+        throws JingleSessionException {
+
+        FileTransferConnection connection = connections.get(toJID);
+
+        if (connection == null
+            || connection.state == JingleConnectionState.CLOSED) {
+            connection = startJingleSession(toJID);
+        }
+
+        if (connection.state == JingleConnectionState.INIT) {
+            waitForConnection(connection);
+        }
+
+        return connection;
+    }
+
+    /**
+     * Will wait up to 30 Seconds for the given FileTransferConnection get out
+     * of state INIT
+     */
+    public void waitForConnection(FileTransferConnection connection) {
+
+        InterruptedException interrupted = null;
+
+        int i = 0;
+        while (connection.state == JingleConnectionState.INIT && i < 60) {
+            try {
+                if (i % 2 == 0)
+                    log.debug(Util.prefix(connection.jid)
+                        + "Waiting for Init since " + (i * 500) / 1000 + "s");
+                i++;
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                interrupted = e;
+            }
+        }
+
+        if (interrupted != null) {
+            log.error("Code not designed to be interruptable", interrupted);
+            Thread.currentThread().interrupt();
         }
     }
 
