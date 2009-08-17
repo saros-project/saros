@@ -62,7 +62,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "feedback")
 public class TextEditCollector extends AbstractStatisticCollector {
 
-    class EditEvent {
+    protected static class EditEvent {
         long time;
         int chars;
 
@@ -286,7 +286,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
     }
 
     @Override
-    protected void clearPreviousData() {
+    protected synchronized void clearPreviousData() {
         charsWritten = 0;
         localEvents.clear();
         remoteEvents.clear();
