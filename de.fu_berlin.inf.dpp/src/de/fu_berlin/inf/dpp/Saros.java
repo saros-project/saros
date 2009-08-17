@@ -108,7 +108,6 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.DataTransferExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
@@ -325,7 +324,7 @@ public class Saros extends AbstractUIPlugin {
         // Only start a DotGraphMonitor if asserts are enabled (aka debug mode)
         assert (dotMonitor = new DotGraphMonitor()) != null;
 
-        isInitialized = false;
+        setInitialized(false);
         setDefault(this);
 
         PicoBuilder picoBuilder = new PicoBuilder(new CompositeInjection(
@@ -410,7 +409,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(CancelInviteExtension.class);
         this.container.addComponent(UserListExtension.class);
         this.container.addComponent(RequestActivityExtension.class);
-        this.container.addComponent(DataTransferExtension.class);
         this.container.addComponent(InviteExtension.class);
         this.container.addComponent(JoinExtension.class);
         this.container.addComponent(LeaveExtension.class);
@@ -437,6 +435,10 @@ public class Saros extends AbstractUIPlugin {
          * managed by PicoContainer.
          */
         reinjector = new Reinjector(this.container);
+    }
+
+    protected static void setInitialized(boolean initialized) {
+        isInitialized = initialized;
     }
 
     /**
@@ -752,7 +754,7 @@ public class Saros extends AbstractUIPlugin {
         if (server == null) {
             throw new URISyntaxException(prefStore
                 .getString(PreferenceConstants.SERVER),
-                "The XMPP server address is invalid: " + server);
+                "The XMPP server address is invalid: " + serverString);
         }
 
         ProxyInfo proxyInfo = getProxyInfo(uri.getHost());
