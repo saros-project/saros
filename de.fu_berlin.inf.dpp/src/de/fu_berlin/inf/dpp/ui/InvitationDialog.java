@@ -79,6 +79,7 @@ import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -144,8 +145,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     /**
      * Class for providing labels of the {@link InvitationDialog#tableViewer}
      */
-    private class InvitationDialogLabelProvider extends LabelProvider implements
-        ITableLabelProvider {
+    protected class InvitationDialogLabelProvider extends LabelProvider
+        implements ITableLabelProvider {
 
         public Image getColumnImage(Object element, int columnIndex) {
             return null;
@@ -168,13 +169,16 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             case 0:
                 return item.nickname;
             case 1: {
-                Boolean supported = discoveryManager.isSupportedNonBlock(
-                    item.jid, Saros.NAMESPACE);
-                if (supported == null) {
+
+                boolean supported;
+                try {
+                    supported = discoveryManager.isSupportedNonBlock(item.jid,
+                        Saros.NAMESPACE);
+                } catch (CacheMissException e) {
                     updateSarosSupportLater(item.jid);
                     return "?";
                 }
-                return supported.booleanValue() ? "Yes" : "No";
+                return supported ? "Yes" : "No";
             }
             case 2:
                 if (item.outgoingProcess != null) {
@@ -195,13 +199,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                         return "";
                     }
                 } else {
-                    Boolean supported = discoveryManager.isSupportedNonBlock(
-                        item.jid, Saros.NAMESPACE);
-                    if (supported == null) {
+                    try {
+                        discoveryManager.isSupportedNonBlock(item.jid,
+                            Saros.NAMESPACE);
+                    } catch (CacheMissException e) {
                         return "Discovery is in progress";
-                    } else {
-                        return "";
                     }
+                    return "";
                 }
             }
             return "";

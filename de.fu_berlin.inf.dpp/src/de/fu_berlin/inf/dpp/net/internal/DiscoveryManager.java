@@ -33,6 +33,13 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 @Component(module = "net")
 public class DiscoveryManager implements Disposable {
 
+    /**
+     * Exception used to signify that no entry has been found in the cache
+     */
+    public static class CacheMissException extends Exception {
+        private static final long serialVersionUID = -4340008321236181064L;
+    }
+
     private static final Logger log = Logger.getLogger(DiscoveryManager.class
         .getName());
 
@@ -151,16 +158,20 @@ public class DiscoveryManager implements Disposable {
     /**
      * Returns true if there is an available presence which supports the given
      * feature. Returns false if all available presences do not support the
-     * given feature. Returns null if there is no available presences supporting
-     * the feature, but not all presences have been queried for support yet.
+     * given feature.
      * 
      * This method will not trigger any updates or block but rather just use the
      * cache and return quickly.
      * 
+     * @throws CacheMissException
+     *             if there is no available presences supporting the feature,
+     *             but not all presences have been queried for support yet.
+     * 
      * @reentrant
      * @nonBlocking
      */
-    public Boolean isSupportedNonBlock(JID jid, String namespace) {
+    public boolean isSupportedNonBlock(JID jid, String namespace)
+        throws CacheMissException {
 
         jid = jid.getBareJID();
 
@@ -180,9 +191,9 @@ public class DiscoveryManager implements Disposable {
 
         if (allCached) {
             return false;
-        } else {
-            return null;
         }
+
+        throw new CacheMissException();
     }
 
     /**
