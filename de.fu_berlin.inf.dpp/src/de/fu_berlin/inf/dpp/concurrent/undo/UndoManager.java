@@ -219,7 +219,7 @@ public class UndoManager implements Disposable, IActivityProvider {
      * A NullOperation is an IUndoableOperation that can be executed, undone and
      * redone without having any effect, except returning OK_STATUS.
      */
-    protected class NullOperation extends AbstractOperation {
+    protected static class NullOperation extends AbstractOperation {
         /*
          * The user shouldn't see a difference in the label between normal
          * typing operations and NullOperations. But we should be able to
