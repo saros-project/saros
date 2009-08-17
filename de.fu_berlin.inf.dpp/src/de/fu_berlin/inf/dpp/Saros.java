@@ -120,7 +120,6 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
-import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
@@ -357,7 +356,6 @@ public class Saros extends AbstractUIPlugin {
          */
         this.container.addComponent(Saros.class, this);
 
-        this.container.addComponent(CDTFacade.class);
         this.container.addComponent(ConnectionSessionManager.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
         this.container.addComponent(ConsistencyWatchdogServer.class);

@@ -76,8 +76,6 @@ import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
-import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -401,12 +399,6 @@ public class EditorManager implements IActivityProvider, Disposable {
             });
         }
     };
-
-    @Inject
-    protected JDTFacade jdtFacade;
-
-    @Inject
-    protected CDTFacade cdtFacade;
 
     @Inject
     protected FileReplacementInProgressObservable fileReplacementInProgressObservable;
@@ -1684,44 +1676,12 @@ public class EditorManager implements IActivityProvider, Disposable {
      *            is needed
      * 
      * @return IDocumentProvider of the given input
-     * 
-     * 
      */
-    public IDocumentProvider getDocumentProvider(IEditorInput input) {
-
-        wpLog.trace("EditorManager.getDocumentProvider invoked");
-
-        Object adapter = input.getAdapter(IFile.class);
-        if (adapter != null) {
-            IFile file = (IFile) adapter;
-
-            String fileExtension = file.getFileExtension();
-
-            if (fileExtension != null) {
-                if (fileExtension.equals("java")) {
-
-                    if (jdtFacade.isJDTAvailable()) {
-                        return jdtFacade.getDocumentProvider();
-                    }
-
-                } else if (fileExtension.equals("c")
-                    || fileExtension.equals("h") || fileExtension.equals("cpp")
-                    || fileExtension.equals("cxx")
-                    || fileExtension.equals("hxx")) {
-
-                    if (cdtFacade.isCDTAvailable()) {
-                        return cdtFacade.getDocumentProvider();
-                    }
-                }
-            }
-        }
-
-        DocumentProviderRegistry registry = DocumentProviderRegistry
-            .getDefault();
-        return registry.getDocumentProvider(input);
+    public static IDocumentProvider getDocumentProvider(IEditorInput input) {
+        return DocumentProviderRegistry.getDefault().getDocumentProvider(input);
     }
 
-    public IDocument getDocument(IEditorPart editorPart) {
+    public static IDocument getDocument(IEditorPart editorPart) {
         IEditorInput input = editorPart.getEditorInput();
 
         return getDocumentProvider(input).getDocument(input);

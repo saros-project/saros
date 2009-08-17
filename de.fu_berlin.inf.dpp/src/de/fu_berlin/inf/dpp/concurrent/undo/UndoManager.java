@@ -554,7 +554,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         IFile file = sharedProject.getProject().getFile(currentActiveEditor);
 
         FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = editorManager.getDocumentProvider(input);
+        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
 
         editorManager.connect(file);
 

@@ -1,5 +1,6 @@
 package de.fu_berlin.inf.dpp.editor.internal;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.ui.IFileEditorInput;
@@ -88,11 +89,7 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     @Override
     public boolean isReadOnly(Object element) {
-        if (!isInSharedProject(element)) {
-            return super.isReadOnly(element);
-        }
-
-        return !this.isDriver || super.isReadOnly(element);
+        return super.isReadOnly(element);
     }
 
     @Override
@@ -106,22 +103,12 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
 
     @Override
     public boolean canSaveDocument(Object element) {
-        // TODO this is probably wrong
-        if (!isInSharedProject(element)) {
-            return super.canSaveDocument(element);
-        }
-
-        return this.isDriver && super.canSaveDocument(element);
+        return super.canSaveDocument(element);
     }
 
     @Override
     public boolean mustSaveDocument(Object element) {
-        // TODO this is probably wrong
-        if (!isInSharedProject(element)) {
-            return super.mustSaveDocument(element);
-        }
-
-        return this.isDriver && super.mustSaveDocument(element);
+        return super.mustSaveDocument(element);
     }
 
     private boolean isInSharedProject(Object element) {
@@ -132,6 +119,6 @@ public class SharedDocumentProvider extends TextFileDocumentProvider {
         IFileEditorInput fileEditorInput = (IFileEditorInput) element;
         IProject project = fileEditorInput.getFile().getProject();
 
-        return project.equals(sharedProject.getProject());
+        return ObjectUtils.equals(project, sharedProject.getProject());
     }
 }

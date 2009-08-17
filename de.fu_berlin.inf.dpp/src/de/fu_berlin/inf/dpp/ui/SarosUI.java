@@ -51,8 +51,6 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.optional.cdt.CDTFacade;
-import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -89,21 +87,9 @@ public class SarosUI {
 
     protected SessionManager sessionManager;
 
-    public SarosUI(SessionManager sessionManager, JDTFacade jdtFacade,
-        CDTFacade cdtFacade) {
+    public SarosUI(SessionManager sessionManager) {
 
         this.sessionManager = sessionManager;
-
-        // It would be nice to eliminate these, because they cause dependencies
-        // to the JDT and CDT, but they are necessary to prevent Observers
-        // from editing the documents
-        if (jdtFacade.isJDTAvailable()) {
-            jdtFacade.installSharedDocumentProvider(sessionManager);
-        }
-
-        if (cdtFacade.isCDTAvailable()) {
-            cdtFacade.installSharedDocumentProvider(sessionManager);
-        }
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override

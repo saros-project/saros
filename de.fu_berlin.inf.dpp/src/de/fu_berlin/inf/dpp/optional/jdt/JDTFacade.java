@@ -4,11 +4,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
-import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * 
@@ -53,22 +51,6 @@ public class JDTFacade implements IJDTSupport {
                     .warn("IJDTSupport could not be instantiated, despite JDT Plugin being installed");
             }
         }
-    }
-
-    public void installSharedDocumentProvider(SessionManager sessionManager) {
-
-        if (!isJDTAvailable())
-            throw new IllegalStateException("JDT Plugin is not available");
-
-        jdtSupport.installSharedDocumentProvider(sessionManager);
-    }
-
-    public IDocumentProvider getDocumentProvider() {
-
-        if (!isJDTAvailable())
-            throw new IllegalStateException("JDT Plugin is not available");
-
-        return jdtSupport.getDocumentProvider();
     }
 
     public List<IPreferenceManipulator> getPreferenceManipulators() {

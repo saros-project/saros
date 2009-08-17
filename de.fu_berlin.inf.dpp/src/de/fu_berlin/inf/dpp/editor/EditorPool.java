@@ -113,12 +113,12 @@ class EditorPool {
         this.editorManager.editorAPI.setEditable(editorPart,
             this.editorManager.isDriver);
 
-        IDocumentProvider documentProvider = this.editorManager
+        IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
         documentProvider
             .addElementStateListener(this.editorManager.dirtyStateListener);
 
-        IDocument document = this.editorManager.getDocument(editorPart);
+        IDocument document = EditorManager.getDocument(editorPart);
 
         document.addDocumentListener(this.editorManager.documentListener);
 
@@ -187,7 +187,7 @@ class EditorPool {
         this.editorManager.editorAPI.removeSharedEditorListener(
             this.editorManager, editorPart);
 
-        IDocumentProvider documentProvider = this.editorManager
+        IDocumentProvider documentProvider = EditorManager
             .getDocumentProvider(input);
         documentProvider
             .removeElementStateListener(this.editorManager.dirtyStateListener);
