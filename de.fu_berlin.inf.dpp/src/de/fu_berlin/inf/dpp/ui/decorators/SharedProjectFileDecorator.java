@@ -88,7 +88,6 @@ public class SharedProjectFileDecorator implements ILightweightLabelDecorator {
 
         @Override
         public void roleChanged(User user) {
-
             updateDecorations(user);
         }
     };
