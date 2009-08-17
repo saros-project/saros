@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.util.Pair;
 @Component(module = "feedback")
 public class DataTransferCollector extends AbstractStatisticCollector {
 
-    public class TransferEvent {
+    public static class TransferEvent {
 
         protected NetTransferMode mode;
 
