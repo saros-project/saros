@@ -36,7 +36,7 @@ public class SplitOperationTest extends TestCase {
         return new DeleteOperation(i, s);
     }
 
-    public static Operation Nop() {
+    public static Operation nop() {
         return new NoOperation();
     }
 
@@ -97,7 +97,7 @@ public class SplitOperationTest extends TestCase {
 
     public void testDelSplit() {
         // Split(Del(8,"abc"), Split(NoOperation, Ins(8,"ghijk")
-        Operation split = S(D(8, "abc"), S(Nop(), I(8, "ghijk")));
+        Operation split = S(D(8, "abc"), S(nop(), I(8, "ghijk")));
         TextEditActivity expected = new TextEditActivity(source, 8, "ghijk",
             "abc", path);
         assertEquals(Collections.singletonList(expected), split.toTextEdit(
