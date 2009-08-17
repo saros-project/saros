@@ -66,6 +66,8 @@ public class SubscriptionListener implements ConnectionSessionListener {
                 case unavailable:
                     // Don't care for these presence infos
                     return;
+                default:
+                    // continue
                 }
 
                 processPresence(presence);
@@ -133,6 +135,10 @@ public class SubscriptionListener implements ConnectionSessionListener {
             sendPresence(Presence.Type.unsubscribed, presence.getFrom());
             informUserAboutUnsubscription(presence.getFrom());
             break;
+        case available:
+        case unavailable:
+        default:
+            // do nothing
         }
 
         connection.getRoster().reload();
