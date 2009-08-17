@@ -58,7 +58,6 @@ public class ConsistencyAction extends Action {
         if (sharedProject != null) {
             watchdogClient.getConsistencyToResolve().remove(
                 isConsistencyListener);
-
         }
 
         sharedProject = newSharedProject;
@@ -75,6 +74,12 @@ public class ConsistencyAction extends Action {
     ValueChangeListener<Boolean> isConsistencyListener = new ValueChangeListener<Boolean>() {
 
         public void setValue(Boolean newValue) {
+
+            if (sharedProject.isHost() && newValue == true) {
+                log.warn("No inconsistency should ever be reported"
+                    + " to the host");
+                return;
+            }
 
             setEnabled(newValue);
 

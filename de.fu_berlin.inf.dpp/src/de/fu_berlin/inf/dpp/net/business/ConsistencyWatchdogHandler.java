@@ -242,14 +242,15 @@ public class ConsistencyWatchdogHandler {
              */
             // find the StartHandle of the inconsistent user
             StartHandle inconsistentStartHandle = null;
-            for (StartHandle startHandle : startHandles)
+            for (StartHandle startHandle : startHandles) {
                 if (from.equals(startHandle.getUser().getJID())) {
                     inconsistentStartHandle = startHandle;
                     break;
                 }
+            }
             if (inconsistentStartHandle == null)
-                log
-                    .error("Could not find the StartHandle of the inconsistent user");
+                log.error("Could not find the StartHandle"
+                    + " of the inconsistent user");
             else {
                 inconsistentStartHandle.startAndAwait(progress);
                 startHandles.remove(inconsistentStartHandle);

@@ -53,7 +53,9 @@ public class ConsistencyWatchdogClient {
 
     protected ISharedProject sharedProject;
 
-    @Inject
+    /**
+     * @Inject Injected via Constructor Injection
+     */
     protected IsInconsistentObservable inconsistencyToResolve;
 
     @Inject
@@ -74,8 +76,10 @@ public class ConsistencyWatchdogClient {
         TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2),
         new NamedThreadFactory("ChecksumCruncher-"));
 
-    public ConsistencyWatchdogClient(SessionManager sessionManager) {
+    public ConsistencyWatchdogClient(SessionManager sessionManager,
+        IsInconsistentObservable inconsistentObservable) {
         this.sessionManager = sessionManager;
+        this.inconsistencyToResolve = inconsistentObservable;
         sessionManager.addSessionListener(new AbstractSessionListener() {
             @Override
             public void sessionStarted(ISharedProject session) {
@@ -110,8 +114,13 @@ public class ConsistencyWatchdogClient {
      * If a check is already in progress, nothing happens (but a warning)
      * 
      * @nonBlocking This method returns immediately.
+     * 
+     * @client Can only be called on the client!
      */
     public void checkConsistency() {
+
+        if (sharedProject.isHost())
+            throw new IllegalStateException("Can only be called on the client");
 
         try {
             executor.submit(Util.wrapSafe(log, new Runnable() {
@@ -146,8 +155,14 @@ public class ConsistencyWatchdogClient {
      *            the checksums to check the documents against
      * 
      * @nonReentrant This method cannot be called twice at the same time.
+     * 
+     *               FIXME This needs to be properly synchronized with
+     *               {@link #setSharedProject(ISharedProject)}
      */
     public void performCheck(List<DocumentChecksum> checksums) {
+
+        if (sharedProject == null)
+            return;
 
         if (checksums == null) {
             log.warn("Consistency Check triggered with out"
@@ -255,6 +270,8 @@ public class ConsistencyWatchdogClient {
 
     protected void setSharedProject(ISharedProject newSharedProject) {
         sharedProject = newSharedProject;
+        this.pathsWithWrongChecksums.clear();
+        this.inconsistencyToResolve.setValue(false);
     }
 
     /**
@@ -274,8 +291,13 @@ public class ConsistencyWatchdogClient {
      * waiting for his reply.
      * 
      * @blocking This method returns after the recovery has finished
+     * 
+     * @client Can only be called on the client!
      */
     public void runRecovery() {
+
+        if (sharedProject.isHost())
+            throw new IllegalStateException("Can only be called on the client");
 
         if (!lock.tryLock()) {
             log.error("Restarting Checksum Error Handling"
