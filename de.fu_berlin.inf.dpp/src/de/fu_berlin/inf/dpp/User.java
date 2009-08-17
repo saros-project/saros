@@ -43,6 +43,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * The public and mutable properties are the role (Driver/Observer), time since
  * going off-line and connection state.
+ * 
+ * @entityObject A user is a entity object, i.e. it can change over time.
  */
 public class User {
 

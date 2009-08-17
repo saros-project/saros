@@ -27,6 +27,9 @@ package de.fu_berlin.inf.dpp.activities;
  * activities should be immutable.
  * 
  * @author rdjemili
+ * 
+ * @valueObject All IActivity subclasses should be Value Objects, i.e. they
+ *              should be immutable
  */
 public interface IActivity {
 

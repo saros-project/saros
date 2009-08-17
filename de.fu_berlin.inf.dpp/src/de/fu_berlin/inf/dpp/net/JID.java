@@ -29,6 +29,8 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
 /**
  * A Jabber ID which is used to identify the users of the Jabber network.
  * 
+ * @valueObject A JID is a value object, i.e. it is immutable!
+ * 
  * @author rdjemili
  */
 public class JID implements Serializable {
