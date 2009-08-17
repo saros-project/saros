@@ -69,7 +69,7 @@ public class FileActivity extends AbstractActivity {
      *            path where the file moved from
      */
     public static FileActivity moved(String source, IPath destPath,
-        IPath sourcePath) throws IOException {
+        IPath sourcePath) {
         return new FileActivity(source, Type.Moved, destPath, sourcePath, null,
             Purpose.ACTIVITY);
     }
