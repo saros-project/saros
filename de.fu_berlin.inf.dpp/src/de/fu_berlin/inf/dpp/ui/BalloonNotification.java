@@ -26,7 +26,6 @@ public class BalloonNotification {
      * The window will be hidden automatically after the value specified in the
      * timeout expires
      * 
-     * 
      * @param pControl
      *            the control, next to where the widget will appear
      * @param pTitle
@@ -41,7 +40,7 @@ public class BalloonNotification {
         String pText, int pTimeout) {
 
         if (pControl != null && pControl.isDisposed()) {
-            return;
+            pControl = null;
         }
 
         Shell parentShell = (pControl != null ? pControl.getShell() : null);
@@ -60,8 +59,10 @@ public class BalloonNotification {
         c.pack(true);
 
         // Locate the balloon to the widget location
-        Point widgetLocation = pControl.toDisplay(new Point(0, 0));
-        window.setLocation(widgetLocation);
+        if (pControl != null) {
+            Point widgetLocation = pControl.toDisplay(new Point(0, 0));
+            window.setLocation(widgetLocation);
+        }
 
         // Runnable that will close the window after time has been expired
         window.getShell().getDisplay().timerExec(pTimeout,
