@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import org.apache.log4j.Logger;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 import org.eclipse.jface.text.source.IAnnotationModel;
@@ -20,6 +21,10 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
  * removes old ones.
  */
 public class ContributionAnnotationManager {
+
+    private static final Logger log = Logger
+        .getLogger(ContributionAnnotationManager.class);
+
     private static int MAX_HISTORY_LENGTH = 20;
 
     protected Map<User, Queue<ContributionAnnotation>> sourceToHistory = new HashMap<User, Queue<ContributionAnnotation>>();
@@ -101,6 +106,15 @@ public class ContributionAnnotationManager {
             if (annotation instanceof ContributionAnnotation) {
 
                 Position pos = model.getPosition(annotation);
+
+                if (pos == null) {
+                    /*
+                     * FIXME This error occurs when search/replacing lots of
+                     * small stuff as client
+                     */
+                    log.warn("Annotation could not be found: " + annotation);
+                    return;
+                }
 
                 if ((offset > pos.offset) && (offset < pos.offset + pos.length)) {
                     Position beforeOffset = new Position(pos.offset, offset
