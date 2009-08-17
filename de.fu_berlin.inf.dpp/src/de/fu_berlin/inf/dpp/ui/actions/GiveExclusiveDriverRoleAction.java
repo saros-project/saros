@@ -102,16 +102,25 @@ public class GiveExclusiveDriverRoleAction extends SelectionProviderAction {
     }
 
     protected void updateEnablement() {
+        setEnabled(shouldBeEnabled());
+    }
+
+    protected boolean shouldBeEnabled() {
+
+        // Nobody selected
+        if (this.selectedUser == null)
+            return false;
+
+        // Not in a shared project
         ISharedProject project = sessionManager.getSharedProject();
+        if (project == null)
+            return false;
 
         // Only the host can use this action
-        boolean enabled = project != null && project.isHost();
+        if (!project.isHost())
+            return false;
 
-        // Only enable if the user is observer or there are more than one driver
-        enabled = enabled && (this.selectedUser != null);
-        enabled = enabled
-            && (this.selectedUser.isObserver() || !project.isExclusiveDriver());
-
-        setEnabled(enabled);
+        // Only enable if the user is observer or there is more than one driver
+        return this.selectedUser.isObserver() || !project.isExclusiveDriver();
     }
 }
