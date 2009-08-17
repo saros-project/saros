@@ -235,7 +235,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * project. Documentation can be found at http://wiki.limewire.org.
      */
     @Override
-    public void initialize() {
+    public synchronized void initialize() {
 
         if (this.getLocal().getSymmetric() != null) {
 
@@ -375,7 +375,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
         }
     }
 
-    private void connect(Collection<SocketCreator> connects) {
+    protected void connect(Collection<SocketCreator> connects) {
 
         ExecutorCompletionService<Socket> completionService = new ExecutorCompletionService<Socket>(
             Executors.newFixedThreadPool(connects.size(),
