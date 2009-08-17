@@ -31,8 +31,9 @@ public class PartialProjectSelectionDialog {
 
     protected WizardDialog dialog;
 
-    public PartialProjectSelectionDialog(IProject project) {
+    public PartialProjectSelectionDialog(Shell parentShell, IProject project) {
         this.project = project;
+        this.parentShell = parentShell;
 
         wizard = new PartialProjectWizard();
         wizard.setWindowTitle("Saros - Configure project to share");
@@ -43,7 +44,7 @@ public class PartialProjectSelectionDialog {
         dialog = new WizardDialog(parentShell, wizard);
     }
 
-    public class PartialProjectWizard extends Wizard {
+    public static class PartialProjectWizard extends Wizard {
 
         @Override
         public boolean performFinish() {
