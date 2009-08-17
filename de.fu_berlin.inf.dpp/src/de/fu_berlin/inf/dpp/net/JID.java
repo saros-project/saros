@@ -24,7 +24,6 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.util.StringUtils;
 
-import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
@@ -118,23 +117,12 @@ public class JID implements Serializable {
         if (obj == null)
             return false;
 
-        if (obj instanceof User) {
-            log.warn("Comparing a JID to a User is highly discouraged",
-                new StackTrace());
-            obj = ((User) obj).getJID();
-        }
-        if (obj instanceof String) {
-            log.warn("Comparing a JID to a String is highly discouraged",
-                new StackTrace());
-            obj = new JID((String) obj);
-        }
         if (obj instanceof JID) {
             JID other = (JID) obj;
             return getBase().equals(other.getBase());
         }
-        log.warn(
-            "Comparing a JID to something other a JID is highly discouraged",
-            new StackTrace());
+        log.warn("Comparing a JID to something other a JID is not supported: "
+            + obj.getClass(), new StackTrace());
         return false;
     }
 

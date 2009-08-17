@@ -128,39 +128,11 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-
-        if (obj == null)
-            return false;
-
-        JID otherJID = null;
-
-        if (obj instanceof String) {
-            otherJID = new JID((String) obj);
-        }
-        if (obj instanceof JID) {
-            otherJID = (JID) obj;
-        }
-        if (obj instanceof User) {
-            otherJID = ((User) obj).jid;
-        }
-
-        if (otherJID != null) {
-            return this.jid.equals(otherJID);
-        }
-
-        log.warn(
-            "Comparing a User to an Object that is not a User, String or JID",
-            new StackTrace());
-
-        return false;
-    }
-
-    @Override
     public int hashCode() {
-        return this.jid.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((jid == null) ? 0 : jid.hashCode());
+        return result;
     }
 
     public int getColorID() {
@@ -184,6 +156,28 @@ public class User {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass()) {
+            if (obj.getClass() == String.class || obj.getClass() == JID.class)
+                log.warn(
+                    "Comparing a User to a String or JID is probably a programming mistake: "
+                        + obj.getClass(), new StackTrace());
+            return false;
+        }
+        User other = (User) obj;
+        if (jid == null) {
+            if (other.jid != null)
+                return false;
+        } else if (!jid.equals(other.jid))
+            return false;
+        return true;
     }
 
     /**
