@@ -311,8 +311,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             removeAllAnnotations(new Predicate<SarosAnnotation>() {
                 public boolean evaluate(SarosAnnotation annotation) {
-                    return annotation.getSource().equals(
-                        user.getJID().toString());
+                    return annotation.getSource().equals(user);
                 }
             });
             remoteEditorManager.removeUser(user);
