@@ -229,9 +229,7 @@ public class MessagingManager implements PacketListener, MessageListener,
 
         private final MultiUserChat muc;
 
-        private JID participant;
-
-        private MessagingWindow window; // is null if disposed
+        private MessagingWindow window = null; // is null if disposed
 
         private final List<ChatLine> history = new ArrayList<ChatLine>();
 
@@ -247,13 +245,6 @@ public class MessagingManager implements PacketListener, MessageListener,
 
         public List<ChatLine> getHistory() {
             return this.history;
-        }
-
-        /**
-         * @return the participant associated to the chat object.
-         */
-        public JID getParticipant() {
-            return this.participant;
         }
 
         public void processPacket(Packet packet) {
@@ -276,6 +267,25 @@ public class MessagingManager implements PacketListener, MessageListener,
         public void processMessage(Chat chat, Message message) {
             this.logCH.debug("processMessage called.");
             processPacket(message);
+        }
+
+        /**
+         * Opens the chat window for this chat session. Refocuses the window if
+         * it is already opened.
+         */
+        public void openWindow() {
+            if (this.window == null) {
+                this.window = new MessagingWindow(this);
+                this.window.open();
+                this.window.getShell().addDisposeListener(
+                    new DisposeListener() {
+                        public void widgetDisposed(DisposeEvent e) {
+                            MultiChatSession.this.window = null;
+                        }
+                    });
+            }
+            this.window.getShell().forceActive();
+            this.window.getShell().forceFocus();
         }
 
         /*
@@ -305,7 +315,8 @@ public class MessagingManager implements PacketListener, MessageListener,
             chatLine.date = new Date();
 
             this.history.add(chatLine);
-            this.window.addChatLine(chatLine);
+            if (this.window != null)
+                this.window.addChatLine(chatLine);
 
             for (IChatListener chatListener : MessagingManager.this.chatListeners) {
                 chatListener.chatMessageAdded(sender, text);
@@ -347,6 +358,9 @@ public class MessagingManager implements PacketListener, MessageListener,
             // TODO CJ Review: connection.removePacketListener(this);
             log.debug("unconnect");
         }
+
+        if (connection == null)
+            return;
 
         if (newState == ConnectionState.CONNECTED) {
             connection.addPacketListener(this, new MessageTypeFilter(
@@ -459,7 +473,7 @@ public class MessagingManager implements PacketListener, MessageListener,
         }
     }
 
-    public void disconnectMultiUserChat() throws XMPPException {
+    public void disconnectMultiUserChat() {
         MessagingManager.log.debug("Leaving MUC session..");
         this.multitrans.getMUC().leave();
     }

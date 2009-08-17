@@ -115,19 +115,13 @@ public class ChatView extends ViewPart implements IConnectionListener,
             public void run() {
                 saros.getConnection().getUser();
                 if (ChatView.this.joined) {
-                    try {
-                        ChatView.this.session
-                            .sendMessage("is leaving the chat...");
-                        ChatView.this.inputText
-                            .setText("You have left the chat. To re-enter the chat please use the connect button.");
-                        messagingManager.disconnectMultiUserChat();
-                        ChatView.this.session = null;
-                        ChatView.this.inputText.setEditable(false);
+                    ChatView.this.session.sendMessage("is leaving the chat...");
+                    ChatView.this.inputText
+                        .setText("You have left the chat. To re-enter the chat please use the connect button.");
+                    messagingManager.disconnectMultiUserChat();
+                    ChatView.this.session = null;
+                    ChatView.this.inputText.setEditable(false);
 
-                    } catch (XMPPException e) {
-                        ChatView.this.viewer.getDocument().set(
-                            "Error: Couldn't disconnect");
-                    }
                     ChatView.this.joined = false;
                     ChatView.this.connectAction.setImageDescriptor(SarosUI
                         .getImageDescriptor("/icons/disconnect.png"));
