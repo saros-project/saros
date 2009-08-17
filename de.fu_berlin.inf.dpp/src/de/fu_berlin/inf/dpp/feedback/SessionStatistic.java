@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
@@ -164,12 +165,7 @@ public class SessionStatistic {
             log.error("Couldn't write session data to file " + path, e);
             return null;
         } finally {
-            try {
-                fos.close();
-            } catch (IOException e) {
-                log.warn("An IOException occurred while trying to"
-                    + " close FileWriter.");
-            }
+            IOUtils.closeQuietly(fos);
         }
 
         return file;
