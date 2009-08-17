@@ -83,13 +83,13 @@ public class FileZipper {
                 zipSingleFile(file, path.toPortableString(), zipStream,
                     progress.newChild(1));
             } catch (CancellationException e) {
-                archive.delete();
+                cleanup(archive);
                 throw e;
             } catch (IllegalArgumentException e) {
-                archive.delete();
+                cleanup(archive);
                 throw e;
             } catch (IOException e) {
-                archive.delete();
+                cleanup(archive);
                 throw e;
             }
         }
@@ -105,6 +105,12 @@ public class FileZipper {
             .throughput(archive.length()), archive.getAbsolutePath()));
 
         progress.done();
+    }
+
+    public static void cleanup(File archive) {
+        if (archive != null && archive.exists() && !archive.delete()) {
+            log.warn("Could not delete archive file: " + archive);
+        }
     }
 
     /**
@@ -145,13 +151,13 @@ public class FileZipper {
                         .newChild(1));
                     ++filesZipped;
                 } catch (CancellationException e) {
-                    archive.delete();
+                    cleanup(archive);
                     throw e;
                 } catch (IllegalArgumentException e) {
                     log.warn(e.getMessage());
                     continue;
                 } catch (IOException e) {
-                    archive.delete();
+                    cleanup(archive);
                     throw e;
                 }
             }
