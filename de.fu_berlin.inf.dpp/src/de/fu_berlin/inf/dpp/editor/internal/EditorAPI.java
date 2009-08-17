@@ -361,13 +361,32 @@ public class EditorAPI implements IEditorAPI {
                 int offset = selection.getOffset();
                 int length = selection.getLength();
                 boolean isCursor = length == 0;
+
+                // Adjust for cases in which the cursor is at the end of a line
                 if (isCursor) {
-                    length = 1;
                     IDocument document = docProvider.getDocument(input);
-                    if (document != null) {
-                        if (offset > 0 && isLineEnd(document, offset)
-                            && !isLineEnd(document, offset - 1)) {
-                            offset--;
+                    if (document == null) {
+                        // try with length == 1 maybe it works...
+                        length = 1;
+                    } else {
+                        int n = document.getLength();
+                        if (n == 0) {
+                            // document has no chars -> cannot adjust anything
+                        } else {
+                            if (offset == n) {
+                                // we are at the end of the document
+                                if (!isLineEnd(document, offset - 1)) {
+                                    length = 1;
+                                    offset--;
+                                }
+                            } else {
+                                // We are inside the document
+                                length = 1;
+                                if (offset > 0 && isLineEnd(document, offset)
+                                    && !isLineEnd(document, offset - 1)) {
+                                    offset--;
+                                }
+                            }
                         }
                     }
                 }
@@ -424,15 +443,22 @@ public class EditorAPI implements IEditorAPI {
     /**
      * Check if there is a line end in a {@link IDocument} at a given offset.
      * 
-     * If the offset is not within the document the method returns
-     * <code>false</code>.
+     * If the offset is not within the document
      * 
-     * @param document
-     * @param offset
+     * 0 <= offset <= document.getLength()
+     * 
+     * then the method returns <code>false</code>.
+     * 
+     * The method returns true for offset == document.getLength()
+     * 
      * @return <code>true</code> if there is a line end at the given offset in
      *         the given document, <code>false</code> otherwise.
      */
     protected boolean isLineEnd(IDocument document, int offset) {
+
+        if (document.getLength() == offset)
+            return true;
+
         try {
             char character = document.getChar(offset);
             return character == '\n' || character == '\r';
