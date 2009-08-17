@@ -112,7 +112,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testEmptyExtension() throws XmlPullParserException, IOException {
         List<TimedActivity> activities = Collections.emptyList();
-        aProvider.create("Session-ID", activities);
+        assertRoundtrip(aProvider.create("Session-ID", activities));
     }
 
     public void testGapInSequenceNumbers() throws XmlPullParserException,
