@@ -381,7 +381,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                         }
                     });
 
-                    editorPool.removeAllEditors();
+                    editorPool.removeAllEditors(sharedProject.getProject());
 
                     sharedProject.removeListener(sharedProjectListener);
                     sharedProject.removeActivityProvider(EditorManager.this);
@@ -987,7 +987,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         if (editorPool.isManaged(editor)) {
 
-            IPath path = editorPool.remove(editor);
+            IPath path = editorPool.remove(editor, sharedProject.getProject());
 
             if (path == null) {
                 log.warn("Editor was managed but path could not be found: "
@@ -1024,7 +1024,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
 
-        this.editorPool.remove(editorPart);
+        this.editorPool.remove(editorPart, sharedProject.getProject());
 
         // Check if the currently active editor is closed
         boolean newActiveEditor = path.equals(this.locallyActiveEditor);

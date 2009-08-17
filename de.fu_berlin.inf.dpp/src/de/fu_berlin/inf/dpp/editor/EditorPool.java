@@ -5,7 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentListener;
@@ -148,7 +150,7 @@ class EditorPool {
      * @return {@link IPath} of the Editor that was removed from the Pool, or
      *         <code>null</code> on error.
      */
-    public IPath remove(IEditorPart editorPart) {
+    public IPath remove(IEditorPart editorPart, IProject project) {
 
         EditorManager.wpLog.trace("EditorPool.remove invoked");
 
@@ -165,6 +167,12 @@ class EditorPool {
             EditorManager.log.warn("Could not find file for editor input "
                 + editorPart.getTitle());
             return null;
+        }
+
+        if (!ObjectUtils.equals(file.getProject(), project)) {
+            EditorManager.log.warn("File is from incorrect project: "
+                + file.getProject() + " should be " + project + ": " + file,
+                new StackTrace());
         }
 
         IPath path = file.getProjectRelativePath();
@@ -192,12 +200,16 @@ class EditorPool {
         documentProvider
             .removeElementStateListener(this.editorManager.dirtyStateListener);
 
-        this.editorManager.resetText(file);
-
         IDocument document = documentProvider.getDocument(input);
-        if (document != null)
+        if (document == null) {
+            EditorManager.log.warn("Could not disconnect from document: "
+                + path);
+        } else {
             document
                 .removeDocumentListener(this.editorManager.documentListener);
+        }
+
+        this.editorManager.resetText(file);
 
         return path;
     }
@@ -245,12 +257,12 @@ class EditorPool {
     /**
      * Removes all {@link IEditorPart} from the EditorPool.
      */
-    public void removeAllEditors() {
+    public void removeAllEditors(IProject project) {
 
         EditorManager.wpLog.trace("EditorPool.removeAllEditors invoked");
 
         for (IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) {
-            remove(part);
+            remove(part, project);
         }
 
         assert getAllEditors().size() == 0;
