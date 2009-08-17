@@ -211,6 +211,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     log.warn("Resource could not be read for sending to peers:"
                         + path, e);
                 }
+                return null;
             case IResourceDelta.REMOVED:
                 return FileActivity.removed(saros.getMyJID().toString(), path,
                     Purpose.ACTIVITY);
@@ -396,7 +397,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    private void exec(FolderActivity activity) throws CoreException {
+    private void exec(FolderActivity activity) {
         IFolder folder = this.sharedProject.getProject().getFolder(
             activity.getPath());
 
