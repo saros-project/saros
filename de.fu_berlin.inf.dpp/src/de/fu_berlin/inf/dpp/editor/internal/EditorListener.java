@@ -185,13 +185,12 @@ public class EditorListener {
 
     public boolean equals(ILineRange one, ILineRange two) {
 
-        if (one == null ^ two == null)
+        if (one == null)
+            return two == null;
+
+        if (two == null)
             return false;
 
-        if (one == null && two == null)
-            return true;
-
-        // both != null
         return one.getNumberOfLines() == two.getNumberOfLines()
             && one.getStartLine() == two.getStartLine();
     }
