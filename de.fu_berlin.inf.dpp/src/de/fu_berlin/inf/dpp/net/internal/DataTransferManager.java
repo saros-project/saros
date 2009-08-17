@@ -176,7 +176,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         return jingleManager.getValue();
     }
 
-    private final class JingleTransferListener implements
+    protected final class JingleTransferListener implements
         IJingleFileTransferListener {
 
         public void incomingDescription(TransferDescription data,
@@ -219,7 +219,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
-    private class IBBTransferListener implements FileTransferListener {
+    protected class IBBTransferListener implements FileTransferListener {
 
         public void fileTransferRequest(final FileTransferRequest request) {
 
@@ -597,6 +597,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                     if (consumed)
                         return;
                 }
+                break;
             case ACTIVITY_TRANSFER:
                 for (IDataReceiver receiver : receivers) {
                     boolean consumed = receiver.receiveActivity(data.sender,
@@ -611,7 +612,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
-    public class TransferModeDispatch implements ITransferModeListener {
+    public static class TransferModeDispatch implements ITransferModeListener {
 
         protected List<ITransferModeListener> listeners = new ArrayList<ITransferModeListener>();
 
