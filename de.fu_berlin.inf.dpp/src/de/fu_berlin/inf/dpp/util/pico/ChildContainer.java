@@ -1,5 +1,7 @@
 package de.fu_berlin.inf.dpp.util.pico;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.PicoCompositionException;
@@ -12,20 +14,39 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 /**
  * A child container is a marker class which delegates to a given delegate
  * container.
- *
+ * 
  * It provides re-injection as a utility method.
  */
 @Component(module = "pico")
 public class ChildContainer extends AbstractDelegatingMutablePicoContainer {
 
-    private static final Logger log = Logger.getLogger(ChildContainer.class
-        .getName());
+    private static final long serialVersionUID = 7332063646703461921L;
 
-    protected Reinjector reinjector;
+    private static final Logger log = Logger.getLogger(ChildContainer.class);
+
+    protected transient Reinjector reinjector;
+
+    protected MutablePicoContainer delegate;
 
     public ChildContainer(MutablePicoContainer delegate) {
         super(delegate);
+        this.delegate = delegate;
         reinjector = new Reinjector(delegate);
+    }
+
+    @Override
+    public int hashCode() {
+        return delegate.hashCode();
+    }
+
+    /**
+     * To make ChildContainer serializable the transient reinjector need to be
+     * recreated during readObject.
+     */
+    private void readObject(java.io.ObjectInputStream in) throws IOException,
+        ClassNotFoundException {
+        in.defaultReadObject();
+        this.reinjector = new Reinjector(delegate);
     }
 
     public void reinject(Object toInjectInto) {
