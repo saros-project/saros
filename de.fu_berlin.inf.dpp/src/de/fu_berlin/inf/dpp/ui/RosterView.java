@@ -480,7 +480,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     /**
      * A sorter that orders by presence and then by name.
      */
-    private class NameSorter extends ViewerSorter {
+    protected class NameSorter extends ViewerSorter {
         @Override
         public int compare(Viewer viewer, Object elem1, Object elem2) {
 
