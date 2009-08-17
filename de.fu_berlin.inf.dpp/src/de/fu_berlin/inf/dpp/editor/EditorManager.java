@@ -89,7 +89,6 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.BlockingProgressMonitor;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Predicate;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -450,6 +449,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void connect(IFile file) {
 
+        // TODO Check that file exists...
         wpLog.trace("EditorManager.connect(" + file.getName() + ") invoked");
 
         if (!isConnected(file)) {
@@ -1186,7 +1186,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * @swt Needs to be called from a UI thread.
      */
-    void resetText(IFile file) {
+    protected void resetText(IFile file) {
 
         wpLog.trace("EditorManager.resetText(" + file.getName() + ") invoked.");
         if (!file.exists()) {
@@ -1303,6 +1303,10 @@ public class EditorManager implements IActivityProvider, Disposable {
                     + " can be saved");
                 // Everything okay! Provider and EditorManager agree
             } else {
+                /*
+                 * This happens when a file which is already saved is saved
+                 * again by a remote user
+                 */
                 log.warn("File is not modified, but "
                     + "EditorManager thinks it is: " + file.toString());
             }
@@ -1321,16 +1325,15 @@ public class EditorManager implements IActivityProvider, Disposable {
                  * this warning is printed we must suspect an inconsistency...
                  * 
                  * This can occur when the ConvertLineDelimitersOperation is run
+                 * 
+                 * FIXME after a role-change, observer (and host) executes two
+                 * save-activities and comes in this warning
                  */
                 log.warn("Saving not necessary (not connected): "
                     + file.toString(), new StackTrace());
                 return;
             }
         }
-        boolean wasReadonly = FileUtil.setReadOnly(file, false);
-
-        wpLog.trace("EditorManager.saveText File " + file.getName()
-            + " was Read-Only?: " + wasReadonly);
 
         IDocument doc = provider.getDocument(input);
 
@@ -1371,11 +1374,15 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         wpLog.trace("EditorManager.saveText File " + file.getName()
             + " will be reseted");
-        resetText(file);
+        /**
+         * resetText leads to disconnecting the document from its provider.
+         * disconnecting document of the driver (after resolving inconsitency)
+         * makes saving impossible
+         * 
+         */
+        if (!isDriver)
+            resetText(file);
 
-        // Reset readonly state
-        if (wasReadonly)
-            FileUtil.setReadOnly(file, true);
     }
 
     /**

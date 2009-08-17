@@ -563,8 +563,6 @@ public class IncomingInvitationProcess extends InvitationProcess implements
         this.transmitter.sendJoinMessage(sharedProject);
         this.invitationProcesses.removeInvitationProcess(this);
 
-        sharedProject.setProjectReadonly(!sharedProject.isDriver());
-
         // Starting the project here is a HACK to workaround the first todo
         // above
         sharedProject.start();

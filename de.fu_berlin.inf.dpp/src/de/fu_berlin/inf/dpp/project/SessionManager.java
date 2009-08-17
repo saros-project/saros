@@ -181,8 +181,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.transmitter.sendLeaveMessage(project);
 
         try {
-            // set resources writable again
-            project.setProjectReadonly(false);
             project.stop();
             project.dispose();
         } catch (RuntimeException e) {
@@ -284,9 +282,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                  * TODO Since we are going to invite people, we need to stop
                  * changing the project
                  */
-                if (!sharedProject.isDriver()) {
-                    sharedProject.setProjectReadonly(false);
-                }
                 if (!EditorAPI.saveProject(sharedProject.getProject())) {
                     log.info("User canceled starting an invitation (as host)");
                     return;
@@ -300,9 +295,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                     SessionManager.this);
                 iw.open();
 
-                if (!sharedProject.isDriver()) {
-                    sharedProject.setProjectReadonly(true);
-                }
             }
         });
 

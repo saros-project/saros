@@ -54,7 +54,7 @@ public interface ISharedProject extends IActivityListener {
     public Collection<User> getParticipants();
 
     /**
-     * @return a list of remote users.
+     * @return a snap-shot copy of all remote users.
      */
     public List<User> getRemoteUsers();
 
@@ -184,15 +184,6 @@ public interface ISharedProject extends IActivityListener {
     public JID getResourceQualifiedJID(JID jid);
 
     public User getLocalUser();
-
-    /**
-     * Sets all resources of the project to a readonly state on the local file
-     * system.
-     * 
-     * @param readonly
-     *            The readonly state to set the file to.
-     */
-    public void setProjectReadonly(boolean readonly);
 
     /**
      * @return true, if there is exactly one driver, false otherwise.

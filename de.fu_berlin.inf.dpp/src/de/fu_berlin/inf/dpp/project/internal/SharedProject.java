@@ -49,7 +49,6 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.util.FileUtil;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -93,13 +92,11 @@ public class SharedProject implements ISharedProject, Disposable {
     protected Blockable stopManagerListener = new Blockable() {
 
         public void unblock() {
-            if (isDriver())
-                setProjectReadonly(false);
+            // TODO see #block()
         }
 
         public void block() {
-            setProjectReadonly(true);
-            // TODO Setting readonly possibly confuses the consistency watchdog
+            // TODO find a way to effectively block the user from doing anything
         }
     };
 
@@ -143,7 +140,6 @@ public class SharedProject implements ISharedProject, Disposable {
         this.concurrentDocumentManager = new ConcurrentDocumentManager(
             Side.HOST_SIDE, this.host, myID, this, activitySequencer);
 
-        setProjectReadonly(false);
     }
 
     /**
@@ -228,9 +224,6 @@ public class SharedProject implements ISharedProject, Disposable {
                 user.setUserRole(role);
 
                 log.info("User " + user + " is now a " + role);
-                if (user.isLocal()) {
-                    setProjectReadonly(user.isObserver());
-                }
 
                 for (ISharedProjectListener listener : SharedProject.this.listeners) {
                     listener.roleChanged(user);
@@ -424,15 +417,6 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public User getLocalUser() {
         return localUser;
-    }
-
-    public void setProjectReadonly(final boolean readonly) {
-        /* TODO run project read only settings in progress monitor thread. */
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                FileUtil.setReadOnly(getProject(), readonly);
-            }
-        });
     }
 
     public ConcurrentDocumentManager getConcurrentDocumentManager() {
