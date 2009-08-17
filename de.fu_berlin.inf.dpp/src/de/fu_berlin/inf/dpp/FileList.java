@@ -270,10 +270,10 @@ public class FileList {
      * invariant of this class.
      */
     private Object readResolve() {
-        all = new HashMap<IPath, Long>();
-        all.putAll(added);
-        all.putAll(altered);
-        all.putAll(unaltered);
+        this.all = new HashMap<IPath, Long>();
+        this.all.putAll(added);
+        this.all.putAll(altered);
+        this.all.putAll(unaltered);
         return this;
     }
 
