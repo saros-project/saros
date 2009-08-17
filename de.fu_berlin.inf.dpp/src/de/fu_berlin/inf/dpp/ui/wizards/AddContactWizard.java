@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.wizard.Wizard;
@@ -165,7 +166,7 @@ public class AddContactWizard extends Wizard {
                 if (getNickname().length() == 0) {
                     this.setMessage(
                         "Enter a Nickname for the Contact (optional)",
-                        WizardPage.INFORMATION);
+                        IMessageProvider.INFORMATION);
                 } else {
                     this.setMessage(null);
                 }

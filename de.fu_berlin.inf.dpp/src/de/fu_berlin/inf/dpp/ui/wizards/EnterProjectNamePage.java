@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -384,7 +384,7 @@ class EnterProjectNamePage extends WizardPage {
 
         if (isSyncSkippingSelected()) {
             setMessage("Skipping Synchronisation might cause inconsistencies!",
-                DialogPage.WARNING);
+                IMessageProvider.WARNING);
         } else {
             setMessage(null);
         }
