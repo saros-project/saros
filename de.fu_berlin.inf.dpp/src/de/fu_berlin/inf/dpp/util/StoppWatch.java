@@ -14,14 +14,6 @@ public class StoppWatch {
     protected StopWatch watch = new StopWatch();
 
     /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-        return watch.equals(obj);
-    }
-
-    /**
      * @see org.apache.commons.lang.time.StopWatch#getSplitTime()
      */
     public long getSplitTime() {
@@ -40,14 +32,6 @@ public class StoppWatch {
      */
     public long getTime() {
         return watch.getTime();
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return watch.hashCode();
     }
 
     /**
