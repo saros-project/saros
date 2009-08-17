@@ -10,6 +10,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -48,8 +51,6 @@ public class ConsistencyWatchdogClient {
 
     protected Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
-    protected boolean executingChecksumErrorHandling;
-
     protected ISharedProject sharedProject;
 
     @Inject
@@ -58,6 +59,9 @@ public class ConsistencyWatchdogClient {
     @Inject
     protected EditorManager editorManager;
 
+    /**
+     * @Inject Injected via Constructor Injection
+     */
     protected SessionManager sessionManager;
 
     @Inject
@@ -69,6 +73,23 @@ public class ConsistencyWatchdogClient {
     protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0,
         TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2),
         new NamedThreadFactory("ChecksumCruncher-"));
+
+    public ConsistencyWatchdogClient(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+        sessionManager.addSessionListener(new AbstractSessionListener() {
+            @Override
+            public void sessionStarted(ISharedProject session) {
+                setSharedProject(session);
+            }
+
+            @Override
+            public void sessionEnded(ISharedProject session) {
+                setSharedProject(null);
+            }
+        });
+
+        setSharedProject(sessionManager.getSharedProject());
+    }
 
     /**
      * Method for queuing another consistency check, which does not print a
@@ -232,28 +253,21 @@ public class ConsistencyWatchdogClient {
         return this.pathsWithWrongChecksums;
     }
 
-    public ConsistencyWatchdogClient(SessionManager sessionManager) {
-        this.sessionManager = sessionManager;
-        sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISharedProject session) {
-                setSharedProject(session);
-            }
-
-            @Override
-            public void sessionEnded(ISharedProject session) {
-                setSharedProject(null);
-            }
-        });
-
-        setSharedProject(sessionManager.getSharedProject());
-    }
-
-    private void setSharedProject(ISharedProject newSharedProject) {
+    protected void setSharedProject(ISharedProject newSharedProject) {
         sharedProject = newSharedProject;
     }
 
-    Object lock;
+    /**
+     * boolean condition variable used to interrupt another thread from
+     * performing a recovery in {@link #runRecovery()}
+     */
+    private AtomicBoolean cancelRecovery = new AtomicBoolean();
+
+    /**
+     * Lock used exclusively in {@link #runRecovery()} to prevent two recovery
+     * operations running concurrently.
+     */
+    private Lock lock = new ReentrantLock();
 
     /**
      * Start a consistency recovery by sending a checksum error to the host and
@@ -263,60 +277,66 @@ public class ConsistencyWatchdogClient {
      */
     public void runRecovery() {
 
-        final Object myLock;
-
-        synchronized (this) {
-
-            lock = myLock = new Object();
-
-            if (executingChecksumErrorHandling) {
-                log.error("Restarting Checksum Error Handling"
-                    + " while another operation is running");
-                while (executingChecksumErrorHandling) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        return;
-                    }
-                }
-            }
-
-            // Raise flag, so we know that we are currently performing a
-            // recovery
-            executingChecksumErrorHandling = true;
-        }
-
-        Set<IPath> pathsOfHandledFiles = new HashSet<IPath>(
-            pathsWithWrongChecksums);
-
-        for (final IPath path : pathsOfHandledFiles) {
-
-            // Save document before asking host to resend
+        if (!lock.tryLock()) {
+            log.error("Restarting Checksum Error Handling"
+                + " while another operation is running");
             try {
-                editorManager.saveLazy(path);
-            } catch (FileNotFoundException e) {
-                // Sending the checksum error message should recreate
-                // this file
-            }
-        }
-
-        // Send checksumErrorMessage to host
-        transmitter.sendFileChecksumErrorMessage(Collections
-            .singletonList(sharedProject.getHost().getJID()),
-            pathsOfHandledFiles, false);
-
-        // block until all inconsistencies are resolved
-        Set<IPath> remainingFiles = new HashSet<IPath>(pathsOfHandledFiles);
-        while (remainingFiles.size() > 0 && lock == myLock) {
-            remainingFiles.retainAll(pathsWithWrongChecksums);
-            try {
-                Thread.sleep(100);
+                // Try to cancel currently running recovery
+                do {
+                    cancelRecovery.set(true);
+                } while (!lock.tryLock(100, TimeUnit.MILLISECONDS));
             } catch (InterruptedException e) {
+                log.error("Not designed to be interruptable");
                 return;
             }
         }
 
-        // Clear-flag indicating recovery is done
-        executingChecksumErrorHandling = false;
+        // Lock has been acquired
+        try {
+            cancelRecovery.set(false);
+
+            Set<IPath> pathsOfHandledFiles = new HashSet<IPath>(
+                pathsWithWrongChecksums);
+
+            for (final IPath path : pathsOfHandledFiles) {
+
+                if (cancelRecovery.get())
+                    return;
+
+                // Save document before asking host to resend
+                try {
+                    editorManager.saveLazy(path);
+                } catch (FileNotFoundException e) {
+                    // Sending the checksum error message should recreate
+                    // this file
+                }
+            }
+
+            if (cancelRecovery.get())
+                return;
+
+            // Send checksumErrorMessage to host
+            transmitter.sendFileChecksumErrorMessage(Collections
+                .singletonList(sharedProject.getHost().getJID()),
+                pathsOfHandledFiles, false);
+
+            // block until all inconsistencies are resolved
+            Set<IPath> remainingFiles = new HashSet<IPath>(pathsOfHandledFiles);
+            while (remainingFiles.size() > 0) {
+
+                if (cancelRecovery.get())
+                    return;
+
+                remainingFiles.retainAll(pathsWithWrongChecksums);
+
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 }
