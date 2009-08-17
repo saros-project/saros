@@ -20,6 +20,8 @@
 package de.fu_berlin.inf.dpp.ui;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 
 import org.apache.log4j.Logger;
@@ -51,6 +53,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
+import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -60,6 +64,8 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -88,6 +94,52 @@ public class SessionView extends ViewPart {
 
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
+
+    /**
+     * This RosterListener is responsible to trigger updates to our table
+     * viewer, whenever roster elements change.
+     * 
+     * This is mostly used to update the nickname of the user at the moment.
+     */
+    protected class SessionRosterListener implements RosterListener {
+        public void changed(final Collection<String> addresses) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    if (sharedProject == null)
+                        return;
+
+                    for (String address : addresses) {
+                        JID jid = sharedProject
+                            .getResourceQualifiedJID(new JID(address));
+                        if (jid == null)
+                            continue;
+
+                        User user = sharedProject.getUser(jid);
+                        if (user == null)
+                            continue;
+
+                        viewer.refresh(user);
+                    }
+                }
+            });
+        }
+
+        public void presenceChanged(Presence presence) {
+            changed(Collections.singleton(presence.getFrom()));
+        }
+
+        public void entriesUpdated(Collection<String> addresses) {
+            changed(addresses);
+        }
+
+        public void entriesDeleted(Collection<String> addresses) {
+            changed(addresses);
+        }
+
+        public void entriesAdded(Collection<String> addresses) {
+            changed(addresses);
+        }
+    }
 
     @Component(module = "ui")
     public static class SessionViewTableViewer extends TableViewer {
@@ -143,11 +195,11 @@ public class SessionView extends ViewPart {
         }
 
         public Object[] getElements(Object parent) {
-            if (SessionView.this.sharedProject == null)
+            if (sharedProject == null)
                 return new Object[] {};
 
-            User[] participants = SessionView.this.sharedProject
-                .getParticipants().toArray(new User[] {});
+            User[] participants = sharedProject.getParticipants().toArray(
+                new User[] {});
             Arrays.sort(participants, alphabeticalUserComparator);
 
             return participants;
@@ -172,7 +224,7 @@ public class SessionView extends ViewPart {
         private void refreshTable() {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
-                    SessionContentProvider.this.tableViewer.refresh();
+                    tableViewer.refresh();
                 }
             });
         }
@@ -266,6 +318,9 @@ public class SessionView extends ViewPart {
     @Inject
     protected ChildContainer container;
 
+    @Inject
+    protected RosterTracker rosterTracker;
+
     public SessionView() {
 
         Saros.reinject(this);
@@ -283,6 +338,9 @@ public class SessionView extends ViewPart {
          */
         editorManager.addSharedEditorListener(sharedEditorListener);
 
+        // Make sure the Session View is informed about changes to the roster
+        // entry of the user
+        rosterTracker.addRosterListener(new SessionRosterListener());
     }
 
     @Override
