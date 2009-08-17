@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,7 +28,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.test.stubs.FileStub;
@@ -163,8 +161,7 @@ public class FileListTest extends TestCase {
         assertFalse(emptyFileList.equals(otherFileList));
     }
 
-    public void testRoundtripSerialization() throws XmlPullParserException,
-        IOException {
+    public void testRoundtripSerialization() {
 
         FileList replicated = FileList.fromXML(fileList.toXML());
         assertEquals(fileList, replicated);
