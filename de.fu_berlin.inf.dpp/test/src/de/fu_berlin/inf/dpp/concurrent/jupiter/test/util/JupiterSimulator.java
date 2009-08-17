@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 import java.util.LinkedList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Path;
@@ -74,14 +74,12 @@ public class JupiterSimulator {
 
     public void assertDocs(String string) {
 
-        TestCase
-            .assertEquals("Client mismatch: ", string, client.getDocument());
-        TestCase
-            .assertEquals("Client mismatch: ", string, client.getDocument());
-        TestCase.assertEquals("Client Queue not empty:", 0, client.inQueue
-            .size());
-        TestCase.assertEquals("Server Queue not empty:", 0, server.inQueue
-            .size());
+        Assert.assertEquals("Client mismatch: ", string, client.getDocument());
+        Assert.assertEquals("Client mismatch: ", string, client.getDocument());
+        Assert
+            .assertEquals("Client Queue not empty:", 0, client.inQueue.size());
+        Assert
+            .assertEquals("Server Queue not empty:", 0, server.inQueue.size());
 
     }
 
