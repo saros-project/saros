@@ -20,7 +20,6 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -555,15 +554,6 @@ public class ActivitySequencer {
      */
     public void sendActivity(List<User> recipients, IActivity activity) {
         this.outgoingQueue.add(new QueueItem(recipients, activity));
-    }
-
-    /**
-     * Convenience method to address a single recipient.
-     * 
-     * @see #sendActivity(List, IActivity)
-     */
-    public void sendActivity(User recipient, IActivity activity) {
-        sendActivity(Collections.singletonList(recipient), activity);
     }
 
     /**

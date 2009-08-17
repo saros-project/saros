@@ -265,27 +265,26 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         public void userJoined(User user) {
 
-            // TODO [MR] This should only be sent to this user
-
             // TODO The user should be able to ask us for this state
 
-            // TODO The user does not know our history but just our current
-            // position
-
-            // TODO Since we send the information about editors and viewports in
-            // different activities, there are always warnings displayed
-
             // Let the new user know where we are
-            fireActivity(new EditorActivity(saros.getMyJID().toString(),
-                Type.Activated, locallyActiveEditor));
+            List<User> recipient = Collections.singletonList(user);
 
-            if (locallyActiveEditor == null) {
-                return;
+            for (IPath path : getLocallyOpenEditors()) {
+                sharedProject.sendActivity(recipient, new EditorActivity(saros
+                    .getMyJID().toString(), Type.Activated, path));
             }
 
+            if (locallyActiveEditor == null)
+                return;
+
+            sharedProject.sendActivity(recipient, new EditorActivity(saros
+                .getMyJID().toString(), Type.Activated, locallyActiveEditor));
+
             if (localViewport != null) {
-                fireActivity(new ViewportActivity(saros.getMyJID().toString(),
-                    localViewport, locallyActiveEditor));
+                sharedProject.sendActivity(recipient, new ViewportActivity(
+                    saros.getMyJID().toString(), localViewport,
+                    locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -295,13 +294,13 @@ public class EditorManager implements IActivityProvider, Disposable {
                 int offset = localSelection.getOffset();
                 int length = localSelection.getLength();
 
-                fireActivity(new TextSelectionActivity(saros.getMyJID()
-                    .toString(), offset, length, locallyActiveEditor));
+                sharedProject.sendActivity(recipient,
+                    new TextSelectionActivity(saros.getMyJID().toString(),
+                        offset, length, locallyActiveEditor));
             } else {
                 log.warn("No select for locallyActivateEditor: "
                     + locallyActiveEditor);
             }
-
         }
 
         public void userLeft(final User user) {

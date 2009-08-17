@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.project.internal;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -138,7 +139,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
         /* add host to driver list. */
         this.concurrentDocumentManager = new ConcurrentDocumentManager(
-            Side.HOST_SIDE, this.host, myID, this, activitySequencer);
+            Side.HOST_SIDE, this.host, myID, this);
 
     }
 
@@ -159,7 +160,7 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(myID, localUser);
 
         this.concurrentDocumentManager = new ConcurrentDocumentManager(
-            Side.CLIENT_SIDE, this.host, myID, this, activitySequencer);
+            Side.CLIENT_SIDE, this.host, myID, this);
     }
 
     public Collection<User> getParticipants() {
@@ -461,7 +462,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
             // Send activity to every remote user.
             if (this.concurrentDocumentManager.isHostSide()) {
-                activitySequencer.sendActivity(getRemoteUsers(), activity);
+                sendActivity(getRemoteUsers(), activity);
             }
         } catch (Exception e) {
             log.error("Error while executing activity.", e);
@@ -498,8 +499,27 @@ public class SharedProject implements ISharedProject, Disposable {
             .activityCreated(activity);
 
         if (!consumed) {
-            activitySequencer.sendActivity(getRemoteUsers(), activity);
+            sendActivity(getRemoteUsers(), activity);
         }
+    }
+
+    /**
+     * Convenience method to address a single recipient.
+     * 
+     * @see #sendActivity(List, IActivity)
+     */
+    public void sendActivity(User recipient, IActivity activity) {
+        sendActivity(Collections.singletonList(recipient), activity);
+    }
+
+    public void sendActivity(List<User> toWhom, IActivity activity) {
+        if (toWhom == null)
+            throw new IllegalArgumentException();
+
+        if (activity == null)
+            throw new IllegalArgumentException();
+
+        activitySequencer.sendActivity(toWhom, activity);
     }
 
     public void addActivityProvider(IActivityProvider provider) {

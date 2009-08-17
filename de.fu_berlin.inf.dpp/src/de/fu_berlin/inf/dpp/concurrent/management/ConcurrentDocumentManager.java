@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -63,8 +62,6 @@ public class ConcurrentDocumentManager implements Disposable {
 
     // TODO [MR] Remove.
     private final Side side;
-
-    private final ActivitySequencer sequencer;
 
     private final ISharedProject sharedProject;
 
@@ -224,20 +221,19 @@ public class ConcurrentDocumentManager implements Disposable {
                  * TODO ConcurrentDocumentManager should not depend on
                  * ActivitySequencer.
                  */
-                sequencer.sendActivity(host, jupiterActivity);
+                sharedProject.sendActivity(host, jupiterActivity);
                 return true;
             }
         }
     };
 
     public ConcurrentDocumentManager(final Side side, User host, JID myJID,
-        final ISharedProject sharedProject, ActivitySequencer sequencer) {
+        final ISharedProject sharedProject) {
 
         this.side = side;
         this.host = host;
         this.myJID = myJID;
         this.sharedProject = sharedProject;
-        this.sequencer = sequencer;
 
         if (isHostSide()) {
             this.concurrentDocuments = new HashMap<IPath, JupiterDocumentServer>();
@@ -480,7 +476,7 @@ public class ConcurrentDocumentManager implements Disposable {
             if (to.equals(host)) {
                 execTextEditActivity(transformed);
             } else {
-                sequencer.sendActivity(to, transformed);
+                sharedProject.sendActivity(to, transformed);
             }
         }
     }

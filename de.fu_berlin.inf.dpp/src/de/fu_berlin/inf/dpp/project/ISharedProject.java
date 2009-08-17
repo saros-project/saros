@@ -240,9 +240,26 @@ public interface ISharedProject extends IActivityListener {
      * All the ActivityProviders will call this method when new events occurred
      * in the UI.
      * 
+     * The given activity will be transformed by the ConcurrentDocumentManager
+     * and then send to all remote users.
+     * 
      * @see IActivityListener
      */
     public void activityCreated(IActivity activity);
+
+    /**
+     * Sends the given activity to the given list of users.
+     * 
+     * This method will by-pass the ConcurrentDocumentManager.
+     */
+    public void sendActivity(List<User> recipient, IActivity activity);
+
+    /**
+     * Convenience method to address a single recipient.
+     * 
+     * @see #sendActivity(List, IActivity)
+     */
+    public void sendActivity(User recipient, IActivity activity);
 
     /**
      * Adds an {@link IActivityProvider} and also registers itself as
@@ -258,4 +275,5 @@ public interface ISharedProject extends IActivityListener {
      * {@link IActivityListener} on that provider.
      */
     public void removeActivityProvider(IActivityProvider provider);
+
 }

@@ -50,6 +50,8 @@ public class XMPPChatReceiver {
     /**
      * This is called from the XMPPConnection for each incoming Packet and will
      * dispatch these to the registered listeners.
+     * 
+     * @sarosThread must be called from the Dispatch Thread
      */
     public void processPacket(Packet packet) {
 

@@ -323,10 +323,8 @@ public class ConsistencyWatchdogHandler {
 
             try {
                 // Send the file to client
-                project.getSequencer().sendActivity(
-                    fromUser,
-                    FileActivity.created(project.getProject(),
-                        myJID.toString(), path, Purpose.RECOVERY));
+                project.sendActivity(fromUser, FileActivity.created(project
+                    .getProject(), myJID.toString(), path, Purpose.RECOVERY));
             } catch (IOException e) {
                 log.error("File could not be read, despite existing: " + path,
                     e);
@@ -334,8 +332,8 @@ public class ConsistencyWatchdogHandler {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            project.getSequencer().sendActivity(fromUser,
-                FileActivity.removed(myJID.toString(), path, Purpose.RECOVERY));
+            project.sendActivity(fromUser, FileActivity.removed(myJID
+                .toString(), path, Purpose.RECOVERY));
             progress.worked(8);
         }
         progress.done();
