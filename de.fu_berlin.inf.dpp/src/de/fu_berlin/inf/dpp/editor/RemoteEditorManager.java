@@ -36,53 +36,6 @@ public class RemoteEditorManager {
 
     protected Map<User, RemoteEditorState> editorStates = new HashMap<User, RemoteEditorState>();
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
-        @Override
-        public boolean receive(EditorActivity editorActivity) {
-
-            User sender = sharedProject.getUser(new JID(editorActivity
-                .getSource()));
-
-            switch (editorActivity.getType()) {
-            case Activated:
-                getEditorState(sender).activated(editorActivity.getPath());
-                break;
-            case Saved:
-                break;
-            case Closed:
-                getEditorState(sender).closed(editorActivity.getPath());
-                break;
-            }
-
-            return false;
-        }
-
-        @Override
-        public boolean receive(ViewportActivity viewportActivity) {
-
-            User sender = sharedProject.getUser(new JID(viewportActivity
-                .getSource()));
-
-            getEditorState(sender).setViewport(viewportActivity.getEditor(),
-                viewportActivity.getLineRange());
-
-            return false;
-        }
-
-        @Override
-        public boolean receive(TextSelectionActivity textSelectionActivity) {
-
-            User sender = sharedProject.getUser(new JID(textSelectionActivity
-                .getSource()));
-
-            getEditorState(sender).setSelection(
-                textSelectionActivity.getEditor(),
-                textSelectionActivity.getSelection());
-
-            return false;
-        }
-    };
-
     protected ISharedProject sharedProject;
 
     /**
@@ -90,11 +43,11 @@ public class RemoteEditorManager {
      */
     public static class RemoteEditor {
 
-        IPath path;
+        protected IPath path;
 
-        ITextSelection selection;
+        protected ITextSelection selection;
 
-        ILineRange viewport;
+        protected ILineRange viewport;
 
         public RemoteEditor(IPath path) {
             this.path = path;
@@ -126,6 +79,12 @@ public class RemoteEditorManager {
      * one remote user.
      */
     public static class RemoteEditorState {
+
+        protected User user;
+
+        protected LinkedHashMap<IPath, RemoteEditor> openEditors = new LinkedHashMap<IPath, RemoteEditor>();
+
+        protected RemoteEditor activeEditor;
 
         public RemoteEditorState(User user) {
             this.user = user;
@@ -214,11 +173,42 @@ public class RemoteEditorManager {
             }
         }
 
-        public User user;
+        protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+            @Override
+            public boolean receive(EditorActivity editorActivity) {
 
-        LinkedHashMap<IPath, RemoteEditor> openEditors = new LinkedHashMap<IPath, RemoteEditor>();
+                switch (editorActivity.getType()) {
+                case Activated:
+                    activated(editorActivity.getPath());
+                    break;
+                case Saved:
+                    break;
+                case Closed:
+                    closed(editorActivity.getPath());
+                    break;
+                }
 
-        RemoteEditor activeEditor;
+                return false;
+            }
+
+            @Override
+            public boolean receive(ViewportActivity viewportActivity) {
+
+                setViewport(viewportActivity.getEditor(), viewportActivity
+                    .getLineRange());
+
+                return false;
+            }
+
+            @Override
+            public boolean receive(TextSelectionActivity textSelectionActivity) {
+
+                setSelection(textSelectionActivity.getEditor(),
+                    textSelectionActivity.getSelection());
+
+                return false;
+            }
+        };
 
         /**
          * Returns the activeEditor of the user of this RemoteEditorState or
@@ -250,6 +240,9 @@ public class RemoteEditorManager {
             return new HashSet<IPath>(openEditors.keySet());
         }
 
+        public void exec(IActivity activity) {
+            activity.dispatch(activityReceiver);
+        }
     }
 
     public RemoteEditorManager(ISharedProject sharedProject) {
@@ -267,7 +260,10 @@ public class RemoteEditorManager {
     }
 
     public void exec(IActivity activity) {
-        activity.dispatch(activityReceiver);
+
+        User sender = sharedProject.getUser(new JID(activity.getSource()));
+
+        getEditorState(sender).exec(activity);
     }
 
     /**
