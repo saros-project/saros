@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -338,21 +339,23 @@ public class StatisticManager extends AbstractFeedbackManager {
         SessionStatistic data) {
         if (activeCollectors == null || activeCollectors.isEmpty()) {
             log.warn("There are no active SessionCollectors left,"
-                + " but we were called from one anyhow.");
+                + " but we were called from one anyhow.", new StackTrace());
         }
 
         // fetch the data from the collector and remove him from the active list
         statistic.addAll(data);
-        if (!activeCollectors.remove(collector)) {
-            log.warn("We were called from a collector that wasn't in"
-                + " the list of active collectors");
+        if (activeCollectors != null) {
+            if (!activeCollectors.remove(collector)) {
+                log.warn("We were called from a collector that wasn't in"
+                    + " the list of active collectors");
+            }
         }
 
         /*
          * write statistic to file, if all data has arrived; send it to our
          * server, if user permitted submission
          */
-        if (activeCollectors.isEmpty()) {
+        if (activeCollectors == null || activeCollectors.isEmpty()) {
             saveAndSubmitStatistic();
             log.debug(statistic.toString());
         }
