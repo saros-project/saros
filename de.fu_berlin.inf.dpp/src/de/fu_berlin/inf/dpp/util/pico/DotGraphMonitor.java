@@ -11,7 +11,6 @@ package de.fu_berlin.inf.dpp.util.pico;
  *****************************************************************************/
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -52,6 +51,8 @@ import de.fu_berlin.inf.dpp.util.Pair;
 public final class DotGraphMonitor extends AbstractComponentMonitor implements
     ComponentMonitor {
 
+    private static final long serialVersionUID = 7368290879876948459L;
+
     private static final Logger log = Logger.getLogger(DotGraphMonitor.class
         .getName());
 
@@ -63,8 +64,7 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
         super(delegate);
     }
 
-    public void save(File file) throws IOException {
-
+    public void save(File file) {
         try {
             String output = "digraph G {\n" + "  node [shape=box];\n"
                 + "  rank=source;\n" + "  rankdir=LR;\n  node[penwidth=2.0];\n"
