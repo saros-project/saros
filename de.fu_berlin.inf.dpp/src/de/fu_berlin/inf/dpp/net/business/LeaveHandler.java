@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.WarningMessageDialog;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Business logic for handling Leave Message
@@ -52,7 +53,7 @@ public class LeaveHandler {
         @Override
         public void leaveReceived(JID fromJID) {
 
-            ISharedProject project = sessionManager.getSharedProject();
+            final ISharedProject project = sessionManager.getSharedProject();
 
             if (project == null) {
                 log.warn("Received leave message but shared"
@@ -60,7 +61,7 @@ public class LeaveHandler {
                 return;
             }
 
-            User user = project.getUser(fromJID);
+            final User user = project.getUser(fromJID);
             if (user == null) {
                 log.warn("Received leave message from user which"
                     + " is not part of our shared project session: " + fromJID);
@@ -77,7 +78,12 @@ public class LeaveHandler {
                     "Closing the session because the host left.");
             } else {
                 // Client
-                project.removeUser(user);
+                Util.runSafeSWTSync(log, new Runnable() {
+                    public void run() {
+                        // FIXME see above...
+                        project.removeUser(user);
+                    }
+                });
             }
         }
     }
