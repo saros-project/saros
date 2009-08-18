@@ -47,7 +47,6 @@ import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -386,12 +385,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         if (activity.isRecovery()) {
-            ConcurrentDocumentManager concurrentManager = this.sharedProject
-                .getConcurrentDocumentManager();
 
             // The file contents has been replaced, now reset Jupiter
-            if (concurrentManager.isManagedByJupiter(path))
-                concurrentManager.resetJupiterClient(path);
+            this.sharedProject.getConcurrentDocumentClient().reset(path);
 
             consistencyWatchdogClient.queueConsistencyCheck();
         }

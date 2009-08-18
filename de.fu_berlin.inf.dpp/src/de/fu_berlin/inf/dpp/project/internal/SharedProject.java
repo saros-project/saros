@@ -37,13 +37,14 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.RoleActivity;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager.Side;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
+import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer.QueueItem;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -69,7 +70,9 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected ActivitySequencer activitySequencer;
 
-    protected ConcurrentDocumentManager concurrentDocumentManager;
+    protected ConcurrentDocumentClient concurrentDocumentClient;
+
+    protected ConcurrentDocumentServer concurrentDocumentServer;
 
     protected final List<IActivityProvider> activityProviders = new LinkedList<IActivityProvider>();
 
@@ -138,9 +141,8 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(this.host.getJID(), this.host);
 
         /* add host to driver list. */
-        this.concurrentDocumentManager = new ConcurrentDocumentManager(
-            Side.HOST_SIDE, this.host, myID, this);
-
+        this.concurrentDocumentServer = new ConcurrentDocumentServer(this);
+        this.concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
     /**
@@ -159,21 +161,58 @@ public class SharedProject implements ISharedProject, Disposable {
         this.participants.put(hostID, host);
         this.participants.put(myID, localUser);
 
-        this.concurrentDocumentManager = new ConcurrentDocumentManager(
-            Side.CLIENT_SIDE, this.host, myID, this);
+        this.concurrentDocumentClient = new ConcurrentDocumentClient(this);
     }
 
     public Collection<User> getParticipants() {
         return this.participants.values();
     }
 
-    public List<User> getRemoteUsers() {
-        Collection<User> users = getParticipants();
-        List<User> result = new ArrayList<User>(users.size() - 1);
-        for (User user : users) {
-            if (user.isRemote()) {
+    public List<User> getRemoteObservers() {
+        List<User> result = new ArrayList<User>();
+        for (User user : getParticipants()) {
+            if (user.isLocal())
+                continue;
+            if (user.isObserver())
                 result.add(user);
-            }
+        }
+        return result;
+    }
+
+    public List<User> getObservers() {
+        List<User> result = new ArrayList<User>();
+        for (User user : getParticipants()) {
+            if (user.isObserver())
+                result.add(user);
+        }
+        return result;
+    }
+
+    public List<User> getDrivers() {
+        List<User> result = new ArrayList<User>();
+        for (User user : getParticipants()) {
+            if (user.isDriver())
+                result.add(user);
+        }
+        return result;
+    }
+
+    public List<User> getRemoteDrivers() {
+        List<User> result = new ArrayList<User>();
+        for (User user : getParticipants()) {
+            if (user.isLocal())
+                continue;
+            if (user.isDriver())
+                result.add(user);
+        }
+        return result;
+    }
+
+    public List<User> getRemoteUsers() {
+        List<User> result = new ArrayList<User>();
+        for (User user : getParticipants()) {
+            if (user.isRemote())
+                result.add(user);
         }
         return result;
     }
@@ -184,29 +223,34 @@ public class SharedProject implements ISharedProject, Disposable {
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws InterruptedException
-     * @throws CancellationException
      */
     public void initiateRoleChange(final User user, final UserRole newRole,
         SubMonitor progress) throws CancellationException, InterruptedException {
         assert localUser.isHost() : "Only the host can initiate role changes.";
 
         if (user.isHost()) {
-            activityCreated(new RoleActivity(
-                getLocalUser().getJID().toString(), user.getJID().toString(),
-                newRole));
 
-            setUserRole(user, newRole);
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    activityCreated(new RoleActivity(getLocalUser().getJID()
+                        .toString(), user.getJID().toString(), newRole));
+
+                    setUserRole(user, newRole);
+                }
+            });
+
         } else {
             StartHandle startHandle = stopManager.stop(user,
                 "Performing role change", progress);
 
-            activityCreated(new RoleActivity(
-                getLocalUser().getJID().toString(), user.getJID().toString(),
-                newRole));
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    activityCreated(new RoleActivity(getLocalUser().getJID()
+                        .toString(), user.getJID().toString(), newRole));
 
-            setUserRole(user, newRole);
+                    setUserRole(user, newRole);
+                }
+            });
 
             if (!startHandle.start())
                 log
@@ -219,18 +263,18 @@ public class SharedProject implements ISharedProject, Disposable {
      */
     public void setUserRole(final User user, final UserRole role) {
 
-        assert user != null;
-        Util.runSafeSWTSync(log, new Runnable() {
-            public void run() {
-                user.setUserRole(role);
+        assert Util.isSWT() : "Must be called from SWT Thread";
 
-                log.info("User " + user + " is now a " + role);
+        if (user == null || role == null)
+            throw new IllegalArgumentException();
 
-                for (ISharedProjectListener listener : SharedProject.this.listeners) {
-                    listener.roleChanged(user);
-                }
-            }
-        });
+        user.setUserRole(role);
+
+        log.info("User " + user + " is now a " + role);
+
+        for (ISharedProjectListener listener : SharedProject.this.listeners) {
+            listener.roleChanged(user);
+        }
     }
 
     /*
@@ -373,7 +417,11 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public void dispose() {
         stopManager.removeBlockable(stopManagerListener);
-        concurrentDocumentManager.dispose();
+
+        if (concurrentDocumentServer != null) {
+            concurrentDocumentServer.dispose();
+        }
+        concurrentDocumentClient.dispose();
     }
 
     /**
@@ -420,8 +468,12 @@ public class SharedProject implements ISharedProject, Disposable {
         return localUser;
     }
 
-    public ConcurrentDocumentManager getConcurrentDocumentManager() {
-        return concurrentDocumentManager;
+    public ConcurrentDocumentClient getConcurrentDocumentClient() {
+        return concurrentDocumentClient;
+    }
+
+    public ConcurrentDocumentServer getConcurrentDocumentServer() {
+        return concurrentDocumentServer;
     }
 
     public ITransmitter getTransmitter() {
@@ -440,47 +492,32 @@ public class SharedProject implements ISharedProject, Disposable {
         freeColors.add(colorID);
     }
 
-    public void execTransformedActivity(TextEditActivity activity) {
-
-        if (activity == null)
-            throw new IllegalArgumentException("Activity cannot be null");
-
-        assert Util.isSWT();
-
-        try {
-            log.debug("Executing   transformed activity: " + activity);
-
-            for (IActivityProvider exec : this.activityProviders) {
-                exec.exec(activity);
-            }
-
-            /*
-             * FIXME The following will send the activities to everybody, so all
-             * drivers will receive the message twice (once through Jupiter once
-             * as a Activity)
-             */
-
-            // Send activity to every remote user.
-            if (this.concurrentDocumentManager.isHostSide()) {
-                sendActivity(getRemoteUsers(), activity);
-            }
-        } catch (Exception e) {
-            log.error("Error while executing activity.", e);
-        }
-    }
-
     public void exec(List<IActivity> activities) {
-        // TODO Check all this for problems with concurrency.
 
-        final List<IActivity> stillToExecute = concurrentDocumentManager
-            .exec(activities);
-        if (stillToExecute.isEmpty()) {
-            return;
+        if (isHost()) {
+            TransformationResult transformed = concurrentDocumentServer
+                .transformIncoming(activities);
+
+            activities = transformed.getLocalActivities();
+
+            for (QueueItem item : transformed.getSendToPeers()) {
+                sendActivity(item.recipients, item.activity);
+            }
         }
+
+        final List<IActivity> stillToExecute = activities;
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                for (IActivity activity : stillToExecute) {
+
+                TransformationResult transformed = concurrentDocumentClient
+                    .transformIncoming(stillToExecute);
+
+                for (QueueItem item : transformed.getSendToPeers()) {
+                    sendActivity(item.recipients, item.activity);
+                }
+
+                for (IActivity activity : transformed.executeLocally) {
                     for (IActivityProvider executor : activityProviders) {
                         executor.exec(activity);
                     }
@@ -491,15 +528,17 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public void activityCreated(IActivity activity) {
 
+        assert Util.isSWT() : "Must be called from the SWT Thread";
+
         if (activity == null)
             throw new IllegalArgumentException("Activity cannot be null");
 
         /* Let ConcurrentDocumentManager have a look at the activities first */
-        boolean consumed = this.concurrentDocumentManager
-            .activityCreated(activity);
+        List<QueueItem> toSend = this.concurrentDocumentClient
+            .transformOutgoing(activity);
 
-        if (!consumed) {
-            sendActivity(getRemoteUsers(), activity);
+        for (QueueItem item : toSend) {
+            sendActivity(item.recipients, item.activity);
         }
     }
 
@@ -512,7 +551,7 @@ public class SharedProject implements ISharedProject, Disposable {
         sendActivity(Collections.singletonList(recipient), activity);
     }
 
-    public void sendActivity(List<User> toWhom, IActivity activity) {
+    public void sendActivity(List<User> toWhom, final IActivity activity) {
         if (toWhom == null)
             throw new IllegalArgumentException();
 

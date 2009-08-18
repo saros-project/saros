@@ -30,8 +30,8 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
+import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
@@ -79,7 +79,7 @@ public interface ISharedProject extends IActivityListener {
      * Set the role of the given user. This is called on incoming activities
      * from the network.
      * 
-     * @swt This method needs to be called from the SWT UI thread
+     * @swt This method MUST to be called from the SWT UI thread
      * @param user
      *            the user which role has to be set.
      * @param role
@@ -97,13 +97,15 @@ public interface ISharedProject extends IActivityListener {
      * The host is the person that initiated this SharedProject and holds all
      * original files.
      * 
-     * @return the host.
+     * @immutable This method will always return the same value for a session
      */
     public User getHost();
 
     /**
      * @return <code>true</code> if the local client is the host of this shared
      *         project. <code>false</code> otherwise.
+     * 
+     * @immutable This method will always return the same value for a session
      */
     public boolean isHost();
 
@@ -120,6 +122,8 @@ public interface ISharedProject extends IActivityListener {
      * 
      * @param user
      *            the user that is to be removed.
+     * 
+     * @swt Must be called from SWT!
      */
     public void removeUser(User user);
 
@@ -183,6 +187,11 @@ public interface ISharedProject extends IActivityListener {
      */
     public JID getResourceQualifiedJID(JID jid);
 
+    /**
+     * Returns the {@link User} who is representing the local eclipse instance
+     * 
+     * @immutable This method will always return the same value for a session
+     */
     public User getLocalUser();
 
     /**
@@ -196,7 +205,15 @@ public interface ISharedProject extends IActivityListener {
      * 
      * @return the concurrent document manager
      */
-    public ConcurrentDocumentManager getConcurrentDocumentManager();
+    public ConcurrentDocumentServer getConcurrentDocumentServer();
+
+    /**
+     * the concurrent document manager is responsible for all jupiter controlled
+     * documents
+     * 
+     * @return the concurrent document manager
+     */
+    public ConcurrentDocumentClient getConcurrentDocumentClient();
 
     /**
      * The ITransmitter is the network component and responsible for
@@ -225,13 +242,6 @@ public interface ISharedProject extends IActivityListener {
     public void returnColor(int colorID);
 
     /**
-     * Execute activity after jupiter transforming process.
-     * 
-     * @swt Must be called from the SWT Thread
-     */
-    public void execTransformedActivity(TextEditActivity activity);
-
-    /**
      * Excutes the given activities locally.
      */
     public void exec(List<IActivity> activities);
@@ -244,6 +254,8 @@ public interface ISharedProject extends IActivityListener {
      * and then send to all remote users.
      * 
      * @see IActivityListener
+     * 
+     * @swt MUST be called from the SWT thread to ensure synchronization!
      */
     public void activityCreated(IActivity activity);
 
@@ -275,5 +287,11 @@ public interface ISharedProject extends IActivityListener {
      * {@link IActivityListener} on that provider.
      */
     public void removeActivityProvider(IActivityProvider provider);
+
+    public List<User> getDrivers();
+
+    public List<User> getObservers();
+
+    public List<User> getRemoteObservers();
 
 }

@@ -109,6 +109,8 @@ public class User {
      * 
      * @return <code>true</code> if this User is driver, <code>false</code>
      *         otherwise.
+     * 
+     *         This is always !isObserver()
      */
     public boolean isDriver() {
         return this.role == UserRole.DRIVER;
@@ -119,6 +121,8 @@ public class User {
      * 
      * @return <code>true</code> if this User is observer, <code>false</code>
      *         otherwise.
+     * 
+     *         This is always !isDriver()
      */
     public boolean isObserver() {
         return this.role == UserRole.OBSERVER;

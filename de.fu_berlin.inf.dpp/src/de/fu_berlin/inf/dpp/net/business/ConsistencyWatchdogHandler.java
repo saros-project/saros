@@ -27,7 +27,6 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentManager;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -313,10 +312,7 @@ public class ConsistencyWatchdogHandler {
         progress.worked(1);
 
         // Reset jupiter
-        ConcurrentDocumentManager concurrentManager = project
-            .getConcurrentDocumentManager();
-        if (concurrentManager.isManagedByJupiterServer(from, path))
-            concurrentManager.resetJupiterServer(from, path);
+        project.getConcurrentDocumentServer().reset(from, path);
 
         progress.worked(1);
 

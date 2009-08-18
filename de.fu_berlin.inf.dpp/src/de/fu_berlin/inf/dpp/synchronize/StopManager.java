@@ -306,7 +306,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 "Stop cannot be called without a shared project");
 
         // Creating StopActivity for asking user to stop
-        StopActivity stopActivity = new StopActivity(sharedProject
+        final StopActivity stopActivity = new StopActivity(sharedProject
             .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
             .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
 
@@ -327,7 +327,11 @@ public class StopManager implements IActivityProvider, Disposable {
             .getJID().toString());
         expectedAcknowledgments.add(expectedAck);
 
-        fireActivity(stopActivity);
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                fireActivity(stopActivity);
+            }
+        });
 
         // Block until user acknowledged
         log.debug("Waiting for acknowledgment " + Util.prefix(user.getJID()));
@@ -428,10 +432,16 @@ public class StopManager implements IActivityProvider, Disposable {
 
         startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
-        fireActivity(new StopActivity(sharedProject.getLocalUser().getJID()
-            .toString(), sharedProject.getLocalUser().getJID(), handle
-            .getUser().getJID(), Type.UNLOCKREQUEST, State.INITIATED, handle
-            .getHandleID()));
+        final StopActivity activity = new StopActivity(sharedProject
+            .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
+            .getJID(), handle.getUser().getJID(), Type.UNLOCKREQUEST,
+            State.INITIATED, handle.getHandleID());
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                fireActivity(activity);
+            }
+        });
     }
 
     /**

@@ -20,8 +20,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class JupiterDocumentServer {
 
-    private static Logger log = Logger
-        .getLogger(JupiterDocumentServer.class);
+    private static Logger log = Logger.getLogger(JupiterDocumentServer.class);
 
     /**
      * List of proxy clients.
@@ -34,15 +33,13 @@ public class JupiterDocumentServer {
         this.editor = path;
     }
 
-    public void addProxyClient(JID jid) {
-        this.proxies.put(jid, new Jupiter(false));
+    public synchronized void addProxyClient(JID jid) {
+        if (!this.proxies.containsKey(jid))
+            this.proxies.put(jid, new Jupiter(false));
     }
 
-    /**
-     * TODO SZ Removing a proxy client needs to be synced probably
-     */
-    public void removeProxyClient(JID jid) {
-        this.proxies.remove(jid);
+    public synchronized boolean removeProxyClient(JID jid) {
+        return this.proxies.remove(jid) != null;
     }
 
     public Map<JID, JupiterActivity> transformJupiterActivity(
@@ -77,16 +74,6 @@ public class JupiterDocumentServer {
         return result;
     }
 
-    /*
-     * TODO Make sure that this is not a problem:
-     * 
-     * Was Passiert, wenn während der Bearbeitung ein neuer proxy eingefügt
-     * wird?
-     */
-    public HashMap<JID, Jupiter> getProxies() {
-        return this.proxies;
-    }
-
     public boolean isExist(JID jid) {
         if (this.proxies.containsKey(jid)) {
             return true;
@@ -94,12 +81,12 @@ public class JupiterDocumentServer {
         return false;
     }
 
-    public void updateVectorTime(JID source, JID dest) {
+    public synchronized void updateVectorTime(JID source, JID dest) {
         Jupiter proxy = this.proxies.get(source);
         if (proxy != null) {
             try {
                 Timestamp ts = proxy.getTimestamp();
-                getProxies().get(dest).updateVectorTime(
+                this.proxies.get(dest).updateVectorTime(
                     new JupiterVectorTime(ts.getComponents()[1], ts
                         .getComponents()[0]));
             } catch (TransformationException e) {
@@ -111,5 +98,10 @@ public class JupiterDocumentServer {
                 .error("No proxy found for given source jid: " + source);
         }
 
+    }
+
+    public synchronized void reset(JID jid) {
+        if (removeProxyClient(jid))
+            addProxyClient(jid);
     }
 }

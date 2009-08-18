@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -57,6 +58,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  * @author rdjemili
  * @author coezbek
+ * @author marrin
  */
 public class ActivitySequencer {
 
@@ -69,7 +71,7 @@ public class ActivitySequencer {
      */
     protected static final int MILLIS_UPDATE = 1000;
 
-    protected static class QueueItem {
+    public static class QueueItem {
 
         public final List<User> recipients;
         public final IActivity activity;
@@ -77,6 +79,10 @@ public class ActivitySequencer {
         public QueueItem(List<User> recipients, IActivity activity) {
             this.recipients = recipients;
             this.activity = activity;
+        }
+
+        public QueueItem(User host, IActivity transformedActivity) {
+            this(Collections.singletonList(host), transformedActivity);
         }
     }
 
@@ -195,6 +201,7 @@ public class ActivitySequencer {
          *         sequence number, otherwise <code>null</code>.
          */
         public TimedActivity removeNext() {
+
             if (!queuedActivities.isEmpty()
                 && queuedActivities.peek().getSequenceNumber() == expectedSequenceNumber) {
 
@@ -212,34 +219,45 @@ public class ActivitySequencer {
          * if there is a file transfer for the JID of this queue, and skip an
          * expected sequence number.
          */
-        public void checkForMissingActivities() {
-            if (queuedActivities.isEmpty()) {
+        protected void checkForMissingActivities() {
+
+            if (queuedActivities.isEmpty())
                 return;
-            }
+
             int firstQueuedSequenceNumber = queuedActivities.peek()
                 .getSequenceNumber();
 
-            if (expectedSequenceNumber == firstQueuedSequenceNumber) {
-                // Next Activity is ready to be executed
-                return;
-            }
-
-            if (expectedSequenceNumber != FIRST_SEQUENCE_NUMBER
-                && firstQueuedSequenceNumber < expectedSequenceNumber) {
+            // Discard all activities which we are no longer waiting for
+            while (firstQueuedSequenceNumber < expectedSequenceNumber) {
 
                 TimedActivity activity = queuedActivities.remove();
-                log
-                    .error("Expected activity #"
-                        + expectedSequenceNumber
-                        + " but an older activity is still in the queue and will be dropped (#"
-                        + firstQueuedSequenceNumber + "): " + activity);
-                return;
+
+                log.error("Expected activity #" + expectedSequenceNumber
+                    + " but an older activity is still in the queue"
+                    + " and will be dropped (#" + firstQueuedSequenceNumber
+                    + "): " + activity);
+
+                if (queuedActivities.isEmpty())
+                    return;
+
+                firstQueuedSequenceNumber = queuedActivities.peek()
+                    .getSequenceNumber();
             }
+
+            if (firstQueuedSequenceNumber == expectedSequenceNumber)
+                return; // Next Activity is ready to be executed
+
+            /*
+             * Last case: firstQueuedSequenceNumber > expectedSequenceNumber
+             * 
+             * -> Check for time-out
+             */
             long age = System.currentTimeMillis() - oldestLocalTimestamp;
             if (age > ACTIVITY_TIMEOUT) {
                 if (age < ACTIVITY_TIMEOUT * 2) {
                     // Early exit if there is a file transfer running.
                     if (transferManager.isReceiving(jid)) {
+                        // TODO SS need to be more flexible
                         return;
                     }
                 }
@@ -253,6 +271,27 @@ public class ActivitySequencer {
                 expectedSequenceNumber = firstQueuedSequenceNumber;
                 updateOldestLocalTimestamp();
             }
+        }
+
+        /**
+         * Returns all activities which can be executed. If there are none, an
+         * empty List is returned.
+         * 
+         * This method also checks for missing activities and discards out-dated
+         * or unwanted activities.
+         */
+        public List<TimedActivity> removeActivities() {
+
+            checkForMissingActivities();
+
+            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
+
+            TimedActivity activity;
+            while ((activity = removeNext()) != null) {
+                result.add(activity);
+            }
+
+            return result;
         }
     }
 
@@ -323,14 +362,14 @@ public class ActivitySequencer {
         /**
          * @return all activities that can be executed. If there are none, an
          *         empty List is returned.
+         * 
+         *         This method also checks for missing activities and discards
+         *         out-dated or unwanted activities.
          */
         public List<TimedActivity> removeActivities() {
             ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
             for (ActivityQueue queue : jid2queue.values()) {
-                TimedActivity activity;
-                while ((activity = queue.removeNext()) != null) {
-                    result.add(activity);
-                }
+                result.addAll(queue.removeActivities());
             }
             return result;
         }
@@ -456,12 +495,12 @@ public class ActivitySequencer {
                     sendActivities(e.getKey(), optimize(e.getValue()));
                 }
 
-                // Periodically run check for missing activities
+                /*
+                 * Periodically execQueues() because waiting activities might
+                 * have timed-out
+                 */
                 transmitter.executeAsDispatch(new Runnable() {
                     public void run() {
-                        incomingQueues.checkForMissingActivities();
-                        // Maybe the check above has unblocked queued activities
-                        // that can be executed now.
                         execQueue();
                     }
                 });
@@ -480,8 +519,14 @@ public class ActivitySequencer {
             private void sendActivities(User recipient,
                 List<IActivity> activities) {
 
-                if (recipient.isLocal() || activities.contains(null)) {
-                    throw new IllegalArgumentException();
+                if (recipient.isLocal()) {
+                    throw new IllegalArgumentException(
+                        "Sending a message to the local user is not supported");
+                }
+
+                if (activities.contains(null)) {
+                    throw new IllegalArgumentException(
+                        "Cannot send a null activity");
                 }
 
                 JID recipientJID = recipient.getJID();
@@ -552,8 +597,25 @@ public class ActivitySequencer {
     /**
      * Sends the given activity to the given recipients.
      */
-    public void sendActivity(List<User> recipients, IActivity activity) {
-        this.outgoingQueue.add(new QueueItem(recipients, activity));
+    public void sendActivity(List<User> recipients, final IActivity activity) {
+
+        /**
+         * Short cut all messages directed at local user
+         */
+        ArrayList<User> toSendViaNetwork = new ArrayList<User>();
+        for (User user : recipients) {
+            if (user.isLocal()) {
+                transmitter.executeAsDispatch(new Runnable() {
+                    public void run() {
+                        sharedProject.exec(Collections.singletonList(activity));
+                    }
+                });
+            } else {
+                toSendViaNetwork.add(user);
+            }
+        }
+
+        this.outgoingQueue.add(new QueueItem(toSendViaNetwork, activity));
     }
 
     /**

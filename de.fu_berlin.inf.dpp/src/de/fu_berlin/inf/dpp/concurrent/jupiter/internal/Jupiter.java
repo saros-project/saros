@@ -27,6 +27,7 @@ import java.util.List;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
+import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
@@ -36,12 +37,16 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This class implements the client-side core of the Jupiter control algorithm.
  */
 public class Jupiter implements Algorithm {
+
+    private static final Logger log = Logger.getLogger(Jupiter.class);
 
     /**
      * The inclusion transformation function used to transform operations.
@@ -86,8 +91,8 @@ public class Jupiter implements Algorithm {
      * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateJupiterActivity(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation,
      *      de.fu_berlin.inf.dpp.net.JID, IPath)
      */
-    public JupiterActivity generateJupiterActivity(Operation op, JID originator,
-        IPath editor) {
+    public JupiterActivity generateJupiterActivity(Operation op,
+        JID originator, IPath editor) {
 
         // send(op, myMsgs, otherMsgs);
         JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime,
@@ -108,6 +113,16 @@ public class Jupiter implements Algorithm {
      */
     public Operation receiveJupiterActivity(JupiterActivity jupiterActivity)
         throws TransformationException {
+
+        if (jupiterActivity.getOperation() instanceof TimestampOperation) {
+
+            // TODO Use timestamps correctly!
+            log.warn("Timestamp operations are not tested at the moment");
+
+            updateVectorTime(jupiterActivity.getTimestamp());
+            return new NoOperation();
+        }
+
         Timestamp timestamp = jupiterActivity.getTimestamp();
         if (!(timestamp instanceof JupiterVectorTime)) {
             throw new IllegalArgumentException(
@@ -118,8 +133,8 @@ public class Jupiter implements Algorithm {
 
         Operation newOp = transform(jupiterActivity.getOperation());
         this.vectorTime = this.vectorTime.incrementRemoteOperationCount();
-
         return newOp;
+
     }
 
     /**
