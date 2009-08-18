@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -80,17 +81,15 @@ public class StopManager implements IActivityProvider, Disposable {
     protected ValueChangeListener<SharedProject> sharedProjectObserver = new ValueChangeListener<SharedProject>() {
         public void setValue(SharedProject newSharedProject) {
 
-            if (newSharedProject == StopManager.this.sharedProject)
+            if (newSharedProject == sharedProject)
                 return;
 
             // session ended, start all local start handles
             if (newSharedProject == null && sharedProject != null) {
-                List<StartHandle> localStartHandles = startHandles
-                    .get(sharedProject.getLocalUser());
-                if (localStartHandles != null)
-                    for (StartHandle startHandle : localStartHandles) {
-                        startHandle.start();
-                    }
+                for (StartHandle startHandle : getStartHandles(sharedProject
+                    .getLocalUser())) {
+                    startHandle.start();
+                }
                 lockProject(false);
             }
 
@@ -396,9 +395,10 @@ public class StopManager implements IActivityProvider, Disposable {
                 + " couldn't be removed because it doesn't exist any more.");
         }
 
-        if (!noStartHandlesFor(sharedProject.getLocalUser())) {
-            log.debug(startHandles.get(sharedProject.getLocalUser()).size()
-                + " startHandles remaining.");
+        int remainingHandles = getStartHandles(sharedProject.getLocalUser())
+            .size();
+        if (remainingHandles > 0) {
+            log.debug(remainingHandles + " startHandles remaining.");
             return false;
         }
         Util.runSafeSWTSync(log, new Runnable() {
@@ -471,13 +471,7 @@ public class StopManager implements IActivityProvider, Disposable {
      * StartHandles. These Lists are created lazily.
      */
     public void addStartHandle(StartHandle startHandle) {
-        User user = startHandle.getUser();
-        List<StartHandle> handleList = startHandles.get(user);
-        if (handleList == null) {
-            handleList = new LinkedList<StartHandle>();
-            startHandles.put(user, handleList);
-        }
-        handleList.add(startHandle);
+        getStartHandles(startHandle.getUser()).add(startHandle);
     }
 
     /**
@@ -488,21 +482,17 @@ public class StopManager implements IActivityProvider, Disposable {
      *         otherwise
      */
     public boolean removeStartHandle(StartHandle startHandle) {
-        User user = startHandle.getUser();
-        List<StartHandle> handleList = startHandles.get(user);
-        if (handleList == null)
-            return false; // nothing to do
-        boolean out = handleList.remove(startHandle);
-        if (handleList.isEmpty())
-            startHandles.remove(user);
-        return out;
+        return getStartHandles(startHandle.getUser()).remove(startHandle);
     }
 
-    /**
-     * @return true if there don't exist any StartHandles for the given user
-     */
-    public boolean noStartHandlesFor(User user) {
-        return !startHandles.containsKey(user);
+    public synchronized List<StartHandle> getStartHandles(User user) {
+
+        List<StartHandle> result = startHandles.get(user);
+        if (result == null) {
+            result = new CopyOnWriteArrayList<StartHandle>();
+            startHandles.put(user, result);
+        }
+        return result;
     }
 
     public StartHandle generateStartHandle(StopActivity stopActivity) {
