@@ -404,16 +404,6 @@ public class ActivitySequencer {
             }
             return result;
         }
-
-        /**
-         * Check each queue for activities that are too old and eventually skip
-         * missing activities.
-         */
-        public void checkForMissingActivities() {
-            for (ActivityQueue queue : jid2queue.values()) {
-                queue.checkForMissingActivities();
-            }
-        }
     }
 
     protected final ActivityQueuesManager incomingQueues = new ActivityQueuesManager();
