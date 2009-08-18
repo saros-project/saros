@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
@@ -163,6 +165,11 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     }
 
     /**
+     * Used to make stopSharedProject reentrant
+     */
+    private Lock stopSharedProjectLock = new ReentrantLock();
+
+    /**
      * @nonSWT
      */
     public void stopSharedProject() {
@@ -172,35 +179,42 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 new StackTrace());
         }
 
-        SharedProject project = currentlySharedProject.getValue();
-
-        if (project == null) {
+        if (!stopSharedProjectLock.tryLock())
             return;
-        }
-
-        this.transmitter.sendLeaveMessage(project);
 
         try {
-            project.stop();
-            project.dispose();
-        } catch (RuntimeException e) {
-            log.error("Error stopping project: ", e);
-        }
+            SharedProject project = currentlySharedProject.getValue();
 
-        this.currentlySharedProject.setValue(null);
-
-        for (ISessionListener listener : this.listeners) {
-            try {
-                listener.sessionEnded(project);
-            } catch (RuntimeException e) {
-                log.error("Internal error in notifying listener"
-                    + " of SharedProject end: ", e);
+            if (project == null) {
+                return;
             }
+
+            this.transmitter.sendLeaveMessage(project);
+
+            try {
+                project.stop();
+                project.dispose();
+            } catch (RuntimeException e) {
+                log.error("Error stopping project: ", e);
+            }
+
+            this.currentlySharedProject.setValue(null);
+
+            for (ISessionListener listener : this.listeners) {
+                try {
+                    listener.sessionEnded(project);
+                } catch (RuntimeException e) {
+                    log.error("Internal error in notifying listener"
+                        + " of SharedProject end: ", e);
+                }
+            }
+
+            sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
+
+            log.info("Session left");
+        } finally {
+            stopSharedProjectLock.unlock();
         }
-
-        sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
-
-        SessionManager.log.info("Session left");
     }
 
     public ISharedProject getSharedProject() {
