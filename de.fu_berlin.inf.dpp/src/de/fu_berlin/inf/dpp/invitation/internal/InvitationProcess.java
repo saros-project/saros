@@ -143,7 +143,8 @@ public abstract class InvitationProcess implements IInvitationProcess {
             this.transmitter.sendCancelInvitationMessage(this.peer, errorMsg);
         }
 
-        this.invitationUI.cancel(this.peer, errorMsg, replicated);
+        if (invitationUI != null)
+            this.invitationUI.cancel(this.peer, errorMsg, replicated);
 
         this.invitationProcesses.removeInvitationProcess(this);
     }
