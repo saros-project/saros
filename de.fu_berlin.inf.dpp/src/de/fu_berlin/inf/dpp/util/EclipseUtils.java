@@ -86,4 +86,25 @@ public class EclipseUtils {
         return openWindow(md);
     }
 
+    /**
+     * Opens a MessageDialog of the type {@link MessageDialog#QUESTION} and
+     * dispatches a call to forceActive (which gives a visual hint on the
+     * task-bar that the application wants focus).
+     * 
+     * @param shell
+     *            the parent shell
+     * @param dialogTitle
+     *            the dialog title, or <code>null</code> if none
+     * @param dialogMessage
+     *            the dialog message
+     * @return true if the user answered with YES
+     */
+    public static boolean openQuestionMessageDialog(Shell shell,
+        String dialogTitle, String dialogMessage) {
+        MessageDialog md = new MessageDialog(shell, dialogTitle, null,
+            dialogMessage, MessageDialog.QUESTION, new String[] {
+                IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL}, 0);
+        return openWindow(md) == 0;
+    }
+
 }
