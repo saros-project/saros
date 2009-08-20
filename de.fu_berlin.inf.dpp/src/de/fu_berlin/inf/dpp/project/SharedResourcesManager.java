@@ -220,10 +220,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
         }
 
-        private void fireActivity(IActivity activity) {
-            for (IActivityListener listener : listeners) {
-                listener.activityCreated(activity);
-            }
+        private void fireActivity(final IActivity activity) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    for (IActivityListener listener : listeners) {
+                        listener.activityCreated(activity);
+                    }
+                }
+            });
         }
     }
 
