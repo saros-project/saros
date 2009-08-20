@@ -534,30 +534,13 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
     }
 
-    /**
-     * Sends a query, a {@link IQ.Type} GET, to the user with given {@link JID}.
-     * 
-     * Example using provider:
-     * <p>
-     * <code>XStreamExtensionProvider<VersionInfo> versionProvider = new
-     * XStreamExtensionProvider<VersionInfo>( "sarosVersion", VersionInfo.class,
-     * Version.class, Compatibility.class);<br>
-     * sendQuery(jid, versionProvider, 5000);
-     * </code>
-     * </p>
-     * This call sends a request to the user with jid and waits 5 seconds for an
-     * answer. If it arrives in time, a payload of type VersionInfo will be
-     * returned, else the result is null.
-     * 
-     */
     public <T> T sendQuery(JID rqJID, XStreamExtensionProvider<T> provider,
-        long timeout) {
-        
+        T payload, long timeout) {
         if (connection == null || !connection.isConnected())
             return null;
 
         // Request the version from a remote user
-        IQ request = provider.createIQ(null);
+        IQ request = provider.createIQ(payload);
 
         request.setType(IQ.Type.GET);
         request.setTo(rqJID.toString());
@@ -575,6 +558,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         } finally {
             collector.cancel();
         }
+
     }
 
     /**

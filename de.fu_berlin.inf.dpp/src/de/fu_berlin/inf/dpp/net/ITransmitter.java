@@ -29,6 +29,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
+import org.jivesoftware.smack.packet.IQ;
 import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -38,6 +39,7 @@ import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -353,5 +355,23 @@ public interface ITransmitter {
      * handle his Jingle negotiation attempts.
      */
     public void awaitJingleManager(JID peer);
+
+    /**
+     * Sends a query, a {@link IQ.Type} GET, to the user with given {@link JID}.
+     * 
+     * Example using provider:
+     * <p>
+     * <code>XStreamExtensionProvider<VersionInfo> versionProvider = new
+     * XStreamExtensionProvider<VersionInfo>( "sarosVersion", VersionInfo.class,
+     * Version.class, Compatibility.class);<br>
+     * sendQuery(jid, versionProvider, 5000);
+     * </code>
+     * </p>
+     * In this example this sends a request to the user with jid and waits 5
+     * seconds for an answer. If it arrives in time, a payload of type T (in
+     * this case VersionInfo) will be returned, else the result is null.
+     */
+    public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
+        T payload, long timeout);
 
 }

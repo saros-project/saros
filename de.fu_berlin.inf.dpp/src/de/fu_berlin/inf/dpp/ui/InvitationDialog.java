@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -87,8 +88,11 @@ import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.ArrayIterator;
 import de.fu_berlin.inf.dpp.util.MappingIterator;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * Dialog by which the hosts can invite clients to a shared project session.
@@ -458,35 +462,33 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         setSelectedCancelable(true);
         getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
-        try {
-            String name = project.getProject().getName();
+        final List<JID> selectedJIDs = getSelectedJIDs();
 
-            // Invite all selected users...
-            for (InviterData invdat : getSelectedItems()) {
-                JID toInvite = discoveryManager.getSupportingPresence(
-                    invdat.jid, Saros.NAMESPACE);
-                if (toInvite == null) {
-                    if (MessageDialog
-                        .openConfirm(
-                            this.getShell(),
-                            "Invite user who does not support Saros?",
-                            "User "
-                                + invdat.jid
-                                + " does not seem to use Saros "
-                                + "(but rather a normal Instant Messaging client), invite anyway?")) {
-                        toInvite = invdat.jid;
-                    } else {
-                        continue;
+        ProgressMonitorDialog asyncCheck = new ProgressMonitorDialog(getShell());
+
+        /**
+         * Investigate asynchronously (not blocking the SWT-Thread) the peers'
+         * client compatibility, that is Saros availability and Saros version
+         * conflicts.
+         */
+        try {
+            asyncCheck.run(true, true, new IRunnableWithProgress() {
+                public void run(IProgressMonitor monitor) {
+                    try {
+                        performInvitationAsync(selectedJIDs, SubMonitor
+                            .convert(monitor));
+                    } finally {
+                        monitor.done();
                     }
                 }
-                invdat.progress = new InvitationProgressMonitor(toInvite);
-                invdat.outgoingProcess = sessionManager.invite(project,
-                    toInvite, name, InvitationDialog.this, localFileList,
-                    SubMonitor.convert(invdat.progress, 1000));
-            }
+            });
 
         } catch (RuntimeException e) {
-            log.error("Failed to perform invitation:", e);
+            log.error("Internal error while performing invitation:", e);
+        } catch (InvocationTargetException e) {
+            log.error("Failed to perform invitation:", e.getTargetException());
+        } catch (InterruptedException e) {
+            log.error("Internal error while performing invitation:", e);
         }
         updateButtons();
     }
@@ -714,8 +716,34 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         return getIterable(table.getSelection());
     }
 
+    /**
+     * Get a snapshot copy of the JIDs currently selected.
+     * 
+     * The resulting JIDs are plain JIDs!
+     */
+    public ArrayList<JID> getSelectedJIDs() {
+        ArrayList<JID> jids = new ArrayList<JID>();
+        for (InviterData invdat : getSelectedItems()) {
+            jids.add(invdat.jid);
+        }
+        return jids;
+    }
+
     protected Iterable<InviterData> getAllItems() {
         return getIterable(table.getItems());
+    }
+
+    /**
+     * @return the {@link InviterData} object for the given (plain) JID or null
+     *         if this JID is not found in the InvitationDialog table
+     */
+    protected InviterData getItem(JID jid) {
+        for (InviterData currItem : getAllItems()) {
+            if (currItem.jid.equals(jid)) {
+                return currItem;
+            }
+        }
+        return null;
     }
 
     protected static Iterable<InviterData> getIterable(final TableItem[] items) {
@@ -890,6 +918,171 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
                 table.select(index);
             }
             index++;
+        }
+    }
+
+    /**
+     * Checks the compatibility of the local Saros version with the given user's
+     * one. If the versions are compatible, the invitation continues, otherwise
+     * a confirmation of the user is required (a {@link MessageDialog} pops up).
+     * 
+     * @return <code>true</code> if the versions are compatible or the user
+     *         confirms to proceed with incompatible versions,
+     *         <code>false</code> if the versions are incompatible and the user
+     *         does not want to proceed
+     * 
+     * @blocking This method blocks until the version information can be
+     *           retrieved from the peer
+     */
+    public boolean checkVersion(final JID rqPeerJID) {
+
+        log.debug("Checking " + rqPeerJID + "'s Saros version...");
+
+        final VersionInfo remoteVersionInfo = versionManager
+            .determineCompatibility(rqPeerJID);
+
+        if (remoteVersionInfo != null
+            && remoteVersionInfo.compatibility == Compatibility.OK)
+            return true;
+
+        // Ask user what to do
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    return MessageDialog.openQuestion(getShell(),
+                        "Saros Version Conflict with " + rqPeerJID.getBase(),
+                        getCompatibilityWarningMessage(rqPeerJID,
+                            remoteVersionInfo));
+                }
+            });
+        } catch (Exception e) {
+            log.error(
+                "An error ocurred while trying to open the confirm dialog.", e);
+            return false;
+        }
+    }
+
+    /**
+     * @nonSWT This is a long running operation and must not be called from the
+     *         SWT thread
+     */
+    protected void performInvitationAsync(List<JID> selectedJIDs,
+        SubMonitor monitor) {
+
+        monitor.beginTask("Investigating peers' client compatibility",
+            selectedJIDs.size());
+
+        try {
+            // Invite all selected users...
+            for (JID currItem : selectedJIDs) {
+                performInvitationAsync(currItem, monitor.newChild(1));
+            }
+        } finally {
+            monitor.done();
+        }
+    }
+
+    protected void performInvitationAsync(final JID plainJID, SubMonitor monitor) {
+
+        monitor.beginTask("Investigating compatiblity for " + plainJID, 4);
+
+        try {
+            monitor.subTask("Performing Service Discovery for " + plainJID);
+            JID toInvite = discoveryManager.getSupportingPresence(plainJID,
+                Saros.NAMESPACE);
+            monitor.worked(1);
+
+            monitor.subTask("Checking if user is online " + plainJID);
+            if (toInvite == null) {
+
+                if (!roster.getPresence(plainJID.toString()).isAvailable())
+                    return;
+
+                if (!confirmUnsupported(plainJID))
+                    return;
+
+                toInvite = plainJID;
+            }
+            monitor.worked(1);
+
+            monitor.subTask("Retrieving " + plainJID + "'s Saros version...");
+            if (!checkVersion(toInvite))
+                return;
+            monitor.worked(1);
+
+            monitor.subTask("Starting invitation for " + plainJID);
+            
+            final JID toInviteFinal = toInvite;
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    InviterData invdat = getItem(plainJID);
+                    if (invdat != null) {
+                        invdat.progress = new InvitationProgressMonitor(
+                            toInviteFinal);
+                        invdat.outgoingProcess = sessionManager.invite(project,
+                            toInviteFinal, project.getProject().getName(),
+                            InvitationDialog.this, localFileList, SubMonitor
+                                .convert(invdat.progress, 1000));
+                    }
+                }
+            });
+            monitor.worked(1);
+        } finally {
+            monitor.done();
+        }
+    }
+
+    private boolean confirmUnsupported(final JID currItem) {
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    return MessageDialog.openConfirm(getShell(),
+                        "Invite user who does not support Saros?", "User "
+                            + currItem + " does not seem to use Saros "
+                            + "(but rather a normal Instant Messaging client),"
+                            + " invite anyway?");
+                }
+            });
+        } catch (Exception e) {
+            log.error(
+                "An error ocurred while trying to open the confirm dialog.", e);
+            return false;
+        }
+    }
+
+    public String getCompatibilityWarningMessage(JID rqPeerJID,
+        VersionManager.VersionInfo remoteVersionInfo) {
+
+        if (remoteVersionInfo == null)
+            return "Asking "
+                + rqPeerJID.getBase()
+                + " for the Saros version in use failed.\n\n"
+                + "This probably means that the version used by your peer is\n"
+                + "older than version 9.8.21 and does not support version checking.\n"
+                + "It is best to ask your peer to update.\n\nDo you want to invite "
+                + rqPeerJID.getBase() + " anyway?";
+
+        switch (remoteVersionInfo.compatibility) {
+        case TOO_NEW:
+            return "Your peer's Saros version ("
+                + remoteVersionInfo.version
+                + ") is too old, please tell your peer to check for updates! Your Saros version is: "
+                + versionManager.getVersion()
+                + "\nProceeding with incompatible versions may cause malfunctions!\n\nDo you want to invite "
+                + rqPeerJID.getBase() + " anyway?";
+        case TOO_OLD:
+            return "Your Saros version ("
+                + versionManager.getVersion().toString()
+                + ") is too old, please check for updates! Your peer has a newer version: "
+                + remoteVersionInfo.version
+                + "\nProceeding with incompatible versions may cause malfunctions!\n\nDo you want to invite "
+                + rqPeerJID.getBase() + " anyway?";
+        default:
+            log.warn("Warning message requested when no warning is in place!",
+                new StackTrace());
+            // No warning to display
+            return null;
+
         }
     }
 }

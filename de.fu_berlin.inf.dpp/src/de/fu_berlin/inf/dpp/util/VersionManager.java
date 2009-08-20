@@ -97,7 +97,34 @@ public class VersionManager {
      * {@link Version#equals(Object)} to each other.
      */
     public static Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+
+    /**
+     * Initialize the compatibility map.
+     * 
+     * For each version, all older versions that are compatible should be added
+     * in order of release date.
+     * 
+     * For the first version which is too old the commit which broke
+     * compatibility should be listed.
+     */
     static {
+
+        /**
+         * <Add new version here>
+         */
+
+        /**
+         * Version 9.8.21
+         */
+        compatibilityChart.put(new Version("9.8.21"), Arrays.asList(
+            new Version("9.8.21"), new Version("9.8.21.DEVEL")));
+
+        /**
+         * Version 9.8.21.DEVEL
+         * 
+         * No longer compatible with 9.7.31 since r.1576 changed serialization
+         * of Activities
+         */
         compatibilityChart.put(new Version("9.8.21.DEVEL"), Arrays
             .asList(new Version("9.8.21.DEVEL")));
     }
@@ -132,20 +159,21 @@ public class VersionManager {
                 @SuppressWarnings("unchecked")
                 XStreamIQPacket<VersionInfo> iq = (XStreamIQPacket<VersionInfo>) packet;
 
-                if (iq.getType() == IQ.Type.GET) {
-                    VersionInfo remote = iq.getPayload();
+                if (iq.getType() != IQ.Type.GET)
+                    return;
 
-                    VersionInfo local = new VersionInfo();
-                    local.version = getVersion();
-                    local.compatibility = determineCompatbility(local.version,
-                        remote.version);
+                VersionInfo remote = iq.getPayload();
 
-                    IQ reply = versionProvider.createIQ(local);
-                    reply.setType(IQ.Type.RESULT);
-                    reply.setPacketID(iq.getPacketID());
-                    reply.setTo(iq.getFrom());
-                    saros.getConnection().sendPacket(reply);
-                }
+                VersionInfo local = new VersionInfo();
+                local.version = getVersion();
+                local.compatibility = determineCompatibility(local.version,
+                    remote.version);
+
+                IQ reply = versionProvider.createIQ(local);
+                reply.setType(IQ.Type.RESULT);
+                reply.setPacketID(iq.getPacketID());
+                reply.setTo(iq.getFrom());
+                saros.getConnection().sendPacket(reply);
             }
         }, versionProvider.getIQFilter());
     }
@@ -162,11 +190,13 @@ public class VersionManager {
      * whether his version is compatible with ours. We must then check by
      * ourselves.
      * 
-     * @blocking If the request times out (5s) or an error occurs null is
+     * @blocking If the request times out (7,5s) or an error occurs null is
      *           returned.
      */
     public VersionInfo queryVersion(JID rqJID) {
-        return transmitter.sendQuery(rqJID, versionProvider, 5000);
+        VersionInfo versionInfo = new VersionInfo();
+        versionInfo.version = getVersion();
+        return transmitter.sendQuery(rqJID, versionProvider, versionInfo, 7500);
     }
 
     /**
@@ -181,18 +211,18 @@ public class VersionManager {
      * indicates whether the localVersion passed first is compatible with the
      * remoteVersion.
      */
-    public Compatibility determineCompatbility(Version localVersion,
+    public Compatibility determineCompatibility(Version localVersion,
         Version remoteVersion) {
 
         // If localVersion is older than remote version, then we cannot know
         // whether we are compatible
-        if (localVersion.compareTo(remoteVersion) < 0) {
+        if (localVersion.compareTo(remoteVersion) < 0)
             return Compatibility.TOO_OLD;
-        }
+
         List<Version> compatibleVersions = compatibilityChart.get(localVersion);
         if (compatibleVersions == null) {
-            log.error("VersionManager does not know about current version:"
-                + localVersion);
+            log.error("VersionManager does not know about current version."
+                + " The release manager must have slept:" + localVersion);
 
             // Fallback to comparing versions directly
             return Compatibility.valueOf(localVersion.compareTo(remoteVersion));
@@ -205,14 +235,74 @@ public class VersionManager {
     }
 
     /**
+     * If the remote version is newer than the local one, the remote
+     * compatibility comparison result will be returned.
+     * 
+     * @return A {@link VersionInfo} object with the remote
+     *         {@link VersionInfo#version} and {@link VersionInfo#compatibility}
+     *         info or <code>null</code> if could not get version information
+     *         from the peer (this probably means the other person is TOO_OLD)
+     * 
+     *         The return value describes whether the local version is
+     *         compatible with the peer's one (e.g.
+     *         {@link Compatibility#TOO_OLD} means that the local version is too
+     *         old)
+     * 
+     * @blocking This method may take some time (up to 7,5s) if the peer is not
+     *           responding.
+     */
+    public VersionInfo determineCompatibility(JID peer) {
+
+        VersionInfo remoteVersionInfo = queryVersion(peer);
+
+        /*
+         * FIXME Our caller should be able to distinguish whether the query
+         * failed or it is an IM client which sends back the message
+         */
+
+        if (remoteVersionInfo == null)
+            return null; // No answer from peer
+
+        if (remoteVersionInfo.compatibility == null)
+            return null; /*
+                          * Peer does not understand our query and just sends it
+                          * back to us. IMs like Pidgin do this.
+                          */
+
+        VersionInfo result = new VersionInfo();
+        result.version = remoteVersionInfo.version;
+
+        Compatibility localComp = determineCompatibility(getVersion(),
+            remoteVersionInfo.version);
+        Compatibility remoteComp = remoteVersionInfo.compatibility;
+
+        if (localComp == Compatibility.TOO_OLD) {
+            // Our version is older than the peer's one, let's trust his info
+            if (remoteComp == Compatibility.OK) {
+                // only if he tell's us that it is okay, return OK
+                result.compatibility = Compatibility.OK;
+            } else {
+                // otherwise we are too old
+                result.compatibility = Compatibility.TOO_OLD;
+            }
+        } else {
+            // We are newer, thus we can just use our compatibility result
+            result.compatibility = localComp;
+        }
+        return result;
+    }
+
+    /**
      * Given the bundle version string of a remote Saros instance, will return
      * whether the local version is compatible with the given instance.
+     * 
+     * @blocking This is a long running operation
      */
     public Compatibility determineCompatibility(String remoteVersionString) {
 
         Version remoteVersion = Util.parseBundleVersion(remoteVersionString);
         Version localVersion = Util.getBundleVersion(bundle);
 
-        return determineCompatbility(localVersion, remoteVersion);
+        return determineCompatibility(localVersion, remoteVersion);
     }
 }
