@@ -33,6 +33,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
@@ -108,7 +109,7 @@ public class JoinSessionWizard extends Wizard {
              */
             pageChanges++;
             if (!requestHostFileList()) {
-                getShell().forceActive();
+                EditorAPI.getShell().forceActive();
                 return null;
             }
             getShell().forceActive();
