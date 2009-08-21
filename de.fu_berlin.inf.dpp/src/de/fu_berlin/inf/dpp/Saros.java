@@ -555,7 +555,7 @@ public class Saros extends AbstractUIPlugin {
                  * FIXME Provide a unique thread context in which all
                  * connecting/disconnecting is done.
                  */
-                Util.runSafeSyncFork(log, new Runnable() {
+                Util.runSafeAsync(log, new Runnable() {
                     public void run() {
                         disconnect();
                     }

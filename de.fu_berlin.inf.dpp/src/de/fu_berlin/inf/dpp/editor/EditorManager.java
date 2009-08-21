@@ -987,17 +987,18 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         if (editorPool.isManaged(editor)) {
 
-            IPath path = editorPool.remove(editor, sharedProject.getProject());
-
+            // Pretend as if the editor was closed locally (but use the old part
+            // before the move happened) and then simulate it being opened again
+            IPath path = editorPool.getCurrentPath(editor, sharedProject
+                .getProject());
             if (path == null) {
                 log.warn("Editor was managed but path could not be found: "
                     + editor);
             } else {
-                fireActivity(new EditorActivity(sharedProject.getLocalUser()
-                    .getJID().toString(), Type.Closed, path));
+                partClosedOfPath(editor, path);
             }
 
-            partActivated(editor);
+            partOpened(editor);
         }
     }
 
@@ -1013,6 +1014,11 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
 
         IPath path = editorAPI.getEditorPath(editorPart);
+
+        partClosedOfPath(editorPart, path);
+    }
+
+    protected void partClosedOfPath(IEditorPart editorPart, IPath path) {
 
         // if closing the followed editor, leave follow mode
         if (getFollowedUser() != null) {
@@ -1179,16 +1185,16 @@ public class EditorManager implements IActivityProvider, Disposable {
     protected void resetText(IFile file) {
 
         wpLog.trace("EditorManager.resetText(" + file.getName() + ") invoked.");
-        if (!file.exists()) {
-            log.warn("EditorManager.resetText :" + file.getName()
-                + "does not exist. Exit.");
-            return;
-        }
-
         if (isConnected(file)) {
-            FileEditorInput input = new FileEditorInput(file);
-            IDocumentProvider provider = getDocumentProvider(input);
-            provider.disconnect(input);
+
+            if (file.exists()) {
+                FileEditorInput input = new FileEditorInput(file);
+                IDocumentProvider provider = getDocumentProvider(input);
+                provider.disconnect(input);
+            } else {
+                log.warn("Could not disconnect from file,"
+                    + " because it no longer exists: " + file.getName());
+            }
             this.connectedFiles.remove(file);
             wpLog.trace("EditorManager.resetText file " + file.getName()
                 + " disconnencted.");
@@ -1366,7 +1372,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             + " will be reseted");
         /**
          * resetText leads to disconnecting the document from its provider.
-         * disconnecting document of the driver (after resolving inconsitency)
+         * disconnecting document of the driver (after resolving inconsistency)
          * makes saving impossible
          * 
          */

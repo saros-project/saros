@@ -81,7 +81,10 @@ public class LeaveSessionAction extends Action {
 
         ISharedProject sharedProject = sessionManager.getSharedProject();
 
-        assert sharedProject != null;
+        if (sharedProject == null) {
+            log.warn("ISharedProject does no longer exist!");
+            return;
+        }
 
         boolean reallyLeave;
 

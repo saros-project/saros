@@ -132,6 +132,37 @@ class EditorPool {
             .currentTimeMillis());
     }
 
+    public IPath getCurrentPath(IEditorPart editorPart, IProject project) {
+
+        IEditorInput input = editorInputMap.get(editorPart);
+        if (input == null) {
+            EditorManager.log
+                .warn("EditorPart was never added to the EditorPool: "
+                    + editorPart.getTitle());
+            return null;
+        }
+
+        IFile file = ResourceUtil.getFile(input);
+        if (file == null) {
+            EditorManager.log.warn("Could not find file for editor input "
+                + editorPart.getTitle());
+            return null;
+        }
+
+        if (!ObjectUtils.equals(file.getProject(), project)) {
+            EditorManager.log.warn("File is from incorrect project: "
+                + file.getProject() + " should be " + project + ": " + file,
+                new StackTrace());
+        }
+
+        IPath path = file.getProjectRelativePath();
+        if (path == null) {
+            EditorManager.log.warn("Could not find path for editor "
+                + editorPart.getTitle());
+        }
+        return path;
+    }
+
     /**
      * Tries to remove an {@link IEditorPart} from {@link EditorPool}. This
      * Method also disconnects the editorPart from its data source (identified

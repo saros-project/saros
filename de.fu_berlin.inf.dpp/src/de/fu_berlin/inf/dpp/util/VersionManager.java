@@ -114,10 +114,10 @@ public class VersionManager {
          */
 
         /**
-         * Version 9.8.21
+         * Version 9.8.21.r1660
          */
-        compatibilityChart.put(new Version("9.8.21"), Arrays.asList(
-            new Version("9.8.21"), new Version("9.8.21.DEVEL")));
+        compatibilityChart.put(new Version("9.8.21.r1660"), Arrays.asList(
+            new Version("9.8.21.r1660"), new Version("9.8.21.DEVEL")));
 
         /**
          * Version 9.8.21.DEVEL
