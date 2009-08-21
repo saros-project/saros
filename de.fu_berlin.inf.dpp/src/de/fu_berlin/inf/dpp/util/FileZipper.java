@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.util;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.concurrent.CancellationException;
@@ -15,7 +15,9 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 
@@ -77,7 +79,7 @@ public class FileZipper {
         ZipOutputStream zipStream = new ZipOutputStream(outputStream);
 
         for (IPath path : files) {
-            File file = project.getFile(path).getLocation().toFile();
+            IFile file = project.getFile(path);
 
             try {
                 zipSingleFile(file, path.toPortableString(), zipStream,
@@ -130,7 +132,7 @@ public class FileZipper {
      * @throws IllegalArgumentException
      *             if the list of files is empty. The archive is then deleted.
      */
-    public static void zipFiles(List<File> files, File archive,
+    public static void zipFiles(List<IFile> files, File archive,
         SubMonitor progress) throws IOException {
         try {
             if (files.isEmpty()) {
@@ -145,7 +147,7 @@ public class FileZipper {
             ZipOutputStream zipStream = new ZipOutputStream(outputStream);
             int filesZipped = 0;
 
-            for (File file : files) {
+            for (IFile file : files) {
                 try {
                     zipSingleFile(file, file.getName(), zipStream, progress
                         .newChild(1));
@@ -183,8 +185,9 @@ public class FileZipper {
      * @throws IllegalArgumentException
      *             if the file was a directory or didn't exist
      */
-    protected static void zipSingleFile(File file, String filename,
+    protected static void zipSingleFile(IFile file, String filename,
         ZipOutputStream zipStream, SubMonitor progress) throws IOException {
+
         try {
 
             if (progress.isCanceled()) {
@@ -194,22 +197,34 @@ public class FileZipper {
             progress.beginTask("Compressing: " + filename, 1);
             log.debug("Compress file: " + filename);
 
-            if (file.isDirectory()) {
-                throw new IllegalArgumentException(
-                    "Zipping directories is not supported: " + filename);
-            }
-
-            if (file.exists()) {
-                zipStream.putNextEntry(new ZipEntry(filename));
-                IOUtils.copy(new FileInputStream(file), zipStream);
-                zipStream.closeEntry();
-            } else {
+            if (!file.exists()) {
                 throw new IllegalArgumentException(
                     "The file to zip does not exist: " + filename);
             }
 
+            zipStream.putNextEntry(new ZipEntry(filename));
+            writeFileToStream(file, filename, zipStream);
+            zipStream.closeEntry();
+
         } finally {
             progress.done();
+        }
+    }
+
+    public static void writeFileToStream(IFile file, String filename,
+        ZipOutputStream zipStream) throws CausedIOException, IOException {
+        InputStream in;
+        try {
+            in = file.getContents();
+        } catch (CoreException e) {
+            throw new CausedIOException("Could not obtain InputStream for "
+                + filename, e);
+        }
+
+        try {
+            IOUtils.copy(in, zipStream);
+        } finally {
+            IOUtils.closeQuietly(in);
         }
     }
 }
