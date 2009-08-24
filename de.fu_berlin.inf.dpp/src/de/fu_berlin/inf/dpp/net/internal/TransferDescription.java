@@ -28,7 +28,11 @@ import de.fu_berlin.inf.dpp.util.CausedIOException;
  */
 public class TransferDescription implements Serializable {
 
-    private static final long serialVersionUID = -4063208452619555716L;
+    private static final long serialVersionUID = -3775431613174873948L;
+
+    protected TransferDescription() {
+        // prevent access to this class except through helper methods
+    }
 
     /**
      * File extensions which we take to be already compressed so that Saros does
@@ -161,7 +165,7 @@ public class TransferDescription implements Serializable {
         result.sender = sender;
         result.type = FileTransferType.ACTIVITY_TRANSFER;
         result.sessionID = sessionID;
-        result.compressed = true; // Already GZIPPED
+        result.compressed = false;
 
         return result;
     }
@@ -174,12 +178,12 @@ public class TransferDescription implements Serializable {
         try {
             object = new ObjectOutputStream(os);
             object.writeObject(this);
+            object.close();
+            os.close();
         } catch (IOException e) {
             // should not happen
-            throw new RuntimeException("Could not serialize");
-        } finally {
-            IOUtils.closeQuietly(object);
-            IOUtils.closeQuietly(os);
+            throw new RuntimeException(
+                "Could not serialize: ObjectOutputStream failed");
         }
 
         byte[] bytes64 = Base64.encodeBase64(os.toByteArray());
@@ -187,7 +191,9 @@ public class TransferDescription implements Serializable {
         try {
             return new String(bytes64, "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            return new String(bytes64);
+            // should not happen
+            throw new RuntimeException(
+                "Could not serialize: UTF-8 not available");
         }
     }
 

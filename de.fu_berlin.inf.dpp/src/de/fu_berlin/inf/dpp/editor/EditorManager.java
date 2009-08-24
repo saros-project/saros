@@ -74,6 +74,7 @@ import de.fu_berlin.inf.dpp.editor.annotations.ViewportAnnotation;
 import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
+import de.fu_berlin.inf.dpp.editor.internal.RevertBufferListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -320,6 +321,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected ISessionListener sessionListener = new AbstractSessionListener() {
 
+        protected RevertBufferListener buffListener;
+
         @Override
         public void sessionStarted(ISharedProject project) {
             sharedProject = project;
@@ -357,6 +360,11 @@ public class EditorManager implements IActivityProvider, Disposable {
                     if (activeEditor != null) {
                         partActivated(activeEditor);
                     }
+
+                    // register bufferManager and initialize user's role in
+                    // session
+                    buffListener = new RevertBufferListener(EditorManager.this,
+                        sharedProject);
                 }
             });
         }
@@ -385,6 +393,10 @@ public class EditorManager implements IActivityProvider, Disposable {
 
                     sharedProject.removeListener(sharedProjectListener);
                     sharedProject.removeActivityProvider(EditorManager.this);
+
+                    if (buffListener != null)
+                        buffListener.dispose();
+
                     sharedProject = null;
                     lastEditTimes.clear();
                     lastRemoteEditTimes.clear();
@@ -423,6 +435,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         stopManager.addBlockable(stopManagerListener);
         this.stopManager = stopManager;
+
     }
 
     public boolean isConnected(IFile file) {
@@ -1709,4 +1722,53 @@ public class EditorManager implements IActivityProvider, Disposable {
     public void dispose() {
         stopManager.removeBlockable(stopManagerListener);
     }
+
+    /**
+     * Triggers a "Document Revert" by other session participants. This happens
+     * when a driver rejected changes in file buffer (e.g. "Close editor"+
+     * "Do NOT save"). This method gets invoked, only when the user is a driver.
+     * It sends to other session participants two activities which revert their
+     * documents:
+     * <ul>
+     * <li>TextEdit - replaces content of the document with new (reverted)
+     * content</li>
+     * <li>EditorAcitvity(Type.Saved) - saves the reverted document</li>
+     * </ul>
+     * 
+     * @param path
+     *            path of the document which was reverted
+     * @param newContent
+     *            new content of the document (after it was reverted)
+     * @param oldContent
+     *            old content of the document (before reverting)
+     */
+    public void triggerRevert(IPath path, String newContent, String oldContent) {
+
+        wpLog.trace(".triggerRevert invoked");
+        wpLog.trace(".triggerRevert File: " + path.toOSString());
+
+        String source = sharedProject.getLocalUser().getJID().toString();
+        int offset = 0;
+
+        /**
+         * TODO We should warn the user if he is reverting changes by other
+         * drivers
+         * 
+         * TODO If the UndoManager knows which changes were ours, we could
+         * revert just those
+         */
+        IActivity textEditActivity = new TextEditActivity(source, offset,
+            newContent, oldContent, path);
+
+        IActivity saveActivity = new EditorActivity(source, Type.Saved, path);
+
+        fireActivity(textEditActivity);
+        fireActivity(saveActivity);
+
+    }
+
+    public Set<IPath> getRemoteOpenEditors() {
+        return remoteEditorManager.getRemoteOpenEditors();
+    }
+
 }

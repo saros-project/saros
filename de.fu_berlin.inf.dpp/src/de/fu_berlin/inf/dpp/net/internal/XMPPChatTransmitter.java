@@ -19,7 +19,6 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -34,10 +33,8 @@ import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -310,15 +307,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                     .createActivityTransferDescription(recipient, new JID(
                         connection.getUser()), sID);
 
-                // TODO Move to Utils and/or switch to Util.deflate/inflate
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                GZIPOutputStream gos = new GZIPOutputStream(bos);
-                IOUtils.write(data, gos);
-                gos.finish();
-                IOUtils.closeQuietly(gos);
-
-                dataManager.sendData(transferData, bos.toByteArray(),
-                    SubMonitor.convert(new NullProgressMonitor()));
+                dataManager.sendData(transferData, data, SubMonitor
+                    .convert(new NullProgressMonitor()));
             } catch (IOException e) {
                 log.error("Failed to sent activities:" + timedActivities, e);
                 return;

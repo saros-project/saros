@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -743,7 +742,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             final TimedActivities content;
             try {
                 content = activitiesProvider.parseString(IOUtils.toString(
-                    new GZIPInputStream(input), "UTF-8"));
+                    input, "UTF-8"));
             } catch (IOException e) {
                 log.error("Could not parse incoming activity:", e);
                 return true;

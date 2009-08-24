@@ -221,4 +221,5 @@ Export-Package: de.fu_berlin.inf.dpp;
  org.xmlpull.v1;x-friends:="de.fu_berlin.inf.dpp.test"
 Bundle-Vendor: FU-Berlin
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.eclipse.core.net.proxy
+Import-Package: org.eclipse.core.filesystem,
+ org.eclipse.core.net.proxy
