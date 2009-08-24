@@ -529,6 +529,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 + Util.throughput(content.length, delta) + ": " + transferData);
             return connectionType;
         } catch (IOException e) {
+            close();
             throw new JingleSessionException(prefix() + "Failed to send files");
         } finally {
             progress.done();
