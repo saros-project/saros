@@ -114,6 +114,15 @@ public class VersionManager {
          */
 
         /**
+         * Version 9.9.11.DEVEL
+         * 
+         * No longer compatible with 9.8.21 since r.1665 changed compression of
+         * Activities
+         */
+        compatibilityChart.put(new Version("9.9.11.DEVEL"), Arrays
+            .asList(new Version("9.9.11.DEVEL")));
+
+        /**
          * Version 9.8.21.r1660
          */
         compatibilityChart.put(new Version("9.8.21.r1660"), Arrays.asList(
