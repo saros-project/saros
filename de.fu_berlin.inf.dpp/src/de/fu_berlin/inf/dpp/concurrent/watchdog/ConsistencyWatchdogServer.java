@@ -131,14 +131,35 @@ public class ConsistencyWatchdogServer extends Job {
 
         Set<IPath> missingDocuments = new HashSet<IPath>(docsChecksums.keySet());
 
+        Set<IPath> localEditors = editorManager.getLocallyOpenEditors();
+        Set<IPath> remoteEditors = editorManager.getRemoteOpenEditors();
+        Set<IPath> allEditors = new HashSet<IPath>();
+        allEditors.addAll(localEditors);
+        allEditors.addAll(remoteEditors);
+
         // Update Checksums for all open documents
-        for (IPath docPath : editorManager.getOpenEditorsOfAllParticipants()) {
+        for (IPath docPath : allEditors) {
 
             if (monitor.isCanceled())
                 return Status.CANCEL_STATUS;
 
-            // Get document (which might be null if file does not exist)
             IDocument doc = editorManager.getDocument(docPath);
+
+            // Null means that the document does not exist locally
+            if (doc == null) {
+                if (localEditors.contains(docPath)) {
+                    log.error("EditorManager is in an inconsistent state. "
+                        + "It is reporting a locally open editor but no"
+                        + " document could be found on disk: " + docPath);
+                }
+                if (!remoteEditors.contains(docPath)) {
+                    /*
+                     * Since remote users do not report this document as open,
+                     * they are right (and our EditorPool might be confused)
+                     */
+                    continue;
+                }
+            }
 
             // Update listener management
             missingDocuments.remove(docPath);
