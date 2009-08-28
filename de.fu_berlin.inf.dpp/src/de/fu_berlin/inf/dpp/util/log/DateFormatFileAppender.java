@@ -36,21 +36,31 @@ public class DateFormatFileAppender extends FileAppender {
     public synchronized void setFile(String fileName, boolean append,
         boolean bufferedIO, int bufferSize) throws IOException {
 
-        // directory of the Eclipse log
-        String directory = Platform.getLogFileLocation().toFile().getParent();
-        /*
-         * Make a back-up copy of the fileName, because it will be changed by us
-         * and could not be reused.
-         */
-        if (this.fileBackup == null) {
-            this.fileBackup = fileName;
+        String actualFileName = fileName;
+        try {
+            // directory of the Eclipse log
+            String directory = Platform.getLogFileLocation().toFile()
+                .getParent();
+
+            /*
+             * Make a back-up copy of the fileName, because it will be changed
+             * by us and could not be reused.
+             */
+            if (this.fileBackup == null) {
+                this.fileBackup = fileName;
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat(fileBackup);
+            actualFileName = directory + File.separator
+                + sdf.format(new Date());
+            if (!Util.mkdirs(actualFileName)) {
+                LogLog.error("Could not create dirs for " + actualFileName);
+            }
+
+        } catch (NullPointerException e) {
+            LogLog
+                .error("Eclipse is not initialized to be used by DateFormatFileAppender");
         }
-        SimpleDateFormat sdf = new SimpleDateFormat(fileBackup);
-        String actualFileName = directory + File.separator
-            + sdf.format(new Date());
-        if (!Util.mkdirs(actualFileName)) {
-            LogLog.error("Could not create dirs for " + actualFileName);
-        }
+
         super.setFile(actualFileName, append, bufferedIO, bufferSize);
     }
 }
