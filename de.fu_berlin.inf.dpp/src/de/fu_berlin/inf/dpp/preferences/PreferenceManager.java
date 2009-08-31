@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 /**
  * The Preference Manager is responsible for
  * 
- * a.) disabling dangerous preferences on the host or client before a
+ * a.) changing dangerous preferences on the host or client before a
  * SharedProject session is started
  * 
  * b.) restoring the preference after the end of the session
@@ -40,27 +40,27 @@ public class PreferenceManager {
         if (jdtFacade.isJDTAvailable()) {
             manipulators.addAll(jdtFacade.getPreferenceManipulators());
         }
+        manipulators.add(new LineDelimiterManipulator());
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
 
             @Override
             public void sessionStarted(ISharedProject session) {
 
-                // TODO The user should be told that we are disabling options...
+                // TODO The user should be told that we are changing options...
                 IProject project = session.getProject();
                 if (session.isHost()) {
-
                     for (IPreferenceManipulator manipulator : manipulators) {
                         if (manipulator.isDangerousForHost()
                             && manipulator.isEnabled(project)) {
-                            restorePoints.add(manipulator.disable(project));
+                            restorePoints.add(manipulator.change(project));
                         }
                     }
                 } else {
                     for (IPreferenceManipulator manipulator : manipulators) {
                         if (manipulator.isDangerousForClient()
                             && manipulator.isEnabled(project)) {
-                            restorePoints.add(manipulator.disable(project));
+                            restorePoints.add(manipulator.change(project));
                         }
                     }
                 }

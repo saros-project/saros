@@ -342,58 +342,52 @@ public class EditorAPI implements IEditorAPI {
             IEditorInput input = textEditor.getEditorInput();
             IAnnotationModel model = docProvider.getAnnotationModel(input);
 
-            if (model != null) {
+            if (model == null) {
+                return;
+            }
+            if (selection.isEmpty()) {
+                setSelectionAnnotation(source, model, null, null);
+                return;
+            }
 
-                if (selection.isEmpty()) {
-                    setSelectionAnnotation(source, model, null, null);
-                    return;
-                }
+            if (following) {
+                reveal(editorPart, selection);
+            }
+            /*
+             * If the selection's length is 0 it will be displayed as a cursor.
+             * It is moved one character to the left if the offset is at the end
+             * of the line but not already at the start of the line. So the
+             * cursor is not displayed in completely empty lines. :-(
+             */
+            int offset = selection.getOffset();
+            int length = selection.getLength();
+            boolean isCursor = length == 0;
 
-                if (following) {
-                    reveal(editorPart, selection);
-                }
-
-                // If the selection's length is 0 it will be displayed as a
-                // cursor. It is moved one character to the left if the offset
-                // is at the end of the line but not already at the start of the
-                // line.
-                // So the cursor is not displayed in completely empty lines. :-(
-                int offset = selection.getOffset();
-                int length = selection.getLength();
-                boolean isCursor = length == 0;
-
-                // Adjust for cases in which the cursor is at the end of a line
-                if (isCursor) {
-                    IDocument document = docProvider.getDocument(input);
-                    if (document == null) {
-                        // try with length == 1 maybe it works...
-                        length = 1;
-                    } else {
-                        int n = document.getLength();
-                        if (n == 0) {
-                            // document has no chars -> cannot adjust anything
-                        } else {
-                            if (offset == n) {
-                                // we are at the end of the document
-                                if (!isLineEnd(document, offset - 1)) {
-                                    length = 1;
-                                    offset--;
-                                }
-                            } else {
-                                // We are inside the document
-                                length = 1;
-                                if (offset > 0 && isLineEnd(document, offset)
-                                    && !isLineEnd(document, offset - 1)) {
-                                    offset--;
-                                }
-                            }
+            // Adjust for cases in which the cursor is at the end of a line.
+            if (isCursor) {
+                IDocument document = docProvider.getDocument(input);
+                if (document != null && document.getLength() != 0) {
+                    /*
+                     * If line not empty and offset at line end then move cursor
+                     * one position to the left.
+                     */
+                    try {
+                        IRegion lineInfo = document
+                            .getLineInformationOfOffset(offset);
+                        int lineLength = lineInfo.getLength();
+                        if (lineLength != 0
+                            && offset == (lineInfo.getOffset() + lineLength)) {
+                            length = 1;
+                            offset--;
                         }
+                    } catch (BadLocationException e) {
+                        // Ignored intentionally.
                     }
                 }
-
-                setSelectionAnnotation(source, model, new SelectionAnnotation(
-                    source, isCursor), new Position(offset, length));
             }
+
+            setSelectionAnnotation(source, model, new SelectionAnnotation(
+                source, isCursor), new Position(offset, length));
         }
     }
 
@@ -438,33 +432,6 @@ public class EditorAPI implements IEditorAPI {
 
         if (newAnnotation != null)
             model.addAnnotation(newAnnotation, position);
-    }
-
-    /**
-     * Check if there is a line end in a {@link IDocument} at a given offset.
-     * 
-     * If the offset is not within the document
-     * 
-     * 0 <= offset <= document.getLength()
-     * 
-     * then the method returns <code>false</code>.
-     * 
-     * The method returns true for offset == document.getLength()
-     * 
-     * @return <code>true</code> if there is a line end at the given offset in
-     *         the given document, <code>false</code> otherwise.
-     */
-    protected boolean isLineEnd(IDocument document, int offset) {
-
-        if (document.getLength() == offset)
-            return true;
-
-        try {
-            char character = document.getChar(offset);
-            return character == '\n' || character == '\r';
-        } catch (BadLocationException e) {
-            return false;
-        }
     }
 
     public static int getLine(ITextViewerExtension5 viewer, int offset) {

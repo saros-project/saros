@@ -39,7 +39,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IDocumentExtension4;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.text.source.Annotation;
@@ -467,24 +466,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
             connectedFiles.add(file);
 
-            IDocument document = documentProvider.getDocument(input);
-
             wpLog.trace("EditorManager.connect: IDocument loaded");
-
-            // if line delimiters are not in unix style convert them
-            if (document instanceof IDocumentExtension4) {
-
-                if (!((IDocumentExtension4) document).getDefaultLineDelimiter()
-                    .equals("\n")) {
-
-                    // TODO fails if editorPart is not using a IFileEditorInput
-                    EditorUtils.convertLineDelimiters(file);
-                }
-                ((IDocumentExtension4) document).setInitialLineDelimiter("\n");
-            } else {
-                EditorManager.log
-                    .error("Can't discover line delimiter of document");
-            }
         }
     }
 

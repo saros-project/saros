@@ -52,6 +52,9 @@ public class EditorUtils {
         }
     }
 
+    /**
+     * TODO Unused since 2009-08-26.
+     */
     public static void convertLineDelimiters(IFile file) {
 
         EditorManager.log.debug("Converting line delimiters...");

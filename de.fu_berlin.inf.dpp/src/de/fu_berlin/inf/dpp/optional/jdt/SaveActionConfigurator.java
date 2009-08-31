@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.util.StateChangeNotifier;
  * 
  * - Methods for disabling SaveActions and restoring them.
  * 
- * - TODO Provide method for montoring SaveActions enabled state.
+ * - TODO Provide method for monitoring SaveActions enabled state.
  * 
  * Important classes for this are:
  * 
@@ -56,7 +56,7 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
             .getEnabledPostSaveListeners(project).length > 0;
     }
 
-    public String getSaveActionPreferenceKey() {
+    protected String getSaveActionPreferenceKey() {
 
         // Copied from AbstractSaveParticipantPreferenceConfiguration because
         // the field is private
@@ -68,7 +68,7 @@ public class SaveActionConfigurator implements IPreferenceManipulator {
         return EDITOR_SAVE_PARTICIPANT_PREFIX + POSTSAVELISTENER_ID;
     }
 
-    public IRestorePoint disable(final IProject project) {
+    public IRestorePoint change(final IProject project) {
 
         IEclipsePreferences prefs = new ProjectScope(project)
             .getNode(JavaUI.ID_PLUGIN);

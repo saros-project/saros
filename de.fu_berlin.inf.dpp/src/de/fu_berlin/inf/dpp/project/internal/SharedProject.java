@@ -104,12 +104,14 @@ public class SharedProject implements ISharedProject, Disposable {
         }
     };
 
+    /**
+     * Common constructor code for host and client side.
+     */
     protected SharedProject(Saros saros, ITransmitter transmitter,
         DataTransferManager transferManager, IProject project,
         StopManager stopManager, JID myJID, int myColorID) {
 
         assert transmitter != null;
-
         assert myJID != null;
 
         this.saros = saros;
