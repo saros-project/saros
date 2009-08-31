@@ -8,7 +8,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -107,8 +106,6 @@ public class LocalPresenceTracker {
             return;
         }
         active = newValue;
-
-        Packet packet = new Packet();
 
         Presence presence = new Presence(Presence.Type.available);
         if (active) {
