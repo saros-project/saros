@@ -129,6 +129,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
 import de.fu_berlin.inf.dpp.project.internal.RoleManager;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.LocalPresenceTracker;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -366,6 +367,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JDTFacade.class);
         this.container.addComponent(JingleFileTransferManagerObservable.class);
+        this.container.addComponent(LocalPresenceTracker.class);
         this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);
         this.container.addComponent(PreferenceManager.class);
