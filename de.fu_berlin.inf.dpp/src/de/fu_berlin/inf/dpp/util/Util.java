@@ -929,12 +929,11 @@ public class Util {
      * given number of bytes in the given time in milliseconds.
      */
     public static String throughput(long length, long deltaMs) {
-
         if (deltaMs == 0) {
-            return " (" + (length / 1024L) + "kb in < 1 ms)";
+            return " (" + formatByte(length) + " in < 1 ms)";
         } else {
-            return " (" + (length / 1024L) + "kb in " + deltaMs + " ms at "
-                + (1000L * length / 1024L) / deltaMs + " kb/s)";
+            return " (" + formatByte(length) + " in " + deltaMs + " ms at "
+                + (1000L * length / 1024L) / deltaMs + " KiB/s)";
         }
     }
 
@@ -953,15 +952,15 @@ public class Util {
 
     /**
      * Turn an integer representing a file size into a human readable
-     * representation. For instance 573 becomes 573byte, 16787 becomes 16KB.
+     * representation. For instance 573 becomes 573byte, 16787 becomes 16KiB.
      */
     public static String formatByte(long length) {
         if (length < 1 << 13) {
             return length + "byte";
         }
         if (length < 1 << 23) {
-            return (length / 1024) + "KB";
+            return (length / 1024) + "KiB";
         }
-        return length / 1024 / 1024 + "MB";
+        return length / 1024 / 1024 + "MiB";
     }
 }

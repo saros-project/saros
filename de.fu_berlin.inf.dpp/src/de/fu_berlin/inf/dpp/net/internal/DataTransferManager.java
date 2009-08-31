@@ -251,8 +251,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             }
 
             log.debug("[IBB] Starting incoming file transfer: "
-                + data.toString() + ", size: " + request.getFileSize() / 1024
-                + "kbyte");
+                + data.toString() + ", size: "
+                + Util.formatByte(request.getFileSize()));
             long startTime = System.nanoTime();
 
             addIncomingFileTransfer(data);
@@ -303,7 +303,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             receiveData(data, new ByteArrayInputStream(content));
         }
-
     }
 
     private static final Logger log = Logger
