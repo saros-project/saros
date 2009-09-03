@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -129,6 +130,30 @@ public class StatisticManager extends AbstractFeedbackManager {
         return getStatisticSubmissionStatus() == STATISTIC_ALLOW;
     }
 
+    public boolean isPseudonymSubmissionAllowed() {
+
+        String result = saros.getPreferenceStore().getString(
+            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM);
+
+        if (result != null && result.trim().length() > 0) {
+            return saros.getPreferenceStore().getBoolean(
+                PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM);
+        }
+
+        return saros.getConfigPrefs().getBoolean(
+            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, false);
+    }
+
+    public void setPseudonymSubmissionAllowed(boolean isPseudonymAllowed) {
+        // store in configuration and preference scope
+        saros.getConfigPrefs().putBoolean(
+            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
+        saros.saveConfigPrefs();
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM, isPseudonymAllowed);
+
+    }
+
     /**
      * Returns whether the submission of statistic is allowed, forbidden or
      * unknown. The global preferences have priority but if the value wasn't
@@ -177,6 +202,42 @@ public class StatisticManager extends AbstractFeedbackManager {
         saros.saveConfigPrefs();
         saros.getPreferenceStore().setValue(
             PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, submission);
+    }
+
+    public void setStatisticsPseudonymID(String userID) {
+        // store in configuration and preference scope
+        saros.getConfigPrefs().put(PreferenceConstants.STATISTICS_PSEUDONYM_ID,
+            userID);
+        saros.saveConfigPrefs();
+        saros.getPreferenceStore().setValue(
+            PreferenceConstants.STATISTICS_PSEUDONYM_ID, userID);
+    }
+
+    /**
+     * The Statistics Pseudonym ID is a self-selected String the user set in the
+     * preferences which will be voluntarily transmitted as part of the
+     * statistics submission. Its intention is to let the Saros team identify a
+     * user uniquely.
+     * 
+     * The Statistics Pseudonym ID is completely orthogonal to the
+     * {@link #getUserID()} which is a randomly assigned ID and cannot not be
+     * modified by the user.
+     * 
+     * @return "" is returned if the user has not set a UserID on the
+     *         {@link FeedbackPreferencePage}
+     */
+    public String getStatisticsPseudonymID() {
+
+        // First look in the Preferences
+        String userID = saros.getPreferenceStore().getString(
+            PreferenceConstants.STATISTICS_PSEUDONYM_ID);
+
+        if (userID != null && userID.trim().length() > 0)
+            return userID;
+
+        // Fall back to the Configuration
+        return saros.getConfigPrefs().get(
+            PreferenceConstants.STATISTICS_PSEUDONYM_ID, "");
     }
 
     /**

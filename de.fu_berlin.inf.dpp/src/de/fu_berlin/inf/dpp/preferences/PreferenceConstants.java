@@ -93,4 +93,13 @@ public class PreferenceConstants {
 
     public static final String RANDOM_USER_ID = "user.id";
 
+    /**
+     * Preference used for a way to let the user identify himself.
+     * 
+     * For instance, this might get a value such as "coezbek" or "rdjemili".
+     */
+    public static final String STATISTICS_PSEUDONYM_ID = "STATISTICS_PSEUDONYM_ID";
+
+    public static final String STATISTIC_ALLOW_PSEUDONYM = "STATISTIC_ALLOW_PSEUDONYM";
+
 }

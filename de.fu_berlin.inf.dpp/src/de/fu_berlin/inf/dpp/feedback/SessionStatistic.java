@@ -14,6 +14,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -41,10 +43,35 @@ public class SessionStatistic {
     protected static final String KEY_FEEDBACK_INTERVAL = "feedback.survey.interval";
 
     protected static final String KEY_SESSION_COUNT = "session.count";
-    protected static final String KEY_SESSION_TIME = "session.time";
     protected static final String KEY_SESSION_TIME_USERS = "session.time.users";
     protected static final String KEY_SESSION_ID = "session.id";
     protected static final String KEY_SESSION_USERS_TOTAL = "session.users.total";
+
+    /**
+     * The duration of the session for the local user in minutes with two digits
+     * precision.
+     */
+    protected static final String KEY_SESSION_LOCAL_DURATION = "session.time";
+
+    /**
+     * ISO DateTime (UTC) of the time the session started for the local user.
+     * 
+     * This might not be equal to the start of the whole session, because the
+     * local user might not be host.
+     * 
+     * @since 9.9.11
+     */
+    protected static final String KEY_SESSION_LOCAL_START = "session.local.start";
+
+    /**
+     * ISO DateTime (UTC) of the time the session ended for the local user.
+     * 
+     * This might not be equal to the end of the whole session, because the
+     * local user might not be host.
+     * 
+     * @since 9.9.11
+     */
+    protected static final String KEY_SESSION_LOCAL_END = "session.local.end";
 
     protected static final String KEY_ROLE = "role";
     protected static final String KEY_ROLE_OBSERVER = "role.observer";
@@ -63,13 +90,23 @@ public class SessionStatistic {
 
     // Keys for DataTransferCollector
     protected static final String KEY_TRANSFER_STATS = "data_transfer";
-    protected static final Object TRANSFER_STATS_EVENT_SUFFIX = "number_of_events";
+    protected static final String TRANSFER_STATS_EVENT_SUFFIX = "number_of_events";
     // Total size in KB
-    protected static final Object TRANSFER_STATS_SIZE_SUFFIX = "total_size_kb";
+    protected static final String TRANSFER_STATS_SIZE_SUFFIX = "total_size_kb";
     // Total size for transfers in milliseconds
-    protected static final Object TRANSFER_STATS_TIME_SUFFIX = "total_time_ms";
+    protected static final String TRANSFER_STATS_TIME_SUFFIX = "total_time_ms";
     // Convenience value of total_size / total_time in KB/s
-    protected static final Object TRANSFER_STATS_THROUGHPUT_SUFFIX = "average_throughput_kbs";
+    protected static final String TRANSFER_STATS_THROUGHPUT_SUFFIX = "average_throughput_kbs";
+
+    /**
+     * A pseudonym set by the user in the preferences to identify himself. This
+     * can be used to track the randomly generated
+     * {@link SessionStatistic#KEY_USER_ID} to a "real" person if the user
+     * chooses to do so.
+     * 
+     * @since 9.9.11
+     */
+    protected static final String KEY_PSEUDONYM = "user.pseudonym";
 
     /**
      * This is the {@link Properties} object to hold our statistical data.
@@ -231,12 +268,12 @@ public class SessionStatistic {
         data.setProperty(KEY_SESSION_COUNT, String.valueOf(count));
     }
 
-    public double getSessionTime() {
-        return Double.parseDouble(data.getProperty(KEY_SESSION_TIME));
+    public double getLocalSessionDuration() {
+        return Double.parseDouble(data.getProperty(KEY_SESSION_LOCAL_DURATION));
     }
 
-    public void setSessionTime(double time) {
-        data.setProperty(KEY_SESSION_TIME, String.valueOf(time));
+    public void setLocalSessionDuration(double time) {
+        data.setProperty(KEY_SESSION_LOCAL_DURATION, String.valueOf(time));
     }
 
     /**
@@ -505,5 +542,19 @@ public class SessionStatistic {
             .valueOf(totalTransferTime));
         data.setProperty(appendToKey(key, TRANSFER_STATS_THROUGHPUT_SUFFIX),
             String.valueOf(Math.round(throughput * 10.0) / 10.0));
+    }
+
+    public void setPseudonym(String pseudonym) {
+        data.setProperty(KEY_PSEUDONYM, pseudonym);
+    }
+
+    public void setLocalSessionStartTime(DateTime localSessionStart) {
+        data.setProperty(KEY_SESSION_LOCAL_START, localSessionStart.toDateTime(
+            DateTimeZone.UTC).toString());
+    }
+
+    public void setLocalSessionEndTime(DateTime localSessionEnd) {
+        data.setProperty(KEY_SESSION_LOCAL_START, localSessionEnd.toDateTime(
+            DateTimeZone.UTC).toString());
     }
 }

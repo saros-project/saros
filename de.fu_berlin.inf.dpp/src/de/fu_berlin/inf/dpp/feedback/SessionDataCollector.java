@@ -1,5 +1,8 @@
 package de.fu_berlin.inf.dpp.feedback;
 
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -21,8 +24,8 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     protected Saros saros;
 
     protected String currentSessionID;
-    protected long sessionStart;
-    protected long sessionTime;
+    protected DateTime localSessionStart;
+    protected DateTime localSessionEnd;
     protected boolean isHost;
 
     public SessionDataCollector(StatisticManager statisticManager,
@@ -37,23 +40,35 @@ public class SessionDataCollector extends AbstractStatisticCollector {
     @Override
     protected void processGatheredData() {
         data.setSessionID(currentSessionID);
-        data.setSessionTime(StatisticManager.getTimeInMinutes(sessionTime));
+        data.setLocalSessionStartTime(localSessionStart);
+        data.setLocalSessionEndTime(localSessionEnd);
+        data.setLocalSessionDuration(StatisticManager
+            .getTimeInMinutes(new Duration(localSessionStart, localSessionEnd)
+                .getMillis()));
         data.setSessionCount(statisticManager.getSessionCount());
         data.setIsHost(isHost);
+
+        if (statisticManager.isPseudonymSubmissionAllowed()) {
+            String pseudonym = statisticManager.getStatisticsPseudonymID()
+                .trim();
+            if (pseudonym.length() > 0) {
+                data.setPseudonym(pseudonym);
+            }
+        }
 
         storeGeneralInfos();
     }
 
     @Override
     protected void doOnSessionEnd(ISharedProject project) {
-        sessionTime = System.currentTimeMillis() - sessionStart;
+        localSessionEnd = new DateTime();
         isHost = project.getLocalUser().isHost();
     }
 
     @Override
     protected void doOnSessionStart(ISharedProject project) {
         currentSessionID = sessionID.getValue();
-        sessionStart = System.currentTimeMillis();
+        localSessionStart = new DateTime();
     }
 
     /**

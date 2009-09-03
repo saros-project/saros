@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -21,6 +23,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.picocontainer.annotations.Inject;
@@ -58,11 +61,17 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected Button radioDisable;
     protected Button radioEnable;
     protected Button allowSubmission;
+    protected Button allowPseudonym;
     protected Combo intervalCombo;
+    protected Text statisticsPseudonymText;
+    protected Composite pseudonymityIDGroup;
+    protected Composite pseudonymityGroup;
 
     protected boolean isFeedbackDisabled;
     protected FeedbackInterval currentInterval;
     protected boolean isSubmissionAllowed;
+    protected String pseudonymID;
+    protected boolean isPseudonymAllowed;
 
     public FeedbackPreferencePage() {
         Saros.reinject(this);
@@ -79,6 +88,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
         int interval = feedbackManager.getSurveyInterval();
         currentInterval = FeedbackInterval.getFromInterval(interval);
         isSubmissionAllowed = statisticManager.isStatisticSubmissionAllowed();
+        isPseudonymAllowed = statisticManager.isPseudonymSubmissionAllowed();
+        pseudonymID = statisticManager.getStatisticsPseudonymID();
 
         initComponents();
     }
@@ -90,7 +101,35 @@ public class FeedbackPreferencePage extends PreferencePage implements
         intervalCombo.select(currentInterval.getIndex());
         setIntervalComboVisible();
 
+        statisticsPseudonymText.setText(pseudonymID);
+
         allowSubmission.setSelection(isSubmissionAllowed);
+        setSubmissionAllowed(isSubmissionAllowed);
+        allowPseudonym.setSelection(isPseudonymAllowed);
+        setPseudonymAllowed(isPseudonymAllowed);
+    }
+
+    /**
+     * Sets the combo box to enabled if the user enabled the feedback reminders
+     * or disabled otherwise.
+     */
+    protected void setIntervalComboVisible() {
+        if (intervalCombo == null)
+            return;
+        intervalCombo.setEnabled(!isFeedbackDisabled);
+    }
+
+    protected void setSubmissionAllowed(boolean allowed) {
+        isSubmissionAllowed = allowed;
+        allowPseudonym.setEnabled(isSubmissionAllowed);
+        statisticsPseudonymText.setEnabled(isSubmissionAllowed
+            && isPseudonymAllowed);
+    }
+
+    protected void setPseudonymAllowed(boolean isAllowed) {
+        isPseudonymAllowed = isAllowed;
+        statisticsPseudonymText.setEnabled(isSubmissionAllowed
+            && isPseudonymAllowed);
     }
 
     @Override
@@ -223,21 +262,25 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected void createStatisticGroup(Composite parent) {
         Group group = new Group(parent, SWT.NONE);
         group.setText(Messages.getString("feedback.page.group.statistic")); //$NON-NLS-1$
-        group.setLayout(new GridLayout(2, false));
+        group.setLayout(new GridLayout(1, false));
         group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-        allowSubmission = new Button(group, SWT.CHECK);
+        Composite row1 = new Composite(group, SWT.NONE);
+        row1.setLayout(new GridLayout(2, false));
+        row1.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        allowSubmission = new Button(row1, SWT.CHECK);
         allowSubmission.setText(Messages
             .getString("feedback.page.statistic.allow")); //$NON-NLS-1$
 
         allowSubmission.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                isSubmissionAllowed = allowSubmission.getSelection();
+                setSubmissionAllowed(allowSubmission.getSelection());
             }
         });
 
-        Button infoButton = new Button(group, SWT.PUSH);
+        Button infoButton = new Button(row1, SWT.PUSH);
         infoButton.setText(Messages.getString("feedback.page.button.more")); //$NON-NLS-1$
         infoButton.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true,
             false));
@@ -248,6 +291,42 @@ public class FeedbackPreferencePage extends PreferencePage implements
                 Util.openExternalBrowser(StatisticManager.INFO_URL);
             }
 
+        });
+
+        pseudonymityGroup = new Composite(group, SWT.NONE);
+        pseudonymityGroup.setLayout(new GridLayout(1, false));
+        pseudonymityGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+            true, false));
+
+        allowPseudonym = new Button(pseudonymityGroup, SWT.CHECK);
+        allowPseudonym.setText(Messages
+            .getString("feedback.page.statistic.pseudonym.allow")); //$NON-NLS-1$
+
+        allowPseudonym.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setPseudonymAllowed(allowPseudonym.getSelection());
+            }
+        });
+
+        pseudonymityIDGroup = new Composite(pseudonymityGroup, SWT.NONE);
+        pseudonymityIDGroup.setLayout(new GridLayout(2, false));
+        pseudonymityIDGroup.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
+            true, false));
+
+        Link label = new Link(pseudonymityIDGroup, SWT.NONE);
+        label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+        label.setText(Messages.getString("feedback.page.userid")); //$NON-NLS-1$
+        label.addListener(SWT.Selection, new LinkListener());
+
+        statisticsPseudonymText = new Text(pseudonymityIDGroup, SWT.SINGLE
+            | SWT.BORDER);
+        statisticsPseudonymText.setLayoutData(new GridData(SWT.FILL,
+            SWT.CENTER, true, false));
+        statisticsPseudonymText.addModifyListener(new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+                pseudonymID = statisticsPseudonymText.getText();
+            }
         });
     }
 
@@ -284,16 +363,6 @@ public class FeedbackPreferencePage extends PreferencePage implements
         label.setLayoutData(gd);
     }
 
-    /**
-     * Sets the combo box visible if the user enabled the feedback reminders or
-     * invisible otherwise.
-     */
-    protected void setIntervalComboVisible() {
-        if (intervalCombo == null)
-            return;
-        intervalCombo.setEnabled(!isFeedbackDisabled);
-    }
-
     @Override
     protected void performDefaults() {
         // get default values from PreferenceStore
@@ -301,8 +370,10 @@ public class FeedbackPreferencePage extends PreferencePage implements
             PreferenceConstants.FEEDBACK_SURVEY_DISABLED) != FeedbackManager.FEEDBACK_ENABLED;
         currentInterval = FeedbackInterval.getFromInterval(getPreferenceStore()
             .getDefaultInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL));
-        isSubmissionAllowed = getPreferenceStore().getDefaultInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == StatisticManager.STATISTIC_ALLOW;
+        setSubmissionAllowed(getPreferenceStore().getDefaultInt(
+            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == StatisticManager.STATISTIC_ALLOW);
+        setPseudonymAllowed(getPreferenceStore().getDefaultBoolean(
+            PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM));
 
         // initialize components with defaults
         initComponents();
@@ -311,10 +382,14 @@ public class FeedbackPreferencePage extends PreferencePage implements
 
     @Override
     public boolean performOk() {
+
         feedbackManager.setFeedbackDisabled(isFeedbackDisabled);
         feedbackManager.setSurveyInterval(currentInterval.getInterval());
 
         statisticManager.setStatisticSubmissionAllowed(isSubmissionAllowed);
+        statisticManager.setPseudonymSubmissionAllowed(isPseudonymAllowed);
+        statisticManager.setStatisticsPseudonymID(pseudonymID);
+
         return super.performOk();
     }
 

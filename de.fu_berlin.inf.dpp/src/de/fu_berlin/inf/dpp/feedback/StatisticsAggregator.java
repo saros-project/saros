@@ -17,7 +17,6 @@ import java.util.Map.Entry;
 import javax.swing.JFileChooser;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -56,6 +55,7 @@ public class StatisticsAggregator {
 
         File rootFolder = fc.getSelectedFile();
 
+        headers.add("filename");
         for (File item : listFiles(rootFolder, "txt")) {
 
             log.info("Processing " + item);
@@ -69,7 +69,6 @@ public class StatisticsAggregator {
 
             Map<String, String> values = new HashMap<String, String>();
             values.put("filename", item.getAbsolutePath());
-            headers.add("Filename");
             allData.add(values);
 
             for (Entry<Object, Object> b : data.entrySet()) {
@@ -87,8 +86,7 @@ public class StatisticsAggregator {
         Collections.sort(headersSorted);
 
         for (String header : headersSorted) {
-            sb.append('"').append(StringEscapeUtils.escapeJava(header)).append(
-                '"').append('\t');
+            sb.append(header.replaceAll("\\s", " ")).append('\t');
         }
         sb.append("\n");
 
@@ -96,9 +94,7 @@ public class StatisticsAggregator {
             for (String header : headersSorted) {
 
                 if (row.containsKey(header)) {
-                    sb.append('"').append(
-                        StringEscapeUtils.escapeJava(row.get(header))).append(
-                        '"');
+                    sb.append(row.get(header).replaceAll("\\s", " "));
 
                 }
                 sb.append('\t');
