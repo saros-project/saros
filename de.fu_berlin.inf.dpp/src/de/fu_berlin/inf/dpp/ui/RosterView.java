@@ -111,8 +111,6 @@ public class RosterView extends ViewPart {
 
     private Roster roster;
 
-    private XMPPConnection connection;
-
     /*
      * Actions
      */
@@ -194,6 +192,11 @@ public class RosterView extends ViewPart {
         dataTransferManager.getTransferModeDispatch().add(transferModeListener);
     }
 
+    /*
+     * TODO Maybe we could only update those elements that have been updated
+     * (but make sure that the given addresses have not structurally changed/new
+     * buddy groups)
+     */
     protected IRosterListener rosterListener = new IRosterListener() {
 
         public void entriesAdded(Collection<String> addresses) {
@@ -201,16 +204,6 @@ public class RosterView extends ViewPart {
         }
 
         public void entriesUpdated(Collection<String> addresses) {
-            for (String address : addresses) {
-                log.debug(address + ": "
-                    + connection.getRoster().getEntry(address).getType() + ", "
-                    + connection.getRoster().getEntry(address).getStatus());
-            }
-            /*
-             * TODO Maybe we could only update those elements that have been
-             * updated (but make sure that the given addresses have not
-             * structurally changed/new buddy groups)
-             */
             refreshRosterTree(true);
         }
 
