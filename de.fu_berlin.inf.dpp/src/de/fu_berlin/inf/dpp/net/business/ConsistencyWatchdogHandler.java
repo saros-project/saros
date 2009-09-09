@@ -217,46 +217,50 @@ public class ConsistencyWatchdogHandler {
 
         List<StartHandle> startHandles = null;
 
-        if (sessionManager.getSharedProject().isHost()) {
-            progress.beginTask("Performing recovery", 1200);
-            startHandles = stopManager.stop(sessionManager.getSharedProject()
-                .getParticipants(), "Consistency recovery", progress
-                .newChild(200));
-            progress.subTask("Send files to clients");
-            performConsistencyRecovery(from, paths, progress.newChild(700));
+        try {
+            if (sessionManager.getSharedProject().isHost()) {
+                progress.beginTask("Performing recovery", 1200);
+                startHandles = stopManager.stop(sessionManager
+                    .getSharedProject().getParticipants(),
+                    "Consistency recovery", progress.newChild(200));
+                progress.subTask("Send files to clients");
+                performConsistencyRecovery(from, paths, progress.newChild(700));
 
-            progress.subTask("Wait for peers");
-            waiting = progress.newChild(300);
-        } else {
-            waiting = progress;
-        }
-        waiting.beginTask("Waiting for peers", 500);
+                progress.subTask("Wait for peers");
+                waiting = progress.newChild(300);
+            } else {
+                waiting = progress;
+            }
+            waiting.beginTask("Waiting for peers", 500);
 
-        if (startHandles != null) {
-            /*
-             * We have to start the StartHandle of the inconsistent user first
-             * (blocking!) because otherwise the other participants can be
-             * started before the inconsistent user completely processed the
-             * consistency recovery.
-             */
-            // find the StartHandle of the inconsistent user
-            StartHandle inconsistentStartHandle = null;
-            for (StartHandle startHandle : startHandles) {
-                if (from.equals(startHandle.getUser().getJID())) {
-                    inconsistentStartHandle = startHandle;
-                    break;
+            if (startHandles != null) {
+                /*
+                 * We have to start the StartHandle of the inconsistent user
+                 * first (blocking!) because otherwise the other participants
+                 * can be started before the inconsistent user completely
+                 * processed the consistency recovery.
+                 */
+                // find the StartHandle of the inconsistent user
+                StartHandle inconsistentStartHandle = null;
+                for (StartHandle startHandle : startHandles) {
+                    if (from.equals(startHandle.getUser().getJID())) {
+                        inconsistentStartHandle = startHandle;
+                        break;
+                    }
+                }
+                if (inconsistentStartHandle == null)
+                    log.error("Could not find the StartHandle"
+                        + " of the inconsistent user");
+                else {
+                    inconsistentStartHandle.startAndAwait(progress);
+                    startHandles.remove(inconsistentStartHandle);
                 }
             }
-            if (inconsistentStartHandle == null)
-                log.error("Could not find the StartHandle"
-                    + " of the inconsistent user");
-            else {
-                inconsistentStartHandle.startAndAwait(progress);
-                startHandles.remove(inconsistentStartHandle);
-            }
 
-            for (StartHandle startHandle : startHandles)
-                startHandle.start();
+        } finally {
+            if (startHandles != null)
+                for (StartHandle startHandle : startHandles)
+                    startHandle.start();
 
             closeChecksumErrorMessage(pathsOfInconsistencies, from);
         }
