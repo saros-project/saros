@@ -62,7 +62,12 @@ public class StatisticsAggregator {
 
             Properties data = new Properties();
             try {
-                data.load(new FileInputStream(item));
+                FileInputStream fileInputStream = new FileInputStream(item);
+                try {
+                    data.load(fileInputStream);
+                } finally {
+                    fileInputStream.close();
+                }
             } catch (Exception e) {
                 log.error("Failure to parse statistics: " + item, e);
             }

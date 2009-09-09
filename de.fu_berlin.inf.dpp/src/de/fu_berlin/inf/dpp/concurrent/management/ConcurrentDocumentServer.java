@@ -159,10 +159,11 @@ public class ConcurrentDocumentServer implements Disposable {
 
         for (Entry<JID, JupiterActivity> entry : outgoing.entrySet()) {
 
-            User to = sharedProject.getUser(entry.getKey());
+            JID jid = entry.getKey();
+            User to = sharedProject.getUser(jid);
 
             if (to == null) {
-                log.error("Unknown user in transformation result: " + to);
+                log.error("Unknown user in transformation result: " + jid);
                 continue;
             }
 

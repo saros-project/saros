@@ -96,7 +96,7 @@ public class VersionManager {
      * {@link Compatibility#OK} if and only if the version information are
      * {@link Version#equals(Object)} to each other.
      */
-    public static Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+    public static final Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
 
     /**
      * Initialize the compatibility map.

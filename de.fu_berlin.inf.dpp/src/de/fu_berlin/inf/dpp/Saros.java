@@ -823,13 +823,12 @@ public class Saros extends AbstractUIPlugin {
             return null;
 
         for (IProxyData pd : ips.getProxyDataForHost(host)) {
-            if (pd.getType() == IProxyData.HTTP_PROXY_TYPE) {
+            if (IProxyData.HTTP_PROXY_TYPE.equals(pd.getType())) {
                 return ProxyInfo.forHttpProxy(pd.getHost(), pd.getPort(), pd
                     .getUserId(), pd.getPassword());
-            } else if (pd.getType() == IProxyData.SOCKS_PROXY_TYPE) {
+            } else if (IProxyData.SOCKS_PROXY_TYPE.equals(pd.getType())) {
                 return ProxyInfo.forSocks5Proxy(pd.getHost(), pd.getPort(), pd
                     .getUserId(), pd.getPassword());
-
             }
         }
 
