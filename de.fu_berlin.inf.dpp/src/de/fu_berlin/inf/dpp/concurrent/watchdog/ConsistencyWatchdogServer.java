@@ -7,12 +7,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -137,45 +142,73 @@ public class ConsistencyWatchdogServer extends Job {
         allEditors.addAll(localEditors);
         allEditors.addAll(remoteEditors);
 
+        IProject project = sharedProject.getProject();
+
         // Update Checksums for all open documents
         for (IPath docPath : allEditors) {
 
             if (monitor.isCanceled())
                 return Status.CANCEL_STATUS;
 
-            IDocument doc = editorManager.getDocument(docPath);
+            IFile file = project.getFile(docPath);
 
-            // Null means that the document does not exist locally
-            if (doc == null) {
-                if (localEditors.contains(docPath)) {
-                    log.error("EditorManager is in an inconsistent state. "
-                        + "It is reporting a locally open editor but no"
-                        + " document could be found on disk: " + docPath);
-                }
-                if (!remoteEditors.contains(docPath)) {
-                    /*
-                     * Since remote users do not report this document as open,
-                     * they are right (and our EditorPool might be confused)
-                     */
-                    continue;
+            IDocument doc;
+            IDocumentProvider provider = null;
+            FileEditorInput input = null;
+            if (!file.exists()) {
+                doc = null;
+            } else {
+                input = new FileEditorInput(file);
+                provider = EditorManager.getDocumentProvider(input);
+                try {
+                    provider.connect(input);
+                    doc = provider.getDocument(input);
+                } catch (CoreException e) {
+                    log.warn("Could not check checksum of file "
+                        + docPath.toOSString());
+                    provider = null;
+                    doc = null;
                 }
             }
 
-            // Update listener management
-            missingDocuments.remove(docPath);
+            try {
+                // Null means that the document does not exist locally
+                if (doc == null) {
+                    if (localEditors.contains(docPath)) {
+                        log.error("EditorManager is in an inconsistent state. "
+                            + "It is reporting a locally open editor but no"
+                            + " document could be found on disk: " + docPath);
+                    }
+                    if (!remoteEditors.contains(docPath)) {
+                        /*
+                         * Since remote users do not report this document as
+                         * open, they are right (and our EditorPool might be
+                         * confused)
+                         */
+                        continue;
+                    }
+                }
 
-            DocumentChecksum checksum = docsChecksums.get(docPath);
-            if (checksum == null) {
-                checksum = new DocumentChecksum(docPath);
-                docsChecksums.put(docPath, checksum);
+                // Update listener management
+                missingDocuments.remove(docPath);
+
+                DocumentChecksum checksum = docsChecksums.get(docPath);
+                if (checksum == null) {
+                    checksum = new DocumentChecksum(docPath);
+                    docsChecksums.put(docPath, checksum);
+                }
+
+                /*
+                 * Potentially bind to null doc, which will set the Checksum to
+                 * represent a missing file (existsFile() == false)
+                 */
+                checksum.bind(doc);
+                checksum.update();
+            } finally {
+                if (provider != null) {
+                    provider.disconnect(input);
+                }
             }
-
-            /*
-             * Potentially bind to null doc, which will set the Checksum to
-             * represent a missing file (existsFile() == false)
-             */
-            checksum.bind(doc);
-            checksum.update();
         }
 
         // Unregister all documents that are no longer there

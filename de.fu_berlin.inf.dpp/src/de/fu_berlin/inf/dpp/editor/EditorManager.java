@@ -468,10 +468,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             } catch (CoreException e) {
                 log.error("Error connecting to a document provider on file '"
                     + file.toString() + "':", e);
-                e.printStackTrace();
             }
             connectedFiles.add(file);
-
         }
     }
 
@@ -516,54 +514,6 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public Set<IPath> getLocallyOpenEditors() {
         return this.locallyOpenEditors;
-    }
-
-    /**
-     * Return the document of the given path.
-     * 
-     * @param path
-     *            the path of the wanted document
-     * @return the document or null if no document exists with given path or no
-     *         editor with this file is open
-     */
-    public IDocument getDocument(IPath path) {
-
-        /**
-         * TODO this can be done much simpler:
-         * 
-         * 1) get the default DocumentProvider
-         * 
-         * 2) get from the provider the document
-         */
-
-        if (path == null)
-            throw new IllegalArgumentException();
-
-        IDocument result = null;
-
-        Set<IEditorPart> editors = getEditors(path);
-
-        if (!editors.isEmpty()) {
-            result = getDocument(editors.iterator().next());
-        }
-
-        // if result == null there is no editor with this resource open
-        if (result == null) {
-
-            IFile file = sharedProject.getProject().getFile(path);
-            if (file == null || !file.exists()) {
-                log.error("No file in project for path " + path,
-                    new StackTrace());
-                return null;
-            }
-
-            connect(file);
-
-            // get Document from FileBuffer
-            result = EditorUtils.getTextFileBuffer(file).getDocument();
-            disconnect(file);
-        }
-        return result;
     }
 
     /**
@@ -1158,46 +1108,64 @@ public class EditorManager implements IActivityProvider, Disposable {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
 
-        connect(file);
-
-        IDocument doc = provider.getDocument(input);
-
-        // Check if the replaced text is really there.
-        if (log.isDebugEnabled()) {
-
-            String is;
-            try {
-                is = doc.get(offset, replacedText.length());
-                if (!is.equals(replacedText)) {
-                    log.error("replaceText should be '"
-                        + StringEscapeUtils.escapeJava(replacedText) + "' is '"
-                        + StringEscapeUtils.escapeJava(is) + "'");
-                }
-            } catch (BadLocationException e) {
-                // Ignore, because this is going to fail again just below
-            }
-        }
-
-        // Try to replace
         try {
-            doc.replace(offset, replacedText.length(), text);
-        } catch (BadLocationException e) {
-            log
-                .error(String
-                    .format(
-                        "Could not apply TextEdit at %d-%d of document with length %d.\nWas supposed to replace '%s' with '%s'.",
-                        offset, offset + replacedText.length(),
-                        doc.getLength(), replacedText, text));
+            provider.connect(input);
+        } catch (CoreException e) {
+            log.error("Could not connect document provider for file: "
+                + file.toString(), e);
+            // TODO Trigger a consistency recovery
             return;
         }
-        lastRemoteEditTimes.put(file.getProjectRelativePath(), System
-            .currentTimeMillis());
 
-        IAnnotationModel model = provider.getAnnotationModel(input);
-        contributionAnnotationManager.insertAnnotation(model, offset, text
-            .length(), source);
+        try {
+            IDocument doc = provider.getDocument(input);
+            if (doc == null) {
+                log.error("Could not connect document provider for file: "
+                    + file.toString(), new StackTrace());
+                // TODO Trigger a consistency recovery
+                return;
+            }
 
-        disconnect(file);
+            // Check if the replaced text is really there.
+            if (log.isDebugEnabled()) {
+
+                String is;
+                try {
+                    is = doc.get(offset, replacedText.length());
+                    if (!is.equals(replacedText)) {
+                        log
+                            .error("replaceText should be '"
+                                + StringEscapeUtils.escapeJava(replacedText)
+                                + "' is '" + StringEscapeUtils.escapeJava(is)
+                                + "'");
+                    }
+                } catch (BadLocationException e) {
+                    // Ignore, because this is going to fail again just below
+                }
+            }
+
+            // Try to replace
+            try {
+                doc.replace(offset, replacedText.length(), text);
+            } catch (BadLocationException e) {
+                log.error(String.format(
+                    "Could not apply TextEdit at %d-%d of document "
+                        + "with length %d.\nWas supposed to replace"
+                        + " '%s' with '%s'.", offset, offset
+                        + replacedText.length(), doc.getLength(), replacedText,
+                    text));
+                return;
+            }
+            lastRemoteEditTimes.put(file.getProjectRelativePath(), System
+                .currentTimeMillis());
+
+            IAnnotationModel model = provider.getAnnotationModel(input);
+            contributionAnnotationManager.insertAnnotation(model, offset, text
+                .length(), source);
+
+        } finally {
+            provider.disconnect(input);
+        }
     }
 
     /**
