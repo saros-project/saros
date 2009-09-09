@@ -47,10 +47,11 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected static final Operation timestamp = new TimestampOperation();
     protected static final Operation noOp = new NoOperation();
-    protected static final Operation insert = new InsertOperation(34,
-        "inserted text");
+    protected static final Operation insert = new InsertOperation(
+        34,
+        "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test‰¸‰ˆ¸‡·");
     protected static final Operation delete = new DeleteOperation(37,
-        "deleted text");
+        "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test‰¸‰ˆ¸‡·");
     protected static final Operation easySplit = new SplitOperation(insert,
         delete);
     protected static final Operation nestedSplit = new SplitOperation(insert,
@@ -63,7 +64,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             new byte[] { 34, 72 }, Purpose.ACTIVITY),
         new FolderActivity(source, FolderActivity.Type.Created, path),
         new RoleActivity(source, "user@server", UserRole.DRIVER),
-        new TextEditActivity(source, 23, "foo", "bar", path),
+        new TextEditActivity(source, 23, "foo\r\ntest\n\nbla", "bar", path),
         new TextSelectionActivity(source, 1, 2, path),
         new ViewportActivity(source, 5, 10, path) };
 
@@ -110,9 +111,14 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         }
     }
 
-    public void testEmptyExtension() throws XmlPullParserException, IOException {
+    public void testEmptyExtension() {
         List<TimedActivity> activities = Collections.emptyList();
-        assertRoundtrip(aProvider.create("Session-ID", activities));
+        try {
+            aProvider.create("Session-ID", activities);
+            fail();
+        } catch (IllegalArgumentException e) {
+            // Expected exception.
+        }
     }
 
     public void testGapInSequenceNumbers() throws XmlPullParserException,
@@ -130,10 +136,18 @@ public class ActivitiesExtensionProviderTest extends TestCase {
         assertRoundtrip(extension);
     }
 
+    public void testLineDelimiters() throws XmlPullParserException, IOException {
+        for (String lineEnding : new String[] { "\n", "\r", "\r\n" }) {
+            assertRoundtrip(new TextEditActivity(source, 42, lineEnding, "",
+                path));
+        }
+    }
+
     protected void assertRoundtrip(PacketExtension extension)
         throws XmlPullParserException, IOException {
+        String xml = extension.toXML().replaceAll("\r", "");
         assertEquals(aProvider.getPayload(extension), aProvider
-            .getPayload(parseExtension(extension.toXML())));
+            .getPayload(parseExtension(xml)));
     }
 
     protected PacketExtension createPacketExtension(IActivity activity) {

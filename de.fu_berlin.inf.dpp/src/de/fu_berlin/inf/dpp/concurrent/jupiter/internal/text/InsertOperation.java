@@ -28,9 +28,11 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * The InsertOperation is used to hold a text together with its position index.
@@ -42,6 +44,7 @@ public class InsertOperation implements ITextOperation {
     /**
      * the text to be inserted.
      */
+    @XStreamConverter(UrlEncodingStringConverter.class)
     private String text;
 
     /**

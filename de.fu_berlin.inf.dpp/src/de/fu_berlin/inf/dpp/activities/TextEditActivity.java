@@ -25,12 +25,14 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * An immutable text activity.
@@ -43,13 +45,11 @@ public class TextEditActivity extends AbstractActivity {
     @XStreamAsAttribute
     public final int offset;
 
-    /**
-     * This string only uses \n as line delimiter. Keep this in mind when adding
-     * it to an IDocument with probably other line delimiters.
-     */
+    @XStreamConverter(UrlEncodingStringConverter.class)
     public final String text;
 
     @XStreamAlias("replaced")
+    @XStreamConverter(UrlEncodingStringConverter.class)
     public final String replacedText;
 
     @XStreamAsAttribute
