@@ -509,7 +509,7 @@ public class SharedProject implements ISharedProject, Disposable {
 
         final List<IActivity> stillToExecute = activities;
 
-        Util.runSafeSWTSync(log, new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
 
                 TransformationResult transformed = concurrentDocumentClient
