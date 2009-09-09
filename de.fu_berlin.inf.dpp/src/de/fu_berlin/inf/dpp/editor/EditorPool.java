@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -28,6 +29,8 @@ import de.fu_berlin.inf.dpp.util.StackTrace;
  * can be traced to an {@link IFile} and an {@link ITextViewer}.
  */
 class EditorPool {
+
+    private static Logger log = Logger.getLogger(EditorPool.class.getName());
 
     protected EditorManager editorManager;
 
@@ -74,24 +77,25 @@ class EditorPool {
      */
     public void add(IEditorPart editorPart) {
 
-        EditorManager.wpLog.trace("EditorPool.add invoked");
-
         IPath path = this.editorManager.editorAPI.getEditorPath(editorPart);
+
         if (path == null) {
-            EditorManager.log.warn("Could not find path/resource for editor "
+            log.warn("Could not find path/resource for editor "
                 + editorPart.getTitle());
             return;
         }
+
+        log.trace("EditorPool.add (" + path.toOSString() + ") invoked");
+
         if (getEditors(path).contains(editorPart)) {
-            EditorManager.log.error(
-                "EditorPart was added twice to the EditorPool: "
-                    + editorPart.getTitle(), new StackTrace());
+            log.error("EditorPart was added twice to the EditorPool: "
+                + editorPart.getTitle(), new StackTrace());
             return;
         }
 
         ITextViewer viewer = EditorAPI.getViewer(editorPart);
         if (viewer == null) {
-            EditorManager.log.warn("This editor is not a ITextViewer: "
+            log.warn("This editor is not a ITextViewer: "
                 + editorPart.getTitle());
             return;
         }
@@ -100,7 +104,7 @@ class EditorPool {
 
         IFile file = ResourceUtil.getFile(input);
         if (file == null) {
-            EditorManager.log.warn("This editor does not use IFiles as input");
+            log.warn("This editor does not use IFiles as input");
             return;
         }
 
@@ -136,29 +140,26 @@ class EditorPool {
 
         IEditorInput input = editorInputMap.get(editorPart);
         if (input == null) {
-            EditorManager.log
-                .warn("EditorPart was never added to the EditorPool: "
-                    + editorPart.getTitle());
+            log.warn("EditorPart was never added to the EditorPool: "
+                + editorPart.getTitle());
             return null;
         }
 
         IFile file = ResourceUtil.getFile(input);
         if (file == null) {
-            EditorManager.log.warn("Could not find file for editor input "
+            log.warn("Could not find file for editor input "
                 + editorPart.getTitle());
             return null;
         }
 
         if (!ObjectUtils.equals(file.getProject(), project)) {
-            EditorManager.log.warn("File is from incorrect project: "
-                + file.getProject() + " should be " + project + ": " + file,
-                new StackTrace());
+            log.warn("File is from incorrect project: " + file.getProject()
+                + " should be " + project + ": " + file, new StackTrace());
         }
 
         IPath path = file.getProjectRelativePath();
         if (path == null) {
-            EditorManager.log.warn("Could not find path for editor "
-                + editorPart.getTitle());
+            log.warn("Could not find path for editor " + editorPart.getTitle());
         }
         return path;
     }
@@ -183,41 +184,37 @@ class EditorPool {
      */
     public IPath remove(IEditorPart editorPart, IProject project) {
 
-        EditorManager.wpLog.trace("EditorPool.remove invoked");
+        log.trace("EditorPool.remove " + editorPart + "invoked");
 
         IEditorInput input = editorInputMap.remove(editorPart);
         if (input == null) {
-            EditorManager.log
-                .warn("EditorPart was never added to the EditorPool: "
-                    + editorPart.getTitle());
+            log.warn("EditorPart was never added to the EditorPool: "
+                + editorPart.getTitle());
             return null;
         }
 
         IFile file = ResourceUtil.getFile(input);
         if (file == null) {
-            EditorManager.log.warn("Could not find file for editor input "
+            log.warn("Could not find file for editor input "
                 + editorPart.getTitle());
             return null;
         }
 
         if (!ObjectUtils.equals(file.getProject(), project)) {
-            EditorManager.log.warn("File is from incorrect project: "
-                + file.getProject() + " should be " + project + ": " + file,
-                new StackTrace());
+            log.warn("File is from incorrect project: " + file.getProject()
+                + " should be " + project + ": " + file, new StackTrace());
         }
 
         IPath path = file.getProjectRelativePath();
         if (path == null) {
-            EditorManager.log.warn("Could not find path for editor "
-                + editorPart.getTitle());
+            log.warn("Could not find path for editor " + editorPart.getTitle());
             return null;
         }
 
         // TODO Remove should remove empty HashSets
         if (!getEditors(path).remove(editorPart)) {
-            EditorManager.log
-                .error("EditorPart was never added to the EditorPool: "
-                    + editorPart.getTitle());
+            log.error("EditorPart was never added to the EditorPool: "
+                + editorPart.getTitle());
             return null;
         }
 
@@ -233,14 +230,13 @@ class EditorPool {
 
         IDocument document = documentProvider.getDocument(input);
         if (document == null) {
-            EditorManager.log.warn("Could not disconnect from document: "
-                + path);
+            log.warn("Could not disconnect from document: " + path);
         } else {
             document
                 .removeDocumentListener(this.editorManager.documentListener);
         }
 
-        this.editorManager.resetText(file);
+        this.editorManager.disconnect(file);
 
         return path;
     }
@@ -257,8 +253,7 @@ class EditorPool {
      */
     public Set<IEditorPart> getEditors(IPath path) {
 
-        EditorManager.wpLog.trace("EditorPool.getEditors(" + path.toString()
-            + ") invoked");
+        log.trace(".getEditors(" + path.toString() + ") invoked");
         if (!editorParts.containsKey(path)) {
             HashSet<IEditorPart> result = new HashSet<IEditorPart>();
             editorParts.put(path, result);
@@ -275,7 +270,7 @@ class EditorPool {
      */
     public Set<IEditorPart> getAllEditors() {
 
-        EditorManager.wpLog.trace("EditorPool.getAllEditors invoked");
+        log.trace("EditorPool.getAllEditors invoked");
 
         Set<IEditorPart> result = new HashSet<IEditorPart>();
 
@@ -290,7 +285,7 @@ class EditorPool {
      */
     public void removeAllEditors(IProject project) {
 
-        EditorManager.wpLog.trace("EditorPool.removeAllEditors invoked");
+        log.trace("EditorPool.removeAllEditors invoked");
 
         for (IEditorPart part : new HashSet<IEditorPart>(getAllEditors())) {
             remove(part, project);
@@ -306,7 +301,7 @@ class EditorPool {
      */
     public void setDriverEnabled(boolean isDriver) {
 
-        EditorManager.wpLog.trace("EditorPool.setDriverEnabled");
+        log.trace("EditorPool.setDriverEnabled");
 
         for (IEditorPart editorPart : getAllEditors()) {
             this.editorManager.editorAPI.setEditable(editorPart, isDriver);

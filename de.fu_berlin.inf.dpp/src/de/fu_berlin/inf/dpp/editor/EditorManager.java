@@ -451,8 +451,14 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void connect(IFile file) {
 
-        // TODO Check that file exists...
-        wpLog.trace("EditorManager.connect(" + file.getName() + ") invoked");
+        if (!file.isAccessible()) {
+            log.error(".connect File " + file.getName()
+                + " could not be accessed");
+            return;
+        }
+
+        wpLog.trace(".connect(" + file.getProjectRelativePath().toOSString()
+            + ") invoked");
 
         if (!isConnected(file)) {
             FileEditorInput input = new FileEditorInput(file);
@@ -466,8 +472,25 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
             connectedFiles.add(file);
 
-            wpLog.trace("EditorManager.connect: IDocument loaded");
         }
+    }
+
+    public void disconnect(IFile file) {
+
+        wpLog.trace(".disconnect(" + file.getProjectRelativePath().toOSString()
+            + ") invoked");
+
+        if (!isConnected(file)) {
+            log.warn(".disconnect(): Trying to disconnect"
+                + " DocProvider which is not connected: "
+                + file.getFullPath().toOSString());
+        }
+        FileEditorInput input = new FileEditorInput(file);
+        IDocumentProvider documentProvider = getDocumentProvider(input);
+        documentProvider.disconnect(file);
+
+        connectedFiles.remove(file);
+
     }
 
     public void setEditorAPI(IEditorAPI editorAPI) {
@@ -505,6 +528,14 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public IDocument getDocument(IPath path) {
 
+        /**
+         * TODO this can be done much simpler:
+         * 
+         * 1) get the default DocumentProvider
+         * 
+         * 2) get from the provider the document
+         */
+
         if (path == null)
             throw new IllegalArgumentException();
 
@@ -530,6 +561,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             // get Document from FileBuffer
             result = EditorUtils.getTextFileBuffer(file).getDocument();
+            disconnect(file);
         }
         return result;
     }
@@ -871,12 +903,6 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.editorRemoved(user, path);
 
-        // TODO Review for disconnection of document providers.
-        /*
-         * IFile file = EditorManager.this.sharedProject.getProject()
-         * .getFile(path); resetText(file);
-         */
-
         if (user.equals(getFollowedUser())) {
             for (IEditorPart part : editorPool.getEditors(path)) {
                 editorAPI.closeEditor(part);
@@ -889,7 +915,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partOpened(IEditorPart editorPart) {
 
-        wpLog.trace("EditorManager.partOpened invoked");
+        wpLog.trace(".partOpened invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;
@@ -900,8 +926,13 @@ public class EditorManager implements IActivityProvider, Disposable {
          * the editor having been closed (for instance outside of Eclipse).
          * Others might be confused about if they receive this editor from us.
          */
-        if (!editorAPI.getEditorResource(editorPart).isAccessible())
+        IResource editorResource = editorAPI.getEditorResource(editorPart);
+        if (!editorResource.isAccessible()) {
+            log.warn(".partOpened resource: "
+                + editorResource.getLocation().toOSString()
+                + " is not accesible");
             return;
+        }
 
         this.editorPool.add(editorPart);
 
@@ -925,7 +956,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partActivated(IEditorPart editorPart) {
 
-        wpLog.trace("EditorManager.partActiveted invoked");
+        wpLog.trace(".partActiveted invoked");
 
         // First check for last editor being closed (which is a null editorPart)
         if (editorPart == null) {
@@ -1166,34 +1197,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         contributionAnnotationManager.insertAnnotation(model, offset, text
             .length(), source);
 
-        // Don't disconnect from provider yet, because otherwise the text
-        // changes would be lost. We only disconnect when the document is
-        // reset or saved.
-    }
-
-    /**
-     * TODO document what this does and start thinking about what really needs
-     * to be done if a user resets (closes without saving) a file.
-     * 
-     * @swt Needs to be called from a UI thread.
-     */
-    protected void resetText(IFile file) {
-
-        wpLog.trace("EditorManager.resetText(" + file.getName() + ") invoked.");
-        if (isConnected(file)) {
-
-            if (file.exists()) {
-                FileEditorInput input = new FileEditorInput(file);
-                IDocumentProvider provider = getDocumentProvider(input);
-                provider.disconnect(input);
-            } else {
-                log.warn("Could not disconnect from file,"
-                    + " because it no longer exists: " + file.getName());
-            }
-            this.connectedFiles.remove(file);
-            wpLog.trace("EditorManager.resetText file " + file.getName()
-                + " disconnencted.");
-        }
+        disconnect(file);
     }
 
     /**
@@ -1281,14 +1285,10 @@ public class EditorManager implements IActivityProvider, Disposable {
         editorListener.driverEditorSaved(path, true);
 
         FileEditorInput input = new FileEditorInput(file);
-        wpLog.trace("EditorManager.saveText EditorInput created ");
-
         IDocumentProvider provider = getDocumentProvider(input);
-        wpLog.trace("EditorManager.saveText IDocumentProvider craeted ");
 
         if (isConnected(file)) {
-            wpLog.trace("EditorManager.saveText File " + file.getName()
-                + " is connected");
+            wpLog.trace(".saveText File " + file.getName() + " is connected");
             if (provider.canSaveDocument(input)) {
                 wpLog.trace("EditorManager.saveText File " + file.getName()
                     + " can be saved");
@@ -1366,13 +1366,11 @@ public class EditorManager implements IActivityProvider, Disposable {
         wpLog.trace("EditorManager.saveText File " + file.getName()
             + " will be reseted");
         /**
-         * resetText leads to disconnecting the document from its provider.
          * disconnecting document of the driver (after resolving inconsistency)
          * makes saving impossible
-         * 
          */
         if (!isDriver)
-            resetText(file);
+            disconnect(file);
 
     }
 
@@ -1390,6 +1388,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         // TODO technically we should mark the file as saved in the
         // editorPool, or?
+        // What is the reason of this?
 
         editorListener.driverEditorSaved(path, false);
         fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
@@ -1401,7 +1400,6 @@ public class EditorManager implements IActivityProvider, Disposable {
      * importantly the ActivitySequencer).
      */
     protected void fireActivity(IActivity activity) {
-        wpLog.trace("EditorManager.fireActivity invoked");
 
         for (IActivityListener listener : this.activityListeners) {
             listener.activityCreated(activity);
