@@ -1,7 +1,10 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -82,8 +85,8 @@ public class FileZipper {
             IFile file = project.getFile(path);
 
             try {
-                zipSingleFile(file, path.toPortableString(), zipStream,
-                    progress.newChild(1));
+                zipSingleFile(new WrappedIFile(file), path.toPortableString(),
+                    zipStream, progress.newChild(1));
             } catch (CancellationException e) {
                 cleanup(archive);
                 throw e;
@@ -132,7 +135,7 @@ public class FileZipper {
      * @throws IllegalArgumentException
      *             if the list of files is empty. The archive is then deleted.
      */
-    public static void zipFiles(List<IFile> files, File archive,
+    public static void zipFiles(List<File> files, File archive,
         SubMonitor progress) throws IOException {
         try {
             if (files.isEmpty()) {
@@ -147,10 +150,10 @@ public class FileZipper {
             ZipOutputStream zipStream = new ZipOutputStream(outputStream);
             int filesZipped = 0;
 
-            for (IFile file : files) {
+            for (File file : files) {
                 try {
-                    zipSingleFile(file, file.getName(), zipStream, progress
-                        .newChild(1));
+                    zipSingleFile(new WrappedFile(file), file.getName(),
+                        zipStream, progress.newChild(1));
                     ++filesZipped;
                 } catch (CancellationException e) {
                     cleanup(archive);
@@ -173,19 +176,21 @@ public class FileZipper {
     }
 
     /**
-     * Adds the given file to the ZipStream.
+     * Adds the given file to the ZipStream. The file might be a {@link File} or
+     * an {@link IFile} which is concealed by the {@link FileWrapper} interface
      * 
-     * @filename the name of the file that should be added to the archive. It
-     *           might as well be a relative path name. In this case the
-     *           specified subdirectories are automatically created inside the
-     *           archive.
+     * @param filename
+     *            the name of the file that should be added to the archive. It
+     *            might as well be a relative path name. In this case the
+     *            specified subdirectories are automatically created inside the
+     *            archive.
      * @cancelable
      * @throws IOException
      *             if an error occurred while trying to zip the file
      * @throws IllegalArgumentException
-     *             if the file was a directory or didn't exist
+     *             if the file was null or a directory or didn't exist
      */
-    protected static void zipSingleFile(IFile file, String filename,
+    protected static void zipSingleFile(FileWrapper file, String filename,
         ZipOutputStream zipStream, SubMonitor progress) throws IOException {
 
         try {
@@ -197,7 +202,7 @@ public class FileZipper {
             progress.beginTask("Compressing: " + filename, 1);
             log.debug("Compress file: " + filename);
 
-            if (!file.exists()) {
+            if (file == null || !file.exists()) {
                 throw new IllegalArgumentException(
                     "The file to zip does not exist: " + filename);
             }
@@ -211,12 +216,12 @@ public class FileZipper {
         }
     }
 
-    public static void writeFileToStream(IFile file, String filename,
+    protected static void writeFileToStream(FileWrapper file, String filename,
         ZipOutputStream zipStream) throws CausedIOException, IOException {
         InputStream in;
         try {
-            in = file.getContents();
-        } catch (CoreException e) {
+            in = file.getInputStream();
+        } catch (Exception e) {
             throw new CausedIOException("Could not obtain InputStream for "
                 + filename, e);
         }
@@ -227,4 +232,66 @@ public class FileZipper {
             IOUtils.closeQuietly(in);
         }
     }
+
+    /**
+     * An interface that allows us to use different file classes.
+     * 
+     * @see WrappedFile
+     * @see WrappedIFile
+     */
+    interface FileWrapper {
+        public boolean exists();
+
+        public InputStream getInputStream() throws FileNotFoundException,
+            CoreException;
+
+        public String getName();
+    }
+
+    /**
+     * A class that wraps a {@link File}.
+     */
+    static class WrappedFile implements FileWrapper {
+        protected File file;
+
+        public WrappedFile(File file) {
+            this.file = file;
+        }
+
+        public boolean exists() {
+            return (file).exists();
+        }
+
+        public InputStream getInputStream() throws FileNotFoundException {
+            return new BufferedInputStream(new FileInputStream(file));
+        }
+
+        public String getName() {
+            return file.getName();
+        }
+    }
+
+    /**
+     * A class that wraps an {@link IFile}.
+     */
+    static class WrappedIFile implements FileWrapper {
+        protected IFile file;
+
+        public WrappedIFile(IFile file) {
+            this.file = file;
+        }
+
+        public boolean exists() {
+            return file.exists();
+        }
+
+        public InputStream getInputStream() throws CoreException {
+            return file.getContents();
+        }
+
+        public String getName() {
+            return file.getName();
+        }
+    }
+
 }
