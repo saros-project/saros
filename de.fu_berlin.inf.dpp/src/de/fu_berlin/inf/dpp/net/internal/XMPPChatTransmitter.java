@@ -468,7 +468,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             message.addExtension(extension);
 
             // TODO Why is this here and not in sendMessage()!?
-            if (participant.getPresence() == UserConnectionState.OFFLINE) {
+            if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
 
                 /*
                  * TODO [CO] 2009-02-07 This probably does not work anymore! See

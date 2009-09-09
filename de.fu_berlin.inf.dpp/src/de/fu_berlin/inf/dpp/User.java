@@ -42,7 +42,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * eclipse instance, all others are remote users.
  * 
  * The public and mutable properties are the role (Driver/Observer), time since
- * going off-line and connection state.
+ * going off-line, connection state and away information.
  * 
  * @entityObject A user is a entity object, i.e. it can change over time.
  */
@@ -64,7 +64,9 @@ public class User {
 
     protected final int colorID;
 
-    protected UserConnectionState presence = UserConnectionState.UNKNOWN;
+    protected UserConnectionState connectionState = UserConnectionState.UNKNOWN;
+
+    protected boolean away = false;
 
     /**
      * Time stamp when User became offline the last time. In seconds.
@@ -145,19 +147,27 @@ public class User {
         return this.colorID;
     }
 
-    public UserConnectionState getPresence() {
-        return this.presence;
+    public UserConnectionState getConnectionState() {
+        return this.connectionState;
     }
 
-    public void setPresence(UserConnectionState presence) {
-        this.presence = presence;
-        if (this.presence == User.UserConnectionState.OFFLINE) {
+    public void setConnectionState(UserConnectionState presence) {
+        this.connectionState = presence;
+        if (this.connectionState == User.UserConnectionState.OFFLINE) {
             this.offlineTime = new Date().getTime();
         }
     }
 
+    public boolean isAway() {
+        return away;
+    }
+
+    public void setAway(boolean away) {
+        this.away = away;
+    }
+
     public int getOfflineSeconds() {
-        if (this.presence == UserConnectionState.OFFLINE) {
+        if (this.connectionState == UserConnectionState.OFFLINE) {
             return (int) (((new Date().getTime()) - this.offlineTime) / 1000);
         } else {
             return 0;

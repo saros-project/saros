@@ -14,11 +14,12 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.util.DeferredValueChangeListener;
+import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
 /**
  * This class is responsible of setting the presence of Saros to away if the
- * user deactives the Eclipse window
+ * user deactivates the Eclipse window
  */
 public class LocalPresenceTracker {
 
@@ -72,11 +73,7 @@ public class LocalPresenceTracker {
 
             protected ValueChangeListener<Boolean> windowChanges = new ValueChangeListener<Boolean>() {
                 public void setValue(Boolean newValue) {
-                    try {
-                        setActive(newValue);
-                    } catch (RuntimeException e) {
-                        log.error("Error in setting presence", e);
-                    }
+                    setActive(newValue);
                 }
             };
 
@@ -87,10 +84,20 @@ public class LocalPresenceTracker {
             protected DeferredValueChangeListener<Boolean> deferrer = new DeferredValueChangeListener<Boolean>(
                 windowChanges, 5, TimeUnit.SECONDS);
 
-            protected void setActiveDeferred(boolean b) {
-                deferrer.setValue(b);
-            }
+            protected void setActiveDeferred(final boolean active) {
+                Util.wrapSafe(log, new Runnable() {
+                    public void run() {
+                        log.debug("Eclipse window active: " + active);
 
+                        /*
+                         * Wait one second before sending an active presence
+                         * update and 5 seconds for an away update.
+                         */
+                        deferrer.setValue(active, active ? 1 : 5,
+                            TimeUnit.SECONDS);
+                    }
+                }).run();
+            }
         });
 
         setActive(bench.getActiveWorkbenchWindow() != null);

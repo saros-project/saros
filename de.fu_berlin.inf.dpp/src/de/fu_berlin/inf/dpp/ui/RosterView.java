@@ -55,7 +55,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
 import org.jivesoftware.smack.RosterGroup;
-import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.RosterPacket;
@@ -68,8 +67,10 @@ import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
@@ -97,8 +98,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * @author rdjemili
  */
 @Component(module = "ui")
-public class RosterView extends ViewPart implements IConnectionListener,
-    IRosterTree {
+public class RosterView extends ViewPart {
 
     private static Logger log = Logger.getLogger(RosterView.class);
 
@@ -151,6 +151,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
     @Inject
     protected DataTransferManager dataTransferManager;
 
+    @Inject
+    protected RosterTracker rosterTracker;
+
     public RosterView() {
 
         // Make sure that we get all dependencies injected
@@ -185,8 +188,58 @@ public class RosterView extends ViewPart implements IConnectionListener,
             });
 
         dataTransferManager.getTransferModeDispatch().add(transferModeListener);
-
     }
+
+    protected IRosterListener rosterListener = new IRosterListener() {
+
+        public void entriesAdded(Collection<String> addresses) {
+            refreshRosterTree(true);
+        }
+
+        public void entriesUpdated(Collection<String> addresses) {
+            for (String address : addresses) {
+                log.debug(address + ": "
+                    + connection.getRoster().getEntry(address).getType() + ", "
+                    + connection.getRoster().getEntry(address).getStatus());
+            }
+            /*
+             * TODO Maybe we could only update those elements that have been
+             * updated (but make sure that the given addresses have not
+             * structurally changed/new buddy groups)
+             */
+            refreshRosterTree(true);
+        }
+
+        public void entriesDeleted(Collection<String> addresses) {
+            refreshRosterTree(false);
+        }
+
+        public void presenceChanged(Presence presence) {
+            log.trace("Presence changed: " + presence.getFrom() + ": "
+                + presence);
+            refreshRosterTree(new JID(presence.getFrom()));
+        }
+
+        public void rosterChanged(Roster newRoster) {
+            roster = newRoster;
+            refreshRosterTree(true);
+        }
+    };
+
+    private IConnectionListener connectionListener = new IConnectionListener() {
+
+        public void connectionStateChanged(XMPPConnection connection,
+            final ConnectionState newState) {
+
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    updateStatusInformation(newState);
+                    updateEnablement();
+                }
+            });
+        }
+
+    };
 
     private final class RosterViewTransferModeListener implements
         ITransferModeListener {
@@ -218,7 +271,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
      * 
      * @author rdjemili
      */
-    private interface TreeItem {
+    protected interface TreeItem {
 
         /**
          * @return all child items of this tree item.
@@ -229,7 +282,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     /**
      * A group item which holds a number of users.
      */
-    public static class GroupItem implements TreeItem {
+    protected static class GroupItem implements TreeItem {
         private final RosterGroup group;
 
         public GroupItem(RosterGroup group) {
@@ -252,7 +305,7 @@ public class RosterView extends ViewPart implements IConnectionListener,
     /**
      * A group item that holds all users that don't belong to another group.
      */
-    private class UnfiledGroupItem implements TreeItem {
+    protected class UnfiledGroupItem implements TreeItem {
 
         /*
          * (non-Javadoc)
@@ -265,6 +318,10 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         @Override
         public String toString() {
+            /*
+             * TODO This is confusing if the user really has a group named
+             * "Buddies".
+             */
             return "Buddies";
         }
     }
@@ -293,19 +350,12 @@ public class RosterView extends ViewPart implements IConnectionListener,
          * @see org.eclipse.jface.viewers.IStructuredContentProvider
          */
         public Object[] getElements(Object parent) {
-            if (parent.equals(getViewSite())
-                && (RosterView.this.roster != null)) {
+            if (parent.equals(getViewSite()) && (roster != null)) {
                 List<TreeItem> groups = new LinkedList<TreeItem>();
-                for (RosterGroup rg : RosterView.this.roster.getGroups()) {
-                    GroupItem item = new GroupItem(rg);
+                for (RosterGroup rosterGroup : roster.getGroups()) {
+                    GroupItem item = new GroupItem(rosterGroup);
                     groups.add(item);
                 }
-
-                // for (Iterator it = roster.getGroups(); it.hasNext();) {
-                // GroupItem item = new GroupItem((RosterGroup) it.next());
-                // groups.add(item);
-                // }
-
                 groups.add(new UnfiledGroupItem());
 
                 return groups.toArray();
@@ -354,6 +404,9 @@ public class RosterView extends ViewPart implements IConnectionListener,
 
         private final Image personImage = SarosUI.getImage("icons/user.png");
 
+        private final Image personAwayImage = SarosUI
+            .getImage("icons/clock.png");
+
         private final Image personOfflineImage = new Image(
             Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
 
@@ -365,10 +418,8 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 String label = Util.getDisplayableName(entry);
 
                 // append presence information if available
-                Presence presence = RosterView.this.roster.getPresence(entry
-                    .getUser());
-                RosterEntry e = RosterView.this.roster
-                    .getEntry(entry.getUser());
+                Presence presence = roster.getPresence(entry.getUser());
+                RosterEntry e = roster.getEntry(entry.getUser());
                 if (e.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
                     label = label + " (wait for permission)";
                 } else if (presence != null) {
@@ -390,12 +441,12 @@ public class RosterView extends ViewPart implements IConnectionListener,
                 Presence presence = roster.getPresence(entry.getUser());
 
                 if (presence.isAvailable()) {
-                    return this.personImage;
+                    return presence.isAway() ? personAwayImage : personImage;
                 } else {
-                    return this.personOfflineImage;
+                    return personOfflineImage;
                 }
             }
-            return this.groupImage;
+            return groupImage;
         }
 
         public StyledString getStyledText(Object element) {
@@ -556,13 +607,12 @@ public class RosterView extends ViewPart implements IConnectionListener,
         hookContextMenu();
         // hookDoubleClickAction();
         contributeToActionBars();
-        updateEnablement();
-        composite.layout();
 
-        saros.addListener(this);
-
-        connectionStateChanged(saros.getConnection(), saros
+        saros.addListener(connectionListener);
+        rosterTracker.addRosterListener(rosterListener);
+        connectionListener.connectionStateChanged(saros.getConnection(), saros
             .getConnectionState());
+        rosterListener.rosterChanged(saros.getRoster());
     }
 
     @Override
@@ -573,10 +623,12 @@ public class RosterView extends ViewPart implements IConnectionListener,
             disposable.dispose();
         }
 
+        saros.removeListener(connectionListener);
+
         dataTransferManager.getTransferModeDispatch().remove(
             transferModeListener);
 
-        saros.removeListener(this);
+        rosterTracker.removeRosterListener(rosterListener);
     }
 
     /**
@@ -585,33 +637,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
     @Override
     public void setFocus() {
         this.viewer.getControl().setFocus();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.listeners.IConnectionListener
-     */
-    public void connectionStateChanged(XMPPConnection connection,
-        final ConnectionState newState) {
-
-        if (newState == ConnectionState.CONNECTED) {
-            this.roster = connection.getRoster();
-            this.connection = connection;
-            attachRosterListener();
-        } else {
-            // FIXME unregister from Roster!
-            this.roster = null;
-        }
-
-        refreshRosterTree(true);
-
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                updateStatusInformation(newState);
-                updateEnablement();
-            }
-        });
     }
 
     /**
@@ -631,39 +656,6 @@ public class RosterView extends ViewPart implements IConnectionListener,
     protected void updateStatusInformation(final ConnectionState newState) {
         label.setText(sarosUI.getDescription(newState));
         composite.layout();
-    }
-
-    protected void attachRosterListener() {
-
-        this.connection.getRoster().addRosterListener(new RosterListener() {
-            public void entriesAdded(Collection<String> addresses) {
-                refreshRosterTree(true);
-            }
-
-            public void entriesUpdated(Collection<String> addresses) {
-                for (String address : addresses) {
-                    log.debug(address + ": "
-                        + connection.getRoster().getEntry(address).getType()
-                        + ", "
-                        + connection.getRoster().getEntry(address).getStatus());
-                }
-                /*
-                 * TODO Maybe we could only update those elements that have been
-                 * updated (but make sure that the given addresses have not
-                 * structurally changed/new buddy groups)
-                 */
-                refreshRosterTree(true);
-            }
-
-            public void entriesDeleted(Collection<String> addresses) {
-                refreshRosterTree(false);
-            }
-
-            public void presenceChanged(Presence presence) {
-                log.debug(presence.getFrom() + ": " + presence);
-                refreshRosterTree(new JID(presence.getFrom()));
-            }
-        });
     }
 
     protected void refreshRosterTree(final JID jid) {

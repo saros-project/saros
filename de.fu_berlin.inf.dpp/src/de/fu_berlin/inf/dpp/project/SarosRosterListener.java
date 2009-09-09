@@ -7,15 +7,15 @@ import java.util.Collection;
 
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterListener;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -25,12 +25,9 @@ import de.fu_berlin.inf.dpp.util.Util;
  * roster.
  */
 @Component(module = "net")
-public class SarosRosterListener implements ConnectionSessionListener {
+public class SarosRosterListener {
 
-    @Inject
-    protected SharedProjectObservable currentlySharedProject;
-
-    protected RosterListener listener = new RosterListener() {
+    public class Listener implements IRosterListener {
         public void entriesAdded(Collection<String> addresses) {
             // ignore
         }
@@ -73,32 +70,24 @@ public class SarosRosterListener implements ConnectionSessionListener {
 
             assert user.getJID().strictlyEquals(presenceJID);
 
-            if (presence.isAvailable()
-                && user.getPresence() != UserConnectionState.ONLINE)
-                user.setPresence(User.UserConnectionState.ONLINE);
+            if (presence.isAvailable()) {
+                if (user.getConnectionState() != UserConnectionState.ONLINE) {
+                    user.setConnectionState(User.UserConnectionState.ONLINE);
+                }
+                user.setAway(presence.isAway());
+            }
 
             if (!presence.isAvailable()
-                && user.getPresence() != UserConnectionState.OFFLINE)
-                user.setPresence(User.UserConnectionState.OFFLINE);
-        }
-    };
-
-    protected XMPPConnection connection;
-
-    protected Roster roster;
-
-    protected void setRoster(Roster newRoster) {
-
-        // Unregister from current roster (if set)
-        if (this.roster != null) {
-            this.roster.removeRosterListener(listener);
+                && user.getConnectionState() != UserConnectionState.OFFLINE)
+                user.setConnectionState(User.UserConnectionState.OFFLINE);
         }
 
-        this.roster = newRoster;
+        public void rosterChanged(Roster roster) {
 
-        // Register to new roster (if set)
-        if (this.roster != null) {
-            this.roster.addRosterListener(listener);
+            if (roster == null) {
+                // The connection is now offline
+                return;
+            }
 
             // Update all presences
             for (RosterEntry rosterEntry : roster.getEntries()) {
@@ -110,24 +99,16 @@ public class SarosRosterListener implements ConnectionSessionListener {
         }
     }
 
-    public void startConnection() {
-        if (connection != null) {
+    @Inject
+    protected SharedProjectObservable currentlySharedProject;
 
-            Roster roster = connection.getRoster();
-            setRoster(roster);
-        }
+    @Inject
+    protected RosterTracker rosterTracker;
+
+    public SarosRosterListener(RosterTracker rosterTracker) {
+        rosterTracker.addRosterListener(listener);
     }
 
-    public void stopConnection() {
-        setRoster(null);
-    }
-
-    public void disposeConnection() {
-        connection = null;
-    }
-
-    public void prepareConnection(XMPPConnection connection) {
-        this.connection = connection;
-    }
+    protected IRosterListener listener = new Listener();
 
 }

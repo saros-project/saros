@@ -48,6 +48,7 @@ import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
@@ -104,6 +105,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     @Inject
     protected VersionManager versionManager;
+
+    @Inject
+    private RosterTracker rosterTracker;
 
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
@@ -306,7 +310,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 Window iw = new InvitationDialog(saros, versionManager,
                     sharedProject, EditorAPI.getShell(), toInvite,
                     discoveryManager, partialProjectResources,
-                    SessionManager.this);
+                    SessionManager.this, rosterTracker);
                 iw.open();
 
             }

@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.part.ViewPart;
-import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.packet.Presence;
 import org.picocontainer.annotations.Inject;
 
@@ -64,6 +64,7 @@ import de.fu_berlin.inf.dpp.editor.AbstractSharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.ISharedEditorListener;
 import de.fu_berlin.inf.dpp.editor.annotations.SarosAnnotation;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -95,13 +96,15 @@ public class SessionView extends ViewPart {
     private static final Logger log = Logger.getLogger(SessionView.class
         .getName());
 
+    protected IRosterListener rosterListener;
+
     /**
      * This RosterListener is responsible to trigger updates to our table
      * viewer, whenever roster elements change.
      * 
      * This is mostly used to update the nickname of the user at the moment.
      */
-    protected class SessionRosterListener implements RosterListener {
+    protected class SessionRosterListener implements IRosterListener {
         public void changed(final Collection<String> addresses) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -138,6 +141,14 @@ public class SessionView extends ViewPart {
 
         public void entriesAdded(Collection<String> addresses) {
             changed(addresses);
+        }
+
+        public void rosterChanged(Roster roster) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    viewer.refresh();
+                }
+            });
         }
     }
 
@@ -221,7 +232,7 @@ public class SessionView extends ViewPart {
             // Do nothing
         }
 
-        private void refreshTable() {
+        public void refreshTable() {
             Util.runSafeSWTAsync(log, new Runnable() {
                 public void run() {
                     tableViewer.refresh();
@@ -233,6 +244,7 @@ public class SessionView extends ViewPart {
     protected class SessionLabelProvider extends LabelProvider implements
         ITableLabelProvider, ITableColorProvider, ITableFontProvider {
 
+        private final Image awayImage = SarosUI.getImage("icons/clock.png");
         private final Image userImage = SarosUI.getImage("icons/user.png");
         private final Image driverImage = SarosUI
             .getImage("icons/user_edit.png");
@@ -248,7 +260,12 @@ public class SessionView extends ViewPart {
 
         @Override
         public Image getImage(Object obj) {
-            return ((User) obj).isDriver() ? this.driverImage : this.userImage;
+            User user = (User) obj;
+            if (user.isAway()) {
+                return awayImage;
+            } else {
+                return user.isDriver() ? driverImage : userImage;
+            }
         }
 
         public Image getColumnImage(Object obj, int index) {
@@ -325,22 +342,25 @@ public class SessionView extends ViewPart {
 
         Saros.reinject(this);
 
-        /**
+        /*
          * Register with the Editors preference store, for getting notified when
          * color settings change.
          */
         EditorsUI.getPreferenceStore().addPropertyChangeListener(
             editorPrefsListener);
 
-        /**
+        /*
          * Listener responsible for refreshing the viewer if the follow mode
          * changed (because the followed user is shown in bold)
          */
         editorManager.addSharedEditorListener(sharedEditorListener);
 
-        // Make sure the Session View is informed about changes to the roster
-        // entry of the user
-        rosterTracker.addRosterListener(new SessionRosterListener());
+        /*
+         * Make sure the Session View is informed about changes to the roster
+         * entry of the user
+         */
+        rosterListener = new SessionRosterListener();
+        rosterTracker.addRosterListener(rosterListener);
     }
 
     @Override
@@ -349,6 +369,7 @@ public class SessionView extends ViewPart {
             editorPrefsListener);
         editorManager.removeSharedEditorListener(sharedEditorListener);
         sessionManager.removeSessionListener(sessionListener);
+        rosterTracker.removeRosterListener(rosterListener);
 
         // Stop container
         container.dispose();
@@ -373,10 +394,10 @@ public class SessionView extends ViewPart {
 
         // Make sure one column we got fills the whole table
         final Table table = this.viewer.getTable();
-        TableColumnLayout ad = new TableColumnLayout();
-        table.getParent().setLayout(ad);
+        TableColumnLayout layout = new TableColumnLayout();
+        table.getParent().setLayout(layout);
         TableColumn column = new TableColumn(table, SWT.NONE);
-        ad.setColumnData(column, new ColumnWeightData(100));
+        layout.setColumnData(column, new ColumnWeightData(100));
 
         /**
          * Make sure that background color fills the whole row

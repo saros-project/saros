@@ -1,13 +1,11 @@
 package de.fu_berlin.inf.dpp.net;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.RosterListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
@@ -23,56 +21,13 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "net")
 public class RosterTracker implements ConnectionSessionListener {
 
-    private static final Logger log = Logger.getLogger(RosterTracker.class
-        .getName());
-
-    protected List<RosterListener> rosterListeners = new ArrayList<RosterListener>();
+    static final Logger log = Logger.getLogger(RosterTracker.class.getName());
 
     protected XMPPConnection connection;
 
     protected Roster roster;
 
-    protected RosterListener rosterListener = new RosterListener() {
-        public void entriesAdded(Collection<String> addresses) {
-            try {
-                for (RosterListener listener : rosterListeners) {
-                    listener.entriesAdded(addresses);
-                }
-            } catch (RuntimeException e) {
-                log.error("Internal error:", e);
-            }
-        }
-
-        public void entriesUpdated(Collection<String> addresses) {
-            try {
-                for (RosterListener listener : rosterListeners) {
-                    listener.entriesUpdated(addresses);
-                }
-            } catch (RuntimeException e) {
-                log.error("Internal error:", e);
-            }
-        }
-
-        public void entriesDeleted(Collection<String> addresses) {
-            try {
-                for (RosterListener listener : rosterListeners) {
-                    listener.entriesDeleted(addresses);
-                }
-            } catch (RuntimeException e) {
-                log.error("Internal error:", e);
-            }
-        }
-
-        public void presenceChanged(Presence presence) {
-            try {
-                for (RosterListener listener : rosterListeners) {
-                    listener.presenceChanged(presence);
-                }
-            } catch (RuntimeException e) {
-                log.error("Internal error:", e);
-            }
-        }
-    };
+    protected DispatchingRosterListener listener = new DispatchingRosterListener();
 
     /**
      * Adds a listener to this roster. The listener will be fired anytime one or
@@ -81,10 +36,8 @@ public class RosterTracker implements ConnectionSessionListener {
      * @param rosterListener
      *            a roster listener.
      */
-    public void addRosterListener(RosterListener rosterListener) {
-        if (!rosterListeners.contains(rosterListener)) {
-            rosterListeners.add(rosterListener);
-        }
+    public void addRosterListener(IRosterListener rosterListener) {
+        listener.add(rosterListener);
     }
 
     /**
@@ -94,8 +47,8 @@ public class RosterTracker implements ConnectionSessionListener {
      * @param rosterListener
      *            a roster listener.
      */
-    public void removeRosterListener(RosterListener rosterListener) {
-        rosterListeners.remove(rosterListener);
+    public void removeRosterListener(IRosterListener rosterListener) {
+        listener.remove(rosterListener);
     }
 
     public void disposeConnection() {
@@ -108,23 +61,28 @@ public class RosterTracker implements ConnectionSessionListener {
     }
 
     public void prepareConnection(XMPPConnection connection) {
+        if (this.connection != null) {
+            log.warn("PrepareConnection called without "
+                + "previous call to dispose");
+        }
+
         this.connection = connection;
     }
 
     public void startConnection() {
 
         if (this.connection == null) {
-            log
-                .error("StartConnection called without previous call to prepare");
+            log.error("StartConnection called without "
+                + "previous call to prepare");
             return;
         }
         if (this.roster != null) {
             log.warn("StartConnection called without previous call to stop");
             stopConnection();
         }
-        this.roster = this.connection.getRoster();
-        // TODO This is too late, we might miss Roster events... reload?
-        this.roster.addRosterListener(rosterListener);
+
+        setRoster(this.connection.getRoster());
+
     }
 
     public void stopConnection() {
@@ -136,8 +94,25 @@ public class RosterTracker implements ConnectionSessionListener {
             return;
         }
 
-        this.roster.removeRosterListener(rosterListener);
-        this.roster = null;
+        setRoster(null);
+    }
+
+    protected void setRoster(Roster newRoster) {
+
+        // Unregister from current roster (if set)
+        if (this.roster != null) {
+            this.roster.removeRosterListener(listener);
+        }
+
+        this.roster = newRoster;
+
+        // Register to new roster (if set)
+        if (this.roster != null) {
+            // TODO This is too late, we might miss Roster events... reload?
+            this.roster.addRosterListener(listener);
+
+            listener.rosterChanged(this.roster);
+        }
     }
 
     /**
@@ -156,8 +131,8 @@ public class RosterTracker implements ConnectionSessionListener {
     }
 
     /**
-     * Returns the RQ-JIDs of all presences of the given (plain) 
-     * JID which are available.
+     * Returns the RQ-JIDs of all presences of the given (plain) JID which are
+     * available.
      * 
      * An empty list is returned if no presence for the given JID is online.
      */

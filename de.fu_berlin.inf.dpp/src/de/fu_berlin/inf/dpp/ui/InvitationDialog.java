@@ -64,21 +64,19 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.RosterEntry;
-import org.jivesoftware.smack.RosterListener;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 import org.limewire.collection.Function;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
-import de.fu_berlin.inf.dpp.net.IConnectionListener;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -106,8 +104,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * TODO Creating the FileList asynchronously should be put into a separate
  * class.
  */
-public class InvitationDialog extends Dialog implements IInvitationUI,
-    IConnectionListener {
+public class InvitationDialog extends Dialog implements IInvitationUI {
 
     private static final Logger log = Logger.getLogger(InvitationDialog.class
         .getName());
@@ -118,7 +115,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     protected Button cancelSelectedInvitationButton;
     protected Button autoCloseButton;
 
-    protected Roster roster;
     protected List<JID> autoinviteJID;
     protected Display display;
 
@@ -132,6 +128,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     protected Saros saros;
 
     protected DiscoveryManager discoveryManager;
+
+    protected RosterTracker rosterTracker;
 
     private List<IResource> resources;
 
@@ -219,7 +217,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     public InvitationDialog(Saros saros, VersionManager versionManager,
         SharedProject project, Shell parentShell, List<JID> autoInvite,
         DiscoveryManager discoManager, List<IResource> resources,
-        SessionManager sessionManager) {
+        SessionManager sessionManager, RosterTracker rosterTracker) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
         this.project = project;
@@ -228,6 +226,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.resources = resources;
         this.versionManager = versionManager;
         this.sessionManager = sessionManager;
+        this.rosterTracker = rosterTracker;
     }
 
     protected ExecutorService worker = Executors
@@ -250,13 +249,17 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }));
     }
 
+    public void dispose() {
+        worker.shutdown();
+        rosterTracker.removeRosterListener(rosterListener);
+    }
+
     @Override
     protected Control createContents(Composite parent) {
 
         getShell().addDisposeListener(new DisposeListener() {
             public void widgetDisposed(DisposeEvent e) {
-                worker.shutdown();
-                setRoster(null);
+                dispose();
             }
         });
 
@@ -339,8 +342,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         this.cancelSelectedInvitationButton.setEnabled(false);
 
         // get online users from roster
-        setRoster(saros.getRoster());
-        refreshRosterList();
+        rosterTracker.addRosterListener(rosterListener);
+        rosterListener.rosterChanged(saros.getRoster());
 
         Control c = super.createContents(parent);
 
@@ -614,7 +617,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
     protected void updateInvitationProgressInternal(JID jid) {
 
         if (this.table.isDisposed()) {
-            setRoster(null);
+            dispose();
             return;
         }
 
@@ -795,20 +798,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         updateInvitationProgress(jid);
     }
 
-    /**
-     * @see IConnectionListener
-     */
-    public void connectionStateChanged(XMPPConnection connection,
-        final ConnectionState newState) {
-
-        setRoster(saros.getRoster());
-        refreshRosterList();
-    }
-
-    /**
-     * TODO Provide a better mechanisms to subscribe to the roster.
-     */
-    RosterListener rosterListener = new RosterListener() {
+    IRosterListener rosterListener = new IRosterListener() {
 
         public void refreshRoster() {
             runGUIAsynch(new Runnable() {
@@ -833,17 +823,11 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         public void presenceChanged(Presence presence) {
             refreshRoster();
         }
-    };
 
-    public void setRoster(Roster newRoster) {
-        if (this.roster != null) {
-            this.roster.removeRosterListener(rosterListener);
+        public void rosterChanged(Roster roster) {
+            refreshRoster();
         }
-        this.roster = newRoster;
-        if (this.roster != null) {
-            this.roster.addRosterListener(rosterListener);
-        }
-    }
+    };
 
     /**
      * Clears and re-fills the table with all online users from the roster.
@@ -856,7 +840,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
 
         this.table.removeAll();
 
-        if (this.roster == null)
+        Roster roster = saros.getRoster();
+        if (roster == null)
             return;
 
         // Save currently running Invitations...
@@ -867,9 +852,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
         }
         this.input.clear();
 
-        for (RosterEntry entry : this.roster.getEntries()) {
+        for (RosterEntry entry : roster.getEntries()) {
 
-            Presence presence = this.roster.getPresence(entry.getUser());
+            Presence presence = roster.getPresence(entry.getUser());
             if (presence == null || !presence.isAvailable())
                 continue;
 
@@ -995,6 +980,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             monitor.subTask("Checking if user is online " + plainJID);
             if (toInvite == null) {
 
+                Roster roster = saros.getRoster();
+
                 if (!roster.getPresence(plainJID.toString()).isAvailable())
                     return;
 
@@ -1011,7 +998,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI,
             monitor.worked(1);
 
             monitor.subTask("Starting invitation for " + plainJID);
-            
+
             final JID toInviteFinal = toInvite;
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {

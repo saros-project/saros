@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.RosterListener;
+import org.jivesoftware.smack.Roster;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
@@ -17,6 +17,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -59,9 +60,9 @@ public class DiscoveryManager implements Disposable {
 
     /**
      * This RosterListener closure is added to the RosterTracker to get
-     * notifications if the roster is changed.
+     * notifications when the roster changes.
      */
-    protected RosterListener rosterListener = new RosterListener() {
+    protected IRosterListener rosterListener = new IRosterListener() {
 
         protected void clearCache(Presence presence) {
             String rjid = presence.getFrom();
@@ -103,6 +104,10 @@ public class DiscoveryManager implements Disposable {
         public void presenceChanged(Presence presence) {
             log.trace("presenceChanged");
             clearCache(presence);
+        }
+
+        public void rosterChanged(Roster roster) {
+            cache.clear();
         }
     };
 

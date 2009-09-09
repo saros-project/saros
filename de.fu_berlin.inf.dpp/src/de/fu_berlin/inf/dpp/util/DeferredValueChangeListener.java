@@ -34,6 +34,14 @@ public class DeferredValueChangeListener<T> implements ValueChangeListener<T> {
     }
 
     public void setValue(final T newValue) {
+        setValue(newValue, time, timeUnit);
+    }
+
+    /**
+     * This method first cancels any pending value setting and then schedules a
+     * new value setting to occur after the given amount of time.
+     */
+    public void setValue(final T newValue, long time, TimeUnit timeUnit) {
 
         // Lazyly create Thread-Pool Executor
         if (executor == null)
