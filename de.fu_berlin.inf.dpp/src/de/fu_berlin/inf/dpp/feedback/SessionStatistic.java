@@ -192,7 +192,7 @@ public class SessionStatistic {
 
         File file = filePath.toFile();
         FileOutputStream fos = null;
-        log.debug("Writing statistic data to " + file.getPath());
+        log.info("Writing statistic data to " + file.getPath());
 
         // write the statistic to the file
         try {

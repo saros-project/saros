@@ -60,9 +60,8 @@ public class RequestForFileListHandler {
                         if (process != null) {
                             process.invitationAccepted(sender);
                         } else {
-                            log
-                                .warn("Received Invitation Acceptance from unknown user ["
-                                    + sender.getBase() + "]");
+                            log.warn("Rcvd Invitation Acceptance"
+                                + " from unknown user " + Util.prefix(sender));
                         }
                     }
                 });

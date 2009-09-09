@@ -249,8 +249,9 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             listener.invitationReceived(process);
         }
 
-        SessionManager.log.info("Received invitation from [" + from.getBase()
-            + "] with Saros version " + sarosVersion);
+        log.info("Rcvd Invitation " + Util.prefix(from) + "sessionID: "
+            + sessionID + ", colorID: " + colorID + ", sarosVersion: "
+            + sarosVersion);
 
         return process;
     }

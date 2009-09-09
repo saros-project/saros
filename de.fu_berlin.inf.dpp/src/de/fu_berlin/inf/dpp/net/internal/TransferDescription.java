@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A TransferDescription contains all necessary information for dealing with
@@ -104,14 +105,17 @@ public class TransferDescription implements Serializable {
 
         switch (type) {
         case ARCHIVE_TRANSFER:
-            return "Archive from " + getSender() + " [SID=" + sessionID + "]";
+            return "Archive from " + Util.prefix(getSender()) + " [SID="
+                + sessionID + "]";
         case FILELIST_TRANSFER:
-            return "FileList from " + getSender() + " [SID=" + sessionID + "]";
+            return "FileList from " + Util.prefix(getSender()) + " [SID="
+                + sessionID + "]";
         case RESOURCE_TRANSFER:
-            return "Resource from " + getSender() + ": " + file_project_path
-                + " [SID=" + sessionID + "]";
+            return "Resource from " + Util.prefix(getSender()) + ": "
+                + file_project_path + " [SID=" + sessionID + "]";
         case ACTIVITY_TRANSFER:
-            return "Activity from " + getSender() + ": [SID=" + sessionID + "]";
+            return "Activity from " + Util.prefix(getSender()) + ": [SID="
+                + sessionID + "]";
         default:
             return "Not a valid FileTransferType";
         }

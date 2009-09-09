@@ -14,6 +14,7 @@ import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -57,9 +58,8 @@ public class SubscriptionListener implements ConnectionSessionListener {
                 }
 
                 final Presence presence = (Presence) packet;
-
-                log.debug("Received presence packet from: "
-                    + presence.getFrom() + " " + presence);
+                log.info("Received presence packet from: " + Util.prefix(new JID(presence.getFrom())) + " "
+                    + presence);
 
                 switch (presence.getType()) {
                 case available:
@@ -75,7 +75,7 @@ public class SubscriptionListener implements ConnectionSessionListener {
         });
 
     public void processPresence(Presence presence) {
-
+        String userName = Util.prefix(new JID(presence.getFrom()));
         switch (presence.getType()) {
         case error:
             log.warn("Received error presence package - condition: "
@@ -84,16 +84,15 @@ public class SubscriptionListener implements ConnectionSessionListener {
             return;
 
         case subscribed:
-            log.debug("User subscribed to us: " + presence.getFrom());
+            log.info("User subscribed to us: " + userName);
             break;
 
         case unsubscribed:
-            log.debug("User unsubscribed from us: " + presence.getFrom());
+            log.info("User unsubscribed from us: " + userName);
             break;
 
         case subscribe:
-            log.debug("User requests to subscribe to" + " us: "
-                + presence.getFrom());
+            log.info("User requests to subscribe to" + " us: " + userName);
 
             // ask user for confirmation of subscription
             if (askUserForSubscriptionConfirmation(presence.getFrom())) {
@@ -121,8 +120,7 @@ public class SubscriptionListener implements ConnectionSessionListener {
             break;
 
         case unsubscribe:
-            log.debug("User requests to unsubscribe from us: "
-                + presence.getFrom());
+            log.info("User requests to unsubscribe from us: " + userName);
             // if appropriate entry exists remove that
             RosterEntry e = connection.getRoster().getEntry(presence.getFrom());
             if (e != null) {

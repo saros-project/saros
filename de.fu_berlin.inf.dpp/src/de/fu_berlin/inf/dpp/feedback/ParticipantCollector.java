@@ -14,6 +14,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * A Collector class that collects for each number of users the time they were
@@ -66,8 +67,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             // add the new user to the set
             users.add(user);
 
-            log.debug("User " + user.getJID()
-                + " joined. Session now contains "
+            log.info(Util.prefix(user.getJID())
+                + "joined. Session now contains "
                 + currentNumberOfParticipants + " users.");
         }
 
@@ -77,8 +78,9 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             // handle the event with the former number of users
             handleUserEvent(currentNumberOfParticipants + 1);
 
-            log.debug("User " + user.getJID() + " left. Session now contains "
-                + currentNumberOfParticipants + " users.");
+            log.info(Util.prefix(user.getJID())
+                + "left. Session now contains " + currentNumberOfParticipants
+                + " users.");
         }
 
     };
@@ -143,7 +145,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
 
         handleUserEvent(currentNumberOfParticipants);
 
-        log.debug("Session started: Current number of participants: "
+        log.info("Session started: Current number of participants: "
             + currentNumberOfParticipants);
     }
 
@@ -154,7 +156,7 @@ public class ParticipantCollector extends AbstractStatisticCollector {
         sessionTime = Math.max(1, System.currentTimeMillis() - sessionStart);
         handleUserEvent(currentNumberOfParticipants);
 
-        log.debug("Session ended: Current number of participants: "
+        log.info("Session ended: Current number of participants: "
             + currentNumberOfParticipants);
     }
 

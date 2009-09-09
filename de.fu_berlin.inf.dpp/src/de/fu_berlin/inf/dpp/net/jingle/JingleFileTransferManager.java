@@ -294,11 +294,11 @@ public class JingleFileTransferManager {
         connection.getSession().addMediaListener(new JingleMediaListener() {
 
             public void mediaClosed(PayloadType cand) {
-                log.debug("Media closed [" + jid.getBase() + "]");
+                log.debug("Media closed " + Util.prefix(jid));
             }
 
             public void mediaEstablished(PayloadType pt) {
-                log.debug("Media established [" + jid.getBase() + "]");
+                log.debug("Media established " + Util.prefix(jid));
             }
         });
 
@@ -317,8 +317,7 @@ public class JingleFileTransferManager {
 
             public void sessionClosedOnError(XMPPException arg0,
                 JingleSession arg1) {
-                log.info("JingleSession closed on error [" + jid.getBase()
-                    + "]");
+                log.info("JingleSession closed on error " + Util.prefix(jid));
                 connection.setState(JingleConnectionState.ERROR);
             }
 
@@ -496,7 +495,7 @@ public class JingleFileTransferManager {
         if (outgoing != null) {
             try {
                 outgoing.session.terminate();
-                log.info("JingleSession Terminated [" + jid.getBase() + "]");
+                log.info("JingleSession Terminated " + Util.prefix(jid));
             } catch (XMPPException e1) {
                 log.error(
                     "Error during terminating outgoing jingle session with JID : "

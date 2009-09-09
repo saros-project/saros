@@ -650,9 +650,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         public boolean receivedResource(JID from, IPath path, InputStream input) {
 
-            log
-                .debug("Incoming resource from " + from.toString() + ": "
-                    + path);
+            log.debug("Incoming resource from " + Util.prefix(from) + ": "
+                + path);
 
             // TODO CJ: move this to business logic
             IInvitationProcess process = invitationProcesses
@@ -672,8 +671,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             IInvitationProcess process = invitationProcesses
                 .getInvitationProcess(data.sender);
             if (process == null) {
-                log.warn("Received FileList from unknown user ["
-                    + data.sender.getBase() + "]");
+                log.warn("Rcvd FileList from unknown user "
+                    + Util.prefix(data.sender));
                 return false;
             }
 
@@ -703,7 +702,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         public boolean receivedArchive(TransferDescription data,
             InputStream input) {
 
-            log.debug("Incoming archive [" + data.sender.getName() + "]");
+            log.debug("Incoming archive " + Util.prefix(data.sender));
 
             long startTime = System.currentTimeMillis();
 

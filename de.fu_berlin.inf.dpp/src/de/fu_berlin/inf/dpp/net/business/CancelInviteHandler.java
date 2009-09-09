@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
+import de.fu_berlin.inf.dpp.util.Util;
 
 @Component(module = "net")
 public class CancelInviteHandler extends CancelInviteExtension {
@@ -36,8 +37,8 @@ public class CancelInviteHandler extends CancelInviteExtension {
         if (process != null) {
             process.cancel(errorMsg, true);
         } else {
-            log.warn("Received Invitation Canceled message from unknown user ["
-                + sender.getBase() + "]");
+            log.warn("Received Invitation Canceled message from unknown user "
+                + Util.prefix(sender));
         }
     }
 }

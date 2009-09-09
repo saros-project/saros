@@ -185,9 +185,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        log.debug("Send request to cancel Invititation to ["
-            + user.getBase()
-            + "] "
+        log.debug("Send request to cancel Invititation to "
+            + Util.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
         sendMessage(user, cancelInviteExtension.create(sessionID.getValue(),
@@ -232,8 +231,8 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendInviteMessage(ISharedProject sharedProject, JID guest,
         String description, int colorID, Version sarosVersion) {
-        log.debug("Send invitation to [" + guest.getBase()
-            + "] with description '" + description + "' and Saros version "
+        log.debug("Send invitation to " + Util.prefix(guest)
+            + " with description '" + description + "' and Saros version "
             + sarosVersion.toString());
         sendMessage(guest, inviteExtension.create(sharedProject.getProject()
             .getName(), description, colorID, sarosVersion));
@@ -315,7 +314,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             }
         }
 
-        log.debug("Sent Activities to " + recipient + ": " + timedActivities);
+        log.debug("Sent (" + String.format("%03d", timedActivities.size())
+            + ") " + Util.prefix(recipient) + timedActivities);
     }
 
     /**

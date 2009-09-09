@@ -163,7 +163,8 @@ public class ConcurrentDocumentServer implements Disposable {
             User to = sharedProject.getUser(jid);
 
             if (to == null) {
-                log.error("Unknown user in transformation result: " + jid);
+                log.error("Unknown user in transformation result: "
+                    + Util.prefix(jid));
                 continue;
             }
 
@@ -187,7 +188,7 @@ public class ConcurrentDocumentServer implements Disposable {
 
         assert sharedProject.isHost();
 
-        log.debug("Resetting jupiter server for [" + jid.getBase() + "]: "
+        log.debug("Resetting jupiter server for " + Util.prefix(jid) + ": "
             + path.toOSString());
         this.server.reset(path, jid);
     }

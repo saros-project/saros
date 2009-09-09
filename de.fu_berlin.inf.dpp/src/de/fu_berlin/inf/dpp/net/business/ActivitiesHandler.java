@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Handler for all {@link TimedActivities}
@@ -39,22 +40,24 @@ public class ActivitiesHandler {
             public void processPacket(Packet packet) {
                 try {
                     TimedActivities payload = provider.getPayload(packet);
-
                     if (payload == null) {
                         log.warn("Invalid ActivitiesExtensionPacket"
                             + " does not contain a payload: " + packet);
                         return;
                     }
+                    JID from = new JID(packet.getFrom());
+                    List<TimedActivity> timedActivities = payload
+                    .getTimedActivities();
 
                     if (!ObjectUtils.equals(sessionID.getValue(), payload
                         .getSessionID())) {
-                        log.warn("Received ActivitiesExtensionPacket"
-                            + " from an old/unknown session: " + packet);
+                        log.warn("Rcvd ("
+                            + String.format("%03d", timedActivities.size())
+                            + ") " + Util.prefix(from) + "from an old/unknown session: " + timedActivities);
                         return;
                     }
 
-                    receiveActivities(new JID(packet.getFrom()), payload
-                        .getTimedActivities());
+                    receiveActivities(from, timedActivities);
 
                 } catch (Exception e) {
                     log.error(
@@ -80,16 +83,16 @@ public class ActivitiesHandler {
      */
     public void receiveActivities(JID fromJID,
         List<TimedActivity> timedActivities) {
-        String source = fromJID.toString();
 
         final ISharedProject project = sharedProject.getValue();
 
         if (project == null || project.getUser(fromJID) == null) {
-            log.warn("Received activities from " + source
-                + " but User is no participant: " + timedActivities);
+            log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
+                + ") " + Util.prefix(fromJID) + " but User is no participant: " + timedActivities);
             return;
         } else {
-            log.debug("Rcvd [" + fromJID.getName() + "]: " + timedActivities);
+            log.debug("Rcvd (" + String.format("%03d", timedActivities.size())
+                + ") " + Util.prefix(fromJID) + ": " + timedActivities);
         }
 
         for (TimedActivity timedActivity : timedActivities) {

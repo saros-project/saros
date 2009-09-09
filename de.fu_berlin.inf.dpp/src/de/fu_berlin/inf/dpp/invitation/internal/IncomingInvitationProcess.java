@@ -92,7 +92,8 @@ public class IncomingInvitationProcess extends InvitationProcess implements
     public IncomingInvitationProcess(SessionManager sessionManager,
         ITransmitter transmitter, DataTransferManager dataTransferManager,
         JID from, String projectName, String description, int colorID,
-        String peersSarosVersion, InvitationProcessObservable invitationProcesses) {
+        String peersSarosVersion,
+        InvitationProcessObservable invitationProcesses) {
 
         super(transmitter, from, description, colorID, peersSarosVersion,
             invitationProcesses);
@@ -111,11 +112,11 @@ public class IncomingInvitationProcess extends InvitationProcess implements
      */
     public void fileListReceived(JID from, FileList fileList) {
 
-        log.debug("Received file list from " + from.getBase());
+        log.debug("Received file list from " + Util.prefix(from));
         assertState(State.HOST_FILELIST_REQUESTED);
 
         if (fileList == null) {
-            cancel("Failed to receive remote file list.", false);
+            cancel("Failed to receive remote file list from " + Util.prefix(from), false);
         } else {
             setState(State.HOST_FILELIST_SENT);
             this.remoteFileList = fileList;
@@ -369,7 +370,7 @@ public class IncomingInvitationProcess extends InvitationProcess implements
 
         progressMonitor.subTask("File received: " + path.lastSegment() + " ("
             + this.filesLeftToSynchronize + " left)");
-        log.debug("New file received: " + path);
+        log.trace("New file received: " + path);
 
         IFile file = this.localProject.getFile(path);
 

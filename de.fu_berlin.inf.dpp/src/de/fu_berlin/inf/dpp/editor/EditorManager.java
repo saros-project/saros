@@ -298,7 +298,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                     new TextSelectionActivity(saros.getMyJID().toString(),
                         offset, length, locallyActiveEditor));
             } else {
-                log.warn("No select for locallyActivateEditor: "
+                log.warn("No selection for locallyActivateEditor: "
                     + locallyActiveEditor);
             }
         }
@@ -1575,7 +1575,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             .getActiveEditor();
 
         if (activeEditor == null) {
-            log.info("User [" + jumpTo + "] has no editor open");
+            log.info(Util.prefix(jumpTo.getJID())
+                + "has no editor open");
             return;
         }
 
@@ -1589,8 +1590,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         ILineRange viewport = activeEditor.getViewport();
 
         if (viewport == null) {
-            log.warn("User [" + jumpTo + "] has no viewport in editor: "
-                + activeEditor.getPath());
+            log.warn(Util.prefix(jumpTo.getJID())
+                + "has no viewport in editor: " + activeEditor.getPath());
             return;
         }
 

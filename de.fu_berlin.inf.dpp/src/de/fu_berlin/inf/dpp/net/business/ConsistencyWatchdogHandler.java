@@ -111,13 +111,14 @@ public class ConsistencyWatchdogHandler {
             final String pathsOfInconsistencies = Util.toOSString(paths);
 
             if (resolved) {
-                log.info("Inconsistency resolved for [" + from + "]");
+                log.info("Inconsistency resolved for " + Util.prefix(from)
+                    + "for " + pathsOfInconsistencies);
                 closeChecksumErrorMessage(pathsOfInconsistencies, from);
                 return;
             }
 
-            log.debug("Received Checksum Error from [" + from + "] for "
-                + pathsOfInconsistencies);
+            log.debug("Received Checksum Error from " + Util.prefix(from)
+                + "for " + pathsOfInconsistencies);
 
             startRecovery(pathsOfInconsistencies, from, paths);
         }

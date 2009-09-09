@@ -278,7 +278,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      */
     protected void countSessions() {
         putSessionCount(getSessionCount() + 1);
-        log.debug("Session count: " + getSessionCount());
+        log.info("Session count: " + getSessionCount());
     }
 
     /**

@@ -437,7 +437,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
                 return;
             } catch (IOException e) {
-                log.debug("Jingle [" + connectTo.getName() + "] "
+                log.debug("Jingle " + Util.prefix(connectTo)
                     + "Failed to listen with either TCP or UDP.", e);
 
                 close();

@@ -11,6 +11,7 @@ import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Business Logic for handling Invitation requests
@@ -55,17 +56,15 @@ public class InvitationHandler {
             String sarosVersion) {
             if (sessionIDObservable.getValue().equals(
                 SessionIDObservable.NOT_IN_SESSION)) {
-                log.debug("Received invitation with session id " + sessionID
-                    + " and ColorID: " + colorID);
+                log.debug("Rcvd Invitation " + Util.prefix(sender)
+                    + "sessionID: " + sessionID + ", colorID: " + colorID
+                    + ", sarosVersion: " + sarosVersion);
                 sessionManager.invitationReceived(sender, sessionID,
                     projectName, description, colorID, sarosVersion);
             } else {
-                transmitter
-                    .sendMessage(
-                        sender,
-                        cancelInviteExtension
-                            .create(sessionID,
-                                "I am already in a Saros-Session, try to contact me by chat first."));
+                transmitter.sendMessage(sender, cancelInviteExtension.create(
+                    sessionID, "I am already in a Saros-Session,"
+                        + " try to contact me by chat first."));
             }
         }
     }
