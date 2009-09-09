@@ -24,8 +24,8 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
-import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 
 /**
  * Class used to initialize default preference values.
@@ -62,7 +62,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         prefs.putBoolean(PreferenceConstants.AUTO_CLOSE_DIALOG, true);
         prefs.putBoolean(PreferenceConstants.SKIP_SYNC_SELECTABLE, false);
 
-        // its a new workspace per default, is set to false in earlyStartup()
+        // its a new workspace per default, is set to false after first start in
+        // earlyStartup()
         prefs.putBoolean(PreferenceConstants.NEW_WORKSPACE, true);
 
         // Initialize Feedback Preferences
@@ -70,6 +71,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             FeedbackManager.FEEDBACK_ENABLED);
         prefs.putInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL, 5);
         prefs.putInt(PreferenceConstants.STATISTIC_ALLOW_SUBMISSION,
-            StatisticManager.STATISTIC_UNKNOWN);
+            AbstractFeedbackManager.UNKNOWN);
+        prefs.putInt(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION,
+            AbstractFeedbackManager.UNKNOWN);
+        prefs.putInt(PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL,
+            AbstractFeedbackManager.FORBID);
     }
 }

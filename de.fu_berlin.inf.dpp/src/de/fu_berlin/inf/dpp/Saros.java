@@ -78,6 +78,7 @@ import de.fu_berlin.inf.dpp.concurrent.watchdog.SessionViewOpener;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.feedback.DataTransferCollector;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.ParticipantCollector;
 import de.fu_berlin.inf.dpp.feedback.RoleChangeCollector;
@@ -363,6 +364,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(DataTransferManager.class);
         this.container.addComponent(DiscoveryManager.class);
         this.container.addComponent(EditorManager.class);
+        this.container.addComponent(ErrorLogManager.class);
         this.container.addComponent(FeedbackManager.class);
         this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JDTFacade.class);
@@ -518,12 +520,17 @@ public class Saros extends AbstractUIPlugin {
         if (!autoConnect)
             return;
 
+        StatisticManager statisticManager = container
+            .getComponent(StatisticManager.class);
+        ErrorLogManager errorLogManager = container
+            .getComponent(ErrorLogManager.class);
+
         // we need at least a user name, but also the agreement to the
-        // statistic submission
+        // statistic and error log submission
         boolean hasUserName = this.container
             .getComponent(PreferenceUtils.class).hasUserName();
-        boolean hasAgreement = this.container.getComponent(
-            StatisticManager.class).hasStatisticAgreement();
+        boolean hasAgreement = statisticManager.hasStatisticAgreement()
+            && errorLogManager.hasErrorLogAgreement();
 
         if (hasUserName && hasAgreement) {
             asyncConnect();

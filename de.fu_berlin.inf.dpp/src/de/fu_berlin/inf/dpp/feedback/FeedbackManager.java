@@ -47,7 +47,6 @@ public class FeedbackManager extends AbstractFeedbackManager {
 
     public static final long MIN_SESSION_TIME = 5 * 60; // 5 min.
 
-    public static final int FEEDBACK_UNDEFINED = 0;
     public static final int FEEDBACK_ENABLED = 1;
     public static final int FEEDBACK_DISABLED = 2;
 

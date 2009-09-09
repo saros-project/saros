@@ -26,6 +26,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
+import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 
@@ -41,6 +43,12 @@ public class ConfigurationWizard extends Wizard {
 
     @Inject
     protected PreferenceUtils preferenceUtils;
+
+    @Inject
+    protected StatisticManager statisticManager;
+
+    @Inject
+    protected ErrorLogManager errorLogManager;
 
     /**
      * We keep our own list of IWizardPage2s so we can call performFinish on
@@ -69,7 +77,8 @@ public class ConfigurationWizard extends Wizard {
             this.pages.add(new GeneralSettingsPage(saros, preferenceUtils));
         }
         if (askAboutStatisticSubmission) {
-            this.pages.add(new AllowStatisticSubmissionPage());
+            this.pages.add(new AllowStatisticSubmissionPage(statisticManager,
+                errorLogManager));
         }
     }
 

@@ -8,8 +8,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -20,7 +24,6 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.FeedbackPreferencePage;
 import de.fu_berlin.inf.dpp.util.StackTrace;
-import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * The StatisticManager is supposed to gather statistic data and submit it at
@@ -37,10 +40,6 @@ public class StatisticManager extends AbstractFeedbackManager {
     protected static final Random random = new Random();
 
     public static final String INFO_URL = "https://www.inf.fu-berlin.de/w/SE/DPPFeedback"; //$NON-NLS-1$
-
-    public static final int STATISTIC_UNKNOWN = 0;
-    public static final int STATISTIC_ALLOW = 1;
-    public static final int STATISTIC_FORBID = 2;
 
     public static final String STATISTIC_FILE_NAME = "session-data";
     public static final String STATISTIC_FILE_EXTENSION = ".txt";
@@ -127,7 +126,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      * @return true if it is allowed
      */
     public boolean isStatisticSubmissionAllowed() {
-        return getStatisticSubmissionStatus() == STATISTIC_ALLOW;
+        return getStatisticSubmissionStatus() == ALLOW;
     }
 
     public boolean isPseudonymSubmissionAllowed() {
@@ -164,9 +163,9 @@ public class StatisticManager extends AbstractFeedbackManager {
      */
     public int getStatisticSubmissionStatus() {
         int status = saros.getConfigPrefs().getInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, -1);
+            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION, UNDEFINED);
 
-        if (status == -1)
+        if (status == UNDEFINED)
             status = saros.getPreferenceStore().getInt(
                 PreferenceConstants.STATISTIC_ALLOW_SUBMISSION);
         return status;
@@ -175,13 +174,9 @@ public class StatisticManager extends AbstractFeedbackManager {
     /**
      * Saves in the workspace and globally if the user wants to submit statistic
      * data.
-     * 
-     * @param allow
      */
     public void setStatisticSubmissionAllowed(boolean allow) {
-        int submission = allow ? StatisticManager.STATISTIC_ALLOW
-            : StatisticManager.STATISTIC_FORBID;
-
+        int submission = allow ? ALLOW : FORBID;
         setStatisticSubmission(submission);
     }
 
@@ -193,7 +188,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      * the local setting is working with latest global data.
      * 
      * @param submission
-     *            (see constants of StatisticManager)
+     *            (see constants of {@link AbstractFeedbackManager})
      */
     protected void setStatisticSubmission(int submission) {
         // store in configuration and preference scope
@@ -247,7 +242,7 @@ public class StatisticManager extends AbstractFeedbackManager {
      *         otherwise false
      */
     public boolean hasStatisticAgreement() {
-        return getStatisticSubmissionStatus() != STATISTIC_UNKNOWN;
+        return getStatisticSubmissionStatus() != UNKNOWN;
     }
 
     /**
@@ -293,7 +288,11 @@ public class StatisticManager extends AbstractFeedbackManager {
         sb.append("  Feedback interval: " + feedbackManager.getSurveyInterval()
             + "\n");
         sb.append("  Statistic submission allowed: "
-            + this.isStatisticSubmissionAllowed());
+            + isStatisticSubmissionAllowed() + "\n");
+        sb.append("  Pseudonym submission allowed: "
+            + isPseudonymSubmissionAllowed());
+        if (isPseudonymSubmissionAllowed())
+            sb.append("\n  Pseudonym is: " + getStatisticsPseudonymID());
         log.info(sb.toString());
     }
 
@@ -316,9 +315,11 @@ public class StatisticManager extends AbstractFeedbackManager {
                 userID);
             saros.saveConfigPrefs();
         }
-        // if we are a developer, add this info to our user ID
+        // HACK if we are a developer, add this info to our user ID
         if (saros.getVersion().endsWith("DEVEL"))
-            return "sarosTeam-" + userID;
+            userID = "sarosTeam-" + userID;
+        if (isPseudonymSubmissionAllowed())
+            userID += "-" + getStatisticsPseudonymID();
         return userID;
     }
 
@@ -357,35 +358,54 @@ public class StatisticManager extends AbstractFeedbackManager {
     }
 
     /**
-     * Saves the statistic in a file and submits it to our Tomcat server if the
-     * user has permitted statistic submission.
+     * Saves the statistic as a file in the plugin's state area and submits it
+     * to our server if the user has permitted statistic submission.
      * 
      * @nonblocking Because the upload might take some time, it is executed
      *              asynchronously in a new thread.
      */
     protected void saveAndSubmitStatistic() {
-        Util.runSafeAsync(log, new Runnable() {
+        // save to disk
+        File file = statistic
+            .toFile(saros.getStateLocation(), createFileName());
 
-            public void run() {
-                File file = statistic.toFile(saros.getStateLocation(),
-                    createFileName());
+        // only submit, if user permitted submission
+        if (isStatisticSubmissionAllowed()) {
+            submitStatisticFile(file);
+        } else {
+            log.info(String.format("Statistic was "
+                + "gathered and saved to %s, but the "
+                + "submission is forbidden by the user.", file
+                .getAbsolutePath()));
+        }
+    }
 
-                // only submit, if user permitted submission
-                if (isStatisticSubmissionAllowed()) {
-                    try {
-                        FileSubmitter.uploadStatisticFile(file);
-                    } catch (IOException e) {
-                        log.error(String.format("Couldn't upload file: %s. %s",
-                            e.getMessage(), e.getCause().getMessage()));
-                    }
-                } else {
-                    log.info(String.format(
-                        "Statistic was gathered and saved to %s,"
-                            + " but the submission is forbidden by the user",
-                        file.getAbsolutePath()));
+    /**
+     * Submits the given statistic file to our Tomcat server by wrapping the
+     * submission in an IRunnableWithProgress to report feedback of the
+     * execution in the active workbench windows status bar.
+     * 
+     * @see FileSubmitter#uploadStatisticFile(File, SubMonitor)
+     * @nonblocking
+     * @cancelable
+     */
+    protected void submitStatisticFile(final File file) {
+        runAsyncInWorkbenchWindow(log, new IRunnableWithProgress() {
+            public void run(IProgressMonitor monitor) {
+                try {
+                    FileSubmitter.uploadStatisticFile(file, SubMonitor
+                        .convert(monitor));
+                } catch (IOException e) {
+                    log.error(String.format("Couldn't upload file: %s. %s", e
+                        .getMessage(), e.getCause() != null ? e.getCause()
+                        .getMessage() : ""));
+                } catch (CancellationException e) {
+                    log.warn("The submission of the statistic file was"
+                        + " cancelled by the user.");
+                } finally {
+                    monitor.done();
                 }
             }
-
         });
     }
 
@@ -413,12 +433,13 @@ public class StatisticManager extends AbstractFeedbackManager {
         }
 
         /*
-         * write statistic to file, if all data has arrived; send it to our
-         * server, if user permitted submission
+         * Write statistic to file, if all data has arrived; send it to our
+         * server, if the user permitted submission. Because the upload(s) might
+         * take some time, it is executed asynchronously
          */
         if (activeCollectors == null || activeCollectors.isEmpty()) {
-            saveAndSubmitStatistic();
             log.debug(statistic.toString());
+            saveAndSubmitStatistic();
         }
     }
 }

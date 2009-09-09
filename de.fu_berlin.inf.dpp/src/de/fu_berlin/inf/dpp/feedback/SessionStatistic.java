@@ -22,7 +22,16 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * The SessionStatistic class wraps a Properties object in which the gathered
  * statistical data can be stored as simple key/value pairs. This data can then
- * be saved to disk as a file.
+ * be saved to disk as a file.<br>
+ * <br>
+ * 
+ * TODO Add a field user.saros.team to the SessionStatistic which is set to true
+ * if:<br>
+ * - the associated button on the FeedbackPreferencePage is true <br>
+ * - the Saros version number does not end with rXXXX <br>
+ * - the version number is just [X]X.[X]X.[X]X (with [X] being optional)<br>
+ * The value should be determined by the SessionDataCollector and written to the
+ * statistic on the end of a session.
  * 
  * @author Lisa Dohrmann
  */

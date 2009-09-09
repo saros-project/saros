@@ -11,6 +11,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -41,6 +42,9 @@ public class StartupSaros implements IStartup {
 
     @Inject
     protected StatisticManager statisticManager;
+
+    @Inject
+    protected ErrorLogManager errorLogManager;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -89,7 +93,8 @@ public class StartupSaros implements IStartup {
             public void run() {
                 // determine which pages have to be shown
                 boolean hasUsername = preferenceUtils.hasUserName();
-                boolean hasAgreement = statisticManager.hasStatisticAgreement();
+                boolean hasAgreement = statisticManager.hasStatisticAgreement()
+                    && errorLogManager.hasErrorLogAgreement();
 
                 if (!hasUsername || !hasAgreement) {
                     Wizard wiz = new ConfigurationWizard(!hasUsername,

@@ -30,6 +30,8 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.feedback.AbstractFeedbackManager;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.FeedbackManager;
 import de.fu_berlin.inf.dpp.feedback.Messages;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
@@ -58,9 +60,14 @@ public class FeedbackPreferencePage extends PreferencePage implements
     @Inject
     protected StatisticManager statisticManager;
 
+    @Inject
+    protected ErrorLogManager errorLogManager;
+
     protected Button radioDisable;
     protected Button radioEnable;
     protected Button allowSubmission;
+    protected Button allowErrorLogSubmission;
+    protected Button allowFullErrorLogSubmission;
     protected Button allowPseudonym;
     protected Combo intervalCombo;
     protected Text statisticsPseudonymText;
@@ -70,6 +77,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
     protected boolean isFeedbackDisabled;
     protected FeedbackInterval currentInterval;
     protected boolean isSubmissionAllowed;
+    protected boolean isErrorLogSubmissionAllowed;
+    protected boolean isFullErrorLogSubmissionAllowed;
     protected String pseudonymID;
     protected boolean isPseudonymAllowed;
 
@@ -90,6 +99,10 @@ public class FeedbackPreferencePage extends PreferencePage implements
         isSubmissionAllowed = statisticManager.isStatisticSubmissionAllowed();
         isPseudonymAllowed = statisticManager.isPseudonymSubmissionAllowed();
         pseudonymID = statisticManager.getStatisticsPseudonymID();
+        isErrorLogSubmissionAllowed = errorLogManager
+            .isErrorLogSubmissionAllowed();
+        isFullErrorLogSubmissionAllowed = errorLogManager
+            .isFullErrorLogSubmissionAllowed();
 
         initComponents();
     }
@@ -107,6 +120,12 @@ public class FeedbackPreferencePage extends PreferencePage implements
         setSubmissionAllowed(isSubmissionAllowed);
         allowPseudonym.setSelection(isPseudonymAllowed);
         setPseudonymAllowed(isPseudonymAllowed);
+        allowErrorLogSubmission.setSelection(isErrorLogSubmissionAllowed);
+        allowFullErrorLogSubmission
+            .setSelection(isFullErrorLogSubmissionAllowed);
+
+        allowFullErrorLogSubmission.setEnabled(isErrorLogSubmissionAllowed);
+
     }
 
     /**
@@ -132,6 +151,11 @@ public class FeedbackPreferencePage extends PreferencePage implements
             && isPseudonymAllowed);
     }
 
+    protected void setErrorLogSubmissionAllowed(boolean allowed) {
+        isErrorLogSubmissionAllowed = allowed;
+        allowFullErrorLogSubmission.setEnabled(allowed);
+    }
+
     @Override
     protected Control createContents(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
@@ -142,9 +166,8 @@ public class FeedbackPreferencePage extends PreferencePage implements
         createStartSurveyGroup(composite);
         createIntervalGroup(composite);
         createStatisticGroup(composite);
+        createErrorLogGroup(composite);
         createContactGroup(composite);
-
-        createSpacer(composite, 1);
 
         Label label = new Label(composite, SWT.NONE);
         label.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -328,6 +351,50 @@ public class FeedbackPreferencePage extends PreferencePage implements
                 pseudonymID = statisticsPseudonymText.getText();
             }
         });
+
+        /*
+         * TODO Add a Check-Button to determine whether the user is a member of
+         * the Saros team or not. A checked button means: Whatever version of
+         * Saros is used, this user is a team member and thus his statistic has
+         * to be filtered from the rest.
+         */
+    }
+
+    protected void createErrorLogGroup(Composite parent) {
+        Group group = new Group(parent, SWT.NONE);
+        group.setText(Messages.getString("feedback.page.group.error.log")); //$NON-NLS-1$
+        group.setLayout(new GridLayout(1, false));
+        group.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+        allowErrorLogSubmission = new Button(group, SWT.CHECK);
+        allowErrorLogSubmission.setText(Messages
+            .getString("feedback.page.error.log.allow")); //$NON-NLS-1$
+
+        allowErrorLogSubmission.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                setErrorLogSubmissionAllowed(allowErrorLogSubmission
+                    .getSelection());
+            }
+        });
+
+        /*
+         * TODO add a button to open the error log directory and let the user
+         * pick a log to view it in an editor
+         */
+
+        allowFullErrorLogSubmission = new Button(group, SWT.CHECK);
+        allowFullErrorLogSubmission.setText(Messages
+            .getString("feedback.page.error.log.full.allow")); //$NON-NLS-1$
+        allowFullErrorLogSubmission
+            .addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    isFullErrorLogSubmissionAllowed = allowFullErrorLogSubmission
+                        .getSelection();
+                }
+            });
+
     }
 
     protected void createContactGroup(Composite parent) {
@@ -371,9 +438,13 @@ public class FeedbackPreferencePage extends PreferencePage implements
         currentInterval = FeedbackInterval.getFromInterval(getPreferenceStore()
             .getDefaultInt(PreferenceConstants.FEEDBACK_SURVEY_INTERVAL));
         setSubmissionAllowed(getPreferenceStore().getDefaultInt(
-            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == StatisticManager.STATISTIC_ALLOW);
+            PreferenceConstants.STATISTIC_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
         setPseudonymAllowed(getPreferenceStore().getDefaultBoolean(
             PreferenceConstants.STATISTIC_ALLOW_PSEUDONYM));
+        setErrorLogSubmissionAllowed(getPreferenceStore().getDefaultInt(
+            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION) == AbstractFeedbackManager.ALLOW);
+        isFullErrorLogSubmissionAllowed = getPreferenceStore().getDefaultInt(
+            PreferenceConstants.ERROR_LOG_ALLOW_SUBMISSION_FULL) == AbstractFeedbackManager.ALLOW;
 
         // initialize components with defaults
         initComponents();
@@ -389,6 +460,10 @@ public class FeedbackPreferencePage extends PreferencePage implements
         statisticManager.setStatisticSubmissionAllowed(isSubmissionAllowed);
         statisticManager.setPseudonymSubmissionAllowed(isPseudonymAllowed);
         statisticManager.setStatisticsPseudonymID(pseudonymID);
+        errorLogManager
+            .setErrorLogSubmissionAllowed(isErrorLogSubmissionAllowed);
+        errorLogManager
+            .setFullErrorLogSubmissionAllowed(isFullErrorLogSubmissionAllowed);
 
         return super.performOk();
     }

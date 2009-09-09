@@ -36,6 +36,7 @@ import org.picocontainer.Disposable;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
@@ -57,6 +58,8 @@ public class ConnectDisconnectAction extends Action implements Disposable {
 
     protected StatisticManager statisticManager;
 
+    protected ErrorLogManager errorLogManager;
+
     protected PreferenceUtils preferenceUtils;
 
     protected IConnectionListener connectionListener = new IConnectionListener() {
@@ -76,12 +79,14 @@ public class ConnectDisconnectAction extends Action implements Disposable {
 
     public ConnectDisconnectAction(SarosUI sarosUI, Saros saros,
         IStatusLineManager statusLineManager,
-        StatisticManager statisticManager, PreferenceUtils preferenceUtils) {
+        StatisticManager statisticManager, ErrorLogManager errorLogManager,
+        PreferenceUtils preferenceUtils) {
 
         this.saros = saros;
         this.statusLineManager = statusLineManager;
         this.sarosUI = sarosUI;
         this.statisticManager = statisticManager;
+        this.errorLogManager = errorLogManager;
         this.preferenceUtils = preferenceUtils;
 
         updateStatus();
@@ -113,10 +118,14 @@ public class ConnectDisconnectAction extends Action implements Disposable {
                 saros.disconnect();
                 return;
             }
-            // see if we have a user name and an agreement to submitting
-            // user statistics, if not, show wizard before connecting
+            /*
+             * see if we have a user name and an agreement to submitting user
+             * statistics and the error log, if not, show wizard before
+             * connecting
+             */
             boolean hasUsername = preferenceUtils.hasUserName();
-            boolean hasAgreement = statisticManager.hasStatisticAgreement();
+            boolean hasAgreement = statisticManager.hasStatisticAgreement()
+                && errorLogManager.hasErrorLogAgreement();
 
             if (!hasUsername || !hasAgreement) {
                 boolean ok = showConfigurationWizard(!hasUsername,
@@ -133,7 +142,7 @@ public class ConnectDisconnectAction extends Action implements Disposable {
 
     /**
      * Opens the ConfigurationWizard to let the user specify his account
-     * settings and the agreement for statistic submissions.
+     * settings and the agreement for statistic and error log submissions.
      * 
      * @param askForAccount
      * @param askAboutStatisticTransfer

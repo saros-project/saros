@@ -65,6 +65,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.feedback.ErrorLogManager;
 import de.fu_berlin.inf.dpp.feedback.StatisticManager;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
@@ -144,6 +145,9 @@ public class RosterView extends ViewPart {
 
     @Inject
     protected StatisticManager statisticManager;
+
+    @Inject
+    ErrorLogManager errorLogManager;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -735,7 +739,7 @@ public class RosterView extends ViewPart {
         IToolBarManager toolBarManager = bars.getToolBarManager();
         ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
             sarosUI, saros, bars.getStatusLineManager(), statisticManager,
-            preferenceUtils);
+            errorLogManager, preferenceUtils);
         disposables.add(connectAction);
         toolBarManager.add(connectAction);
         toolBarManager.add(new NewContactAction(saros));
