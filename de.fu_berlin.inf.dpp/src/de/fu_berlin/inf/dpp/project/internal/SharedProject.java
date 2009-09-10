@@ -51,6 +51,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -323,14 +324,18 @@ public class SharedProject implements ISharedProject, Disposable {
         assert user.getSharedProject().equals(this);
 
         JID jid = user.getJID();
-        if (this.participants.containsKey(jid)) {
-            log.warn("User " + jid + " added twice to SharedProject");
+
+        if (participants.putIfAbsent(jid, user) != null) {
+            log.error("User " + Util.prefix(jid)
+                + " added twice to SharedProject", new StackTrace());
+            throw new IllegalArgumentException();
         }
-        participants.putIfAbsent(jid, user);
+
         for (ISharedProjectListener listener : this.listeners) {
             listener.userJoined(user);
         }
-        SharedProject.log.info("User " + jid + " joined session");
+
+        log.info("User " + jid + " joined session");
     }
 
     public void removeUser(User user) {
