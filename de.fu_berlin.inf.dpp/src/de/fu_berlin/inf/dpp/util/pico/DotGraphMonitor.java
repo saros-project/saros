@@ -232,12 +232,11 @@ public final class DotGraphMonitor extends AbstractComponentMonitor implements
         List<String> list = new ArrayList<String>(lines);
         Collections.sort(list);
 
-        String dependencies = "";
+        StringBuilder dependencies = new StringBuilder();
         for (Object aList : list) {
-            String dep = (String) aList;
-            dependencies = dependencies + dep;
+            dependencies.append(aList);
         }
-        return dependencies.replaceAll("'", "\"");
+        return dependencies.toString().replaceAll("'", "\"");
     }
 
     public String getInterfaceDependencyGraph() {
