@@ -845,10 +845,10 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
             return;
 
         // Save currently running Invitations...
-        HashMap<JID, IOutgoingInvitationProcess> currentInvitations = new HashMap<JID, IOutgoingInvitationProcess>();
+        HashMap<JID, InviterData> oldInvData = new HashMap<JID, InviterData>();
         for (InviterData data : input) {
             if (data.outgoingProcess != null)
-                currentInvitations.put(data.jid, data.outgoingProcess);
+                oldInvData.put(data.jid, data);
         }
         this.input.clear();
 
@@ -866,20 +866,28 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
             InviterData invdat = new InviterData();
             invdat.jid = new JID(entry.getUser());
             invdat.nickname = Util.getDisplayableName(entry);
+
             // Check if we have a running invitation for the user
-            invdat.outgoingProcess = currentInvitations.remove(invdat.jid);
+            InviterData currData = oldInvData.remove(invdat.jid);
+            if (currData != null) {
+                invdat.outgoingProcess = currData.outgoingProcess;
+                invdat.progress = currData.progress;
+            }
 
             this.input.add(invdat);
         }
 
         // TODO Keep in dialog and show as error to user...
-        if (currentInvitations.size() > 0) {
-            for (IOutgoingInvitationProcess process : currentInvitations
-                .values()) {
-                log.warn("User " + process.getPeer()
-                    + " went offline during invitation.");
-                process.cancel("User went offline", true);
-            }
+
+        for (InviterData invData : oldInvData.values()) {
+            log.warn("User " + invData.outgoingProcess.getPeer()
+                + " went offline during invitation.");
+            /*
+             * TODO Checking the cancellation state should be done in the
+             * process
+             */
+            if (invData.outgoingProcess.getState() != IInvitationProcess.State.CANCELED)
+                invData.outgoingProcess.cancel("User went offline", true);
         }
 
         this.tableViewer.refresh();
