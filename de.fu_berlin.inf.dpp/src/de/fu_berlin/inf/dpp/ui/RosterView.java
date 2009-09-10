@@ -539,11 +539,9 @@ public class RosterView extends ViewPart {
                 if (elem2 instanceof RosterEntry) {
                     RosterEntry entry2 = (RosterEntry) elem2;
 
-                    Presence presence1 = RosterView.this.roster
-                        .getPresence(entry1.getUser());
+                    Presence presence1 = roster.getPresence(entry1.getUser());
 
-                    Presence presence2 = RosterView.this.roster
-                        .getPresence(entry2.getUser());
+                    Presence presence2 = roster.getPresence(entry2.getUser());
 
                     if (presence1 == null) {
                         if (presence2 != null) {
