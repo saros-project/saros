@@ -16,11 +16,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
@@ -223,50 +220,34 @@ public class ConsistencyWatchdogClient {
             return true;
         }
 
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+        IDocument doc = editorManager.getDocument(path);
 
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
+        // if doc is still null give up
+        if (doc == null) {
             log.warn("Could not check checksum of file " + path.toOSString());
             return false;
         }
 
-        try {
-            IDocument doc = provider.getDocument(input);
+        if ((doc.getLength() != checksum.getLength())
+            || (doc.get().hashCode() != checksum.getHash())) {
 
-            // if doc is still null give up
-            if (doc == null) {
-                log.warn("Could not check checksum of file "
-                    + path.toOSString());
-                return false;
+            long lastEdited = editorManager.getLastEditTime(path);
+
+            long lastRemoteEdited = editorManager.getLastRemoteEditTime(path);
+
+            if ((System.currentTimeMillis() - lastEdited) > 4000
+                && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
+
+                log.debug(String.format(
+                    "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)", path
+                        .toString(), doc.getLength(),
+                    doc.getLength() == checksum.getLength() ? "==" : "!=",
+                    checksum.getLength(), doc.get().hashCode(), doc.get()
+                        .hashCode() == checksum.getHash() ? "==" : "!=",
+                    checksum.getHash()));
+
+                return true;
             }
-
-            if ((doc.getLength() != checksum.getLength())
-                || (doc.get().hashCode() != checksum.getHash())) {
-
-                long lastEdited = editorManager.getLastEditTime(path);
-
-                long lastRemoteEdited = editorManager
-                    .getLastRemoteEditTime(path);
-
-                if ((System.currentTimeMillis() - lastEdited) > 4000
-                    && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
-
-                    log.debug(String.format(
-                        "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
-                        path.toString(), doc.getLength(),
-                        doc.getLength() == checksum.getLength() ? "==" : "!=",
-                        checksum.getLength(), doc.get().hashCode(), doc.get()
-                            .hashCode() == checksum.getHash() ? "==" : "!=",
-                        checksum.getHash()));
-
-                    return true;
-                }
-            }
-        } finally {
-            provider.disconnect(input);
         }
         return false;
     }

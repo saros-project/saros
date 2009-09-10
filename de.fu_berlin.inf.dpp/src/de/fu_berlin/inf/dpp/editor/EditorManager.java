@@ -451,14 +451,8 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void connect(IFile file) {
 
-        if (!file.isAccessible()) {
-            log.error(".connect File " + file.getName()
-                + " could not be accessed");
-            return;
-        }
-
-        wpLog.trace(".connect(" + file.getProjectRelativePath().toOSString()
-            + ") invoked");
+        // TODO Check that file exists...
+        wpLog.trace("EditorManager.connect(" + file.getName() + ") invoked");
 
         if (!isConnected(file)) {
             FileEditorInput input = new FileEditorInput(file);
@@ -468,27 +462,12 @@ public class EditorManager implements IActivityProvider, Disposable {
             } catch (CoreException e) {
                 log.error("Error connecting to a document provider on file '"
                     + file.toString() + "':", e);
+                e.printStackTrace();
             }
             connectedFiles.add(file);
+
+            wpLog.trace("EditorManager.connect: IDocument loaded");
         }
-    }
-
-    public void disconnect(IFile file) {
-
-        wpLog.trace(".disconnect(" + file.getProjectRelativePath().toOSString()
-            + ") invoked");
-
-        if (!isConnected(file)) {
-            log.warn(".disconnect(): Trying to disconnect"
-                + " DocProvider which is not connected: "
-                + file.getFullPath().toOSString());
-        }
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider documentProvider = getDocumentProvider(input);
-        documentProvider.disconnect(file);
-
-        connectedFiles.remove(file);
-
     }
 
     public void setEditorAPI(IEditorAPI editorAPI) {
@@ -514,6 +493,45 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public Set<IPath> getLocallyOpenEditors() {
         return this.locallyOpenEditors;
+    }
+
+    /**
+     * Return the document of the given path.
+     * 
+     * @param path
+     *            the path of the wanted document
+     * @return the document or null if no document exists with given path or no
+     *         editor with this file is open
+     */
+    public IDocument getDocument(IPath path) {
+
+        if (path == null)
+            throw new IllegalArgumentException();
+
+        IDocument result = null;
+
+        Set<IEditorPart> editors = getEditors(path);
+
+        if (!editors.isEmpty()) {
+            result = getDocument(editors.iterator().next());
+        }
+
+        // if result == null there is no editor with this resource open
+        if (result == null) {
+
+            IFile file = sharedProject.getProject().getFile(path);
+            if (file == null || !file.exists()) {
+                log.error("No file in project for path " + path,
+                    new StackTrace());
+                return null;
+            }
+
+            connect(file);
+
+            // get Document from FileBuffer
+            result = EditorUtils.getTextFileBuffer(file).getDocument();
+        }
+        return result;
     }
 
     /**
@@ -853,6 +871,12 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.editorRemoved(user, path);
 
+        // TODO Review for disconnection of document providers.
+        /*
+         * IFile file = EditorManager.this.sharedProject.getProject()
+         * .getFile(path); resetText(file);
+         */
+
         if (user.equals(getFollowedUser())) {
             for (IEditorPart part : editorPool.getEditors(path)) {
                 editorAPI.closeEditor(part);
@@ -865,7 +889,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partOpened(IEditorPart editorPart) {
 
-        wpLog.trace(".partOpened invoked");
+        wpLog.trace("EditorManager.partOpened invoked");
 
         if (!isSharedEditor(editorPart)) {
             return;
@@ -876,13 +900,8 @@ public class EditorManager implements IActivityProvider, Disposable {
          * the editor having been closed (for instance outside of Eclipse).
          * Others might be confused about if they receive this editor from us.
          */
-        IResource editorResource = editorAPI.getEditorResource(editorPart);
-        if (!editorResource.isAccessible()) {
-            log.warn(".partOpened resource: "
-                + editorResource.getLocation().toOSString()
-                + " is not accesible");
+        if (!editorAPI.getEditorResource(editorPart).isAccessible())
             return;
-        }
 
         this.editorPool.add(editorPart);
 
@@ -906,7 +925,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      */
     public void partActivated(IEditorPart editorPart) {
 
-        wpLog.trace(".partActiveted invoked");
+        wpLog.trace("EditorManager.partActiveted invoked");
 
         // First check for last editor being closed (which is a null editorPart)
         if (editorPart == null) {
@@ -1108,63 +1127,72 @@ public class EditorManager implements IActivityProvider, Disposable {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
 
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            log.error("Could not connect document provider for file: "
-                + file.toString(), e);
-            // TODO Trigger a consistency recovery
-            return;
+        connect(file);
+
+        IDocument doc = provider.getDocument(input);
+
+        // Check if the replaced text is really there.
+        if (log.isDebugEnabled()) {
+
+            String is;
+            try {
+                is = doc.get(offset, replacedText.length());
+                if (!is.equals(replacedText)) {
+                    log.error("replaceText should be '"
+                        + StringEscapeUtils.escapeJava(replacedText) + "' is '"
+                        + StringEscapeUtils.escapeJava(is) + "'");
+                }
+            } catch (BadLocationException e) {
+                // Ignore, because this is going to fail again just below
+            }
         }
 
+        // Try to replace
         try {
-            IDocument doc = provider.getDocument(input);
-            if (doc == null) {
-                log.error("Could not connect document provider for file: "
-                    + file.toString(), new StackTrace());
-                // TODO Trigger a consistency recovery
-                return;
+            doc.replace(offset, replacedText.length(), text);
+        } catch (BadLocationException e) {
+            log
+                .error(String
+                    .format(
+                        "Could not apply TextEdit at %d-%d of document with length %d.\nWas supposed to replace '%s' with '%s'.",
+                        offset, offset + replacedText.length(),
+                        doc.getLength(), replacedText, text));
+            return;
+        }
+        lastRemoteEditTimes.put(file.getProjectRelativePath(), System
+            .currentTimeMillis());
+
+        IAnnotationModel model = provider.getAnnotationModel(input);
+        contributionAnnotationManager.insertAnnotation(model, offset, text
+            .length(), source);
+
+        // Don't disconnect from provider yet, because otherwise the text
+        // changes would be lost. We only disconnect when the document is
+        // reset or saved.
+    }
+
+    /**
+     * TODO document what this does and start thinking about what really needs
+     * to be done if a user resets (closes without saving) a file.
+     * 
+     * @swt Needs to be called from a UI thread.
+     */
+    protected void resetText(IFile file) {
+
+        wpLog.trace("EditorManager.resetText(" + file.getName() + ") invoked.");
+        if (isConnected(file)) {
+
+            if (file.exists()) {
+                FileEditorInput input = new FileEditorInput(file);
+                IDocumentProvider provider = getDocumentProvider(input);
+                provider.disconnect(input);
+            } else {
+                log.warn("Could not disconnect from file,"
+                    + " because it no longer exists: " + file.getName());
             }
-
-            // Check if the replaced text is really there.
-            if (log.isDebugEnabled()) {
-
-                String is;
-                try {
-                    is = doc.get(offset, replacedText.length());
-                    if (!is.equals(replacedText)) {
-                        log
-                            .error("replaceText should be '"
-                                + StringEscapeUtils.escapeJava(replacedText)
-                                + "' is '" + StringEscapeUtils.escapeJava(is)
-                                + "'");
-                    }
-                } catch (BadLocationException e) {
-                    // Ignore, because this is going to fail again just below
-                }
-            }
-
-            // Try to replace
-            try {
-                doc.replace(offset, replacedText.length(), text);
-            } catch (BadLocationException e) {
-                log.error(String.format(
-                    "Could not apply TextEdit at %d-%d of document "
-                        + "with length %d.\nWas supposed to replace"
-                        + " '%s' with '%s'.", offset, offset
-                        + replacedText.length(), doc.getLength(), replacedText,
-                    text));
-                return;
-            }
-            lastRemoteEditTimes.put(file.getProjectRelativePath(), System
-                .currentTimeMillis());
-
-            IAnnotationModel model = provider.getAnnotationModel(input);
-            contributionAnnotationManager.insertAnnotation(model, offset, text
-                .length(), source);
-
-        } finally {
-            provider.disconnect(input);
+            this.connectedFiles.remove(file);
+            wpLog.trace("EditorManager.resetText file " + file.getName()
+                + " disconnencted.");
         }
     }
 
@@ -1253,10 +1281,14 @@ public class EditorManager implements IActivityProvider, Disposable {
         editorListener.driverEditorSaved(path, true);
 
         FileEditorInput input = new FileEditorInput(file);
+        wpLog.trace("EditorManager.saveText EditorInput created ");
+
         IDocumentProvider provider = getDocumentProvider(input);
+        wpLog.trace("EditorManager.saveText IDocumentProvider craeted ");
 
         if (isConnected(file)) {
-            wpLog.trace(".saveText File " + file.getName() + " is connected");
+            wpLog.trace("EditorManager.saveText File " + file.getName()
+                + " is connected");
             if (provider.canSaveDocument(input)) {
                 wpLog.trace("EditorManager.saveText File " + file.getName()
                     + " can be saved");
@@ -1334,11 +1366,13 @@ public class EditorManager implements IActivityProvider, Disposable {
         wpLog.trace("EditorManager.saveText File " + file.getName()
             + " will be reseted");
         /**
+         * resetText leads to disconnecting the document from its provider.
          * disconnecting document of the driver (after resolving inconsistency)
          * makes saving impossible
+         * 
          */
         if (!isDriver)
-            disconnect(file);
+            resetText(file);
 
     }
 
@@ -1356,7 +1390,6 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         // TODO technically we should mark the file as saved in the
         // editorPool, or?
-        // What is the reason of this?
 
         editorListener.driverEditorSaved(path, false);
         fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID()
@@ -1368,6 +1401,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * importantly the ActivitySequencer).
      */
     protected void fireActivity(IActivity activity) {
+        wpLog.trace("EditorManager.fireActivity invoked");
 
         for (IActivityListener listener : this.activityListeners) {
             listener.activityCreated(activity);
