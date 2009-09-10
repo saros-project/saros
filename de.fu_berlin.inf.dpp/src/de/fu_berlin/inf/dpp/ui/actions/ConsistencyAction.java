@@ -80,7 +80,8 @@ public class ConsistencyAction extends Action {
                     + " to the host");
                 return;
             }
-
+            log.debug("Inconsistency indicator goes: "
+                + (newValue ? "on" : "off"));
             setEnabled(newValue);
 
             if (newValue) {
@@ -118,6 +119,7 @@ public class ConsistencyAction extends Action {
 
     @Override
     public void run() {
+        log.debug("User activated CW recovery.");
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
                 watchdogClient.runRecovery();
