@@ -25,8 +25,7 @@ import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator;
 @Component(module = "integration")
 public class JDTFacade implements IJDTSupport {
 
-    public static final Logger log = Logger
-        .getLogger(JDTFacade.class.getName());
+    private static final Logger log = Logger.getLogger(JDTFacade.class);
 
     public IJDTSupport jdtSupport;
 

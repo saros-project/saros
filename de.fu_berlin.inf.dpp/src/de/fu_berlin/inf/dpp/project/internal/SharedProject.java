@@ -59,7 +59,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class SharedProject implements ISharedProject, Disposable {
 
-    public static final Logger log = Logger.getLogger(SharedProject.class);
+    private static final Logger log = Logger.getLogger(SharedProject.class);
 
     public static final int MAX_USERCOLORS = 5;
 
@@ -336,9 +336,8 @@ public class SharedProject implements ISharedProject, Disposable {
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (this.participants.remove(jid) == null) {
-            log
-                .warn("Tried to remove user who was not in participants: "
-                    + jid);
+            log.warn("Tried to remove user who was" + " not in participants: "
+                + jid);
             return;
         }
         if (isHost()) {
