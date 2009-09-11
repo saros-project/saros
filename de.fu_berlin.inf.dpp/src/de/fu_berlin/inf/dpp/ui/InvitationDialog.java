@@ -80,6 +80,7 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager.CacheMissException;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
@@ -131,7 +132,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
 
     protected RosterTracker rosterTracker;
 
-    private List<IResource> resources;
+    protected List<IResource> resources;
+
+    protected PreferenceUtils preferenceUtils;
 
     /**
      * Object representing a row in the {@link InvitationDialog#tableViewer}
@@ -217,7 +220,8 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
     public InvitationDialog(Saros saros, VersionManager versionManager,
         SharedProject project, Shell parentShell, List<JID> autoInvite,
         DiscoveryManager discoManager, List<IResource> resources,
-        SessionManager sessionManager, RosterTracker rosterTracker) {
+        SessionManager sessionManager, RosterTracker rosterTracker,
+        PreferenceUtils preferenceUtils) {
         super(parentShell);
         this.autoinviteJID = autoInvite;
         this.project = project;
@@ -227,6 +231,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         this.versionManager = versionManager;
         this.sessionManager = sessionManager;
         this.rosterTracker = rosterTracker;
+        this.preferenceUtils = preferenceUtils;
     }
 
     protected ExecutorService worker = Executors
@@ -316,6 +321,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         boolean autoCloseDialog = saros.getPreferenceStore().getBoolean(
             PreferenceConstants.AUTO_CLOSE_DIALOG);
         this.autoCloseButton.setSelection(autoCloseDialog);
+
+        if (preferenceUtils.forceFileTranserByChat()) {
+            Label label = new Label(composite, SWT.NONE);
+            label
+                .setText("Attention: P2P connection with Jingle is deactivated. Using IBB instead!"
+                    + '\n'
+                    + "To activate Jingle uncheck 'Avoid direct file transfer connection' in Saros preferences.");
+        }
 
         this.cancelSelectedInvitationButton
             .addSelectionListener(new SelectionAdapter() {

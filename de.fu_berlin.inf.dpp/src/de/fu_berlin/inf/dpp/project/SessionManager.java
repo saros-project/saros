@@ -311,7 +311,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 Window iw = new InvitationDialog(saros, versionManager,
                     sharedProject, EditorAPI.getShell(), toInvite,
                     discoveryManager, partialProjectResources,
-                    SessionManager.this, rosterTracker);
+                    SessionManager.this, rosterTracker, preferenceUtils);
                 iw.open();
 
             }
