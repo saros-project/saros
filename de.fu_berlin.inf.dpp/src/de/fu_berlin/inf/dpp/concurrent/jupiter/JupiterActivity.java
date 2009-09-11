@@ -6,6 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 import de.fu_berlin.inf.dpp.activities.AbstractActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityConsumer;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -27,8 +28,8 @@ public class JupiterActivity extends AbstractActivity {
     @XStreamAsAttribute
     private IPath editor;
 
-    public JupiterActivity(Timestamp timestamp, Operation operation, JID source,
-        IPath editor) {
+    public JupiterActivity(Timestamp timestamp, Operation operation,
+        JID source, IPath editor) {
         super(source.toString());
         this.timestamp = timestamp;
         this.operation = operation;
@@ -114,8 +115,11 @@ public class JupiterActivity extends AbstractActivity {
         return this.editor;
     }
 
-    public boolean dispatch(IActivityReceiver receiver) {
-        return receiver.receive(this);
+    public boolean dispatch(IActivityConsumer consumer) {
+        return consumer.consume(this);
     }
 
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
+    }
 }

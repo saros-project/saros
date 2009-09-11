@@ -163,9 +163,9 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected ContributionAnnotationManager contributionAnnotationManager;
 
-    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
         @Override
-        public boolean receive(EditorActivity editorActivity) {
+        public void receive(EditorActivity editorActivity) {
 
             User sender = sharedProject.getUser(new JID(editorActivity
                 .getSource()));
@@ -179,25 +179,21 @@ public class EditorManager implements IActivityProvider, Disposable {
             } else if (editorActivity.getType().equals(Type.Saved)) {
                 saveText(editorActivity.getPath());
             }
-            return false;
         }
 
         @Override
-        public boolean receive(TextEditActivity textEditActivity) {
+        public void receive(TextEditActivity textEditActivity) {
             execTextEdit(textEditActivity);
-            return false;
         }
 
         @Override
-        public boolean receive(TextSelectionActivity textSelectionActivity) {
+        public void receive(TextSelectionActivity textSelectionActivity) {
             execTextSelection(textSelectionActivity);
-            return false;
         }
 
         @Override
-        public boolean receive(ViewportActivity viewportActivity) {
+        public void receive(ViewportActivity viewportActivity) {
             execViewport(viewportActivity);
-            return false;
         }
     };
 

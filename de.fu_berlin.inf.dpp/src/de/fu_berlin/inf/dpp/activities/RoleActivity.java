@@ -96,7 +96,11 @@ public class RoleActivity extends AbstractActivity {
             + this.getRole() + ")";
     }
 
-    public boolean dispatch(IActivityReceiver receiver) {
-        return receiver.receive(this);
+    public boolean dispatch(IActivityConsumer consumer) {
+        return consumer.consume(this);
+    }
+
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 }

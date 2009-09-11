@@ -112,13 +112,10 @@ public class StopManager implements IActivityProvider, Disposable {
         observable.add(sharedProjectObserver);
     }
 
-    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
-        /**
-         * @return true if the activity is expected and causes an effect, false
-         *         otherwise
-         */
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+
         @Override
-        public boolean receive(final StopActivity stopActivity) {
+        public void receive(final StopActivity stopActivity) {
 
             if (sharedProject == null)
                 throw new IllegalStateException(
@@ -146,13 +143,13 @@ public class StopManager implements IActivityProvider, Disposable {
                                     .getLocalUser().getJID().toString()));
                         }
                     });
-                    return true;
+                    return;
                 }
                 if (stopActivity.getState() == State.ACKNOWLEDGED) {
                     if (!expectedAcknowledgments.contains(stopActivity)) {
                         log.warn("Received unexpected StopActivity: "
                             + stopActivity);
-                        return false;
+                        return;
                     }
 
                     // it has to be removed from the expected ack list
@@ -161,11 +158,11 @@ public class StopManager implements IActivityProvider, Disposable {
                         reentrantLock.lock();
                         acknowledged.signalAll();
                         reentrantLock.unlock();
-                        return true;
+                        return;
                     } else {
                         log.warn("Received unexpected "
                             + "StopActivity acknowledgement: " + stopActivity);
-                        return false;
+                        return;
                     }
                 }
             }
@@ -173,12 +170,11 @@ public class StopManager implements IActivityProvider, Disposable {
             if (stopActivity.getType() == Type.UNLOCKREQUEST) {
                 if (stopActivity.getState() == State.INITIATED) {
 
-                    boolean result = executeUnlock(generateStartHandle(stopActivity));
+                    executeUnlock(generateStartHandle(stopActivity));
                     // sends an acknowledgment
                     fireActivity(stopActivity
                         .generateAcknowledgment(sharedProject.getLocalUser()
                             .getJID().toString()));
-                    return result;
                 }
 
                 if (stopActivity.getState() == State.ACKNOWLEDGED) {
@@ -187,10 +183,10 @@ public class StopManager implements IActivityProvider, Disposable {
                     if (handle == null) {
                         log.error("StartHandle for " + stopActivity
                             + " could not be found.");
-                        return false;
+                        return;
                     }
                     handle.acknowledge();
-                    return true;
+                    return;
                 }
             }
 

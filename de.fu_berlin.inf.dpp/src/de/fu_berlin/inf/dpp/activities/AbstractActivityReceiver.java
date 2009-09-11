@@ -2,50 +2,101 @@ package de.fu_berlin.inf.dpp.activities;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 
+/**
+ * Abstract implementation of IActivityReceiver which does nothing
+ */
 public class AbstractActivityReceiver implements IActivityReceiver {
 
-    public boolean receive(ViewportActivity viewportActivity) {
-        // empty implementation
-        return false;
+    public void receive(ViewportActivity viewportActivity) {
+        // do nothing
     }
 
-    public boolean receive(TextSelectionActivity textSelectionActivity) {
-        // empty implementation
-        return false;
+    public void receive(TextSelectionActivity textSelectionActivity) {
+        // do nothing
     }
 
-    public boolean receive(TextEditActivity textEditActivity) {
-        // empty implementation
-        return false;
+    public void receive(TextEditActivity textEditActivity) {
+        // do nothing
     }
 
-    public boolean receive(RoleActivity roleActivity) {
-        // empty implementation
-        return false;
+    public void receive(RoleActivity roleActivity) {
+        // do nothing
     }
 
-    public boolean receive(FolderActivity folderActivity) {
-        // empty implementation
-        return false;
+    public void receive(FolderActivity folderActivity) {
+        // do nothing
     }
 
-    public boolean receive(FileActivity fileActivity) {
-        // empty implementation
-        return false;
+    public void receive(FileActivity fileActivity) {
+        // do nothing
     }
 
-    public boolean receive(EditorActivity editorActivity) {
-        // empty implementation
-        return false;
+    public void receive(EditorActivity editorActivity) {
+        // do nothing
     }
 
-    public boolean receive(JupiterActivity jupiterActivity) {
-        // empty implementation
-        return false;
+    public void receive(JupiterActivity jupiterActivity) {
+        // do nothing
     }
 
-    public boolean receive(StopActivity stopActivity) {
-        // empty implementation
-        return false;
+    public void receive(StopActivity stopActivity) {
+        // do nothing
+    }
+
+    /**
+     * Returns a IActivityConsumer from the given IActivityReceiver which
+     * returns the given value for all calls to consume after calling receive on
+     * the IActivityReceiver.
+     */
+    public static IActivityConsumer asConsumer(
+        final IActivityReceiver receiver, final boolean consume) {
+
+        return new IActivityConsumer() {
+
+            public boolean consume(ViewportActivity viewportActivity) {
+                receiver.receive(viewportActivity);
+                return consume;
+            }
+
+            public boolean consume(TextSelectionActivity textSelectionActivity) {
+                receiver.receive(textSelectionActivity);
+                return consume;
+            }
+
+            public boolean consume(TextEditActivity textEditActivity) {
+                receiver.receive(textEditActivity);
+                return consume;
+            }
+
+            public boolean consume(RoleActivity roleActivity) {
+                receiver.receive(roleActivity);
+                return consume;
+            }
+
+            public boolean consume(FolderActivity folderActivity) {
+                receiver.receive(folderActivity);
+                return consume;
+            }
+
+            public boolean consume(FileActivity fileActivity) {
+                receiver.receive(fileActivity);
+                return consume;
+            }
+
+            public boolean consume(EditorActivity editorActivity) {
+                receiver.receive(editorActivity);
+                return consume;
+            }
+
+            public boolean consume(JupiterActivity jupiterActivity) {
+                receiver.receive(jupiterActivity);
+                return consume;
+            }
+
+            public boolean consume(StopActivity stopActivity) {
+                receiver.receive(stopActivity);
+                return consume;
+            }
+        };
     }
 }

@@ -40,10 +40,24 @@ public interface IActivity {
 
     /**
      * The activity will call the receive method of the given receiver with the
-     * actual type of this IActivity.
+     * actual type of this IActivity and return whether the receiver consumed
+     * the message.
+     * 
+     * For instance if dispatch is called on a FolderActivity it will call
+     * {@link IActivityConsumer#consume(FolderActivity)}
      * 
      * @return <code>true</code> if the receiver consumed this activity,
      *         otherwise <code>false</code>.
      */
-    public boolean dispatch(IActivityReceiver receiver);
+    public boolean dispatch(IActivityConsumer receiver);
+
+    /**
+     * The activity will call the receive method of the given receiver with the
+     * actual type of this IActivity.
+     * 
+     * For instance if dispatch is called on a FolderActivity it will call
+     * {@link IActivityReceiver#receive(FolderActivity)}
+     */
+    public void dispatch(IActivityReceiver receiver);
+
 }

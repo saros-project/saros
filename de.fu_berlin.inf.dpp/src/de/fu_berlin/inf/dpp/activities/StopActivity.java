@@ -152,10 +152,6 @@ public class StopActivity extends AbstractActivity {
         }
     }
 
-    public boolean dispatch(IActivityReceiver receiver) {
-        return receiver.receive(this);
-    }
-
     public State getState() {
         return state;
     }
@@ -183,5 +179,13 @@ public class StopActivity extends AbstractActivity {
         sb.append(", affected user: " + user.toString());
         sb.append(", src: " + getSource() + ")");
         return sb.toString();
+    }
+
+    public boolean dispatch(IActivityConsumer consumer) {
+        return consumer.consume(this);
+    }
+
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 }

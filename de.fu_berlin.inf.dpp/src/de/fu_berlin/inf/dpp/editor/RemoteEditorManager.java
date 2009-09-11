@@ -175,7 +175,7 @@ public class RemoteEditorManager {
 
         protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
             @Override
-            public boolean receive(EditorActivity editorActivity) {
+            public void receive(EditorActivity editorActivity) {
 
                 switch (editorActivity.getType()) {
                 case Activated:
@@ -187,26 +187,20 @@ public class RemoteEditorManager {
                     closed(editorActivity.getPath());
                     break;
                 }
-
-                return false;
             }
 
             @Override
-            public boolean receive(ViewportActivity viewportActivity) {
+            public void receive(ViewportActivity viewportActivity) {
 
                 setViewport(viewportActivity.getEditor(), viewportActivity
                     .getLineRange());
-
-                return false;
             }
 
             @Override
-            public boolean receive(TextSelectionActivity textSelectionActivity) {
+            public void receive(TextSelectionActivity textSelectionActivity) {
 
                 setSelection(textSelectionActivity.getEditor(),
                     textSelectionActivity.getSelection());
-
-                return false;
             }
         };
 

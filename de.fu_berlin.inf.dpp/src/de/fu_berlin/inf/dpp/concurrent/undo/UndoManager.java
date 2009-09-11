@@ -316,7 +316,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         }
     };
 
-    protected final IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
 
         /**
          * @return true if the given activity was created locally
@@ -330,17 +330,17 @@ public class UndoManager implements Disposable, IActivityProvider {
          * undo history.
          */
         @Override
-        public boolean receive(TextEditActivity textEditActivity) {
+        public void receive(TextEditActivity textEditActivity) {
 
             if (!enabled)
-                return false;
+                return;
 
             /*
              * When performing an undo/redo there are fired activities which are
              * expected and have to be ignored when coming back.
              */
             if (expectedActivities.remove(textEditActivity))
-                return false;
+                return;
 
             Operation operation = textEditActivity.toOperation();
 
@@ -362,11 +362,11 @@ public class UndoManager implements Disposable, IActivityProvider {
                         .error("Editor of the local TextEditActivity is not the current "
                             + "active editor. Possibly the current active editor is not"
                             + " up to date.");
-                    return false;
+                    return;
                 }
                 updateCurrentLocalAtomicOperation(operation);
             }
-            return false;
+            return;
         }
     };
 

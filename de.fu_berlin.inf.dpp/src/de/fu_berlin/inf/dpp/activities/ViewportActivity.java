@@ -95,7 +95,11 @@ public class ViewportActivity extends AbstractActivity {
             + this.topIndex + "," + this.bottomIndex + "))";
     }
 
-    public boolean dispatch(IActivityReceiver receiver) {
-        return receiver.receive(this);
+    public boolean dispatch(IActivityConsumer consumer) {
+        return consumer.consume(this);
+    }
+
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 }

@@ -155,11 +155,10 @@ public class ConcurrentDocumentClient implements Disposable {
 
     protected final IActivityReceiver clientReceiver = new AbstractActivityReceiver() {
         @Override
-        public boolean receive(FileActivity fileActivity) {
+        public void receive(FileActivity fileActivity) {
             if (fileActivity.getType() == FileActivity.Type.Removed) {
                 jupiterClient.reset(fileActivity.getPath());
             }
-            return false;
         }
     };
 

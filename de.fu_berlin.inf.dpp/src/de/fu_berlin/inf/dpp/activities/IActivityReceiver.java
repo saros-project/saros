@@ -2,23 +2,33 @@ package de.fu_berlin.inf.dpp.activities;
 
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 
+/**
+ * A Receiver is an interface for handling multiple dispatch in Java.
+ * 
+ * In our case we want to call one of the specialized receive methods in
+ * IActivityReceiver for a given IActivity.
+ * 
+ * For instance, if an IActivity is a TextSelectionActivity, we want the method
+ * {@link #receive(TextSelectionActivity)} to be called.
+ * 
+ */
 public interface IActivityReceiver {
 
-    boolean receive(ViewportActivity viewportActivity);
+    void receive(ViewportActivity viewportActivity);
 
-    boolean receive(TextSelectionActivity textSelectionActivity);
+    void receive(TextSelectionActivity textSelectionActivity);
 
-    boolean receive(TextEditActivity textEditActivity);
+    void receive(TextEditActivity textEditActivity);
 
-    boolean receive(RoleActivity roleActivity);
+    void receive(RoleActivity roleActivity);
 
-    boolean receive(FolderActivity folderActivity);
+    void receive(FolderActivity folderActivity);
 
-    boolean receive(FileActivity fileActivity);
+    void receive(FileActivity fileActivity);
 
-    boolean receive(EditorActivity editorActivity);
+    void receive(EditorActivity editorActivity);
 
-    boolean receive(JupiterActivity jupiterActivity);
+    void receive(JupiterActivity jupiterActivity);
 
-    boolean receive(StopActivity stopActivity);
+    void receive(StopActivity stopActivity);
 }

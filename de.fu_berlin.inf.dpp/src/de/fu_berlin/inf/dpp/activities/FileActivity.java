@@ -198,8 +198,12 @@ public class FileActivity extends AbstractActivity {
         return true;
     }
 
-    public boolean dispatch(IActivityReceiver receiver) {
-        return receiver.receive(this);
+    public boolean dispatch(IActivityConsumer consumer) {
+        return consumer.consume(this);
+    }
+
+    public void dispatch(IActivityReceiver receiver) {
+        receiver.receive(this);
     }
 
     public boolean isRecovery() {
