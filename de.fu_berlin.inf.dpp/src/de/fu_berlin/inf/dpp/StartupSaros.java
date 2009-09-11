@@ -59,8 +59,13 @@ public class StartupSaros implements IStartup {
         String lastVersion = saros.getConfigPrefs().get(
             PreferenceConstants.SAROS_VERSION, "unknown");
 
-        // only continue if version changed
-        if (currentVersion.equals(lastVersion)) {
+        boolean assertEnabled = false;
+
+        // Side-effect-full assert to set assertEnabled to true if -ea
+        assert true == (assertEnabled = true);
+
+        // only continue if version changed or if -ea (for testing)
+        if (currentVersion.equals(lastVersion) || assertEnabled) {
             return;
         }
 
