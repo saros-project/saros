@@ -229,7 +229,11 @@ public class SharedProject implements ISharedProject, Disposable {
      */
     public void initiateRoleChange(final User user, final UserRole newRole,
         SubMonitor progress) throws CancellationException, InterruptedException {
-        assert localUser.isHost() : "Only the host can initiate role changes.";
+
+        if (!localUser.isHost()) {
+            throw new IllegalArgumentException(
+                "Only the host can initiate role changes.");
+        }
 
         if (user.isHost()) {
 
@@ -256,8 +260,8 @@ public class SharedProject implements ISharedProject, Disposable {
             });
 
             if (!startHandle.start())
-                log
-                    .error("Didn't unblock. There still exist unstarted StartHandles.");
+                log.error("Didn't unblock. "
+                    + "There still exist unstarted StartHandles.");
         }
     }
 
@@ -295,7 +299,7 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.project.ISharedProject
      */
     public boolean isHost() {
-        return this.host.equals(localUser);
+        return this.localUser.isHost();
     }
 
     /*
@@ -304,7 +308,7 @@ public class SharedProject implements ISharedProject, Disposable {
      * @see de.fu_berlin.inf.dpp.ISharedProject
      */
     public boolean isDriver() {
-        return localUser.isDriver();
+        return this.localUser.isDriver();
     }
 
     public boolean isExclusiveDriver() {
