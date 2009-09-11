@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
@@ -895,8 +897,8 @@ public class Util {
             InputStream newStream = new ByteArrayInputStream(inputBytes);
 
             // read Lines from
-            Object[] oldContent = IOUtils.readLines(oldStream).toArray();
-            Object[] newContent = IOUtils.readLines(newStream).toArray();
+            Object[] oldContent = readLinesAndEscapeNewlines(oldStream);
+            Object[] newContent = readLinesAndEscapeNewlines(newStream);
 
             // Calculate diff of the two files
             Diff diff = new Diff(oldContent, newContent);
@@ -922,6 +924,30 @@ public class Util {
         } catch (IOException e) {
             log.error("Can't convert file content to String", e);
         }
+    }
+
+    /**
+     * Reads the given stream into an array of lines while retaining and
+     * escaping the line delimiters.
+     */
+    public static String[] readLinesAndEscapeNewlines(InputStream stream)
+        throws IOException {
+
+        List<String> result = new ArrayList<String>();
+        String data = IOUtils.toString(stream);
+        Matcher matcher = Pattern.compile("\\r\\n|\\r|\\n").matcher(data);
+        int previousEnd = 0;
+        while (matcher.find()) {
+            // Extract line and escape line delimiter.
+            result.add(data.substring(previousEnd, matcher.start())
+                + escapeForLogging(matcher.group()));
+            previousEnd = matcher.end();
+        }
+        // If there is no line delimiter after the last line...
+        if (previousEnd != data.length()) {
+            result.add(data.substring(previousEnd, data.length()));
+        }
+        return result.toArray(new String[result.size()]);
     }
 
     /**

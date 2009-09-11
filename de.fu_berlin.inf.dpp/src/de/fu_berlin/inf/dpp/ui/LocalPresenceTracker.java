@@ -87,8 +87,8 @@ public class LocalPresenceTracker {
             protected void setActiveDeferred(final boolean active) {
                 Util.wrapSafe(log, new Runnable() {
                     public void run() {
-                        log.debug("Eclipse window now " + (active ? "" : "in")
-                            + "active.");
+                        log.debug("Eclipse window now "
+                            + (active ? "  " : "in") + "active.");
                         /*
                          * Wait one second before sending an active presence
                          * update and 5 seconds for an away update.
