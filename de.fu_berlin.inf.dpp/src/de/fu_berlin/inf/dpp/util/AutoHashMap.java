@@ -27,7 +27,7 @@ public class AutoHashMap<K, V> implements Map<K, V> {
     protected Function<K, V> provider;
 
     /**
-     * Returns a AutoHashMap which automatically will initilize an ArrayList<V>
+     * Returns a AutoHashMap which automatically will initialize an ArrayList<V>
      * when queried for a key for which there is no value.
      */
     public static <K, V> AutoHashMap<K, List<V>> getListHashMap() {
