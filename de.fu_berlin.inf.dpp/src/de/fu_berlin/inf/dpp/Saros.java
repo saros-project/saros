@@ -35,8 +35,6 @@ import org.apache.log4j.helpers.LogLog;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.preferences.ConfigurationScope;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -1158,22 +1156,6 @@ public class Saros extends AbstractUIPlugin {
         }
     }
 
-    /**
-     * Log a message to the Eclipse ErrorLog. This method should be used to log
-     * all errors that occur in the plugin that cannot be corrected by the user
-     * and seem to be errors within the plug-in or the used libraries.
-     * 
-     * @param message
-     *            A meaningful description of during which operation the error
-     *            occurred
-     * @param e
-     *            The exception associated with the error (may be null)
-     */
-    public static void log(String message, Exception e) {
-        plugin.getLog().log(
-            new Status(IStatus.ERROR, Saros.SAROS, IStatus.ERROR, message, e));
-    }
-
     protected class XMPPConnectionListener implements ConnectionListener {
 
         public void connectionClosed() {
@@ -1281,10 +1263,5 @@ public class Saros extends AbstractUIPlugin {
      */
     public String getVersion() {
         return sarosVersion;
-    }
-
-    public static boolean getFileTransferModeViaChat() {
-        return plugin.getPreferenceStore().getBoolean(
-            PreferenceConstants.FORCE_FILETRANSFER_BY_CHAT);
     }
 }

@@ -36,7 +36,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
-import de.fu_berlin.inf.dpp.Saros;
 
 /**
  * TODO Very kludgy window for chat messages. Needs some work
@@ -136,7 +135,7 @@ public class MessagingWindow extends ApplicationWindow {
         try {
             document.replace(document.getLength(), 0, newLine.toString());
         } catch (BadLocationException e) {
-            Saros.log("Could not update chat window", e);
+            // Saros.log("Could not update chat window", e);
         }
 
         // Show sender in bold

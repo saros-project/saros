@@ -142,6 +142,9 @@ public class DataTransferManager implements ConnectionSessionListener {
     @Inject
     protected ActivitiesExtensionProvider activitiesProvider;
 
+    @Inject
+    protected PreferenceUtils preferenceUtils;
+
     protected Saros saros;
 
     protected SessionIDObservable sessionID;
@@ -443,7 +446,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         public boolean isSuitable(JID jid) {
 
-            if (Saros.getFileTransferModeViaChat())
+            if (preferenceUtils.forceFileTranserByChat())
                 return false;
 
             if (!discoveryManager.isJingleSupported(jid))
@@ -779,7 +782,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         OutgoingFileTransfer
             .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
 
-        if (!Saros.getFileTransferModeViaChat()) {
+        if (!preferenceUtils.forceFileTranserByChat()) {
             // Start Jingle Manager asynchronous
             this.startingJingleThread = new Thread(new Runnable() {
                 /**
