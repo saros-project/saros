@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * Observable which keeps track of all InvitationProcesses currently running.
@@ -31,7 +32,8 @@ public class InvitationProcessObservable {
         if (oldProcess != null) {
             log.error("An internal error occurred:"
                 + " An existing invititation process with "
-                + oldProcess.getPeer() + " was replace by a new one");
+                + oldProcess.getPeer() + " was replace by a new one",
+                new StackTrace());
         }
     }
 
@@ -39,7 +41,7 @@ public class InvitationProcessObservable {
         if (this.processes.remove(process.getPeer()) == null) {
             log.error("An internal error occurred:"
                 + " No invititation process with " + process.getPeer()
-                + " could be found");
+                + " could be found", new StackTrace());
         }
     }
 
