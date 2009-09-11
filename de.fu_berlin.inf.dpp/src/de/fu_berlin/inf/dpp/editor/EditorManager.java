@@ -737,6 +737,14 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         assert Util.isSWT();
 
+        User sender = sharedProject.getUser(new JID(activity.getSource()));
+        if (sender == null) {
+            log
+                .warn("Trying to execute activity for unknown user: "
+                    + activity);
+            return;
+        }
+
         // First let the remoteEditorManager update itself based on the activity
         remoteEditorManager.exec(activity);
 
@@ -1609,8 +1617,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             .getActiveEditor();
 
         if (activeEditor == null) {
-            log.info(Util.prefix(jumpTo.getJID())
-                + "has no editor open");
+            log.info(Util.prefix(jumpTo.getJID()) + "has no editor open");
             return;
         }
 
