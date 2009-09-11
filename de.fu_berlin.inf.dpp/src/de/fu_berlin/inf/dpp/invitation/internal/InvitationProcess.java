@@ -122,7 +122,7 @@ public abstract class InvitationProcess implements IInvitationProcess {
         if (replicated) {
             if (errorMsg != null) {
                 InvitationProcess.log
-                    .error("Invitation was canceled by remote user because of an error on his/her side: "
+                    .info("Invitation was canceled by remote user because of an error on his/her side: "
                         + errorMsg);
             } else {
                 InvitationProcess.log

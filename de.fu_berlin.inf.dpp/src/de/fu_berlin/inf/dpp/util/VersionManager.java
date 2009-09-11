@@ -108,10 +108,24 @@ public class VersionManager {
      * compatibility should be listed.
      */
     static {
-
         /**
          * <Add new version here>
          */
+
+        /**
+         * Version 9.10.2.DEVEL
+         */
+        compatibilityChart.put(new Version("9.10.2.DEVEL"), Arrays.asList(
+            new Version("9.10.2.DEVEL"), 
+            new Version("9.9.11.r1706"),
+            new Version("9.9.11.DEVEL")));
+
+        /**
+         * Version 9.9.11.r1706
+         */
+        compatibilityChart.put(new Version("9.9.11.r1706"), Arrays.asList(
+            new Version("9.9.11.r1706"), 
+            new Version("9.9.11.DEVEL")));
 
         /**
          * Version 9.9.11.DEVEL
@@ -231,7 +245,7 @@ public class VersionManager {
         List<Version> compatibleVersions = compatibilityChart.get(localVersion);
         if (compatibleVersions == null) {
             log.error("VersionManager does not know about current version."
-                + " The release manager must have slept:" + localVersion);
+                + " The release manager must have slept: " + localVersion);
 
             // Fallback to comparing versions directly
             return Compatibility.valueOf(localVersion.compareTo(remoteVersion));
