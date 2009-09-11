@@ -5,6 +5,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -491,15 +492,35 @@ public class DataTransferManager implements ConnectionSessionListener {
         try {
             // Try all transmitters
             for (Transmitter transmitter : transmitters) {
-                if (sendData(transmitter, transferData, input, progress
-                    .newChild(70))) {
-                    // Successfully sent!
-                    return;
+                try {
+                    if (sendData(transmitter, transferData, input, progress
+                        .newChild(70))) {
+                        // Successfully sent!
+                        return;
+                    }
+                } catch (CancellationException e) {
+
+                    // User canceled! -> Don't try again
+                    log.info(Util.prefix(transferData.recipient)
+                        + "Cancelled to sending " + transferData + " with "
+                        + transmitter.getName() + ":" + e.getMessage());
+
+                    /*
+                     * TODO Make this a proper checked exception of the right
+                     * type and pass up the stack
+                     */
+                    throw new CausedIOException(Util
+                        .prefix(transferData.recipient)
+                        + "Cancelled to sending "
+                        + transferData
+                        + " with "
+                        + transmitter.getName() + ":", e);
                 }
             }
             // No transmitter worked! :-(
             throw new IOException(Util.prefix(transferData.recipient)
-                + "Exhausted all options to send " + transferData);
+                + "Exhausted all options " + Arrays.toString(transmitters)
+                + " to send " + transferData);
         } finally {
             progress.done();
         }
@@ -526,6 +547,8 @@ public class DataTransferManager implements ConnectionSessionListener {
             transferModeDispatch.transferFinished(transferData.recipient, mode,
                 false, content.length, duration);
             return true;
+        } catch (CancellationException e) {
+            throw e; // Rethrow to circumvent the Exception catch below
         } catch (CausedIOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "
                 + transferData + " with " + transmitter.getName() + ":", e
