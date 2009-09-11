@@ -538,9 +538,7 @@ public class RosterView extends ViewPart {
 
                 if (elem2 instanceof RosterEntry) {
                     RosterEntry entry2 = (RosterEntry) elem2;
-
                     Presence presence1 = roster.getPresence(entry1.getUser());
-
                     Presence presence2 = roster.getPresence(entry2.getUser());
 
                     if (presence1 == null) {
@@ -551,7 +549,6 @@ public class RosterView extends ViewPart {
                         if (presence2 == null) {
                             return -1;
                         }
-
                         // Both not null
                         if (presence1.isAvailable() && !presence2.isAvailable()) {
                             return -1;
@@ -562,6 +559,11 @@ public class RosterView extends ViewPart {
                     }
                 }
             }
+
+            if (elem1 instanceof RosterEntry)
+                elem1 = Util.getDisplayableName((RosterEntry) elem1);
+            if (elem2 instanceof RosterEntry)
+                elem2 = Util.getDisplayableName((RosterEntry) elem2);
 
             // otherwise use default order
             return super.compare(viewer, elem1, elem2);

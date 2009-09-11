@@ -185,7 +185,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendCancelInvitationMessage(JID user, String errorMsg) {
-        log.debug("Send request to cancel Invititation to "
+        log.debug("Send request to cancel Invitation to "
             + Util.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
@@ -194,7 +194,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendRequestForFileListMessage(JID toJID) {
-        log.debug("Send request for FileList to " + toJID);
+        log.debug("Send request for FileList to " + Util.prefix(toJID));
 
         sendMessage(toJID, requestForFileListExtension.create());
     }
@@ -223,7 +223,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             JID recipient = entry.getKey();
             int expectedSequenceNumber = entry.getValue();
             log.info("Requesting old activity (sequence number="
-                + expectedSequenceNumber + "," + andup + ") from " + recipient);
+                + expectedSequenceNumber + "," + andup + ") from "
+                + Util.prefix(recipient));
             sendMessage(recipient, requestActivityExtension.create(
                 expectedSequenceNumber, andup));
         }
@@ -309,7 +310,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 dataManager.sendData(transferData, data, SubMonitor
                     .convert(new NullProgressMonitor()));
             } catch (IOException e) {
-                log.error("Failed to sent activities:" + timedActivities, e);
+                log.error("Failed to sent activities (" + Util.formatByte(data.length)
+                    + "): " + timedActivities, e);
                 return;
             }
         }
@@ -384,7 +386,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendUserListTo(JID to, Collection<User> participants) {
-        XMPPChatTransmitter.log.debug("Sending user list to " + to.toString());
+        XMPPChatTransmitter.log
+            .debug("Sending user list to " + Util.prefix(to));
 
         sendMessage(to, userListExtension.create(participants));
     }
@@ -420,7 +423,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 sendMessageWithoutQueueing(jid, message);
             } catch (IOException e) {
                 // If checksums are failed to be sent, this is not a big problem
-                log.warn("Sending Checksum to " + jid + " failed: ", e);
+                log.warn("Sending Checksum to " + Util.prefix(jid)
+                    + " failed: ", e);
             }
         }
     }

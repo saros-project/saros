@@ -124,14 +124,18 @@ public class StopManager implements IActivityProvider, Disposable {
                 throw new IllegalStateException(
                     "Cannot receive StopActivities without a shared project");
 
+            User user = sharedProject.getUser(stopActivity.getRecipient());
+            if (user == null || !user.isLocal())
+                throw new IllegalArgumentException(
+                    "Received StopActivity which is not for the local user");
+
             if (stopActivity.getType() == Type.LOCKREQUEST) {
 
                 /*
                  * local user locks his project and adds a startHandle so he
                  * knows he is locked. Then he acknowledges
                  */
-                if (stopActivity.getState() == State.INITIATED
-                    && sharedProject.getUser(stopActivity.getUser()).isLocal()) {
+                if (stopActivity.getState() == State.INITIATED) {
                     addStartHandle(generateStartHandle(stopActivity));
                     // locks project and acknowledges
                     Util.runSafeSWTSync(log, new Runnable() {
@@ -144,9 +148,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     });
                     return true;
                 }
-                if (stopActivity.getState() == State.ACKNOWLEDGED
-                    && sharedProject.getUser(stopActivity.getInitiator())
-                        .isLocal()) {
+                if (stopActivity.getState() == State.ACKNOWLEDGED) {
                     if (!expectedAcknowledgments.contains(stopActivity)) {
                         log.warn("Received unexpected StopActivity: "
                             + stopActivity);
@@ -161,17 +163,15 @@ public class StopManager implements IActivityProvider, Disposable {
                         reentrantLock.unlock();
                         return true;
                     } else {
-                        log
-                            .warn("Received unexpected StopActivity acknowledgement: "
-                                + stopActivity);
+                        log.warn("Received unexpected "
+                            + "StopActivity acknowledgement: " + stopActivity);
                         return false;
                     }
                 }
             }
 
             if (stopActivity.getType() == Type.UNLOCKREQUEST) {
-                if (stopActivity.getState() == State.INITIATED
-                    && sharedProject.getUser(stopActivity.getUser()).isLocal()) {
+                if (stopActivity.getState() == State.INITIATED) {
 
                     boolean result = executeUnlock(generateStartHandle(stopActivity));
                     // sends an acknowledgment
@@ -181,9 +181,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     return result;
                 }
 
-                if (stopActivity.getState() == State.ACKNOWLEDGED
-                    && sharedProject.getUser(stopActivity.getInitiator())
-                        .isLocal()) {
+                if (stopActivity.getState() == State.ACKNOWLEDGED) {
                     StartHandle handle = startsToBeAcknowledged
                         .remove(stopActivity.getActivityID());
                     if (handle == null) {
@@ -192,10 +190,12 @@ public class StopManager implements IActivityProvider, Disposable {
                         return false;
                     }
                     handle.acknowledge();
+                    return true;
                 }
             }
 
-            return false;
+            throw new IllegalArgumentException(
+                "StopActivity is of unknown type: " + stopActivity);
         }
     };
 
@@ -465,15 +465,14 @@ public class StopManager implements IActivityProvider, Disposable {
         activityListeners.remove(listener);
     }
 
-    public void fireActivity(IActivity stopActivity) {
-        /*
-         * TODO Now StopActivities are sent to everybody, it would be better if
-         * it was sent only to the affected participant.
-         */
-        for (IActivityListener listener : activityListeners) {
-            listener.activityCreated(stopActivity); // Informs SharedProject for
-            // sending the activity
-        }
+    public void fireActivity(StopActivity stopActivity) {
+
+        User recipient = sharedProject.getUser(stopActivity.getRecipient());
+        if (recipient == null)
+            throw new IllegalArgumentException("StopActivity contains"
+                + " recipient which already left: " + stopActivity);
+
+        sharedProject.sendActivity(recipient, stopActivity);
     }
 
     /**

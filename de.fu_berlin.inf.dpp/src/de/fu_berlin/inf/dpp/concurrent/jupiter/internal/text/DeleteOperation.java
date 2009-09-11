@@ -24,6 +24,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -92,7 +93,8 @@ public class DeleteOperation implements ITextOperation {
     @Override
     public String toString() {
         return "Delete(" + this.position + ",'"
-            + Util.escapeForLogging(this.text) + "')";
+            + Util.escapeForLogging(StringUtils.abbreviate(this.text, 150))
+            + "')";
     }
 
     @Override

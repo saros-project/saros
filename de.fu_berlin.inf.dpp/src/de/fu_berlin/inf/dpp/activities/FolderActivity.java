@@ -6,8 +6,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("folderActivity")
-public class FolderActivity extends AbstractActivity implements
-    IResourceActivity {
+public class FolderActivity extends AbstractActivity {
     public static enum Type {
         Created, Removed, Moved
     }
@@ -27,14 +26,23 @@ public class FolderActivity extends AbstractActivity implements
         this.path = path;
     }
 
+    /**
+     * Constructor for moved folders.
+     * 
+     * @param oldPath
+     *            path where the folder moved from
+     * @param newPath
+     *            path where the folder moved to
+     */
+    public FolderActivity(String source, IPath oldPath, IPath newPath) {
+        this(source, Type.Moved, newPath);
+        this.oldPath = oldPath;
+    }
+
     public IPath getPath() {
         return this.path;
     }
 
-    /**
-     * Returns the folder which was moved to a new destination 
-     * (given by getPath()) or null if not a move.
-     */
     public IPath getOldPath() {
         return this.oldPath;
     }

@@ -111,12 +111,19 @@ class EnterProjectNamePage extends WizardPage {
         case HANDMADE:
         case IBB:
         default:
-            setDescription("Attention: No P2P connection with Jingle available! Using IBB instead!"
-                + '\n'
-                + "Suggestion: Update an existing project or copy resources from another project.");
+            
+            if (preferenceUtils.forceFileTranserByChat()) {
+                setDescription("Attention: P2P connection with Jingle is deactivated. Using IBB instead!"
+                    + '\n'
+                    + "To activate Jingle uncheck 'Avoid direct file transfer connection' in Saros preferences.");
+            } else {
+                setDescription("Attention: No P2P connection with Jingle available! Using IBB instead!"
+                    + '\n'
+                    + "Suggestion: Update an existing project or copy resources from another project.");
+            }    
             setImageDescriptor(SarosUI
                 .getImageDescriptor("icons/ibb_connection.png"));
-        }
+        }            
     }
 
     /**

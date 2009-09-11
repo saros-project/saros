@@ -12,7 +12,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 @XStreamAlias("fileActivity")
-public class FileActivity extends AbstractActivity implements IResourceActivity {
+public class FileActivity extends AbstractActivity {
 
     /**
      * Enum used to distinguish file activities which are caused as part of a
@@ -52,27 +52,6 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     public static FileActivity created(IProject project, String source,
         IPath path, Purpose purpose) throws IOException {
 
-        // TODO Use Eclipse Method of getting the contents of a file:
-        // IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        //
-        // IFile file = (IFile) project.findMember(path);
-        // IPath npath = file.getProjectRelativePath();
-        //
-        // InputStream in = null;
-        // byte[] content = null;
-        // try {
-        // in = file.getContents();
-        // content = IOUtils.toByteArray(in);
-        // } catch (CoreException e) {
-        // log.warn(".created() can not get the content of "
-        // + npath.toOSString());
-        // } finally {
-        // IOUtils.closeQuietly(in);
-        // }
-        //
-        // return new FileActivity(source, Type.Created, npath, null, content,
-        // purpose);
-
         File f = new File(project.getFile(path).getLocation().toOSString());
         byte[] content = FileUtils.readFileToByteArray(f);
 
@@ -83,31 +62,16 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
     /**
      * Builder for moving files.
      * 
-     * @param source
-     *            JabberID of the origin user
-     * 
      * @param destPath
      *            path where the file moved to
+     * 
      * @param sourcePath
      *            path where the file moved from
-     * @param contentChange
-     *            if true, a snapshot copy is made of the file at the
-     *            destination path and sent as part of the activity.
-     * @throws IOException
-     *             the new content of the file could not be read
      */
-    public static FileActivity moved(IProject project, String source,
-        IPath destPath, IPath sourcePath, boolean contentChange)
-        throws IOException {
-
-        byte[] content = null;
-        if (contentChange) {
-            File file = new File(project.findMember(destPath).getLocation()
-                .toOSString());
-            content = FileUtils.readFileToByteArray(file);
-        }
-        return new FileActivity(source, Type.Moved, destPath, sourcePath,
-            content, Purpose.ACTIVITY);
+    public static FileActivity moved(String source, IPath destPath,
+        IPath sourcePath) {
+        return new FileActivity(source, Type.Moved, destPath, sourcePath, null,
+            Purpose.ACTIVITY);
     }
 
     /**
@@ -116,8 +80,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param path
      *            the path of the file to remove
      */
-    public static FileActivity removed(String source, IPath path,
-        Purpose purpose) {
+    public static IActivity removed(String source, IPath path, Purpose purpose) {
         return new FileActivity(source, Type.Removed, path, null, null, purpose);
     }
 
@@ -127,23 +90,23 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param source
      *            JID as a string of the user who is the source (originator) of
      *            this activity
-     * @param newPath
+     * @param path
      *            where to save the data, destination of a move, file to to
      *            remove depending on type
      * @param oldPath
      *            if type == Moved, the path from where the file was moved (null
      *            otherwise)
      * @param data
-     *            data of the file to be created (only valid for creating and
-     *            moving)
+     *            data of the file to be created (only valid if type == Created)
      */
-    public FileActivity(String source, Type type, IPath newPath, IPath oldPath,
+    public FileActivity(String source, Type type, IPath path, IPath oldPath,
         byte[] data, Purpose purpose) {
         super(source);
 
         if (type == null || purpose == null)
             throw new IllegalArgumentException();
 
+        // Make sure this is not bogus!
         switch (type) {
         case Created:
             if (data == null || oldPath != null)
@@ -154,13 +117,13 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
                 throw new IllegalArgumentException();
             break;
         case Moved:
-            if (newPath == null || oldPath == null)
+            if (data != null || oldPath == null)
                 throw new IllegalArgumentException();
             break;
         }
 
         this.type = type;
-        this.path = newPath;
+        this.path = path;
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;

@@ -213,7 +213,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
     }
 
     /**
-     * Returns the error log file produced by the SarosFileAppender or null, if
+     * Returns the error log file produced by the SessionLogAppender or null, if
      * none could be found.
      * 
      * @return an existing error log file or null

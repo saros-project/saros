@@ -15,12 +15,8 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourceAttributes;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -122,7 +118,8 @@ public class FileUtil {
      */
     public static void writeFile(InputStream input, IFile file,
         SubMonitor monitor) throws CoreException {
-        if (file != null && file.exists()) {
+
+        if (file.exists()) {
             replaceFileContent(input, file, monitor);
         } else {
             createFile(input, file, monitor);
@@ -139,42 +136,31 @@ public class FileUtil {
      * @pre the file must not exist. Use writeFile() for getting this cases
      *      handled.
      */
-    public static void createFile(final InputStream input, final IFile file,
+    public static void createFile(InputStream input, IFile file,
         SubMonitor monitor) throws CoreException {
 
-        IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
-            public void run(IProgressMonitor monitor) throws CoreException {
-                // Make sure directory exists
-                mkdirs(file);
+        // Make sure directory exists
+        mkdirs(file);
 
-                // Make sure that parent is writable
-                IContainer parent = file.getParent();
-                boolean wasReadOnly = false;
-                if (parent != null)
-                    wasReadOnly = setReadOnly(parent, false);
+        // Make sure that parent is writable
+        IContainer parent = file.getParent();
+        boolean wasReadOnly = false;
+        if (parent != null)
+            wasReadOnly = setReadOnly(parent, false);
 
-                BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(
-                    monitor);
-                file.create(input, true, blockingMonitor);
+        BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(
+            monitor);
+        file.create(input, true, blockingMonitor);
+        try {
+            blockingMonitor.await();
+        } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
+            Thread.currentThread().interrupt();
+        }
 
-                try {
-                    blockingMonitor.await();
-                } catch (InterruptedException e) {
-                    log.error("Code not designed to be interruptable", e);
-                    Thread.currentThread().interrupt();
-                }
-
-                // Reset permissions on parent
-                if (parent != null && wasReadOnly)
-                    setReadOnly(parent, true);
-
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(createFolderProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
+        // Reset permissions on parent
+        if (parent != null && wasReadOnly)
+            setReadOnly(parent, true);
     }
 
     /**
@@ -227,15 +213,15 @@ public class FileUtil {
         boolean wasReadOnly = FileUtil.setReadOnly(root, false);
 
         try {
-            create(parent);
-        } catch (CoreException e) {
-            log.error("Could not create Dir: " + parent.getFullPath());
-            return false;
+            if (!create(parent)) {
+                log.error("Could not create Dir: " + parent.getFullPath());
+                return false;
+            } else
+                return true;
         } finally {
             if (wasReadOnly)
                 FileUtil.setReadOnly(root, true);
         }
-        return true;
     }
 
     public static IFolder getParentFolder(IResource resource) {
@@ -250,38 +236,32 @@ public class FileUtil {
         return (IFolder) parent;
     }
 
-    public static void create(final IFolder folder) throws CoreException {
+    public static boolean create(final IFolder folder) {
 
-        // if ((folder == null) || (folder.exists())) {
-        // log.debug(".create() Creating folder not possible");
-        // return;
-        // }
-
-        if (folder == null) {
-            log.warn(".create() Creating folder not possible -  it is null");
-            throw new IllegalArgumentException();
+        if (folder == null || folder.exists()) {
+            return true;
         }
-        if (folder.exists()) {
-            log.debug(".create() Creating folder " + folder.getName()
-                + " not possible - it already exists");
-            return;
-        }
-        IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
-            public void run(IProgressMonitor monitor) throws CoreException {
-                create(getParentFolder(folder));
-                folder.create(IResource.NONE, true, monitor);
+        create(getParentFolder(folder));
+        try {
+            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+            // TODO Actually we have to perform this as Workspace Runnable
 
-                if (monitor.isCanceled()) {
-                    log.warn("Creating folder failed: " + folder);
-                }
-
+            folder.create(IResource.NONE, true, monitor);
+            try {
+                monitor.await();
+            } catch (InterruptedException e) {
+                log.error("Code not designed to handle InterruptedException");
+                Thread.currentThread().interrupt();
+                return false;
             }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(createFolderProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
+            if (monitor.isCanceled()) {
+                log.warn("Creating folder failed: " + folder);
+                return false;
+            }
+            return true;
+        } catch (CoreException e) {
+            return false;
+        }
     }
 
     /**
@@ -331,68 +311,27 @@ public class FileUtil {
         }
     }
 
-    public static void delete(final IResource resource) throws CoreException {
+    public static void delete(IResource resource) throws CoreException {
         if (!resource.exists()) {
             log.warn("File not found for deletion: " + resource);
             return;
         }
 
         setReadOnly(resource, false);
+        BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+        // TODO Actually we have to perform this as Workspace Runnable
 
-        IWorkspaceRunnable deleteProcedure = new IWorkspaceRunnable() {
-            public void run(IProgressMonitor monitor) throws CoreException {
-                resource.delete(false, monitor);
-
-                if (monitor.isCanceled()) {
-                    log.warn("Removing resource failed: " + resource);
-                }
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(deleteProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
-    }
-
-    /**
-     * Moves the given {@link IResource} to the place, that is pointed by the
-     * given {@link IPath}. This Method excepts relative to workspace Path and
-     * Resource.
-     * 
-     * @param destination
-     *            Destination of moving the given resource.
-     * @param source
-     *            Resource, that is going to be moved
-     * 
-     * */
-    public static void move(final IPath destination, final IResource source)
-        throws CoreException {
-
-        log.trace(".move(" + destination.toOSString() + " , "
-            + source.getName() + ")");
-
-        if (!source.isAccessible()) {
-            log.warn(".move Source file can not be accessed  "
-                + source.getName());
-            return;
+        resource.delete(false, monitor);
+        try {
+            monitor.await();
+        } catch (InterruptedException e) {
+            log.error("Code not designed to be interruptable", e);
+            Thread.currentThread().interrupt();
         }
 
-        IWorkspaceRunnable moveProcedure = new IWorkspaceRunnable() {
-            public void run(IProgressMonitor monitor) throws CoreException {
-                IPath absDestination = destination.makeAbsolute();
-
-                source.move(absDestination, false, monitor);
-
-                if (monitor.isCanceled()) {
-                    log.warn("Moving resource failed (Cancel Button pressed).");
-                }
-            }
-        };
-
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        workspace.run(moveProcedure, workspace.getRoot(),
-            IWorkspace.AVOID_UPDATE, null);
-
+        if (monitor.isCanceled()) {
+            log.warn("Removing resource failed: " + resource);
+        }
     }
+
 }

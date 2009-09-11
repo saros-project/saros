@@ -269,6 +269,7 @@ public class SarosUI {
      * @swt
      */
     public void performRoleChange(final User user, final UserRole newRole) {
+
         ProgressMonitorDialog dialog = new ProgressMonitorDialog(EditorAPI
             .getAWorkbenchWindow().getShell());
 
@@ -287,8 +288,8 @@ public class SarosUI {
                             user, newRole, progress);
 
                     } catch (CancellationException e) {
-                        log
-                            .warn("Role change failed because user canceled the role change");
+                        log.warn("Role change failed because user"
+                            + " canceled the role change");
                         Util.runSafeSWTSync(log, new Runnable() {
                             public void run() {
                                 MessageDialog.openInformation(EditorAPI
