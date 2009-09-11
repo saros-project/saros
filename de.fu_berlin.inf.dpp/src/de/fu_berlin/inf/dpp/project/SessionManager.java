@@ -38,7 +38,6 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
@@ -46,6 +45,7 @@ import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;

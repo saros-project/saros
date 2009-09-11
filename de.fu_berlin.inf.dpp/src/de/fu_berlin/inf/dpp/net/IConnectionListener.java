@@ -22,7 +22,6 @@ package de.fu_berlin.inf.dpp.net;
 import org.jivesoftware.smack.XMPPConnection;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.Saros.ConnectionState;
 
 /**
  * A listener for changes to the current connection state. Use
