@@ -119,8 +119,6 @@ public class EditorManager implements IActivityProvider, Disposable {
     protected static Logger wpLog = Logger.getLogger(EditorManager.class
         .getName());
 
-    protected static EditorManager instance;
-
     protected SharedEditorListenerDispatch editorListener = new SharedEditorListenerDispatch();
 
     protected IEditorAPI editorAPI;
