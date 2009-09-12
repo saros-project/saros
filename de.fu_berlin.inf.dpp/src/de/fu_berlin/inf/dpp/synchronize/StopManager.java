@@ -175,6 +175,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     fireActivity(stopActivity
                         .generateAcknowledgment(sharedProject.getLocalUser()
                             .getJID().toString()));
+                    return;
                 }
 
                 if (stopActivity.getState() == State.ACKNOWLEDGED) {
