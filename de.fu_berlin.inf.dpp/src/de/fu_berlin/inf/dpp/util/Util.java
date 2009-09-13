@@ -887,8 +887,18 @@ public class Util {
     public static void logDiff(Logger log, JID from, IPath path,
         byte[] inputBytes, IFile file) {
         try {
+            if (file == null) {
+                log.error("No file given", new StackTrace());
+                return;
+            }
+
             if (!file.exists()) {
-                log.info("Missing file detected: " + file);
+                log.info("File on disk is missing: " + file);
+                return;
+            }
+
+            if (inputBytes == null) {
+                log.info("File on disk is to be deleted:" + file);
                 return;
             }
 
