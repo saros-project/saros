@@ -30,4 +30,6 @@ public interface IActivityConsumer {
     boolean consume(JupiterActivity jupiterActivity);
 
     boolean consume(StopActivity stopActivity);
+
+    boolean consume(PingPongActivity pingPongActivity);
 }

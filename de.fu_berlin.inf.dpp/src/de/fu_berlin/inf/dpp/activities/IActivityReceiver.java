@@ -31,4 +31,6 @@ public interface IActivityReceiver {
     void receive(JupiterActivity jupiterActivity);
 
     void receive(StopActivity stopActivity);
+
+    void receive(PingPongActivity pingPongActivity);
 }

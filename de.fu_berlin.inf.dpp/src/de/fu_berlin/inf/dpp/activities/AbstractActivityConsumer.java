@@ -55,6 +55,11 @@ public class AbstractActivityConsumer implements IActivityConsumer {
         return false;
     }
 
+    public boolean consume(PingPongActivity pingPongActivity) {
+        // empty implementation
+        return false;
+    }
+
     /**
      * Utility method for converting a IActivityConsumer into an
      * IActivityReceiver (the result from the calls to consume are ignored)
@@ -96,6 +101,10 @@ public class AbstractActivityConsumer implements IActivityConsumer {
 
             public void receive(StopActivity stopActivity) {
                 consumer.consume(stopActivity);
+            }
+
+            public void receive(PingPongActivity pingPongActivity) {
+                consumer.consume(pingPongActivity);
             }
         };
     }

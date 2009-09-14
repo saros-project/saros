@@ -123,6 +123,7 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionManager;
+import de.fu_berlin.inf.dpp.project.PingPongCentral;
 import de.fu_berlin.inf.dpp.project.SarosRosterListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.project.SharedResourcesManager;
@@ -282,6 +283,7 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(LocalPresenceTracker.class);
         this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);
+        this.container.addComponent(PingPongCentral.class);
         this.container.addComponent(PreferenceManager.class);
         this.container.addComponent(PreferenceUtils.class);
         this.container.addComponent(RoleManager.class);

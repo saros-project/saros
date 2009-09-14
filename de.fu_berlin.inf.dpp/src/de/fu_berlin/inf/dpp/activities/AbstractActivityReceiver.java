@@ -43,6 +43,10 @@ public class AbstractActivityReceiver implements IActivityReceiver {
         // do nothing
     }
 
+    public void receive(PingPongActivity pingPongActivity) {
+        // do nothing
+    }
+
     /**
      * Returns a IActivityConsumer from the given IActivityReceiver which
      * returns the given value for all calls to consume after calling receive on
@@ -95,6 +99,11 @@ public class AbstractActivityReceiver implements IActivityReceiver {
 
             public boolean consume(StopActivity stopActivity) {
                 receiver.receive(stopActivity);
+                return consume;
+            }
+
+            public boolean consume(PingPongActivity pingPongActivity) {
+                receiver.receive(pingPongActivity);
                 return consume;
             }
         };
