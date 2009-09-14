@@ -21,6 +21,9 @@ package de.fu_berlin.inf.dpp.project;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,6 +48,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -76,13 +80,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
     /**
      * While paused the SharedResourcesManager doesn't fire activities
      */
-    private boolean pause = false;
+    protected boolean pause = false;
 
-    private ISharedProject sharedProject;
+    protected ISharedProject sharedProject;
 
-    private final ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
-
-    private final List<IActivityListener> listeners = new LinkedList<IActivityListener>();
+    protected List<IActivityListener> listeners = new LinkedList<IActivityListener>();
 
     protected StopManager stopManager;
 
@@ -125,13 +127,120 @@ public class SharedResourcesManager implements IResourceChangeListener,
     /**
      * Listens for resource changes in shared project and fires activities.
      */
-    private class ResourceDeltaVisitor implements IResourceDeltaVisitor {
+    protected class ResourceDeltaVisitor implements IResourceDeltaVisitor {
+
+        // stores activities that happen while one change event
+        protected List<IResourceActivity> activitiesBuffer = new ArrayList<IResourceActivity>();
+
+        /**
+         * Compares the length (in number segments) of IPaths of given
+         * Activities. Longer path is 'bigger'.
+         * */
+        protected class PathLengthComparator implements
+            Comparator<IResourceActivity> {
+
+            public int compare(IResourceActivity a1, IResourceActivity a2) {
+                int a1sc = a1.getPath().segmentCount();
+                int a2sc = a2.getPath().segmentCount();
+
+                return a1sc - a2sc;
+            }
+
+        }
+
+        /**
+         * Compares the length (in number segments) of IPaths of given
+         * Activities. Shorter path is 'bigger'.
+         * */
+        protected class ReversePathLengthComparator implements
+            Comparator<IResourceActivity> {
+
+            PathLengthComparator pathLengthComparator = new PathLengthComparator();
+
+            public int compare(IResourceActivity a1, IResourceActivity a2) {
+                return -pathLengthComparator.compare(a1, a2);
+            }
+        }
+
+        /**
+         * To be run before change event ends. It orders activities in buffer
+         * and fires them.
+         */
+        public void finish() {
+            for (IActivity activity : getOrderedActivities())
+                fireActivity(activity);
+        }
+
+        /**
+         * Orders activities in buffer.
+         */
+        protected List<IResourceActivity> getOrderedActivities() {
+            // TODO Use a comparator which includes all this as a sorting rule
+
+            List<IResourceActivity> fileCreateActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> fileMoveActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> fileRemoveActivities = new ArrayList<IResourceActivity>();
+
+            List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
+
+            List<IResourceActivity> orderedList;
+
+            /**
+             * split all activities in activities buffer in groups
+             * ({File,Folder} * {Create, Move, Delete})
+             */
+            for (IResourceActivity activity : activitiesBuffer) {
+                FolderActivity.Type tFolder;
+                FileActivity.Type tFile;
+
+                if (activity instanceof FileActivity) {
+                    tFile = ((FileActivity) activity).getType();
+                    if (tFile == FileActivity.Type.Created)
+                        fileCreateActivities.add(activity);
+                    else if (tFile == FileActivity.Type.Moved)
+                        fileMoveActivities.add(activity);
+                    else if (tFile == FileActivity.Type.Removed)
+                        fileRemoveActivities.add(activity);
+
+                }
+                if (activity instanceof FolderActivity) {
+                    tFolder = ((FolderActivity) activity).getType();
+                    if (tFolder == FolderActivity.Type.Created)
+                        folderCreateActivities.add(activity);
+                    else if (tFolder == FolderActivity.Type.Removed)
+                        folderRemoveActivities.add(activity);
+
+                }
+            }
+
+            PathLengthComparator pathLengthComparator = new PathLengthComparator();
+            ReversePathLengthComparator iplc = new ReversePathLengthComparator();
+
+            // Sorts Activities by their length
+            Collections.sort(fileCreateActivities, pathLengthComparator);
+            Collections.sort(fileMoveActivities, pathLengthComparator);
+            Collections.sort(fileRemoveActivities, iplc);
+            Collections.sort(folderCreateActivities, pathLengthComparator);
+            Collections.sort(folderRemoveActivities, iplc);
+
+            orderedList = new ArrayList<IResourceActivity>();
+
+            // add activities to the result
+            orderedList.addAll(folderCreateActivities);
+            orderedList.addAll(fileMoveActivities);
+            orderedList.addAll(fileCreateActivities);
+            orderedList.addAll(fileRemoveActivities);
+            orderedList.addAll(folderRemoveActivities);
+
+            return orderedList;
+        }
 
         public boolean visit(IResourceDelta delta) {
 
-            assert SharedResourcesManager.this.sharedProject != null;
+            assert sharedProject != null;
 
-            if (!SharedResourcesManager.this.sharedProject.isDriver()) {
+            if (!sharedProject.isDriver()) {
                 return false;
             }
 
@@ -140,8 +249,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return true;
             }
 
-            if (resource.getProject() != SharedResourcesManager.this.sharedProject
-                .getProject()) {
+            if (resource.getProject() != sharedProject.getProject()) {
                 return false;
             }
 
@@ -149,45 +257,50 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return false;
             }
 
-            IPath path = delta.getProjectRelativePath();
-            int kind = delta.getKind();
+            IResourceActivity activity = null;
 
-            IActivity activity = null;
-            if (resource instanceof IFile) {
-                activity = handleFileDelta(path, kind);
-
-            } else if (resource instanceof IFolder) {
-                activity = handleFolderDelta(path, kind);
-            }
+            if (resource instanceof IFile)
+                activity = handleFileDelta(delta);
+            else if (resource instanceof IFolder)
+                activity = handleFolderDelta(delta);
 
             if (activity != null) {
+
                 // TODO A delete activity is triggered twice
-                // log.debug("File Activity Fired: " + activity + " for Delta: "
-                // + delta, new StackTrace());
-                fireActivity(activity);
+                activitiesBuffer.add(activity);
             }
 
             return delta.getKind() != IResourceDelta.NO_CHANGE;
         }
 
-        private IActivity handleFolderDelta(IPath path, int kind) {
-            switch (kind) {
+        protected IResourceActivity handleFolderDelta(IResourceDelta delta) {
+            IResource resource = delta.getResource();
+            switch (delta.getKind()) {
             case IResourceDelta.ADDED:
+
                 return new FolderActivity(saros.getMyJID().toString(),
-                    FolderActivity.Type.Created, path);
+                    FolderActivity.Type.Created, resource
+                        .getProjectRelativePath());
 
             case IResourceDelta.REMOVED:
+                if (isMoved(delta))
+                    return null;
                 return new FolderActivity(saros.getMyJID().toString(),
-                    FolderActivity.Type.Removed, path);
+                    FolderActivity.Type.Removed, resource
+                        .getProjectRelativePath());
 
             default:
                 return null;
             }
         }
 
-        private IActivity handleFileDelta(IPath path, int kind) {
+        protected IResourceActivity handleFileDelta(IResourceDelta delta) {
+            IResource resource = delta.getResource();
+            int kind = delta.getKind();
+
             switch (kind) {
             case IResourceDelta.CHANGED:
+                log.debug("Resource " + resource.getName() + " changed");
 
                 /*
                  * FIXME If a CHANGED event happens and it was not triggered by
@@ -197,30 +310,86 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return null;
 
             case IResourceDelta.ADDED:
-                // ignore opened files because otherwise we might send CHANGED
-                // events for files that are also handled by the editor manager.
-                if (editorManager.isOpened(path)) {
+
+                // is this an "ADD" while moving/renaming a file?
+                if (isMovedFrom(delta)) {
+
+                    String jid = saros.getMyJID().toString();
+
+                    IPath newPath = resource.getFullPath().makeRelative();
+                    IPath oldPath = delta.getMovedFromPath().makeRelative();
+
+                    newPath = newPath.removeFirstSegments(1);
+                    oldPath = oldPath.removeFirstSegments(1);
+
+                    try {
+                        return FileActivity.moved(sharedProject.getProject(),
+                            jid, newPath, oldPath, isContentChange(delta));
+                    } catch (IOException e) {
+                        log
+                            .warn("Resource could not be read for sending to peers:"
+                                + resource.getLocation());
+                    }
+                }
+
+                // usual files adding procedure
+
+                // ignore opened files because otherwise we might send
+                // CHANGED
+                // events for files that are also handled by the editor
+                // manager.
+                if (editorManager.isOpened(resource.getProjectRelativePath())) {
                     // TODO Think about if this is needed...
                     return null;
                 }
                 try {
+
                     return FileActivity.created(sharedProject.getProject(),
-                        saros.getMyJID().toString(), path, Purpose.ACTIVITY);
+                        saros.getMyJID().toString(), resource.getFullPath()
+                            .makeRelative().removeFirstSegments(1),
+                        Purpose.ACTIVITY);
                 } catch (IOException e) {
                     log.warn("Resource could not be read for sending to peers:"
-                        + path, e);
+                        + resource.getLocation(), e);
                 }
                 return null;
+
             case IResourceDelta.REMOVED:
-                return FileActivity.removed(saros.getMyJID().toString(), path,
-                    Purpose.ACTIVITY);
+                if (isMoved(delta)) // Ignore "REMOVED" while moving
+                    return null;
+                return FileActivity.removed(saros.getMyJID().toString(),
+                    resource.getProjectRelativePath(), Purpose.ACTIVITY);
 
             default:
                 return null;
             }
         }
 
-        private void fireActivity(final IActivity activity) {
+        /**
+         * It analyzes the given IResourceDelta and returns true if the
+         * "Moved"-flags are set.
+         * */
+        protected boolean isMoved(IResourceDelta delta) {
+            return (isMovedFrom(delta) || isMovedTo(delta));
+        }
+
+        protected boolean isMovedFrom(IResourceDelta delta) {
+            return ((delta.getFlags() & IResourceDelta.MOVED_FROM) != 0);
+        }
+
+        protected boolean isMovedTo(IResourceDelta delta) {
+            return ((delta.getFlags() & IResourceDelta.MOVED_TO) != 0);
+        }
+
+        /**
+         * Indicates content change of a resource while checking its delta.
+         */
+        protected boolean isContentChange(IResourceDelta delta) {
+            return ((delta.getFlags() & IResourceDelta.CONTENT) != 0);
+
+        }
+
+        protected void fireActivity(final IActivity activity) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     for (IActivityListener listener : listeners) {
@@ -304,12 +473,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceChangeEvent.POST_CHANGE:
 
                 IResourceDelta delta = event.getDelta();
-                if (delta != null)
-                    delta.accept(this.visitor);
-                else
-                    log
-                        .error("Unexpected empty delta in SharedResourcesManager: "
-                            + event);
+                log.trace(".resourceChanged() - Delta will be processed");
+                if (delta != null) {
+                    ResourceDeltaVisitor visitor = new ResourceDeltaVisitor();
+                    delta.accept(visitor);
+                    visitor.finish();
+                } else
+                    log.error("Unexpected empty delta in "
+                        + "SharedResourcesManager: " + event);
                 break;
             case IResourceChangeEvent.PRE_CLOSE:
             case IResourceChangeEvent.PRE_DELETE:
@@ -354,7 +525,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    private void exec(FileActivity activity) throws CoreException {
+    protected void exec(FileActivity activity) throws CoreException {
 
         if (this.sharedProject == null) {
             log.warn("Project has ended for FileActivity " + activity);
@@ -362,13 +533,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         IProject project = this.sharedProject.getProject();
+
         IPath path = activity.getPath();
-        IFile file = project.getFile(path);
+        IFile file = sharedProject.getProject().getFile(path);
 
         if (activity.isRecovery()) {
             log.info("Received consistency file: " + activity);
 
-            if (log.isInfoEnabled()) {
+            if (log.isInfoEnabled() && (activity.getContents() != null)) {
                 Util.logDiff(log, new JID(activity.getSource()), path, activity
                     .getContents(), file);
             }
@@ -386,6 +558,30 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
         } else if (activity.getType() == FileActivity.Type.Removed) {
             FileUtil.delete(file);
+        } else if (activity.getType() == FileActivity.Type.Moved) {
+
+            IPath newFilePath = activity.getPath();
+            IResource fileOldResource = project.findMember(activity
+                .getOldPath());
+            IResource nfpR = project.getFile(newFilePath);
+            newFilePath = nfpR.getFullPath();
+
+            if (fileOldResource == null) {
+                log.error(".exec Old File is not availible while moving "
+                    + activity.getOldPath().toOSString());
+            } else
+                FileUtil.move(newFilePath, fileOldResource);
+
+            // while moving content of the file changed
+            if (activity.getContents() != null) {
+
+                IFile fileResource = (IFile) project.findMember(newFilePath
+                    .removeFirstSegments(1));
+
+                fileResource.setContents(new ByteArrayInputStream(activity
+                    .getContents()), true, true, null);
+            }
+
         }
 
         if (activity.isRecovery()) {
@@ -397,13 +593,12 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    private void exec(FolderActivity activity) {
+    protected void exec(FolderActivity activity) throws CoreException {
         IFolder folder = this.sharedProject.getProject().getFolder(
             activity.getPath());
 
         if (activity.getType() == FolderActivity.Type.Created) {
-            if (!FileUtil.create(folder))
-                log.warn("Creating folder failed: " + folder);
+            FileUtil.create(folder);
         } else if (activity.getType() == FolderActivity.Type.Removed) {
             try {
                 FileUtil.delete(folder);
@@ -411,6 +606,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 log.warn("Removing folder failed: " + folder);
             }
         }
+
     }
 
     public void dispose() {

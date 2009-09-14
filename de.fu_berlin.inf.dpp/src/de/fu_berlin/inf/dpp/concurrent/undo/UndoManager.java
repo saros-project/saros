@@ -571,6 +571,8 @@ public class UndoManager implements Disposable, IActivityProvider {
                 log.error("Invalid location for " + textOp);
             }
         }
+
+        editorManager.disconnect(file);
     }
 
     public void addActivityListener(IActivityListener listener) {
