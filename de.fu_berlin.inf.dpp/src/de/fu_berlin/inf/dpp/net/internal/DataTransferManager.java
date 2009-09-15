@@ -111,7 +111,6 @@ public class DataTransferManager implements ConnectionSessionListener {
                 }
             }
         }
-
     };
 
     protected DispatchingJingleFileTransferListener jingleListener;
