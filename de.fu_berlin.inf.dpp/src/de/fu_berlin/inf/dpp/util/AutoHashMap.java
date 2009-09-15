@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,18 @@ public class AutoHashMap<K, V> implements Map<K, V> {
         return new AutoHashMap<K, List<V>>(new Function<K, List<V>>() {
             public List<V> apply(K u) {
                 return new ArrayList<V>();
+            }
+        });
+    }
+
+    /**
+     * Returns a AutoHashMap which automatically will initialize an HashSet<V>
+     * when queried for a key for which there is no value.
+     */
+    public static <K, V> AutoHashMap<K, Set<V>> getSetHashMap() {
+        return new AutoHashMap<K, Set<V>>(new Function<K, Set<V>>() {
+            public Set<V> apply(K u) {
+                return new HashSet<V>();
             }
         });
     }
