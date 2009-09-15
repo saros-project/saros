@@ -17,6 +17,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
  * This model provider is responsible for preventing an session observer from
@@ -24,6 +25,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * 
  * @author rdjemili
  */
+@Component(module = "core") 
 public class SharedModelProvider extends ModelProvider {
 
     private static final Logger log = Logger

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.StackTrace;
@@ -16,6 +17,7 @@ import de.fu_berlin.inf.dpp.util.Util;
  * This class is used to that everybody can have an easy access to the
  * InvitationProcesses.
  */
+@Component(module = "observables")
 public class InvitationProcessObservable {
 
     private static Logger log = Logger

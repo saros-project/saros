@@ -11,6 +11,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.Presence;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.util.DeferredValueChangeListener;
@@ -21,6 +22,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * This class is responsible of setting the presence of Saros to away if the
  * user deactivates the Eclipse window
  */
+@Component(module = "ui") 
 public class LocalPresenceTracker {
 
     private static final Logger log = Logger
