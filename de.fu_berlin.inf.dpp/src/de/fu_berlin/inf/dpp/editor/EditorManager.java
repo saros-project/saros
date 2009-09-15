@@ -125,6 +125,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected RemoteEditorManager remoteEditorManager;
 
+    protected RemoteDriverManager remoteDriverManager;
+
     protected ISharedProject sharedProject;
 
     protected final List<IActivityListener> activityListeners = new LinkedList<IActivityListener>();
@@ -329,6 +331,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             contributionAnnotationManager = new ContributionAnnotationManager(
                 project);
             remoteEditorManager = new RemoteEditorManager(sharedProject);
+            remoteDriverManager = new RemoteDriverManager(sharedProject);
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
@@ -396,6 +399,8 @@ public class EditorManager implements IActivityProvider, Disposable {
                     contributionAnnotationManager.dispose();
                     contributionAnnotationManager = null;
                     remoteEditorManager = null;
+                    remoteDriverManager.dispose();
+                    remoteDriverManager = null;
                     locallyActiveEditor = null;
                     locallyOpenEditors.clear();
                 }
@@ -476,14 +481,14 @@ public class EditorManager implements IActivityProvider, Disposable {
             log.warn(".disconnect(): Trying to disconnect"
                 + " DocProvider which is not connected: "
                 + file.getFullPath().toOSString());
+            return;
         }
+
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider documentProvider = getDocumentProvider(input);
-        // BUG: Must be disconnect(input) but without this bug Saros does not work
-        documentProvider.disconnect(file);
+        documentProvider.disconnect(input);
 
         connectedFiles.remove(file);
-
     }
 
     public void setEditorAPI(IEditorAPI editorAPI) {
@@ -722,8 +727,9 @@ public class EditorManager implements IActivityProvider, Disposable {
             return;
         }
 
-        // First let the remoteEditorManager update itself based on the activity
+        // First let the remote managers update itself based on the activity
         remoteEditorManager.exec(activity);
+        remoteDriverManager.exec(activity);
 
         activity.dispatch(activityReceiver);
     }
@@ -1247,8 +1253,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         wpLog.trace("EditorManager.saveText (" + file.getName() + ") invoked");
 
         if (!file.exists()) {
-            log.error(
-                "Cannot save file that does not exist:" + path.toString(),
+            log.warn("File not found for saving: " + path.toString(),
                 new StackTrace());
             return;
         }
@@ -1258,91 +1263,73 @@ public class EditorManager implements IActivityProvider, Disposable {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = getDocumentProvider(input);
 
-        if (isConnected(file)) {
-            wpLog.trace(".saveText File " + file.getName() + " is connected");
-            if (provider.canSaveDocument(input)) {
-                wpLog.trace("EditorManager.saveText File " + file.getName()
-                    + " can be saved");
-                // Everything okay! Provider and EditorManager agree
-            } else {
-                /*
-                 * This happens when a file which is already saved is saved
-                 * again by a remote user
-                 */
-                log.warn("File is not modified, but "
-                    + "EditorManager thinks it is: " + file.toString());
-            }
-        } else {
-            wpLog.trace("EditorManager.saveText File " + file.getName()
-                + "is NOT connected");
-            if (provider.canSaveDocument(input)) {
-                log.warn("File is modified, but "
-                    + "EditorManager does not know about it: "
-                    + file.toString());
-
-                connect(file);
-            } else {
-                /*
-                 * Saving is not necessary if we have no modified document. If
-                 * this warning is printed we must suspect an inconsistency...
-                 * 
-                 * This can occur when the ConvertLineDelimitersOperation is run
-                 * 
-                 * FIXME after a role-change, observer (and host) executes two
-                 * save-activities and comes in this warning
-                 */
-                log.warn("Saving not necessary (not connected): "
-                    + file.toString(), new StackTrace());
-                return;
-            }
+        if (!provider.canSaveDocument(input)) {
+            /*
+             * This happens when a file which is already saved is saved again by
+             * a remote user
+             */
+            wpLog.debug(".saveText File " + file.getName()
+                + " does not need to be saved");
+            return;
         }
 
-        IDocument doc = provider.getDocument(input);
-
-        IAnnotationModel model = provider.getAnnotationModel(input);
-        model.connect(doc);
-
-        wpLog.trace("EditorManager.saveText Annotations on the IDocument "
-            + "are set");
-
-        dirtyStateListener.enabled = false;
-
-        BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+        wpLog.trace(".saveText File " + file.getName() + " will be saved");
 
         try {
-            provider.saveDocument(monitor, input, doc, true);
-            log.debug("Saved document: " + path);
+            provider.connect(input);
         } catch (CoreException e) {
-            log.error("Failed to save document: " + path, e);
+            log.error("Could not connect to a document provider on file '"
+                + file.toString() + "':", e);
+            return;
         }
 
-        // Wait for saving to be done
         try {
-            if (!monitor.await(10)) {
-                log.warn("Timeout expired on saving document: " + path);
+            IDocument doc = provider.getDocument(input);
+
+            // TODO Why do we need to connect to the annotation model here?
+            IAnnotationModel model = provider.getAnnotationModel(input);
+            if (model != null)
+                model.connect(doc);
+
+            wpLog.trace("EditorManager.saveText Annotations on the IDocument "
+                + "are set");
+
+            dirtyStateListener.enabled = false;
+
+            BlockingProgressMonitor monitor = new BlockingProgressMonitor();
+
+            try {
+                provider.saveDocument(monitor, input, doc, true);
+                log.debug("Saved document: " + path);
+            } catch (CoreException e) {
+                log.error("Failed to save document: " + path, e);
             }
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interruptable", e);
-            Thread.currentThread().interrupt();
+
+            // Wait for saving to be done
+            try {
+                if (!monitor.await(10)) {
+                    log.warn("Timeout expired on saving document: " + path);
+                }
+            } catch (InterruptedException e) {
+                log.error("Code not designed to be interruptable", e);
+                Thread.currentThread().interrupt();
+            }
+
+            if (monitor.isCanceled()) {
+                log.warn("Saving was canceled by user: " + path);
+            }
+
+            dirtyStateListener.enabled = true;
+
+            if (model != null)
+                model.disconnect(doc);
+
+            wpLog.trace("EditorManager.saveText File " + file.getName()
+                + " will be reseted");
+
+        } finally {
+            provider.disconnect(input);
         }
-
-        if (monitor.isCanceled()) {
-            log.warn("Saving was canceled by user: " + path);
-        }
-
-        dirtyStateListener.enabled = true;
-
-        model.disconnect(doc);
-
-        wpLog.trace("EditorManager.saveText File " + file.getName()
-            + " will be reseted");
-        /**
-         * disconnecting document of the driver (after resolving inconsistency)
-         * makes saving impossible
-         */
-        if (!isDriver)
-            disconnect(file);
-
     }
 
     /**
