@@ -22,6 +22,7 @@ import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * This class manages state of open editors of all drivers and connects
@@ -146,7 +147,7 @@ public class RemoteDriverManager {
         IFile file = sharedProject.getProject().getFile(path);
         if (!file.exists()) {
             log.error("Attempting to connect to file which"
-                + " is not available locally: " + path);
+                + " is not available locally: " + path, new StackTrace());
             return;
         }
 
