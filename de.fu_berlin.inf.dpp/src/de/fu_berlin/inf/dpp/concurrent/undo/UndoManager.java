@@ -15,6 +15,7 @@ import org.eclipse.core.commands.operations.IUndoableOperation;
 import org.eclipse.core.commands.operations.OperationHistoryEvent;
 import org.eclipse.core.commands.operations.OperationHistoryFactory;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -54,6 +55,7 @@ import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -544,7 +546,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         providers.remove(provider);
     }
 
-    protected void fireActivity(final TextEditActivity activity) {
+    protected void fireActivity(TextEditActivity activity) {
 
         expectedActivities.add(activity);
 
@@ -556,23 +558,36 @@ public class UndoManager implements Disposable, IActivityProvider {
         FileEditorInput input = new FileEditorInput(file);
         IDocumentProvider provider = EditorManager.getDocumentProvider(input);
 
-        editorManager.connect(file);
-
-        IDocument doc = provider.getDocument(input);
-
-        for (ITextOperation textOp : textOps) {
-            try {
-                if (textOp instanceof DeleteOperation)
-                    doc.replace(textOp.getPosition(), textOp.getTextLength(),
-                        "");
-                if (textOp instanceof InsertOperation)
-                    doc.replace(textOp.getPosition(), 0, textOp.getText());
-            } catch (BadLocationException e) {
-                log.error("Invalid location for " + textOp);
-            }
+        try {
+            provider.connect(input);
+        } catch (CoreException e) {
+            log.error("Could not connect to a document provider on file '"
+                + file.toString() + "':", e);
+            return;
         }
 
-        editorManager.disconnect(file);
+        try {
+            IDocument doc = provider.getDocument(input);
+            if (doc == null) {
+                log.error("Could not connect to a document provider on file '"
+                    + file.toString() + "':", new StackTrace());
+                return;
+            }
+
+            for (ITextOperation textOp : textOps) {
+                try {
+                    if (textOp instanceof DeleteOperation)
+                        doc.replace(textOp.getPosition(), textOp
+                            .getTextLength(), "");
+                    if (textOp instanceof InsertOperation)
+                        doc.replace(textOp.getPosition(), 0, textOp.getText());
+                } catch (BadLocationException e) {
+                    log.error("Invalid location for " + textOp);
+                }
+            }
+        } finally {
+            provider.disconnect(input);
+        }
     }
 
     public void addActivityListener(IActivityListener listener) {
