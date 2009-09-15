@@ -130,4 +130,6 @@ public class PreferenceConstants {
      */
     public static final String STATISTIC_ALLOW_PSEUDONYM = "STATISTIC_ALLOW_PSEUDONYM";
 
+    public static final String PING_PONG = "PINGPONG";
+
 }

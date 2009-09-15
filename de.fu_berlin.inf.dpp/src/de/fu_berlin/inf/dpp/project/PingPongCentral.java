@@ -9,14 +9,19 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.joda.time.Duration;
 
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.PingPongActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
+import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
@@ -29,6 +34,8 @@ public class PingPongCentral extends AbstractActivityProvider {
     protected ISharedProject sharedProject;
 
     protected SessionManager sessionManager;
+
+    protected boolean sendPings = false;
 
     protected AutoHashMap<User, PingStats> stats = new AutoHashMap<User, PingStats>(
         new Function<User, PingStats>() {
@@ -138,6 +145,8 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             pingPongHandle = scheduler.scheduleAtFixedRate(new Runnable() {
                 public void run() {
+                    if (!sendPings)
+                        return;
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             sendPings();
@@ -148,10 +157,33 @@ public class PingPongCentral extends AbstractActivityProvider {
         }
     };
 
-    public PingPongCentral(SessionManager manager) {
+    public PingPongCentral(Saros saros, SessionManager manager,
+        PreferenceUtils preferenceUtils) {
         this.sessionManager = manager;
         this.sessionManager.addSessionListener(sessionListener);
+
+        this.sendPings = preferenceUtils.isPingPongActivated();
+        /*
+         * register a property change listeners to keep sendPings up-to-date
+         */
+        saros.getPreferenceStore().addPropertyChangeListener(propertyListener);
     }
+
+    protected IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+        public void propertyChange(PropertyChangeEvent event) {
+            if (event.getProperty().equals(PreferenceConstants.PING_PONG)) {
+                Object value = event.getNewValue();
+                // make sure the cast will work
+                if (value instanceof Boolean) {
+                    sendPings = ((Boolean) value).booleanValue();
+                } else {
+                    log.warn("Preference value PING_PONG"
+                        + " is supposed to be a boolean, but it unexpectedly"
+                        + " changed to a different type!");
+                }
+            }
+        }
+    };
 
     public void dispose() {
         this.sessionManager.removeSessionListener(sessionListener);

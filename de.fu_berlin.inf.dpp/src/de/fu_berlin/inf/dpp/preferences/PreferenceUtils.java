@@ -106,4 +106,9 @@ public class PreferenceUtils {
         return saros.getPreferenceStore().getBoolean(
             PreferenceConstants.CONCURRENT_UNDO);
     }
+
+    public boolean isPingPongActivated() {
+        return saros.getPreferenceStore().getBoolean(
+            PreferenceConstants.PING_PONG);
+    }
 }

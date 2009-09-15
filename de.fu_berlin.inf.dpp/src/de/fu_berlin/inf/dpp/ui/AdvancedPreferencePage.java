@@ -80,6 +80,11 @@ public class AdvancedPreferencePage extends FieldEditorPreferencePage implements
             PreferenceConstants.AUTO_INVITE,
             "Automatically invite the following comma separated users (for debugging)",
             getFieldEditorParent()));
+
+        addField(new BooleanFieldEditor(PreferenceConstants.PING_PONG,
+            "Perform Latency Measurement using Ping Pong Activities",
+            getFieldEditorParent()));
+
     }
 
     /*
