@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 public class RemoteEditorManager {
 
     private static final Logger log = Logger
-        .getLogger(RemoteEditorManager.class.getName());
+        .getLogger(RemoteEditorManager.class);
 
     protected Map<User, RemoteEditorState> editorStates = new HashMap<User, RemoteEditorState>();
 
@@ -75,7 +75,7 @@ public class RemoteEditorManager {
     }
 
     /**
-     * This class represents the state of the editors, viewport, selection of
+     * This class represents the state of the editors, viewports, selection of
      * one remote user.
      */
     public static class RemoteEditorState {
