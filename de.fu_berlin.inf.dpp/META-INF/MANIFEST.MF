@@ -11,8 +11,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.core.resources,
  org.eclipse.ui.ide,
- org.eclipse.cdt.ui;resolution:=optional,
- org.eclipse.cdt.core;resolution:=optional,
  org.eclipse.jdt.core;resolution:=optional,
  org.eclipse.jdt.ui;resolution:=optional,
  org.junit
