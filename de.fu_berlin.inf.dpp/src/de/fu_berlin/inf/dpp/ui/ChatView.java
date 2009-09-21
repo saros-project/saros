@@ -113,7 +113,6 @@ public class ChatView extends ViewPart implements IConnectionListener,
 
             @Override
             public void run() {
-                saros.getConnection().getUser();
                 if (ChatView.this.joined) {
                     ChatView.this.session.sendMessage("is leaving the chat...");
                     ChatView.this.inputText

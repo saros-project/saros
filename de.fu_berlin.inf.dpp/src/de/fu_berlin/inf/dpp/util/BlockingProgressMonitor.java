@@ -9,6 +9,20 @@ import org.eclipse.core.runtime.ProgressMonitorWrapper;
 
 /**
  * A ProgressMonitor which can be waited upon.
+ * 
+ * Typical usage pattern:
+ * 
+ * <pre>
+ * BlockingProgressMonitor blockingMonitor = new BlockingProgressMonitor(monitor);
+ * object.longRunningOperation(blockingMonitor);
+ * 
+ * try {
+ *     blockingMonitor.await();
+ * } catch (InterruptedException e) {
+ *     log.error(&quot;Code not designed to be interruptible&quot;, e);
+ *     Thread.currentThread().interrupt();
+ * }
+ * </pre>
  */
 public class BlockingProgressMonitor extends ProgressMonitorWrapper {
 

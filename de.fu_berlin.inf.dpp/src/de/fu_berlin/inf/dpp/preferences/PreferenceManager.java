@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 
-import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.optional.jdt.JDTFacade;
 import de.fu_berlin.inf.dpp.preferences.IPreferenceManipulator.IRestorePoint;
@@ -33,14 +32,14 @@ public class PreferenceManager {
 
     protected List<IRestorePoint> restorePoints = new ArrayList<IRestorePoint>();
 
-    public PreferenceManager(final Saros saros, JDTFacade jdtFacade,
-        SessionManager sessionManager) {
+    public PreferenceManager(JDTFacade jdtFacade, SessionManager sessionManager) {
 
         // collect PreferenceManipulators
         if (jdtFacade.isJDTAvailable()) {
             manipulators.addAll(jdtFacade.getPreferenceManipulators());
         }
         manipulators.add(new LineDelimiterManipulator());
+        manipulators.add(new EncodingManipulator());
 
         sessionManager.addSessionListener(new AbstractSessionListener() {
 

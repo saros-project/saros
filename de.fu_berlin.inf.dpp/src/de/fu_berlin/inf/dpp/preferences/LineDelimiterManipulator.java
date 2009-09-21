@@ -16,7 +16,7 @@ import de.fu_berlin.inf.dpp.util.StateChangeNotifier;
 
 public class LineDelimiterManipulator implements IPreferenceManipulator {
 
-    private static Logger log = Logger
+    private static final Logger log = Logger
         .getLogger(LineDelimiterManipulator.class);
 
     /**
@@ -30,7 +30,7 @@ public class LineDelimiterManipulator implements IPreferenceManipulator {
     public IRestorePoint change(final IProject project) {
 
         /* Read the line delimiter from the project specific configuration. */
-        this.oldLineDelimiter = getLineDelimiterPreference(project);
+        oldLineDelimiter = getLineDelimiterPreference(project);
         log.debug("Project line delimiter: "
             + StringEscapeUtils.escapeJava(oldLineDelimiter));
         /*
