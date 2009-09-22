@@ -24,6 +24,8 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 /**
  * A text load activity activates a new resource. If the path is
  * <code>null</code> no resource is currently active.
@@ -49,7 +51,7 @@ public class EditorActivity extends AbstractActivity {
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivity(String source, Type type, IPath path) {
+    public EditorActivity(JID source, Type type, IPath path) {
         super(source);
         if ((type != Type.Activated) && (path == null)) {
             throw new IllegalArgumentException(

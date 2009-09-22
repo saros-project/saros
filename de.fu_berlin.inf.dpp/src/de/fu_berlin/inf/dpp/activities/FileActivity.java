@@ -11,6 +11,8 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 @XStreamAlias("fileActivity")
 public class FileActivity extends AbstractActivity implements IResourceActivity {
 
@@ -49,7 +51,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param path
      *            the path of the file to copy the data from
      */
-    public static FileActivity created(IProject project, String source,
+    public static FileActivity created(IProject project, JID source,
         IPath path, Purpose purpose) throws IOException {
 
         // TODO Use Eclipse Method of getting the contents of a file:
@@ -85,7 +87,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * 
      * @param source
      *            JabberID of the origin user
-     *
+     * 
      * @param destPath
      *            path where the file moved to
      * @param sourcePath
@@ -96,7 +98,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @throws IOException
      *             the new content of the file could not be read
      */
-    public static FileActivity moved(IProject project, String source,
+    public static FileActivity moved(IProject project, JID source,
         IPath destPath, IPath sourcePath, boolean contentChange)
         throws IOException {
 
@@ -116,8 +118,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * @param path
      *            the path of the file to remove
      */
-    public static FileActivity removed(String source, IPath path,
-        Purpose purpose) {
+    public static FileActivity removed(JID source, IPath path, Purpose purpose) {
         return new FileActivity(source, Type.Removed, path, null, null, purpose);
     }
 
@@ -125,8 +126,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      * Generic constructor for {@link FileActivity}s
      * 
      * @param source
-     *            JID as a string of the user who is the source (originator) of
-     *            this activity
+     *            JID the user who is the source (originator) of this activity
      * @param newPath
      *            where to save the data, destination of a move, file to to
      *            remove depending on type
@@ -137,7 +137,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivity(String source, Type type, IPath newPath, IPath oldPath,
+    public FileActivity(JID source, Type type, IPath newPath, IPath oldPath,
         byte[] data, Purpose purpose) {
         super(source);
 

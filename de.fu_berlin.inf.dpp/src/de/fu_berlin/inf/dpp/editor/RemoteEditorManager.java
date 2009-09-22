@@ -21,7 +21,6 @@ import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -255,7 +254,7 @@ public class RemoteEditorManager {
 
     public void exec(IActivity activity) {
 
-        User sender = sharedProject.getUser(new JID(activity.getSource()));
+        User sender = sharedProject.getUser(activity.getSource());
 
         getEditorState(sender).exec(activity);
     }

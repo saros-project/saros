@@ -25,7 +25,7 @@ import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A role activity indicates that a user has a new Role in the Driver/Observer
@@ -38,16 +38,16 @@ public class RoleActivity extends AbstractActivity {
     protected final UserRole role;
 
     @XStreamAsAttribute
-    @XStreamConverter(UrlEncodingStringConverter.class)
-    protected final String id;
+    @XStreamConverter(JIDConverter.class)
+    protected final JID affectedUser;
 
     /**
      * Creates a new RoleActivity which indicates that the given user should
      * change into the given role.
      */
-    public RoleActivity(String source, String affectedUser, UserRole role) {
+    public RoleActivity(JID source, JID affectedUser, UserRole role) {
         super(source);
-        this.id = affectedUser;
+        this.affectedUser = affectedUser;
         this.role = role;
     }
 
@@ -55,7 +55,7 @@ public class RoleActivity extends AbstractActivity {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((affectedUser == null) ? 0 : affectedUser.hashCode());
         result = prime * result + ((role == null) ? 0 : role.hashCode());
         return result;
     }
@@ -69,10 +69,10 @@ public class RoleActivity extends AbstractActivity {
         if (!(obj instanceof RoleActivity))
             return false;
         RoleActivity other = (RoleActivity) obj;
-        if (id == null) {
-            if (other.id != null)
+        if (affectedUser == null) {
+            if (other.affectedUser != null)
                 return false;
-        } else if (!id.equals(other.id))
+        } else if (!affectedUser.equals(other.affectedUser))
             return false;
         if (role == null) {
             if (other.role != null)
@@ -83,7 +83,7 @@ public class RoleActivity extends AbstractActivity {
     }
 
     public JID getAffectedUser() {
-        return new JID(id);
+        return affectedUser;
     }
 
     public UserRole getRole() {

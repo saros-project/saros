@@ -27,6 +27,8 @@ import org.eclipse.jface.text.TextSelection;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 @XStreamAlias("textSelectionActivity")
 public class TextSelectionActivity extends AbstractActivity {
 
@@ -39,8 +41,7 @@ public class TextSelectionActivity extends AbstractActivity {
     @XStreamAsAttribute
     private final IPath editor;
 
-    public TextSelectionActivity(String source, int offset, int length,
-        IPath path) {
+    public TextSelectionActivity(JID source, int offset, int length, IPath path) {
         super(source);
         if (path == null) {
             throw new IllegalArgumentException("path must not be null");

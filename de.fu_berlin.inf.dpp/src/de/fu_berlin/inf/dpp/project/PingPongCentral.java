@@ -19,7 +19,7 @@ import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.PingPongActivity;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.util.Function;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
+@Component(module = "net")
 public class PingPongCentral extends AbstractActivityProvider {
 
     private static final Logger log = Logger.getLogger(PingPongCentral.class);
@@ -195,8 +196,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             User initiator = sharedProject.getUser(pingPongActivity
                 .getInitiator());
-            User sender = sharedProject.getUser(new JID(pingPongActivity
-                .getSource()));
+            User sender = sharedProject.getUser(pingPongActivity.getSource());
 
             if (initiator.isLocal()) {
 

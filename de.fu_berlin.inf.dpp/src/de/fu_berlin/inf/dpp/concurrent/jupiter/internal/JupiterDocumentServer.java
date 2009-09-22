@@ -47,7 +47,7 @@ public class JupiterDocumentServer {
 
         Map<JID, JupiterActivity> result = new HashMap<JID, JupiterActivity>();
 
-        JID source = new JID(jupiterActivity.getSource());
+        JID source = jupiterActivity.getSource();
 
         // 1. Use JupiterClient of sender to transform JupiterActivity
         Jupiter sourceProxy = proxies.get(source);

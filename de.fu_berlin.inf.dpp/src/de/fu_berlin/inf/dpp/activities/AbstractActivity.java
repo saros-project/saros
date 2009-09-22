@@ -6,7 +6,8 @@ import org.apache.log4j.Logger;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
+import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 // TODO [MR] Add some information what needs to be done to add a new activity.
 public abstract class AbstractActivity implements IActivity {
@@ -16,16 +17,16 @@ public abstract class AbstractActivity implements IActivity {
         .getName());
 
     @XStreamAsAttribute
-    @XStreamConverter(UrlEncodingStringConverter.class)
-    protected final String source;
+    @XStreamConverter(JIDConverter.class)
+    protected final JID source;
 
-    public AbstractActivity(String source) {
+    public AbstractActivity(JID source) {
         if (source == null)
             throw new IllegalArgumentException("Source cannot be null");
         this.source = source;
     }
 
-    public String getSource() {
+    public JID getSource() {
         return this.source;
     }
 

@@ -30,7 +30,7 @@ public class JupiterActivity extends AbstractActivity {
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
         JID source, IPath editor) {
-        super(source.toString());
+        super(source);
         this.timestamp = timestamp;
         this.operation = operation;
         this.editor = editor;

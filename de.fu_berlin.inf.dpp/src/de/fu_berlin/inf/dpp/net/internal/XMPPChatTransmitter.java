@@ -125,7 +125,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     @Inject
     protected SharedProjectObservable sharedProject;
-
+    
     @Inject
     protected ChecksumErrorExtension checksumErrorExtension;
 
@@ -310,8 +310,10 @@ public class XMPPChatTransmitter implements ITransmitter,
                 dataManager.sendData(transferData, data, SubMonitor
                     .convert(new NullProgressMonitor()));
             } catch (IOException e) {
-                log.error("Failed to sent activities (" + Util.formatByte(data.length)
-                    + "): " + timedActivities, e);
+                log
+                    .error("Failed to sent activities ("
+                        + Util.formatByte(data.length) + "): "
+                        + timedActivities, e);
                 return;
             }
         }

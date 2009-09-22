@@ -140,7 +140,7 @@ public class StopManager implements IActivityProvider, Disposable {
                             lockProject(true);
                             fireActivity(stopActivity
                                 .generateAcknowledgment(sharedProject
-                                    .getLocalUser().getJID().toString()));
+                                    .getLocalUser().getJID()));
                         }
                     });
                     return;
@@ -174,7 +174,7 @@ public class StopManager implements IActivityProvider, Disposable {
                     // sends an acknowledgment
                     fireActivity(stopActivity
                         .generateAcknowledgment(sharedProject.getLocalUser()
-                            .getJID().toString()));
+                            .getJID()));
                     return;
                 }
 
@@ -304,8 +304,8 @@ public class StopManager implements IActivityProvider, Disposable {
 
         // Creating StopActivity for asking user to stop
         final StopActivity stopActivity = new StopActivity(sharedProject
-            .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
-            .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
+            .getLocalUser().getJID(), sharedProject.getLocalUser().getJID(),
+            user.getJID(), Type.LOCKREQUEST, State.INITIATED);
 
         StartHandle handle = generateStartHandle(stopActivity);
         addStartHandle(handle);
@@ -321,7 +321,7 @@ public class StopManager implements IActivityProvider, Disposable {
         }
 
         StopActivity expectedAck = stopActivity.generateAcknowledgment(user
-            .getJID().toString());
+            .getJID());
         expectedAcknowledgments.add(expectedAck);
 
         Util.runSafeSWTSync(log, new Runnable() {
@@ -430,9 +430,9 @@ public class StopManager implements IActivityProvider, Disposable {
         startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
         final StopActivity activity = new StopActivity(sharedProject
-            .getLocalUser().getJID().toString(), sharedProject.getLocalUser()
-            .getJID(), handle.getUser().getJID(), Type.UNLOCKREQUEST,
-            State.INITIATED, handle.getHandleID());
+            .getLocalUser().getJID(), sharedProject.getLocalUser().getJID(),
+            handle.getUser().getJID(), Type.UNLOCKREQUEST, State.INITIATED,
+            handle.getHandleID());
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {

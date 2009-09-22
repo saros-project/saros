@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.activities;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 /**
  * An interface for all things that occur in a shared project session such as
  * editing a file, opening or closing editors, switching roles, etc.
@@ -36,7 +38,7 @@ public interface IActivity {
     /**
      * Returns the Jabber ID of the user which has caused this activity.
      */
-    public String getSource();
+    public JID getSource();
 
     /**
      * The activity will call the receive method of the given receiver with the

@@ -9,7 +9,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
+import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A StopActivity is used for signaling to a user that he should be stopped or
@@ -19,13 +19,13 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 public class StopActivity extends AbstractActivity {
 
     @XStreamAsAttribute
-    @XStreamConverter(UrlEncodingStringConverter.class)
-    protected String initiator;
+    @XStreamConverter(JIDConverter.class)
+    protected JID initiator;
 
     // the user who has to be locked / unlocked
     @XStreamAsAttribute
-    @XStreamConverter(UrlEncodingStringConverter.class)
-    protected String user;
+    @XStreamConverter(JIDConverter.class)
+    protected JID user;
 
     public enum Type {
         LOCKREQUEST, UNLOCKREQUEST
@@ -47,12 +47,12 @@ public class StopActivity extends AbstractActivity {
 
     protected static Random random = new Random();
 
-    public StopActivity(String source, JID initiator, JID user, Type type,
+    public StopActivity(JID source, JID initiator, JID user, Type type,
         State state) {
 
         super(source);
-        this.initiator = initiator.toString();
-        this.user = user.toString();
+        this.initiator = initiator;
+        this.user = user;
         this.state = state;
         this.type = type;
         this.stopActivityID = new SimpleDateFormat("HHmmssSS")
@@ -60,7 +60,7 @@ public class StopActivity extends AbstractActivity {
             + random.nextLong();
     }
 
-    public StopActivity(String source, JID initiator, JID user, Type type,
+    public StopActivity(JID source, JID initiator, JID user, Type type,
         State state, String stopActivityID) {
 
         this(source, initiator, user, type, state);
@@ -122,7 +122,7 @@ public class StopActivity extends AbstractActivity {
      * The user to be locked/unlocked by this activity
      */
     public JID getUser() {
-        return new JID(user);
+        return user;
     }
 
     /**
@@ -131,7 +131,7 @@ public class StopActivity extends AbstractActivity {
      * (in most cases this should be the host)
      */
     public JID getInitiator() {
-        return new JID(initiator);
+        return initiator;
     }
 
     /**
@@ -156,9 +156,9 @@ public class StopActivity extends AbstractActivity {
         return state;
     }
 
-    public StopActivity generateAcknowledgment(String source) {
-        return new StopActivity(source, new JID(initiator), new JID(user),
-            type, State.ACKNOWLEDGED, stopActivityID);
+    public StopActivity generateAcknowledgment(JID source) {
+        return new StopActivity(source, initiator, user, type,
+            State.ACKNOWLEDGED, stopActivityID);
     }
 
     public Type getType() {

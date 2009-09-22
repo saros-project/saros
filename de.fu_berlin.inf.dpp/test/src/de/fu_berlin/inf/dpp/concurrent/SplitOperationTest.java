@@ -15,6 +15,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * testing SplitOperation.toTextEdit()
@@ -22,7 +23,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 public class SplitOperationTest extends TestCase {
 
     protected IPath path = new Path("path");
-    protected String source = "source";
+    protected JID source = new JID("source@server");
 
     public static Operation S(Operation one, Operation two) {
         return new SplitOperation(one, two);

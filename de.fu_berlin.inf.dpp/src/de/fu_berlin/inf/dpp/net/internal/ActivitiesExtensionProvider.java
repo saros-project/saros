@@ -40,6 +40,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
 
 @Component(module = "net")
@@ -54,7 +55,7 @@ public class ActivitiesExtensionProvider extends
             TimedActivity.class, JupiterActivity.class,
             JupiterVectorTime.class, DeleteOperation.class,
             InsertOperation.class, NoOperation.class, SplitOperation.class,
-            TimestampOperation.class);
+            TimestampOperation.class, JID.class);
     }
 
     public PacketExtension create(String sessionID,

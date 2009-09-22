@@ -47,13 +47,16 @@ public class ActivitiesHandler {
                     }
                     JID from = new JID(packet.getFrom());
                     List<TimedActivity> timedActivities = payload
-                    .getTimedActivities();
+                        .getTimedActivities();
 
                     if (!ObjectUtils.equals(sessionID.getValue(), payload
                         .getSessionID())) {
-                        log.warn("Rcvd ("
-                            + String.format("%03d", timedActivities.size())
-                            + ") " + Util.prefix(from) + "from an old/unknown session: " + timedActivities);
+                        log
+                            .warn("Rcvd ("
+                                + String.format("%03d", timedActivities.size())
+                                + ") " + Util.prefix(from)
+                                + "from an old/unknown session: "
+                                + timedActivities);
                         return;
                     }
 
@@ -88,7 +91,8 @@ public class ActivitiesHandler {
 
         if (project == null || project.getUser(fromJID) == null) {
             log.warn("Rcvd (" + String.format("%03d", timedActivities.size())
-                + ") " + Util.prefix(fromJID) + " but User is no participant: " + timedActivities);
+                + ") " + Util.prefix(fromJID) + " but User is no participant: "
+                + timedActivities);
             return;
         } else {
             log.debug("Rcvd (" + String.format("%03d", timedActivities.size())

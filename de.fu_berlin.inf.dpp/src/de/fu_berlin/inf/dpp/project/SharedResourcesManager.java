@@ -278,14 +278,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:
 
-                return new FolderActivity(saros.getMyJID().toString(),
+                return new FolderActivity(saros.getMyJID(),
                     FolderActivity.Type.Created, resource
                         .getProjectRelativePath());
 
             case IResourceDelta.REMOVED:
                 if (isMoved(delta))
                     return null;
-                return new FolderActivity(saros.getMyJID().toString(),
+                return new FolderActivity(saros.getMyJID(),
                     FolderActivity.Type.Removed, resource
                         .getProjectRelativePath());
 
@@ -314,7 +314,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 // is this an "ADD" while moving/renaming a file?
                 if (isMovedFrom(delta)) {
 
-                    String jid = saros.getMyJID().toString();
+                    JID jid = saros.getMyJID();
 
                     IPath newPath = resource.getFullPath().makeRelative();
                     IPath oldPath = delta.getMovedFromPath().makeRelative();
@@ -345,9 +345,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 try {
 
                     return FileActivity.created(sharedProject.getProject(),
-                        saros.getMyJID().toString(), resource.getFullPath()
-                            .makeRelative().removeFirstSegments(1),
-                        Purpose.ACTIVITY);
+                        saros.getMyJID(), resource.getFullPath().makeRelative()
+                            .removeFirstSegments(1), Purpose.ACTIVITY);
                 } catch (IOException e) {
                     log.warn("Resource could not be read for sending to peers:"
                         + resource.getLocation(), e);
@@ -357,8 +356,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceDelta.REMOVED:
                 if (isMoved(delta)) // Ignore "REMOVED" while moving
                     return null;
-                return FileActivity.removed(saros.getMyJID().toString(),
-                    resource.getProjectRelativePath(), Purpose.ACTIVITY);
+                return FileActivity.removed(saros.getMyJID(), resource
+                    .getProjectRelativePath(), Purpose.ACTIVITY);
 
             default:
                 return null;
@@ -541,7 +540,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             log.info("Received consistency file: " + activity);
 
             if (log.isInfoEnabled() && (activity.getContents() != null)) {
-                Util.logDiff(log, new JID(activity.getSource()), path, activity
+                Util.logDiff(log, activity.getSource(), path, activity
                     .getContents(), file);
             }
         }

@@ -12,12 +12,12 @@ public class PingPongActivity extends AbstractActivity {
 
     public DateTime departureTime;
 
-    public PingPongActivity(String source) {
+    public PingPongActivity(JID source) {
         super(source);
     }
 
     public PingPongActivity(JID sender, JID initiator, DateTime departureTime) {
-        super(sender.toString());
+        super(sender);
         this.initiator = initiator;
         this.departureTime = departureTime;
     }

@@ -7,6 +7,8 @@ import org.eclipse.jface.text.source.LineRange;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 @XStreamAlias("viewportActivity")
 public class ViewportActivity extends AbstractActivity {
     @XStreamAsAttribute
@@ -20,7 +22,7 @@ public class ViewportActivity extends AbstractActivity {
     @XStreamAsAttribute
     protected final IPath editor;
 
-    public ViewportActivity(String source, int topIndex, int bottomIndex,
+    public ViewportActivity(JID source, int topIndex, int bottomIndex,
         IPath editor) {
         super(source);
 
@@ -36,7 +38,7 @@ public class ViewportActivity extends AbstractActivity {
         this.editor = editor;
     }
 
-    public ViewportActivity(String source, ILineRange viewport, IPath editor) {
+    public ViewportActivity(JID source, ILineRange viewport, IPath editor) {
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);

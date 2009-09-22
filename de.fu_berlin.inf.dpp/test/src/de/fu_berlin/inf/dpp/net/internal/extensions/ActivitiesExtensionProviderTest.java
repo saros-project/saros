@@ -40,15 +40,13 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected static final JID jid = new JID("testman@jabber.cc");
-    protected static final String source = jid.toString();
     protected static final IPath path = new Path("testpath");
     protected static final Timestamp jupiterTime = new JupiterVectorTime(1, 3);
     protected static final ActivitiesExtensionProvider provider = new ActivitiesExtensionProvider();
 
     protected static final Operation timestamp = new TimestampOperation();
     protected static final Operation noOp = new NoOperation();
-    protected static final Operation insert = new InsertOperation(
-        34,
+    protected static final Operation insert = new InsertOperation(34,
         "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test‰¸‰ˆ¸‡·");
     protected static final Operation delete = new DeleteOperation(37,
         "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test‰¸‰ˆ¸‡·");
@@ -59,14 +57,14 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             new SplitOperation(insert, easySplit)));
 
     protected static final IActivity[] activities = new IActivity[] {
-        new EditorActivity(source, EditorActivity.Type.Activated, path),
-        new FileActivity(source, FileActivity.Type.Created, path, null,
+        new EditorActivity(jid, EditorActivity.Type.Activated, path),
+        new FileActivity(jid, FileActivity.Type.Created, path, null,
             new byte[] { 34, 72 }, Purpose.ACTIVITY),
-        new FolderActivity(source, FolderActivity.Type.Created, path),
-        new RoleActivity(source, "user@server", UserRole.DRIVER),
-        new TextEditActivity(source, 23, "foo\r\ntest\n\nbla", "bar", path),
-        new TextSelectionActivity(source, 1, 2, path),
-        new ViewportActivity(source, 5, 10, path) };
+        new FolderActivity(jid, FolderActivity.Type.Created, path),
+        new RoleActivity(jid, new JID("user@server"), UserRole.DRIVER),
+        new TextEditActivity(jid, 23, "foo\r\ntest\n\nbla", "bar", path),
+        new TextSelectionActivity(jid, 1, 2, path),
+        new ViewportActivity(jid, 5, 10, path) };
 
     protected ActivitiesExtensionProvider aProvider = new ActivitiesExtensionProvider();
 
@@ -101,7 +99,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     public void testEditorActivity() {
         for (EditorActivity.Type type : EditorActivity.Type.values()) {
             try {
-                new EditorActivity("user@server", type, null);
+                new EditorActivity(new JID("user@server"), type, null);
                 if (type != EditorActivity.Type.Activated) {
                     fail();
                 }
@@ -123,7 +121,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testGapInSequenceNumbers() throws XmlPullParserException,
         IOException {
-        IActivity activity = new EditorActivity(source,
+        IActivity activity = new EditorActivity(jid,
             EditorActivity.Type.Activated, null);
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>(2);
@@ -138,8 +136,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testLineDelimiters() throws XmlPullParserException, IOException {
         for (String lineEnding : new String[] { "\n", "\r", "\r\n" }) {
-            assertRoundtrip(new TextEditActivity(source, 42, lineEnding, "",
-                path));
+            assertRoundtrip(new TextEditActivity(jid, 42, lineEnding, "", path));
         }
     }
 
@@ -151,9 +148,9 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     }
 
     protected PacketExtension createPacketExtension(IActivity activity) {
-        return aProvider.create("4711", Collections
-            .singletonList(new TimedActivity(activity, new JID(activity
-                .getSource()), 42)));
+        return aProvider.create("4711",
+            Collections.singletonList(new TimedActivity(activity, activity
+                .getSource(), 42)));
     }
 
     protected PacketExtension parseExtension(String xml)

@@ -324,7 +324,7 @@ public class UndoManager implements Disposable, IActivityProvider {
          * @return true if the given activity was created locally
          */
         protected boolean local(IActivity activity) {
-            return activity.getSource().equals(saros.getMyJID().toString());
+            return activity.getSource().equals(saros.getMyJID());
         }
 
         /**
@@ -505,8 +505,8 @@ public class UndoManager implements Disposable, IActivityProvider {
             return;
         }
 
-        for (TextEditActivity activity : op.toTextEdit(editor, saros.getMyJID()
-            .toString())) {
+        for (TextEditActivity activity : op
+            .toTextEdit(editor, saros.getMyJID())) {
             log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -516,8 +516,8 @@ public class UndoManager implements Disposable, IActivityProvider {
 
         Operation op = calcRedoOperation(editor);
 
-        for (TextEditActivity activity : op.toTextEdit(editor, saros.getMyJID()
-            .toString())) {
+        for (TextEditActivity activity : op
+            .toTextEdit(editor, saros.getMyJID())) {
             log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
         }

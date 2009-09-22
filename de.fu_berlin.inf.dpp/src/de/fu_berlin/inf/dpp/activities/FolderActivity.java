@@ -5,6 +5,8 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.net.JID;
+
 @XStreamAlias("folderActivity")
 public class FolderActivity extends AbstractActivity implements
     IResourceActivity {
@@ -21,7 +23,7 @@ public class FolderActivity extends AbstractActivity implements
     @XStreamAsAttribute
     private IPath oldPath;
 
-    public FolderActivity(String source, Type type, IPath path) {
+    public FolderActivity(JID source, Type type, IPath path) {
         super(source);
         this.type = type;
         this.path = path;
@@ -32,8 +34,8 @@ public class FolderActivity extends AbstractActivity implements
     }
 
     /**
-     * Returns the folder which was moved to a new destination
-     * (given by getPath()) or null if not a move.
+     * Returns the folder which was moved to a new destination (given by
+     * getPath()) or null if not a move.
      */
     public IPath getOldPath() {
         return this.oldPath;

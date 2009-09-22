@@ -17,7 +17,6 @@ import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -83,8 +82,7 @@ public class RemoteDriverManager {
 
         @Override
         public void receive(final EditorActivity editorActivity) {
-            User sender = sharedProject.getUser(new JID(editorActivity
-                .getSource()));
+            User sender = sharedProject.getUser(editorActivity.getSource());
             IPath path = editorActivity.getPath();
 
             if (path == null) {

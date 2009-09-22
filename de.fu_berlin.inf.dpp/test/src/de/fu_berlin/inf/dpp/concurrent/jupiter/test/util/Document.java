@@ -68,7 +68,7 @@ public class Document {
     public void execOperation(Operation op) {
 
         List<TextEditActivity> activities = op.toTextEdit(new Path("dummy"),
-            "dummy");
+            new JID("dummy@server"));
 
         for (TextEditActivity activity : activities) {
 

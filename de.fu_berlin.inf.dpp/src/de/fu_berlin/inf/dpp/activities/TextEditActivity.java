@@ -31,6 +31,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
+import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
@@ -69,9 +70,9 @@ public class TextEditActivity extends AbstractActivity {
      * @param editor
      *            path of the editor where this activity happened.
      * @param source
-     *            JID as String of the user that caused this activity
+     *            JID of the user that caused this activity
      */
-    public TextEditActivity(String source, int offset, String text,
+    public TextEditActivity(JID source, int offset, String text,
         String replacedText, IPath editor) {
         super(source);
         if (text == null)

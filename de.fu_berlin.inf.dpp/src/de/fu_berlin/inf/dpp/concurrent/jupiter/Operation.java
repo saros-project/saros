@@ -6,6 +6,7 @@ import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
+import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * An Operation is a representation of a user activity for the use by an
@@ -22,7 +23,7 @@ public interface Operation {
      * operation if applied in order to the editor denoted by the given path by
      * the user identified by the given source.
      */
-    List<TextEditActivity> toTextEdit(IPath path, String source);
+    List<TextEditActivity> toTextEdit(IPath path, JID source);
 
     /**
      * Returns a list of all operations represented by this operation that
