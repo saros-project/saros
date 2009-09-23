@@ -7,6 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Map which will automatically insert a value for a given key if the Map does
@@ -37,6 +39,20 @@ public class AutoHashMap<K, V> implements Map<K, V> {
                 return new ArrayList<V>();
             }
         });
+    }
+
+    /**
+     * Returns a AutoHashMap which automatically will initialize an
+     * LinkedBlockingQueue<V> when queried for a key for which there is no
+     * value.
+     */
+    public static <K, V> AutoHashMap<K, BlockingQueue<V>> getBlockingQueueHashMap() {
+        return new AutoHashMap<K, BlockingQueue<V>>(
+            new Function<K, BlockingQueue<V>>() {
+                public BlockingQueue<V> apply(K u) {
+                    return new LinkedBlockingQueue<V>();
+                }
+            });
     }
 
     /**
