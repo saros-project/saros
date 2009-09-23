@@ -35,6 +35,7 @@ import org.apache.commons.codec.EncoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
@@ -358,6 +359,21 @@ public class Util {
         } finally {
             IOUtils.closeQuietly(input);
         }
+    }
+
+    /**
+     * Utility method similar to {@link ObjectUtils#equals(Object, Object)},
+     * which causes a compile error if the second parameter is not a subclass of
+     * the first.
+     */
+    public static <V, K extends V> boolean equals(V object1, K object2) {
+        if (object1 == object2) {
+            return true;
+        }
+        if ((object1 == null) || (object2 == null)) {
+            return false;
+        }
+        return object1.equals(object2);
     }
 
     /**
@@ -1017,7 +1033,7 @@ public class Util {
      */
     public static byte[] toByteArray(InputStream in, long estimatedSize,
         SubMonitor subMonitor) throws IOException {
-        
+
         byte[] buf = new byte[CHUNKSIZE];
         int count;
         ByteArrayOutputStream bos = new ByteArrayOutputStream((int) Math.min(
@@ -1028,10 +1044,10 @@ public class Util {
         subMonitor.beginTask("Reading from Inputstream", Math.max(1, steps));
         try {
             while ((count = in.read(buf, 0, CHUNKSIZE)) > 0) {
-                
+
                 if (subMonitor.isCanceled())
                     throw new CancellationException();
-                
+
                 bos.write(buf, 0, count);
                 subMonitor.worked(1);
             }
