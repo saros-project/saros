@@ -347,8 +347,6 @@ public class DataTransferManager implements ConnectionSessionListener {
                 + data.toString() + ", size: "
                 + Util.formatByte(content.length));
 
-            OutgoingFileTransfer
-                .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
             OutgoingFileTransfer transfer = fileTransferManager
                 .createOutgoingFileTransfer(data.getRecipient().toString());
 
@@ -800,9 +798,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager
             .addFileTransferListener(new IBBTransferListener());
-
-        OutgoingFileTransfer
-            .setResponseTimeout(XMPPChatTransmitter.MAX_TRANSFER_RETRIES * 1000);
 
         if (!preferenceUtils.forceFileTranserByChat()) {
             // Start Jingle Manager asynchronous
