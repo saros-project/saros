@@ -1,12 +1,11 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
@@ -28,11 +27,12 @@ import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -74,13 +74,13 @@ public class JingleFileTransferManager {
 
     public class FileTransferConnection {
 
-        final JID jid;
+        protected final JID jid;
 
-        JingleConnectionState state;
+        protected JingleConnectionState state;
 
-        JingleSession session = null;
+        protected JingleSession session = null;
 
-        JingleFileTransferSession fileTransfer = null;
+        protected JingleFileTransferSession fileTransfer = null;
 
         public FileTransferConnection(JID jid) {
             this.jid = jid;
@@ -110,6 +110,10 @@ public class JingleFileTransferManager {
         public JingleSession getSession() {
             return session;
         }
+
+        public JingleFileTransferSession getFileTransfer() {
+            return fileTransfer;
+        }
     }
 
     private static Logger log = Logger
@@ -119,10 +123,10 @@ public class JingleFileTransferManager {
 
     private JingleManager jm;
 
+    protected IncomingTransferObjectExtensionProvider incomingExtProv;
+
     private Map<JID, FileTransferConnection> connections = Collections
         .synchronizedMap(new HashMap<JID, FileTransferConnection>());
-
-    protected DispatchingJingleFileTransferListener fileTransferListener;
 
     /**
      * The FileMediaManager manages all FileTransferSessions. When a Jingle
@@ -147,7 +151,7 @@ public class JingleFileTransferManager {
 
             final JingleFileTransferSession newSession = new JingleFileTransferSession(
                 payload, remoteCandidate, localCandidate, null, jingleSession,
-                fileTransferListener, remoteJID);
+                fileTransferListener, remoteJID, incomingExtProv);
 
             // TODO Make sure we don't need to do this asynchronously
             newSession.initialize();
@@ -170,7 +174,7 @@ public class JingleFileTransferManager {
             return newSession;
         }
 
-        List<PayloadType> payloads = Collections
+        protected List<PayloadType> payloads = Collections
             .singletonList((PayloadType) new PayloadType.Audio(333, "fileshare"));
 
         @Override
@@ -190,28 +194,21 @@ public class JingleFileTransferManager {
         return sb.toString();
     }
 
-    /**
-     * This executor is used to decouple the reading from the ObjectInputStream
-     * and the notification of the listeners. Thus we can continue reading, even
-     * while the DataTransferManager is handling our data.
-     */
-    ExecutorService dispatch = Executors
-        .newSingleThreadExecutor(new NamedThreadFactory(
-            "JingleFileTransferManager-Dispatch-"));
-
     private FileMediaManager mediaManager;
 
     protected Saros saros;
 
+    protected IJingleFileTransferListener fileTransferListener;
+
     public JingleFileTransferManager(Saros saros, XMPPConnection connection,
-        IJingleFileTransferListener listener) {
+        IJingleFileTransferListener listener,
+        IncomingTransferObjectExtensionProvider incomingExtProv) {
         this.xmppConnection = connection;
         this.saros = saros;
+        this.incomingExtProv = incomingExtProv;
 
         // Add another layer of indirection
-        this.fileTransferListener = new DispatchingJingleFileTransferListener(
-            dispatch);
-        this.fileTransferListener.add(listener);
+        this.fileTransferListener = listener;
 
         log.debug("Starting to initialize jingle file transfer manager.");
         initialize();
@@ -378,10 +375,12 @@ public class JingleFileTransferManager {
      * has been send.
      * 
      * Note that only one JingleSession can be created at the same time.
+     * 
+     * @throws IOException
      */
     public NetTransferMode send(final TransferDescription transferDescription,
         final byte[] content, SubMonitor progress)
-        throws JingleSessionException {
+        throws UserCancellationException, JingleSessionException, IOException {
 
         JID toJID = transferDescription.getRecipient();
 
@@ -425,11 +424,11 @@ public class JingleFileTransferManager {
 
         int i = 0;
         while (connection.state == JingleConnectionState.INIT && i < 60) {
+            if (i % 2 == 0)
+                log.debug(Util.prefix(connection.jid)
+                    + "Waiting for Init since " + (i * 500) / 1000 + "s");
+            i++;
             try {
-                if (i % 2 == 0)
-                    log.debug(Util.prefix(connection.jid)
-                        + "Waiting for Init since " + (i * 500) / 1000 + "s");
-                i++;
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 interrupted = e;
@@ -537,7 +536,7 @@ public class JingleFileTransferManager {
         public void setState(JID jid, JingleConnectionState state);
     }
 
-    List<IJingleStateListener> stateListeners = new ArrayList<IJingleStateListener>();
+    protected List<IJingleStateListener> stateListeners = new ArrayList<IJingleStateListener>();
 
     public void addJingleStateListener(IJingleStateListener listener) {
         stateListeners.add(listener);

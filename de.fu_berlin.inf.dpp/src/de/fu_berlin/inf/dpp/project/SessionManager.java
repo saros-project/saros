@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.window.Window;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
@@ -40,15 +41,14 @@ import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
-import de.fu_berlin.inf.dpp.invitation.internal.IncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.internal.OutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.OutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IOutgoingInvitationUI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
@@ -60,9 +60,11 @@ import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.ui.InvitationDialog;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * The SessionManager is responsible for initiating new Saros sessions and for
@@ -107,7 +109,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected VersionManager versionManager;
 
     @Inject
-    private RosterTracker rosterTracker;
+    protected RosterTracker rosterTracker;
+
+    @Inject
+    protected DispatchThreadContext dispatchThreadContext;
 
     private final List<ISessionListener> listeners = new CopyOnWriteArrayList<ISessionListener>();
 
@@ -134,7 +139,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.partialProjectResources = partialProjectResources;
 
         SharedProject sharedProject = new SharedProject(saros,
-            this.transmitter, this.transferManager, project, myJID, stopManager);
+            this.transmitter, this.transferManager, dispatchThreadContext,
+            project, myJID, stopManager, new DateTime());
 
         this.currentlySharedProject.setValue(sharedProject);
 
@@ -152,11 +158,12 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     /**
      * {@inheritDoc}
      */
-    public ISharedProject joinSession(IProject project, JID host, int colorID) {
+    public ISharedProject joinSession(IProject project, JID host, int colorID,
+        DateTime sessionStart) {
 
         SharedProject sharedProject = new SharedProject(saros,
-            this.transmitter, this.transferManager, project, saros.getMyJID(),
-            host, colorID, stopManager);
+            this.transmitter, this.transferManager, dispatchThreadContext,
+            project, saros.getMyJID(), host, colorID, stopManager, sessionStart);
         this.currentlySharedProject.setValue(sharedProject);
 
         for (ISessionListener listener : this.listeners) {
@@ -213,12 +220,16 @@ public class SessionManager implements IConnectionListener, ISessionManager {
                 }
             }
 
-            sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
+            clearSessionID();
 
             log.info("Session left");
         } finally {
             stopSharedProjectLock.unlock();
         }
+    }
+
+    public void clearSessionID() {
+        sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
     }
 
     public ISharedProject getSharedProject() {
@@ -235,15 +246,18 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.listeners.remove(listener);
     }
 
-    public IIncomingInvitationProcess invitationReceived(JID from,
-        String sessionID, String projectName, String description, int colorID,
-        String sarosVersion) {
+    public void invitationReceived(JID from, String sessionID,
+        String projectName, String description, int colorID,
+        VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
+        String invitationID) {
 
         this.sessionID.setValue(sessionID);
 
-        IIncomingInvitationProcess process = new IncomingInvitationProcess(
-            this, this.transmitter, transferManager, from, projectName,
-            description, colorID, sarosVersion, invitationProcesses);
+        IncomingInvitationProcess process = new IncomingInvitationProcess(this,
+            this.transmitter, from, projectName, description, colorID,
+            invitationProcesses, versionManager, versionInfo, sessionStart,
+            sarosUI, invitationID);
+        process.start();
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);
@@ -251,9 +265,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         log.info("Rcvd Invitation " + Util.prefix(from) + "sessionID: "
             + sessionID + ", colorID: " + colorID + ", sarosVersion: "
-            + sarosVersion);
-
-        return process;
+            + versionInfo.version);
     }
 
     public void connectionStateChanged(XMPPConnection connection,
@@ -281,14 +293,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         // TODO this is currently disabled
         this.transmitter.sendRequestForActivity(project,
             expectedSequenceNumbers, true);
-    }
-
-    public void cancelIncomingInvitation() {
-        /**
-         * We never started a session, but still had set a session ID because we
-         * were in an InvitationProcess.
-         */
-        sessionID.setValue(SessionIDObservable.NOT_IN_SESSION);
     }
 
     public void openInviteDialog(final @Nullable List<JID> toInvite) {
@@ -335,17 +339,21 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * 
      * @return the outgoing invitation process.
      */
-    public IOutgoingInvitationProcess invite(ISharedProject project,
-        JID toInvite, String description, IInvitationUI inviteUI,
-        FileList localFileList, SubMonitor monitor) {
+    public OutgoingInvitationProcess invite(final ISharedProject project,
+        final JID toInvite, final String description,
+        final IOutgoingInvitationUI inviteUI, final FileList localFileList,
+        final SubMonitor monitor) {
 
-        OutgoingInvitationProcess result = new OutgoingInvitationProcess(saros,
-            transmitter, transferManager, toInvite, project, description,
-            inviteUI, project.getFreeColor(), localFileList, monitor,
-            invitationProcesses, versionManager);
-
-        result.start();
-
+        final OutgoingInvitationProcess result = new OutgoingInvitationProcess(
+            transmitter, toInvite, project, description, inviteUI, project
+                .getFreeColor(), localFileList, monitor, invitationProcesses,
+            versionManager, stopManager);
+        Util.runSafeAsync("OutInvitationProcess-" + toInvite.getBase(), log,
+            new Runnable() {
+                public void run() {
+                    result.start();
+                }
+            });
         return result;
     }
 }

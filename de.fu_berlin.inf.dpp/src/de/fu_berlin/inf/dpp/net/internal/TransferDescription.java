@@ -100,6 +100,22 @@ public class TransferDescription implements Serializable {
      */
     public boolean compressed;
 
+    /**
+     * This field is set to true if we are in an invitation process
+     */
+    public boolean invitation;
+
+    /**
+     * The invitationID of this TransferDescription or null if this
+     * TransferDescription is not used during an invitation.
+     */
+    public String invitationID = null;
+
+    /**
+     * This field is for internal use by BinaryChannel to identify an object.
+     */
+    public int objectid = -1;
+
     @Override
     public String toString() {
 
@@ -122,12 +138,13 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createFileListTransferDescription(
-        JID recipient, JID sender, String sessionID) {
+        JID recipient, JID sender, String sessionID, String invitationID) {
         TransferDescription result = new TransferDescription();
         result.sender = sender;
         result.recipient = recipient;
         result.type = FileTransferType.FILELIST_TRANSFER;
         result.sessionID = sessionID;
+        result.invitationID = invitationID;
         result.compressed = false;
         return result;
     }
@@ -149,13 +166,14 @@ public class TransferDescription implements Serializable {
     }
 
     public static TransferDescription createArchiveTransferDescription(
-        JID recipient2, JID jid, String sessionID) {
+        JID recipient2, JID jid, String sessionID, String invitationID) {
 
         TransferDescription result = new TransferDescription();
         result.recipient = recipient2;
         result.sender = jid;
         result.type = FileTransferType.ARCHIVE_TRANSFER;
         result.sessionID = sessionID;
+        result.invitationID = invitationID;
         result.compressed = true;
 
         return result;
@@ -176,6 +194,18 @@ public class TransferDescription implements Serializable {
 
     public String toBase64() {
 
+        byte[] bytes64 = Base64.encodeBase64(toByteArray());
+
+        try {
+            return new String(bytes64, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // should not happen
+            throw new RuntimeException(
+                "Could not serialize: UTF-8 not available");
+        }
+    }
+
+    public byte[] toByteArray() {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
 
         ObjectOutputStream object = null;
@@ -189,16 +219,7 @@ public class TransferDescription implements Serializable {
             throw new RuntimeException(
                 "Could not serialize: ObjectOutputStream failed");
         }
-
-        byte[] bytes64 = Base64.encodeBase64(os.toByteArray());
-
-        try {
-            return new String(bytes64, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // should not happen
-            throw new RuntimeException(
-                "Could not serialize: UTF-8 not available");
-        }
+        return os.toByteArray();
     }
 
     public JID getRecipient() {
@@ -229,7 +250,24 @@ public class TransferDescription implements Serializable {
             IOUtils.closeQuietly(os);
             IOUtils.closeQuietly(is);
         }
+    }
 
+    public static TransferDescription fromByteArray(byte[] data)
+        throws ClassNotFoundException {
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+
+        ObjectInputStream object = null;
+        try {
+            object = new ObjectInputStream(in);
+            Object o = object.readObject();
+            object.close();
+            in.close();
+            return (TransferDescription) o;
+        } catch (IOException e) {
+            // should not happen
+            throw new RuntimeException(
+                "Could not serialize: ObjectOutputStream failed");
+        }
     }
 
     public JID getSender() {
@@ -243,5 +281,4 @@ public class TransferDescription implements Serializable {
     public boolean compressInDataTransferManager() {
         return !compressed;
     }
-
 }

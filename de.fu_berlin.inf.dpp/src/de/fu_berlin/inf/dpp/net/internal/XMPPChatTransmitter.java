@@ -19,8 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.net.internal;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -53,7 +56,6 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
-import org.osgi.framework.Version;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.FileList;
@@ -62,29 +64,35 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListConfirmationExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
+import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * The one ITransmitter implementation which uses Smack Chat objects.
@@ -125,7 +133,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     @Inject
     protected SharedProjectObservable sharedProject;
-    
+
     @Inject
     protected ChecksumErrorExtension checksumErrorExtension;
 
@@ -133,13 +141,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected ChecksumExtension checksumExtension;
 
     @Inject
-    protected InviteExtension inviteExtension;
-
-    @Inject
     protected LeaveExtension leaveExtension;
-
-    @Inject
-    protected JoinExtension joinExtension;
 
     @Inject
     protected RequestActivityExtension requestActivityExtension;
@@ -151,10 +153,25 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected CancelInviteExtension cancelInviteExtension;
 
     @Inject
-    protected RequestForFileListExtension requestForFileListExtension;
+    protected ActivitiesExtensionProvider activitiesProvider;
 
     @Inject
-    protected ActivitiesExtensionProvider activitiesProvider;
+    protected InvitationInfo.InvitationExtensionProvider invExtProv;
+
+    @Inject
+    protected FileListRequestExtensionProvider fileListRequestExtProv;
+
+    @Inject
+    protected JoinExtensionProvider userListExtProv;
+
+    @Inject
+    protected UserListConfirmationExtensionProvider userListConfExtProv;
+
+    @Inject
+    protected IncomingTransferObjectExtensionProvider incomingExtProv;
+
+    @Inject
+    protected DispatchThreadContext dispatchThread;
 
     protected DataTransferManager dataManager;
 
@@ -163,18 +180,214 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         this.dataManager = dataManager;
         this.sessionID = sessionID;
-
-        // TODO Use DI better
-        dataManager.chatTransmitter = this;
     }
 
-    protected ExecutorService dispatch = Executors
-        .newSingleThreadExecutor(new NamedThreadFactory(
-            "XMPPChatTransmitter-Dispatch-"));
+    /********************************************************************************
+     * Invitation process' help functions --- START
+     ********************************************************************************/
 
-    public void executeAsDispatch(Runnable runnable) {
-        dispatch.submit(Util.wrapSafe(log, runnable));
+    public void sendInvitation(ISharedProject sharedProject, JID guest,
+        String description, int colorID, VersionInfo versionInfo,
+        String invitationID) {
+
+        log.trace("Sending invitation to " + Util.prefix(guest)
+            + " with description " + description);
+
+        InvitationInfo invInfo = new InvitationInfo(sessionID, invitationID,
+            sharedProject.getProject().getName(), description, colorID,
+            versionInfo, sharedProject.getSessionStart());
+
+        Message msg = new Message();
+        msg.setTo(guest.toString());
+        msg.addExtension(invExtProv.create(invInfo));
+
+        connection.sendPacket(msg);
     }
+
+    /**
+     * TODO: think about handling timeouts.
+     */
+    public DefaultInvitationInfo receiveFileListRequest(String invitationID,
+        SubMonitor monitor) throws LocalCancellationException, IOException {
+
+        log.trace("Waiting for FileListRequest...");
+
+        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
+            fileListRequestExtProv, sessionID, invitationID);
+
+        Packet result = receive(monitor, installReceiver(filter), 500, true);
+        return fileListRequestExtProv.getPayload(result);
+    }
+
+    /**
+     * Sends a request for @link{FileList} direct over the XMPP connection.
+     */
+    public void sendFileListRequest(JID toJID, String invitationID) {
+        log.trace("Sending request for FileList to " + Util.prefix(toJID));
+        Message msg = new Message();
+        msg.setTo(toJID.toString());
+        msg.addExtension(fileListRequestExtProv
+            .create(new DefaultInvitationInfo(sessionID, invitationID)));
+        connection.sendPacket(msg);
+    }
+
+    /**
+     * TODO: think about handling timeouts.
+     */
+    public FileList receiveFileList(SarosPacketCollector collector,
+        SubMonitor monitor, boolean forceWait)
+        throws UserCancellationException, IOException {
+
+        log.trace("Waiting for FileList from "); //
+
+        IncomingTransferObject result = incomingExtProv.getPayload(receive(
+            monitor, collector, 1000, true));
+
+        if (monitor.isCanceled()) {
+            result.reject();
+            throw new LocalCancellationException();
+        }
+
+        byte[] data = result.accept(monitor);
+        String fileListAsString;
+        try {
+            fileListAsString = new String(data, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            fileListAsString = new String(data);
+        }
+
+        // should return null if it's not parseable.
+        return FileList.fromXML(fileListAsString);
+    }
+
+    public SarosPacketCollector getInvitationCollector(String invitationID,
+        FileTransferType type) {
+
+        PacketFilter filter = PacketExtensionUtils
+            .getIncomingTransferObjectFilter(incomingExtProv, sessionID,
+                invitationID, type);
+
+        return installReceiver(filter);
+    }
+
+    /**
+     * TODO: think about handling timeouts.
+     */
+    public InputStream receiveArchive(SarosPacketCollector collector,
+        SubMonitor monitor, boolean forceWait) throws IOException,
+        UserCancellationException {
+
+        monitor.beginTask("Receiving archive", 100);
+
+        try {
+            IncomingTransferObject result = incomingExtProv.getPayload(receive(
+                monitor.newChild(10), collector, 1000, forceWait));
+
+            if (monitor.isCanceled()) {
+                result.reject();
+                throw new LocalCancellationException();
+            }
+            byte[] data = result.accept(monitor.newChild(90));
+
+            return new ByteArrayInputStream(data);
+        } finally {
+            monitor.done();
+        }
+    }
+
+    /**
+     * Helper for receiving a Packet via XMPPChatReceiver using
+     * SarosPacketCollector.
+     */
+    protected SarosPacketCollector installReceiver(PacketFilter filter) {
+        return receiver.createCollector(filter);
+    }
+
+    protected Packet receive(SubMonitor monitor,
+        SarosPacketCollector collector, long timeout, boolean forceWait)
+        throws LocalCancellationException, IOException {
+
+        if (connection == null || !connection.isConnected())
+            return null;
+
+        try {
+            Packet result;
+            do {
+                if (monitor.isCanceled())
+                    throw new LocalCancellationException();
+                // Wait up to [timeout] seconds for a result.
+                result = collector.nextResult(timeout);
+            } while (forceWait && result == null);
+
+            if (result != null)
+                return result;
+            throw new IOException("Collector timeout: no packet received.");
+
+        } finally {
+            collector.cancel();
+        }
+    }
+
+    public void sendUserList(JID to, String invitationID, Collection<User> users) {
+        log.trace("Sending userList to " + Util.prefix(to));
+        UserListInfo userListInfo = new UserListInfo(sessionID, invitationID,
+            users);
+        Message msg = new Message();
+        msg.addExtension(userListExtProv.create(userListInfo));
+        msg.setTo(to.toString());
+        connection.sendPacket(msg);
+    }
+
+    public void sendUserListConfirmation(JID to) {
+        log.trace("Sending userListConfirmation to " + Util.prefix(to));
+        Message msg = new Message();
+        msg.addExtension(userListConfExtProv.create("conf"));
+        msg.setTo(to.toString());
+        connection.sendPacket(msg);
+    }
+
+    public boolean receiveUserListConfirmation(List<User> fromUsers,
+        SubMonitor monitor) throws CancellationException, IOException {
+        log.trace("Waiting for UserListConfirmations...");
+        PacketFilter filter = userListConfExtProv.getPacketFilter();
+
+        if (connection == null || !connection.isConnected())
+            return false;
+
+        SarosPacketCollector collector = receiver.createCollector(filter);
+        ArrayList<JID> fromUserJIDs = new ArrayList<JID>();
+        for (User user : fromUsers) {
+            fromUserJIDs.add(user.getJID());
+        }
+        try {
+            Packet result;
+            JID jid;
+            do {
+                if (monitor.isCanceled())
+                    throw new CancellationException();
+
+                // Wait up to [timeout] seconds for a result.
+                result = collector.nextResult(100);
+                if (result == null)
+                    continue;
+
+                jid = new JID(result.getFrom());
+                if (!fromUserJIDs.remove(jid)) {
+                    log.debug("UserListConfirmation from unknown user: "
+                        + Util.prefix(jid));
+                } else {
+                    log.debug("UserListConfirmation from: " + Util.prefix(jid));
+                }
+            } while (fromUserJIDs.size() > 0);
+            return true;
+        } finally {
+            collector.cancel();
+        }
+    }
+
+    /********************************************************************************
+     * Invitation process' help functions --- END
+     ********************************************************************************/
 
     /**
      * A simple struct that is used to queue message transfers.
@@ -193,17 +406,10 @@ public class XMPPChatTransmitter implements ITransmitter,
             errorMsg));
     }
 
-    public void sendRequestForFileListMessage(JID toJID) {
-        log.debug("Send request for FileList to " + Util.prefix(toJID));
-
-        sendMessage(toJID, requestForFileListExtension.create());
-    }
-
     public void awaitJingleManager(JID peer) {
         // If other user supports Jingle, make sure that we are done starting
         // the JingleManager
         dataManager.awaitJingleManager(peer);
-
     }
 
     public void sendRequestForActivity(ISharedProject sharedProject,
@@ -212,10 +418,8 @@ public class XMPPChatTransmitter implements ITransmitter,
         // TODO this method is currently not used. Probably they interfere with
         // Jupiter
         if (true) {
-            log
-                .error(
-                    "Unexpected Call to Request for Activity, which is currently disabled:",
-                    new StackTrace());
+            log.error("Unexpected Call to Request for Activity,"
+                + " which is currently disabled:", new StackTrace());
             return;
         }
 
@@ -228,31 +432,6 @@ public class XMPPChatTransmitter implements ITransmitter,
             sendMessage(recipient, requestActivityExtension.create(
                 expectedSequenceNumber, andup));
         }
-    }
-
-    public void sendInviteMessage(ISharedProject sharedProject, JID guest,
-        String description, int colorID, Version sarosVersion) {
-        log.debug("Send invitation to " + Util.prefix(guest)
-            + " with description '" + description + "' and Saros version "
-            + sarosVersion.toString());
-        sendMessage(guest, inviteExtension.create(sharedProject.getProject()
-            .getName(), description, colorID, sarosVersion));
-    }
-
-    public void sendJoinMessage(ISharedProject sharedProject) {
-        try {
-            /*
-             * HACK sleep process for 1000 millis to ensure invitation state
-             * process on host.
-             */
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            log.error("Code not designed to be interruptable", e);
-            Thread.currentThread().interrupt();
-            return;
-        }
-        sendMessageToAll(sharedProject, joinExtension.create(sharedProject
-            .getLocalUser().getColorID()));
     }
 
     /*
@@ -272,9 +451,6 @@ public class XMPPChatTransmitter implements ITransmitter,
      * but rather using the DataTransferManager.
      * 
      * TODO: Add Progress
-     * 
-     * TODO: Add some heuristics for splitting very large lists of
-     * timeActivities
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivity> timedActivities) {
@@ -296,16 +472,24 @@ public class XMPPChatTransmitter implements ITransmitter,
         try {
             data = extensionToSend.toXML().getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.error("UTF-8 is unsupported", e); // send as XMPP Message
+            log.error("UTF-8 is unsupported", e);
         }
 
         if (data == null || data.length < MAX_XMPP_MESSAGE_SIZE) {
+            // send as XMPP Message
             sendMessage(recipient, extensionToSend);
         } else {
+            // send using DataTransferManager
             try {
+                String user = connection.getUser();
+                if (user == null) {
+                    log
+                        .warn("Local user is not logged in to the connection, yet.");
+                    return;
+                }
                 TransferDescription transferData = TransferDescription
-                    .createActivityTransferDescription(recipient, new JID(
-                        connection.getUser()), sID);
+                    .createActivityTransferDescription(recipient,
+                        new JID(user), sID);
 
                 dataManager.sendData(transferData, data, SubMonitor
                     .convert(new NullProgressMonitor()));
@@ -315,6 +499,10 @@ public class XMPPChatTransmitter implements ITransmitter,
                         + Util.formatByte(data.length) + "): "
                         + timedActivities, e);
                 return;
+            } catch (UserCancellationException e) {
+                log.error(
+                    "Cancellation cannot occur, because NullProgressMonitors"
+                        + " are used on both sides!", e);
             }
         }
 
@@ -325,32 +513,48 @@ public class XMPPChatTransmitter implements ITransmitter,
     /**
      * {@inheritDoc}
      */
-    public void sendFileList(JID recipient, FileList fileList,
-        SubMonitor progress) throws IOException {
+    public void sendFileList(JID recipient, String invitationID,
+        FileList fileList, SubMonitor progress) throws IOException,
+        UserCancellationException {
 
+        String user = connection.getUser();
+        if (user == null) {
+            log.warn("Local user is not logged in to the connection, yet.");
+            return;
+        }
         progress.beginTask("Sending FileList", 100);
 
         TransferDescription data = TransferDescription
-            .createFileListTransferDescription(recipient, new JID(connection
-                .getUser()), sessionID.getValue());
+            .createFileListTransferDescription(recipient, new JID(user),
+                sessionID.getValue(), invitationID);
+
+        String xml = fileList.toXML();
+
+        byte[] content = xml.getBytes("UTF-8");
+
         /*
          * TODO [MR] Not portable because String#getBytes() uses the platform's
          * default encoding.
          */
-        dataManager.sendData(data, fileList.toXML().getBytes(), progress
-            .newChild(100));
+        dataManager.sendData(data, content, progress.newChild(100));
 
         progress.done();
     }
 
     public void sendFile(JID to, IProject project, IPath path,
-        int sequenceNumber, SubMonitor progress) throws IOException {
+        int sequenceNumber, SubMonitor progress) throws IOException,
+        UserCancellationException {
 
+        String user = connection.getUser();
+        if (user == null) {
+            log.warn("Local user is not logged in to the connection, yet.");
+            return;
+        }
         progress.beginTask("Sending " + path.lastSegment(), 100);
 
         TransferDescription transfer = TransferDescription
-            .createFileTransferDescription(to, new JID(connection.getUser()),
-                path, sessionID.getValue());
+            .createFileTransferDescription(to, new JID(user), path, sessionID
+                .getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
         if (!f.isFile())
@@ -360,38 +564,36 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         // TODO Use Eclipse to read file?
         byte[] content = FileUtils.readFileToByteArray(f);
-        progress.newChild(10).done();
+        progress.worked(10);
 
         progress.subTask("Sending file " + path.lastSegment());
         dataManager.sendData(transfer, content, progress.newChild(90));
-
         progress.done();
     }
 
-    public void sendProjectArchive(JID recipient, IProject project,
-        File archive, SubMonitor progress) throws IOException {
+    public void sendProjectArchive(JID recipient, String invitationID,
+        IProject project, File archive, SubMonitor progress)
+        throws UserCancellationException, IOException {
 
+        String user = connection.getUser();
+        if (user == null) {
+            log.warn("Local user is not logged in to the connection, yet.");
+            return;
+        }
         progress.beginTask("Sending Archive", 100);
 
         TransferDescription transfer = TransferDescription
-            .createArchiveTransferDescription(recipient, new JID(connection
-                .getUser()), sessionID.getValue());
+            .createArchiveTransferDescription(recipient, new JID(user),
+                sessionID.getValue(), invitationID);
 
         progress.subTask("Reading archive");
         byte[] content = FileUtils.readFileToByteArray(archive);
-        progress.newChild(10).done();
+        progress.worked(10);
 
         progress.subTask("Sending archive");
         dataManager.sendData(transfer, content, progress.newChild(90));
 
         progress.done();
-    }
-
-    public void sendUserListTo(JID to, Collection<User> participants) {
-        XMPPChatTransmitter.log
-            .debug("Sending user list to " + Util.prefix(to));
-
-        sendMessage(to, userListExtension.create(participants));
     }
 
     public void sendFileChecksumErrorMessage(List<JID> recipients,
@@ -628,9 +830,14 @@ public class XMPPChatTransmitter implements ITransmitter,
         if (callback == null)
             throw new IllegalArgumentException();
 
+        String user = connection.getUser();
+        if (user == null) {
+            log.warn("Local user is not logged in to the connection, yet.");
+            return;
+        }
         final TransferDescription transfer = TransferDescription
-            .createFileTransferDescription(recipient, new JID(connection
-                .getUser()), path, sessionID.getValue());
+            .createFileTransferDescription(recipient, new JID(user), path,
+                sessionID.getValue());
 
         File f = new File(project.getFile(path).getLocation().toOSString());
 
@@ -641,7 +848,8 @@ public class XMPPChatTransmitter implements ITransmitter,
                 try {
                     // To test if asynchronously arriving file transfers work:
                     // Thread.sleep(10000);
-                    dataManager.sendData(transfer, content, progress);
+                    dataManager.sendData(transfer, content, progress
+                        .newChild(100));
                     callback.fileSent(path);
                 } catch (Exception e) {
                     callback.fileTransferFailed(path, e);
@@ -681,7 +889,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         this.chatmanager = connection.getChatManager();
 
-        // Register a packetlistener which takes care of decoupling the
+        // Register a PacketListener which takes care of decoupling the
         // processing of Packets from the Smack thread
         this.connection.addPacketListener(new PacketListener() {
 
@@ -689,7 +897,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 .getSessionIDPacketFilter(sessionID);
 
             public void processPacket(final Packet packet) {
-                executeAsDispatch(new Runnable() {
+                dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
                         if (sessionFilter.accept(packet)) {
                             try {
@@ -719,15 +927,4 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void stopConnection() {
         // TODO stop sending, but queue rather
     }
-
-    /**
-     * Get the ExecutorService under which all incoming activities should be
-     * executed.
-     * 
-     * @return
-     */
-    public ExecutorService getDispatchExecutor() {
-        return dispatch;
-    }
-
 }

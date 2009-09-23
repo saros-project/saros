@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.VersionManager;
 
@@ -21,7 +22,7 @@ class ShowDescriptionPage extends WizardPage {
     private final JoinSessionWizard joinSessionWizard;
 
     protected ShowDescriptionPage(JoinSessionWizard joinSessionWizard,
-        VersionManager manager) {
+        VersionManager manager, IncomingInvitationProcess invProcess) {
         super("firstPage");
         this.joinSessionWizard = joinSessionWizard;
 
@@ -32,40 +33,36 @@ class ShowDescriptionPage extends WizardPage {
             .getImageDescriptor("icons/start_invitation.png"));
 
         /*
-         * Check for compatibility of the local and remot saros versions, and
-         * inform the user what to do (but the user can always proceed).
+         * Show compatibility issues and inform the user what to do (but the
+         * user can always proceed).
          */
-        String remoteSarosVersion = joinSessionWizard.process
-            .getPeersSarosVersion();
-        VersionManager.Compatibility compatibility = manager
-            .determineCompatibility(remoteSarosVersion);
-        switch (compatibility) {
+        VersionManager.VersionInfo vInfo = invProcess.versionInfo;
+
+        String remoteSarosVersion = vInfo.version.toString();
+        switch (vInfo.compatibility) {
 
         case TOO_NEW:
-            setMessage(
-                "Your peer's Saros version ("
-                    + remoteSarosVersion
-                    + ") is too old, please tell your peer to check for updates! Your Saros version is: "
-                    + manager.getVersion()
-                    + "\n Proceeding with incompatible versions may cause malfunctions!",
-                WARNING);
+            setMessage("Your Saros version is: " + manager.getVersion()
+                + ". Your peer has an older version: " + remoteSarosVersion
+                + ".\n Please tell your peer to check for updates!"
+                + " Proceeding with incompatible versions"
+                + " may cause malfunctions!", WARNING);
             break;
 
         case OK:
-            setMessage("Your Saros version (" + manager.getVersion().toString()
-                + ") is compatible with your peer's one (" + remoteSarosVersion
-                + ").", INFORMATION);
+            setMessage("Your Saros version " + manager.getVersion().toString()
+                + " is compatible with your peer's one " + remoteSarosVersion,
+                INFORMATION);
             break;
 
         case TOO_OLD:
         default:
-            setMessage(
-                "Your Saros version ("
-                    + manager.getVersion().toString()
-                    + ") is too old, please check for updates! Your peer has a newer version: "
-                    + remoteSarosVersion
-                    + "\n Proceeding with incompatible versions may cause malfunctions!",
-                WARNING);
+            setMessage("Your Saros version is too old: "
+                + manager.getVersion().toString()
+                + ". Your peer has a newer version: " + remoteSarosVersion
+                + ".\n Please check for updates!"
+                + " Proceeding with incompatible versions"
+                + " may cause malfunctions!", WARNING);
         }
     }
 

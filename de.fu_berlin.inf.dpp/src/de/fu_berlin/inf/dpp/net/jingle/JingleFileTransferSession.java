@@ -1,11 +1,7 @@
 package de.fu_berlin.inf.dpp.net.jingle;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
@@ -40,9 +36,13 @@ import org.limewire.rudp.UDPSelectorProvider;
 import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
+import de.fu_berlin.inf.dpp.net.jingle.protocol.BinaryChannel;
 import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
@@ -59,13 +59,16 @@ import de.fu_berlin.inf.dpp.util.Util;
  * Documentation for the RUDP component from limewire can be found at:
  * http://wiki.limewire.org/index.php?title=Javadocs .
  * 
+ * The TCP connection uses a bidirectional, Saros specific protocol.
+ * 
  * @author chjacob
  * @author oezbek
+ * @author sszuecs
  */
 public class JingleFileTransferSession extends JingleMediaSession {
 
     private static final Logger log = Logger
-        .getLogger(JingleFileTransferSession.class.getName());
+        .getLogger(JingleFileTransferSession.class);
 
     public static final int TIMEOUTSECONDS = 15;
 
@@ -73,10 +76,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     protected class ReceiverThread extends Thread {
 
-        private ObjectInputStream input;
+        private final BinaryChannel channel;
 
-        public ReceiverThread(ObjectInputStream ii) {
-            this.input = ii;
+        public ReceiverThread(BinaryChannel binaryChannel) {
+            channel = binaryChannel;
         }
 
         /**
@@ -84,19 +87,35 @@ public class JingleFileTransferSession extends JingleMediaSession {
          */
         @Override
         public void run() {
-
+            log.debug("Jingle ReceiverThread started.");
             try {
                 while (!isInterrupted()) {
-                    final TransferDescription data;
+                    /*
+                     * TODO: ask GUI if user wants to get the data. It should
+                     * return a ProgressMonitor with Util#getRunnableContext(),
+                     * that we can use here.
+                     */
+                    SubMonitor progress = SubMonitor
+                        .convert(new NullProgressMonitor());
+                    progress.beginTask("receive", 100);
+
                     try {
-                        data = (TransferDescription) input.readUnshared();
+                        IncomingTransferObject transferObject = channel
+                            .receiveIncomingTransferObject(progress.newChild(1));
+
+                        fileTransferListener.incomingData(transferObject);
+
+                    } catch (UserCancellationException e) {
+                        log.info("canceled transfer");
+                        if (!progress.isCanceled())
+                            progress.setCanceled(true);
                     } catch (SocketException e) {
                         log.debug(prefix() + "Connection was closed by me.");
-                        close();
+                        channel.dispose();
                         return;
                     } catch (EOFException e) {
                         log.debug(prefix() + "Connection was closed by peer.");
-                        close();
+                        channel.dispose();
                         return;
                     } catch (IOException e) {
                         log.error(prefix() + "Crashed", e);
@@ -106,65 +125,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
                             + "Received unexpected object in ReceiveThread", e);
                         continue;
                     }
-
-                    /*
-                     * TODO: ask GUI if user wants to get the data. It should
-                     * return a ProgressMonitor with Util#getRunnableContext(),
-                     * that we can use here.
-                     */
-                    SubMonitor monitor = SubMonitor
-                        .convert(new NullProgressMonitor());
-
-                    fileTransferListener.incomingDescription(data,
-                        connectionType);
-
-                    long startTime = System.currentTimeMillis();
-
-                    // Read incoming chunks of data
-                    byte[] content;
-                    try {
-                        int n = input.readInt();
-
-                        content = new byte[n];
-
-                        int count = input.readInt();
-                        int pos = 0;
-
-                        while (count > 0) {
-                            input.readFully(content, pos, count);
-                            pos += count;
-
-                            count = input.readInt();
-                        }
-
-                        if (count == -1) {
-                            // canceled
-                            fileTransferListener.transferFailed(data,
-                                connectionType, null);
-                            continue;
-                        }
-
-                        if (data.compressInDataTransferManager()) {
-                            content = Util.inflate(content, monitor);
-                        }
-
-                    } catch (IOException e) {
-                        log.error(prefix() + "Crashed", e);
-                        fileTransferListener.transferFailed(data,
-                            connectionType, e);
-                        close();
-                        return;
-                    }
-
-                    long duration = Math.max(0, System.currentTimeMillis()
-                        - startTime);
-                    fileTransferListener.incomingData(data, connectionType,
-                        content, content.length, duration);
                 }
             } catch (RuntimeException e) {
                 log.error(prefix() + "Internal Error in Receive Thread: ", e);
                 // If there is programming problem, close the socket
-                close();
+                shutdown();
             }
         }
     }
@@ -185,9 +150,10 @@ public class JingleFileTransferSession extends JingleMediaSession {
     private UDPSelectorProvider udpSelectorProvider;
 
     private NetTransferMode connectionType = NetTransferMode.UNKNOWN;
-    private Socket socket;
-    private ObjectOutputStream objectOutputStream;
-    private ObjectInputStream objectInputStream;
+
+    private BinaryChannel binaryChannel;
+
+    protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
     private String remoteIp;
     private String localIp;
@@ -222,11 +188,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
     public JingleFileTransferSession(PayloadType payloadType,
         TransportCandidate remote, TransportCandidate local,
         String mediaLocator, JingleSession jingleSession,
-        IJingleFileTransferListener fileTransferListener, JID connectTo) {
+        IJingleFileTransferListener fileTransferListener, JID connectTo,
+        IncomingTransferObjectExtensionProvider incomingExtProv) {
         super(payloadType, remote, local, mediaLocator, jingleSession);
 
         this.connectTo = connectTo;
         this.fileTransferListener = fileTransferListener;
+        this.incomingExtProv = incomingExtProv;
     }
 
     /**
@@ -353,13 +321,13 @@ public class JingleFileTransferSession extends JingleMediaSession {
         connect(creators);
     }
 
-    abstract static class SocketCreator implements Callable<Socket> {
+    protected abstract static class SocketCreator implements Callable<Socket> {
 
-        SocketCreator(NetTransferMode type) {
+        protected SocketCreator(NetTransferMode type) {
             this.type = type;
         }
 
-        NetTransferMode type;
+        protected NetTransferMode type;
 
         public NetTransferMode getType() {
             return this.type;
@@ -407,7 +375,19 @@ public class JingleFileTransferSession extends JingleMediaSession {
             }
 
             try {
-                this.socket = socketFuture.get();
+                Socket socket = socketFuture.get();
+                this.connectionType = futures.get(socketFuture).getType();
+                binaryChannel = new BinaryChannel(socket, incomingExtProv,
+                    this.connectionType);
+                this.receiveThread = new ReceiverThread(binaryChannel);
+                this.receiveThread.start();
+
+                // Make sure the other connect-futures are canceled
+                for (Future<Socket> future : futures.keySet()) {
+                    future.cancel(true);
+                }
+                return;
+
             } catch (InterruptedException e) {
                 log.error("Code not designed to be interruptable", e);
                 Thread.currentThread().interrupt();
@@ -416,31 +396,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
                 log.debug("Jingle [" + connectTo.getName()
                     + "] Could not connect with either TCP or UDP.");
                 continue;
-            }
-
-            try {
-                this.objectOutputStream = new ObjectOutputStream(
-                    new BufferedOutputStream(socket.getOutputStream()));
-                this.objectOutputStream.flush();
-                this.objectInputStream = new ObjectInputStream(
-                    new BufferedInputStream(socket.getInputStream()));
-
-                this.receiveThread = new ReceiverThread(objectInputStream);
-                this.receiveThread.start();
-
-                this.connectionType = futures.get(socketFuture).getType();
-
-                // Make sure the other connect-futures are canceled
-                for (Future<Socket> future : futures.keySet()) {
-                    future.cancel(true);
-                }
-
-                return;
             } catch (IOException e) {
                 log.debug("Jingle " + Util.prefix(connectTo)
                     + "Failed to listen with either TCP or UDP.", e);
 
-                close();
+                shutdown();
             }
         }
 
@@ -450,32 +410,8 @@ public class JingleFileTransferSession extends JingleMediaSession {
         }
 
         // Failed to connect...
-        assert objectOutputStream == null && objectInputStream == null;
+        assert !binaryChannel.isConnected();
     }
-
-    /**
-     * This field is used by the send method to reset the given object stream
-     * ever now and then.
-     */
-    private int resetCounter = 0;
-
-    /**
-     * Constant sent after the last chunk to indicate the end of the single
-     * file.
-     */
-    protected static final int DONE = 0;
-
-    /**
-     * Constant indicating that the user has canceled the transfer. The peer
-     * will discard the file.
-     */
-    protected static final int CANCELED = -1;
-
-    /**
-     * Chunksize used for splitting the data to send into packets in between of
-     * which the sending of the file can be canceled.
-     */
-    protected static final int CHUNKSIZE = 32000;
 
     /**
      * This method is called from the JingleFileTransferManager to send files
@@ -483,57 +419,31 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * 
      * @throws JingleSessionException
      *             if sending failed.
+     * @throws IOException
      */
-    public synchronized NetTransferMode send(TransferDescription transferData,
-        byte[] content, SubMonitor progress) throws JingleSessionException {
+    public NetTransferMode send(TransferDescription transferDescription,
+        byte[] content, SubMonitor progress) throws UserCancellationException,
+        JingleSessionException, IOException {
 
-        if (objectOutputStream == null) {
+        if (progress.isCanceled())
+            throw new CancellationException();
+
+        if (!binaryChannel.isConnected()) {
             throw new JingleSessionException("Failed to send files with Jingle");
         }
 
-        progress.setWorkRemaining(content.length);
-        try {
-            long startTime = System.currentTimeMillis();
-            objectOutputStream.writeUnshared(transferData);
-            // Prevent caching of byte[] data in the handle table of the OOS
+        binaryChannel.sendDirect(transferDescription, content, progress);
 
-            // Write Size:
-            objectOutputStream.writeInt(content.length);
+        return connectionType;
+    }
 
-            int i = 0;
-            while (i < content.length) {
-                if (progress.isCanceled()) {
-                    objectOutputStream.writeInt(CANCELED);
-                    objectOutputStream.flush();
-                    throw new CancellationException();
-                }
-
-                int count = Math.min(CHUNKSIZE, content.length - i);
-                objectOutputStream.writeInt(count);
-                objectOutputStream.write(content, i, count);
-                progress.worked(count);
-                i += count;
-            }
-            objectOutputStream.writeInt(DONE);
-            objectOutputStream.flush();
-
-            if (resetCounter++ > 128) {
-                // Reset periodically to flush stream handles to the data
-                objectOutputStream.reset();
-                resetCounter = 0;
-            }
-
-            long endTime = System.currentTimeMillis();
-            long delta = endTime - startTime;
-            log.debug(prefix() + "Sent"
-                + Util.throughput(content.length, delta) + ": " + transferData);
-            return connectionType;
-        } catch (IOException e) {
-            close();
-            throw new JingleSessionException(prefix() + "Failed to send files");
-        } finally {
-            progress.done();
-        }
+    /**
+     * Sends a message to reject a transfer described by the given
+     * TransferDescription.
+     */
+    public void sendReject(TransferDescription transferDescription)
+        throws IOException {
+        binaryChannel.sendReject(transferDescription);
     }
 
     /**
@@ -568,27 +478,16 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
     @Override
     public void stopReceive() {
-        close();
+        shutdown();
     }
 
-    public synchronized void close() {
-
-        if (receiveThread != null)
-            receiveThread.interrupt();
-
-        Util.close(socket);
-        Util.close(objectInputStream);
-        Util.close(objectOutputStream);
-
-        objectInputStream = null;
-        objectOutputStream = null;
-        socket = null;
-
+    public synchronized void shutdown() {
+        binaryChannel.dispose();
         connectionType = null;
     }
 
-    public synchronized boolean isConnected() {
-        return objectInputStream != null && objectOutputStream != null;
+    public boolean isConnected() {
+        return binaryChannel.isConnected();
     }
 
     public NetTransferMode getConnectionType() {

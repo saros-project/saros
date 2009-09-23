@@ -25,6 +25,7 @@ import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
+import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
@@ -288,10 +289,44 @@ public interface ISharedProject extends IActivityListener {
      */
     public void removeActivityProvider(IActivityProvider provider);
 
+    /**
+     * Returns a list of all users in this project which are drivers right now.
+     * 
+     * @snapshot This is a snapshot copy. This list does not change if users'
+     *           role change.
+     * 
+     *           There is no guarantee that the users in this list will be part
+     *           of the project after you exit the SWT thread context.
+     */
     public List<User> getDrivers();
 
+    /**
+     * Returns a list of all users in this project which are observers right
+     * now.
+     * 
+     * @snapshot This is a snapshot copy. This list does not change if users'
+     *           role change.
+     * 
+     *           There is no guarantee that the users in this list will be part
+     *           of the project after you exit the SWT thread context.
+     */
     public List<User> getObservers();
 
+    /**
+     * Returns all users in this project which are both remotely and observers
+     * right now.
+     * 
+     * @snapshot This is a snapshot copy. This list does not change if users'
+     *           role change.
+     * 
+     *           There is no guarantee that the users in this list will be part
+     *           of the project after you exit the SWT thread context.
+     */
     public List<User> getRemoteObservers();
+
+    /**
+     * Returns the DateTime at which this SharedProject was started on the host.
+     */
+    public DateTime getSessionStart();
 
 }

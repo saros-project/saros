@@ -19,7 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 
 /**
  * A listener for SharedProject life-cycle related events.
@@ -54,5 +54,5 @@ public interface ISessionListener {
      * @param invitation
      *            the invitation process which represents the invitation.
      */
-    public void invitationReceived(IIncomingInvitationProcess invitation);
+    public void invitationReceived(IncomingInvitationProcess invitation);
 }

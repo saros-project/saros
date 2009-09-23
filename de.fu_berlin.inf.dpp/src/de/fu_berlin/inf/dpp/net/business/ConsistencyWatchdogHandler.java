@@ -32,7 +32,6 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
@@ -339,18 +338,6 @@ public class ConsistencyWatchdogHandler {
             progress.worked(8);
         }
         progress.done();
-    }
-
-    protected void sendFile(JID from, ISharedProject project, final IPath path,
-        SubMonitor progress) {
-        try {
-            transmitter.sendFile(from, project.getProject(), path,
-                TimedActivity.NO_SEQUENCE_NR, progress);
-        } catch (IOException e) {
-            // TODO This means we were really unable to send
-            // this file. No more falling back.
-            log.error("Could not sent file for consistency resolution", e);
-        }
     }
 
     /**

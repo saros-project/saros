@@ -7,12 +7,14 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.joda.time.DateTime;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * An interface behind which the {@link SessionManager} hides its non-public
@@ -57,7 +59,8 @@ public interface ISessionManager {
      * 
      * @return the shared project.
      */
-    public ISharedProject joinSession(IProject project, JID host, int myColorID);
+    public ISharedProject joinSession(IProject project, JID host,
+        int myColorID, DateTime sessionStart);
 
     /**
      * Leaves the currently active session. If the local user is the host, this
@@ -66,6 +69,11 @@ public interface ISessionManager {
      * Has no effect if there is no currently shared project.
      */
     public void stopSharedProject();
+
+    /**
+     * Sets the sessionID to <code>NOT_IN_SESSION</code>
+     */
+    public void clearSessionID();
 
     /**
      * Add the given session listener. Is ignored if the listener is already
@@ -95,12 +103,11 @@ public interface ISessionManager {
      *            invitations.
      * @param colorID
      *            the assigned color id for the invited participant.
-     * @return the process that represents the invitation and which handles the
-     *         further interaction with the invitation.
      */
-    public IIncomingInvitationProcess invitationReceived(JID from,
-        String sessionID, String projectName, String description, int colorID,
-        String sarosVersion);
+    public void invitationReceived(JID from, String sessionID,
+        String projectName, String description, int colorID,
+        VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
+        String invitationID);
 
     /*
      * @see IConnectionListener
@@ -109,13 +116,5 @@ public interface ISessionManager {
         ConnectionState newState);
 
     public void onReconnect(Map<JID, Integer> expectedSequenceNumbers);
-
-    /**
-     * Called by the Invitation Process if the invitation did not work out
-     * (joinSession was not called).
-     * 
-     * Set the SessionID to none, so that new Sessions can be begun.
-     */
-    public void cancelIncomingInvitation();
 
 }

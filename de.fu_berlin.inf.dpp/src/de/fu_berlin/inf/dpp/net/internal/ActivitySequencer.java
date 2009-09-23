@@ -45,6 +45,7 @@ import de.fu_berlin.inf.dpp.activities.ViewportActivity;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -423,9 +424,13 @@ public class ActivitySequencer {
 
     protected final DataTransferManager transferManager;
 
-    public ActivitySequencer(ISharedProject sharedProject,
-        ITransmitter transmitter, DataTransferManager transferManager) {
+    protected final DispatchThreadContext dispatchThread;
 
+    public ActivitySequencer(ISharedProject sharedProject,
+        ITransmitter transmitter, DataTransferManager transferManager,
+        DispatchThreadContext threadContext) {
+
+        this.dispatchThread = threadContext;
         this.sharedProject = sharedProject;
         this.transmitter = transmitter;
         this.transferManager = transferManager;
@@ -489,7 +494,7 @@ public class ActivitySequencer {
                  * Periodically execQueues() because waiting activities might
                  * have timed-out
                  */
-                transmitter.executeAsDispatch(new Runnable() {
+                dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
                         execQueue();
                     }
@@ -595,7 +600,7 @@ public class ActivitySequencer {
         ArrayList<User> toSendViaNetwork = new ArrayList<User>();
         for (User user : recipients) {
             if (user.isLocal()) {
-                transmitter.executeAsDispatch(new Runnable() {
+                dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
                         sharedProject.exec(Collections.singletonList(activity));
                     }

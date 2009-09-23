@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.SubMonitor;
+import org.joda.time.DateTime;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.Saros;
@@ -42,6 +43,7 @@ import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer.QueueItem;
@@ -94,6 +96,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
     protected FreeColors freeColors = null;
 
+    protected DateTime sessionStart;
+
     protected Blockable stopManagerListener = new Blockable() {
 
         public void unblock() {
@@ -109,8 +113,9 @@ public class SharedProject implements ISharedProject, Disposable {
      * Common constructor code for host and client side.
      */
     protected SharedProject(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager, IProject project,
-        StopManager stopManager, JID myJID, int myColorID) {
+        DataTransferManager transferManager,
+        DispatchThreadContext threadContext, IProject project,
+        StopManager stopManager, JID myJID, int myColorID, DateTime sessionStart) {
 
         assert transmitter != null;
         assert myJID != null;
@@ -120,10 +125,11 @@ public class SharedProject implements ISharedProject, Disposable {
         this.project = project;
         this.transferManager = transferManager;
         this.stopManager = stopManager;
+        this.sessionStart = sessionStart;
 
         this.localUser = new User(this, myJID, myColorID);
         this.activitySequencer = new ActivitySequencer(this, transmitter,
-            transferManager);
+            transferManager, threadContext);
 
         stopManager.addBlockable(stopManagerListener);
     }
@@ -132,10 +138,12 @@ public class SharedProject implements ISharedProject, Disposable {
      * Constructor called for SharedProject of the host
      */
     public SharedProject(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager, IProject project, JID myID,
-        StopManager stopManager) {
+        DataTransferManager transferManager,
+        DispatchThreadContext threadContext, IProject project, JID myID,
+        StopManager stopManager, DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, project, stopManager, myID, 0);
+        this(saros, transmitter, transferManager, threadContext, project,
+            stopManager, myID, 0, sessionStart);
 
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
         this.localUser.setUserRole(UserRole.DRIVER);
@@ -152,11 +160,13 @@ public class SharedProject implements ISharedProject, Disposable {
      * Constructor of client
      */
     public SharedProject(Saros saros, ITransmitter transmitter,
-        DataTransferManager transferManager, IProject project, JID myID,
-        JID hostID, int myColorID, StopManager stopManager) {
+        DataTransferManager transferManager,
+        DispatchThreadContext threadContext, IProject project, JID myID,
+        JID hostID, int myColorID, StopManager stopManager,
+        DateTime sessionStart) {
 
-        this(saros, transmitter, transferManager, project, stopManager, myID,
-            myColorID);
+        this(saros, transmitter, transferManager, threadContext, project,
+            stopManager, myID, myColorID, sessionStart);
 
         this.host = new User(this, hostID, 0);
         this.host.setUserRole(UserRole.DRIVER);
@@ -339,14 +349,14 @@ public class SharedProject implements ISharedProject, Disposable {
             listener.userJoined(user);
         }
 
-        log.info("User " + jid + " joined session");
+        log.info("User " + Util.prefix(jid) + " joined session");
     }
 
     public void removeUser(User user) {
         JID jid = user.getJID();
         if (this.participants.remove(jid) == null) {
-            log.warn("Tried to remove user who was" + " not in participants: "
-                + jid);
+            log.warn("Tried to remove user who was not in participants: "
+                + Util.prefix(jid));
             return;
         }
         if (isHost()) {
@@ -361,7 +371,7 @@ public class SharedProject implements ISharedProject, Disposable {
             listener.userLeft(user);
         }
 
-        SharedProject.log.info("User " + jid + " left session");
+        log.info("User " + Util.prefix(jid) + " left session");
     }
 
     /*
@@ -445,7 +455,7 @@ public class SharedProject implements ISharedProject, Disposable {
         if (jid.isBareJID()) {
             throw new IllegalArgumentException(
                 "JIDs used for the SharedProject should always be resource qualified: "
-                    + jid);
+                    + Util.prefix(jid));
         }
 
         User user = this.participants.get(jid);
@@ -581,5 +591,9 @@ public class SharedProject implements ISharedProject, Disposable {
     public void removeActivityProvider(IActivityProvider provider) {
         this.activityProviders.remove(provider);
         provider.removeActivityListener(this);
+    }
+
+    public DateTime getSessionStart() {
+        return sessionStart;
     }
 }

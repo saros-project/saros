@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.project;
 
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 
 /**
  * Abstract ISessionListener that does nothing in all the methods.
@@ -9,7 +9,7 @@ import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
  */
 public abstract class AbstractSessionListener implements ISessionListener {
 
-    public void invitationReceived(IIncomingInvitationProcess invitation) {
+    public void invitationReceived(IncomingInvitationProcess invitation) {
         // do nothing
     }
 

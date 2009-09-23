@@ -34,15 +34,18 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IIncomingInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelLocation;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelOption;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * A wizard that guides the user through an incoming invitation process.
@@ -58,7 +61,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager;
  * 
  * @author rdjemili
  */
-public class JoinSessionWizard extends Wizard {
+public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
 
     private static final Logger log = Logger.getLogger(JoinSessionWizard.class
         .getName());
@@ -69,7 +72,7 @@ public class JoinSessionWizard extends Wizard {
 
     protected WizardDialogAccessable wizardDialog;
 
-    protected IIncomingInvitationProcess process;
+    protected IncomingInvitationProcess process;
 
     protected boolean requested = false;
 
@@ -83,7 +86,7 @@ public class JoinSessionWizard extends Wizard {
 
     protected VersionManager manager;
 
-    public JoinSessionWizard(IIncomingInvitationProcess process,
+    public JoinSessionWizard(IncomingInvitationProcess process,
         DataTransferManager dataTransferManager,
         PreferenceUtils preferenceUtils, VersionManager manager) {
         this.process = process;
@@ -125,7 +128,7 @@ public class JoinSessionWizard extends Wizard {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
                     throws InterruptedException {
-                    process.requestRemoteFileList(monitor);
+                    process.requestRemoteFileList(SubMonitor.convert(monitor));
                 }
             });
         } catch (InvocationTargetException e) {
@@ -158,56 +161,26 @@ public class JoinSessionWizard extends Wizard {
         return true;
     }
 
-    public void showCancelMessage(JID jid, String errorMsg, boolean replicated) {
+    public void showCancelMessage(JID jid, String errorMsg,
+        CancelLocation cancelLocation) {
         if (errorMsg != null) {
             EclipseUtils.openErrorMessageDialog(getShell(),
                 "Invitation aborted", "Could not complete invitation with "
                     + jid.getBase() + " because an error occurred:\n\n"
                     + errorMsg);
         } else {
-            // errorMsg == null means canceled either by us or peer
-            if (replicated) {
+            switch (cancelLocation) {
+            case LOCAL:
+                EclipseUtils.openInformationMessageDialog(getShell(),
+                    "Invitation cancelled", "Invitation was cancelled by You.");
+                break;
+            case REMOTE:
                 EclipseUtils.openInformationMessageDialog(getShell(),
                     "Invitation cancelled",
                     "Invitation was cancelled by inviter (" + jid.getBase()
                         + ").");
             }
         }
-
-        if (replicated) {
-            /*
-             * TODO The entanglement between UI and process is too complicated
-             * to sort out, how to close this dialog when it is currently
-             * executing the finishing synchronization
-             */
-            wizardDialog.close();
-        }
-
-    }
-
-    IInvitationUI ui = new IInvitationUI() {
-        public void cancel(final JID jid, final String errorMsg,
-            final boolean replicated) {
-            Util.runSafeSWTAsync(log, new Runnable() {
-                public void run() {
-                    showCancelMessage(jid, errorMsg, replicated);
-                }
-            });
-        }
-
-        public void runGUIAsynch(Runnable runnable) {
-            // TODO this cannot be ignored an InvitationUI like the
-            // JoinSessionWizard need to implement this
-            assert false;
-        }
-
-        public void updateInvitationProgress(JID jid) {
-            // ignored, not needed atm
-        }
-    };
-
-    public IInvitationUI getInvitationUI() {
-        return ui;
     }
 
     @Override
@@ -218,7 +191,7 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public void addPages() {
-        this.descriptionPage = new ShowDescriptionPage(this, manager);
+        this.descriptionPage = new ShowDescriptionPage(this, manager, process);
         this.namePage = new EnterProjectNamePage(this, dataTransferManager,
             preferenceUtils);
 
@@ -265,12 +238,12 @@ public class JoinSessionWizard extends Wizard {
 
     @Override
     public boolean performCancel() {
-        try {
-            this.process.cancel(null, false);
-        } catch (RuntimeException e) {
-            log.error("Failed to cancel process: ", e);
-        }
-
+        Util.runSafeAsync(log, new Runnable() {
+            public void run() {
+                process.cancel(null, CancelLocation.LOCAL,
+                    CancelOption.NOTIFY_PEER);
+            }
+        });
         return true;
     }
 
@@ -352,5 +325,41 @@ public class JoinSessionWizard extends Wizard {
 
     public boolean isUpdateSelected() {
         return updateSelected;
+    }
+
+    public void cancel(final JID jid, final String errorMsg,
+        final CancelLocation cancelLocation) {
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                showCancelMessage(jid, errorMsg, cancelLocation);
+            }
+        });
+
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                wizardDialog.close();
+            }
+        });
+
+    }
+
+    /*
+     * The interfaces IIncomingInvitationUI and IOutgoingInvitationUI should be
+     * separated (they should not extend a common interface IInvitationUI) so we
+     * do not have to implement these methods here.
+     */
+
+    public void runGUIAsynch(Runnable runnable) {
+        // TODO Auto-generated method stub
+    }
+
+    public void updateInvitationProgress(JID jid) {
+        // TODO Auto-generated method stub
+    }
+
+    public boolean showVersionConflictWarning(VersionInfo versionInfo, JID peer) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

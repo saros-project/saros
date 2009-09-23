@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -70,6 +69,7 @@ import bmsi.util.DiffPrint;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -1028,11 +1028,11 @@ public class Util {
      *            whole stream is read and not only the given number of bytes.
      * 
      * @cancelable This long-running operation can be canceled via the given
-     *             progress monitor and will throw an CancellationException in
-     *             this case.
+     *             progress monitor and will throw an UserCancellationException
+     *             in this case.
      */
     public static byte[] toByteArray(InputStream in, long estimatedSize,
-        SubMonitor subMonitor) throws IOException {
+        SubMonitor subMonitor) throws IOException, LocalCancellationException {
 
         byte[] buf = new byte[CHUNKSIZE];
         int count;
@@ -1046,7 +1046,7 @@ public class Util {
             while ((count = in.read(buf, 0, CHUNKSIZE)) > 0) {
 
                 if (subMonitor.isCanceled())
-                    throw new CancellationException();
+                    throw new LocalCancellationException();
 
                 bos.write(buf, 0, count);
                 subMonitor.worked(1);

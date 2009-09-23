@@ -81,7 +81,6 @@ Export-Package: de.fu_berlin.inf.dpp;
    de.fu_berlin.inf.dpp,
    org.eclipse.core.resources,
    de.fu_berlin.inf.dpp.net",
- de.fu_berlin.inf.dpp.invitation.internal;x-friends:="de.fu_berlin.inf.dpp.test",
  de.fu_berlin.inf.dpp.net;
   uses:="org.eclipse.core.runtime,
    de.fu_berlin.inf.dpp.activities,

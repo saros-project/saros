@@ -17,7 +17,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class JoinSessionWizardUtils {
@@ -27,11 +27,11 @@ public class JoinSessionWizardUtils {
 
     public static class ScanRunner implements Runnable {
 
-        public ScanRunner(IIncomingInvitationProcess invitationProcess) {
+        public ScanRunner(IncomingInvitationProcess invitationProcess) {
             this.invitationProcess = invitationProcess;
         }
 
-        IIncomingInvitationProcess invitationProcess;
+        IncomingInvitationProcess invitationProcess;
 
         IProject project = null;
 
@@ -72,7 +72,7 @@ public class JoinSessionWizardUtils {
      * Run the scan for the best matching project as a blocking operation.
      */
     public static IProject getBestScanMatch(
-        IIncomingInvitationProcess invitationProcess) {
+        IncomingInvitationProcess invitationProcess) {
 
         ScanRunner runner = new ScanRunner(invitationProcess);
 

@@ -1,16 +1,20 @@
 package de.fu_berlin.inf.dpp.net.business;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -31,41 +35,55 @@ public class InvitationHandler {
     @Inject
     protected CancelInviteExtension cancelInviteExtension;
 
-    protected SessionIDObservable sessionIDObservable;
+    @Inject
+    protected SarosUI sarosUI;
 
-    protected Handler handler;
+    protected final SessionIDObservable sessionIDObservable;
 
     public InvitationHandler(XMPPChatReceiver receiver,
-        SessionIDObservable sessionIDObservable) {
-        this.sessionIDObservable = sessionIDObservable;
+        SessionIDObservable sessionIDObservablePar,
+        final InvitationExtensionProvider invExtProv) {
+        this.sessionIDObservable = sessionIDObservablePar;
+        receiver.addPacketListener(new PacketListener() {
 
-        this.handler = new Handler(sessionIDObservable);
+            public void processPacket(Packet packet) {
+                JID fromJID = new JID(packet.getFrom());
+                InvitationInfo invInfo = invExtProv.getPayload(packet);
 
-        receiver.addPacketListener(handler, handler.getFilter());
-    }
+                if (invInfo == null) {
+                    log.warn("Inv" + Util.prefix(fromJID)
+                        + ": The received invitation packet's"
+                        + " payload is null.");
+                    return;
+                }
 
-    protected class Handler extends InviteExtension {
+                log
+                    .debug("Inv" + Util.prefix(fromJID)
+                        + ": Received invitation (invitationID: "
+                        + invInfo.invitationID + ", sessionID: "
+                        + invInfo.sessionID + ", projectName: "
+                        + invInfo.projectName + ", colorID: " + invInfo.colorID
+                        + ", sarosVersion: " + invInfo.versionInfo.version
+                        + ", sarosComp: " + invInfo.versionInfo.compatibility
+                        + ")");
 
-        public Handler(SessionIDObservable sessionID) {
-            super(sessionID);
-        }
+                String sessionID = invInfo.sessionID;
+                String invitationID = invInfo.invitationID;
 
-        @Override
-        public void invitationReceived(JID sender, String sessionID,
-            String projectName, String description, int colorID,
-            String sarosVersion) {
-            if (sessionIDObservable.getValue().equals(
-                SessionIDObservable.NOT_IN_SESSION)) {
-                log.debug("Rcvd Invitation " + Util.prefix(sender)
-                    + "sessionID: " + sessionID + ", colorID: " + colorID
-                    + ", sarosVersion: " + sarosVersion);
-                sessionManager.invitationReceived(sender, sessionID,
-                    projectName, description, colorID, sarosVersion);
-            } else {
-                transmitter.sendMessage(sender, cancelInviteExtension.create(
-                    sessionID, "I am already in a Saros-Session,"
-                        + " try to contact me by chat first."));
+                if (sessionIDObservable.getValue().equals(
+                    SessionIDObservable.NOT_IN_SESSION)) {
+                    sessionManager.invitationReceived(
+                        new JID(packet.getFrom()), sessionID,
+                        invInfo.projectName, invInfo.projectDesc,
+                        invInfo.colorID, invInfo.versionInfo,
+                        invInfo.sessionStart, sarosUI, invitationID);
+                } else {
+                    transmitter.sendMessage(new JID(packet.getFrom()),
+                        cancelInviteExtension.create(sessionID,
+                            "I am already in a Saros-Session,"
+                                + "try to contact me by chat first."));
+                }
             }
-        }
+        }, invExtProv.getPacketFilter());
     }
 }

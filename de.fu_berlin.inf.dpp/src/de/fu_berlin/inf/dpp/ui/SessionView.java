@@ -253,9 +253,9 @@ public class SessionView extends ViewPart {
         public String getColumnText(Object obj, int index) {
 
             User participant = (User) obj;
-
             return participant.getHumanReadableName()
-                + (participant.isDriver() ? " (Driver)" : "");
+                + (participant.isDriver() ? " (Driver)" : "")
+                + (participant.isInvitationComplete() ? "" : " [Joining...]");
         }
 
         @Override

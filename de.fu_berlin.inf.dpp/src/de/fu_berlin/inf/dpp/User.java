@@ -42,7 +42,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  * eclipse instance, all others are remote users.
  * 
  * The public and mutable properties are the role (Driver/Observer), time since
- * going off-line, connection state and away information.
+ * going off-line, connection state, away information and whether this user is
+ * still joining or already part of the Session.
  * 
  * @entityObject A user is a entity object, i.e. it can change over time.
  */
@@ -63,6 +64,8 @@ public class User {
     protected final JID jid;
 
     protected final int colorID;
+
+    protected boolean invitationComplete = false;
 
     protected UserConnectionState connectionState = UserConnectionState.UNKNOWN;
 
@@ -145,6 +148,20 @@ public class User {
 
     public int getColorID() {
         return this.colorID;
+    }
+
+    /**
+     * @return <code>true</code> if the invitation is currently in progress,
+     *         <code>false</code> if the invitation process is complete
+     */
+    public boolean isInvitationComplete() {
+        if (isHost())
+            return true;
+        return this.invitationComplete;
+    }
+
+    public void setInvitationComplete(boolean invitationIsComplete) {
+        this.invitationComplete = invitationIsComplete;
     }
 
     public UserConnectionState getConnectionState() {

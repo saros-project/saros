@@ -10,6 +10,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector.CancelHook;
 
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
@@ -54,13 +55,11 @@ public class XMPPChatReceiver {
      * @sarosThread must be called from the Dispatch Thread
      */
     public void processPacket(Packet packet) {
-
         Map<PacketListener, PacketFilter> copy;
 
         synchronized (listeners) {
             copy = new HashMap<PacketListener, PacketFilter>(listeners);
         }
-
         for (Entry<PacketListener, PacketFilter> entry : copy.entrySet()) {
             PacketListener listener = entry.getKey();
             PacketFilter filter = entry.getValue();
@@ -69,5 +68,17 @@ public class XMPPChatReceiver {
                 listener.processPacket(packet);
             }
         }
+    }
+
+    public SarosPacketCollector createCollector(PacketFilter filter) {
+        final SarosPacketCollector collector = new SarosPacketCollector(
+            new CancelHook() {
+                public void cancelPacketCollector(SarosPacketCollector collector) {
+                    removePacketListener(collector);
+                }
+            }, filter);
+        addPacketListener(collector, filter);
+
+        return collector;
     }
 }

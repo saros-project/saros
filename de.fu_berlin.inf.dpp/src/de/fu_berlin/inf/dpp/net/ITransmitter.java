@@ -20,17 +20,17 @@ package de.fu_berlin.inf.dpp.net;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.jivesoftware.smack.packet.IQ;
-import org.osgi.framework.Version;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
@@ -38,10 +38,15 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
-import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * An humble interface that is responsible for network functionality. The idea
@@ -65,14 +70,10 @@ public interface ITransmitter {
      * @param description
      *            a informal description text that can be provided with the
      *            invitation. Can not be <code>null</code>.
-     * @param sarosVersion
-     *            The version of Saros installed locally. The invited user can
-     *            use this version information to check whether his/her version
-     *            is compatible. See {@link VersionManager}.
-     * 
      */
-    public void sendInviteMessage(ISharedProject sharedProject, JID jid,
-        String description, int colorID, Version sarosVersion);
+    public void sendInvitation(ISharedProject sharedProject, JID jid,
+        String description, int colorID, VersionInfo versionInfo,
+        String invitationID);
 
     /**
      * Sends an cancellation message that tells the receiver that the invitation
@@ -95,6 +96,7 @@ public interface ITransmitter {
      * @param jid
      *            the Jabber ID of the user to which the file list is to be
      *            sent.
+     * 
      * @param fileList
      *            the file list that is to be sent.
      * 
@@ -102,19 +104,64 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws OperationCanceledException
+     * @throws UserCancellationException
      *             if the operation was canceled via the given progress monitor
-     *             an OperationCanceledException is thrown. If the operation was
+     *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
      *             the operation completed successfully, before noticing the
      *             cancellation.
+     * 
+     *             if the operation was canceled by the recipient (remotely) a
+     *             RemoteCancellationException is thrown
      * 
      * @throws IOException
      *             if the operation fails because of a problem with the XMPP
      *             Connection.
      */
-    public void sendFileList(JID jid, FileList fileList, SubMonitor monitor)
-        throws IOException;
+    public void sendFileList(JID jid, String invitationID, FileList fileList,
+        SubMonitor monitor) throws IOException, UserCancellationException;
+
+    /**
+     * @throws CancellationException
+     *             A User canceled.
+     * @throws IOException
+     *             If the operation fails because of a problem with the XMPP
+     *             Connection.
+     * @throws LocalCancellationException
+     */
+    public DefaultInvitationInfo receiveFileListRequest(String invitationID,
+        SubMonitor monitor) throws IOException, LocalCancellationException;
+
+    /**
+     * @param archiveCollector
+     * @blocking If forceWait is true.
+     * 
+     * @throws CancellationException
+     *             A User canceled.
+     * @throws IOException
+     *             If the operation fails because of a problem with the XMPP
+     *             Connection.
+     */
+    public FileList receiveFileList(SarosPacketCollector archiveCollector,
+        SubMonitor monitor, boolean forceWait)
+        throws UserCancellationException, IOException;
+
+    /**
+     * @param b
+     * @param archiveCollector
+     * @throws IOException
+     *             If the operation fails because of a problem with the XMPP
+     *             Connection.
+     * @throws UserCancellationException
+     */
+    public InputStream receiveArchive(SarosPacketCollector archiveCollector,
+        SubMonitor monitor, boolean b) throws IOException,
+        UserCancellationException;
+
+    public void sendUserList(JID to, String invitationID, Collection<User> user);
+
+    public boolean receiveUserListConfirmation(List<User> fromUsers,
+        SubMonitor monitor) throws CancellationException, IOException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -122,7 +169,7 @@ public interface ITransmitter {
      * @param recipient
      *            the Jabber ID of the recipient.
      */
-    public void sendRequestForFileListMessage(JID recipient);
+    public void sendFileListRequest(JID recipient, String invitationID);
 
     /**
      * Sends given file to given recipient with given sequence number.
@@ -148,9 +195,9 @@ public interface ITransmitter {
      *             If the file could not be read, other errors are reported to
      *             the call-back.
      * 
-     * @throws OperationCanceledException
+     * @throws CancellationException
      *             if the operation was canceled via the given progress monitor
-     *             an OperationCanceledException is thrown. If the operation was
+     *             an CancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
      *             the operation completed successfully, before noticing the
      *             cancellation.
@@ -179,19 +226,23 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws OperationCanceledException
+     * @throws UserCancellationException
      *             if the operation was canceled via the given progress monitor
-     *             an OperationCanceledException is thrown. If the operation was
+     *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
      *             the operation completed successfully, before noticing the
      *             cancellation.
+     * 
+     *             if the operation was canceled by the recipient a
+     *             RemoteCancellationException is thrown
      * 
      * @throws IOException
      *             If the given path identifies no file (but a directory), the
      *             file could not be read or an error occurred while sending
      */
     public void sendFile(JID to, IProject project, IPath path,
-        int sequenceNumber, SubMonitor monitor) throws IOException;
+        int sequenceNumber, SubMonitor monitor) throws IOException,
+        UserCancellationException;
 
     /**
      * Sends given archive file to given recipient.
@@ -209,19 +260,24 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws OperationCanceledException
+     * @throws IOException
+     *             If the file could not be read or an error occurred while
+     *             sending or a technical error happened.
+     * @throws UserCancellationException
      *             if the operation was canceled via the given progress monitor
-     *             an OperationCanceledException is thrown. If the operation was
+     *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
      *             the operation completed successfully, before noticing the
      *             cancellation.
      * 
-     * @throws IOException
-     *             If the file could not be read or an error occurred while
-     *             sending
+     *             if the operation was canceled by the recipient a
+     *             RemoteCancellationException is thrown
+     * 
+     * @blocking Blocks until the transfer is complete.
      */
-    public void sendProjectArchive(JID recipient, IProject project,
-        File archive, SubMonitor monitor) throws IOException;
+    public void sendProjectArchive(JID recipient, String invitationID,
+        IProject project, File archive, SubMonitor monitor) throws IOException,
+        UserCancellationException;
 
     /**
      * Sends queued file transfers.
@@ -232,16 +288,6 @@ public interface ITransmitter {
      * Sends queued messages.
      */
     public void sendRemainingMessages();
-
-    /**
-     * Sends a list of users to given recipient
-     * 
-     * @param to
-     *            Recipient of this list
-     * @param participants
-     *            List of Users, of current shared project participants
-     */
-    public void sendUserListTo(JID to, Collection<User> participants);
 
     /**
      * Sends a request for activities to all users.
@@ -263,16 +309,6 @@ public interface ITransmitter {
         Map<JID, Integer> requestedSequenceNumbers, boolean andUp);
 
     /* ---------- etc --------- */
-
-    /**
-     * Sends a join message to the participants of given shared project. See
-     * {@link IInvitationProcess} for more information when this is supposed be
-     * sent.
-     * 
-     * @param sharedProject
-     *            the shared project that this join message refers to.
-     */
-    public void sendJoinMessage(ISharedProject sharedProject);
 
     /**
      * Sends a leave message to the participants of given shared project. See
@@ -340,16 +376,6 @@ public interface ITransmitter {
         Collection<DocumentChecksum> checksums);
 
     /**
-     * Execute the given runnable as if it was received via the network
-     * component.
-     * 
-     * This is used by the ConcurrentDocumentManager to skip sending a
-     * JupiterActivity via the network which originated on the host to the
-     * JupiterServer.
-     */
-    public void executeAsDispatch(Runnable runnable);
-
-    /**
      * Make sure that Jingle has sufficiently initialized so that a remote
      * client trying to connect to us, will not fail because we are not ready to
      * handle his Jingle negotiation attempts.
@@ -373,5 +399,8 @@ public interface ITransmitter {
      */
     public <T> T sendQuery(JID jid, XStreamExtensionProvider<T> provider,
         T payload, long timeout);
+
+    public SarosPacketCollector getInvitationCollector(String invitationID,
+        FileTransferType filelistTransfer);
 
 }

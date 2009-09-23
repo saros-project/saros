@@ -20,8 +20,10 @@
 package de.fu_berlin.inf.dpp;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -87,31 +89,31 @@ import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.XMPPUtil;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
 import de.fu_berlin.inf.dpp.net.business.ChecksumHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
-import de.fu_berlin.inf.dpp.net.business.JoinHandler;
 import de.fu_berlin.inf.dpp.net.business.LeaveHandler;
 import de.fu_berlin.inf.dpp.net.business.RequestForActivityHandler;
-import de.fu_berlin.inf.dpp.net.business.RequestForFileListHandler;
 import de.fu_berlin.inf.dpp.net.business.UserListHandler;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
+import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.InviteExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.RequestForFileListExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
@@ -268,18 +270,19 @@ public class Saros extends AbstractUIPlugin {
          */
         this.container.addComponent(Saros.class, this);
 
+        // Thread Context
+        this.container.addComponent(DispatchThreadContext.class);
+
+        // Core Managers
         this.container.addComponent(ConnectionSessionManager.class);
         this.container.addComponent(ConsistencyWatchdogClient.class);
         this.container.addComponent(ConsistencyWatchdogServer.class);
-        this.container.addComponent(SharedProjectObservable.class);
         this.container.addComponent(DataTransferManager.class);
         this.container.addComponent(DiscoveryManager.class);
         this.container.addComponent(EditorManager.class);
         this.container.addComponent(ErrorLogManager.class);
         this.container.addComponent(FeedbackManager.class);
-        this.container.addComponent(IsInconsistentObservable.class);
         this.container.addComponent(JDTFacade.class);
-        this.container.addComponent(JingleFileTransferManagerObservable.class);
         this.container.addComponent(LocalPresenceTracker.class);
         this.container.addComponent(MultiUserChatManager.class);
         this.container.addComponent(MessagingManager.class);
@@ -290,7 +293,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(RosterTracker.class);
         this.container.addComponent(SarosRosterListener.class);
         this.container.addComponent(SarosUI.class);
-        this.container.addComponent(SessionIDObservable.class);
         this.container.addComponent(SessionManager.class);
         this.container.addComponent(SessionViewOpener.class);
         this.container.addComponent(SharedResourcesManager.class);
@@ -306,6 +308,10 @@ public class Saros extends AbstractUIPlugin {
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);
         this.container.addComponent(InvitationProcessObservable.class);
+        this.container.addComponent(IsInconsistentObservable.class);
+        this.container.addComponent(JingleFileTransferManagerObservable.class);
+        this.container.addComponent(SessionIDObservable.class);
+        this.container.addComponent(SharedProjectObservable.class);
 
         // Handlers
         this.container.addComponent(CancelInviteHandler.class);
@@ -315,8 +321,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(RequestForActivityHandler.class);
         this.container.addComponent(ConsistencyWatchdogHandler.class);
         this.container.addComponent(ChecksumHandler.class);
-        this.container.addComponent(JoinHandler.class);
-        this.container.addComponent(RequestForFileListHandler.class);
         this.container.addComponent(ActivitiesHandler.class);
 
         // Extensions
@@ -325,13 +329,19 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(CancelInviteExtension.class);
         this.container.addComponent(UserListExtension.class);
         this.container.addComponent(RequestActivityExtension.class);
-        this.container.addComponent(InviteExtension.class);
-        this.container.addComponent(JoinExtension.class);
         this.container.addComponent(LeaveExtension.class);
-        this.container.addComponent(RequestForFileListExtension.class);
 
         // Extension Providers
         this.container.addComponent(ActivitiesExtensionProvider.class);
+        this.container
+            .addComponent(InvitationInfo.InvitationExtensionProvider.class);
+        this.container
+            .addComponent(IncomingTransferObjectExtensionProvider.class);
+        this.container
+            .addComponent(DefaultInvitationInfo.FileListRequestExtensionProvider.class);
+        this.container.addComponent(UserListInfo.JoinExtensionProvider.class);
+        this.container
+            .addComponent(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class);
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);
@@ -638,8 +648,9 @@ public class Saros extends AbstractUIPlugin {
                 Util.runSafeSWTSync(log, new Runnable() {
                     public void run() {
                         MessageDialog.openError(EditorAPI.getShell(),
-                            "Error Connecting", "Could not connect to server '"
-                                + server + "' as user '" + username
+                            "Error Connecting",
+                            " could not connect to server '" + server
+                                + "' as user '" + username
                                 + "'.\nErrorMessage was:\n" + e.getMessage());
                     }
                 });
@@ -1124,9 +1135,10 @@ public class Saros extends AbstractUIPlugin {
 
                     while (!isConnected() && i++ < CONNECTION_RETRIES) {
 
-                        log.info("Reconnecting...");
-
                         try {
+                            log.info("Reconnecting...("
+                                + InetAddress.getLocalHost().toString() + ")");
+
                             connect(true);
                             if (!isConnected())
                                 Thread.sleep(5000);
@@ -1136,6 +1148,9 @@ public class Saros extends AbstractUIPlugin {
                                 e);
                             Thread.currentThread().interrupt();
                             return;
+                        } catch (UnknownHostException e) {
+                            log
+                                .info("Could not get localhost, maybe the network interface is down.");
                         }
                     }
 

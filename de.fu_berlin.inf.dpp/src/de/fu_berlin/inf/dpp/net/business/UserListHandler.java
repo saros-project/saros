@@ -1,30 +1,27 @@
-/**
- * 
- */
 package de.fu_berlin.inf.dpp.net.business;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.filter.AndFilter;
-import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.extensions.JoinExtension;
-import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
-import de.fu_berlin.inf.dpp.net.internal.extensions.UserListExtension;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.UserListInfo.UserListEntry;
+import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * This class is responsible for parsing and processing a user list sent to us.
- * 
+ * Business Logic for handling Invitation requests
  */
 @Component(module = "net")
 public class UserListHandler {
@@ -33,88 +30,90 @@ public class UserListHandler {
         .getName());
 
     @Inject
-    protected IXMPPTransmitter transmitter;
+    protected XMPPChatTransmitter transmitter;
 
     @Inject
-    protected JoinExtension joinExtension;
-
     protected SessionManager sessionManager;
 
-    protected Handler handler;
+    @Inject
+    protected CancelInviteExtension cancelInviteExtension;
 
-    protected SessionIDObservable sessionIDObservable;
+    @Inject
+    protected SarosUI sarosUI;
 
-    public UserListHandler(SessionManager sessionManager,
-        XMPPChatReceiver receiver, SessionIDObservable sessionIDObservable) {
+    protected final SessionIDObservable sessionIDObservable;
 
-        this.sessionIDObservable = sessionIDObservable;
-        this.sessionManager = sessionManager;
-        this.handler = new Handler(sessionIDObservable);
+    public UserListHandler(XMPPChatReceiver receiver,
+        SessionIDObservable sessionIDObservablePar,
+        final JoinExtensionProvider userListExtProv) {
+        this.sessionIDObservable = sessionIDObservablePar;
+        // TODO SessionID-Filter
+        receiver.addPacketListener(new PacketListener() {
 
-        receiver.addPacketListener(handler, handler.getFilter());
-    }
+            public void processPacket(Packet packet) {
+                JID fromJID = new JID(packet.getFrom());
 
-    protected class Handler extends UserListExtension {
+                log.debug("Inv" + Util.prefix(fromJID) + ": Received userList");
+                UserListInfo userListInfo = userListExtProv.getPayload(packet);
 
-        public Handler(SessionIDObservable sessionID) {
-            super(sessionID);
-        }
-
-        @Override
-        public PacketFilter getFilter() {
-            return new AndFilter(super.getFilter(), PacketExtensionUtils
-                .getFromHostFilter(sessionManager));
-        }
-
-        @Override
-        public void userListReceived(JID fromJID, List<UserListEntry> userList) {
-
-            ISharedProject project = sessionManager.getSharedProject();
-
-            assert project != null;
-
-            User fromUser = project.getUser(fromJID);
-
-            if (fromUser == null || !fromUser.isHost()) {
-                log.error("Received UserList from user which "
-                    + "is not part of our session or is not host: " + fromJID);
-                return;
-            }
-
-            log.debug("Received user list");
-
-            for (UserListEntry receivedUser : userList) {
-
-                // Check if we already know this user
-                User user = project.getUser(receivedUser.getJID());
-
-                if (user == null) {
-                    // This user is not part of our project
-                    user = new User(project, receivedUser.getJID(),
-                        receivedUser.getColorID());
-                    user.setUserRole(receivedUser.getUserRole());
-
-                    // Add him and send him a message, and tell him our
-                    // color
-                    project.addUser(user);
-
-                    // TODO This needs to be synchronized
-                    transmitter.sendMessage(user.getJID(), joinExtension
-                        .create(project.getLocalUser().getColorID()));
-                } else {
-                    // User already exists
-
-                    // Check if the existing user has the color that we
-                    // expect
-                    if (user.getColorID() != receivedUser.getColorID()) {
-                        log.warn("Received color id doesn't"
-                            + " match known color id");
-                    }
-
-                    // Update his role
-                    user.setUserRole(receivedUser.getUserRole());
+                if (userListInfo == null) {
+                    log.warn("Inv" + Util.prefix(fromJID)
+                        + ": The received userList packet's"
+                        + " payload is null.");
+                    return;
                 }
+
+                ISharedProject sharedProject = sessionManager
+                    .getSharedProject();
+                assert sharedProject != null;
+
+                User fromUser = sharedProject.getUser(fromJID);
+
+                if (fromUser == null || !fromUser.isHost()) {
+                    log.error("Received UserList from user which "
+                        + "is not part of our session or is not host: "
+                        + Util.prefix(fromJID));
+                    return;
+                }
+
+                // Adding new users
+                User newUser;
+                for (UserListEntry userEntry : userListInfo.userList) {
+
+                    // Check if we already know this user
+                    User user = sharedProject.getUser(userEntry.jid);
+
+                    if (user == null) {
+                        // This user is not part of our project
+                        newUser = new User(sharedProject, userEntry.jid,
+                            userEntry.colorID);
+                        newUser.setUserRole(userEntry.userRole);
+                        newUser
+                            .setInvitationComplete(userEntry.invitationComplete);
+
+                        // Add him and send him a message, and tell him our
+                        // colour
+                        sharedProject.addUser(newUser);
+                    } else {
+                        // User already exists
+
+                        // Check if the existing user has the colour that we
+                        // expect
+                        if (user.getColorID() != userEntry.colorID) {
+                            log.warn("Received color id doesn't"
+                                + " match known color id");
+                        }
+
+                        // Update his role
+                        user.setUserRole(userEntry.userRole);
+                        // Update invitation status
+                        user
+                            .setInvitationComplete(userEntry.invitationComplete);
+                    }
+                }
+                transmitter.sendUserListConfirmation(fromJID);
             }
-        }
+
+        }, userListExtProv.getPacketFilter());
     }
 }

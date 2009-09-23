@@ -1,32 +1,27 @@
 package de.fu_berlin.inf.dpp.net.internal;
 
 import java.io.ByteArrayInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.dnd.TransferData;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smackx.filetransfer.FileTransferListener;
 import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
@@ -35,15 +30,16 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.FileTransfer.Status;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
-import de.fu_berlin.inf.dpp.net.IDataReceiver;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
-import de.fu_berlin.inf.dpp.net.jingle.DispatchingJingleFileTransferListener;
+import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.jingle.IJingleFileTransferListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleSessionException;
@@ -113,7 +109,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     };
 
-    protected DispatchingJingleFileTransferListener jingleListener;
+    protected IJingleFileTransferListener jingleListener = new JingleTransferListener();
 
     protected FileTransferManager fileTransferManager;
 
@@ -121,11 +117,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected Thread startingJingleThread;
 
-    protected List<IDataReceiver> receivers;
-
     protected XMPPConnection connection;
-
-    protected XMPPChatTransmitter chatTransmitter;
 
     @Inject
     protected DiscoveryManager discoveryManager;
@@ -137,13 +129,25 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected JingleFileTransferManagerObservable jingleManager;
 
     @Inject
+    protected XMPPChatReceiver receiver;
+
+    @Inject
     protected ActivitiesHandler activitiesHandler;
+
+    @Inject
+    protected InvitationProcessObservable invitationProcess;
 
     @Inject
     protected ActivitiesExtensionProvider activitiesProvider;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
+
+    @Inject
+    protected DispatchThreadContext dispatchThreadContext;
+
+    @Inject
+    protected IncomingTransferObjectExtensionProvider incomingExtProv;
 
     protected Saros saros;
 
@@ -178,138 +182,169 @@ public class DataTransferManager implements ConnectionSessionListener {
         return jingleManager.getValue();
     }
 
+    /**
+     * JingleTransferListener receives from all JingleFileTransferSessions
+     * {@link IncomingTransferObject}
+     */
     protected final class JingleTransferListener implements
         IJingleFileTransferListener {
 
-        public void incomingDescription(TransferDescription data,
-            NetTransferMode connectionType) {
-
-            addIncomingFileTransfer(data);
+        /**
+         * It changes to the Thread context of XMPPChatTransmiter before calling
+         * XMPPChatReceiver's processPacket.
+         */
+        public void incomingData(final IncomingTransferObject transferObject) {
+            addIncomingTransferObject(transferObject);
         }
+    }
 
-        public void incomingData(TransferDescription data,
-            NetTransferMode mode, byte[] content, long size,
-            long transferDuration) {
+    protected void addIncomingTransferObject(
+        final IncomingTransferObject transferObject) {
 
-            removeIncomingFileTransfer(data);
-            transferModeDispatch.transferFinished(data.getSender(), mode, true,
-                size, transferDuration);
+        final TransferDescription description = transferObject
+            .getTransferDescription();
 
-            receiveData(data, new ByteArrayInputStream(content));
-        }
+        final Packet packet = new Message();
+        packet.setPacketID(Packet.ID_NOT_AVAILABLE);
+        packet.setFrom(description.sender.toString());
+        packet.addExtension(incomingExtProv
+            .create(new IncomingTransferObject() {
+                public byte[] accept(final SubMonitor progress)
+                    throws UserCancellationException, IOException {
 
-        public void transferFailed(TransferDescription data,
-            NetTransferMode connectionType, Exception e) {
+                    addIncomingFileTransfer(description);
+                    try {
 
-            try {
-                IInvitationProcess process = invitationProcesses
-                    .getInvitationProcess(data.sender);
-                if (process != null) {
-                    /*
-                     * if e == null this means that the other side canceled, we
-                     * just drop the file transfer then, because a cancelation
-                     * will arrive as a extension
-                     */
-                    if (e != null) {
-                        process.cancel("File Transfer via Jingle failed:\n"
-                            + Util.getMessage(e), false);
+                        // TODO Put size in TransferDescription, so we can
+                        // display it here
+                        log.debug("[" + getTransferMode().toString()
+                            + "] Starting incoming file transfer: "
+                            + description.toString());
+
+                        long startTime = System.nanoTime();
+
+                        byte[] content = transferObject.accept(progress);
+
+                        long duration = Math.max(0, System.nanoTime()
+                            - startTime) / 1000000;
+
+                        log.debug("[" + getTransferMode().toString()
+                            + "] Finished incoming file transfer: "
+                            + description.toString() + ", size: "
+                            + Util.throughput(content.length, duration));
+
+                        transferModeDispatch.transferFinished(description
+                            .getSender(), getTransferMode(), true,
+                            content.length, duration);
+
+                        return content;
+
+                    } finally {
+                        removeIncomingFileTransfer(description);
                     }
                 }
-            } finally {
-                removeIncomingFileTransfer(data);
+
+                public TransferDescription getTransferDescription() {
+                    return transferObject.getTransferDescription();
+                }
+
+                public void reject() throws IOException {
+                    transferObject.reject();
+                }
+
+                public NetTransferMode getTransferMode() {
+                    return transferObject.getTransferMode();
+                }
+            }));
+
+        dispatchThreadContext.executeAsDispatch(new Runnable() {
+            public void run() {
+                // ask upper layer to accept
+                receiver.processPacket(packet);
             }
-        }
+        });
     }
 
     protected class IBBTransferListener implements FileTransferListener {
 
-        public void fileTransferRequest(final FileTransferRequest request) {
+        public void fileTransferRequest(final FileTransferRequest request)
+            throws CancellationException {
 
-            Util.runSafeAsync("IBBTransferListener-fileTransferRequest-", log,
-                new Runnable() {
-                    public void run() {
-                        receiveIBB(request);
-                    }
-                });
-        }
-
-        protected void receiveIBB(FileTransferRequest request) {
-            // TODO: ask GUI if user wants to get the data. It should return a
-            // ProgressMonitor with Util#getRunnableContext(), that we can use
-            // here.
-            IProgressMonitor monitor = new NullProgressMonitor();
-
-            TransferDescription data;
+            final TransferDescription transferDescription;
             try {
-                data = TransferDescription.fromBase64(request.getDescription());
+                transferDescription = TransferDescription.fromBase64(request
+                    .getDescription());
             } catch (IOException e) {
                 log.error("Incoming File Transfer via IBB failed: ", e);
-
-                IInvitationProcess process = invitationProcesses
-                    .getInvitationProcess(new JID(request.getRequestor()));
-                if (process != null) {
-                    process.cancel(e.getMessage(), false);
-                }
                 return;
             }
 
-            log.debug("[IBB] Starting incoming file transfer: "
-                + data.toString() + ", size: "
-                + Util.formatByte(request.getFileSize()));
-            long startTime = System.nanoTime();
+            final IncomingTransferObject transferObject = new IncomingTransferObject() {
 
-            addIncomingFileTransfer(data);
+                public byte[] accept(SubMonitor monitor)
+                    throws UserCancellationException, IOException {
 
-            byte[] content;
-            try {
-                IncomingFileTransfer accept = request.accept();
+                    monitor.beginTask("Receive via IBB", 10000);
 
-                InputStream in = accept.recieveFile();
-                try {
-                    content = IOUtils.toByteArray(in);
-                } finally {
-                    IOUtils.closeQuietly(in);
+                    IncomingFileTransfer accept = request.accept();
+                    monitor.worked(100);
+
+                    byte[] content;
+                    InputStream in = null;
+                    try {
+                        if (monitor.isCanceled())
+                            throw new CancellationException();
+                        in = accept.recieveFile();
+                        monitor.worked(100);
+                        content = Util.toByteArray(in, request.getFileSize(),
+                            monitor.newChild(8000));
+                        IOUtils.closeQuietly(in);
+
+                        // File is meant to be empty
+                        if (transferDescription.emptyFile) {
+                            content = new byte[0];
+                        }
+
+                        if (transferDescription.compressInDataTransferManager())
+                            content = Util.inflate(content, monitor
+                                .newChild(1500));
+
+                    } catch (LocalCancellationException e) {
+                        log.info("Local monitor was cancelled.");
+                        throw e;
+                    } catch (IOException e) {
+                        log.error("Incoming File Transfer via IBB failed: ", e);
+                        throw e;
+                    } catch (XMPPException e) {
+                        log.error("Incoming File Transfer via IBB failed: ", e);
+                        throw new IOException();
+                    }
+
+                    monitor.worked(100);
+                    monitor.done();
+
+                    return content;
                 }
 
-                // File is meant to be empty
-                if (data.emptyFile) {
-                    content = new byte[0];
+                public TransferDescription getTransferDescription() {
+                    return transferDescription;
                 }
 
-                if (data.compressInDataTransferManager()) {
-                    content = Util
-                        .inflate(content, SubMonitor.convert(monitor));
+                public void reject() throws IOException {
+                    request.reject();
                 }
 
-            } catch (Exception e) {
-                log.error("Incoming File Transfer via IBB failed: ", e);
-
-                IInvitationProcess process = invitationProcesses
-                    .getInvitationProcess(new JID(request.getRequestor()));
-                if (process != null) {
-                    process.cancel("File Transfer via IBB failed:\n"
-                        + Util.getMessage(e), false);
+                public NetTransferMode getTransferMode() {
+                    return NetTransferMode.IBB;
                 }
-                return;
-            } finally {
-                removeIncomingFileTransfer(data);
-            }
 
-            long duration = Math.max(0, System.nanoTime() - startTime) / 1000000;
-
-            log.debug("[IBB] Finished incoming file transfer: "
-                + data.toString() + ", size: "
-                + Util.throughput(request.getFileSize(), duration));
-
-            transferModeDispatch.transferFinished(data.getSender(),
-                NetTransferMode.IBB, true, content.length, duration);
-
-            receiveData(data, new ByteArrayInputStream(content));
+            };
+            addIncomingTransferObject(transferObject);
         }
     }
 
     private static final Logger log = Logger
-        .getLogger(DataTransferManager.class.getName());
+        .getLogger(DataTransferManager.class);
 
     public interface Transmitter {
 
@@ -322,8 +357,6 @@ public class DataTransferManager implements ConnectionSessionListener {
         public boolean isSuitable(JID jid);
 
         /**
-         * Send the given data as a blocking operation.
-         * 
          * If this call returns the data has been send successfully, otherwise
          * an IOException is thrown with the reason why the transfer failed.
          * 
@@ -331,22 +364,27 @@ public class DataTransferManager implements ConnectionSessionListener {
          *            The data to be sent.
          * @throws IOException
          *             if the send failed
+         * @throws UserCancellationException
+         *             It will be thrown if the user (locally or remotely) has
+         *             canceled the transfer.
+         * @blocking Send the given data as a blocking operation.
          */
         public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor callback) throws IOException;
+            SubMonitor callback) throws IOException, UserCancellationException;
 
     }
 
     protected Transmitter ibb = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor progress) throws IOException {
+            SubMonitor progress) throws IOException, CancellationException {
 
             final long startTime = System.nanoTime();
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
                 + data.toString() + ", size: "
                 + Util.formatByte(content.length));
 
+            OutgoingFileTransfer.setResponseTimeout(30000);
             OutgoingFileTransfer transfer = fileTransferManager
                 .createOutgoingFileTransfer(data.getRecipient().toString());
 
@@ -374,8 +412,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                 if (progress.isCanceled()) {
                     transfer.cancel();
-                    throw new CancellationException(
-                        "Transfer was canceled by user");
+                    throw new CancellationException();
                 }
                 int newProgress = (int) ((100.0 * transfer.getAmountWritten()) / Math
                     .max(1, content.length));
@@ -430,7 +467,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Transmitter jingle = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor progress) throws IOException {
+            SubMonitor progress) throws UserCancellationException, IOException {
             try {
                 JingleFileTransferManager jftm = getJingleManager();
                 if (jftm == null)
@@ -469,9 +506,17 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     };
 
-    protected void sendData(TransferDescription transferData, byte[] input,
-        SubMonitor progress) throws IOException {
-
+    /**
+     * Dispatch to Transmitter.
+     * 
+     * @throws UserCancellationException
+     *             It will be thrown if the local or remote user has canceled
+     *             the transfer.
+     * @throws IOException
+     *             If a technical problem occurred.
+     */
+    public void sendData(TransferDescription transferData, byte[] input,
+        SubMonitor progress) throws IOException, UserCancellationException {
         // TODO Buffer correctly when not connected....
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
@@ -492,29 +537,10 @@ public class DataTransferManager implements ConnectionSessionListener {
         try {
             // Try all transmitters
             for (Transmitter transmitter : transmitters) {
-                try {
-                    if (sendData(transmitter, transferData, input, progress
-                        .newChild(70))) {
-                        // Successfully sent!
-                        return;
-                    }
-                } catch (CancellationException e) {
-
-                    // User canceled! -> Don't try again
-                    log.info(Util.prefix(transferData.recipient)
-                        + "Cancelled to sending " + transferData + " with "
-                        + transmitter.getName() + ":" + e.getMessage());
-
-                    /*
-                     * TODO Make this a proper checked exception of the right
-                     * type and pass up the stack
-                     */
-                    throw new CausedIOException(Util
-                        .prefix(transferData.recipient)
-                        + "Cancelled to sending "
-                        + transferData
-                        + " with "
-                        + transmitter.getName() + ":", e);
+                if (sendData(transmitter, transferData, input, progress
+                    .newChild(70))) {
+                    // Successfully sent!
+                    return;
                 }
             }
             // No transmitter worked! :-(
@@ -529,9 +555,14 @@ public class DataTransferManager implements ConnectionSessionListener {
     /**
      * Tries to send the given data using the given transmitter returning true
      * if the transfer was successfully completed, false otherwise.
+     * 
+     * @throws UserCancellationException
+     *             It will be thrown if the local user or remote user has
+     *             canceled the transfer.
      */
     protected boolean sendData(Transmitter transmitter,
-        TransferDescription transferData, byte[] content, SubMonitor progress) {
+        TransferDescription transferData, byte[] content, SubMonitor progress)
+        throws UserCancellationException {
 
         if (!transmitter.isSuitable(transferData.recipient))
             return false;
@@ -547,7 +578,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             transferModeDispatch.transferFinished(transferData.recipient, mode,
                 false, content.length, duration);
             return true;
-        } catch (CancellationException e) {
+        } catch (UserCancellationException e) {
             throw e; // Rethrow to circumvent the Exception catch below
         } catch (CausedIOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "
@@ -559,78 +590,6 @@ public class DataTransferManager implements ConnectionSessionListener {
             // Try other transport methods
         }
         return false;
-    }
-
-    /**
-     * Adds the given receiver to the top of the stack of the receivers notified
-     * when data arrives.
-     * 
-     * The receiver should return true if it has consumed the given data.
-     * 
-     * @param receiver
-     *            If the given receiver already exists, it is removed and put to
-     *            the front of the receivers list.
-     */
-    public void addDataReceiver(IDataReceiver receiver) {
-        if (receivers.contains(receiver))
-            receivers.remove(receiver);
-
-        receivers.add(0, receiver);
-    }
-
-    public void removeDataReceiver(IDataReceiver receiver) {
-        receivers.remove(receiver);
-    }
-
-    /**
-     * Will dispatch the received data to the IDataReceivers registered.
-     * 
-     * Closes the input stream, before returning.
-     */
-    protected void receiveData(TransferDescription data, InputStream input) {
-
-        if (!sessionID.getValue().equals(data.sessionID)) {
-            log.warn("Received Data with invalid " + "SessionID: "
-                + data.toString());
-            return;
-        }
-
-        try {
-            switch (data.type) {
-            case ARCHIVE_TRANSFER:
-                for (IDataReceiver receiver : receivers) {
-                    boolean consumed = receiver.receivedArchive(data, input);
-                    if (consumed)
-                        return;
-                }
-                break;
-            case FILELIST_TRANSFER:
-                for (IDataReceiver receiver : receivers) {
-                    boolean consumed = receiver.receivedFileList(data, input);
-                    if (consumed)
-                        return;
-                }
-                break;
-            case RESOURCE_TRANSFER:
-                for (IDataReceiver receiver : receivers) {
-                    boolean consumed = receiver.receivedResource(data.sender,
-                        Path.fromPortableString(data.file_project_path), input);
-                    if (consumed)
-                        return;
-                }
-                break;
-            case ACTIVITY_TRANSFER:
-                for (IDataReceiver receiver : receivers) {
-                    boolean consumed = receiver.receiveActivity(data.sender,
-                        input);
-                    if (consumed)
-                        return;
-                }
-                break;
-            }
-        } finally {
-            IOUtils.closeQuietly(input);
-        }
     }
 
     public static class TransferModeDispatch implements ITransferModeListener {
@@ -669,135 +628,19 @@ public class DataTransferManager implements ConnectionSessionListener {
         }
     }
 
-    protected IDataReceiver defaultReceiver = new IDataReceiver() {
-
-        public boolean receivedResource(JID from, IPath path, InputStream input) {
-
-            log.debug("Incoming resource from " + Util.prefix(from) + ": "
-                + path);
-
-            // TODO CJ: move this to business logic
-            IInvitationProcess process = invitationProcesses
-                .getInvitationProcess(from);
-            if (process != null) {
-                process.resourceReceived(from, path, input);
-                return true;
-            }
-
-            log.error("Failed to receive resource (nobody wanted it!)");
-            return true;
-        }
-
-        public boolean receivedFileList(TransferDescription data,
-            InputStream input) {
-
-            IInvitationProcess process = invitationProcesses
-                .getInvitationProcess(data.sender);
-            if (process == null) {
-                log.warn("Rcvd FileList from unknown user "
-                    + Util.prefix(data.sender));
-                return false;
-            }
-
-            String fileListAsString;
-            try {
-                fileListAsString = Util.read(input);
-            } catch (IOException e) {
-                log.error("Error receiving FileList", e);
-                return true;
-            }
-
-            FileList fileList = null;
-
-            if (fileListAsString != null) {
-                try {
-                    fileList = FileList.fromXML(fileListAsString);
-                } catch (Exception e) {
-                    process.cancel("Could not parse your FileList", false);
-                    log.error("Could not parse FileList", e);
-                }
-            }
-
-            process.fileListReceived(data.getSender(), fileList);
-            return true;
-        }
-
-        public boolean receivedArchive(TransferDescription data,
-            InputStream input) {
-
-            log.debug("Incoming archive " + Util.prefix(data.sender));
-
-            long startTime = System.currentTimeMillis();
-
-            ZipInputStream zip = new ZipInputStream(input);
-
-            try {
-                ZipEntry entry;
-                while ((entry = zip.getNextEntry()) != null) {
-                    receivedResource(data.getSender(), Path
-                        .fromPortableString(entry.getName()),
-                        new FilterInputStream(zip) {
-                            @Override
-                            public void close() throws IOException {
-                                // don't close the ZipInputStream, we close the
-                                // entry ourselves...
-                            }
-                        });
-
-                    zip.closeEntry();
-                }
-                log.debug(String.format("Unpacked archive [%s] in %d s",
-                    data.sender.getName(),
-                    (System.currentTimeMillis() - startTime) / 1000));
-
-            } catch (IOException e) {
-                log.error("Failed to receive and unpack archive", e);
-            } finally {
-                IOUtils.closeQuietly(zip);
-            }
-            return true;
-        }
-
-        public boolean receiveActivity(final JID sender, InputStream input) {
-
-            final TimedActivities content;
-            try {
-                content = activitiesProvider.parseString(IOUtils.toString(
-                    input, "UTF-8"));
-            } catch (IOException e) {
-                log.error("Could not parse incoming activity:", e);
-                return true;
-            }
-
-            chatTransmitter.executeAsDispatch(new Runnable() {
-                public void run() {
-                    activitiesHandler.receiveActivities(sender, content
-                        .getTimedActivities());
-                }
-            });
-            return true;
-        }
-    };
-
     public void prepareConnection(final XMPPConnection connection) {
 
         // Create Containers
         this.connection = connection;
 
-        if (jingleListener == null) {
-            jingleListener = new DispatchingJingleFileTransferListener(
-                chatTransmitter.getDispatchExecutor());
-            jingleListener.add(new JingleTransferListener());
-        }
-
         this.fileTransferQueue = new ConcurrentLinkedQueue<TransferData>();
-        this.receivers = new LinkedList<IDataReceiver>();
-        this.receivers.add(defaultReceiver);
         this.jingleManager.setValue(null);
 
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager
             .addFileTransferListener(new IBBTransferListener());
+
+        OutgoingFileTransfer.setResponseTimeout(30000);
 
         if (!preferenceUtils.forceFileTranserByChat()) {
             // Start Jingle Manager asynchronous
@@ -807,8 +650,9 @@ public class DataTransferManager implements ConnectionSessionListener {
                  */
                 public void run() {
                     try {
-                        jingleManager.setValue(new JingleFileTransferManager(
-                            saros, connection, jingleListener));
+                        jingleManager
+                            .setValue(new JingleFileTransferManager(saros,
+                                connection, jingleListener, incomingExtProv));
                         log.debug("Jingle Manager started");
                     } catch (Exception e) {
 
@@ -880,7 +724,6 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     public void disposeConnection() {
         fileTransferQueue.clear();
-        receivers.clear();
         transferModeDispatch.clear();
 
         connection = null;

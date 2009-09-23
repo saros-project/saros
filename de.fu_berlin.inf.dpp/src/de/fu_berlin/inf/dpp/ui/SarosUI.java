@@ -48,12 +48,10 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.invitation.IIncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
-import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
-import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.wizards.JoinSessionWizard;
 import de.fu_berlin.inf.dpp.ui.wizards.WizardDialogAccessable;
@@ -91,44 +89,29 @@ public class SarosUI {
 
         this.sessionManager = sessionManager;
 
-        sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void invitationReceived(
-                final IIncomingInvitationProcess process) {
-                Util.runSafeSWTAsync(log, new Runnable() {
-                    public void run() {
-                        showIncomingInvitationUI(process);
-                    }
-                });
-            }
-
-            @Override
-            public void sessionStarted(ISharedProject sharedProject) {
-                Util.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        openSarosViews();
-                    }
-                });
-            }
-
-        });
     }
 
-    protected void showIncomingInvitationUI(IIncomingInvitationProcess process) {
+    public JoinSessionWizard showIncomingInvitationUI(
+        IncomingInvitationProcess process) {
 
         JoinSessionWizard sessionWizard = new JoinSessionWizard(process,
             dataTransferManager, preferenceUtils, manager);
-        WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
+        final WizardDialogAccessable wizardDialog = new WizardDialogAccessable(
             EditorAPI.getShell(), sessionWizard);
 
         // TODO Provide help :-)
         wizardDialog.setHelpAvailable(false);
+
         sessionWizard.setWizardDlg(wizardDialog);
-        process.setInvitationUI(sessionWizard.getInvitationUI());
 
         // Fixes #2727848: InvitationDialog is opened in the
         // background
-        EclipseUtils.openWindow(wizardDialog);
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                EclipseUtils.openWindow(wizardDialog);
+            }
+        });
+        return sessionWizard;
     }
 
     /**

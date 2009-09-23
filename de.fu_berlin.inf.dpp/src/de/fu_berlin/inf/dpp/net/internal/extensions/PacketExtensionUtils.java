@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.net.internal.extensions;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.log4j.Logger;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -27,10 +29,16 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
+import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * Holds various simple helper methods to create and parse simple Smack packet
@@ -39,6 +47,9 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
  * @author rdjemili
  */
 public class PacketExtensionUtils {
+
+    private static final Logger log = Logger
+        .getLogger(PacketExtensionUtils.class);
 
     public static final String NAMESPACE = "de.fu_berlin.inf.dpp";
 
@@ -106,10 +117,71 @@ public class PacketExtensionUtils {
             new PacketFilter() {
                 public boolean accept(Packet arg0) {
                     Message message = (Message) arg0;
-
                     return sessionIDObservable.getValue().equals(
-                        PacketExtensionUtils.getSessionID(message));
+                        getSessionID(message));
                 }
             });
+    }
+
+    /**
+     * @return PacketFilter that only accepts Messages (!) which belong to the
+     *         current invitation
+     * 
+     *         TODO: do we need the MessageTypeFilter(Message.Type.chat) linke
+     *         in getSessionIDPacketFilter?
+     */
+    public static PacketFilter getInvitationIDPacketFilter(
+        final XStreamExtensionProvider<? extends DefaultInvitationInfo> extProv,
+        final String invitationID) {
+
+        return new PacketFilter() {
+            public boolean accept(Packet arg0) {
+                DefaultInvitationInfo invInfo = extProv.getPayload(arg0);
+                return invitationID.equals(invInfo.invitationID);
+            }
+        };
+    }
+
+    public static PacketFilter getIncomingTransferObjectFilter(
+        final IncomingTransferObjectExtensionProvider extProv,
+        final SessionIDObservable sessionID, final String invitationID,
+        final TransferDescription.FileTransferType type) {
+
+        return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
+
+            public boolean accept(Packet packet) {
+                IncomingTransferObject payload = extProv.getPayload(packet);
+
+                if (payload == null) {
+                    log.error("Invalid payload in packet: " + packet);
+                    return false;
+                }
+
+                TransferDescription transferDescription = payload
+                    .getTransferDescription();
+                if (!Util.equals(transferDescription.sessionID, sessionID
+                    .getValue()))
+                    return false;
+
+                if (!ObjectUtils.equals(transferDescription.invitationID,
+                    invitationID))
+                    return false;
+
+                if (!ObjectUtils.equals(transferDescription.type, type))
+                    return false;
+
+                return true;
+
+            }
+        });
+    }
+
+    public static PacketFilter getInvitationFilter(
+        XStreamExtensionProvider<? extends DefaultInvitationInfo> extProv,
+        SessionIDObservable sessionID, final String invitationID) {
+
+        // getSessionIDPacketFilter(sessionID)
+        return new AndFilter(extProv.getPacketFilter(),
+            getInvitationIDPacketFilter(extProv, invitationID));
     }
 }

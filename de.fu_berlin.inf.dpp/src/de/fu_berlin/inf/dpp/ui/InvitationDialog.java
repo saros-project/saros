@@ -70,10 +70,10 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IOutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IInvitationUI;
+import de.fu_berlin.inf.dpp.invitation.OutgoingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IOutgoingInvitationUI;
 import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelLocation;
 import de.fu_berlin.inf.dpp.net.IRosterListener;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.RosterTracker;
@@ -90,7 +90,6 @@ import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
-import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
@@ -105,10 +104,9 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * TODO Creating the FileList asynchronously should be put into a separate
  * class.
  */
-public class InvitationDialog extends Dialog implements IInvitationUI {
+public class InvitationDialog extends Dialog implements IOutgoingInvitationUI {
 
-    private static final Logger log = Logger.getLogger(InvitationDialog.class
-        .getName());
+    private static final Logger log = Logger.getLogger(InvitationDialog.class);
 
     protected TableViewer tableViewer;
     protected Table table;
@@ -116,6 +114,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
     protected Button cancelSelectedInvitationButton;
     protected Button autoCloseButton;
 
+    protected Roster roster;
     protected List<JID> autoinviteJID;
     protected Display display;
 
@@ -143,7 +142,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         JID jid;
         String nickname;
         String error = "";
-        IOutgoingInvitationProcess outgoingProcess;
+        OutgoingInvitationProcess outgoingProcess;
         InvitationProgressMonitor progress;
     }
 
@@ -174,7 +173,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
             case 0:
                 return item.nickname;
             case 1: {
-
                 boolean supported;
                 try {
                     supported = discoveryManager.isSupportedNonBlock(item.jid,
@@ -187,29 +185,18 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
             }
             case 2:
                 if (item.outgoingProcess != null) {
-                    return getStateDesc(item.outgoingProcess.getState());
+                    if (!item.progress.isCanceled())
+                        return item.progress.getTaskName();
+                    return item.outgoingProcess.getCancelMessage();
                 } else {
                     return "";
                 }
             case 3:
                 if (item.outgoingProcess != null) {
-
-                    switch (item.outgoingProcess.getState()) {
-                    case SYNCHRONIZING:
-                        return "" + (item.progress.worked / 10.0) + "% "
-                            + Util.singleLineString(item.progress.getSubTask());
-                    case CANCELED:
-                        return item.error;
-                    default:
+                    if (item.progress.isCanceled())
                         return "";
-                    }
+                    return (item.progress.getWorked() / 10.0) + "%";
                 } else {
-                    try {
-                        discoveryManager.isSupportedNonBlock(item.jid,
-                            Saros.NAMESPACE);
-                    } catch (CacheMissException e) {
-                        return "Discovery is in progress";
-                    }
                     return "";
                 }
             }
@@ -470,45 +457,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         }
     }
 
-    protected void performInvitation() {
-
-        makeSureFileListIsAvailable();
-
-        setInviteable(false);
-        setSelectedCancelable(true);
-        getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
-
-        final List<JID> selectedJIDs = getSelectedJIDs();
-
-        ProgressMonitorDialog asyncCheck = new ProgressMonitorDialog(getShell());
-
-        /**
-         * Investigate asynchronously (not blocking the SWT-Thread) the peers'
-         * client compatibility, that is Saros availability and Saros version
-         * conflicts.
-         */
-        try {
-            asyncCheck.run(true, true, new IRunnableWithProgress() {
-                public void run(IProgressMonitor monitor) {
-                    try {
-                        performInvitationAsync(selectedJIDs, SubMonitor
-                            .convert(monitor));
-                    } finally {
-                        monitor.done();
-                    }
-                }
-            });
-
-        } catch (RuntimeException e) {
-            log.error("Internal error while performing invitation:", e);
-        } catch (InvocationTargetException e) {
-            log.error("Failed to perform invitation:", e.getTargetException());
-        } catch (InterruptedException e) {
-            log.error("Internal error while performing invitation:", e);
-        }
-        updateButtons();
-    }
-
     protected void startFileListCreationAsync() {
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
@@ -667,13 +615,13 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
 
         // If we still have on-going invitations, cancel them
         for (InviterData data : input) {
-            IOutgoingInvitationProcess process = data.outgoingProcess;
+            OutgoingInvitationProcess process = data.outgoingProcess;
             if (process != null) {
                 State state = process.getState();
                 if (!(state == State.CANCELED || state == State.DONE)) {
                     log.warn("Dialog closed, but an invitation"
                         + " is still on-going with: " + process.getPeer());
-                    process.cancel(null, false);
+                    data.progress.setCanceled(true);
                 }
             }
         }
@@ -779,30 +727,14 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
     protected void cancelInvite() {
         for (InviterData invdat : getSelectedItems()) {
             if (invdat.outgoingProcess != null) {
-                // Null means the host canceled locally
-                invdat.outgoingProcess.cancel(null, false);
+                invdat.progress.setCanceled(true);
             }
         }
 
         updateInvitationProgress(null);
     }
 
-    protected static final String[] StateNames = { "Initialized",
-        "Invitation sent. Waiting for acknowledgement...",
-        "Invitation accepted. Sending filelist...",
-        "Filelist sent to client. Waiting for sync info...",
-        "Sync Info received",
-        "Synchronizing project files. Transfering files...",
-        "Files sent. Waiting for invitee...", "Invitiation completed",
-        "Invitation canceled" };
-
-    protected String getStateDesc(IInvitationProcess.State state) {
-        // TODO Use a simple switch statement instead of the ordinal() HACK
-        return InvitationDialog.StateNames[state.ordinal()];
-    }
-
-    public void cancel(JID jid, String errorMsg, boolean replicated) {
-
+    public void cancel(JID jid, String errorMsg, CancelLocation cancelLocation) {
         for (InviterData data : input) {
             if (data.jid.equals(jid)) {
                 data.error = errorMsg;
@@ -853,7 +785,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
 
         this.table.removeAll();
 
-        Roster roster = saros.getRoster();
+        roster = saros.getRoster();
         if (roster == null)
             return;
 
@@ -873,7 +805,7 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
 
             // Is there already a user with this bare-JID in the project
             JID jid = project.getResourceQualifiedJID(new JID(entry.getUser()));
-            if (jid != null)
+            if (jid != null && project.getUser(jid).isInvitationComplete())
                 continue;
 
             InviterData invdat = new InviterData();
@@ -891,7 +823,6 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         }
 
         // TODO Keep in dialog and show as error to user...
-
         for (InviterData invData : oldInvData.values()) {
             log.warn("User " + invData.outgoingProcess.getPeer()
                 + " went offline during invitation.");
@@ -899,8 +830,9 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
              * TODO Checking the cancellation state should be done in the
              * process
              */
-            if (invData.outgoingProcess.getState() != IInvitationProcess.State.CANCELED)
-                invData.outgoingProcess.cancel("User went offline", true);
+            // if (invData.outgoingProcess.getState() !=
+            // IInvitationProcess.State.CANCELED)
+            // invData.outgoingProcess.cancel("User went offline", true);
         }
 
         this.tableViewer.refresh();
@@ -927,126 +859,44 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         }
     }
 
-    /**
-     * Checks the compatibility of the local Saros version with the given user's
-     * one. If the versions are compatible, the invitation continues, otherwise
-     * a confirmation of the user is required (a {@link MessageDialog} pops up).
-     * 
-     * @return <code>true</code> if the versions are compatible or the user
-     *         confirms to proceed with incompatible versions,
-     *         <code>false</code> if the versions are incompatible and the user
-     *         does not want to proceed
-     * 
-     * @blocking This method blocks until the version information can be
-     *           retrieved from the peer
-     */
-    public boolean checkVersion(final JID rqPeerJID) {
+    protected void performInvitation() {
+        makeSureFileListIsAvailable();
+        setInviteable(false);
+        setSelectedCancelable(true);
+        getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
 
-        log.debug("Checking " + rqPeerJID + "'s Saros version...");
+        List<JID> selectedJIDs = getSelectedJIDs();
 
-        final VersionInfo remoteVersionInfo = versionManager
-            .determineCompatibility(rqPeerJID);
-
-        if (remoteVersionInfo != null
-            && remoteVersionInfo.compatibility == Compatibility.OK)
-            return true;
-
-        // Ask user what to do
-        try {
-            return Util.runSWTSync(new Callable<Boolean>() {
-                public Boolean call() {
-                    return MessageDialog.openQuestion(getShell(),
-                        "Saros Version Conflict with " + rqPeerJID.getBase(),
-                        getCompatibilityWarningMessage(rqPeerJID,
-                            remoteVersionInfo));
-                }
-            });
-        } catch (Exception e) {
-            log.error(
-                "An error ocurred while trying to open the confirm dialog.", e);
-            return false;
-        }
-    }
-
-    /**
-     * @nonSWT This is a long running operation and must not be called from the
-     *         SWT thread
-     */
-    protected void performInvitationAsync(List<JID> selectedJIDs,
-        SubMonitor monitor) {
-
-        monitor.beginTask("Investigating peers' client compatibility",
-            selectedJIDs.size());
-
-        try {
-            // Invite all selected users...
-            for (JID currItem : selectedJIDs) {
-                performInvitationAsync(currItem, monitor.newChild(1));
-            }
-        } finally {
-            monitor.done();
-        }
-    }
-
-    protected void performInvitationAsync(final JID plainJID, SubMonitor monitor) {
-
-        monitor.beginTask("Investigating compatiblity for " + plainJID, 4);
-
-        try {
-            monitor.subTask("Performing Service Discovery for " + plainJID);
-            JID toInvite = discoveryManager.getSupportingPresence(plainJID,
-                Saros.NAMESPACE);
-            monitor.worked(1);
-
-            monitor.subTask("Checking if user is online " + plainJID);
-            if (toInvite == null) {
-
-                Roster roster = saros.getRoster();
-
-                if (!roster.getPresence(plainJID.toString()).isAvailable())
-                    return;
-
-                if (!confirmUnsupported(plainJID))
-                    return;
-
-                toInvite = plainJID;
-            }
-            monitor.worked(1);
-
-            monitor.subTask("Retrieving " + plainJID + "'s Saros version...");
-            if (!checkVersion(toInvite))
+        // Invite all selected users...
+        for (JID currItem : selectedJIDs) {
+            InviterData invdat = getItem(currItem);
+            if (invdat == null)
                 return;
-            monitor.worked(1);
-
-            monitor.subTask("Starting invitation for " + plainJID);
-
-            final JID toInviteFinal = toInvite;
-            Util.runSafeSWTSync(log, new Runnable() {
-                public void run() {
-                    InviterData invdat = getItem(plainJID);
-                    if (invdat != null) {
-                        invdat.progress = new InvitationProgressMonitor(
-                            toInviteFinal);
-                        invdat.outgoingProcess = sessionManager.invite(project,
-                            toInviteFinal, project.getProject().getName(),
-                            InvitationDialog.this, localFileList, SubMonitor
-                                .convert(invdat.progress, 1000));
-                    }
-                }
-            });
-            monitor.worked(1);
-        } finally {
-            monitor.done();
+            // TODO plainJID or rqJID... final not final???
+            invdat.progress = new InvitationProgressMonitor(currItem);
+            invdat.outgoingProcess = sessionManager.invite(project, currItem,
+                project.getProject().getName(), InvitationDialog.this,
+                localFileList, SubMonitor.convert(invdat.progress, 1000));
         }
+        updateButtons();
     }
 
-    private boolean confirmUnsupported(final JID currItem) {
+    /**
+     * Asks the user for confirmation to proceed.
+     * 
+     * @return <code>true</code> if the user confirms to proceed,
+     *         <code>false</code> otherwise.
+     * 
+     *         TODO: is this the right way?
+     * @nonReentrant In order to avoid a mass of question dialogs the same time.
+     */
+    public synchronized boolean confirmUnsupportedSaros(final JID peer) {
         try {
             return Util.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() {
                     return MessageDialog.openConfirm(getShell(),
                         "Invite user who does not support Saros?", "User "
-                            + currItem + " does not seem to use Saros "
+                            + peer + " does not seem to use Saros "
                             + "(but rather a normal Instant Messaging client),"
                             + " invite anyway?");
                 }
@@ -1058,39 +908,87 @@ public class InvitationDialog extends Dialog implements IInvitationUI {
         }
     }
 
-    public String getCompatibilityWarningMessage(JID rqPeerJID,
-        VersionManager.VersionInfo remoteVersionInfo) {
-
-        if (remoteVersionInfo == null)
-            return "Asking "
-                + rqPeerJID.getBase()
+    /**
+     * Asks the user for confirmation to proceed. This method should only be
+     * user if the versions are incompatible.
+     * 
+     * @param remoteVersionInfo
+     *            a {@link VersionInfo} object with the local
+     *            {@link VersionInfo#version} and the ultimate
+     *            {@link VersionInfo#compatibility}. You can get this
+     *            {@link VersionInfo} object by the method
+     *            {@link VersionManager#determineCompatibility(JID)}.
+     *            <code>null</code> is allowed.
+     * 
+     * @return <code>true</code> if the user confirms to proceed,
+     *         <code>false</code> otherwise.
+     * 
+     *         TODO: is this the right way?
+     * @nonReentrant In order to avoid a mass of question dialogs the same time.
+     */
+    public synchronized boolean confirmVersionConflict(
+        VersionInfo remoteVersionInfo, JID peer) {
+        final String title = "Saros Version Conflict with " + peer.getBase();
+        final String message;
+        if (remoteVersionInfo == null) {
+            message = "Asking "
+                + peer
                 + " for the Saros version in use failed.\n\n"
                 + "This probably means that the version used by your peer is\n"
                 + "older than version 9.8.21 and does not support version checking.\n"
                 + "It is best to ask your peer to update.\n\nDo you want to invite "
-                + rqPeerJID.getBase() + " anyway?";
-
-        switch (remoteVersionInfo.compatibility) {
-        case TOO_NEW:
-            return "Your peer's Saros version ("
-                + remoteVersionInfo.version
-                + ") is too old, please tell your peer to check for updates! Your Saros version is: "
-                + versionManager.getVersion()
-                + "\nProceeding with incompatible versions may cause malfunctions!\n\nDo you want to invite "
-                + rqPeerJID.getBase() + " anyway?";
-        case TOO_OLD:
-            return "Your Saros version ("
-                + versionManager.getVersion().toString()
-                + ") is too old, please check for updates! Your peer has a newer version: "
-                + remoteVersionInfo.version
-                + "\nProceeding with incompatible versions may cause malfunctions!\n\nDo you want to invite "
-                + rqPeerJID.getBase() + " anyway?";
-        default:
-            log.warn("Warning message requested when no warning is in place!",
-                new StackTrace());
-            // No warning to display
-            return null;
-
+                + peer.getBase() + " anyway?";
+        } else {
+            switch (remoteVersionInfo.compatibility) {
+            case TOO_OLD:
+                message = "Your Saros version is too old: "
+                    + versionManager.getVersion()
+                    + ".\nYour peer has a newer version: "
+                    + remoteVersionInfo.version
+                    + ".\nPlease check for updates!"
+                    + " Proceeding with incompatible versions"
+                    + " may cause malfunctions!\n\nDo you want to invite "
+                    + peer.getBase() + " anyway?";
+                break;
+            case TOO_NEW:
+                message = "Your Saros version is: "
+                    + versionManager.getVersion()
+                    + ".\nYour peer has an older version: "
+                    + remoteVersionInfo.version
+                    + ".\nPlease tell your peer to check for updates!"
+                    + " Proceeding with incompatible versions"
+                    + " may cause malfunctions!\n\nDo you want to invite "
+                    + peer.getBase() + " anyway?";
+                break;
+            default:
+                log.warn(
+                    "Warning message requested when no warning is in place!",
+                    new StackTrace());
+                // No warning to display
+                message = "An internal error occurred.\n\nDo you want to invite "
+                    + peer + " anyway?";
+                break;
+            }
         }
+
+        try {
+            return Util.runSWTSync(new Callable<Boolean>() {
+                public Boolean call() {
+                    return MessageDialog.openQuestion(getShell(), title,
+                        message);
+                }
+            });
+        } catch (Exception e) {
+            log.error(
+                "An error ocurred while trying to open the confirm dialog.", e);
+            return false;
+        }
+    }
+
+    /**
+     * @return RQ-JID if the peer has Saros, <code>null</code> otherwise.
+     */
+    public JID hasSaros(JID peer) {
+        return discoveryManager.getSupportingPresence(peer, Saros.NAMESPACE);
     }
 }
