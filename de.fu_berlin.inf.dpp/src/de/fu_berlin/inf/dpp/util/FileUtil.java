@@ -148,6 +148,8 @@ public class FileUtil {
 
         ZipInputStream zip = new ZipInputStream(input);
 
+        long startTime = System.currentTimeMillis();
+
         try {
             ZipEntry entry;
             while ((entry = zip.getNextEntry()) != null) {
@@ -169,6 +171,9 @@ public class FileUtil {
 
                 zip.closeEntry();
             }
+            log.debug(String.format("Unpacked archive in %d s", (System
+                .currentTimeMillis() - startTime) / 1000));
+
         } catch (IOException e) {
             log.error("Failed to unpack archive", e);
             return false;
