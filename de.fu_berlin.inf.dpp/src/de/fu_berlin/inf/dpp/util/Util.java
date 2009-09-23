@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,7 +76,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class Util {
 
-    private static final Logger log = Logger.getLogger(Util.class.getName());
+    private static final Logger log = Logger.getLogger(Util.class);
 
     protected static final Base64 base64Codec = new Base64();
     protected static final URLCodec urlCodec = new URLCodec();
@@ -998,5 +999,46 @@ public class Util {
             return (length / 1024) + "KiB";
         }
         return length / 1024 / 1024 + "MiB";
+    }
+
+    /**
+     * This method can be used for reading an InputStream completely into a byte
+     * array. But unlike IOUtils this method reports progress and is cancelable
+     * via the given monitor.
+     * 
+     * @param estimatedSize
+     *            Estimated size of data in bytes to be read from the input
+     *            stream used for initializing the progress monitor. Note: The
+     *            whole stream is read and not only the given number of bytes.
+     * 
+     * @cancelable This long-running operation can be canceled via the given
+     *             progress monitor and will throw an CancellationException in
+     *             this case.
+     */
+    public static byte[] toByteArray(InputStream in, long estimatedSize,
+        SubMonitor subMonitor) throws IOException {
+        
+        byte[] buf = new byte[CHUNKSIZE];
+        int count;
+        ByteArrayOutputStream bos = new ByteArrayOutputStream((int) Math.min(
+            estimatedSize, Integer.MAX_VALUE));
+
+        int steps = (int) Math
+            .min(Integer.MAX_VALUE, estimatedSize / CHUNKSIZE);
+        subMonitor.beginTask("Reading from Inputstream", Math.max(1, steps));
+        try {
+            while ((count = in.read(buf, 0, CHUNKSIZE)) > 0) {
+                
+                if (subMonitor.isCanceled())
+                    throw new CancellationException();
+                
+                bos.write(buf, 0, count);
+                subMonitor.worked(1);
+            }
+            return bos.toByteArray();
+        } finally {
+            IOUtils.closeQuietly(bos);
+            subMonitor.done();
+        }
     }
 }
