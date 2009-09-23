@@ -1,10 +1,14 @@
 package de.fu_berlin.inf.dpp.util;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CancellationException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.NullOutputStream;
@@ -22,6 +26,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -128,6 +133,50 @@ public class FileUtil {
             createFile(input, file, monitor);
         }
 
+    }
+
+    /**
+     * Unzip the data in the given InputStream as a Zip archive to the given
+     * IContainer
+     * 
+     * @cancelable This long-running operation can be canceled via the given
+     *             progress monitor and will throw an CancellationException in
+     *             this case.
+     */
+    public static boolean writeArchive(InputStream input, IContainer container,
+        SubMonitor monitor) throws CoreException {
+
+        ZipInputStream zip = new ZipInputStream(input);
+
+        try {
+            ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+
+                if (monitor.isCanceled())
+                    throw new CancellationException();
+
+                IPath path = Path.fromPortableString(entry.getName());
+                IFile file = container.getFile(path);
+
+                writeFile(new FilterInputStream(zip) {
+                    @Override
+                    public void close() throws IOException {
+                        // prevent the ZipInputStream from being closed
+                    }
+                }, file, monitor.newChild(1));
+
+                log.debug("File written to disk: " + path);
+
+                zip.closeEntry();
+            }
+        } catch (IOException e) {
+            log.error("Failed to unpack archive", e);
+            return false;
+        } finally {
+            IOUtils.closeQuietly(zip);
+            monitor.done();
+        }
+        return true;
     }
 
     /**
