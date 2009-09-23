@@ -34,8 +34,7 @@ import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacke
 @Component(module = "misc")
 public class VersionManager {
 
-    private static final Logger log = Logger.getLogger(VersionManager.class
-        .getName());
+    private static final Logger log = Logger.getLogger(VersionManager.class);
 
     /**
      * Data Object for sending version information
@@ -53,24 +52,49 @@ public class VersionManager {
      * remote one.
      */
     public enum Compatibility {
+
         /**
          * Versions are (probably) compatible
          */
-        OK,
+        OK {
+            @Override
+            public Compatibility invert() {
+                return OK;
+            }
+        },
         /**
          * The local version is (probably) too old to work with the remote
          * version.
          * 
          * The user should be told to upgrade
          */
-        TOO_OLD,
+        TOO_OLD {
+            @Override
+            public Compatibility invert() {
+                return TOO_NEW;
+            }
+        },
         /**
          * The local version is (probably) too new to work with the remote
          * version.
          * 
          * The user should be told to tell the peer to update.
          */
-        TOO_NEW;
+        TOO_NEW {
+            @Override
+            public Compatibility invert() {
+                return TOO_OLD;
+            }
+        };
+
+        /**
+         * 
+         * @return <code>TOO_OLD</code> if the initial compatibility was
+         *         <code>TOO_NEW</code>, <code>TOO_NEW</code> if the initial
+         *         compatibility was <code>TOO_OLD</code>, <code>OK</code>
+         *         otherwise
+         */
+        public abstract Compatibility invert();
 
         /**
          * Given a result from {@link Comparator#compare(Object, Object)} will
@@ -96,7 +120,7 @@ public class VersionManager {
      * {@link Compatibility#OK} if and only if the version information are
      * {@link Version#equals(Object)} to each other.
      */
-    public static final Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
+    public static Map<Version, List<Version>> compatibilityChart = new HashMap<Version, List<Version>>();
 
     /**
      * Initialize the compatibility map.
@@ -116,16 +140,14 @@ public class VersionManager {
          * Version 9.10.2.DEVEL
          */
         compatibilityChart.put(new Version("9.10.2.DEVEL"), Arrays.asList(
-            new Version("9.10.2.DEVEL"), 
-            new Version("9.9.11.r1706"),
+            new Version("9.10.2.DEVEL"), new Version("9.9.11.r1706"),
             new Version("9.9.11.DEVEL")));
 
         /**
          * Version 9.9.11.r1706
          */
         compatibilityChart.put(new Version("9.9.11.r1706"), Arrays.asList(
-            new Version("9.9.11.r1706"), 
-            new Version("9.9.11.DEVEL")));
+            new Version("9.9.11.r1706"), new Version("9.9.11.DEVEL")));
 
         /**
          * Version 9.9.11.DEVEL
@@ -179,8 +201,10 @@ public class VersionManager {
 
         receiver.addPacketListener(new PacketListener() {
             public void processPacket(Packet packet) {
+
                 @SuppressWarnings("unchecked")
                 XStreamIQPacket<VersionInfo> iq = (XStreamIQPacket<VersionInfo>) packet;
+                log.debug("Version request from " + iq.getFrom());
 
                 if (iq.getType() != IQ.Type.GET)
                     return;
@@ -197,6 +221,7 @@ public class VersionManager {
                 reply.setPacketID(iq.getPacketID());
                 reply.setTo(iq.getFrom());
                 saros.getConnection().sendPacket(reply);
+                log.debug("Sending version info to " + iq.getFrom());
             }
         }, versionProvider.getIQFilter());
     }
@@ -242,6 +267,10 @@ public class VersionManager {
         if (localVersion.compareTo(remoteVersion) < 0)
             return Compatibility.TOO_OLD;
 
+        // We are always compatible with ourselves
+        if (localVersion.compareTo(remoteVersion) == 0)
+            return Compatibility.OK;
+
         List<Version> compatibleVersions = compatibilityChart.get(localVersion);
         if (compatibleVersions == null) {
             log.error("VersionManager does not know about current version."
@@ -252,19 +281,23 @@ public class VersionManager {
         }
 
         if (compatibleVersions.contains(remoteVersion))
+            // The compatibilityChart tells us that we are compatible
             return Compatibility.OK;
         else
-            return Compatibility.TOO_OLD;
+            return Compatibility.TOO_NEW;
     }
 
+    
     /**
      * If the remote version is newer than the local one, the remote
      * compatibility comparison result will be returned.
      * 
      * @return A {@link VersionInfo} object with the remote
-     *         {@link VersionInfo#version} and {@link VersionInfo#compatibility}
-     *         info or <code>null</code> if could not get version information
-     *         from the peer (this probably means the other person is TOO_OLD)
+     *         {@link VersionInfo#version} and the ultimate
+     *         {@link VersionInfo#compatibility} (based on both the local and
+     *         the remote compatibility information) or <code>null</code> if
+     *         could not get version information from the peer (this probably
+     *         means the other person is TOO_OLD)
      * 
      *         The return value describes whether the local version is
      *         compatible with the peer's one (e.g.
@@ -275,9 +308,10 @@ public class VersionManager {
      *           responding.
      */
     public VersionInfo determineCompatibility(JID peer) {
+        return determineCompatibility(queryVersion(peer));
+    }
 
-        VersionInfo remoteVersionInfo = queryVersion(peer);
-
+    public VersionInfo determineCompatibility(VersionInfo remoteVersionInfo) {
         /*
          * FIXME Our caller should be able to distinguish whether the query
          * failed or it is an IM client which sends back the message
