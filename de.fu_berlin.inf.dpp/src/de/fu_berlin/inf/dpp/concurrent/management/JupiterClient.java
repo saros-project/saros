@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -49,6 +50,12 @@ public class JupiterClient {
             jupiterActivity);
     }
 
+    public synchronized boolean isCurrent(ChecksumActivity checksumActivity)
+        throws TransformationException {
+        return get(checksumActivity.path).isCurrent(
+            checksumActivity.getTimestamp());
+    }
+
     public synchronized void reset(IPath path) {
         this.clientDocs.remove(path);
     }
@@ -63,4 +70,15 @@ public class JupiterClient {
             textEdit.toOperation(), sharedProject.getLocalUser().getJID(),
             textEdit.getEditor());
     }
+
+    /**
+     * Given a checksum, this method will return a new checksum activity with
+     * the timestamp set to the VectorTime of the Jupiter algorithm used for
+     * managing the document addressed by the checksum.
+     */
+    public synchronized ChecksumActivity withTimestamp(
+        ChecksumActivity checksumActivity) {
+        return get(checksumActivity.path).withTimestamp(checksumActivity);
+    }
+
 }

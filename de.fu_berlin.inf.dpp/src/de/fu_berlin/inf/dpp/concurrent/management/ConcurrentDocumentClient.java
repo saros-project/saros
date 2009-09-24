@@ -9,6 +9,7 @@ import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
@@ -111,6 +112,22 @@ public class ConcurrentDocumentClient implements Disposable {
                 result.add(new QueueItem(sharedProject.getRemoteObservers(),
                     activity));
             }
+        } else if (activity instanceof ChecksumActivity) {
+            ChecksumActivity checksumActivity = (ChecksumActivity) activity;
+
+            /**
+             * Only the host can generate Checksums
+             */
+            assert sharedProject.isHost();
+
+            // Send Jupiter specific checksum to ConcurrentDocumentServer
+            result.add(new QueueItem(host, jupiterClient
+                .withTimestamp(checksumActivity)));
+
+            // Send general checksum to all observers
+            result.add(new QueueItem(sharedProject.getRemoteObservers(),
+                checksumActivity));
+
         } else {
             result.add(new QueueItem(sharedProject.getRemoteUsers(), activity));
         }
@@ -143,6 +160,9 @@ public class ConcurrentDocumentClient implements Disposable {
 
                 if (activity instanceof JupiterActivity) {
                     result.addAll(receiveActivity((JupiterActivity) activity));
+                } else if (activity instanceof ChecksumActivity
+                    && sharedProject.isDriver()) {
+                    result.addAll(receiveChecksum((ChecksumActivity) activity));
                 } else {
                     result.executeLocally.add(activity);
                 }
@@ -150,6 +170,26 @@ public class ConcurrentDocumentClient implements Disposable {
                 log.error("Error while receiving activity: " + activity, e);
             }
         }
+        return result;
+    }
+
+    /**
+     * Will receive an incoming ChecksumActivity and discard it if it is not
+     * valid within the current local Jupiter timestamp
+     */
+    protected TransformationResult receiveChecksum(ChecksumActivity activity) {
+
+        TransformationResult result = new TransformationResult(sharedProject
+            .getLocalUser());
+
+        try {
+            if (jupiterClient.isCurrent(activity))
+                result.executeLocally.add(activity);
+        } catch (TransformationException e) {
+            // TODO this should trigger a consistency check
+            log.error("Error during transformation of: " + activity, e);
+        }
+
         return result;
     }
 
@@ -214,5 +254,15 @@ public class ConcurrentDocumentClient implements Disposable {
     public synchronized void reset(IPath path) {
         log.debug("Resetting jupiter client: " + path.toOSString());
         jupiterClient.reset(path);
+    }
+
+    public boolean isCurrent(ChecksumActivity checksumActivity) {
+        try {
+            return jupiterClient.isCurrent(checksumActivity);
+        } catch (TransformationException e) {
+            log.error("Error during transformation of: " + checksumActivity, e);
+            // TODO this should trigger a consistency recovery. Difficult :-(
+            return false;
+        }
     }
 }

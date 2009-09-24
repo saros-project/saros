@@ -92,7 +92,6 @@ import de.fu_berlin.inf.dpp.net.XMPPUtil;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.ActivitiesHandler;
 import de.fu_berlin.inf.dpp.net.business.CancelInviteHandler;
-import de.fu_berlin.inf.dpp.net.business.ChecksumHandler;
 import de.fu_berlin.inf.dpp.net.business.ConsistencyWatchdogHandler;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.business.InvitationHandler;
@@ -320,7 +319,6 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(LeaveHandler.class);
         this.container.addComponent(RequestForActivityHandler.class);
         this.container.addComponent(ConsistencyWatchdogHandler.class);
-        this.container.addComponent(ChecksumHandler.class);
         this.container.addComponent(ActivitiesHandler.class);
 
         // Extensions

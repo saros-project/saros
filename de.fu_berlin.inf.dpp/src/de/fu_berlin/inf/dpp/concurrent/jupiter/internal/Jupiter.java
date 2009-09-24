@@ -30,6 +30,7 @@ import javax.swing.undo.CannotUndoException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
@@ -106,6 +107,46 @@ public class Jupiter implements Algorithm {
         this.vectorTime = this.vectorTime.incrementLocalOperationCount();
 
         return jupiterActivity;
+    }
+
+    /**
+     * Returns whether the local user represented by this Jupiter instance has
+     * not modified the document locally.
+     * 
+     * This is done by comparing the remote component of the given timestamp to
+     * the local operation count.
+     * 
+     * @throws TransformationException
+     *             If the given timestamp has a remote operation count which is
+     *             larger than our local time (which indicates that the remote
+     *             timestamp refers to an event which did not yet occur)
+     */
+    public boolean isCurrent(Timestamp timestamp)
+        throws TransformationException {
+
+        if (timestamp == null) {
+            /*
+             * If this timestamp is null, this means it was sent to us while we
+             * were still an observer
+             */
+            return this.vectorTime.getLocalOperationCount() == 0;
+        }
+
+        if (!(timestamp instanceof JupiterVectorTime)) {
+            throw new IllegalArgumentException(
+                "Jupiter expects timestamps of type JupiterVectorTime but is "
+                    + timestamp.getClass());
+        }
+        JupiterVectorTime remoteVectorTime = (JupiterVectorTime) timestamp;
+
+        if (remoteVectorTime.getRemoteOperationCount() > this.vectorTime
+            .getLocalOperationCount()) {
+            throw new TransformationException(
+                "precondition #2 violated (Remote vector time is greater than local vector time).");
+        }
+
+        return remoteVectorTime.getRemoteOperationCount() == this.vectorTime
+            .getLocalOperationCount();
     }
 
     /**
@@ -354,4 +395,7 @@ public class Jupiter implements Algorithm {
 
     }
 
+    public ChecksumActivity withTimestamp(ChecksumActivity checksumActivity) {
+        return checksumActivity.withTimestamp(this.vectorTime);
+    }
 }

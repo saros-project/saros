@@ -32,5 +32,7 @@ public interface IActivityReceiver {
 
     void receive(StopActivity stopActivity);
 
+    void receive(ChecksumActivity checksumActivity);
+
     void receive(PingPongActivity pingPongActivity);
 }

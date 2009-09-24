@@ -1,9 +1,7 @@
 package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -21,16 +19,16 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
+import de.fu_berlin.inf.dpp.util.Util;
 
 /**
  * This class is an eclipse job run on the host side ONLY.
@@ -150,80 +148,13 @@ public class ConsistencyWatchdogServer extends Job {
             if (monitor.isCanceled())
                 return Status.CANCEL_STATUS;
 
-            IFile file = project.getFile(docPath);
-
-            IDocument doc;
-            IDocumentProvider provider = null;
-            FileEditorInput input = null;
-            if (!file.exists()) {
-                doc = null;
-            } else {
-                input = new FileEditorInput(file);
-                provider = EditorManager.getDocumentProvider(input);
-                try {
-                    provider.connect(input);
-                    doc = provider.getDocument(input);
-                } catch (CoreException e) {
-                    log.warn("Could not check checksum of file "
-                        + docPath.toOSString());
-                    provider = null;
-                    doc = null;
-                }
-            }
-
-            try {
-                // Null means that the document does not exist locally
-                if (doc == null) {
-                    if (localEditors.contains(docPath)) {
-                        log.error("EditorManager is in an inconsistent state. "
-                            + "It is reporting a locally open editor but no"
-                            + " document could be found on disk: " + docPath);
-                    }
-                    if (!remoteEditors.contains(docPath)) {
-                        /*
-                         * Since remote users do not report this document as
-                         * open, they are right (and our EditorPool might be
-                         * confused)
-                         */
-                        continue;
-                    }
-                }
-
-                // Update listener management
-                missingDocuments.remove(docPath);
-
-                DocumentChecksum checksum = docsChecksums.get(docPath);
-                if (checksum == null) {
-                    checksum = new DocumentChecksum(docPath);
-                    docsChecksums.put(docPath, checksum);
-                }
-
-                /*
-                 * Potentially bind to null doc, which will set the Checksum to
-                 * represent a missing file (existsFile() == false)
-                 */
-                checksum.bind(doc);
-                checksum.update();
-            } finally {
-                if (provider != null) {
-                    provider.disconnect(input);
-                }
-            }
+            updateChecksum(missingDocuments, localEditors, remoteEditors,
+                project, docPath);
         }
 
         // Unregister all documents that are no longer there
         for (IPath missing : missingDocuments) {
             docsChecksums.remove(missing).dispose();
-        }
-
-        // Send to all Clients
-        // TODO Since this is done asynchronously a race condition might occur
-        if (saros.isConnected()) {
-            // We will send a message, even if no file is open, because
-            // otherwise clients do not know that the consistency has been
-            // resolved.
-            transmitter.sendDocChecksumsToClients(getOthers(), docsChecksums
-                .values());
         }
 
         if (monitor.isCanceled())
@@ -234,13 +165,85 @@ public class ConsistencyWatchdogServer extends Job {
         return Status.OK_STATUS;
     }
 
-    public List<JID> getOthers() {
-        ArrayList<JID> result = new ArrayList<JID>();
-        for (User user : sharedProject.getParticipants()) {
-            if (user.isRemote()) {
-                result.add(user.getJID());
+    protected void updateChecksum(final Set<IPath> missingDocuments,
+        final Set<IPath> localEditors, final Set<IPath> remoteEditors,
+        final IProject project, final IPath docPath) {
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+
+                IFile file = project.getFile(docPath);
+
+                IDocument doc;
+                IDocumentProvider provider = null;
+                FileEditorInput input = null;
+                if (!file.exists()) {
+                    doc = null;
+                } else {
+                    input = new FileEditorInput(file);
+                    provider = EditorManager.getDocumentProvider(input);
+                    try {
+                        provider.connect(input);
+                        doc = provider.getDocument(input);
+                    } catch (CoreException e) {
+                        log.warn("Could not check checksum of file "
+                            + docPath.toOSString());
+                        provider = null;
+                        doc = null;
+                    }
+                }
+
+                try {
+                    // Null means that the document does not exist locally
+                    if (doc == null) {
+                        if (localEditors.contains(docPath)) {
+                            log
+                                .error("EditorManager is in an inconsistent state. "
+                                    + "It is reporting a locally open editor but no"
+                                    + " document could be found on disk: "
+                                    + docPath);
+                        }
+                        if (!remoteEditors.contains(docPath)) {
+                            /*
+                             * Since remote users do not report this document as
+                             * open, they are right (and our EditorPool might be
+                             * confused)
+                             */
+                            return;
+                        }
+                    }
+
+                    // Update listener management
+                    missingDocuments.remove(docPath);
+
+                    DocumentChecksum checksum = docsChecksums.get(docPath);
+                    if (checksum == null) {
+                        checksum = new DocumentChecksum(docPath);
+                        docsChecksums.put(docPath, checksum);
+                    }
+
+                    /*
+                     * Potentially bind to null doc, which will set the Checksum
+                     * to represent a missing file (existsFile() == false)
+                     */
+                    checksum.bind(doc);
+                    checksum.update();
+
+                    // Sent this activity to the server
+                    ChecksumActivity checksumActivity = new ChecksumActivity(
+                        sharedProject.getLocalUser().getJID(), checksum
+                            .getPath(), checksum.getHash(), checksum
+                            .getLength());
+
+                    sharedProject.activityCreated(checksumActivity);
+
+                } finally {
+                    if (provider != null) {
+                        provider.disconnect(input);
+                    }
+                }
+
             }
-        }
-        return result;
+        });
     }
 }

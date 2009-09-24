@@ -448,6 +448,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
         if (fileReplacementInProgressObservable.isReplacementInProgress())
             return;
 
+        /*
+         * If the StopManager has paused the project do not react to resource
+         * changes
+         */
         if (pause) {
             /*
              * TODO This warning is misleading! The consistency recovery process
@@ -588,7 +592,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             // The file contents has been replaced, now reset Jupiter
             this.sharedProject.getConcurrentDocumentClient().reset(path);
 
-            consistencyWatchdogClient.queueConsistencyCheck();
+            this.consistencyWatchdogClient.performCheck(path);
         }
     }
 

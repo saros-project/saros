@@ -46,10 +46,8 @@ public class PingPongActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return (getSource().equals(getInitiator().toString()) ? "Ping" : "Pong")
-            + "Activity(initiator="
-            + getInitiator()
-            + ",departed="
+        return (getSource().equals(getInitiator()) ? "Ping" : "Pong")
+            + "Activity(initiator=" + getInitiator() + ",departed="
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 

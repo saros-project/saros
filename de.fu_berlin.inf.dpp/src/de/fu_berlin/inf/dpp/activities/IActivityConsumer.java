@@ -31,5 +31,7 @@ public interface IActivityConsumer {
 
     boolean consume(StopActivity stopActivity);
 
+    boolean consume(ChecksumActivity checksumActivity);
+
     boolean consume(PingPongActivity pingPongActivity);
 }

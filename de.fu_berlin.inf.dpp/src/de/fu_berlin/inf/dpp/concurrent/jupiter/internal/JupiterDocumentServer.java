@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -103,5 +104,40 @@ public class JupiterDocumentServer {
     public synchronized void reset(JID jid) {
         if (removeProxyClient(jid))
             addProxyClient(jid);
+    }
+
+    public Map<JID, ChecksumActivity> withTimestamp(
+        ChecksumActivity checksumActivity) throws TransformationException {
+
+        Map<JID, ChecksumActivity> result = new HashMap<JID, ChecksumActivity>();
+
+        JID source = checksumActivity.getSource();
+
+        // 1. Verify that this checksum can still be sent to others...
+        Jupiter sourceProxy = proxies.get(source);
+
+        boolean isCurrent = sourceProxy.isCurrent(checksumActivity
+            .getTimestamp());
+
+        if (!isCurrent)
+            return result; // Checksum is no longer valid => discard
+
+        // 2. Put timestamp into all resulting checksums
+        for (Map.Entry<JID, Jupiter> entry : proxies.entrySet()) {
+
+            JID jid = entry.getKey();
+
+            // Skip sender
+            if (jid.equals(source))
+                continue;
+
+            Jupiter remoteProxy = entry.getValue();
+
+            ChecksumActivity timestamped = checksumActivity
+                .withTimestamp(remoteProxy.getTimestamp());
+            result.put(jid, timestamped);
+        }
+
+        return result;
     }
 }

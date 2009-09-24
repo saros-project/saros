@@ -11,6 +11,7 @@ import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.IActivity;
 import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
@@ -129,6 +130,8 @@ public class ConcurrentDocumentServer implements Disposable {
 
                 if (activity instanceof JupiterActivity) {
                     result.addAll(receive((JupiterActivity) activity));
+                } else if (activity instanceof ChecksumActivity) {
+                    result.addAll(withTimestamp((ChecksumActivity) activity));
                 } else {
                     result.executeLocally.add(activity);
                 }
@@ -190,5 +193,40 @@ public class ConcurrentDocumentServer implements Disposable {
         log.debug("Resetting jupiter server for " + Util.prefix(jid) + ": "
             + path.toOSString());
         this.server.reset(path, jid);
+    }
+
+    /**
+     * Does the actual work of transforming a JupiterActivity.
+     */
+    protected List<QueueItem> withTimestamp(ChecksumActivity checksumActivity) {
+
+        List<QueueItem> result = new ArrayList<QueueItem>();
+
+        // Timestamp checksumActivity with jupiter document server
+        Map<JID, ChecksumActivity> outgoing;
+        try {
+            outgoing = server.withTimestamp(checksumActivity);
+        } catch (TransformationException e) {
+            log.error("Error during transformation of: " + checksumActivity, e);
+            // TODO this should trigger a consistency check
+            return result;
+        }
+
+        for (Entry<JID, ChecksumActivity> entry : outgoing.entrySet()) {
+
+            JID jid = entry.getKey();
+            User to = sharedProject.getUser(jid);
+
+            if (to == null) {
+                log.error("Unknown user in transformation result: "
+                    + Util.prefix(jid));
+                continue;
+            }
+
+            ChecksumActivity transformed = entry.getValue();
+
+            result.add(new QueueItem(to, transformed));
+        }
+        return result;
     }
 }

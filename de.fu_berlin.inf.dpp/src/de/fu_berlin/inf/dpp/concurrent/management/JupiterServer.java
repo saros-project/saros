@@ -6,6 +6,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
@@ -86,6 +87,14 @@ public class JupiterServer {
             .getEditorPath());
 
         return docServer.transformJupiterActivity(jupiterActivity);
+    }
+
+    public synchronized Map<JID, ChecksumActivity> withTimestamp(
+        ChecksumActivity checksumActivity) throws TransformationException {
+
+        JupiterDocumentServer docServer = getServer(checksumActivity.getPath());
+
+        return docServer.withTimestamp(checksumActivity);
     }
 
 }

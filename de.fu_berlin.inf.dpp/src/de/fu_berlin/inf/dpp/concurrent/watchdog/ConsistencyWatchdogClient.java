@@ -2,13 +2,11 @@ package de.fu_berlin.inf.dpp.concurrent.watchdog;
 
 import java.io.FileNotFoundException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
@@ -23,19 +21,28 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
+import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
+import de.fu_berlin.inf.dpp.project.AbstractActivityProvider;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
+import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SessionView;
 import de.fu_berlin.inf.dpp.ui.actions.ConsistencyAction;
-import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
-import de.fu_berlin.inf.dpp.util.Util;
+import de.fu_berlin.inf.dpp.util.StackTrace;
 
 /**
  * This class is responsible to process checksums sent to us from the server by
@@ -47,12 +54,10 @@ import de.fu_berlin.inf.dpp.util.Util;
  * 
  */
 @Component(module = "consistency")
-public class ConsistencyWatchdogClient {
+public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     private static Logger log = Logger
         .getLogger(ConsistencyWatchdogClient.class);
-
-    protected Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
     protected ISharedProject sharedProject;
 
@@ -75,202 +80,6 @@ public class ConsistencyWatchdogClient {
     @Inject
     protected DataTransferManager dataTransferManager;
 
-    protected ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 1, 0,
-        TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2),
-        new NamedThreadFactory("ChecksumCruncher-"));
-
-    public ConsistencyWatchdogClient(SessionManager sessionManager,
-        IsInconsistentObservable inconsistentObservable) {
-        this.sessionManager = sessionManager;
-        this.inconsistencyToResolve = inconsistentObservable;
-        sessionManager.addSessionListener(new AbstractSessionListener() {
-            @Override
-            public void sessionStarted(ISharedProject session) {
-                setSharedProject(session);
-            }
-
-            @Override
-            public void sessionEnded(ISharedProject session) {
-                setSharedProject(null);
-            }
-        });
-
-        setSharedProject(sessionManager.getSharedProject());
-    }
-
-    /**
-     * Method for queuing another consistency check, which does not print a
-     * warning if there are already checks queued.
-     */
-    public void queueConsistencyCheck() {
-        // If there is already a consistency recovery waiting to be executed,
-        // we do not need to append another one
-        if (executor.getQueue().size() > 1)
-            return;
-
-        checkConsistency();
-    }
-
-    /**
-     * Starts a new Consistency Check.
-     * 
-     * If a check is already in progress, nothing happens (but a warning)
-     * 
-     * @nonBlocking This method returns immediately.
-     * 
-     * @client Can only be called on the client!
-     */
-    public void checkConsistency() {
-
-        if (sharedProject.isHost())
-            throw new IllegalStateException("Can only be called on the client");
-
-        try {
-            executor.submit(Util.wrapSafe(log, new Runnable() {
-                public void run() {
-                    performCheck(currentChecksums);
-                }
-            }));
-        } catch (RejectedExecutionException e) {
-            /*
-             * Ignore Checksums that arrive before we are done processing the
-             * last set of Checksums.
-             */
-            log.warn("Received Checksums before processing"
-                + " of previous checksums finished");
-        }
-
-    }
-
-    protected List<DocumentChecksum> currentChecksums;
-
-    public void setChecksums(List<DocumentChecksum> checksums) {
-        this.currentChecksums = checksums;
-    }
-
-    /**
-     * Checks the local documents against the given checksums.
-     * 
-     * Use the VariableProxy getConsistenciesToResolve() to be notified if
-     * inconsistencies are found or resolved.
-     * 
-     * @param checksums
-     *            the checksums to check the documents against
-     * 
-     * @nonReentrant This method cannot be called twice at the same time.
-     * 
-     *               FIXME This needs to be properly synchronized with
-     *               {@link #setSharedProject(ISharedProject)}
-     */
-    public void performCheck(List<DocumentChecksum> checksums) {
-
-        if (sharedProject == null)
-            return;
-
-        if (checksums == null) {
-            log.warn("Consistency Check triggered with out"
-                + " preceeding call to setChecksums()");
-            return;
-        }
-
-        log.trace(String.format(
-            "Received %d checksums for %d existing inconsistencies", checksums
-                .size(), pathsWithWrongChecksums.size()));
-
-        Set<IPath> newInconsistencies = new CopyOnWriteArraySet<IPath>();
-
-        for (DocumentChecksum checksum : checksums) {
-            if (isInconsistent(checksum)) {
-                newInconsistencies.add(checksum.getPath());
-            }
-        }
-
-        pathsWithWrongChecksums = newInconsistencies;
-        if (pathsWithWrongChecksums.isEmpty()) {
-            if (inconsistencyToResolve.getValue()) {
-                log.info("All Inconsistencies are resolved");
-                inconsistencyToResolve.setValue(false);
-            }
-        } else {
-            if (!inconsistencyToResolve.getValue()) {
-                log.info("Inconsistencies have been detected");
-                inconsistencyToResolve.setValue(true);
-            }
-        }
-
-    }
-
-    private boolean isInconsistent(DocumentChecksum checksum) {
-        IPath path = checksum.getPath();
-
-        ISharedProject sharedProject = sessionManager.getSharedProject();
-        IFile file = sharedProject.getProject().getFile(path);
-
-        if (!checksum.existsFile()) {
-            /*
-             * If the checksum tells us that the file does not exist at the
-             * host, check whether we still have it. If it exists, we do have an
-             * inconsistency
-             */
-            return file.exists();
-        }
-
-        /*
-         * If the checksum tells us, that the file exists, but we do not have
-         * it, it is an inconsistency as well
-         */
-        if (!file.exists()) {
-            return true;
-        }
-
-        FileEditorInput input = new FileEditorInput(file);
-        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
-
-        try {
-            provider.connect(input);
-        } catch (CoreException e) {
-            log.warn("Could not check checksum of file " + path.toOSString());
-            return false;
-        }
-
-        try {
-            IDocument doc = provider.getDocument(input);
-
-            // if doc is still null give up
-            if (doc == null) {
-                log.warn("Could not check checksum of file "
-                    + path.toOSString());
-                return false;
-            }
-
-            if ((doc.getLength() != checksum.getLength())
-                || (doc.get().hashCode() != checksum.getHash())) {
-
-                long lastEdited = editorManager.getLastEditTime(path);
-
-                long lastRemoteEdited = editorManager
-                    .getLastRemoteEditTime(path);
-
-                if ((System.currentTimeMillis() - lastEdited) > 4000
-                    && (System.currentTimeMillis() - lastRemoteEdited > 4000)) {
-
-                    log.debug(String.format(
-                        "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)",
-                        path.toString(), doc.getLength(),
-                        doc.getLength() == checksum.getLength() ? "==" : "!=",
-                        checksum.getLength(), doc.get().hashCode(), doc.get()
-                            .hashCode() == checksum.getHash() ? "==" : "!=",
-                        checksum.getHash()));
-
-                    return true;
-                }
-            }
-        } finally {
-            provider.disconnect(input);
-        }
-        return false;
-    }
-
     /**
      * Returns the variable proxy which stores the current inconsistency state
      * 
@@ -279,18 +88,110 @@ public class ConsistencyWatchdogClient {
         return this.inconsistencyToResolve;
     }
 
+    protected HashMap<IPath, ChecksumActivity> stats = new HashMap<IPath, ChecksumActivity>();
+
+    protected Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
+
+    protected ISessionListener sessionListener = new AbstractSessionListener() {
+        private ISharedProjectListener sharedProjectListner = new AbstractSharedProjectListener() {
+
+            @Override
+            public void roleChanged(User user) {
+
+                if (user.isRemote())
+                    return;
+
+                // Clear our checksums
+                latestChecksums.clear();
+            }
+        };
+
+        @Override
+        public void sessionEnded(ISharedProject newSharedProject) {
+
+            newSharedProject
+                .removeActivityProvider(ConsistencyWatchdogClient.this);
+            newSharedProject.removeListener(sharedProjectListner);
+
+            sharedProject = null;
+        }
+
+        @Override
+        public void sessionStarted(ISharedProject newSharedProject) {
+            sharedProject = newSharedProject;
+
+            stats.clear();
+
+            pathsWithWrongChecksums.clear();
+            inconsistencyToResolve.setValue(false);
+
+            newSharedProject
+                .addActivityProvider(ConsistencyWatchdogClient.this);
+            newSharedProject.addListener(sharedProjectListner);
+        }
+    };
+
+    public ConsistencyWatchdogClient(SessionManager sessionManager,
+        IsInconsistentObservable inconsistentObservable) {
+        this.sessionManager = sessionManager;
+        this.inconsistencyToResolve = inconsistentObservable;
+
+        this.sessionManager.addSessionListener(sessionListener);
+    }
+
+    public void dispose() {
+        this.sessionManager.removeSessionListener(sessionListener);
+    }
+
+    public Map<IPath, ChecksumActivity> latestChecksums = new HashMap<IPath, ChecksumActivity>();
+
+    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+        @Override
+        public void receive(ChecksumActivity checksumActivity) {
+
+            latestChecksums.put(checksumActivity.getPath(), checksumActivity);
+
+            performCheck(checksumActivity);
+        }
+
+        @Override
+        public void receive(TextEditActivity text) {
+            latestChecksums.remove(text.getEditor());
+        }
+
+        @Override
+        public void receive(FileActivity fileActivity) {
+
+            // Recoveries do not invalidate checksums :-)
+            if (fileActivity.isRecovery())
+                return;
+
+            /*
+             * (we do not need to handle FolderActivities because all files are
+             * created/deleted via FileActivity)
+             */
+
+            switch (fileActivity.getType()) {
+            case Created:
+            case Removed:
+                latestChecksums.remove(fileActivity.getPath());
+                break;
+            case Moved:
+                latestChecksums.remove(fileActivity.getPath());
+                latestChecksums.remove(fileActivity.getOldPath());
+                break;
+            default:
+                log.error("Unhandled FileActivity.Type: " + fileActivity);
+            }
+        }
+    };
+
     /**
      * Returns the set of files for which the ConsistencyWatchdog has identified
      * an inconsistency
      */
     public Set<IPath> getPathsWithWrongChecksums() {
         return this.pathsWithWrongChecksums;
-    }
-
-    protected void setSharedProject(ISharedProject newSharedProject) {
-        sharedProject = newSharedProject;
-        this.pathsWithWrongChecksums.clear();
-        this.inconsistencyToResolve.setValue(false);
     }
 
     /**
@@ -378,6 +279,126 @@ public class ConsistencyWatchdogClient {
             }
         } finally {
             lock.unlock();
+        }
+    }
+
+    @Override
+    public void exec(IActivity activity) {
+        activity.dispatch(activityReceiver);
+    }
+
+    private boolean isInconsistent(ChecksumActivity checksum) {
+        IPath path = checksum.getPath();
+
+        ISharedProject sharedProject = sessionManager.getSharedProject();
+        IFile file = sharedProject.getProject().getFile(path);
+
+        if (!checksum.existsFile()) {
+            /*
+             * If the checksum tells us that the file does not exist at the
+             * host, check whether we still have it. If it exists, we do have an
+             * inconsistency
+             */
+            return file.exists();
+        }
+
+        /*
+         * If the checksum tells us, that the file exists, but we do not have
+         * it, it is an inconsistency as well
+         */
+        if (!file.exists()) {
+            return true;
+        }
+
+        FileEditorInput input = new FileEditorInput(file);
+        IDocumentProvider provider = EditorManager.getDocumentProvider(input);
+
+        try {
+            provider.connect(input);
+        } catch (CoreException e) {
+            log.warn("Could not check checksum of file " + path.toOSString());
+            return false;
+        }
+
+        try {
+            IDocument doc = provider.getDocument(input);
+
+            // if doc is still null give up
+            if (doc == null) {
+                log.warn("Could not check checksum of file "
+                    + path.toOSString());
+                return false;
+            }
+
+            if ((doc.getLength() != checksum.getLength())
+                || (doc.get().hashCode() != checksum.getHash())) {
+
+                log.debug(String.format(
+                    "Inconsistency detected: %s L(%d %s %d) H(%x %s %x)", path
+                        .toString(), doc.getLength(),
+                    doc.getLength() == checksum.getLength() ? "==" : "!=",
+                    checksum.getLength(), doc.get().hashCode(), doc.get()
+                        .hashCode() == checksum.getHash() ? "==" : "!=",
+                    checksum.getHash()));
+
+                return true;
+            }
+        } finally {
+            provider.disconnect(input);
+        }
+        return false;
+    }
+
+    /**
+     * Will run a consistency check.
+     * 
+     * @return whether a consistency check could be performed or not (for
+     *         instance because no current checksum is available)
+     * 
+     * @swt This must be called from SWT
+     * 
+     * @client This can only be called on the client
+     */
+    public boolean performCheck(IPath path) {
+
+        if (sharedProject == null) {
+            log.warn("Session already ended. Cannot perform consistency check",
+                new StackTrace());
+            return false;
+        }
+
+        ChecksumActivity checksumActivity = latestChecksums.get(path);
+        if (checksumActivity != null) {
+            performCheck(checksumActivity);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected synchronized void performCheck(ChecksumActivity checksumActivity) {
+
+        if (sharedProject.isDriver()
+            && !sharedProject.getConcurrentDocumentClient().isCurrent(
+                checksumActivity))
+            return;
+
+        if (isInconsistent(checksumActivity)) {
+            pathsWithWrongChecksums.add(checksumActivity.path);
+        } else {
+            pathsWithWrongChecksums.remove(checksumActivity.path);
+        }
+
+        if (pathsWithWrongChecksums.isEmpty()) {
+            if (inconsistencyToResolve.getValue()) {
+                log.info("All Inconsistencies are resolved");
+                inconsistencyToResolve.setValue(false);
+            }
+        } else {
+            if (!inconsistencyToResolve.getValue()) {
+                log.info("Inconsistencies have been detected");
+                inconsistencyToResolve.setValue(true);
+            }
         }
     }
 }

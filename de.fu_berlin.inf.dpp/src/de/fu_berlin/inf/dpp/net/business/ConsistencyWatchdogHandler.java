@@ -11,12 +11,16 @@ import java.util.concurrent.CancellationException;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.jivesoftware.smack.filter.AndFilter;
 import org.jivesoftware.smack.filter.MessageTypeFilter;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -24,9 +28,11 @@ import org.jivesoftware.smack.packet.Message;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity;
 import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
+import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
@@ -296,8 +302,8 @@ public class ConsistencyWatchdogHandler {
         progress.done();
     }
 
-    protected void recoverFile(JID from, ISharedProject project, JID myJID,
-        final IPath path, SubMonitor progress) {
+    protected void recoverFile(JID from, final ISharedProject project,
+        final JID myJID, final IPath path, SubMonitor progress) {
 
         User fromUser = project.getUser(from);
 
@@ -326,6 +332,34 @@ public class ConsistencyWatchdogHandler {
                 // Send the file to client
                 project.sendActivity(fromUser, FileActivity.created(project
                     .getProject(), myJID, path, Purpose.RECOVERY));
+
+                // Immediately follow up with a new checksum
+                IDocument doc;
+                FileEditorInput input = new FileEditorInput(file);
+                IDocumentProvider provider = EditorManager
+                    .getDocumentProvider(input);
+                try {
+                    provider.connect(input);
+                    doc = provider.getDocument(input);
+
+                    final DocumentChecksum checksum = new DocumentChecksum(path);
+                    checksum.bind(doc);
+                    checksum.update();
+                    Util.runSafeSWTSync(log, new Runnable() {
+                        public void run() {
+                            project
+                                .activityCreated(new ChecksumActivity(myJID,
+                                    path, checksum.getHash(), checksum
+                                        .getLength()));
+                        }
+                    });
+                } catch (CoreException e) {
+                    log.warn("Could not check checksum of file "
+                        + path.toOSString());
+                } finally {
+                    provider.disconnect(input);
+                }
+
             } catch (IOException e) {
                 log.error("File could not be read, despite existing: " + path,
                     e);
@@ -335,6 +369,13 @@ public class ConsistencyWatchdogHandler {
             // Tell the client to delete the file
             project.sendActivity(fromUser, FileActivity.removed(myJID, path,
                 Purpose.RECOVERY));
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    project.activityCreated(ChecksumActivity.missing(myJID,
+                        path));
+                }
+            });
+
             progress.worked(8);
         }
         progress.done();
