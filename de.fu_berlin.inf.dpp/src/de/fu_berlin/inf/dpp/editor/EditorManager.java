@@ -50,6 +50,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.DocumentProviderRegistry;
 import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
@@ -1167,10 +1168,20 @@ public class EditorManager implements IActivityProvider, Disposable {
             lastRemoteEditTimes.put(file.getProjectRelativePath(), System
                 .currentTimeMillis());
 
+            for (IEditorPart editorPart : editorPool.getEditors(file
+                .getProjectRelativePath())) {
+
+                if (editorPart instanceof ITextEditor) {
+                    ITextEditor textEditor = (ITextEditor) editorPart;
+                    IAnnotationModel model = textEditor.getDocumentProvider()
+                        .getAnnotationModel(textEditor.getEditorInput());
+                    contributionAnnotationManager.insertAnnotation(model,
+                        offset, text.length(), source);
+                }
+            }
             IAnnotationModel model = provider.getAnnotationModel(input);
             contributionAnnotationManager.insertAnnotation(model, offset, text
                 .length(), source);
-
         } finally {
             provider.disconnect(input);
         }

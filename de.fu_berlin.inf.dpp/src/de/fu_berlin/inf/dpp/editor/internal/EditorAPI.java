@@ -363,22 +363,20 @@ public class EditorAPI implements IEditorAPI {
             int length = selection.getLength();
             boolean isCursor = length == 0;
 
-            // Adjust for cases in which the cursor is at the end of a line.
             if (isCursor) {
                 IDocument document = docProvider.getDocument(input);
                 if (document != null && document.getLength() != 0) {
-                    /*
-                     * If line not empty and offset at line end then move cursor
-                     * one position to the left.
-                     */
                     try {
                         IRegion lineInfo = document
                             .getLineInformationOfOffset(offset);
                         int lineLength = lineInfo.getLength();
-                        if (lineLength != 0
-                            && offset == (lineInfo.getOffset() + lineLength)) {
+                        if (lineLength != 0) {
+                            // Cursor visible if line has content.
                             length = 1;
-                            offset--;
+                            if (offset == (lineInfo.getOffset() + lineLength)) {
+                                // Move one position left if at end of line.
+                                offset--;
+                            }
                         }
                     } catch (BadLocationException e) {
                         // Ignored intentionally.
