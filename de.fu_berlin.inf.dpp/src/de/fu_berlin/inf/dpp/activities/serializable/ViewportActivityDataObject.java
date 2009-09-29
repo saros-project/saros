@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
@@ -7,10 +7,12 @@ import org.eclipse.jface.text.source.LineRange;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("viewportActivity")
-public class ViewportActivity extends AbstractActivity {
+public class ViewportActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     @XStreamAlias("top")
     protected final int topIndex;
@@ -22,7 +24,7 @@ public class ViewportActivity extends AbstractActivity {
     @XStreamAsAttribute
     protected final IPath editor;
 
-    public ViewportActivity(JID source, int topIndex, int bottomIndex,
+    public ViewportActivityDataObject(JID source, int topIndex, int bottomIndex,
         IPath editor) {
         super(source);
 
@@ -38,7 +40,7 @@ public class ViewportActivity extends AbstractActivity {
         this.editor = editor;
     }
 
-    public ViewportActivity(JID source, ILineRange viewport, IPath editor) {
+    public ViewportActivityDataObject(JID source, ILineRange viewport, IPath editor) {
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);
@@ -76,9 +78,9 @@ public class ViewportActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof ViewportActivity))
+        if (!(obj instanceof ViewportActivityDataObject))
             return false;
-        ViewportActivity other = (ViewportActivity) obj;
+        ViewportActivityDataObject other = (ViewportActivityDataObject) obj;
         if (bottomIndex != other.bottomIndex)
             return false;
         if (editor == null) {
@@ -93,15 +95,15 @@ public class ViewportActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "ViewportActivity(path:" + this.editor + ",range:("
+        return "ViewportActivityDataObject(path:" + this.editor + ",range:("
             + this.topIndex + "," + this.bottomIndex + "))";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

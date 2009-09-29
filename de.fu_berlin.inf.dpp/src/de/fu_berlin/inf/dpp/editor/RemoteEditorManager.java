@@ -15,17 +15,17 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
- * remote users as we believe it to be by listening to the activities we
+ * remote users as we believe it to be by listening to the activityDataObjects we
  * receive.
  */
 public class RemoteEditorManager {
@@ -172,34 +172,34 @@ public class RemoteEditorManager {
             }
         }
 
-        protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+        protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
             @Override
-            public void receive(EditorActivity editorActivity) {
+            public void receive(EditorActivityDataObject editorActivityDataObject) {
 
-                switch (editorActivity.getType()) {
+                switch (editorActivityDataObject.getType()) {
                 case Activated:
-                    activated(editorActivity.getPath());
+                    activated(editorActivityDataObject.getPath());
                     break;
                 case Saved:
                     break;
                 case Closed:
-                    closed(editorActivity.getPath());
+                    closed(editorActivityDataObject.getPath());
                     break;
                 }
             }
 
             @Override
-            public void receive(ViewportActivity viewportActivity) {
+            public void receive(ViewportActivityDataObject viewportActivityDataObject) {
 
-                setViewport(viewportActivity.getEditor(), viewportActivity
+                setViewport(viewportActivityDataObject.getEditor(), viewportActivityDataObject
                     .getLineRange());
             }
 
             @Override
-            public void receive(TextSelectionActivity textSelectionActivity) {
+            public void receive(TextSelectionActivityDataObject textSelectionActivityDataObject) {
 
-                setSelection(textSelectionActivity.getEditor(),
-                    textSelectionActivity.getSelection());
+                setSelection(textSelectionActivityDataObject.getEditor(),
+                    textSelectionActivityDataObject.getSelection());
             }
         };
 
@@ -233,8 +233,8 @@ public class RemoteEditorManager {
             return new HashSet<IPath>(openEditors.keySet());
         }
 
-        public void exec(IActivity activity) {
-            activity.dispatch(activityReceiver);
+        public void exec(IActivityDataObject activityDataObject) {
+            activityDataObject.dispatch(activityDataObjectReceiver);
         }
     }
 
@@ -252,11 +252,11 @@ public class RemoteEditorManager {
         return result;
     }
 
-    public void exec(IActivity activity) {
+    public void exec(IActivityDataObject activityDataObject) {
 
-        User sender = sharedProject.getUser(activity.getSource());
+        User sender = sharedProject.getUser(activityDataObject.getSource());
 
-        getEditorState(sender).exec(activity);
+        getEditorState(sender).exec(activityDataObject);
     }
 
     /**

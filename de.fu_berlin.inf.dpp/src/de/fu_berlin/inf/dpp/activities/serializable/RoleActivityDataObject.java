@@ -17,22 +17,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
- * A role activity indicates that a user has a new Role in the Driver/Observer
+ * A role activityDataObject indicates that a user has a new Role in the Driver/Observer
  * schemes of things.
  */
 @XStreamAlias("roleActivity")
-public class RoleActivity extends AbstractActivity {
+public class RoleActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
     protected final UserRole role;
@@ -42,10 +44,10 @@ public class RoleActivity extends AbstractActivity {
     protected final JID affectedUser;
 
     /**
-     * Creates a new RoleActivity which indicates that the given user should
+     * Creates a new RoleActivityDataObject which indicates that the given user should
      * change into the given role.
      */
-    public RoleActivity(JID source, JID affectedUser, UserRole role) {
+    public RoleActivityDataObject(JID source, JID affectedUser, UserRole role) {
         super(source);
         this.affectedUser = affectedUser;
         this.role = role;
@@ -66,9 +68,9 @@ public class RoleActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof RoleActivity))
+        if (!(obj instanceof RoleActivityDataObject))
             return false;
-        RoleActivity other = (RoleActivity) obj;
+        RoleActivityDataObject other = (RoleActivityDataObject) obj;
         if (affectedUser == null) {
             if (other.affectedUser != null)
                 return false;
@@ -92,15 +94,15 @@ public class RoleActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "RoleActivity(user:" + this.getAffectedUser() + ",new role:"
+        return "RoleActivityDataObject(user:" + this.getAffectedUser() + ",new role:"
             + this.getRole() + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

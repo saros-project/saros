@@ -30,7 +30,7 @@ import javax.swing.undo.CannotUndoException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
@@ -395,7 +395,7 @@ public class Jupiter implements Algorithm {
 
     }
 
-    public ChecksumActivity withTimestamp(ChecksumActivity checksumActivity) {
-        return checksumActivity.withTimestamp(this.vectorTime);
+    public ChecksumActivityDataObject withTimestamp(ChecksumActivityDataObject checksumActivityDataObject) {
+        return checksumActivityDataObject.withTimestamp(this.vectorTime);
     }
 }

@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.eclipse.core.runtime.IPath;
@@ -27,10 +27,12 @@ import org.eclipse.jface.text.TextSelection;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("textSelectionActivity")
-public class TextSelectionActivity extends AbstractActivity {
+public class TextSelectionActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
     private final int offset;
@@ -41,7 +43,7 @@ public class TextSelectionActivity extends AbstractActivity {
     @XStreamAsAttribute
     private final IPath editor;
 
-    public TextSelectionActivity(JID source, int offset, int length, IPath path) {
+    public TextSelectionActivityDataObject(JID source, int offset, int length, IPath path) {
         super(source);
         if (path == null) {
             throw new IllegalArgumentException("path must not be null");
@@ -83,10 +85,10 @@ public class TextSelectionActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof TextSelectionActivity))
+        if (!(obj instanceof TextSelectionActivityDataObject))
             return false;
 
-        TextSelectionActivity activity = (TextSelectionActivity) obj;
+        TextSelectionActivityDataObject activity = (TextSelectionActivityDataObject) obj;
         return (this.offset == activity.offset)
             && (this.length == activity.length)
             && (ObjectUtils.equals(this.editor, activity.editor));
@@ -94,16 +96,16 @@ public class TextSelectionActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "TextSelectionActivity(offset:" + this.offset + ",length:"
+        return "TextSelectionActivityDataObject(offset:" + this.offset + ",length:"
             + this.length + ",src:" + getSource() + ",path:" + this.editor
             + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

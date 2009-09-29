@@ -21,7 +21,7 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 
 /**
  * This class is responsible for parsing RequestForActivities and sending the
- * requested activities back.
+ * requested activityDataObjects back.
  * 
  */
 @Component(module = "net")
@@ -71,7 +71,7 @@ public class RequestForActivityHandler {
             ISharedProject sharedProject = sessionManager.getSharedProject();
 
             if (sharedProject.getUser(fromJID) == null) {
-                log.warn("Received Request for activity from user which"
+                log.warn("Received Request for activityDataObject from user which"
                     + " is not part of our shared project session: " + fromJID);
                 return;
             }
@@ -85,10 +85,10 @@ public class RequestForActivityHandler {
 
             if (activities.size() > 0) {
                 log.info("I am sending back " + activities.size()
-                    + " activities.");
+                    + " activityDataObjects.");
                 transmitter.sendTimedActivities(fromJID, activities);
             } else {
-                log.error("No matching activities found");
+                log.error("No matching activityDataObjects found");
             }
         }
     }

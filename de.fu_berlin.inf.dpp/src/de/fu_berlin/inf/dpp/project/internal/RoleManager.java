@@ -8,8 +8,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -108,17 +108,17 @@ public class RoleManager implements IActivityProvider {
      * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
-    public void exec(IActivity activity) {
-        if (activity instanceof RoleActivity) {
-            RoleActivity roleActivity = (RoleActivity) activity;
-            User user = this.sharedProject.getUser(roleActivity
+    public void exec(IActivityDataObject activityDataObject) {
+        if (activityDataObject instanceof RoleActivityDataObject) {
+            RoleActivityDataObject roleActivityDataObject = (RoleActivityDataObject) activityDataObject;
+            User user = this.sharedProject.getUser(roleActivityDataObject
                 .getAffectedUser());
             if (user == null) {
                 throw new IllegalArgumentException("User "
-                    + roleActivity.getAffectedUser()
+                    + roleActivityDataObject.getAffectedUser()
                     + " is not a participant in this shared project");
             }
-            UserRole role = roleActivity.getRole();
+            UserRole role = roleActivityDataObject.getRole();
             this.sharedProject.setUserRole(user, role);
         }
     }

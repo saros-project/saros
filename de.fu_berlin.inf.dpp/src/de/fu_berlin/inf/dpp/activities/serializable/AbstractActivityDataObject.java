@@ -1,4 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
@@ -6,21 +6,22 @@ import org.apache.log4j.Logger;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
-// TODO [MR] Add some information what needs to be done to add a new activity.
-public abstract class AbstractActivity implements IActivity {
+// TODO [MR] Add some information what needs to be done to add a new activityDataObject.
+public abstract class AbstractActivityDataObject implements IActivityDataObject {
 
     @SuppressWarnings("unused")
-    private static final Logger log = Logger.getLogger(AbstractActivity.class
+    private static final Logger log = Logger.getLogger(AbstractActivityDataObject.class
         .getName());
 
     @XStreamAsAttribute
     @XStreamConverter(JIDConverter.class)
     protected final JID source;
 
-    public AbstractActivity(JID source) {
+    public AbstractActivityDataObject(JID source) {
         if (source == null)
             throw new IllegalArgumentException("Source cannot be null");
         this.source = source;
@@ -41,10 +42,10 @@ public abstract class AbstractActivity implements IActivity {
             return true;
         if (obj == null)
             return false;
-        if (!(obj instanceof AbstractActivity))
+        if (!(obj instanceof AbstractActivityDataObject))
             return false;
 
-        AbstractActivity other = (AbstractActivity) obj;
+        AbstractActivityDataObject other = (AbstractActivityDataObject) obj;
         return ObjectUtils.equals(this.source, other.source);
     }
 }

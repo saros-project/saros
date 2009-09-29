@@ -17,23 +17,25 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * A text load activity activates a new resource. If the path is
+ * A text load activityDataObject activates a new resource. If the path is
  * <code>null</code> no resource is currently active.
  * 
  * @author rdjemili
  */
 @XStreamAlias("editorActivity")
-public class EditorActivity extends AbstractActivity {
+public class EditorActivityDataObject extends AbstractActivityDataObject {
 
     public static enum Type {
         Activated, Closed, Saved
@@ -51,11 +53,11 @@ public class EditorActivity extends AbstractActivity {
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivity(JID source, Type type, IPath path) {
+    public EditorActivityDataObject(JID source, Type type, IPath path) {
         super(source);
         if ((type != Type.Activated) && (path == null)) {
             throw new IllegalArgumentException(
-                "Null path for non-activation type editor activity given.");
+                "Null path for non-activation type editor activityDataObject given.");
         }
 
         this.type = type;
@@ -89,9 +91,9 @@ public class EditorActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof EditorActivity))
+        if (!(obj instanceof EditorActivityDataObject))
             return false;
-        EditorActivity other = (EditorActivity) obj;
+        EditorActivityDataObject other = (EditorActivityDataObject) obj;
         if (path == null) {
             if (other.path != null)
                 return false;
@@ -107,15 +109,15 @@ public class EditorActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "EditorActivity(type:" + this.type + ",path:"
+        return "EditorActivityDataObject(type:" + this.type + ",path:"
             + (this.path != null ? this.path : "no path") + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

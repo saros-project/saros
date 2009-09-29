@@ -30,7 +30,7 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -77,7 +77,7 @@ public interface ISharedProject extends IActivityListener {
         SubMonitor progress) throws CancellationException, InterruptedException;
 
     /**
-     * Set the role of the given user. This is called on incoming activities
+     * Set the role of the given user. This is called on incoming activityDataObjects
      * from the network.
      * 
      * @swt This method MUST to be called from the SWT UI thread
@@ -154,18 +154,18 @@ public interface ISharedProject extends IActivityListener {
 
     /**
      * @return the sequencer that is responsible for sending and receiving
-     *         activities.
+     *         activityDataObjects.
      */
     public ActivitySequencer getSequencer();
 
     /**
-     * Activates sending of activities. The reason that this isn't done
+     * Activates sending of activityDataObjects. The reason that this isn't done
      * automatically are unit tests.
      */
     public void start();
 
     /**
-     * Deactivates sending of activities.
+     * Deactivates sending of activityDataObjects.
      */
     public void stop();
 
@@ -243,36 +243,36 @@ public interface ISharedProject extends IActivityListener {
     public void returnColor(int colorID);
 
     /**
-     * Excutes the given activities locally.
+     * Excutes the given activityDataObjects locally.
      */
-    public void exec(List<IActivity> activities);
+    public void exec(List<IActivityDataObject> activityDataObjects);
 
     /**
      * All the ActivityProviders will call this method when new events occurred
      * in the UI.
      * 
-     * The given activity will be transformed by the ConcurrentDocumentManager
+     * The given activityDataObject will be transformed by the ConcurrentDocumentManager
      * and then send to all remote users.
      * 
      * @see IActivityListener
      * 
      * @swt MUST be called from the SWT thread to ensure synchronization!
      */
-    public void activityCreated(IActivity activity);
+    public void activityCreated(IActivityDataObject activityDataObject);
 
     /**
-     * Sends the given activity to the given list of users.
+     * Sends the given activityDataObject to the given list of users.
      * 
      * This method will by-pass the ConcurrentDocumentManager.
      */
-    public void sendActivity(List<User> recipient, IActivity activity);
+    public void sendActivity(List<User> recipient, IActivityDataObject activityDataObject);
 
     /**
      * Convenience method to address a single recipient.
      * 
-     * @see #sendActivity(List, IActivity)
+     * @see #sendActivity(List, IActivityDataObject)
      */
-    public void sendActivity(User recipient, IActivity activity);
+    public void sendActivity(User recipient, IActivityDataObject activityDataObject);
 
     /**
      * Adds an {@link IActivityProvider} and also registers itself as

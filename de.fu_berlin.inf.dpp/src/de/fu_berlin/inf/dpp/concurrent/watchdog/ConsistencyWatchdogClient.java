@@ -22,12 +22,12 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -88,7 +88,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         return this.inconsistencyToResolve;
     }
 
-    protected HashMap<IPath, ChecksumActivity> stats = new HashMap<IPath, ChecksumActivity>();
+    protected HashMap<IPath, ChecksumActivityDataObject> stats = new HashMap<IPath, ChecksumActivityDataObject>();
 
     protected Set<IPath> pathsWithWrongChecksums = new CopyOnWriteArraySet<IPath>();
 
@@ -143,45 +143,45 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         this.sessionManager.removeSessionListener(sessionListener);
     }
 
-    public Map<IPath, ChecksumActivity> latestChecksums = new HashMap<IPath, ChecksumActivity>();
+    public Map<IPath, ChecksumActivityDataObject> latestChecksums = new HashMap<IPath, ChecksumActivityDataObject>();
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
         @Override
-        public void receive(ChecksumActivity checksumActivity) {
+        public void receive(ChecksumActivityDataObject checksumActivityDataObject) {
 
-            latestChecksums.put(checksumActivity.getPath(), checksumActivity);
+            latestChecksums.put(checksumActivityDataObject.getPath(), checksumActivityDataObject);
 
-            performCheck(checksumActivity);
+            performCheck(checksumActivityDataObject);
         }
 
         @Override
-        public void receive(TextEditActivity text) {
+        public void receive(TextEditActivityDataObject text) {
             latestChecksums.remove(text.getEditor());
         }
 
         @Override
-        public void receive(FileActivity fileActivity) {
+        public void receive(FileActivityDataObject fileActivityDataObject) {
 
             // Recoveries do not invalidate checksums :-)
-            if (fileActivity.isRecovery())
+            if (fileActivityDataObject.isRecovery())
                 return;
 
             /*
              * (we do not need to handle FolderActivities because all files are
-             * created/deleted via FileActivity)
+             * created/deleted via FileActivityDataObject)
              */
 
-            switch (fileActivity.getType()) {
+            switch (fileActivityDataObject.getType()) {
             case Created:
             case Removed:
-                latestChecksums.remove(fileActivity.getPath());
+                latestChecksums.remove(fileActivityDataObject.getPath());
                 break;
             case Moved:
-                latestChecksums.remove(fileActivity.getPath());
-                latestChecksums.remove(fileActivity.getOldPath());
+                latestChecksums.remove(fileActivityDataObject.getPath());
+                latestChecksums.remove(fileActivityDataObject.getOldPath());
                 break;
             default:
-                log.error("Unhandled FileActivity.Type: " + fileActivity);
+                log.error("Unhandled FileActivityDataObject.Type: " + fileActivityDataObject);
             }
         }
     };
@@ -283,11 +283,11 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     }
 
     @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(activityReceiver);
+    public void exec(IActivityDataObject activityDataObject) {
+        activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
-    private boolean isInconsistent(ChecksumActivity checksum) {
+    private boolean isInconsistent(ChecksumActivityDataObject checksum) {
         IPath path = checksum.getPath();
 
         ISharedProject sharedProject = sessionManager.getSharedProject();
@@ -367,26 +367,26 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             return false;
         }
 
-        ChecksumActivity checksumActivity = latestChecksums.get(path);
-        if (checksumActivity != null) {
-            performCheck(checksumActivity);
+        ChecksumActivityDataObject checksumActivityDataObject = latestChecksums.get(path);
+        if (checksumActivityDataObject != null) {
+            performCheck(checksumActivityDataObject);
             return true;
         } else {
             return false;
         }
     }
 
-    protected synchronized void performCheck(ChecksumActivity checksumActivity) {
+    protected synchronized void performCheck(ChecksumActivityDataObject checksumActivityDataObject) {
 
         if (sharedProject.isDriver()
             && !sharedProject.getConcurrentDocumentClient().isCurrent(
-                checksumActivity))
+                checksumActivityDataObject))
             return;
 
-        if (isInconsistent(checksumActivity)) {
-            pathsWithWrongChecksums.add(checksumActivity.path);
+        if (isInconsistent(checksumActivityDataObject)) {
+            pathsWithWrongChecksums.add(checksumActivityDataObject.path);
         } else {
-            pathsWithWrongChecksums.remove(checksumActivity.path);
+            pathsWithWrongChecksums.remove(checksumActivityDataObject.path);
         }
 
         if (pathsWithWrongChecksums.isEmpty()) {

@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -106,17 +106,17 @@ public class JupiterDocumentServer {
             addProxyClient(jid);
     }
 
-    public Map<JID, ChecksumActivity> withTimestamp(
-        ChecksumActivity checksumActivity) throws TransformationException {
+    public Map<JID, ChecksumActivityDataObject> withTimestamp(
+        ChecksumActivityDataObject checksumActivityDataObject) throws TransformationException {
 
-        Map<JID, ChecksumActivity> result = new HashMap<JID, ChecksumActivity>();
+        Map<JID, ChecksumActivityDataObject> result = new HashMap<JID, ChecksumActivityDataObject>();
 
-        JID source = checksumActivity.getSource();
+        JID source = checksumActivityDataObject.getSource();
 
         // 1. Verify that this checksum can still be sent to others...
         Jupiter sourceProxy = proxies.get(source);
 
-        boolean isCurrent = sourceProxy.isCurrent(checksumActivity
+        boolean isCurrent = sourceProxy.isCurrent(checksumActivityDataObject
             .getTimestamp());
 
         if (!isCurrent)
@@ -133,7 +133,7 @@ public class JupiterDocumentServer {
 
             Jupiter remoteProxy = entry.getValue();
 
-            ChecksumActivity timestamped = checksumActivity
+            ChecksumActivityDataObject timestamped = checksumActivityDataObject
                 .withTimestamp(remoteProxy.getTimestamp());
             result.put(jid, timestamped);
         }

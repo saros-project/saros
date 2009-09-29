@@ -1,30 +1,32 @@
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * A checksum activity is used to communicate checksums from the host to the
+ * A checksum activityDataObject is used to communicate checksums from the host to the
  * clients.
  * 
- * A checksum activity always relates to a certain file (given a path) and
+ * A checksum activityDataObject always relates to a certain file (given a path) and
  * contains the hash and length of the file.
  * 
  * To indicate that a file is missing on the host NON_EXISTING_DOC is used.
  * 
- * A checksum activity also may contain a JupiterTimestamp to indicate at which
+ * A checksum activityDataObject also may contain a JupiterTimestamp to indicate at which
  * point of time the checksum was created. A remote user can use this
  * information to see whether the checksum can be used to check for consistency
  * or whether the local user has already written additional text which
  * invalidates the checksum.
  */
 @XStreamAlias("fileActivity")
-public class ChecksumActivity extends AbstractActivity {
+public class ChecksumActivityDataObject extends AbstractActivityDataObject {
 
     /**
      * Constant used for representing a missing file
@@ -44,10 +46,10 @@ public class ChecksumActivity extends AbstractActivity {
     public Timestamp jupiterTimestamp;
 
     /**
-     * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
+     * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set (such is
      * used when communicating with users which are observers)
      */
-    public ChecksumActivity(JID source, IPath path, long hash, long length) {
+    public ChecksumActivityDataObject(JID source, IPath path, long hash, long length) {
         super(source);
         this.path = path;
         this.hash = hash;
@@ -56,10 +58,10 @@ public class ChecksumActivity extends AbstractActivity {
     }
 
     /**
-     * Constructor for checksum activities including a Timestamp (for users
+     * Constructor for checksum activityDataObjects including a Timestamp (for users
      * which are drivers)
      */
-    public ChecksumActivity(JID source, IPath path, long hash, long length,
+    public ChecksumActivityDataObject(JID source, IPath path, long hash, long length,
         Timestamp jupiterTimestamp) {
         super(source);
         this.path = path;
@@ -69,20 +71,20 @@ public class ChecksumActivity extends AbstractActivity {
     }
 
     /**
-     * Create a ChecksumActivity which indicates that the file is missing on the
+     * Create a ChecksumActivityDataObject which indicates that the file is missing on the
      * host.
      */
-    public static ChecksumActivity missing(JID source, IPath path) {
-        return new ChecksumActivity(source, path, NON_EXISTING_DOC,
+    public static ChecksumActivityDataObject missing(JID source, IPath path) {
+        return new ChecksumActivityDataObject(source, path, NON_EXISTING_DOC,
             NON_EXISTING_DOC);
     }
 
     /**
-     * Returns a new checksum activity which is identical to this activity, but
+     * Returns a new checksum activityDataObject which is identical to this activityDataObject, but
      * has the timestamp set to the given value.
      */
-    public ChecksumActivity withTimestamp(Timestamp jupiterTimestamp) {
-        return new ChecksumActivity(source, path, hash, length,
+    public ChecksumActivityDataObject withTimestamp(Timestamp jupiterTimestamp) {
+        return new ChecksumActivityDataObject(source, path, hash, length,
             jupiterTimestamp);
     }
 
@@ -99,11 +101,11 @@ public class ChecksumActivity extends AbstractActivity {
             + length + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 
@@ -125,7 +127,7 @@ public class ChecksumActivity extends AbstractActivity {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ChecksumActivity other = (ChecksumActivity) obj;
+        ChecksumActivityDataObject other = (ChecksumActivityDataObject) obj;
         if (hash != other.hash)
             return false;
         if (length != other.length)

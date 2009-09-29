@@ -24,14 +24,14 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.PacketExtension;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
-import de.fu_berlin.inf.dpp.activities.RoleActivity;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
@@ -48,10 +48,10 @@ public class ActivitiesExtensionProvider extends
     XStreamExtensionProvider<TimedActivities> {
 
     public ActivitiesExtensionProvider() {
-        super("activities", TimedActivities.class, AbstractActivity.class,
-            EditorActivity.class, FileActivity.class, FolderActivity.class,
-            RoleActivity.class, TextEditActivity.class,
-            TextSelectionActivity.class, ViewportActivity.class,
+        super("activityDataObjects", TimedActivities.class, AbstractActivityDataObject.class,
+            EditorActivityDataObject.class, FileActivityDataObject.class, FolderActivityDataObject.class,
+            RoleActivityDataObject.class, TextEditActivityDataObject.class,
+            TextSelectionActivityDataObject.class, ViewportActivityDataObject.class,
             TimedActivity.class, JupiterActivity.class,
             JupiterVectorTime.class, DeleteOperation.class,
             InsertOperation.class, NoOperation.class, SplitOperation.class,

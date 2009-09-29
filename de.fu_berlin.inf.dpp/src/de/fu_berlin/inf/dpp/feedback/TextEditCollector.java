@@ -22,16 +22,16 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * A collector class that collects local text edit activities and compares them
+ * A collector class that collects local text edit activityDataObjects and compares them
  * in relation to parallelism or rather concurrency with remote text events.<br>
  * It is measured how many characters the local user wrote in a session
  * (whitespaces are omitted, because Eclipse produces many of them automatically
- * e.g. when a new line is started), how many text edit activities he produced
+ * e.g. when a new line is started), how many text edit activityDataObjects he produced
  * (which can be different to the number of characters he wrote, e.g. when
  * copy&paste or Eclipse's method generation was used) and how concurrent the
  * local user's writing was to remote users using different sample intervals. <br>
  * <br>
- * NOTE: Text edit activities that are triggered by Eclipse (e.g. when restoring
+ * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when restoring
  * an editor) are counted as well. And refactorings can produce quite a large
  * number of characters that are counted. <br>
  * <br>
@@ -86,10 +86,10 @@ public class TextEditCollector extends AbstractStatisticCollector {
 
     protected long charsWritten = 0;
 
-    /** List to contain local text activities */
+    /** List to contain local text activityDataObjects */
     protected List<EditEvent> localEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
-    /** List to contain remote text activities */
+    /** List to contain remote text activityDataObjects */
     protected List<EditEvent> remoteEvents = Collections
         .synchronizedList(new ArrayList<EditEvent>());
 
@@ -123,7 +123,7 @@ public class TextEditCollector extends AbstractStatisticCollector {
                 if (user.isLocal()) {
                     /*
                      * accumulate the written chars of the local user and store
-                     * the time and text length of this activity
+                     * the time and text length of this activityDataObject
                      */
                     addToCharsWritten(textLength);
                     localEvents.add(event);

@@ -30,10 +30,10 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -76,7 +76,7 @@ public class UndoManager implements Disposable, IActivityProvider {
 
     private static Logger log = Logger.getLogger(UndoManager.class.getName());
 
-    protected List<TextEditActivity> expectedActivities = new LinkedList<TextEditActivity>();
+    protected List<TextEditActivityDataObject> expectedActivities = new LinkedList<TextEditActivityDataObject>();
 
     /**
      * Every IUndoableOperation has a label to classify it. Typing operations
@@ -313,18 +313,18 @@ public class UndoManager implements Disposable, IActivityProvider {
 
     protected IActivityListener activityListener = new IActivityListener() {
 
-        public void activityCreated(IActivity activity) {
-            activity.dispatch(activityReceiver);
+        public void activityCreated(IActivityDataObject activityDataObject) {
+            activityDataObject.dispatch(activityDataObjectReceiver);
         }
     };
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
 
         /**
-         * @return true if the given activity was created locally
+         * @return true if the given activityDataObject was created locally
          */
-        protected boolean local(IActivity activity) {
-            return activity.getSource().equals(saros.getMyJID());
+        protected boolean local(IActivityDataObject activityDataObject) {
+            return activityDataObject.getSource().equals(saros.getMyJID());
         }
 
         /**
@@ -332,21 +332,21 @@ public class UndoManager implements Disposable, IActivityProvider {
          * undo history.
          */
         @Override
-        public void receive(TextEditActivity textEditActivity) {
+        public void receive(TextEditActivityDataObject textEditActivityDataObject) {
 
             if (!enabled)
                 return;
 
             /*
-             * When performing an undo/redo there are fired activities which are
+             * When performing an undo/redo there are fired activityDataObjects which are
              * expected and have to be ignored when coming back.
              */
-            if (expectedActivities.remove(textEditActivity))
+            if (expectedActivities.remove(textEditActivityDataObject))
                 return;
 
-            Operation operation = textEditActivity.toOperation();
+            Operation operation = textEditActivityDataObject.toOperation();
 
-            if (!local(textEditActivity)) {
+            if (!local(textEditActivityDataObject)) {
                 if (currentLocalCompositeOperation != null)
                     currentLocalCompositeOperation = transformation.transform(
                         currentLocalCompositeOperation, operation,
@@ -356,12 +356,12 @@ public class UndoManager implements Disposable, IActivityProvider {
                         currentLocalAtomicOperation, operation, Boolean.FALSE);
                 }
                 log.debug("adding remote " + operation + " to history");
-                undoHistory.add(textEditActivity.getEditor(), Type.REMOTE,
+                undoHistory.add(textEditActivityDataObject.getEditor(), Type.REMOTE,
                     operation);
             } else {
-                if (!textEditActivity.getEditor().equals(currentActiveEditor)) {
+                if (!textEditActivityDataObject.getEditor().equals(currentActiveEditor)) {
                     log
-                        .error("Editor of the local TextEditActivity is not the current "
+                        .error("Editor of the local TextEditActivityDataObject is not the current "
                             + "active editor. Possibly the current active editor is not"
                             + " up to date.");
                     return;
@@ -505,7 +505,7 @@ public class UndoManager implements Disposable, IActivityProvider {
             return;
         }
 
-        for (TextEditActivity activity : op
+        for (TextEditActivityDataObject activity : op
             .toTextEdit(editor, saros.getMyJID())) {
             log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
@@ -516,7 +516,7 @@ public class UndoManager implements Disposable, IActivityProvider {
 
         Operation op = calcRedoOperation(editor);
 
-        for (TextEditActivity activity : op
+        for (TextEditActivityDataObject activity : op
             .toTextEdit(editor, saros.getMyJID())) {
             log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
@@ -546,7 +546,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         providers.remove(provider);
     }
 
-    protected void fireActivity(TextEditActivity activity) {
+    protected void fireActivity(TextEditActivityDataObject activity) {
 
         expectedActivities.add(activity);
 
@@ -596,8 +596,8 @@ public class UndoManager implements Disposable, IActivityProvider {
         }
     }
 
-    public void exec(IActivity activity) {
-        activity.dispatch(activityReceiver);
+    public void exec(IActivityDataObject activityDataObject) {
+        activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
     public void removeActivityListener(IActivityListener listener) {

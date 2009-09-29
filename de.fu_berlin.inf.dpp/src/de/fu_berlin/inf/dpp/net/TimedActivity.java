@@ -6,11 +6,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 
 /**
- * A simple {@link IActivity} wrapper that add an time stamp.
+ * A simple {@link IActivityDataObject} wrapper that add an time stamp.
  * 
  * @author rdjemili
  */
@@ -25,12 +25,12 @@ public class TimedActivity implements Comparable<TimedActivity> {
      */
     public static final int UNKNOWN_SEQUENCE_NR = -2;
 
-    protected final IActivity activity;
+    protected final IActivityDataObject activityDataObject;
 
     @XStreamAsAttribute
     protected final int sequenceNumber;
 
-    /** A "real" wall clock timestamp for this activity. */
+    /** A "real" wall clock timestamp for this activityDataObject. */
     @XStreamOmitField
     protected long localTimestamp = 0;
 
@@ -42,21 +42,21 @@ public class TimedActivity implements Comparable<TimedActivity> {
     /**
      * Constructs a new TimedActivity.
      * 
-     * @param activity
-     *            the activity to wrap
+     * @param activityDataObject
+     *            the activityDataObject to wrap
      * @param sequenceNumber
-     *            the sequence number that belongs to the activity.
+     *            the sequence number that belongs to the activityDataObject.
      * 
      * @throws IllegalArgumentException
-     *             if activity is <code>null</code> or the sequence number is
+     *             if activityDataObject is <code>null</code> or the sequence number is
      *             {@link TimedActivity#UNKNOWN_SEQUENCE_NR}.
      */
-    public TimedActivity(IActivity activity, JID sender, int sequenceNumber) {
+    public TimedActivity(IActivityDataObject activityDataObject, JID sender, int sequenceNumber) {
 
         if (sender == null) {
             throw new IllegalArgumentException("Source cannot be null");
         }
-        if (activity == null) {
+        if (activityDataObject == null) {
             throw new IllegalArgumentException("Activity cannot be null");
         }
         if (sequenceNumber == UNKNOWN_SEQUENCE_NR) {
@@ -64,23 +64,23 @@ public class TimedActivity implements Comparable<TimedActivity> {
                 "sequenceNumber must not be TimedActicity.UNKNOWN_SEQUENCE_NR");
         }
 
-        this.activity = activity;
+        this.activityDataObject = activityDataObject;
         this.sender = sender;
         this.sequenceNumber = sequenceNumber;
     }
 
     /**
-     * @return the activity.
+     * @return the activityDataObject.
      */
-    public IActivity getActivity() {
-        return this.activity;
+    public IActivityDataObject getActivity() {
+        return this.activityDataObject;
     }
 
     /**
-     * @return the user who sent this time activity
+     * @return the user who sent this time activityDataObject
      * 
-     *         CAUTION: The Source of the activity contained in this timed
-     *         activity might be somebody else.
+     *         CAUTION: The Source of the activityDataObject contained in this timed
+     *         activityDataObject might be somebody else.
      */
     public JID getSender() {
         return this.sender;
@@ -95,7 +95,7 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
     @Override
     public String toString() {
-        return "[" + this.sequenceNumber + ":" + this.activity + "]";
+        return "[" + this.sequenceNumber + ":" + this.activityDataObject + "]";
     }
 
     @Override
@@ -103,7 +103,7 @@ public class TimedActivity implements Comparable<TimedActivity> {
         final int prime = 31;
         int result = 1;
         result = prime * result
-            + ((activity == null) ? 0 : activity.hashCode());
+            + ((activityDataObject == null) ? 0 : activityDataObject.hashCode());
         result = prime * result + sequenceNumber;
         return result;
     }
@@ -121,7 +121,7 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
         TimedActivity other = (TimedActivity) obj;
         return (other.sequenceNumber == this.sequenceNumber)
-            && other.activity.equals(this.activity);
+            && other.activityDataObject.equals(this.activityDataObject);
     }
 
     public int compareTo(TimedActivity other) {
@@ -148,11 +148,11 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
         for (TimedActivity timedActivity : timedActivities) {
 
-            IActivity activity = timedActivity.getActivity();
+            IActivityDataObject activityDataObject = timedActivity.getActivity();
 
-            if (activity instanceof FileActivity
-                && ((FileActivity) activity).getType().equals(
-                    FileActivity.Type.Created)) {
+            if (activityDataObject instanceof FileActivityDataObject
+                && ((FileActivityDataObject) activityDataObject).getType().equals(
+                    FileActivityDataObject.Type.Created)) {
                 return false;
             }
         }

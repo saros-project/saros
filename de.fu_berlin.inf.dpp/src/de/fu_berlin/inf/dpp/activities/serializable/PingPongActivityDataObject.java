@@ -1,22 +1,25 @@
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.net.JID;
 
-public class PingPongActivity extends AbstractActivity {
+public class PingPongActivityDataObject extends AbstractActivityDataObject {
 
     public JID initiator;
 
     public DateTime departureTime;
 
-    public PingPongActivity(JID source) {
+    public PingPongActivityDataObject(JID source) {
         super(source);
     }
 
-    public PingPongActivity(JID sender, JID initiator, DateTime departureTime) {
+    public PingPongActivityDataObject(JID sender, JID initiator, DateTime departureTime) {
         super(sender);
         this.initiator = initiator;
         this.departureTime = departureTime;
@@ -34,13 +37,13 @@ public class PingPongActivity extends AbstractActivity {
         return departureTime;
     }
 
-    public static PingPongActivity create(User localUser) {
-        return new PingPongActivity(localUser.getJID(), localUser.getJID(),
+    public static PingPongActivityDataObject create(User localUser) {
+        return new PingPongActivityDataObject(localUser.getJID(), localUser.getJID(),
             new DateTime());
     }
 
-    public IActivity createPong(User localUser) {
-        return new PingPongActivity(localUser.getJID(), getInitiator(), this
+    public IActivityDataObject createPong(User localUser) {
+        return new PingPongActivityDataObject(localUser.getJID(), getInitiator(), this
             .getDepartureTime());
     }
 
@@ -51,11 +54,11 @@ public class PingPongActivity extends AbstractActivity {
             + departureTime.toString("HH:mm:ss,SSS") + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

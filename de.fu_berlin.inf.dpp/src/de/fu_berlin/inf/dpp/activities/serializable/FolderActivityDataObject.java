@@ -1,15 +1,18 @@
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IResourceActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("folderActivity")
-public class FolderActivity extends AbstractActivity implements
-    IResourceActivity {
+public class FolderActivityDataObject extends AbstractActivityDataObject implements
+    IResourceActivityDataObject {
     public static enum Type {
         Created, Removed, Moved
     }
@@ -23,7 +26,7 @@ public class FolderActivity extends AbstractActivity implements
     @XStreamAsAttribute
     private IPath oldPath;
 
-    public FolderActivity(JID source, Type type, IPath path) {
+    public FolderActivityDataObject(JID source, Type type, IPath path) {
         super(source);
         this.type = type;
         this.path = path;
@@ -63,7 +66,7 @@ public class FolderActivity extends AbstractActivity implements
             return false;
         if (getClass() != obj.getClass())
             return false;
-        FolderActivity other = (FolderActivity) obj;
+        FolderActivityDataObject other = (FolderActivityDataObject) obj;
         if (oldPath == null) {
             if (other.oldPath != null)
                 return false;
@@ -85,17 +88,17 @@ public class FolderActivity extends AbstractActivity implements
     @Override
     public String toString() {
         if (type == Type.Moved)
-            return "FolderActivity(type: Moved, old path: " + this.oldPath
+            return "FolderActivityDataObject(type: Moved, old path: " + this.oldPath
                 + ", new path: " + this.path + ")";
-        return "FolderActivity(type: " + this.type + ", path: " + this.path
+        return "FolderActivityDataObject(type: " + this.type + ", path: " + this.path
             + ")";
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

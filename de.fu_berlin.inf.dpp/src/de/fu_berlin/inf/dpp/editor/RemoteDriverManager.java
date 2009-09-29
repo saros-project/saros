@@ -13,10 +13,10 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -78,12 +78,12 @@ public class RemoteDriverManager {
         }
     };
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
 
         @Override
-        public void receive(final EditorActivity editorActivity) {
-            User sender = sharedProject.getUser(editorActivity.getSource());
-            IPath path = editorActivity.getPath();
+        public void receive(final EditorActivityDataObject editorActivityDataObject) {
+            User sender = sharedProject.getUser(editorActivityDataObject.getSource());
+            IPath path = editorActivityDataObject.getPath();
 
             if (path == null) {
                 /**
@@ -93,7 +93,7 @@ public class RemoteDriverManager {
                 return;
             }
 
-            switch (editorActivity.getType()) {
+            switch (editorActivityDataObject.getType()) {
             case Activated:
                 editorStates.get(path).add(sender);
                 break;
@@ -111,10 +111,10 @@ public class RemoteDriverManager {
     };
 
     /**
-     * This method is called from the shared project when a new activity arrives
+     * This method is called from the shared project when a new activityDataObject arrives
      */
-    public void exec(final IActivity activity) {
-        activity.dispatch(activityReceiver);
+    public void exec(final IActivityDataObject activityDataObject) {
+        activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
     public void dispose() {
@@ -136,7 +136,7 @@ public class RemoteDriverManager {
 
     /**
      * Connects a document under the given path as a reaction on a remote
-     * activity of a driver (e.g. Activate Editor).
+     * activityDataObject of a driver (e.g. Activate Editor).
      */
     protected void connectDocumentProvider(IPath path) {
 
@@ -164,7 +164,7 @@ public class RemoteDriverManager {
 
     /**
      * Disconnects a document under the given path as a reaction on a remote
-     * activity of a driver (e.g. Close Editor)
+     * activityDataObject of a driver (e.g. Close Editor)
      */
     protected void disconnectDocumentProvider(final IPath path) {
 

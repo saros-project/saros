@@ -57,14 +57,14 @@ import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.EditorActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
-import de.fu_berlin.inf.dpp.activities.TextSelectionActivity;
-import de.fu_berlin.inf.dpp.activities.ViewportActivity;
-import de.fu_berlin.inf.dpp.activities.EditorActivity.Type;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditor;
 import de.fu_berlin.inf.dpp.editor.RemoteEditorManager.RemoteEditorState;
@@ -108,8 +108,8 @@ import de.fu_berlin.inf.dpp.util.Util;
  *         reviewed for restarting issues
  * 
  *         TODO CO This class contains too many different concerns: TextEdits,
- *         Editor opening and closing, Parsing of activities, executing of
- *         activities, dirty state management,...
+ *         Editor opening and closing, Parsing of activityDataObjects, executing of
+ *         activityDataObjects, dirty state management,...
  */
 @Component(module = "core")
 public class EditorManager implements IActivityProvider, Disposable {
@@ -164,36 +164,36 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected ContributionAnnotationManager contributionAnnotationManager;
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
         @Override
-        public void receive(EditorActivity editorActivity) {
+        public void receive(EditorActivityDataObject editorActivityDataObject) {
 
-            User sender = sharedProject.getUser(editorActivity.getSource());
+            User sender = sharedProject.getUser(editorActivityDataObject.getSource());
 
-            if (editorActivity.getType().equals(Type.Activated)) {
-                execActivated(sender, editorActivity.getPath());
+            if (editorActivityDataObject.getType().equals(Type.Activated)) {
+                execActivated(sender, editorActivityDataObject.getPath());
 
-            } else if (editorActivity.getType().equals(Type.Closed)) {
-                execClosed(sender, editorActivity.getPath());
+            } else if (editorActivityDataObject.getType().equals(Type.Closed)) {
+                execClosed(sender, editorActivityDataObject.getPath());
 
-            } else if (editorActivity.getType().equals(Type.Saved)) {
-                saveText(editorActivity.getPath());
+            } else if (editorActivityDataObject.getType().equals(Type.Saved)) {
+                saveText(editorActivityDataObject.getPath());
             }
         }
 
         @Override
-        public void receive(TextEditActivity textEditActivity) {
-            execTextEdit(textEditActivity);
+        public void receive(TextEditActivityDataObject textEditActivityDataObject) {
+            execTextEdit(textEditActivityDataObject);
         }
 
         @Override
-        public void receive(TextSelectionActivity textSelectionActivity) {
-            execTextSelection(textSelectionActivity);
+        public void receive(TextSelectionActivityDataObject textSelectionActivityDataObject) {
+            execTextSelection(textSelectionActivityDataObject);
         }
 
         @Override
-        public void receive(ViewportActivity viewportActivity) {
-            execViewport(viewportActivity);
+        public void receive(ViewportActivityDataObject viewportActivityDataObject) {
+            execViewport(viewportActivityDataObject);
         }
     };
 
@@ -267,18 +267,18 @@ public class EditorManager implements IActivityProvider, Disposable {
             List<User> recipient = Collections.singletonList(user);
 
             for (IPath path : getLocallyOpenEditors()) {
-                sharedProject.sendActivity(recipient, new EditorActivity(saros
+                sharedProject.sendActivity(recipient, new EditorActivityDataObject(saros
                     .getMyJID(), Type.Activated, path));
             }
 
             if (locallyActiveEditor == null)
                 return;
 
-            sharedProject.sendActivity(recipient, new EditorActivity(saros
+            sharedProject.sendActivity(recipient, new EditorActivityDataObject(saros
                 .getMyJID(), Type.Activated, locallyActiveEditor));
 
             if (localViewport != null) {
-                sharedProject.sendActivity(recipient, new ViewportActivity(
+                sharedProject.sendActivity(recipient, new ViewportActivityDataObject(
                     saros.getMyJID(), localViewport, locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
@@ -290,7 +290,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                 int length = localSelection.getLength();
 
                 sharedProject.sendActivity(recipient,
-                    new TextSelectionActivity(saros.getMyJID(), offset, length,
+                    new TextSelectionActivityDataObject(saros.getMyJID(), offset, length,
                         locallyActiveEditor));
             } else {
                 log.warn("No selection for locallyActivateEditor: "
@@ -516,7 +516,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     /**
-     * Sets the local editor 'opened' and fires an {@link EditorActivity} of
+     * Sets the local editor 'opened' and fires an {@link EditorActivityDataObject} of
      * type <code>Activated</code>.
      * 
      * @param path
@@ -533,7 +533,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.activeEditorChanged(sharedProject.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID(),
+        fireActivity(new EditorActivityDataObject(sharedProject.getLocalUser().getJID(),
             Type.Activated, path));
     }
 
@@ -542,14 +542,14 @@ public class EditorManager implements IActivityProvider, Disposable {
      * so that all remote parties know that the user is now positioned at the
      * given viewport in the given part.
      * 
-     * A viewport activity not necessarily indicates that the given IEditorPart
+     * A viewport activityDataObject not necessarily indicates that the given IEditorPart
      * is currently active. If it is (the given IEditorPart matches the
      * locallyActiveEditor) then the {@link #localViewport} is updated to
      * reflect this.
      * 
      * 
      * @param part
-     *            The IEditorPart for which to generate a ViewportActivity.
+     *            The IEditorPart for which to generate a ViewportActivityDataObject.
      * 
      * @param viewport
      *            The ILineRange in the given part which represents the
@@ -572,7 +572,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (path.equals(locallyActiveEditor))
             this.localViewport = viewport;
 
-        fireActivity(new ViewportActivity(
+        fireActivity(new ViewportActivityDataObject(
             sharedProject.getLocalUser().getJID(), viewport, path));
     }
 
@@ -582,7 +582,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * selected some text in the given part.
      * 
      * @param part
-     *            The IEditorPart for which to generate a TextSelectionActivity
+     *            The IEditorPart for which to generate a TextSelectionActivityDataObject
      * 
      * @param newSelection
      *            The ITextSelection in the given part which represents the
@@ -602,7 +602,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
 
-        fireActivity(new TextSelectionActivity(sharedProject.getLocalUser()
+        fireActivity(new TextSelectionActivityDataObject(sharedProject.getLocalUser()
             .getJID(), offset, length, path));
     }
 
@@ -683,7 +683,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
-        fireActivity(new TextEditActivity(
+        fireActivity(new TextEditActivityDataObject(
             sharedProject.getLocalUser().getJID(), offset, text, replacedText,
             path));
 
@@ -715,26 +715,26 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * @swt This must be called from the SWT thread.
      */
-    public void exec(final IActivity activity) {
+    public void exec(final IActivityDataObject activityDataObject) {
 
         assert Util.isSWT();
 
-        User sender = sharedProject.getUser(activity.getSource());
+        User sender = sharedProject.getUser(activityDataObject.getSource());
         if (sender == null) {
             log
-                .warn("Trying to execute activity for unknown user: "
-                    + activity);
+                .warn("Trying to execute activityDataObject for unknown user: "
+                    + activityDataObject);
             return;
         }
 
-        // First let the remote managers update itself based on the activity
-        remoteEditorManager.exec(activity);
-        remoteDriverManager.exec(activity);
+        // First let the remote managers update itself based on the activityDataObject
+        remoteEditorManager.exec(activityDataObject);
+        remoteDriverManager.exec(activityDataObject);
 
-        activity.dispatch(activityReceiver);
+        activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
-    protected void execTextEdit(TextEditActivity textEdit) {
+    protected void execTextEdit(TextEditActivityDataObject textEdit) {
 
         wpLog.trace("EditorManager.execTextEdit invoked");
 
@@ -744,7 +744,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         IFile file = sharedProject.getProject().getFile(path);
 
         if (!file.exists()) {
-            log.error("TextEditActivity refers to file which"
+            log.error("TextEditActivityDataObject refers to file which"
                 + " is not available locally: " + textEdit);
             // TODO A consistency check can be started here
             return;
@@ -776,7 +776,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             textEdit.replacedText, textEdit.offset);
     }
 
-    protected void execTextSelection(TextSelectionActivity selection) {
+    protected void execTextSelection(TextSelectionActivityDataObject selection) {
 
         wpLog.trace("EditorManager.execTextSelection invoked");
 
@@ -801,7 +801,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     }
 
-    protected void execViewport(ViewportActivity viewport) {
+    protected void execViewport(ViewportActivityDataObject viewport) {
 
         wpLog.trace("EditorManager.execViewport invoked");
 
@@ -816,8 +816,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             ITextSelection driverSelection = remoteEditorManager
                 .getSelection(user);
             /*
-             * driverSelection can be null if viewport activity came before the
-             * first text selection activity.
+             * driverSelection can be null if viewport activityDataObject came before the
+             * first text selection activityDataObject.
              */
             if (driverSelection != null) {
                 /*
@@ -1024,7 +1024,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.editorRemoved(sharedProject.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID(),
+        fireActivity(new EditorActivityDataObject(sharedProject.getLocalUser().getJID(),
             Type.Closed, path));
 
         /**
@@ -1245,7 +1245,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * SharedEditorListeners (independent of the success of this method) BEFORE
      * the file is actually saved.
      * 
-     * Calling this method will NOT trigger a {@link EditorActivity} of type
+     * Calling this method will NOT trigger a {@link EditorActivityDataObject} of type
      * Save to be sent to the other clients.
      * 
      * @param path
@@ -1343,7 +1343,7 @@ public class EditorManager implements IActivityProvider, Disposable {
     }
 
     /**
-     * Sends an activity for clients to save the editor of given path.
+     * Sends an activityDataObject for clients to save the editor of given path.
      * 
      * @param path
      *            the project relative path to the resource that the driver was
@@ -1359,18 +1359,18 @@ public class EditorManager implements IActivityProvider, Disposable {
         // What is the reason of this?
 
         editorListener.driverEditorSaved(path, false);
-        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID(),
+        fireActivity(new EditorActivityDataObject(sharedProject.getLocalUser().getJID(),
             Type.Saved, path));
     }
 
     /**
-     * Sends given activity to all registered activity listeners (most
+     * Sends given activityDataObject to all registered activityDataObject listeners (most
      * importantly the ActivitySequencer).
      */
-    protected void fireActivity(IActivity activity) {
+    protected void fireActivity(IActivityDataObject activityDataObject) {
 
         for (IActivityListener listener : this.activityListeners) {
-            listener.activityCreated(activity);
+            listener.activityCreated(activityDataObject);
         }
     }
 
@@ -1675,7 +1675,7 @@ public class EditorManager implements IActivityProvider, Disposable {
      * Triggers a "Document Revert" by other session participants. This happens
      * when a driver rejected changes in file buffer (e.g. "Close editor"+
      * "Do NOT save"). This method gets invoked, only when the user is a driver.
-     * It sends to other session participants two activities which revert their
+     * It sends to other session participants two activityDataObjects which revert their
      * documents:
      * <ul>
      * <li>TextEdit - replaces content of the document with new (reverted)
@@ -1705,10 +1705,10 @@ public class EditorManager implements IActivityProvider, Disposable {
          * TODO If the UndoManager knows which changes were ours, we could
          * revert just those
          */
-        IActivity textEditActivity = new TextEditActivity(source, offset,
+        IActivityDataObject textEditActivity = new TextEditActivityDataObject(source, offset,
             newContent, oldContent, path);
 
-        IActivity saveActivity = new EditorActivity(source, Type.Saved, path);
+        IActivityDataObject saveActivity = new EditorActivityDataObject(source, Type.Saved, path);
 
         fireActivity(textEditActivity);
         fireActivity(saveActivity);

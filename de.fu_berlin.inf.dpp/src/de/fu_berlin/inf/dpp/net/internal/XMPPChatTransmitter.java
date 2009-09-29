@@ -426,7 +426,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         for (Entry<JID, Integer> entry : expectedSequenceNumbers.entrySet()) {
             JID recipient = entry.getKey();
             int expectedSequenceNumber = entry.getValue();
-            log.info("Requesting old activity (sequence number="
+            log.info("Requesting old activityDataObject (sequence number="
                 + expectedSequenceNumber + "," + andup + ") from "
                 + Util.prefix(recipient));
             sendMessage(recipient, requestActivityExtension.create(
@@ -444,7 +444,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     /**
-     * Send the given list of timed activities to the given recipient.
+     * Send the given list of timed activityDataObjects to the given recipient.
      * 
      * If the total size in byte of the timedActivities exceeds
      * MAX_XMPP_MESSAGE_SIZE, the message is not send using XMPP Chat Messages
@@ -495,7 +495,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                     .convert(new NullProgressMonitor()));
             } catch (IOException e) {
                 log
-                    .error("Failed to sent activities ("
+                    .error("Failed to sent activityDataObjects ("
                         + Util.formatByte(data.length) + "): "
                         + timedActivities, e);
                 return;

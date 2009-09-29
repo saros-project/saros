@@ -24,9 +24,9 @@ public class TimedActivities {
 
     /**
      * @param sessionID
-     *            The session ID these timed activities belong to.
-     * @param activities
-     *            The activities wrapped by this container. Must not be null or
+     *            The session ID these timed activityDataObjects belong to.
+     * @param activityDataObjects
+     *            The activityDataObjects wrapped by this container. Must not be null or
      *            an empty {@link List}.
      */
     public TimedActivities(String sessionID, List<TimedActivity> activities) {

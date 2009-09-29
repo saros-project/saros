@@ -19,7 +19,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -229,13 +229,13 @@ public class ConsistencyWatchdogServer extends Job {
                     checksum.bind(doc);
                     checksum.update();
 
-                    // Sent this activity to the server
-                    ChecksumActivity checksumActivity = new ChecksumActivity(
+                    // Sent this activityDataObject to the server
+                    ChecksumActivityDataObject checksumActivityDataObject = new ChecksumActivityDataObject(
                         sharedProject.getLocalUser().getJID(), checksum
                             .getPath(), checksum.getHash(), checksum
                             .getLength());
 
-                    sharedProject.activityCreated(checksumActivity);
+                    sharedProject.activityCreated(checksumActivityDataObject);
 
                 } finally {
                     if (provider != null) {

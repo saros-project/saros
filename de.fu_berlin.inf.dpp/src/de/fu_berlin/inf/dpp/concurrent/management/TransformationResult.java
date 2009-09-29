@@ -9,7 +9,7 @@ import java.util.List;
 import org.apache.commons.lang.ObjectUtils;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer.QueueItem;
 
 public class TransformationResult {
@@ -24,16 +24,16 @@ public class TransformationResult {
         ArrayList<User> toSendViaNetwork = new ArrayList<User>();
         for (User user : queueItem.recipients) {
             if (user.isLocal()) {
-                executeLocally.add(queueItem.activity);
+                executeLocally.add(queueItem.activityDataObject);
             } else {
                 toSendViaNetwork.add(user);
             }
         }
         this.sendToPeers.add(new QueueItem(toSendViaNetwork,
-            queueItem.activity));
+            queueItem.activityDataObject));
     }
 
-    public List<IActivity> executeLocally = new ArrayList<IActivity>();
+    public List<IActivityDataObject> executeLocally = new ArrayList<IActivityDataObject>();
 
     public List<QueueItem> sendToPeers = new ArrayList<QueueItem>();
 
@@ -52,7 +52,7 @@ public class TransformationResult {
         }
     }
 
-    public List<IActivity> getLocalActivities() {
+    public List<IActivityDataObject> getLocalActivities() {
         return executeLocally;
     }
 

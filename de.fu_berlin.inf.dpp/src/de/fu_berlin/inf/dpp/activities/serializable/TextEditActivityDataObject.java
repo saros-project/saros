@@ -17,7 +17,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -27,6 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -36,12 +38,12 @@ import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
- * An immutable text activity.
+ * An immutable text activityDataObject.
  * 
  * @author rdjemili
  */
 @XStreamAlias("textEditActivity")
-public class TextEditActivity extends AbstractActivity {
+public class TextEditActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
     public final int offset;
@@ -62,17 +64,17 @@ public class TextEditActivity extends AbstractActivity {
 
     /**
      * @param offset
-     *            the offset inside the document where this activity happened.
+     *            the offset inside the document where this activityDataObject happened.
      * @param text
      *            the text that was inserted.
      * @param replacedText
-     *            the text that was replaced by this activity.
+     *            the text that was replaced by this activityDataObject.
      * @param editor
-     *            path of the editor where this activity happened.
+     *            path of the editor where this activityDataObject happened.
      * @param source
-     *            JID of the user that caused this activity
+     *            JID of the user that caused this activityDataObject
      */
-    public TextEditActivity(JID source, int offset, String text,
+    public TextEditActivityDataObject(JID source, int offset, String text,
         String replacedText, IPath editor) {
         super(source);
         if (text == null)
@@ -90,7 +92,7 @@ public class TextEditActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "TextEditActivity("
+        return "TextEditActivityDataObject("
             + this.offset
             + ",new:'"
             + Util.escapeForLogging(StringUtils.abbreviate(this.text, 150))
@@ -118,10 +120,10 @@ public class TextEditActivity extends AbstractActivity {
             return true;
         if (!super.equals(obj))
             return false;
-        if (!(obj instanceof TextEditActivity))
+        if (!(obj instanceof TextEditActivityDataObject))
             return false;
 
-        TextEditActivity other = (TextEditActivity) obj;
+        TextEditActivityDataObject other = (TextEditActivityDataObject) obj;
 
         if (offset != other.offset)
             return false;
@@ -142,12 +144,12 @@ public class TextEditActivity extends AbstractActivity {
      * Compare text edit information without source settings.
      * 
      * @param obj
-     *            TextEditActivity Object
+     *            TextEditActivityDataObject Object
      * @return true if edit information equals. false otherwise.
      */
     public boolean sameLike(Object obj) {
-        if (obj instanceof TextEditActivity) {
-            TextEditActivity other = (TextEditActivity) obj;
+        if (obj instanceof TextEditActivityDataObject) {
+            TextEditActivityDataObject other = (TextEditActivityDataObject) obj;
             return (this.offset == other.offset) && (this.editor != null)
                 && (other.editor != null) && this.editor.equals(other.editor)
                 && this.text.equals(other.text)
@@ -157,15 +159,15 @@ public class TextEditActivity extends AbstractActivity {
     }
 
     /**
-     * Convert this TextEditActivity to an Operation
+     * Convert this TextEditActivityDataObject to an Operation
      */
     public Operation toOperation() {
 
-        // delete activity
+        // delete activityDataObject
         if ((replacedText.length() > 0) && (text.length() == 0)) {
             return new DeleteOperation(offset, replacedText);
         }
-        // insert activity
+        // insert activityDataObject
         if ((replacedText.length() == 0) && (text.length() > 0)) {
             return new InsertOperation(offset, text);
         }
@@ -181,11 +183,11 @@ public class TextEditActivity extends AbstractActivity {
         return null;
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

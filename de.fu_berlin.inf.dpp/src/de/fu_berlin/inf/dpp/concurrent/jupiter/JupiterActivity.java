@@ -5,9 +5,9 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.AbstractActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * Algorithm.
  */
 @XStreamAlias("jupiterActivity")
-public class JupiterActivity extends AbstractActivity {
+public class JupiterActivity extends AbstractActivityDataObject {
 
     /**
      * Timestamp that specifies the definition context of the enclosed
@@ -115,11 +115,11 @@ public class JupiterActivity extends AbstractActivity {
         return this.editor;
     }
 
-    public boolean dispatch(IActivityConsumer consumer) {
+    public boolean dispatch(IActivityDataObjectConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityReceiver receiver) {
+    public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
     }
 }

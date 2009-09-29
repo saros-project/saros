@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Path;
 
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -67,10 +67,10 @@ public class Document {
      */
     public void execOperation(Operation op) {
 
-        List<TextEditActivity> activities = op.toTextEdit(new Path("dummy"),
+        List<TextEditActivityDataObject> activities = op.toTextEdit(new Path("dummy"),
             new JID("dummy@server"));
 
-        for (TextEditActivity activity : activities) {
+        for (TextEditActivityDataObject activity : activities) {
 
             int start = activity.offset;
             int end = start + activity.replacedText.length();

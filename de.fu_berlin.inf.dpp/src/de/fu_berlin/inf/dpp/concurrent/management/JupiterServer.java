@@ -6,7 +6,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
@@ -89,12 +89,12 @@ public class JupiterServer {
         return docServer.transformJupiterActivity(jupiterActivity);
     }
 
-    public synchronized Map<JID, ChecksumActivity> withTimestamp(
-        ChecksumActivity checksumActivity) throws TransformationException {
+    public synchronized Map<JID, ChecksumActivityDataObject> withTimestamp(
+        ChecksumActivityDataObject checksumActivityDataObject) throws TransformationException {
 
-        JupiterDocumentServer docServer = getServer(checksumActivity.getPath());
+        JupiterDocumentServer docServer = getServer(checksumActivityDataObject.getPath());
 
-        return docServer.withTimestamp(checksumActivity);
+        return docServer.withTimestamp(checksumActivityDataObject);
     }
 
 }

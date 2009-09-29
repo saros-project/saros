@@ -15,7 +15,7 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.activities.IActivity;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -129,7 +129,7 @@ public class ActivitiesHandler {
             return;
         } catch (IOException e) {
             log.error("Could not deserialize incoming "
-                + "activities or an connection error occurred", e);
+                + "activityDataObjects or an connection error occurred", e);
             return;
         }
 
@@ -138,7 +138,7 @@ public class ActivitiesHandler {
             content = provider.parseString(IOUtils.toString(
                 new ByteArrayInputStream(data), "UTF-8"));
         } catch (IOException e) {
-            log.error("Could not parse incoming activities:", e);
+            log.error("Could not parse incoming activityDataObjects:", e);
             return;
         }
 
@@ -153,14 +153,14 @@ public class ActivitiesHandler {
 
     /**
      * This method is called from all the different transfer methods, when an
-     * activity arrives. This method puts the activity into the
+     * activityDataObject arrives. This method puts the activityDataObject into the
      * ActivitySequencer which will execute it.
      * 
      * @param fromJID
-     *            The JID which sent these activities (the source in the
-     *            activities might be different!)
+     *            The JID which sent these activityDataObjects (the source in the
+     *            activityDataObjects might be different!)
      * @param timedActivities
-     *            The received activities including sequence numbers.
+     *            The received activityDataObjects including sequence numbers.
      * 
      * @sarosThread must be called from the Dispatch Thread
      */
@@ -181,17 +181,17 @@ public class ActivitiesHandler {
 
         for (TimedActivity timedActivity : timedActivities) {
 
-            IActivity activity = timedActivity.getActivity();
+            IActivityDataObject activityDataObject = timedActivity.getActivity();
 
             /*
-             * Some activities save space in the message by not setting the
+             * Some activityDataObjects save space in the message by not setting the
              * source and the XML parser needs to provide the source
              */
-            assert activity.getSource() != null : "Received activity without source:"
-                + activity;
+            assert activityDataObject.getSource() != null : "Received activityDataObject without source:"
+                + activityDataObject;
 
             try {
-                // Ask sequencer to execute or queue until missing activities
+                // Ask sequencer to execute or queue until missing activityDataObjects
                 // arrive
                 project.getSequencer().exec(timedActivity);
             } catch (Exception e) {

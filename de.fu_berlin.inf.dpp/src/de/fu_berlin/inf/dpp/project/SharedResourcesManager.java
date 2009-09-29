@@ -45,11 +45,11 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.FolderActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IResourceActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity.Purpose;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IResourceActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
@@ -64,8 +64,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
- * entering text in an text editor. It creates and executes file activities and
- * folder activities.
+ * entering text in an text editor. It creates and executes file activityDataObjects and
+ * folder activityDataObjects.
  * 
  * @author rdjemili
  * 
@@ -78,7 +78,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         .getName());
 
     /**
-     * While paused the SharedResourcesManager doesn't fire activities
+     * While paused the SharedResourcesManager doesn't fire activityDataObjects
      */
     protected boolean pause = false;
 
@@ -125,21 +125,21 @@ public class SharedResourcesManager implements IResourceChangeListener,
     };
 
     /**
-     * Listens for resource changes in shared project and fires activities.
+     * Listens for resource changes in shared project and fires activityDataObjects.
      */
     protected class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
-        // stores activities that happen while one change event
-        protected List<IResourceActivity> activitiesBuffer = new ArrayList<IResourceActivity>();
+        // stores activityDataObjects that happen while one change event
+        protected List<IResourceActivityDataObject> activitiesBuffer = new ArrayList<IResourceActivityDataObject>();
 
         /**
          * Compares the length (in number segments) of IPaths of given
          * Activities. Longer path is 'bigger'.
          * */
         protected class PathLengthComparator implements
-            Comparator<IResourceActivity> {
+            Comparator<IResourceActivityDataObject> {
 
-            public int compare(IResourceActivity a1, IResourceActivity a2) {
+            public int compare(IResourceActivityDataObject a1, IResourceActivityDataObject a2) {
                 int a1sc = a1.getPath().segmentCount();
                 int a2sc = a2.getPath().segmentCount();
 
@@ -153,62 +153,62 @@ public class SharedResourcesManager implements IResourceChangeListener,
          * Activities. Shorter path is 'bigger'.
          * */
         protected class ReversePathLengthComparator implements
-            Comparator<IResourceActivity> {
+            Comparator<IResourceActivityDataObject> {
 
             PathLengthComparator pathLengthComparator = new PathLengthComparator();
 
-            public int compare(IResourceActivity a1, IResourceActivity a2) {
+            public int compare(IResourceActivityDataObject a1, IResourceActivityDataObject a2) {
                 return -pathLengthComparator.compare(a1, a2);
             }
         }
 
         /**
-         * To be run before change event ends. It orders activities in buffer
+         * To be run before change event ends. It orders activityDataObjects in buffer
          * and fires them.
          */
         public void finish() {
-            for (IActivity activity : getOrderedActivities())
-                fireActivity(activity);
+            for (IActivityDataObject activityDataObject : getOrderedActivities())
+                fireActivity(activityDataObject);
         }
 
         /**
-         * Orders activities in buffer.
+         * Orders activityDataObjects in buffer.
          */
-        protected List<IResourceActivity> getOrderedActivities() {
+        protected List<IResourceActivityDataObject> getOrderedActivities() {
             // TODO Use a comparator which includes all this as a sorting rule
 
-            List<IResourceActivity> fileCreateActivities = new ArrayList<IResourceActivity>();
-            List<IResourceActivity> fileMoveActivities = new ArrayList<IResourceActivity>();
-            List<IResourceActivity> fileRemoveActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivityDataObject> fileCreateActivities = new ArrayList<IResourceActivityDataObject>();
+            List<IResourceActivityDataObject> fileMoveActivities = new ArrayList<IResourceActivityDataObject>();
+            List<IResourceActivityDataObject> fileRemoveActivities = new ArrayList<IResourceActivityDataObject>();
 
-            List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
-            List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivityDataObject> folderCreateActivities = new ArrayList<IResourceActivityDataObject>();
+            List<IResourceActivityDataObject> folderRemoveActivities = new ArrayList<IResourceActivityDataObject>();
 
-            List<IResourceActivity> orderedList;
+            List<IResourceActivityDataObject> orderedList;
 
             /**
-             * split all activities in activities buffer in groups
+             * split all activityDataObjects in activityDataObjects buffer in groups
              * ({File,Folder} * {Create, Move, Delete})
              */
-            for (IResourceActivity activity : activitiesBuffer) {
-                FolderActivity.Type tFolder;
-                FileActivity.Type tFile;
+            for (IResourceActivityDataObject activity : activitiesBuffer) {
+                FolderActivityDataObject.Type tFolder;
+                FileActivityDataObject.Type tFile;
 
-                if (activity instanceof FileActivity) {
-                    tFile = ((FileActivity) activity).getType();
-                    if (tFile == FileActivity.Type.Created)
+                if (activity instanceof FileActivityDataObject) {
+                    tFile = ((FileActivityDataObject) activity).getType();
+                    if (tFile == FileActivityDataObject.Type.Created)
                         fileCreateActivities.add(activity);
-                    else if (tFile == FileActivity.Type.Moved)
+                    else if (tFile == FileActivityDataObject.Type.Moved)
                         fileMoveActivities.add(activity);
-                    else if (tFile == FileActivity.Type.Removed)
+                    else if (tFile == FileActivityDataObject.Type.Removed)
                         fileRemoveActivities.add(activity);
 
                 }
-                if (activity instanceof FolderActivity) {
-                    tFolder = ((FolderActivity) activity).getType();
-                    if (tFolder == FolderActivity.Type.Created)
+                if (activity instanceof FolderActivityDataObject) {
+                    tFolder = ((FolderActivityDataObject) activity).getType();
+                    if (tFolder == FolderActivityDataObject.Type.Created)
                         folderCreateActivities.add(activity);
-                    else if (tFolder == FolderActivity.Type.Removed)
+                    else if (tFolder == FolderActivityDataObject.Type.Removed)
                         folderRemoveActivities.add(activity);
 
                 }
@@ -224,9 +224,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             Collections.sort(folderCreateActivities, pathLengthComparator);
             Collections.sort(folderRemoveActivities, iplc);
 
-            orderedList = new ArrayList<IResourceActivity>();
+            orderedList = new ArrayList<IResourceActivityDataObject>();
 
-            // add activities to the result
+            // add activityDataObjects to the result
             orderedList.addAll(folderCreateActivities);
             orderedList.addAll(fileMoveActivities);
             orderedList.addAll(fileCreateActivities);
@@ -257,7 +257,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return false;
             }
 
-            IResourceActivity activity = null;
+            IResourceActivityDataObject activity = null;
 
             if (resource instanceof IFile)
                 activity = handleFileDelta(delta);
@@ -266,27 +266,27 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
             if (activity != null) {
 
-                // TODO A delete activity is triggered twice
+                // TODO A delete activityDataObject is triggered twice
                 activitiesBuffer.add(activity);
             }
 
             return delta.getKind() != IResourceDelta.NO_CHANGE;
         }
 
-        protected IResourceActivity handleFolderDelta(IResourceDelta delta) {
+        protected IResourceActivityDataObject handleFolderDelta(IResourceDelta delta) {
             IResource resource = delta.getResource();
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:
 
-                return new FolderActivity(saros.getMyJID(),
-                    FolderActivity.Type.Created, resource
+                return new FolderActivityDataObject(saros.getMyJID(),
+                    FolderActivityDataObject.Type.Created, resource
                         .getProjectRelativePath());
 
             case IResourceDelta.REMOVED:
                 if (isMoved(delta))
                     return null;
-                return new FolderActivity(saros.getMyJID(),
-                    FolderActivity.Type.Removed, resource
+                return new FolderActivityDataObject(saros.getMyJID(),
+                    FolderActivityDataObject.Type.Removed, resource
                         .getProjectRelativePath());
 
             default:
@@ -294,7 +294,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
         }
 
-        protected IResourceActivity handleFileDelta(IResourceDelta delta) {
+        protected IResourceActivityDataObject handleFileDelta(IResourceDelta delta) {
             IResource resource = delta.getResource();
             int kind = delta.getKind();
 
@@ -323,7 +323,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     oldPath = oldPath.removeFirstSegments(1);
 
                     try {
-                        return FileActivity.moved(sharedProject.getProject(),
+                        return FileActivityDataObject.moved(sharedProject.getProject(),
                             jid, newPath, oldPath, isContentChange(delta));
                     } catch (IOException e) {
                         log
@@ -344,7 +344,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 }
                 try {
 
-                    return FileActivity.created(sharedProject.getProject(),
+                    return FileActivityDataObject.created(sharedProject.getProject(),
                         saros.getMyJID(), resource.getFullPath().makeRelative()
                             .removeFirstSegments(1), Purpose.ACTIVITY);
                 } catch (IOException e) {
@@ -356,7 +356,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceDelta.REMOVED:
                 if (isMoved(delta)) // Ignore "REMOVED" while moving
                     return null;
-                return FileActivity.removed(saros.getMyJID(), resource
+                return FileActivityDataObject.removed(saros.getMyJID(), resource
                     .getProjectRelativePath(), Purpose.ACTIVITY);
 
             default:
@@ -388,11 +388,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         }
 
-        protected void fireActivity(final IActivity activity) {
+        protected void fireActivity(final IActivityDataObject activityDataObject) {
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     for (IActivityListener listener : listeners) {
-                        listener.activityCreated(activity);
+                        listener.activityCreated(activityDataObject);
                     }
                 }
             });
@@ -507,31 +507,31 @@ public class SharedResourcesManager implements IResourceChangeListener,
     /**
      * {@inheritDoc}
      */
-    public void exec(IActivity activity) {
+    public void exec(IActivityDataObject activityDataObject) {
 
-        if (!(activity instanceof FileActivity || activity instanceof FolderActivity))
+        if (!(activityDataObject instanceof FileActivityDataObject || activityDataObject instanceof FolderActivityDataObject))
             return;
 
         try {
             fileReplacementInProgressObservable.startReplacement();
 
-            if (activity instanceof FileActivity) {
-                exec((FileActivity) activity);
-            } else if (activity instanceof FolderActivity) {
-                exec((FolderActivity) activity);
+            if (activityDataObject instanceof FileActivityDataObject) {
+                exec((FileActivityDataObject) activityDataObject);
+            } else if (activityDataObject instanceof FolderActivityDataObject) {
+                exec((FolderActivityDataObject) activityDataObject);
             }
 
         } catch (CoreException e) {
-            log.error("Failed to execute resource activity.", e);
+            log.error("Failed to execute resource activityDataObject.", e);
         } finally {
             fileReplacementInProgressObservable.replacementDone();
         }
     }
 
-    protected void exec(FileActivity activity) throws CoreException {
+    protected void exec(FileActivityDataObject activity) throws CoreException {
 
         if (this.sharedProject == null) {
-            log.warn("Project has ended for FileActivity " + activity);
+            log.warn("Project has ended for FileActivityDataObject " + activity);
             return;
         }
 
@@ -550,7 +550,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
 
         // Create or remove file
-        if (activity.getType() == FileActivity.Type.Created) {
+        if (activity.getType() == FileActivityDataObject.Type.Created) {
             // TODO should be reported to the user
             SubMonitor monitor = SubMonitor.convert(new NullProgressMonitor());
             try {
@@ -559,9 +559,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
             } catch (Exception e) {
                 log.error("Could not write file: " + file);
             }
-        } else if (activity.getType() == FileActivity.Type.Removed) {
+        } else if (activity.getType() == FileActivityDataObject.Type.Removed) {
             FileUtil.delete(file);
-        } else if (activity.getType() == FileActivity.Type.Moved) {
+        } else if (activity.getType() == FileActivityDataObject.Type.Moved) {
 
             IPath newFilePath = activity.getPath();
             IResource fileOldResource = project.findMember(activity
@@ -596,13 +596,13 @@ public class SharedResourcesManager implements IResourceChangeListener,
         }
     }
 
-    protected void exec(FolderActivity activity) throws CoreException {
+    protected void exec(FolderActivityDataObject activity) throws CoreException {
         IFolder folder = this.sharedProject.getProject().getFolder(
             activity.getPath());
 
-        if (activity.getType() == FolderActivity.Type.Created) {
+        if (activity.getType() == FolderActivityDataObject.Type.Created) {
             FileUtil.create(folder);
-        } else if (activity.getType() == FolderActivity.Type.Removed) {
+        } else if (activity.getType() == FolderActivityDataObject.Type.Removed) {
             try {
                 FileUtil.delete(folder);
             } catch (CoreException e) {

@@ -15,10 +15,10 @@ import org.joda.time.Duration;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.PingPongActivity;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -63,10 +63,10 @@ public class PingPongCentral extends AbstractActivityProvider {
             this.user = user;
         }
 
-        public void add(PingPongActivity pingPongActivity) {
+        public void add(PingPongActivityDataObject pingPongActivityDataObject) {
 
             // This is the reply to a ping the local user sent himself
-            Duration rtt = pingPongActivity.getRoundtripTime();
+            Duration rtt = pingPongActivityDataObject.getRoundtripTime();
 
             sessionAverage = sessionAverage.plus(rtt);
 
@@ -190,29 +190,29 @@ public class PingPongCentral extends AbstractActivityProvider {
         this.sessionManager.removeSessionListener(sessionListener);
     }
 
-    protected IActivityReceiver activityReceiver = new AbstractActivityReceiver() {
+    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
         @Override
-        public void receive(PingPongActivity pingPongActivity) {
+        public void receive(PingPongActivityDataObject pingPongActivityDataObject) {
 
-            User initiator = sharedProject.getUser(pingPongActivity
+            User initiator = sharedProject.getUser(pingPongActivityDataObject
                 .getInitiator());
-            User sender = sharedProject.getUser(pingPongActivity.getSource());
+            User sender = sharedProject.getUser(pingPongActivityDataObject.getSource());
 
             if (initiator.isLocal()) {
 
-                stats.get(sender).add(pingPongActivity);
+                stats.get(sender).add(pingPongActivityDataObject);
 
             } else {
                 // This is the ping from another user
-                sharedProject.sendActivity(initiator, pingPongActivity
+                sharedProject.sendActivity(initiator, pingPongActivityDataObject
                     .createPong(sharedProject.getLocalUser()));
             }
         }
     };
 
     @Override
-    public void exec(IActivity activity) {
-        activity.dispatch(activityReceiver);
+    public void exec(IActivityDataObject activityDataObject) {
+        activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
     /**
@@ -229,7 +229,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             stats.get(remoteUser).pingsSent++;
 
-            sharedProject.sendActivity(remoteUser, PingPongActivity
+            sharedProject.sendActivity(remoteUser, PingPongActivityDataObject
                 .create(sharedProject.getLocalUser()));
 
         }

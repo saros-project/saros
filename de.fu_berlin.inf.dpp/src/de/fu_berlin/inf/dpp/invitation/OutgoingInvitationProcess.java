@@ -54,7 +54,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
- * process, so that background activities such as autoBuilding do not interfere
+ * process, so that background activityDataObjects such as autoBuilding do not interfere
  * with the InvitationProcess
  * 
  */

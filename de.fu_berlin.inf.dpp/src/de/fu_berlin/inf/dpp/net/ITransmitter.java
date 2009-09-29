@@ -35,7 +35,7 @@ import org.jivesoftware.smack.packet.IQ;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
@@ -183,7 +183,7 @@ public interface ITransmitter {
      *            the project-relative path of the resource that is to be sent.
      * @param sequenceNumber
      *            the sequence number that will be associated with this
-     *            activity.
+     *            activityDataObject.
      * @param callback
      *            an call-back for the file transfer state. CANNOT be null.
      * 
@@ -220,7 +220,7 @@ public interface ITransmitter {
      * @param path
      *            the project-relative path of the resource that is to be sent.
      * @param sequenceNumber
-     *            the time that will be associated with this activity.
+     *            the time that will be associated with this activityDataObject.
      * 
      * @param monitor
      *            a monitor to which progress will be reported and which is
@@ -290,7 +290,7 @@ public interface ITransmitter {
     public void sendRemainingMessages();
 
     /**
-     * Sends a request for activities to all users.
+     * Sends a request for activityDataObjects to all users.
      * 
      * TODO SS MR Dependency Violation - ITransmitter should not need a shared
      * project
@@ -301,8 +301,8 @@ public interface ITransmitter {
      *            a map containing the sequence number to be requested as a
      *            value and the user to request them from as key
      * @param andUp
-     *            true if all activities after the requested one are requested
-     *            too, false if only the activity with the
+     *            true if all activityDataObjects after the requested one are requested
+     *            too, false if only the activityDataObject with the
      *            requestedSequenceNumber is requested
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
@@ -323,23 +323,23 @@ public interface ITransmitter {
     /**
      * Sends given list of TimedActivities to the given recipient.
      * 
-     * This list MUST not contain any {@link FileActivity}s where
-     * {@link FileActivity#getType()} == {@link FileActivity.Type#Created} as
+     * This list MUST not contain any {@link FileActivityDataObject}s where
+     * {@link FileActivityDataObject#getType()} == {@link FileActivityDataObject.Type#Created} as
      * binary data is not supported in messages bodies.
      * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
-     *            activities.
+     *            activityDataObjects.
      * @param timedActivities
-     *            The list of timed activities to send to the user.
+     *            The list of timed activityDataObjects to send to the user.
      * 
      * @throws IllegalArgumentException
      *             if the recipient is null, the recipient equals the local user
      *             as returned by {@link Saros#getMyJID()} or the given list is
-     *             null or contains no activities.
+     *             null or contains no activityDataObjects.
      * 
      * @throws AssertionError
-     *             if the given list of timed activities contains FileActivities
+     *             if the given list of timed activityDataObjects contains FileActivities
      *             of type created AND the application is run using asserts.
      */
     public void sendTimedActivities(JID recipient,

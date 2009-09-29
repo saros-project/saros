@@ -8,12 +8,12 @@ import org.eclipse.core.runtime.IPath;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.ChecksumActivity;
-import de.fu_berlin.inf.dpp.activities.FileActivity;
-import de.fu_berlin.inf.dpp.activities.IActivity;
-import de.fu_berlin.inf.dpp.activities.IActivityReceiver;
-import de.fu_berlin.inf.dpp.activities.TextEditActivity;
+import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
@@ -82,38 +82,38 @@ public class ConcurrentDocumentClient implements Disposable {
     }
 
     /**
-     * This is called from the shared project when a local activity has been
-     * caused by user activity (for instance the user pressed key 'a')
+     * This is called from the shared project when a local activityDataObject has been
+     * caused by user activityDataObject (for instance the user pressed key 'a')
      * 
-     * This method transforms the activity into a list of events to send to
+     * This method transforms the activityDataObject into a list of events to send to
      * individual users.
      * 
      * @swt Must be called on the SWT Thread to ensure proper synchronization
      * 
-     * @host and @client This is called whenever activities are created LOCALLY
+     * @host and @client This is called whenever activityDataObjects are created LOCALLY
      *       both on the client and on the host
      */
-    public List<QueueItem> transformOutgoing(IActivity activity) {
+    public List<QueueItem> transformOutgoing(IActivityDataObject activityDataObject) {
 
         assert Util.isSWT() : "CDC.transformOutgoing must be called on the SWT Thread";
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
-        if (activity instanceof TextEditActivity) {
-            TextEditActivity textEdit = (TextEditActivity) activity;
+        if (activityDataObject instanceof TextEditActivityDataObject) {
+            TextEditActivityDataObject textEdit = (TextEditActivityDataObject) activityDataObject;
 
             result.add(new QueueItem(host, jupiterClient.generate(textEdit)));
 
             /*
-             * This activity still needs to be sent to all observers, because
+             * This activityDataObject still needs to be sent to all observers, because
              * they are not notified by receiveJupiterActivityHostSide(...).
              */
             if (sharedProject.isHost()) {
                 result.add(new QueueItem(sharedProject.getRemoteObservers(),
-                    activity));
+                    activityDataObject));
             }
-        } else if (activity instanceof ChecksumActivity) {
-            ChecksumActivity checksumActivity = (ChecksumActivity) activity;
+        } else if (activityDataObject instanceof ChecksumActivityDataObject) {
+            ChecksumActivityDataObject checksumActivityDataObject = (ChecksumActivityDataObject) activityDataObject;
 
             /**
              * Only the host can generate Checksums
@@ -122,20 +122,20 @@ public class ConcurrentDocumentClient implements Disposable {
 
             // Send Jupiter specific checksum to ConcurrentDocumentServer
             result.add(new QueueItem(host, jupiterClient
-                .withTimestamp(checksumActivity)));
+                .withTimestamp(checksumActivityDataObject)));
 
             // Send general checksum to all observers
             result.add(new QueueItem(sharedProject.getRemoteObservers(),
-                checksumActivity));
+                checksumActivityDataObject));
 
         } else {
-            result.add(new QueueItem(sharedProject.getRemoteUsers(), activity));
+            result.add(new QueueItem(sharedProject.getRemoteUsers(), activityDataObject));
         }
         return result;
     }
 
     /**
-     * This method is called when activities received over the network should be
+     * This method is called when activityDataObjects received over the network should be
      * executed locally.
      * 
      * This method will transform them and return a set of results which can be
@@ -144,40 +144,40 @@ public class ConcurrentDocumentClient implements Disposable {
      * 
      * @swt Must be called on the SWT Thread to ensure proper synchronization
      * 
-     * @host and @client This is called whenever activities are received from
+     * @host and @client This is called whenever activityDataObjects are received from
      *       REMOTELY both on the client and on the host
      */
-    public TransformationResult transformIncoming(List<IActivity> activities) {
+    public TransformationResult transformIncoming(List<IActivityDataObject> activityDataObjects) {
 
         assert Util.isSWT() : "CDC.transformIncoming must be called on the SWT Thread";
 
         TransformationResult result = new TransformationResult(sharedProject
             .getLocalUser());
 
-        for (IActivity activity : activities) {
+        for (IActivityDataObject activityDataObject : activityDataObjects) {
             try {
-                activity.dispatch(clientReceiver);
+                activityDataObject.dispatch(clientReceiver);
 
-                if (activity instanceof JupiterActivity) {
-                    result.addAll(receiveActivity((JupiterActivity) activity));
-                } else if (activity instanceof ChecksumActivity
+                if (activityDataObject instanceof JupiterActivity) {
+                    result.addAll(receiveActivity((JupiterActivity) activityDataObject));
+                } else if (activityDataObject instanceof ChecksumActivityDataObject
                     && sharedProject.isDriver()) {
-                    result.addAll(receiveChecksum((ChecksumActivity) activity));
+                    result.addAll(receiveChecksum((ChecksumActivityDataObject) activityDataObject));
                 } else {
-                    result.executeLocally.add(activity);
+                    result.executeLocally.add(activityDataObject);
                 }
             } catch (Exception e) {
-                log.error("Error while receiving activity: " + activity, e);
+                log.error("Error while receiving activityDataObject: " + activityDataObject, e);
             }
         }
         return result;
     }
 
     /**
-     * Will receive an incoming ChecksumActivity and discard it if it is not
+     * Will receive an incoming ChecksumActivityDataObject and discard it if it is not
      * valid within the current local Jupiter timestamp
      */
-    protected TransformationResult receiveChecksum(ChecksumActivity activity) {
+    protected TransformationResult receiveChecksum(ChecksumActivityDataObject activity) {
 
         TransformationResult result = new TransformationResult(sharedProject
             .getLocalUser());
@@ -193,11 +193,11 @@ public class ConcurrentDocumentClient implements Disposable {
         return result;
     }
 
-    protected final IActivityReceiver clientReceiver = new AbstractActivityReceiver() {
+    protected final IActivityDataObjectReceiver clientReceiver = new AbstractActivityDataObjectReceiver() {
         @Override
-        public void receive(FileActivity fileActivity) {
-            if (fileActivity.getType() == FileActivity.Type.Removed) {
-                jupiterClient.reset(fileActivity.getPath());
+        public void receive(FileActivityDataObject fileActivityDataObject) {
+            if (fileActivityDataObject.getType() == FileActivityDataObject.Type.Removed) {
+                jupiterClient.reset(fileActivityDataObject.getPath());
             }
         }
     };
@@ -221,7 +221,7 @@ public class ConcurrentDocumentClient implements Disposable {
         }
 
         // Transform to TextEdit so it can be executed locally
-        for (TextEditActivity textEdit : op.toTextEdit(jupiterActivity
+        for (TextEditActivityDataObject textEdit : op.toTextEdit(jupiterActivity
             .getEditorPath(), jupiterActivity.getSource())) {
 
             result.executeLocally.add(textEdit);
@@ -231,8 +231,8 @@ public class ConcurrentDocumentClient implements Disposable {
         if (sharedProject.isHost()) {
             List<User> observers = sharedProject.getObservers();
             observers.remove(host);
-            for (IActivity activity : result.executeLocally) {
-                result.add(new QueueItem(observers, activity));
+            for (IActivityDataObject activityDataObject : result.executeLocally) {
+                result.add(new QueueItem(observers, activityDataObject));
             }
         }
         return result;
@@ -256,11 +256,11 @@ public class ConcurrentDocumentClient implements Disposable {
         jupiterClient.reset(path);
     }
 
-    public boolean isCurrent(ChecksumActivity checksumActivity) {
+    public boolean isCurrent(ChecksumActivityDataObject checksumActivityDataObject) {
         try {
-            return jupiterClient.isCurrent(checksumActivity);
+            return jupiterClient.isCurrent(checksumActivityDataObject);
         } catch (TransformationException e) {
-            log.error("Error during transformation of: " + checksumActivity, e);
+            log.error("Error during transformation of: " + checksumActivityDataObject, e);
             // TODO this should trigger a consistency recovery. Difficult :-(
             return false;
         }
