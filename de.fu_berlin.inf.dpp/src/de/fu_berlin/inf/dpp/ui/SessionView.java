@@ -386,7 +386,7 @@ public class SessionView extends ViewPart {
 
         // TODO Add 5 pixels of padding
         this.viewer = new SessionViewTableViewer(parent, SWT.MULTI
-            | SWT.H_SCROLL | SWT.V_SCROLL);
+            | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
         this.viewer.setContentProvider(new SessionContentProvider());
 
         final SessionLabelProvider labelProvider = new SessionLabelProvider();
