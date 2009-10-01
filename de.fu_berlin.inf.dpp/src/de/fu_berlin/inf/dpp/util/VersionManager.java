@@ -137,6 +137,13 @@ public class VersionManager {
          */
 
         /**
+         * Version 9.10.2.TESTING
+         */
+        compatibilityChart.put(new Version("9.10.2.TESTING"), Arrays.asList(
+            new Version("9.10.2.TESTING"), new Version("9.10.2.DEVEL"),
+            new Version("9.9.11.r1706"), new Version("9.9.11.DEVEL")));
+
+        /**
          * Version 9.10.2.DEVEL
          */
         compatibilityChart.put(new Version("9.10.2.DEVEL"), Arrays.asList(
@@ -287,7 +294,6 @@ public class VersionManager {
             return Compatibility.TOO_NEW;
     }
 
-    
     /**
      * If the remote version is newer than the local one, the remote
      * compatibility comparison result will be returned.
