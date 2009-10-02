@@ -41,16 +41,15 @@ public class DiscoveryManager implements Disposable {
         private static final long serialVersionUID = -4340008321236181064L;
     }
 
-    private static final Logger log = Logger.getLogger(DiscoveryManager.class
-        .getName());
+    private static final Logger log = Logger.getLogger(DiscoveryManager.class);
 
     /**
      * The cache contains the results of calls to querySupport indexed by the
      * string value of a given JID. If the discovery failed, a null value is
      * stored.
      */
-    protected Map<String, DiscoverInfo> cache = Collections
-        .synchronizedMap(new HashMap<String, DiscoverInfo>());
+    protected Map<String, DiscoverInfoWrapper> cache = Collections
+        .synchronizedMap(new HashMap<String, DiscoverInfoWrapper>());
 
     @Inject
     protected Saros saros;
@@ -63,6 +62,12 @@ public class DiscoveryManager implements Disposable {
      * notifications when the roster changes.
      */
     protected IRosterListener rosterListener = new IRosterListener() {
+
+        /**
+         * Stores the most recent presence for each user, so we can keep track
+         * of away/available changes which should not update the RosterView.
+         */
+        protected Map<String, Presence> lastPresenceMap = new HashMap<String, Presence>();
 
         protected void clearCache(Presence presence) {
             String rjid = presence.getFrom();
@@ -101,9 +106,25 @@ public class DiscoveryManager implements Disposable {
             clearCache(addresses);
         }
 
-        public void presenceChanged(Presence presence) {
-            log.trace("presenceChanged");
-            clearCache(presence);
+        public void presenceChanged(Presence current) {
+            log.debug("presenceChanged:" + current.toString());
+
+            if (hasOnlineStateChanged(current))
+                clearCache(current);
+            lastPresenceMap.put(current.getFrom(), current);
+        }
+
+        protected boolean hasOnlineStateChanged(Presence presence) {
+            Presence last = lastPresenceMap.get(presence.getFrom());
+            if (last == null)
+                return false;
+
+            if (((last.isAvailable() || last.isAway()) && (presence
+                .isAvailable() || presence.isAway()))) {
+                return false;
+            }
+
+            return true;
         }
 
         public void rosterChanged(Roster roster) {
@@ -189,8 +210,12 @@ public class DiscoveryManager implements Disposable {
                 continue;
             }
 
-            DiscoverInfo disco = cache.get(rqJID.toString());
-            if (disco != null && disco.containsFeature(Saros.NAMESPACE))
+            DiscoverInfoWrapper info = cache.get(rqJID.toString());
+            if (info == null)
+                continue;
+
+            DiscoverInfo disco = info.item;
+            if (disco != null && disco.containsFeature(namespace))
                 return true;
         }
 
@@ -244,6 +269,17 @@ public class DiscoveryManager implements Disposable {
     }
 
     /**
+     * DiscoverInfo wrapper.
+     */
+    protected static class DiscoverInfoWrapper {
+        public DiscoverInfo item;
+
+        public boolean isAvailable() {
+            return item != null;
+        }
+    }
+
+    /**
      * Perform a ServiceDiscovery and check if the given feature is among the
      * features supported by the given recipient.
      * 
@@ -261,22 +297,39 @@ public class DiscoveryManager implements Disposable {
         if (recipient.getResource().equals(""))
             log.warn("Resource missing: ", new StackTrace());
 
-        DiscoverInfo info;
+        DiscoverInfoWrapper info;
 
-        if (cache.containsKey(recipient.toString())) {
+        // add dummy
+        synchronized (cache) {
             info = cache.get(recipient.toString());
-        } else {
-            // TODO block if a query for the recipient is already in progress
-            info = querySupport(recipient);
-            log.debug("Inserting DiscoveryInfo into Cache for: " + recipient);
-            cache.put(recipient.toString(), info);
+            if (info == null) {
+                info = new DiscoverInfoWrapper();
+                cache.put(recipient.toString(), info);
+            }
+        }
+
+        DiscoverInfo disco = null;
+
+        // FIXME: If a cache clear appears at this point it is possible to have
+        // more than one discovery running for the same JID.
+
+        // wait if there is one discovery in progress
+        synchronized (info) {
+            if (info.isAvailable())
+                disco = info.item;
+            else {
+                disco = info.item = querySupport(recipient);
+                log
+                    .debug("Inserted DiscoveryInfo into Cache for: "
+                        + recipient);
+            }
         }
 
         // Null means that the discovery failed
-        if (info == null)
+        if (disco == null)
             return false;
 
-        return info.containsFeature(feature);
+        return disco.containsFeature(feature);
     }
 
     /**
