@@ -54,8 +54,8 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
- * process, so that background activityDataObjects such as autoBuilding do not interfere
- * with the InvitationProcess
+ * process, so that background activityDataObjects such as autoBuilding do not
+ * interfere with the InvitationProcess
  * 
  */
 public class OutgoingInvitationProcess extends InvitationProcess {
@@ -298,15 +298,6 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         subMonitor.setTaskName("Creating archive...");
         archive = null;
 
-        if (this.toSend.size() == 0) {
-            setState(State.SYNCHRONIZING_DONE);
-            return;
-        }
-
-        // FIX #2836964: Prefix string too short
-        archive = File.createTempFile(
-            "SarosSyncArchive-" + getPeer().getName(), ".zip");
-
         // STOP all users
         log.debug("Inv " + Util.prefix(peer) + ": Stopping users: "
             + sharedProject.getParticipants());
@@ -319,9 +310,25 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         }
         EditorAPI.saveProject(sharedProject.getProject());
 
-        FileZipper.createProjectZipArchive(toSend, archive, sharedProject
-            .getProject(), subMonitor.newChild(25,
-            SubMonitor.SUPPRESS_ALL_LABELS));
+        /**
+         * If the filelist <code>toSend</code> is empty, the projects are
+         * identical. We do not have to send anything, so we do not create an
+         * archive either.
+         */
+        SubMonitor archiveMonitor = subMonitor.newChild(25,
+            SubMonitor.SUPPRESS_ALL_LABELS);
+        if (toSend.size() != 0) {
+            /*
+             * FIX #2836964: Prefix string too short
+             * 
+             * Do not delete the "SarosSyncArchive" prefix.
+             */
+            archive = File.createTempFile("SarosSyncArchive-"
+                + getPeer().getName(), ".zip");
+            FileZipper.createProjectZipArchive(toSend, archive, sharedProject
+                .getProject(), archiveMonitor);
+        }
+        archiveMonitor.done();
 
         User newUser = new User(sharedProject, peer, colorID);
         this.sharedProject.addUser(newUser);
@@ -343,9 +350,14 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected void sendArchive(SubMonitor subMonitor)
         throws UserCancellationException, IOException {
 
-        subMonitor.setTaskName("Sending archive...");
-        transmitter.sendProjectArchive(this.peer, invitationID,
-            this.sharedProject.getProject(), archive, subMonitor);
+        if (archive != null) {
+            subMonitor.setTaskName("Sending archive...");
+            transmitter.sendProjectArchive(this.peer, invitationID,
+                this.sharedProject.getProject(), archive, subMonitor);
+        } else {
+            log.debug("Inv " + Util.prefix(peer)
+                + ": No archive to send. The projects must be 100% identical.");
+        }
 
         if (getState() == State.SYNCHRONIZING) {
             setState(State.SYNCHRONIZING_DONE);
