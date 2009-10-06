@@ -89,6 +89,14 @@ public interface ISharedProject extends IActivityListener {
     public void setUserRole(User user, UserRole role);
 
     /**
+     * Sets the {@link User#invitationComplete} flag to true;
+     * 
+     * @param user
+     *            The user whose invitation process has completed.
+     */
+    public void userInvitationCompleted(final User user);
+
+    /**
      * @return <code>true</code> if the local client is a current driver of this
      *         shared project. <code>false</code> otherwise.
      */

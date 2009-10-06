@@ -65,6 +65,13 @@ public class User {
 
     protected final int colorID;
 
+    /**
+     * The {@link #isInvitationComplete()} status is always false if a new
+     * {@link User} is created. It can be changed only once by calling
+     * {@link #invitationCompleted()}. The reason is: if a {@link User} is
+     * already in the session, he can not leave and join again. In this case a
+     * new {@link User} object will be created.
+     */
     protected boolean invitationComplete = false;
 
     protected UserConnectionState connectionState = UserConnectionState.UNKNOWN;
@@ -160,8 +167,18 @@ public class User {
         return this.invitationComplete;
     }
 
-    public void setInvitationComplete(boolean invitationIsComplete) {
-        this.invitationComplete = invitationIsComplete;
+    /**
+     * Sets the {@link #invitationComplete} flag to true.
+     * 
+     * @throws IllegalStateException
+     *             if the {@link #invitationComplete} flag was already
+     *             <code>true</code>;
+     */
+    public void invitationCompleted() {
+        if (invitationComplete)
+            throw new IllegalStateException(
+                "The invitation status of the user can be set only once!");
+        invitationComplete = true;
     }
 
     public UserConnectionState getConnectionState() {

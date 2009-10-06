@@ -75,6 +75,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected String invitationID;
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
     protected String cancelMessage = "";
+    protected SarosPacketCollector invitationCompleteCollector;
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
         ISharedProject sharedProject, String description,
@@ -224,6 +225,7 @@ public class OutgoingInvitationProcess extends InvitationProcess {
 
         transmitter.sendInvitation(sharedProject, peer, description, colorID,
             hostVersionInfo, invitationID);
+        log.debug("Inv " + Util.prefix(peer) + ": Invitation sent.");
         subMonitor.worked(25);
         subMonitor
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
@@ -350,6 +352,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     protected void sendArchive(SubMonitor subMonitor)
         throws UserCancellationException, IOException {
 
+        invitationCompleteCollector = transmitter
+        .getInvitationCompleteCollector(invitationID);
+
         if (archive != null) {
             subMonitor.setTaskName("Sending archive...");
             transmitter.sendProjectArchive(this.peer, invitationID,
@@ -383,11 +388,15 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     }
 
     protected void done(SubMonitor subMonitor) throws CancellationException,
-        IOException {
+        IOException, LocalCancellationException {
+        subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Completing invitation...");
+
+        transmitter.receiveInvitationCompleteConfirmation(monitor.newChild(50),
+            invitationCompleteCollector);
         log.debug("Inv " + Util.prefix(peer)
             + ": Notifying participants that the invitation is complete.");
-        sharedProject.getUser(peer).setInvitationComplete(true);
+        sharedProject.userInvitationCompleted(sharedProject.getUser(peer));
         synchronized (sharedProject) {
             synchronizeUserList();
         }

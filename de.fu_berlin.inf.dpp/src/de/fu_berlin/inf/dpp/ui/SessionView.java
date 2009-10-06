@@ -220,6 +220,10 @@ public class SessionView extends ViewPart {
             refreshTable();
         }
 
+        public void invitationCompleted(User user) {
+            refreshTable();
+        }
+
         public void userJoined(User user) {
             refreshTable();
         }

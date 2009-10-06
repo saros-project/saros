@@ -33,6 +33,7 @@ import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
+import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -124,20 +125,18 @@ public class PacketExtensionUtils {
     }
 
     /**
-     * @return PacketFilter that only accepts Messages (!) which belong to the
-     *         current invitation
-     * 
-     *         TODO: do we need the MessageTypeFilter(Message.Type.chat) linke
-     *         in getSessionIDPacketFilter?
+     * @return {@link PacketFilter} that only accepts messages which belong to
+     *         the current invitation.
      */
-    public static PacketFilter getInvitationIDPacketFilter(
+    public static PacketFilter getInvitationIDFilter(
         final XStreamExtensionProvider<? extends DefaultInvitationInfo> extProv,
         final String invitationID) {
 
         return new PacketFilter() {
             public boolean accept(Packet arg0) {
                 DefaultInvitationInfo invInfo = extProv.getPayload(arg0);
-                return invitationID.equals(invInfo.invitationID);
+
+                return ObjectUtils.equals(invInfo.invitationID, invitationID);
             }
         };
     }
@@ -176,12 +175,40 @@ public class PacketExtensionUtils {
         });
     }
 
+    /**
+     * @return {@link PacketFilter} that only accepts messages which belong to
+     *         the current session and invitation.
+     */
     public static PacketFilter getInvitationFilter(
         XStreamExtensionProvider<? extends DefaultInvitationInfo> extProv,
         SessionIDObservable sessionID, final String invitationID) {
 
-        // getSessionIDPacketFilter(sessionID)
-        return new AndFilter(extProv.getPacketFilter(),
-            getInvitationIDPacketFilter(extProv, invitationID));
+        return new AndFilter(getSessionIDFilter(extProv, sessionID),
+            getInvitationIDFilter(extProv, invitationID));
+    }
+
+    /**
+     * @return {@link PacketFilter} that only accepts messages which belong to
+     *         the current session.
+     */
+    public static PacketFilter getSessionIDFilter(
+        final XStreamExtensionProvider<? extends DefaultSessionInfo> extProv,
+        final SessionIDObservable sessionID) {
+
+        return new AndFilter(extProv.getPacketFilter(), new PacketFilter() {
+            public boolean accept(Packet packet) {
+                DefaultSessionInfo info = extProv.getPayload(packet);
+
+                if (info == null) {
+                    log.error("Invalid payload in packet: " + packet);
+                    return false;
+                }
+
+                if (!Util.equals(info.sessionID, sessionID.getValue()))
+                    return false;
+
+                return true;
+            }
+        });
     }
 }

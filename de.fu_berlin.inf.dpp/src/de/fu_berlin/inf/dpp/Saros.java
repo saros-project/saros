@@ -340,6 +340,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(UserListInfo.JoinExtensionProvider.class);
         this.container
             .addComponent(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class);
+        this.container
+            .addComponent(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class);
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);

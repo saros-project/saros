@@ -403,4 +403,12 @@ public interface ITransmitter {
     public SarosPacketCollector getInvitationCollector(String invitationID,
         FileTransferType filelistTransfer);
 
+    public void receiveInvitationCompleteConfirmation(SubMonitor monitor,
+        SarosPacketCollector collector) throws LocalCancellationException,
+        IOException;
+
+    public SarosPacketCollector getInvitationCompleteCollector(
+        String invitationID);
+
+    public void sendInvitationCompleteConfirmation(JID to, String invitationID);
 }

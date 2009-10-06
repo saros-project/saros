@@ -249,8 +249,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivityDataObject(getLocalUser().getJID(),
-                        user.getJID(), newRole));
+                    activityCreated(new RoleActivityDataObject(getLocalUser()
+                        .getJID(), user.getJID(), newRole));
 
                     setUserRole(user, newRole);
                 }
@@ -262,8 +262,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivityDataObject(getLocalUser().getJID(),
-                        user.getJID(), newRole));
+                    activityCreated(new RoleActivityDataObject(getLocalUser()
+                        .getJID(), user.getJID(), newRole));
 
                     setUserRole(user, newRole);
                 }
@@ -291,6 +291,35 @@ public class SharedProject implements ISharedProject, Disposable {
 
         for (ISharedProjectListener listener : SharedProject.this.listeners) {
             listener.roleChanged(user);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void userInvitationCompleted(final User user) {
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                userInvitationCompletedWrapped(user);
+            }
+        });
+    }
+
+    public void userInvitationCompletedWrapped(final User user) {
+
+        assert Util.isSWT() : "Must be called from SWT Thread";
+
+        if (user == null)
+            throw new IllegalArgumentException();
+
+        user.invitationCompleted();
+
+        log.debug("The isInvitationComplete status of "
+            + Util.prefix(user.getJID()) + " is now "
+            + user.isInvitationComplete());
+
+        for (ISharedProjectListener listener : SharedProject.this.listeners) {
+            listener.invitationCompleted(user);
         }
     }
 
@@ -553,7 +582,10 @@ public class SharedProject implements ISharedProject, Disposable {
         if (activityDataObject == null)
             throw new IllegalArgumentException("Activity cannot be null");
 
-        /* Let ConcurrentDocumentManager have a look at the activityDataObjects first */
+        /*
+         * Let ConcurrentDocumentManager have a look at the activityDataObjects
+         * first
+         */
         List<QueueItem> toSend = this.concurrentDocumentClient
             .transformOutgoing(activityDataObject);
 
@@ -567,11 +599,13 @@ public class SharedProject implements ISharedProject, Disposable {
      * 
      * @see #sendActivity(List, IActivityDataObject)
      */
-    public void sendActivity(User recipient, IActivityDataObject activityDataObject) {
+    public void sendActivity(User recipient,
+        IActivityDataObject activityDataObject) {
         sendActivity(Collections.singletonList(recipient), activityDataObject);
     }
 
-    public void sendActivity(List<User> toWhom, final IActivityDataObject activityDataObject) {
+    public void sendActivity(List<User> toWhom,
+        final IActivityDataObject activityDataObject) {
         if (toWhom == null)
             throw new IllegalArgumentException();
 

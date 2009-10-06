@@ -21,4 +21,8 @@ public abstract class AbstractSharedProjectListener implements
     public void userLeft(User user) {
         // Do nothing.
     }
+
+    public void invitationCompleted(User user) {
+        // Do nothing.
+    }
 }
