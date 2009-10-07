@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class JoinSessionWizardUtils {
 
     private static final Logger log = Logger
-        .getLogger(JoinSessionWizardUtils.class.getName());
+        .getLogger(JoinSessionWizardUtils.class);
 
     public static class ScanRunner implements Runnable {
 
@@ -111,8 +111,13 @@ public class JoinSessionWizardUtils {
 
         for (int i = 0; i < projects.length; i++) {
             monitor.worked(1);
-            if (monitor.isCanceled())
-                throw new InterruptedException();
+
+            if (monitor.isCanceled()) {
+                if (bestMatch == null)
+                    throw new InterruptedException();
+                else
+                    return bestMatch;
+            }
 
             if (!projects[i].isOpen()) {
                 continue;
