@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -147,9 +148,11 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
         @Override
-        public void receive(ChecksumActivityDataObject checksumActivityDataObject) {
+        public void receive(
+            ChecksumActivityDataObject checksumActivityDataObject) {
 
-            latestChecksums.put(checksumActivityDataObject.getPath(), checksumActivityDataObject);
+            latestChecksums.put(checksumActivityDataObject.getPath(),
+                checksumActivityDataObject);
 
             performCheck(checksumActivityDataObject);
         }
@@ -181,7 +184,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 latestChecksums.remove(fileActivityDataObject.getOldPath());
                 break;
             default:
-                log.error("Unhandled FileActivityDataObject.Type: " + fileActivityDataObject);
+                log.error("Unhandled FileActivityDataObject.Type: "
+                    + fileActivityDataObject);
             }
         }
     };
@@ -196,26 +200,28 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
     /**
      * boolean condition variable used to interrupt another thread from
-     * performing a recovery in {@link #runRecovery()}
+     * performing a recovery in {@link #runRecovery(SubMonitor)}
      */
     private AtomicBoolean cancelRecovery = new AtomicBoolean();
 
     /**
-     * Lock used exclusively in {@link #runRecovery()} to prevent two recovery
-     * operations running concurrently.
+     * Lock used exclusively in {@link #runRecovery(SubMonitor)} to prevent two
+     * recovery operations running concurrently.
      */
     private Lock lock = new ReentrantLock();
 
     /**
      * Start a consistency recovery by sending a checksum error to the host and
-     * waiting for his reply.
+     * waiting for his reply. <br>
+     * The <strong>cancellation</strong> of this method is <strong>not
+     * implemented</strong>, so cancelling the given monitor does not have any
+     * effect.
      * 
      * @blocking This method returns after the recovery has finished
      * 
      * @client Can only be called on the client!
      */
-    public void runRecovery() {
-
+    public void runRecovery(SubMonitor monitor) {
         if (sharedProject.isHost())
             throw new IllegalStateException("Can only be called on the client");
 
@@ -257,6 +263,10 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             if (cancelRecovery.get())
                 return;
 
+            int remainingFilesBefore;
+            monitor.beginTask("Consistency recovery", pathsOfHandledFiles
+                .size());
+
             // Send checksumErrorMessage to host
             transmitter.sendFileChecksumErrorMessage(Collections
                 .singletonList(sharedProject.getHost().getJID()),
@@ -269,7 +279,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 if (cancelRecovery.get())
                     return;
 
+                remainingFilesBefore = remainingFiles.size();
                 remainingFiles.retainAll(pathsWithWrongChecksums);
+                monitor.worked(remainingFilesBefore - remainingFiles.size());
 
                 try {
                     Thread.sleep(100);
@@ -278,6 +290,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
                 }
             }
         } finally {
+            monitor.done();
             lock.unlock();
         }
     }
@@ -367,7 +380,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             return false;
         }
 
-        ChecksumActivityDataObject checksumActivityDataObject = latestChecksums.get(path);
+        ChecksumActivityDataObject checksumActivityDataObject = latestChecksums
+            .get(path);
         if (checksumActivityDataObject != null) {
             performCheck(checksumActivityDataObject);
             return true;
@@ -376,7 +390,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         }
     }
 
-    protected synchronized void performCheck(ChecksumActivityDataObject checksumActivityDataObject) {
+    protected synchronized void performCheck(
+        ChecksumActivityDataObject checksumActivityDataObject) {
 
         if (sharedProject.isDriver()
             && !sharedProject.getConcurrentDocumentClient().isCurrent(

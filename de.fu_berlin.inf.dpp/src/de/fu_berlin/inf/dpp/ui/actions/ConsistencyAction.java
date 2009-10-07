@@ -1,16 +1,23 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -119,12 +126,34 @@ public class ConsistencyAction extends Action {
 
     @Override
     public void run() {
-        log.debug("User activated CW recovery.");
-        Util.runSafeAsync(log, new Runnable() {
+        Util.runSafeSWTAsync(log, new Runnable() {
+
             public void run() {
-                watchdogClient.runRecovery();
+                log.debug("User activated CW recovery.");
+
+                Shell dialogShell = EditorAPI.getShell();
+                if (dialogShell == null)
+                    dialogShell = new Shell();
+
+                ProgressMonitorDialog dialog = new ProgressMonitorDialog(
+                    dialogShell);
+                try {
+                    dialog.run(true, false, new IRunnableWithProgress() {
+                        public void run(IProgressMonitor monitor)
+                            throws InterruptedException {
+
+                            SubMonitor progress = SubMonitor.convert(monitor);
+                            progress.beginTask("Performing recovery...", 100);
+                            watchdogClient.runRecovery(progress.newChild(100));
+                            monitor.done();
+                        }
+                    });
+                } catch (InvocationTargetException e) {
+                    log.error("Exception not expected here.", e);
+                } catch (InterruptedException e) {
+                    log.error("Exception not expected here.", e);
+                }
             }
         });
     }
-
 }
