@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -23,14 +23,14 @@ public class InvitationProcessObservable {
     private static Logger log = Logger
         .getLogger(InvitationProcessObservable.class);
 
-    protected Map<JID, InvitationProcess> processes = new HashMap<JID, InvitationProcess>();
+    protected Map<JID, IInvitationProcess> processes = new HashMap<JID, IInvitationProcess>();
 
-    public synchronized InvitationProcess getInvitationProcess(JID jid) {
+    public synchronized IInvitationProcess getInvitationProcess(JID jid) {
         return this.processes.get(jid);
     }
 
-    public synchronized void addInvitationProcess(InvitationProcess process) {
-        InvitationProcess oldProcess = this.processes.put(process.getPeer(),
+    public synchronized void addInvitationProcess(IInvitationProcess process) {
+        IInvitationProcess oldProcess = this.processes.put(process.getPeer(),
             process);
         if (oldProcess != null) {
             log.error("An internal error occurred:"
@@ -40,7 +40,7 @@ public class InvitationProcessObservable {
         }
     }
 
-    public synchronized void removeInvitationProcess(InvitationProcess process) {
+    public synchronized void removeInvitationProcess(IInvitationProcess process) {
         if (this.processes.remove(process.getPeer()) == null) {
             log.error("An internal error occurred:"
                 + " No invititation process with "

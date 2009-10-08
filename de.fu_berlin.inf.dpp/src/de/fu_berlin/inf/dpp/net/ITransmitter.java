@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -38,8 +39,8 @@ import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
@@ -103,7 +104,7 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws SarosCancellationException
+     * @throws UserCancellationException
      *             if the operation was canceled via the given progress monitor
      *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
@@ -118,9 +119,11 @@ public interface ITransmitter {
      *             Connection.
      */
     public void sendFileList(JID jid, String invitationID, FileList fileList,
-        SubMonitor monitor) throws IOException, SarosCancellationException;
+        SubMonitor monitor) throws IOException, UserCancellationException;
 
     /**
+     * @throws CancellationException
+     *             A User canceled.
      * @throws IOException
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
@@ -133,13 +136,15 @@ public interface ITransmitter {
      * @param archiveCollector
      * @blocking If forceWait is true.
      * 
+     * @throws CancellationException
+     *             A User canceled.
      * @throws IOException
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
      */
     public FileList receiveFileList(SarosPacketCollector archiveCollector,
         SubMonitor monitor, boolean forceWait)
-        throws SarosCancellationException, IOException;
+        throws UserCancellationException, IOException;
 
     /**
      * @param b
@@ -147,16 +152,16 @@ public interface ITransmitter {
      * @throws IOException
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
-     * @throws SarosCancellationException
+     * @throws UserCancellationException
      */
     public InputStream receiveArchive(SarosPacketCollector archiveCollector,
         SubMonitor monitor, boolean b) throws IOException,
-        SarosCancellationException;
+        UserCancellationException;
 
     public void sendUserList(JID to, String invitationID, Collection<User> user);
 
     public boolean receiveUserListConfirmation(List<User> fromUsers,
-        SubMonitor monitor) throws IOException, LocalCancellationException;
+        SubMonitor monitor) throws CancellationException, IOException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -189,6 +194,13 @@ public interface ITransmitter {
      * @throws IOException
      *             If the file could not be read, other errors are reported to
      *             the call-back.
+     * 
+     * @throws CancellationException
+     *             if the operation was canceled via the given progress monitor
+     *             an CancellationException is thrown. If the operation was
+     *             canceled via the monitor and the exception is not received,
+     *             the operation completed successfully, before noticing the
+     *             cancellation.
      */
     public void sendFileAsync(JID recipient, IProject project, IPath path,
         int sequenceNumber, IFileTransferCallback callback, SubMonitor monitor)
@@ -214,7 +226,7 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws SarosCancellationException
+     * @throws UserCancellationException
      *             if the operation was canceled via the given progress monitor
      *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
@@ -230,7 +242,7 @@ public interface ITransmitter {
      */
     public void sendFile(JID to, IProject project, IPath path,
         int sequenceNumber, SubMonitor monitor) throws IOException,
-        SarosCancellationException;
+        UserCancellationException;
 
     /**
      * Sends given archive file to given recipient.
@@ -251,7 +263,7 @@ public interface ITransmitter {
      * @throws IOException
      *             If the file could not be read or an error occurred while
      *             sending or a technical error happened.
-     * @throws SarosCancellationException
+     * @throws UserCancellationException
      *             if the operation was canceled via the given progress monitor
      *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
@@ -265,7 +277,7 @@ public interface ITransmitter {
      */
     public void sendProjectArchive(JID recipient, String invitationID,
         IProject project, File archive, SubMonitor monitor) throws IOException,
-        SarosCancellationException;
+        UserCancellationException;
 
     /**
      * Sends queued file transfers.
@@ -289,8 +301,8 @@ public interface ITransmitter {
      *            a map containing the sequence number to be requested as a
      *            value and the user to request them from as key
      * @param andUp
-     *            true if all activityDataObjects after the requested one are
-     *            requested too, false if only the activityDataObject with the
+     *            true if all activityDataObjects after the requested one are requested
+     *            too, false if only the activityDataObject with the
      *            requestedSequenceNumber is requested
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
@@ -300,7 +312,7 @@ public interface ITransmitter {
 
     /**
      * Sends a leave message to the participants of given shared project. See
-     * {@link InvitationProcess} for more information when this is supposed be
+     * {@link IInvitationProcess} for more information when this is supposed be
      * sent.
      * 
      * @param sharedProject
@@ -312,9 +324,8 @@ public interface ITransmitter {
      * Sends given list of TimedActivities to the given recipient.
      * 
      * This list MUST not contain any {@link FileActivityDataObject}s where
-     * {@link FileActivityDataObject#getType()} ==
-     * {@link FileActivityDataObject.Type#Created} as binary data is not
-     * supported in messages bodies.
+     * {@link FileActivityDataObject#getType()} == {@link FileActivityDataObject.Type#Created} as
+     * binary data is not supported in messages bodies.
      * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
@@ -328,9 +339,8 @@ public interface ITransmitter {
      *             null or contains no activityDataObjects.
      * 
      * @throws AssertionError
-     *             if the given list of timed activityDataObjects contains
-     *             FileActivities of type created AND the application is run
-     *             using asserts.
+     *             if the given list of timed activityDataObjects contains FileActivities
+     *             of type created AND the application is run using asserts.
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivity> timedActivities);

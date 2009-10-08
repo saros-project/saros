@@ -24,8 +24,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-
 /**
  * This class contains method to create a zip archive out of a list of files.
  * 
@@ -62,11 +60,9 @@ public class FileZipper {
      * @throws IOException
      *             if an error occurred while trying to zip a file. The archive
      *             is then deleted.
-     * @throws SarosCancellationException
      */
     public static void createProjectZipArchive(List<IPath> files, File archive,
-        IProject project, SubMonitor progress) throws IOException,
-        SarosCancellationException {
+        IProject project, SubMonitor progress) throws IOException {
 
         StoppWatch stoppWatch = new StoppWatch();
         stoppWatch.start();
@@ -132,16 +128,15 @@ public class FileZipper {
      * @blocking
      * @cancelable This operation can be canceled via the given progress
      *             monitor. If the operation was canceled, the archive file is
-     *             deleted and a LocalCancellationException is thrown
+     *             deleted and an CancellationException is thrown
      * @throws IOException
      *             if an error occurred while trying to zip a file. The archive
      *             is then deleted.
-     * @throws SarosCancellationException
      * @throws IllegalArgumentException
      *             if the list of files is empty. The archive is then deleted.
      */
     public static void zipFiles(List<File> files, File archive,
-        SubMonitor progress) throws IOException, SarosCancellationException {
+        SubMonitor progress) throws IOException {
         try {
             if (files.isEmpty()) {
                 log.warn("The list with files to zip was empty.");
@@ -160,7 +155,7 @@ public class FileZipper {
                     zipSingleFile(new WrappedFile(file), file.getName(),
                         zipStream, progress.newChild(1));
                     ++filesZipped;
-                } catch (SarosCancellationException e) {
+                } catch (CancellationException e) {
                     cleanup(archive);
                     throw e;
                 } catch (IllegalArgumentException e) {
@@ -192,18 +187,16 @@ public class FileZipper {
      * @cancelable
      * @throws IOException
      *             if an error occurred while trying to zip the file
-     * @throws SarosCancellationException
      * @throws IllegalArgumentException
      *             if the file was null or a directory or didn't exist
      */
     protected static void zipSingleFile(FileWrapper file, String filename,
-        ZipOutputStream zipStream, SubMonitor progress) throws IOException,
-        SarosCancellationException {
+        ZipOutputStream zipStream, SubMonitor progress) throws IOException {
 
         try {
 
             if (progress.isCanceled()) {
-                throw new SarosCancellationException();
+                throw new CancellationException();
             }
 
             progress.beginTask("Compressing: " + filename, 1);

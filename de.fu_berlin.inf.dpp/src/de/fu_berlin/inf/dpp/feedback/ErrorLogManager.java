@@ -3,6 +3,7 @@ package de.fu_berlin.inf.dpp.feedback;
 import java.io.File;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.concurrent.CancellationException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Appender;
@@ -14,7 +15,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -263,7 +263,7 @@ public class ErrorLogManager extends AbstractFeedbackManager {
                     log.error(String.format("Couldn't upload file: %s. %s", e
                         .getMessage(), e.getCause() != null ? e.getCause()
                         .getMessage() : ""));
-                } catch (SarosCancellationException e) {
+                } catch (CancellationException e) {
                     log.warn("The submission of the error log file was"
                         + " cancelled by the user.");
                 } finally {

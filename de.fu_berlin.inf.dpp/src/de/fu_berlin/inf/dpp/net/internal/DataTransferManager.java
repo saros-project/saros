@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.io.IOUtils;
@@ -32,7 +33,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransferModeListener;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -209,7 +210,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         packet.addExtension(incomingExtProv
             .create(new IncomingTransferObject() {
                 public byte[] accept(final SubMonitor progress)
-                    throws SarosCancellationException, IOException {
+                    throws UserCancellationException, IOException {
 
                     addIncomingFileTransfer(description);
                     try {
@@ -266,7 +267,8 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     protected class IBBTransferListener implements FileTransferListener {
 
-        public void fileTransferRequest(final FileTransferRequest request) {
+        public void fileTransferRequest(final FileTransferRequest request)
+            throws CancellationException {
 
             final TransferDescription transferDescription;
             try {
@@ -280,7 +282,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             final IncomingTransferObject transferObject = new IncomingTransferObject() {
 
                 public byte[] accept(SubMonitor monitor)
-                    throws SarosCancellationException, IOException {
+                    throws UserCancellationException, IOException {
 
                     monitor.beginTask("Receive via IBB", 10000);
 
@@ -291,7 +293,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                     InputStream in = null;
                     try {
                         if (monitor.isCanceled())
-                            throw new LocalCancellationException();
+                            throw new CancellationException();
                         in = accept.recieveFile();
                         monitor.worked(100);
                         content = Util.toByteArray(in, request.getFileSize(),
@@ -315,8 +317,7 @@ public class DataTransferManager implements ConnectionSessionListener {
                         throw e;
                     } catch (XMPPException e) {
                         log.error("Incoming File Transfer via IBB failed: ", e);
-                        throw new IOException(
-                            "Incoming File Transfer via IBB failed.");
+                        throw new IOException();
                     }
 
                     monitor.worked(100);
@@ -363,20 +364,20 @@ public class DataTransferManager implements ConnectionSessionListener {
          *            The data to be sent.
          * @throws IOException
          *             if the send failed
-         * @throws SarosCancellationException
+         * @throws UserCancellationException
          *             It will be thrown if the user (locally or remotely) has
          *             canceled the transfer.
          * @blocking Send the given data as a blocking operation.
          */
         public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor callback) throws IOException, SarosCancellationException;
+            SubMonitor callback) throws IOException, UserCancellationException;
 
     }
 
     protected Transmitter ibb = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor progress) throws IOException, LocalCancellationException {
+            SubMonitor progress) throws IOException, CancellationException {
 
             final long startTime = System.nanoTime();
             log.debug("[IBB] Sending to " + data.getRecipient() + ": "
@@ -410,7 +411,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
                 if (progress.isCanceled()) {
                     transfer.cancel();
-                    throw new LocalCancellationException();
+                    throw new CancellationException();
                 }
                 int newProgress = (int) ((100.0 * transfer.getAmountWritten()) / Math
                     .max(1, content.length));
@@ -465,7 +466,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected Transmitter jingle = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
-            SubMonitor progress) throws SarosCancellationException, IOException {
+            SubMonitor progress) throws UserCancellationException, IOException {
             try {
                 JingleFileTransferManager jftm = getJingleManager();
                 if (jftm == null)
@@ -507,14 +508,14 @@ public class DataTransferManager implements ConnectionSessionListener {
     /**
      * Dispatch to Transmitter.
      * 
-     * @throws SarosCancellationException
+     * @throws UserCancellationException
      *             It will be thrown if the local or remote user has canceled
      *             the transfer.
      * @throws IOException
      *             If a technical problem occurred.
      */
     public void sendData(TransferDescription transferData, byte[] input,
-        SubMonitor progress) throws IOException, SarosCancellationException {
+        SubMonitor progress) throws IOException, UserCancellationException {
         // TODO Buffer correctly when not connected....
         // this.fileTransferQueue.offer(transfer);
         // sendNextFile();
@@ -554,13 +555,13 @@ public class DataTransferManager implements ConnectionSessionListener {
      * Tries to send the given data using the given transmitter returning true
      * if the transfer was successfully completed, false otherwise.
      * 
-     * @throws SarosCancellationException
+     * @throws UserCancellationException
      *             It will be thrown if the local user or remote user has
      *             canceled the transfer.
      */
     protected boolean sendData(Transmitter transmitter,
         TransferDescription transferData, byte[] content, SubMonitor progress)
-        throws SarosCancellationException {
+        throws UserCancellationException {
 
         if (!transmitter.isSuitable(transferData.recipient))
             return false;
@@ -576,7 +577,7 @@ public class DataTransferManager implements ConnectionSessionListener {
             transferModeDispatch.transferFinished(transferData.recipient, mode,
                 false, content.length, duration);
             return true;
-        } catch (SarosCancellationException e) {
+        } catch (UserCancellationException e) {
             throw e; // Rethrow to circumvent the Exception catch below
         } catch (CausedIOException e) {
             log.error(Util.prefix(transferData.recipient) + "Failed to send "

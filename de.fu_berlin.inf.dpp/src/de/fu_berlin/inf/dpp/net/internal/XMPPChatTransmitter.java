@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -64,8 +65,8 @@ import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
+import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -117,7 +118,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     protected Map<JID, Chat> chats;
 
-    protected Map<JID, InvitationProcess> processes;
+    protected Map<JID, IInvitationProcess> processes;
 
     protected List<MessageTransfer> messageTransferQueue;
 
@@ -238,7 +239,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     public FileList receiveFileList(SarosPacketCollector collector,
         SubMonitor monitor, boolean forceWait)
-        throws SarosCancellationException, IOException {
+        throws UserCancellationException, IOException {
 
         log.trace("Waiting for FileList from "); //
 
@@ -277,7 +278,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     public InputStream receiveArchive(SarosPacketCollector collector,
         SubMonitor monitor, boolean forceWait) throws IOException,
-        SarosCancellationException {
+        UserCancellationException {
 
         monitor.beginTask("Receiving archive", 100);
 
@@ -350,7 +351,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public boolean receiveUserListConfirmation(List<User> fromUsers,
-        SubMonitor monitor) throws IOException, LocalCancellationException {
+        SubMonitor monitor) throws CancellationException, IOException {
         log.trace("Waiting for UserListConfirmations...");
         PacketFilter filter = PacketExtensionUtils.getSessionIDFilter(
             userListConfExtProv, sessionID);
@@ -368,7 +369,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             JID jid;
             do {
                 if (monitor.isCanceled())
-                    throw new LocalCancellationException();
+                    throw new CancellationException();
 
                 // Wait up to [timeout] seconds for a result.
                 result = collector.nextResult(100);
@@ -526,7 +527,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                         + Util.formatByte(data.length) + "): "
                         + timedActivities, e);
                 return;
-            } catch (SarosCancellationException e) {
+            } catch (UserCancellationException e) {
                 log.error(
                     "Cancellation cannot occur, because NullProgressMonitors"
                         + " are used on both sides!", e);
@@ -542,7 +543,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     public void sendFileList(JID recipient, String invitationID,
         FileList fileList, SubMonitor progress) throws IOException,
-        SarosCancellationException {
+        UserCancellationException {
 
         String user = connection.getUser();
         if (user == null) {
@@ -570,7 +571,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendFile(JID to, IProject project, IPath path,
         int sequenceNumber, SubMonitor progress) throws IOException,
-        SarosCancellationException {
+        UserCancellationException {
 
         String user = connection.getUser();
         if (user == null) {
@@ -600,7 +601,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendProjectArchive(JID recipient, String invitationID,
         IProject project, File archive, SubMonitor progress)
-        throws SarosCancellationException, IOException {
+        throws UserCancellationException, IOException {
 
         String user = connection.getUser();
         if (user == null) {
@@ -614,16 +615,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                 sessionID.getValue(), invitationID);
 
         progress.subTask("Reading archive");
-
-        /**
-         * If there is no archive to send, we send a "empty" content. It's
-         * important that the length of the byte array is not 0, otherwise the
-         * transfer does not work.
-         */
-        byte[] content = new byte[1];
-
-        if (archive == null)
-            content = FileUtils.readFileToByteArray(archive);
+        byte[] content = FileUtils.readFileToByteArray(archive);
         progress.worked(10);
 
         progress.subTask("Sending archive");
@@ -914,7 +906,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         // Create Containers
         this.chats = new HashMap<JID, Chat>();
         this.processes = Collections
-            .synchronizedMap(new HashMap<JID, InvitationProcess>());
+            .synchronizedMap(new HashMap<JID, IInvitationProcess>());
         this.messageTransferQueue = Collections
             .synchronizedList(new LinkedList<MessageTransfer>());
 

@@ -4,6 +4,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.CancellationException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.ZipEntry;
@@ -31,7 +32,6 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 
 /**
  * This class contains static utility methods for file handling.
@@ -140,11 +140,11 @@ public class FileUtil {
      * IContainer
      * 
      * @cancelable This long-running operation can be canceled via the given
-     *             progress monitor and will throw an LocalCancellationException
-     *             in this case.
+     *             progress monitor and will throw an CancellationException in
+     *             this case.
      */
     public static boolean writeArchive(InputStream input, IContainer container,
-        SubMonitor monitor) throws CoreException, LocalCancellationException {
+        SubMonitor monitor) throws CoreException {
 
         ZipInputStream zip = new ZipInputStream(input);
 
@@ -155,7 +155,7 @@ public class FileUtil {
             while ((entry = zip.getNextEntry()) != null) {
 
                 if (monitor.isCanceled())
-                    throw new LocalCancellationException();
+                    throw new CancellationException();
 
                 IPath path = Path.fromPortableString(entry.getName());
                 IFile file = container.getFile(path);

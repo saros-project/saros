@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.IPageChangingListener;
 import org.eclipse.jface.dialogs.PageChangingEvent;
@@ -32,19 +33,19 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
-import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IIncomingInvitationUI;
+import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.State;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelLocation;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelOption;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess.IIncomingInvitationUI;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.util.EclipseUtils;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
+import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
  * A wizard that guides the user through an incoming invitation process.
@@ -66,14 +67,23 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
         .getName());
 
     protected ShowDescriptionPage descriptionPage;
+
     protected EnterProjectNamePage namePage;
+
     protected WizardDialogAccessable wizardDialog;
+
     protected IncomingInvitationProcess process;
+
     protected boolean requested = false;
+
     protected String updateProjectName;
+
     protected boolean updateSelected;
+
     protected DataTransferManager dataTransferManager;
+
     protected PreferenceUtils preferenceUtils;
+
     protected VersionManager manager;
 
     public JoinSessionWizard(IncomingInvitationProcess process,
@@ -84,7 +94,6 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
         this.preferenceUtils = preferenceUtils;
         this.manager = manager;
 
-        process.setInvitationUI(this);
         setWindowTitle("Session Invitation");
         setHelpAvailable(false);
         setNeedsProgressMonitor(true);
@@ -103,7 +112,7 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
              */
             pageChanges++;
             if (!requestHostFileList()) {
-                getShell().forceActive();
+                EditorAPI.getShell().forceActive();
                 return null;
             }
             getShell().forceActive();
@@ -118,21 +127,16 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
         try {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
-                    throws InterruptedException, InvocationTargetException {
-                    try {
-                        process.requestRemoteFileList(SubMonitor
-                            .convert(monitor));
-                    } catch (SarosCancellationException e) {
-                        throw new InvocationTargetException(e);
-                    }
+                    throws InterruptedException {
+                    process.requestRemoteFileList(SubMonitor.convert(monitor));
                 }
             });
         } catch (InvocationTargetException e) {
-            processException(e.getCause());
-            return false;
+            log.warn("Exception while requesting remote file list", e);
         } catch (InterruptedException e) {
-            log.error("Not designed to be interrupted.");
-            processException(e);
+            // @InterruptedExceptionOK - IE is used to signal cancelation
+            log.debug("Request of remote file list canceled/interrupted");
+            getShell().close();
             return false;
         }
 
@@ -151,7 +155,32 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
             updateProjectName = "";
         }
 
+        if (process.getState() == State.CANCELED) {
+            return false;
+        }
         return true;
+    }
+
+    public void showCancelMessage(JID jid, String errorMsg,
+        CancelLocation cancelLocation) {
+        if (errorMsg != null) {
+            EclipseUtils.openErrorMessageDialog(getShell(),
+                "Invitation aborted", "Could not complete invitation with "
+                    + jid.getBase() + " because an error occurred:\n\n"
+                    + errorMsg);
+        } else {
+            switch (cancelLocation) {
+            case LOCAL:
+                EclipseUtils.openInformationMessageDialog(getShell(),
+                    "Invitation cancelled", "Invitation was cancelled by You.");
+                break;
+            case REMOTE:
+                EclipseUtils.openInformationMessageDialog(getShell(),
+                    "Invitation cancelled",
+                    "Invitation was cancelled by inviter (" + jid.getBase()
+                        + ").");
+            }
+        }
     }
 
     @Override
@@ -162,16 +191,19 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
 
     @Override
     public void addPages() {
-        descriptionPage = new ShowDescriptionPage(this, manager, process);
-        namePage = new EnterProjectNamePage(this, dataTransferManager,
+        this.descriptionPage = new ShowDescriptionPage(this, manager, process);
+        this.namePage = new EnterProjectNamePage(this, dataTransferManager,
             preferenceUtils);
 
-        addPage(descriptionPage);
-        addPage(namePage);
+        addPage(this.descriptionPage);
+        addPage(this.namePage);
     }
 
     @Override
     public boolean performFinish() {
+        if (this.process.getState() == State.CANCELED) {
+            return false;
+        }
 
         final IProject source = this.namePage.getSourceProject();
         final String target = this.namePage.getTargetProjectName();
@@ -181,20 +213,22 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
             getContainer().run(true, true, new IRunnableWithProgress() {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
+
                     try {
                         JoinSessionWizard.this.process.accept(source, target,
                             skip, SubMonitor.convert(monitor));
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
+                    } catch (OperationCanceledException e) {
+                        // Signal Cancellation to Container
+                        throw new InterruptedException();
                     }
                 }
             });
         } catch (InvocationTargetException e) {
-            processException(e.getCause());
+            log.warn("Exception while requesting remote file list", e);
             return false;
         } catch (InterruptedException e) {
-            log.error("Code not designed to be interrupted.");
-            processException(e);
+            // @InterruptedExceptionOK - IE is used to signal cancelation
+            log.debug("Request of remote file list canceled/interrupted", e);
             return false;
         }
 
@@ -206,7 +240,8 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
     public boolean performCancel() {
         Util.runSafeAsync(log, new Runnable() {
             public void run() {
-                process.localCancel(null, CancelOption.NOTIFY_PEER);
+                process.cancel(null, CancelLocation.LOCAL,
+                    CancelOption.NOTIFY_PEER);
             }
         });
         return true;
@@ -292,8 +327,14 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
         return updateSelected;
     }
 
-    public void cancelWizard(final JID jid, final String errorMsg,
+    public void cancel(final JID jid, final String errorMsg,
         final CancelLocation cancelLocation) {
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                showCancelMessage(jid, errorMsg, cancelLocation);
+            }
+        });
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
@@ -301,59 +342,24 @@ public class JoinSessionWizard extends Wizard implements IIncomingInvitationUI {
             }
         });
 
-        Util.runSafeSWTAsync(log, new Runnable() {
-            public void run() {
-                showCancelMessage(jid, errorMsg, cancelLocation);
-            }
-        });
-
     }
 
-    public void showCancelMessage(JID jid, String errorMsg,
-        CancelLocation cancelLocation) {
+    /*
+     * The interfaces IIncomingInvitationUI and IOutgoingInvitationUI should be
+     * separated (they should not extend a common interface IInvitationUI) so we
+     * do not have to implement these methods here.
+     */
 
-        String peer = jid.getBase();
-
-        if (errorMsg != null) {
-            switch (cancelLocation) {
-            case LOCAL:
-                EclipseUtils.openErrorMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled "
-                        + "locally because of an error:\n\n" + errorMsg);
-                break;
-            case REMOTE:
-                EclipseUtils.openErrorMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled " + "remotely by "
-                        + peer + " because of an error:\n\n" + errorMsg);
-            }
-        } else {
-            switch (cancelLocation) {
-            case LOCAL:
-                break;
-            case REMOTE:
-                EclipseUtils.openInformationMessageDialog(getShell(),
-                    "Invitation Cancelled",
-                    "Your invitation has been cancelled remotely by " + peer
-                        + "!");
-            }
-        }
+    public void runGUIAsynch(Runnable runnable) {
+        // TODO Auto-generated method stub
     }
 
-    protected void processException(Throwable t) {
-        try {
-            throw t;
-        } catch (LocalCancellationException e1) {
-            cancelWizard(process.getPeer(), e1.getMessage(),
-                CancelLocation.LOCAL);
-        } catch (RemoteCancellationException e1) {
-            cancelWizard(process.getPeer(), e1.getMessage(),
-                CancelLocation.REMOTE);
-        } catch (Throwable t2) {
-            log.error("This type of exception is not expected here: " + t2);
-            cancelWizard(process.getPeer(), "Unkown error: " + t2.getMessage(),
-                CancelLocation.REMOTE);
-        }
+    public void updateInvitationProgress(JID jid) {
+        // TODO Auto-generated method stub
+    }
+
+    public boolean showVersionConflictWarning(VersionInfo versionInfo, JID peer) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }
