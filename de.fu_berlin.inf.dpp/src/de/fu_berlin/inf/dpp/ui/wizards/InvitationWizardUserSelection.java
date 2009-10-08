@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.ui.wizards;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.databinding.observable.list.WritableList;
@@ -120,7 +121,8 @@ public class InvitationWizardUserSelection extends WizardPage {
         userListViewer.setLabelProvider(new UserListLabelProvider());
         userListViewer.setContentProvider(new ObservableListContentProvider());
 
-        input = new WritableList(roster.getEntries(), RosterEntry.class);
+        input = new WritableList(new LinkedList<RosterEntry>(roster
+            .getEntries()), RosterEntry.class);
         userListViewer.setInput(input);
 
         // An empty label to skip a grid.
