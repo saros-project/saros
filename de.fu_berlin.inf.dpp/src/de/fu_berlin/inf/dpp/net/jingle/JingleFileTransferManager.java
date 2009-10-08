@@ -27,7 +27,7 @@ import org.jivesoftware.smackx.jingle.nat.JingleTransportManager;
 import org.jivesoftware.smackx.jingle.nat.TransportCandidate;
 
 import de.fu_berlin.inf.dpp.Saros;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
@@ -380,7 +380,7 @@ public class JingleFileTransferManager {
      */
     public NetTransferMode send(final TransferDescription transferDescription,
         final byte[] content, SubMonitor progress)
-        throws UserCancellationException, JingleSessionException, IOException {
+        throws SarosCancellationException, JingleSessionException, IOException {
 
         JID toJID = transferDescription.getRecipient();
 

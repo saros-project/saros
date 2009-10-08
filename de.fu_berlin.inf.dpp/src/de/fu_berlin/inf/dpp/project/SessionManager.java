@@ -19,6 +19,7 @@
  */
 package de.fu_berlin.inf.dpp.project;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -29,21 +30,29 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.window.Window;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.progress.IProgressConstants;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.joda.time.DateTime;
 import org.picocontainer.annotations.Inject;
 import org.picocontainer.annotations.Nullable;
 
-import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
 import de.fu_berlin.inf.dpp.invitation.IncomingInvitationProcess;
 import de.fu_berlin.inf.dpp.invitation.OutgoingInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess.IOutgoingInvitationUI;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
 import de.fu_berlin.inf.dpp.net.IConnectionListener;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -59,8 +68,8 @@ import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
-import de.fu_berlin.inf.dpp.ui.InvitationDialog;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -151,7 +160,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         }
 
         openInviteDialog(preferenceUtils.getAutoInviteUsers());
-
         SessionManager.log.info("Session started");
     }
 
@@ -248,16 +256,22 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
     public void invitationReceived(JID from, String sessionID,
         String projectName, String description, int colorID,
-        VersionInfo versionInfo, DateTime sessionStart, SarosUI sarosUI,
+        VersionInfo versionInfo, DateTime sessionStart, final SarosUI sarosUI,
         String invitationID) {
 
         this.sessionID.setValue(sessionID);
 
-        IncomingInvitationProcess process = new IncomingInvitationProcess(this,
-            this.transmitter, from, projectName, description, colorID,
+        final IncomingInvitationProcess process = new IncomingInvitationProcess(
+            this, this.transmitter, from, projectName, description, colorID,
             invitationProcesses, versionManager, versionInfo, sessionStart,
             sarosUI, invitationID);
-        process.start();
+
+        Util.runSafeSWTAsync(log, new Runnable() {
+            public void run() {
+                sarosUI.showIncomingInvitationUI(process);
+                sarosUI.openSarosViews();
+            }
+        });
 
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);
@@ -283,7 +297,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.transmitter.sendRemainingFiles();
         this.transmitter.sendRemainingMessages();
 
-        // ask for next expected activityDataObjects (in case I missed something while
+        // ask for next expected activityDataObjects (in case I missed something
+        // while
         // being not available)
 
         // TODO this is currently disabled
@@ -296,24 +311,19 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
+                // Instantiates and initializes the wizard
+                InvitationWizard wizard = new InvitationWizard(saros,
+                    sharedProject, rosterTracker, discoveryManager,
+                    SessionManager.this, versionManager, invitationProcesses);
 
-                /*
-                 * TODO Since we are going to invite people, we need to stop
-                 * changing the project
-                 */
-                if (!EditorAPI.saveProject(sharedProject.getProject())) {
-                    log.info("User canceled starting an invitation (as host)");
-                    return;
-                }
-
-                // TODO check if anybody is online, empty dialog feels
-                // strange
-                Window iw = new InvitationDialog(saros, versionManager,
-                    sharedProject, EditorAPI.getShell(), toInvite,
-                    discoveryManager, partialProjectResources,
-                    SessionManager.this, rosterTracker, preferenceUtils);
-                iw.open();
-
+                // Instantiates the wizard container with the wizard and opens
+                // it
+                Shell dialogShell = EditorAPI.getShell();
+                if (dialogShell == null)
+                    dialogShell = new Shell();
+                WizardDialog dialog = new WizardDialog(dialogShell, wizard);
+                dialog.create();
+                dialog.open();
             }
         });
 
@@ -324,32 +334,165 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * 
      * @param toInvite
      *            the JID of the user that is to be invited.
-     * @param description
-     *            a description that will be shown to the invited user before he
-     *            makes the decision to accept or decline the invitation.
-     * @param inviteUI
-     *            user interface of the invitation for feedback calls.
      * 
-     * @param localFileList
-     *            a list of all files currently present in the project
-     * 
-     * @return the outgoing invitation process.
      */
-    public OutgoingInvitationProcess invite(final ISharedProject project,
-        final JID toInvite, final String description,
-        final IOutgoingInvitationUI inviteUI, final FileList localFileList,
-        final SubMonitor monitor) {
+    public void invite(JID toInvite) {
+        ISharedProject project = currentlySharedProject.getValue();
+        String description = project.getProject().getName();
 
         final OutgoingInvitationProcess result = new OutgoingInvitationProcess(
-            transmitter, toInvite, project, description, inviteUI, project
-                .getFreeColor(), localFileList, monitor, invitationProcesses,
-            versionManager, stopManager);
-        Util.runSafeAsync("OutInvitationProcess-" + toInvite.getBase(), log,
-            new Runnable() {
+            transmitter, toInvite, project, description,
+            project.getFreeColor(), invitationProcesses, versionManager,
+            stopManager, discoveryManager);
+
+        OutgoingInvitationJob outgoingInvitationJob = new OutgoingInvitationJob(
+            result);
+        outgoingInvitationJob.schedule();
+    }
+
+    public void invite(Collection<JID> jidsToInvite) {
+        for (JID jid : jidsToInvite)
+            invite(jid);
+    }
+
+    class OutgoingInvitationJob extends Job {
+        OutgoingInvitationProcess process;
+        String peer;
+        Shell dialogShell;
+
+        public OutgoingInvitationJob(OutgoingInvitationProcess process) {
+            super("Inviting " + process.getPeer().getBase() + "...");
+            this.process = process;
+            this.peer = process.getPeer().getBase();
+            setProperty(IProgressConstants.NO_IMMEDIATE_ERROR_PROMPT_PROPERTY,
+                true);
+            setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
+            setProperty(IProgressConstants.ICON_PROPERTY, SarosUI
+                .getImageDescriptor("/icons/invites.png"));
+            dialogShell = EditorAPI.getShell();
+            if (dialogShell == null)
+                dialogShell = new Shell();
+        }
+
+        protected void jobCompleted() {
+            Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    result.start();
+                    MessageDialog.openInformation(dialogShell,
+                        "Invitation Complete",
+                        "Your invitation has been completed!\n\n" + peer
+                            + " is now in the session.");
+                    System.out.println("Job complete.");
                 }
             });
-        return result;
+        }
+
+        protected Action jobCompletedAction() {
+            return new Action("Invitation completed.") {
+                @Override
+                public void run() {
+                    jobCompleted();
+                }
+            };
+        }
+
+        protected void jobCancelledLocally(final String errorMsg) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    if (errorMsg != null)
+                        MessageDialog
+                            .openError(dialogShell, "Invitation Cancelled",
+                                "The invitation of " + peer
+                                    + " has been cancelled "
+                                    + "locally because of an error:\n\n"
+                                    + errorMsg);
+                    else
+                        MessageDialog.openInformation(dialogShell,
+                            "Invitation Cancelled",
+                            "You have cancelled the invitation of " + peer
+                                + "!");
+                }
+            });
+        }
+
+        protected Action jobCancelledLocallyAction(final String errorMsg) {
+            return new Action("Invitation completed.") {
+                @Override
+                public void run() {
+                    jobCancelledLocally(errorMsg);
+                }
+            };
+        }
+
+        protected void jobCancelledRemotely(final String errorMsg) {
+            Util.runSafeSWTSync(log, new Runnable() {
+                public void run() {
+                    if (errorMsg == null)
+                        MessageDialog.openInformation(dialogShell,
+                            "Invitation Cancelled",
+                            "Your invitation has been cancelled "
+                                + "remotely by " + peer + "!");
+                    else
+                        MessageDialog.openError(dialogShell,
+                            "Invitation Cancelled",
+                            "Your invitation has been cancelled "
+                                + "remotely by " + peer
+                                + " because of an error:\n\n" + errorMsg);
+                }
+            });
+        }
+
+        protected Action jobCancelledRemotelyAction(final String errorMsg) {
+            return new Action("Invitation completed.") {
+                @Override
+                public void run() {
+                    jobCancelledRemotely(errorMsg);
+                }
+            };
+        }
+
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+            try {
+                process.start(SubMonitor.convert(monitor));
+            } catch (LocalCancellationException e) {
+                if (isModal(this)) {
+                    setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.FALSE);
+                    jobCancelledLocally(e.getMessage());
+                } else {
+                    setProperty(IProgressConstants.ACTION_PROPERTY,
+                        jobCancelledLocallyAction(e.getMessage()));
+                }
+                return Status.CANCEL_STATUS;
+            } catch (RemoteCancellationException e) {
+                if (isModal(this)) {
+                    setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.FALSE);
+                    jobCancelledRemotely(e.getMessage());
+                } else {
+                    setProperty(IProgressConstants.ACTION_PROPERTY,
+                        jobCancelledRemotelyAction(e.getMessage()));
+                }
+                return Status.CANCEL_STATUS;
+            } catch (Exception e) {
+                log.error("This exception is not expected here: " + e);
+            }
+
+            // Everything went well.
+            if (isModal(this)) {
+                setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.FALSE);
+                jobCompleted();
+            } else {
+                setProperty(IProgressConstants.ACTION_PROPERTY,
+                    jobCompletedAction());
+            }
+            return Status.OK_STATUS;
+        }
+
+        public boolean isModal(Job job) {
+            Boolean isModal = (Boolean) job
+                .getProperty(IProgressConstants.PROPERTY_IN_DIALOG);
+            if (isModal == null)
+                return false;
+            return isModal.booleanValue();
+        }
     }
 }

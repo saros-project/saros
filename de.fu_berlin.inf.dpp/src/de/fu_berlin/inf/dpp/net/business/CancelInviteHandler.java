@@ -7,9 +7,7 @@ import org.apache.log4j.Logger;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelLocation;
-import de.fu_berlin.inf.dpp.invitation.InvitationProcess.CancelOption;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
@@ -34,13 +32,12 @@ public class CancelInviteHandler extends CancelInviteExtension {
 
     @Override
     public void invitationCanceledReceived(JID sender, String errorMsg) {
-        IInvitationProcess process = invitationProcesses
+        InvitationProcess process = invitationProcesses
             .getInvitationProcess(sender);
         if (process != null) {
             log.debug("Inv" + Util.prefix(sender)
                 + ": Received invitation cancel message");
-            process.cancel(errorMsg, CancelLocation.REMOTE,
-                CancelOption.DO_NOT_NOTIFY_PEER);
+            process.remoteCancel(errorMsg);
         } else {
             log.warn("Inv[unkown user]: Received invitation cancel message");
         }

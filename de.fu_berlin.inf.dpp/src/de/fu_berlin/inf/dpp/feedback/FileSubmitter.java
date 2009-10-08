@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.SubMonitor;
 
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 
@@ -99,9 +100,11 @@ public class FileSubmitter {
      * @param zipName
      *            a name for the zip archive, e.g. with added user ID to make it
      *            unique, zipName must be at least 3 characters long!
+     * @throws SarosCancellationException
      */
     public static void uploadErrorLog(String zipLocation, String zipName,
-        File file, SubMonitor monitor) throws IOException {
+        File file, SubMonitor monitor) throws IOException,
+        SarosCancellationException {
         monitor.beginTask("Upload error log..", 3);
 
         try {

@@ -79,6 +79,7 @@ import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.FileTransferConnection;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.IJingleStateListener;
 import de.fu_berlin.inf.dpp.net.jingle.JingleFileTransferManager.JingleConnectionState;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.JingleFileTransferManagerObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -155,6 +156,9 @@ public class RosterView extends ViewPart {
 
     @Inject
     protected RosterTracker rosterTracker;
+
+    @Inject
+    protected InvitationProcessObservable invitationProcesses;
 
     public RosterView() {
 
@@ -754,7 +758,7 @@ public class RosterView extends ViewPart {
         // this.messagingAction = new MessagingAction(this.viewer);
         this.skypeAction = new SkypeAction(this.viewer);
         this.inviteAction = new InviteAction(sessionManager, saros,
-            this.viewer, discoManager);
+            this.viewer, discoManager, invitationProcesses);
         this.renameContactAction = new RenameContactAction(saros, this.viewer);
         this.deleteContactAction = new DeleteContactAction(saros, this.viewer);
     }

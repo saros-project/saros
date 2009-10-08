@@ -17,7 +17,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivity;
@@ -124,7 +124,7 @@ public class ActivitiesHandler {
         byte[] data;
         try {
             data = result.accept(monitor);
-        } catch (UserCancellationException e) {
+        } catch (SarosCancellationException e) {
             log.error("User canceled. This is unexpected", e);
             return;
         } catch (IOException e) {
