@@ -18,6 +18,7 @@ import de.fu_berlin.inf.dpp.ui.actions.LeaveSessionAction;
 import de.fu_berlin.inf.dpp.ui.actions.OpenInviteInterface;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveAllDriverRoleAction;
 import de.fu_berlin.inf.dpp.ui.actions.RemoveDriverRoleAction;
+import de.fu_berlin.inf.dpp.ui.actions.StoppedAction;
 
 /**
  * This is the ToolBar used by the SessionView
@@ -34,7 +35,7 @@ public class SessionViewToolBar implements Disposable {
     protected PreferenceUtils preferences;
 
     public SessionViewToolBar(Saros saros, ViewPart sessionView,
-        ConsistencyAction consistencyAction,
+        StoppedAction stoppedAction, ConsistencyAction consistencyAction,
         OpenInviteInterface openInvitationInterfaceAction,
         RemoveDriverRoleAction removeDriverRoleAction,
         RemoveAllDriverRoleAction removeAllDriverRoleAction,
@@ -57,6 +58,7 @@ public class SessionViewToolBar implements Disposable {
         IActionBars bars = sessionView.getViewSite().getActionBars();
         IToolBarManager toolBar = bars.getToolBarManager();
 
+        toolBar.add(stoppedAction);
         toolBar.add(consistencyAction);
         toolBar.add(openInvitationInterfaceAction);
         if (preferences.isMultiDriverEnabled()) {
