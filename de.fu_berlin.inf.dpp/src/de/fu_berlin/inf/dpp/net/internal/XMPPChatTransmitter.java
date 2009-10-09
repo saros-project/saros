@@ -615,7 +615,9 @@ public class XMPPChatTransmitter implements ITransmitter,
                 sessionID.getValue(), invitationID);
 
         progress.subTask("Reading archive");
-        byte[] content = FileUtils.readFileToByteArray(archive);
+
+        byte[] content = archive == null ? new byte[0] : FileUtils
+            .readFileToByteArray(archive);
         progress.worked(10);
 
         progress.subTask("Sending archive");

@@ -307,44 +307,39 @@ public class IncomingInvitationProcess extends InvitationProcess {
             // We send an empty file list to the host as a notification that we
             // do not need any files. The host does not answer, so we have to
             // skip the archive receiving part.
-            transmitter.sendFileList(peer, invitationID, filesToSynchronize,
-                monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
-        } else {
-            monitor.subTask("Sending file list...");
-
-            SarosPacketCollector archiveCollector = transmitter
-                .getInvitationCollector(invitationID,
-                    FileTransferType.ARCHIVE_TRANSFER);
-
-            transmitter.sendFileList(peer, invitationID, filesToSynchronize,
-                monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
-
-            if (checkCancellation()) {
-                log.debug("Inv" + Util.prefix(peer)
-                    + ": Cancellation checkpoint");
-                return;
-            }
-
-            monitor.subTask("Receiving archive...");
-
-            InputStream archiveStream = transmitter.receiveArchive(
-                archiveCollector, monitor.newChild(75,
-                    SubMonitor.SUPPRESS_ALL_LABELS), true);
-
-            if (checkCancellation()) {
-                log.debug("Inv" + Util.prefix(peer)
-                    + ": Cancellation checkpoint");
-                return;
-            }
-
-            monitor.subTask("Extracting archive...");
-
-            writeArchive(archiveStream, localProject, monitor.newChild(10,
-                SubMonitor.SUPPRESS_ALL_LABELS));
-
-            log.debug("Inv" + Util.prefix(peer)
-                + ": Archive received and written to disk...");
         }
+        monitor.subTask("Sending file list...");
+
+        SarosPacketCollector archiveCollector = transmitter
+            .getInvitationCollector(invitationID,
+                FileTransferType.ARCHIVE_TRANSFER);
+
+        transmitter.sendFileList(peer, invitationID, filesToSynchronize,
+            monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
+
+        if (checkCancellation()) {
+            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            return;
+        }
+
+        monitor.subTask("Receiving archive...");
+
+        InputStream archiveStream = transmitter.receiveArchive(
+            archiveCollector, monitor.newChild(75,
+                SubMonitor.SUPPRESS_ALL_LABELS), true);
+
+        if (checkCancellation()) {
+            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            return;
+        }
+
+        monitor.subTask("Extracting archive...");
+
+        writeArchive(archiveStream, localProject, monitor.newChild(10,
+            SubMonitor.SUPPRESS_ALL_LABELS));
+
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Archive received and written to disk...");
         done();
     }
 

@@ -353,16 +353,15 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         throws UserCancellationException, IOException {
 
         invitationCompleteCollector = transmitter
-        .getInvitationCompleteCollector(invitationID);
+            .getInvitationCompleteCollector(invitationID);
 
-        if (archive != null) {
-            subMonitor.setTaskName("Sending archive...");
-            transmitter.sendProjectArchive(this.peer, invitationID,
-                this.sharedProject.getProject(), archive, subMonitor);
-        } else {
+        if (archive == null)
             log.debug("Inv " + Util.prefix(peer)
                 + ": No archive to send. The projects must be 100% identical.");
-        }
+
+        subMonitor.setTaskName("Sending archive...");
+        transmitter.sendProjectArchive(this.peer, invitationID,
+            this.sharedProject.getProject(), archive, subMonitor);
 
         if (getState() == State.SYNCHRONIZING) {
             setState(State.SYNCHRONIZING_DONE);
