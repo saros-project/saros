@@ -88,8 +88,8 @@ public class UserListHandler {
                         newUser = new User(sharedProject, userEntry.jid,
                             userEntry.colorID);
                         newUser.setUserRole(userEntry.userRole);
-                        newUser
-                            .setInvitationComplete(userEntry.invitationComplete);
+                        if (userEntry.invitationComplete)
+                            newUser.invitationCompleted();
 
                         // Add him and send him a message, and tell him our
                         // colour
@@ -106,9 +106,12 @@ public class UserListHandler {
 
                         // Update his role
                         user.setUserRole(userEntry.userRole);
+
                         // Update invitation status
-                        user
-                            .setInvitationComplete(userEntry.invitationComplete);
+                        if (userEntry.invitationComplete
+                            && !user.isInvitationComplete()) {
+                            sharedProject.userInvitationCompleted(user);
+                        }
                     }
                 }
                 transmitter.sendUserListConfirmation(fromJID);

@@ -75,7 +75,8 @@ import de.fu_berlin.inf.dpp.net.TimedActivity;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.UserListConfirmationExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.InvitationCompleteExtensionProvider;
+import de.fu_berlin.inf.dpp.net.internal.DefaultSessionInfo.UserListConfirmationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
@@ -104,8 +105,7 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 public class XMPPChatTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {
 
-    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class
-        .getName());
+    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class);
 
     public static final int MAX_PARALLEL_SENDS = 10;
     public static final int MAX_TRANSFER_RETRIES = 5;
@@ -169,6 +169,9 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     @Inject
     protected IncomingTransferObjectExtensionProvider incomingExtProv;
+
+    @Inject
+    protected InvitationCompleteExtensionProvider invCompleteExtProv;
 
     @Inject
     protected DispatchThreadContext dispatchThread;
@@ -341,7 +344,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendUserListConfirmation(JID to) {
         log.trace("Sending userListConfirmation to " + Util.prefix(to));
         Message msg = new Message();
-        msg.addExtension(userListConfExtProv.create("conf"));
+        msg.addExtension(userListConfExtProv.create(new DefaultSessionInfo(
+            sessionID)));
         msg.setTo(to.toString());
         connection.sendPacket(msg);
     }
@@ -349,7 +353,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     public boolean receiveUserListConfirmation(List<User> fromUsers,
         SubMonitor monitor) throws CancellationException, IOException {
         log.trace("Waiting for UserListConfirmations...");
-        PacketFilter filter = userListConfExtProv.getPacketFilter();
+        PacketFilter filter = PacketExtensionUtils.getSessionIDFilter(
+            userListConfExtProv, sessionID);
 
         if (connection == null || !connection.isConnected())
             return false;
@@ -383,6 +388,29 @@ public class XMPPChatTransmitter implements ITransmitter,
         } finally {
             collector.cancel();
         }
+    }
+
+    public SarosPacketCollector getInvitationCompleteCollector(
+        String invitationID) {
+
+        PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
+            invCompleteExtProv, sessionID, invitationID);
+        return installReceiver(filter);
+    }
+
+    public void receiveInvitationCompleteConfirmation(SubMonitor monitor,
+        SarosPacketCollector collector) throws LocalCancellationException,
+        IOException {
+
+        receive(monitor, collector, 500, true);
+    }
+
+    public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
+        Message msg = new Message();
+        msg.addExtension(invCompleteExtProv.create(new DefaultInvitationInfo(
+            sessionID, invitationID)));
+        msg.setTo(to.toString());
+        connection.sendPacket(msg);
     }
 
     /********************************************************************************
@@ -587,7 +615,9 @@ public class XMPPChatTransmitter implements ITransmitter,
                 sessionID.getValue(), invitationID);
 
         progress.subTask("Reading archive");
-        byte[] content = FileUtils.readFileToByteArray(archive);
+
+        byte[] content = archive == null ? new byte[0] : FileUtils
+            .readFileToByteArray(archive);
         progress.worked(10);
 
         progress.subTask("Sending archive");

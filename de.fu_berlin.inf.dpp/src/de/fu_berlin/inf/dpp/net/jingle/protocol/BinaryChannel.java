@@ -440,7 +440,7 @@ public class BinaryChannel {
         int offset = 0;
         // splits into chunks with BinaryHeader.remaining=0 is the last packet
         int size = Math.min(data.length - offset, CHUNKSIZE);
-        for (int idx = remaining; size > 0 && idx > 0; idx--) {
+        for (int idx = remaining; idx > 0; idx--) {
 
             if (isRejected(objectid))
                 return; /*

@@ -137,6 +137,21 @@ public class VersionManager {
          */
 
         /**
+         * Version 9.10.30.DEVEL
+         */
+        compatibilityChart.put(new Version("9.10.30.DEVEL"), Arrays.asList(
+            new Version("9.10.30.DEVEL"), new Version("9.10.2.r1803")));
+
+        /**
+         * Version 9.10.2.r1803
+         * 
+         * We are not backward compatible because of changes in the invitation
+         * process.
+         */
+        compatibilityChart.put(new Version("9.10.2.r1803"), Arrays
+            .asList(new Version("9.10.2.r1803")));
+
+        /**
          * Version 9.10.2.DEVEL
          */
         compatibilityChart.put(new Version("9.10.2.DEVEL"), Arrays.asList(

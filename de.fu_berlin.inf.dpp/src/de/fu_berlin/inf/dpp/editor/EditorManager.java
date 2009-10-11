@@ -79,6 +79,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -207,7 +208,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         }
     };
 
-    protected ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
+    protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
         public void roleChanged(final User user) {
 

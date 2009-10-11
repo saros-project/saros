@@ -340,6 +340,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(UserListInfo.JoinExtensionProvider.class);
         this.container
             .addComponent(DefaultInvitationInfo.UserListConfirmationExtensionProvider.class);
+        this.container
+            .addComponent(DefaultInvitationInfo.InvitationCompleteExtensionProvider.class);
 
         // Statistic collectors
         this.container.addComponent(DataTransferCollector.class);
@@ -678,7 +680,9 @@ public class Saros extends AbstractUIPlugin {
 
         String serverString = prefStore.getString(PreferenceConstants.SERVER);
 
-        URI uri = new URI("jabber://" + serverString);
+        URI uri;
+        uri = (serverString.matches("://")) ? new URI(serverString) : new URI(
+            "jabber://" + serverString);
 
         String server = uri.getHost();
         if (server == null) {

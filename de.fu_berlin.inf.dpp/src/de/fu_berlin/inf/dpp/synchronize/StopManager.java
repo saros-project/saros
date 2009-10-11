@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.internal.SharedProject;
+import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 
@@ -49,6 +50,9 @@ public class StopManager implements IActivityProvider, Disposable {
 
     protected List<Blockable> blockables = new LinkedList<Blockable>();
 
+    protected ObservableValue<Boolean> blocked = new ObservableValue<Boolean>(
+        false);
+
     protected ISharedProject sharedProject;
 
     SharedProjectObservable sharedProjectObservable;
@@ -61,8 +65,8 @@ public class StopManager implements IActivityProvider, Disposable {
         .synchronizedMap(new HashMap<User, List<StartHandle>>());
 
     /**
-     * For every initiated unlock (identified by its StopActivityDataObject id) there is
-     * one acknowledgment expected.
+     * For every initiated unlock (identified by its StopActivityDataObject id)
+     * there is one acknowledgment expected.
      */
     private Map<String, StartHandle> startsToBeAcknowledged = Collections
         .synchronizedMap(new HashMap<String, StartHandle>());
@@ -72,8 +76,8 @@ public class StopManager implements IActivityProvider, Disposable {
     protected final Condition acknowledged = reentrantLock.newCondition();
 
     /**
-     * For every initiated StopActivityDataObject (type: LockRequest) there is one
-     * acknowledgment expected.
+     * For every initiated StopActivityDataObject (type: LockRequest) there is
+     * one acknowledgment expected.
      */
     protected Set<StopActivityDataObject> expectedAcknowledgments = Collections
         .synchronizedSet(new HashSet<StopActivityDataObject>());
@@ -121,7 +125,8 @@ public class StopManager implements IActivityProvider, Disposable {
                 throw new IllegalStateException(
                     "Cannot receive StopActivities without a shared project");
 
-            User user = sharedProject.getUser(stopActivityDataObject.getRecipient());
+            User user = sharedProject.getUser(stopActivityDataObject
+                .getRecipient());
             if (user == null || !user.isLocal())
                 throw new IllegalArgumentException(
                     "Received StopActivityDataObject which is not for the local user");
@@ -146,7 +151,8 @@ public class StopManager implements IActivityProvider, Disposable {
                     return;
                 }
                 if (stopActivityDataObject.getState() == State.ACKNOWLEDGED) {
-                    if (!expectedAcknowledgments.contains(stopActivityDataObject)) {
+                    if (!expectedAcknowledgments
+                        .contains(stopActivityDataObject)) {
                         log.warn("Received unexpected StopActivityDataObject: "
                             + stopActivityDataObject);
                         return;
@@ -161,7 +167,8 @@ public class StopManager implements IActivityProvider, Disposable {
                         return;
                     } else {
                         log.warn("Received unexpected "
-                            + "StopActivityDataObject acknowledgement: " + stopActivityDataObject);
+                            + "StopActivityDataObject acknowledgement: "
+                            + stopActivityDataObject);
                         return;
                     }
                 }
@@ -192,7 +199,8 @@ public class StopManager implements IActivityProvider, Disposable {
             }
 
             throw new IllegalArgumentException(
-                "StopActivityDataObject is of unknown type: " + stopActivityDataObject);
+                "StopActivityDataObject is of unknown type: "
+                    + stopActivityDataObject);
         }
     };
 
@@ -303,9 +311,9 @@ public class StopManager implements IActivityProvider, Disposable {
                 "Stop cannot be called without a shared project");
 
         // Creating StopActivityDataObject for asking user to stop
-        final StopActivityDataObject stopActivityDataObject = new StopActivityDataObject(sharedProject
-            .getLocalUser().getJID(), sharedProject.getLocalUser().getJID(),
-            user.getJID(), Type.LOCKREQUEST, State.INITIATED);
+        final StopActivityDataObject stopActivityDataObject = new StopActivityDataObject(
+            sharedProject.getLocalUser().getJID(), sharedProject.getLocalUser()
+                .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
 
         StartHandle handle = generateStartHandle(stopActivityDataObject);
         addStartHandle(handle);
@@ -320,8 +328,8 @@ public class StopManager implements IActivityProvider, Disposable {
             return handle;
         }
 
-        StopActivityDataObject expectedAck = stopActivityDataObject.generateAcknowledgment(user
-            .getJID());
+        StopActivityDataObject expectedAck = stopActivityDataObject
+            .generateAcknowledgment(user.getJID());
         expectedAcknowledgments.add(expectedAck);
 
         Util.runSafeSWTSync(log, new Runnable() {
@@ -366,13 +374,14 @@ public class StopManager implements IActivityProvider, Disposable {
      * @param lock
      *            if true the project gets locked, else it gets unlocked
      */
-    protected void lockProject(boolean lock) {
+    public void lockProject(boolean lock) {
         for (Blockable blockable : blockables) {
             if (lock)
                 blockable.block();
             else
                 blockable.unblock();
         }
+        blocked.setValue(lock);
     }
 
     /**
@@ -429,10 +438,10 @@ public class StopManager implements IActivityProvider, Disposable {
 
         startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
-        final StopActivityDataObject activity = new StopActivityDataObject(sharedProject
-            .getLocalUser().getJID(), sharedProject.getLocalUser().getJID(),
-            handle.getUser().getJID(), Type.UNLOCKREQUEST, State.INITIATED,
-            handle.getHandleID());
+        final StopActivityDataObject activity = new StopActivityDataObject(
+            sharedProject.getLocalUser().getJID(), sharedProject.getLocalUser()
+                .getJID(), handle.getUser().getJID(), Type.UNLOCKREQUEST,
+            State.INITIATED, handle.getHandleID());
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -464,10 +473,13 @@ public class StopManager implements IActivityProvider, Disposable {
 
     public void fireActivity(StopActivityDataObject stopActivityDataObject) {
 
-        User recipient = sharedProject.getUser(stopActivityDataObject.getRecipient());
+        User recipient = sharedProject.getUser(stopActivityDataObject
+            .getRecipient());
         if (recipient == null)
-            throw new IllegalArgumentException("StopActivityDataObject contains"
-                + " recipient which already left: " + stopActivityDataObject);
+            throw new IllegalArgumentException(
+                "StopActivityDataObject contains"
+                    + " recipient which already left: "
+                    + stopActivityDataObject);
 
         sharedProject.sendActivity(recipient, stopActivityDataObject);
     }
@@ -501,9 +513,11 @@ public class StopManager implements IActivityProvider, Disposable {
         return result;
     }
 
-    public StartHandle generateStartHandle(StopActivityDataObject stopActivityDataObject) {
+    public StartHandle generateStartHandle(
+        StopActivityDataObject stopActivityDataObject) {
         User user = sharedProject.getUser(stopActivityDataObject.getUser());
-        return new StartHandle(user, this, stopActivityDataObject.getActivityID());
+        return new StartHandle(user, this, stopActivityDataObject
+            .getActivityID());
     }
 
     public void addBlockable(Blockable stoppable) {
@@ -522,5 +536,9 @@ public class StopManager implements IActivityProvider, Disposable {
         lockProject(false);
         startHandles.clear();
         expectedAcknowledgments.clear();
+    }
+
+    public ObservableValue<Boolean> getBlockedObservable() {
+        return blocked;
     }
 }

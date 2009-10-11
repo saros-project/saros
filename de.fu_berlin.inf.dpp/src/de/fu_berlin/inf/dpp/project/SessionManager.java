@@ -262,10 +262,6 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         for (ISessionListener listener : this.listeners) {
             listener.invitationReceived(process);
         }
-
-        log.info("Rcvd Invitation " + Util.prefix(from) + "sessionID: "
-            + sessionID + ", colorID: " + colorID + ", sarosVersion: "
-            + versionInfo.version);
     }
 
     public void connectionStateChanged(XMPPConnection connection,

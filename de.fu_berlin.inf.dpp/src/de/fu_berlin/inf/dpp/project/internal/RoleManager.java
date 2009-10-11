@@ -12,6 +12,7 @@ import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
+import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
@@ -32,8 +33,9 @@ public class RoleManager implements IActivityProvider {
 
     private ISharedProject sharedProject;
 
-    private ISharedProjectListener sharedProjectListener = new ISharedProjectListener() {
+    private ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
+        @Override
         public void roleChanged(User user) {
 
             /*
@@ -47,12 +49,14 @@ public class RoleManager implements IActivityProvider {
                     : "an observer"));
         }
 
+        @Override
         public void userJoined(User user) {
             SessionView.showNotification("User joined", user
                 .getHumanReadableName()
                 + " joined the session.");
         }
 
+        @Override
         public void userLeft(User user) {
             SessionView.showNotification("User left", user
                 .getHumanReadableName()

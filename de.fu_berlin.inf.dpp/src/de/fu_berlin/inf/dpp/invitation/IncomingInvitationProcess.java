@@ -67,8 +67,8 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * An incoming invitation process.
  * 
  * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
- * process, so that background activityDataObjects such as autoBuilding do not interfere
- * with the InvitationProcess
+ * process, so that background activityDataObjects such as autoBuilding do not
+ * interfere with the InvitationProcess
  * 
  */
 public class IncomingInvitationProcess extends InvitationProcess {
@@ -173,9 +173,11 @@ public class IncomingInvitationProcess extends InvitationProcess {
                     FileTransferType.FILELIST_TRANSFER);
 
             transmitter.sendFileListRequest(peer, invitationID);
+            log.debug("Inv" + Util.prefix(peer)
+                + ": Request for FileList sent.");
 
             remoteFileList = transmitter.receiveFileList(fileListCollector,
-                monitor, true);
+                monitor.newChild(85, SubMonitor.SUPPRESS_ALL_LABELS), true);
 
             monitor.worked(10);
 
@@ -235,7 +237,8 @@ public class IncomingInvitationProcess extends InvitationProcess {
         } catch (CoreException e) {
             cancel(null, CancelLocation.LOCAL, CancelOption.NOTIFY_PEER);
         } catch (Exception e) {
-            cancel(null, CancelLocation.LOCAL, CancelOption.NOTIFY_PEER);
+            cancel(e.getMessage(), CancelLocation.LOCAL,
+                CancelOption.NOTIFY_PEER);
         } finally {
             // Re-enable auto-building...
             if (wasAutobuilding) {
@@ -304,44 +307,39 @@ public class IncomingInvitationProcess extends InvitationProcess {
             // We send an empty file list to the host as a notification that we
             // do not need any files. The host does not answer, so we have to
             // skip the archive receiving part.
-            transmitter.sendFileList(peer, invitationID, filesToSynchronize,
-                monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
-        } else {
-            monitor.subTask("Sending file list...");
-
-            SarosPacketCollector archiveCollector = transmitter
-                .getInvitationCollector(invitationID,
-                    FileTransferType.ARCHIVE_TRANSFER);
-
-            transmitter.sendFileList(peer, invitationID, filesToSynchronize,
-                monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
-
-            if (checkCancellation()) {
-                log.debug("Inv" + Util.prefix(peer)
-                    + ": Cancellation checkpoint");
-                return;
-            }
-
-            monitor.subTask("Receiving archive...");
-
-            InputStream archiveStream = transmitter.receiveArchive(
-                archiveCollector, monitor.newChild(75,
-                    SubMonitor.SUPPRESS_ALL_LABELS), true);
-
-            if (checkCancellation()) {
-                log.debug("Inv" + Util.prefix(peer)
-                    + ": Cancellation checkpoint");
-                return;
-            }
-
-            monitor.subTask("Extracting archive...");
-
-            writeArchive(archiveStream, localProject, monitor.newChild(10,
-                SubMonitor.SUPPRESS_ALL_LABELS));
-
-            log.debug("Inv" + Util.prefix(peer)
-                + ": Archive received and written to disk...");
         }
+        monitor.subTask("Sending file list...");
+
+        SarosPacketCollector archiveCollector = transmitter
+            .getInvitationCollector(invitationID,
+                FileTransferType.ARCHIVE_TRANSFER);
+
+        transmitter.sendFileList(peer, invitationID, filesToSynchronize,
+            monitor.newChild(10, SubMonitor.SUPPRESS_ALL_LABELS));
+
+        if (checkCancellation()) {
+            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            return;
+        }
+
+        monitor.subTask("Receiving archive...");
+
+        InputStream archiveStream = transmitter.receiveArchive(
+            archiveCollector, monitor.newChild(75,
+                SubMonitor.SUPPRESS_ALL_LABELS), true);
+
+        if (checkCancellation()) {
+            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            return;
+        }
+
+        monitor.subTask("Extracting archive...");
+
+        writeArchive(archiveStream, localProject, monitor.newChild(10,
+            SubMonitor.SUPPRESS_ALL_LABELS));
+
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Archive received and written to disk...");
         done();
     }
 
@@ -462,9 +460,20 @@ public class IncomingInvitationProcess extends InvitationProcess {
      * Ends the incoming invitation process.
      */
     protected void done() {
-        // TODO: the Shared Project Session view is not refreshing the local
-        // entry (You)
-        sharedProject.getLocalUser().setInvitationComplete(true);
+        sharedProject.userInvitationCompleted(sharedProject.getLocalUser());
+        log.debug("Inv" + Util.prefix(peer)
+            + ": isInvitationComplete has been set to true.");
+
+        /*
+         * TODO: Wait until all of the activities in the queue (which arrived
+         * during the invitation) are processed and notify the host only after
+         * that.
+         */
+
+        transmitter.sendInvitationCompleteConfirmation(peer, invitationID);
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Invitation complete confirmation sent.");
+
         invitationProcesses.removeInvitationProcess(this);
 
         sharedProject.start();

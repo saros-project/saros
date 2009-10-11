@@ -4,19 +4,18 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 
 @Component(module = "net")
-public class DefaultInvitationInfo {
-    public String sessionID;
+public class DefaultInvitationInfo extends DefaultSessionInfo {
     public String invitationID;
 
     public DefaultInvitationInfo(SessionIDObservable sessionID,
         String invitationID) {
-        this.sessionID = sessionID.getValue();
+        super(sessionID);
         this.invitationID = invitationID;
     }
 
     /*
      * Simple provider classes which do not have any special information
-     * content, e.g. simple requests
+     * content, but are based on the DefaultInvitationInfo e.g. simple requests
      */
 
     public static class FileListRequestExtensionProvider extends
@@ -26,10 +25,10 @@ public class DefaultInvitationInfo {
         }
     }
 
-    public static class UserListConfirmationExtensionProvider extends
-        XStreamExtensionProvider<String> {
-        public UserListConfirmationExtensionProvider() {
-            super("userListConfirmation", String.class);
+    public static class InvitationCompleteExtensionProvider extends
+        XStreamExtensionProvider<DefaultInvitationInfo> {
+        public InvitationCompleteExtensionProvider() {
+            super("invitationComplete", String.class);
         }
     }
 }

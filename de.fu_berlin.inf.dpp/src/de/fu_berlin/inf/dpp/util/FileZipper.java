@@ -14,6 +14,7 @@ import java.util.concurrent.CancellationException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -60,6 +61,8 @@ public class FileZipper {
      * @throws IOException
      *             if an error occurred while trying to zip a file. The archive
      *             is then deleted.
+     * @throws ZipException
+     *             if empty list of files given
      */
     public static void createProjectZipArchive(List<IPath> files, File archive,
         IProject project, SubMonitor progress) throws IOException {

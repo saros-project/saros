@@ -55,4 +55,12 @@ public interface ISharedProjectListener {
      *            the user that has left.
      */
     public void userLeft(User user);
+
+    /**
+     * Is fired when the invitation process of the user has completed.
+     * 
+     * @param user
+     *            the user whose invitation has completed.
+     */
+    public void invitationCompleted(User user);
 }
