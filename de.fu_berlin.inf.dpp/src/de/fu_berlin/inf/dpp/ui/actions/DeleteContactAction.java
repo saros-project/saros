@@ -33,6 +33,7 @@ import org.jivesoftware.smack.XMPPException;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
+import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 public class DeleteContactAction extends SelectionProviderAction {
@@ -80,35 +81,33 @@ public class DeleteContactAction extends SelectionProviderAction {
     }
 
     public void runDeleteAction() {
+        RosterEntry entry = rosterEntry;
 
         Shell shell = EditorAPI.getShell();
-        if ((shell == null) || (this.rosterEntry == null)) {
+        if (shell == null || entry == null) {
             return;
         }
 
         if (MessageDialog.openQuestion(shell, "Confirm Delete",
-            "Are you sure you want to delete " + toString(this.rosterEntry)
+            "Are you sure you want to delete " + toString(entry)
                 + " from your roster?")) {
 
             try {
-                saros.removeContact(this.rosterEntry);
+                saros.removeContact(entry);
             } catch (XMPPException e) {
-                log.error("Could not delete contact "
-                    + toString(this.rosterEntry) + ":", e);
+                log.error("Could not delete contact " + toString(entry) + ":",
+                    e);
             }
         }
     }
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-        Object selected = selection.getFirstElement();
-
-        if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-            this.rosterEntry = (RosterEntry) selected;
-            setEnabled(true);
-        } else {
-            this.rosterEntry = null;
-            setEnabled(false);
+        rosterEntry = null;
+        if (selection.size() == 1) {
+            rosterEntry = ((TreeItem) selection.getFirstElement())
+                .getRosterEntry();
         }
+        setEnabled(rosterEntry != null);
     }
 }

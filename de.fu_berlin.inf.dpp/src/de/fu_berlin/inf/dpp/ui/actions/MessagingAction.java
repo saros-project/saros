@@ -23,10 +23,10 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
-import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.MessagingManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 
 public class MessagingAction extends SelectionProviderAction {
 
@@ -53,13 +53,9 @@ public class MessagingAction extends SelectionProviderAction {
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-        Object selected = selection.getFirstElement();
 
-        if ((selection.size() == 1) && (selected instanceof RosterEntry)) {
-            setEnabled(true);
-        } else {
-            setEnabled(false);
-        }
+        setEnabled(selection.size() == 1
+            && ((TreeItem) selection.getFirstElement()).getRosterEntry() != null);
 
         // TODO disable if user == self
     }

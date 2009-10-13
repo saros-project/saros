@@ -13,6 +13,7 @@ import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.SkypeManager;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -65,19 +66,24 @@ public class SkypeAction extends SelectionProviderAction {
 
     @Override
     public void selectionChanged(IStructuredSelection selection) {
-        final Object item = selection.getFirstElement();
 
-        if ((selection.size() != 1) || !(item instanceof RosterEntry)) {
+        if (selection.size() != 1) {
             setEnabled(false);
-        } else {
-            setEnabled(false);
-            Util.runSafeAsync("SkypeAction-", log, new Runnable() {
-                public void run() {
-                    setEnabled(false);
-                    skypeURL = skypeManager.getSkypeURL((RosterEntry) item);
-                    setEnabled(skypeURL != null);
-                }
-            });
+            return;
         }
+
+        final RosterEntry rosterEntry = ((TreeItem) selection.getFirstElement())
+            .getRosterEntry();
+        if (rosterEntry == null) {
+            setEnabled(false);
+            return;
+        }
+        Util.runSafeAsync("SkypeAction-", log, new Runnable() {
+            public void run() {
+                setEnabled(false);
+                skypeURL = skypeManager.getSkypeURL(rosterEntry.getUser());
+                setEnabled(skypeURL != null);
+            }
+        });
     }
 }

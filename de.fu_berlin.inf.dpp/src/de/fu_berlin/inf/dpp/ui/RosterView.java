@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.ui;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +40,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -101,26 +102,26 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 @Component(module = "ui")
 public class RosterView extends ViewPart {
 
-    private static Logger log = Logger.getLogger(RosterView.class);
+    private static final Logger log = Logger.getLogger(RosterView.class);
 
-    private TreeViewer viewer;
+    protected TreeViewer viewer;
 
-    private Composite composite;
+    protected Composite composite;
 
-    private Label label;
+    protected Label label;
 
-    private Roster roster;
+    protected Roster roster;
 
     /*
      * Actions
      */
-    private InviteAction inviteAction;
+    protected InviteAction inviteAction;
 
-    private RenameContactAction renameContactAction;
+    protected RenameContactAction renameContactAction;
 
-    private DeleteContactAction deleteContactAction;
+    protected DeleteContactAction deleteContactAction;
 
-    private SkypeAction skypeAction;
+    protected SkypeAction skypeAction;
 
     protected List<Disposable> disposables = new ArrayList<Disposable>();
 
@@ -145,7 +146,7 @@ public class RosterView extends ViewPart {
     protected StatisticManager statisticManager;
 
     @Inject
-    ErrorLogManager errorLogManager;
+    protected ErrorLogManager errorLogManager;
 
     @Inject
     protected PreferenceUtils preferenceUtils;
@@ -156,7 +157,474 @@ public class RosterView extends ViewPart {
     @Inject
     protected RosterTracker rosterTracker;
 
+    /*
+     * TODO Maybe we could only update those elements that have been updated
+     * (but make sure that the given addresses have not structurally changed/new
+     * buddy groups)
+     */
+    protected IRosterListener rosterListener = new IRosterListener() {
+
+        public void entriesAdded(Collection<String> addresses) {
+            refreshRosterTree(true);
+        }
+
+        public void entriesUpdated(Collection<String> addresses) {
+            refreshRosterTree(true);
+        }
+
+        public void entriesDeleted(Collection<String> addresses) {
+            refreshRosterTree(false);
+        }
+
+        public void presenceChanged(Presence presence) {
+            refreshRosterTree(true);
+        }
+
+        public void rosterChanged(Roster newRoster) {
+            roster = newRoster;
+            refreshRosterTree(true);
+        }
+    };
+
+    protected final IConnectionListener connectionListener = new IConnectionListener() {
+
+        public void connectionStateChanged(XMPPConnection connection,
+            final ConnectionState newState) {
+
+            Util.runSafeSWTAsync(log, new Runnable() {
+                public void run() {
+                    updateStatusInformation(newState);
+                    updateEnablement();
+                }
+            });
+        }
+
+    };
+
+    protected final class RosterViewTransferModeListener implements
+        ITransferModeListener {
+
+        public void clear() {
+            lastStateMap[0].clear();
+            lastStateMap[1].clear();
+            refreshRosterTree(true);
+        }
+
+        @SuppressWarnings("unchecked")
+        private final Map<JID, NetTransferMode>[] lastStateMap = new HashMap[] {
+            new HashMap<JID, NetTransferMode>(),
+            new HashMap<JID, NetTransferMode>() };
+
+        public void transferFinished(JID jid, NetTransferMode newMode,
+            boolean incoming, long size, long transmissionMillisecs) {
+
+            final NetTransferMode lastState = lastStateMap[incoming ? 0 : 1]
+                .get(jid);
+            if (newMode != lastState) {
+                lastStateMap[incoming ? 0 : 1].put(jid, newMode);
+                refreshRosterTree(jid);
+            }
+        }
+    }
+
+    /**
+     * An item of the roster tree. Can be either a group or a single contact.
+     * 
+     * @author rdjemili
+     */
+    public interface TreeItem {
+
+        /**
+         * @return {@link JID} for this {@link TreeItem} or <code>null</code> if
+         *         there is none associated with it.
+         */
+        JID getJID();
+
+        /**
+         * @return the {@link RosterEntry} for this {@link TreeItem} or
+         *         <code>null</code> if there is none associated with it.
+         */
+        RosterEntry getRosterEntry();
+
+        /**
+         * @return all child items of this tree item.
+         */
+        Collection<TreeItem> getChildren();
+
+        /**
+         * @return if this {@link TreeItem} has children.
+         */
+        boolean hasChildren();
+
+        /**
+         * @return image to display for this tree item.
+         */
+        Image getImage();
+
+        /**
+         * @return item rendered as {@link StyledString} for display.
+         */
+        StyledString getStyledText();
+
+        /**
+         * @return the number of the category this item belongs to. Used to sort
+         *         {@link TreeItem}s. Items are first sorted by category, then
+         *         by the "normal" comparison result.
+         */
+        int getCategory();
+    }
+
+    /**
+     * A contact item for a single user.
+     */
+    protected class ContactItem implements TreeItem {
+        private final Image personImage = SarosUI.getImage("icons/user.png");
+
+        private final Image personAwayImage = SarosUI
+            .getImage("icons/clock.png");
+
+        private final Image personOfflineImage = new Image(
+            Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
+
+        protected final String jid;
+
+        public ContactItem(String jid) {
+            if (jid == null) {
+                throw new IllegalArgumentException("jid must not be null");
+            }
+            this.jid = jid;
+        }
+
+        public JID getJID() {
+            return new JID(jid);
+        }
+
+        public RosterEntry getRosterEntry() {
+            return roster.getEntry(jid);
+        }
+
+        public Collection<TreeItem> getChildren() {
+            return Collections.emptyList();
+        }
+
+        public boolean hasChildren() {
+            return false;
+        }
+
+        public Image getImage() {
+            final Presence presence = roster.getPresence(jid);
+
+            if (presence.isAvailable()) {
+                return presence.isAway() ? personAwayImage : personImage;
+            } else {
+                return personOfflineImage;
+            }
+        }
+
+        public StyledString getStyledText() {
+            // TODO Add a description of the pattern of the result.
+            final StyledString result = new StyledString();
+
+            final String user = jid;
+            final RosterEntry entry = RosterView.this.roster.getEntry(user);
+            if (entry == null) {
+                return result;
+            }
+            result.append(Util.getDisplayableName(entry));
+
+            // Append presence information if available.
+            final Presence presence = roster.getPresence(user);
+            if (entry.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
+                result.append(" (wait for permission)",
+                    StyledString.COUNTER_STYLER);
+            } else if (presence != null && presence.getType() != Type.available
+                && presence.getType() != Type.unavailable) {
+                // Available and Unavailable are visible in the icon color
+                result.append(" (" + presence.getType() + ")",
+                    StyledString.COUNTER_STYLER);
+            }
+
+            // Append DataTransfer state information.
+            if (presence != null && presence.isAvailable()) {
+
+                final JID jid = new JID(user);
+
+                final NetTransferMode in = dataTransferManager
+                    .getIncomingTransferMode(jid);
+                final NetTransferMode out = dataTransferManager
+                    .getOutgoingTransferMode(jid);
+
+                if (in != NetTransferMode.UNKNOWN
+                    || out != NetTransferMode.UNKNOWN) {
+                    result.append(" Last Data Transfer -",
+                        StyledString.QUALIFIER_STYLER);
+                }
+                if (in != NetTransferMode.UNKNOWN) {
+                    result.append(" In: " + in, StyledString.QUALIFIER_STYLER);
+                }
+                if (out != NetTransferMode.UNKNOWN) {
+                    result
+                        .append(" Out: " + out, StyledString.QUALIFIER_STYLER);
+                }
+
+                final JingleFileTransferManager manager = jingleManager
+                    .getValue();
+                if (manager != null) {
+
+                    final FileTransferConnection connection = manager
+                        .getConnection(jid);
+
+                    if (connection != null) {
+                        final JingleConnectionState state = connection
+                            .getState();
+                        result.append(" [" + state + "]",
+                            StyledString.QUALIFIER_STYLER);
+                    }
+                }
+            }
+            return result;
+        }
+
+        /**
+         * @return 0 if the contact is online, otherwise 1. So online contacts
+         *         get sorted before offline ones.
+         */
+        public int getCategory() {
+            return roster.getPresence(jid).isAvailable() ? 0 : 1;
+        }
+
+        @Override
+        public int hashCode() {
+            return jid.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (!(obj instanceof ContactItem)) {
+                return false;
+            }
+            return jid.equals(((ContactItem) obj).jid);
+        }
+
+        @Override
+        public String toString() {
+            return Util.getDisplayableName(roster.getEntry(jid));
+        }
+    }
+
+    /**
+     * A group item which holds a number of users.
+     * 
+     * There are to concrete subclasses because of the way Smack handles groups
+     * and unfiled contacts.
+     */
+    protected abstract class AbstractGroupItem implements TreeItem {
+        private final Image groupImage = SarosUI.getImage("icons/group.png");
+
+        /**
+         * @return <code>null</code> because groups do not have a {@link JID}.
+         */
+        public JID getJID() {
+            return null;
+        }
+
+        /**
+         * @return <code>null</code> because groups do not have a
+         *         {@link RosterEntry}.
+         */
+        public RosterEntry getRosterEntry() {
+            return null;
+        }
+
+        public Image getImage() {
+            return groupImage;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.toString().hashCode();
+        }
+    }
+
+    /**
+     * A group item for users in groups.
+     */
+    protected class GroupItem extends AbstractGroupItem {
+
+        private final RosterGroup group;
+
+        public GroupItem(RosterGroup group) {
+            super();
+            this.group = group;
+        }
+
+        public Collection<TreeItem> getChildren() {
+            final List<TreeItem> result = new ArrayList<TreeItem>(group
+                .getEntryCount());
+            for (RosterEntry rosterEntry : group.getEntries()) {
+                result.add(new ContactItem(rosterEntry.getUser()));
+            }
+            return result;
+        }
+
+        public boolean hasChildren() {
+            return group.getEntryCount() > 0;
+        }
+
+        public StyledString getStyledText() {
+            return new StyledString(this.toString());
+        }
+
+        /**
+         * @return 1 so that {@link UnfiledGroupItem} will be sorted before all
+         *         other groups.
+         */
+        public int getCategory() {
+            return 1;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof GroupItem)) {
+                return false;
+            }
+            return this.toString().equals(obj.toString());
+        }
+
+        @Override
+        public String toString() {
+            return group.getName();
+        }
+    }
+
+    /**
+     * A group item that holds all users that don't belong to another group.
+     */
+    protected class UnfiledGroupItem extends AbstractGroupItem {
+
+        public Collection<TreeItem> getChildren() {
+            final List<TreeItem> result = new ArrayList<TreeItem>(roster
+                .getUnfiledEntryCount());
+            for (RosterEntry rosterEntry : roster.getUnfiledEntries()) {
+                result.add(new ContactItem(rosterEntry.getUser()));
+            }
+            return result;
+        }
+
+        public boolean hasChildren() {
+            return roster.getUnfiledEntryCount() > 0;
+        }
+
+        public StyledString getStyledText() {
+            return new StyledString(this.toString(),
+                StyledString.QUALIFIER_STYLER);
+        }
+
+        /**
+         * @return 0 so the unfiled contacts are sorted before the groups.
+         * 
+         * @see GroupItem#getCategory()
+         */
+        public int getCategory() {
+            return 0;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof UnfiledGroupItem)) {
+                return false;
+            }
+            return this.toString().equals(obj.toString());
+        }
+
+        @Override
+        public String toString() {
+            return "Buddies";
+        }
+    }
+
+    /**
+     * Provide tree content. Elements are of type {@link TreeItem}.
+     */
+    protected class TreeContentProvider implements IStructuredContentProvider,
+        ITreeContentProvider {
+
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // do nothing
+        }
+
+        public void dispose() {
+            // do nothing
+        }
+
+        public Object[] getElements(Object parent) {
+            if (parent.equals(getViewSite()) && (roster != null)) {
+                final List<TreeItem> groups = new LinkedList<TreeItem>();
+                for (RosterGroup rosterGroup : roster.getGroups()) {
+                    groups.add(new GroupItem(rosterGroup));
+                }
+                groups.add(new UnfiledGroupItem());
+
+                return groups.toArray();
+            }
+
+            return new Object[0];
+        }
+
+        public Object getParent(Object child) {
+            return null;
+        }
+
+        public Object[] getChildren(Object parent) {
+            return ((TreeItem) parent).getChildren().toArray();
+        }
+
+        public boolean hasChildren(Object parent) {
+            return ((TreeItem) parent).hasChildren();
+        }
+    }
+
+    protected static class ViewLabelProvider extends LabelProvider implements
+        IStyledLabelProvider {
+
+        @Override
+        public String getText(Object object) {
+            log.warn("Unexpected call to getText(), getStyledText() should"
+                + " be called instead.");
+            return super.getText(object);
+        }
+
+        @Override
+        public Image getImage(Object element) {
+            return ((TreeItem) element).getImage();
+        }
+
+        public StyledString getStyledText(Object element) {
+            return ((TreeItem) element).getStyledText();
+        }
+    }
+
+    protected static class RosterComparator extends ViewerComparator {
+        @Override
+        public int category(Object element) {
+            return ((TreeItem) element).getCategory();
+        }
+    }
+
     public RosterView() {
+        super();
 
         // Make sure that we get all dependencies injected
         Saros.reinject(this);
@@ -167,7 +635,7 @@ public class RosterView extends ViewPart {
                 IJingleStateListener stateListener = new IJingleStateListener() {
                     public void setState(JID jid, JingleConnectionState state) {
                         log.debug("JingleFileTransferManager sent state"
-                            + " update for " + jid.toString() + ": " + state);
+                            + " update for " + Util.prefix(jid) + ": " + state);
                         refreshRosterTree(jid);
                     }
                 };
@@ -192,384 +660,6 @@ public class RosterView extends ViewPart {
         dataTransferManager.getTransferModeDispatch().add(transferModeListener);
     }
 
-    /*
-     * TODO Maybe we could only update those elements that have been updated
-     * (but make sure that the given addresses have not structurally changed/new
-     * buddy groups)
-     */
-    protected IRosterListener rosterListener = new IRosterListener() {
-
-        public void entriesAdded(Collection<String> addresses) {
-            refreshRosterTree(true);
-        }
-
-        public void entriesUpdated(Collection<String> addresses) {
-            refreshRosterTree(true);
-        }
-
-        public void entriesDeleted(Collection<String> addresses) {
-            refreshRosterTree(false);
-        }
-
-        public void presenceChanged(Presence presence) {
-            log.trace("Presence changed: " + presence.getFrom() + ": "
-                + presence);
-            refreshRosterTree(new JID(presence.getFrom()));
-        }
-
-        public void rosterChanged(Roster newRoster) {
-            roster = newRoster;
-            refreshRosterTree(true);
-        }
-    };
-
-    private IConnectionListener connectionListener = new IConnectionListener() {
-
-        public void connectionStateChanged(XMPPConnection connection,
-            final ConnectionState newState) {
-
-            Util.runSafeSWTAsync(log, new Runnable() {
-                public void run() {
-                    updateStatusInformation(newState);
-                    updateEnablement();
-                }
-            });
-        }
-
-    };
-
-    private final class RosterViewTransferModeListener implements
-        ITransferModeListener {
-
-        public void clear() {
-            lastStateMap[0].clear();
-            lastStateMap[1].clear();
-            refreshRosterTree(true);
-        }
-
-        @SuppressWarnings("unchecked")
-        Map<JID, NetTransferMode>[] lastStateMap = new HashMap[] {
-            new HashMap<JID, NetTransferMode>(),
-            new HashMap<JID, NetTransferMode>() };
-
-        public void transferFinished(JID jid, NetTransferMode newMode,
-            boolean incoming, long size, long transmissionMillisecs) {
-
-            NetTransferMode lastState = lastStateMap[incoming ? 0 : 1].get(jid);
-            if (newMode != lastState) {
-                lastStateMap[incoming ? 0 : 1].put(jid, newMode);
-                refreshRosterTree(jid);
-            }
-        }
-    }
-
-    /**
-     * An item of the roster tree. Can be either a group or a single contact.
-     * 
-     * @author rdjemili
-     */
-    protected interface TreeItem {
-
-        /**
-         * @return all child items of this tree item.
-         */
-        Object[] getChildren();
-    }
-
-    /**
-     * A group item which holds a number of users.
-     */
-    protected static class GroupItem implements TreeItem {
-        private final RosterGroup group;
-
-        public GroupItem(RosterGroup group) {
-            this.group = group;
-        }
-
-        /*
-         * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
-         */
-        public Object[] getChildren() {
-            return this.group.getEntries().toArray();
-        }
-
-        @Override
-        public String toString() {
-            return this.group.getName();
-        }
-    }
-
-    /**
-     * A group item that holds all users that don't belong to another group.
-     */
-    protected class UnfiledGroupItem implements TreeItem {
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see de.fu_berlin.inf.dpp.ui.RosterView.TreeItem
-         */
-        public Object[] getChildren() {
-            return RosterView.this.roster.getUnfiledEntries().toArray();
-        }
-
-        @Override
-        public String toString() {
-            /*
-             * TODO This is confusing if the user really has a group named
-             * "Buddies".
-             */
-            return "Buddies";
-        }
-    }
-
-    /**
-     * Provide tree content.
-     */
-    private class TreeContentProvider implements IStructuredContentProvider,
-        ITreeContentProvider {
-
-        /*
-         * @see org.eclipse.jface.viewers.IContentProvider
-         */
-        public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-            // do nothing
-        }
-
-        /*
-         * @see org.eclipse.jface.viewers.IContentProvider
-         */
-        public void dispose() {
-            // do nothing
-        }
-
-        /*
-         * @see org.eclipse.jface.viewers.IStructuredContentProvider
-         */
-        public Object[] getElements(Object parent) {
-            if (parent.equals(getViewSite()) && (roster != null)) {
-                List<TreeItem> groups = new LinkedList<TreeItem>();
-                for (RosterGroup rosterGroup : roster.getGroups()) {
-                    GroupItem item = new GroupItem(rosterGroup);
-                    groups.add(item);
-                }
-                groups.add(new UnfiledGroupItem());
-
-                return groups.toArray();
-            }
-
-            return new Object[0];
-        }
-
-        /*
-         * @see org.eclipse.jface.viewers.ITreeContentProvider
-         */
-        public Object getParent(Object child) {
-            return null; // TODO Is this always a good idea
-        }
-
-        /*
-         * @see org.eclipse.jface.viewers.ITreeContentProvider
-         */
-        public Object[] getChildren(Object parent) {
-            if (parent instanceof TreeItem) {
-                return ((TreeItem) parent).getChildren();
-            }
-
-            return new Object[0];
-        }
-
-        /*
-         * @see org.eclipse.jface.viewers.ITreeContentProvider
-         */
-        public boolean hasChildren(Object parent) {
-            if (parent instanceof TreeItem) {
-                Object[] children = ((TreeItem) parent).getChildren();
-                return children.length > 0;
-            }
-
-            return false;
-        }
-    }
-
-    /**
-     * Shows user name and state in parenthesis.
-     */
-    private class ViewLabelProvider extends LabelProvider implements
-        IStyledLabelProvider {
-        private final Image groupImage = SarosUI.getImage("icons/group.png");
-
-        private final Image personImage = SarosUI.getImage("icons/user.png");
-
-        private final Image personAwayImage = SarosUI
-            .getImage("icons/clock.png");
-
-        private final Image personOfflineImage = new Image(
-            Display.getDefault(), personImage, SWT.IMAGE_DISABLE);
-
-        @Override
-        public String getText(Object obj) {
-            if (obj instanceof RosterEntry) {
-                RosterEntry entry = (RosterEntry) obj;
-
-                String label = Util.getDisplayableName(entry);
-
-                // append presence information if available
-                Presence presence = roster.getPresence(entry.getUser());
-                RosterEntry e = roster.getEntry(entry.getUser());
-                if (e.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
-                    label = label + " (wait for permission)";
-                } else if (presence != null) {
-                    label = label + " (" + presence.getType() + ")";
-                }
-
-                return label;
-            }
-
-            return obj.toString();
-        }
-
-        @Override
-        public Image getImage(Object element) {
-
-            if (element instanceof RosterEntry) {
-                RosterEntry entry = (RosterEntry) element;
-
-                Presence presence = roster.getPresence(entry.getUser());
-
-                if (presence.isAvailable()) {
-                    return presence.isAway() ? personAwayImage : personImage;
-                } else {
-                    return personOfflineImage;
-                }
-            }
-            return groupImage;
-        }
-
-        public StyledString getStyledText(Object element) {
-            if (element instanceof RosterEntry) {
-                RosterEntry entry = (RosterEntry) element;
-
-                StyledString result = new StyledString();
-
-                result.append(Util.getDisplayableName(entry));
-
-                // append presence information if available
-                Presence presence = RosterView.this.roster.getPresence(entry
-                    .getUser());
-                RosterEntry e = RosterView.this.roster
-                    .getEntry(entry.getUser());
-                if (e.getStatus() == RosterPacket.ItemStatus.SUBSCRIPTION_PENDING) {
-                    result.append(" (wait for permission)",
-                        StyledString.COUNTER_STYLER);
-                } else if (presence != null
-                    && presence.getType() != Type.available
-                    && presence.getType() != Type.unavailable) {
-                    // Available and Unavailable are visible in the icon color
-                    result.append(" (" + presence.getType() + ")",
-                        StyledString.COUNTER_STYLER);
-                }
-
-                // Append DataTransfer State information
-                if (presence != null && presence.isAvailable()) {
-
-                    JID jid = new JID(entry.getUser());
-
-                    NetTransferMode in = dataTransferManager
-                        .getIncomingTransferMode(jid);
-                    NetTransferMode out = dataTransferManager
-                        .getOutgoingTransferMode(jid);
-
-                    if (in != NetTransferMode.UNKNOWN
-                        || out != NetTransferMode.UNKNOWN) {
-                        result.append(" Last Data Transfer - ",
-                            StyledString.QUALIFIER_STYLER);
-                    }
-                    if (in != NetTransferMode.UNKNOWN) {
-                        result.append("In: " + in.toString() + " ",
-                            StyledString.QUALIFIER_STYLER);
-                    }
-                    if (out != NetTransferMode.UNKNOWN) {
-                        result.append("Out: " + out.toString(),
-                            StyledString.QUALIFIER_STYLER);
-                    }
-
-                    JingleFileTransferManager manager = jingleManager
-                        .getValue();
-
-                    if (manager != null) {
-
-                        FileTransferConnection connection = manager
-                            .getConnection(jid);
-
-                        if (connection != null) {
-                            JingleConnectionState state = connection.getState();
-                            if (state == JingleConnectionState.ESTABLISHED) {
-                                /*
-                                 * result.append(" [" +
-                                 * connection.getTransferMode().toString() +
-                                 * "]", StyledString.QUALIFIER_STYLER);
-                                 */
-                            } else {
-                                result.append(" [" + state.toString() + "]",
-                                    StyledString.QUALIFIER_STYLER);
-                            }
-                        }
-                    }
-                }
-
-                return result;
-            }
-
-            return new StyledString(element.toString());
-        }
-    }
-
-    /**
-     * A sorter that orders by presence and then by name.
-     */
-    protected class NameSorter extends ViewerSorter {
-        @Override
-        public int compare(Viewer viewer, Object elem1, Object elem2) {
-
-            // sort by presence
-            if (elem1 instanceof RosterEntry) {
-                RosterEntry entry1 = (RosterEntry) elem1;
-
-                if (elem2 instanceof RosterEntry) {
-                    RosterEntry entry2 = (RosterEntry) elem2;
-                    Presence presence1 = roster.getPresence(entry1.getUser());
-                    Presence presence2 = roster.getPresence(entry2.getUser());
-
-                    if (presence1 == null) {
-                        if (presence2 != null) {
-                            return 1;
-                        }
-                    } else {
-                        if (presence2 == null) {
-                            return -1;
-                        }
-                        // Both not null
-                        if (presence1.isAvailable() && !presence2.isAvailable()) {
-                            return -1;
-                        } else if (!presence1.isAvailable()
-                            && presence2.isAvailable()) {
-                            return 1;
-                        }
-                    }
-                }
-            }
-
-            if (elem1 instanceof RosterEntry)
-                elem1 = Util.getDisplayableName((RosterEntry) elem1);
-            if (elem2 instanceof RosterEntry)
-                elem2 = Util.getDisplayableName((RosterEntry) elem2);
-
-            // otherwise use default order
-            return super.compare(viewer, elem1, elem2);
-        }
-    }
-
     /**
      * This is a callback that will allow us to create the viewer and initialize
      * it.
@@ -580,7 +670,7 @@ public class RosterView extends ViewPart {
         this.composite.setBackground(Display.getDefault().getSystemColor(
             SWT.COLOR_WHITE));
 
-        GridLayout layout = new GridLayout(1, true);
+        final GridLayout layout = new GridLayout(1, true);
         composite.setLayout(layout);
 
         this.label = new Label(composite, SWT.LEFT);
@@ -596,7 +686,7 @@ public class RosterView extends ViewPart {
         this.viewer.setContentProvider(new TreeContentProvider());
         this.viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(
             new ViewLabelProvider()));
-        this.viewer.setSorter(new NameSorter());
+        this.viewer.setComparator(new RosterComparator());
         this.viewer.setInput(getViewSite());
         this.viewer.expandAll();
 
@@ -641,10 +731,11 @@ public class RosterView extends ViewPart {
      */
     protected void updateEnablement() {
         this.label.setEnabled(saros.isConnected());
-        if (saros.isConnected())
+        if (saros.isConnected()) {
             label.setToolTipText("Connected using Saros " + saros.getVersion());
-        else
+        } else {
             label.setToolTipText(null);
+        }
     }
 
     /**
@@ -656,21 +747,23 @@ public class RosterView extends ViewPart {
     }
 
     protected void refreshRosterTree(final JID jid) {
-        if (this.viewer.getControl().isDisposed()) {
+        if (viewer.getControl().isDisposed()) {
             return;
         }
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
-                if (roster == null)
+                if (roster == null) {
                     return;
+                }
 
-                RosterEntry entry = roster.getEntry(jid.getBase());
+                final RosterEntry entry = roster.getEntry(jid.getBase());
 
-                if (entry == null)
+                if (entry == null) {
                     return;
+                }
 
-                viewer.update(entry, null);
+                viewer.update(new ContactItem(entry.getUser()), null);
             }
         });
     }
@@ -697,18 +790,18 @@ public class RosterView extends ViewPart {
     }
 
     private void hookContextMenu() {
-        MenuManager menuMgr = new MenuManager("#PopupMenu");
+        final MenuManager menuMgr = new MenuManager("#PopupMenu");
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-            public void menuAboutToShow(IMenuManager manager) {
-                RosterView.this.fillContextMenu(manager);
+            public void menuAboutToShow(final IMenuManager manager) {
+                fillContextMenu(manager);
             }
         });
 
-        Menu menu = menuMgr.createContextMenu(this.viewer.getControl());
+        final Menu menu = menuMgr.createContextMenu(viewer.getControl());
 
-        this.viewer.getControl().setMenu(menu);
-        getSite().registerContextMenu(menuMgr, this.viewer);
+        viewer.getControl().setMenu(menu);
+        getSite().registerContextMenu(menuMgr, viewer);
     }
 
     // private void hookDoubleClickAction() {
@@ -722,15 +815,15 @@ public class RosterView extends ViewPart {
     // }
 
     private void contributeToActionBars() {
-        IActionBars bars = getViewSite().getActionBars();
+        final IActionBars bars = getViewSite().getActionBars();
 
-        IMenuManager menuManager = bars.getMenuManager();
+        final IMenuManager menuManager = bars.getMenuManager();
         // menuManager.add(this.messagingAction);
-        menuManager.add(this.inviteAction);
+        menuManager.add(inviteAction);
         menuManager.add(new Separator());
 
-        IToolBarManager toolBarManager = bars.getToolBarManager();
-        ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
+        final IToolBarManager toolBarManager = bars.getToolBarManager();
+        final ConnectDisconnectAction connectAction = new ConnectDisconnectAction(
             sarosUI, saros, bars.getStatusLineManager(), statisticManager,
             errorLogManager, preferenceUtils);
         disposables.add(connectAction);

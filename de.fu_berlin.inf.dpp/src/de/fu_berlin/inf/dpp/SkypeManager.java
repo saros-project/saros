@@ -68,9 +68,9 @@ public class SkypeManager implements IConnectionListener {
     }
 
     /**
-     * Returns the Skype-URL for given roster entry. This method will query all
-     * presences associated with the given roster entry and return the first
-     * valid Skype url (if any).
+     * Returns the Skype-URL for given JID. This method will query all presences
+     * associated with the given JID and return the first valid Skype url (if
+     * any).
      * 
      * The order in which the presences are queried is undefined. If you need
      * more control use getSkypeURL(JID).
@@ -82,7 +82,7 @@ public class SkypeManager implements IConnectionListener {
      * 
      * @blocking This method is potentially long-running
      */
-    public String getSkypeURL(RosterEntry rosterEntry) {
+    public String getSkypeURL(String jid) {
 
         XMPPConnection connection = saros.getConnection();
         if (connection == null)
@@ -92,12 +92,9 @@ public class SkypeManager implements IConnectionListener {
         if (roster == null)
             return null;
 
-        for (Presence presence : Util.asIterable(roster
-            .getPresences(rosterEntry.getUser()))) {
+        for (Presence presence : Util.asIterable(roster.getPresences(jid))) {
             if (presence.isAvailable()) {
-                JID jid = new JID(presence.getFrom());
-
-                String result = getSkypeURL(jid);
+                String result = getSkypeURL(new JID(presence.getFrom()));
                 if (result != null)
                     return result;
             }

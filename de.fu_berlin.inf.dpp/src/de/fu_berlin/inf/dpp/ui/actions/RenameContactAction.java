@@ -31,6 +31,7 @@ import org.jivesoftware.smack.RosterEntry;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -68,54 +69,48 @@ public class RenameContactAction extends SelectionProviderAction {
         });
     }
 
-    public void runRename() {
+    protected void runRename() {
+        RosterEntry entry = rosterEntry;
 
-        assert this.rosterEntry != null : "Action should only be run if a rosterEntry is selected";
+        assert entry != null : "Action should only be run if a rosterEntry is selected";
 
         Shell shell = EditorAPI.getShell();
 
         assert shell != null : "Action should not be run if the display is disposed";
 
-        String message;
-        if (this.rosterEntry.getName() == null) {
-            message = "Enter the new nickname of this contact '"
-                + this.rosterEntry.getUser() + "':";
-        } else {
-            message = "Enter the new nickname of this contact '"
-                + this.rosterEntry.getUser() + "' with current nickname '"
-                + this.rosterEntry.getName() + "':";
+        String message = "Enter the new nickname of this contact '"
+            + entry.getUser() + "'";
+        if (entry.getName() != null) {
+            message += " with current nickname '" + entry.getName() + "'";
         }
+        message += ":";
 
         InputDialog dialog = new InputDialog(shell, "Set new nickname",
-            message, this.rosterEntry.getName(), null);
+            message, entry.getName(), null);
 
         if (dialog.open() == Window.OK) {
             String newName = dialog.getValue();
-            if (newName.length() == 0) {
-                this.rosterEntry.setName(null);
-            } else {
-                this.rosterEntry.setName(newName);
-            }
+            entry.setName(newName.length() == 0 ? null : newName);
         }
     }
 
-    public RosterEntry getSelectedForRename(IStructuredSelection selection) {
+    protected RosterEntry getSelectedForRename(IStructuredSelection selection) {
 
         if (selection.size() != 1)
             return null;
 
-        Object selected = selection.getFirstElement();
+        TreeItem selected = (TreeItem) selection.getFirstElement();
+        RosterEntry result = selected.getRosterEntry();
+        /*
+         * TODO Why forbid renaming self? Is the own entry displayed at all?
+         */
+        // Compare the plain-JID portion of the XMPP address
+        if (result != null
+            && !new JID(result.getUser()).equals(saros.getMyJID())) {
 
-        if (selected instanceof RosterEntry) {
-            RosterEntry result = (RosterEntry) selected;
-
-            // Compare the plain-JID portion of the XMPP address
-            if (!new JID(result.getUser()).equals(saros.getMyJID())) {
-                return result;
-            }
+            return result;
         }
         return null;
-
     }
 
     @Override

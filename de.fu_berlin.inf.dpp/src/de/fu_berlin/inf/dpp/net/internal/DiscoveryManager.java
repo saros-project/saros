@@ -107,7 +107,7 @@ public class DiscoveryManager implements Disposable {
         }
 
         public void presenceChanged(Presence current) {
-            log.debug("presenceChanged:" + current.toString());
+            log.debug("presenceChanged: " + current.toString());
 
             if (hasOnlineStateChanged(current))
                 clearCache(current);

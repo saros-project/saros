@@ -55,6 +55,7 @@ public class AddContactWizard extends Wizard {
     private static final Logger log = Logger.getLogger(AddContactWizard.class
         .getName());
 
+    // TODO Just to make the code more complicated!? And why false?
     public static final boolean allowToEnterNick = false;
 
     protected Saros saros;

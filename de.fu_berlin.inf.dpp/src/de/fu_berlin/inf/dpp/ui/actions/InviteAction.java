@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.SelectionProviderAction;
-import org.jivesoftware.smack.RosterEntry;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -37,6 +36,7 @@ import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.ui.SarosUI;
+import de.fu_berlin.inf.dpp.ui.RosterView.TreeItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -114,11 +114,12 @@ public class InviteAction extends SelectionProviderAction {
     public List<JID> getSelected() {
         ArrayList<JID> selected = new ArrayList<JID>();
 
-        for (Object o : getStructuredSelection().toList()) {
-            if (!(o instanceof RosterEntry)) {
+        for (Object object : getStructuredSelection().toList()) {
+            JID jid = ((TreeItem) object).getJID();
+            if (jid == null) {
                 return Collections.emptyList();
             } else {
-                selected.add(new JID(((RosterEntry) o).getUser()));
+                selected.add(jid);
             }
         }
 
