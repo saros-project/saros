@@ -172,15 +172,20 @@ public class EditorManager implements IActivityProvider, Disposable {
 
             User sender = sharedProject.getUser(editorActivityDataObject
                 .getSource());
-
-            if (editorActivityDataObject.getType().equals(Type.Activated)) {
-                execActivated(sender, editorActivityDataObject.getPath());
-
-            } else if (editorActivityDataObject.getType().equals(Type.Closed)) {
-                execClosed(sender, editorActivityDataObject.getPath());
-
-            } else if (editorActivityDataObject.getType().equals(Type.Saved)) {
-                saveText(editorActivityDataObject.getPath());
+            IPath path = editorActivityDataObject.getPath();
+            switch (editorActivityDataObject.getType()) {
+            case Activated:
+                execActivated(sender, path);
+                break;
+            case Closed:
+                execClosed(sender, path);
+                break;
+            case Saved:
+                saveText(path);
+                break;
+            default:
+                log.warn("Unexpected type: "
+                    + editorActivityDataObject.getType());
             }
         }
 
@@ -215,6 +220,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected ISharedProjectListener sharedProjectListener = new AbstractSharedProjectListener() {
 
+        @Override
         public void roleChanged(final User user) {
 
             // Make sure we have the up-to-date facts about ourself
@@ -265,6 +271,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             refreshAnnotations();
         }
 
+        @Override
         public void userJoined(User user) {
 
             // TODO The user should be able to ask us for this state
@@ -306,6 +313,7 @@ public class EditorManager implements IActivityProvider, Disposable {
             }
         }
 
+        @Override
         public void userLeft(final User user) {
 
             // If the user left which I am following, then stop following...

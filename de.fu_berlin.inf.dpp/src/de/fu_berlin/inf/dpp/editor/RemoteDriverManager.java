@@ -81,8 +81,10 @@ public class RemoteDriverManager {
     protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
 
         @Override
-        public void receive(final EditorActivityDataObject editorActivityDataObject) {
-            User sender = sharedProject.getUser(editorActivityDataObject.getSource());
+        public void receive(
+            final EditorActivityDataObject editorActivityDataObject) {
+            User sender = sharedProject.getUser(editorActivityDataObject
+                .getSource());
             IPath path = editorActivityDataObject.getPath();
 
             if (path == null) {
@@ -103,7 +105,7 @@ public class RemoteDriverManager {
                 editorStates.get(path).remove(sender);
                 break;
             default:
-                log.warn(".recive() Unknown Activity type");
+                log.warn(".receive() Unknown Activity type");
             }
             updateConnectionState(path);
         }
@@ -111,7 +113,8 @@ public class RemoteDriverManager {
     };
 
     /**
-     * This method is called from the shared project when a new activityDataObject arrives
+     * This method is called from the shared project when a new
+     * activityDataObject arrives
      */
     public void exec(final IActivityDataObject activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
