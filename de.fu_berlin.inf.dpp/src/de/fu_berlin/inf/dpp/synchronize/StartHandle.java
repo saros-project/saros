@@ -58,13 +58,9 @@ public class StartHandle {
 
         stopManager.removeStartHandle(this);
 
-        if (stopManager.getStartHandles(user).size() == 0) {
-            // FIXME Race Condition: What happens if stop is called in this
-            // time?
-            stopManager.initiateUnlock(this);
-            return true;
-        }
-        return false;
+        stopManager.initiateUnlock(this);
+
+        return stopManager.getStartHandles(user).isEmpty();
     }
 
     /**
@@ -90,10 +86,9 @@ public class StartHandle {
 
         stopManager.removeStartHandle(this);
 
-        if (stopManager.getStartHandles(user).size() == 0) {
-            // same Race Condition as in start
-            stopManager.initiateUnlock(this);
+        stopManager.initiateUnlock(this);
 
+        if (stopManager.getStartHandles(user).isEmpty()) {
             try {
                 while (!acknowledged.get() && !progress.isCanceled())
                     Thread.sleep(stopManager.MILLISTOWAIT);
@@ -106,6 +101,7 @@ public class StartHandle {
 
             return acknowledged.get();
         }
+
         return false;
     }
 
