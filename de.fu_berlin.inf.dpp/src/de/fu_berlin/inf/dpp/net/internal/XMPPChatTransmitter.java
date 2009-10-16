@@ -200,11 +200,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             sharedProject.getProject().getName(), description, colorID,
             versionInfo, sharedProject.getSessionStart());
 
-        Message msg = new Message();
-        msg.setTo(guest.toString());
-        msg.addExtension(invExtProv.create(invInfo));
-
-        connection.sendPacket(msg);
+        sendMessage(guest, invExtProv.create(invInfo));
     }
 
     /**
@@ -225,13 +221,10 @@ public class XMPPChatTransmitter implements ITransmitter,
     /**
      * Sends a request for @link{FileList} direct over the XMPP connection.
      */
-    public void sendFileListRequest(JID toJID, String invitationID) {
-        log.trace("Sending request for FileList to " + Util.prefix(toJID));
-        Message msg = new Message();
-        msg.setTo(toJID.toString());
-        msg.addExtension(fileListRequestExtProv
+    public void sendFileListRequest(JID to, String invitationID) {
+        log.trace("Sending request for FileList to " + Util.prefix(to));
+        sendMessage(to, fileListRequestExtProv
             .create(new DefaultInvitationInfo(sessionID, invitationID)));
-        connection.sendPacket(msg);
     }
 
     /**
@@ -241,7 +234,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         SubMonitor monitor, boolean forceWait)
         throws UserCancellationException, IOException {
 
-        log.trace("Waiting for FileList from "); //
+        log.trace("Waiting for FileList from ");
 
         IncomingTransferObject result = incomingExtProv.getPayload(receive(
             monitor, collector, 1000, true));
@@ -333,21 +326,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendUserList(JID to, String invitationID, Collection<User> users) {
         log.trace("Sending userList to " + Util.prefix(to));
-        UserListInfo userListInfo = new UserListInfo(sessionID, invitationID,
-            users);
-        Message msg = new Message();
-        msg.addExtension(userListExtProv.create(userListInfo));
-        msg.setTo(to.toString());
-        connection.sendPacket(msg);
+        sendMessage(to, userListExtProv.create(new UserListInfo(sessionID,
+            invitationID, users)));
     }
 
     public void sendUserListConfirmation(JID to) {
         log.trace("Sending userListConfirmation to " + Util.prefix(to));
-        Message msg = new Message();
-        msg.addExtension(userListConfExtProv.create(new DefaultSessionInfo(
+        sendMessage(to, userListConfExtProv.create(new DefaultSessionInfo(
             sessionID)));
-        msg.setTo(to.toString());
-        connection.sendPacket(msg);
     }
 
     public boolean receiveUserListConfirmation(List<User> fromUsers,
@@ -406,11 +392,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
-        Message msg = new Message();
-        msg.addExtension(invCompleteExtProv.create(new DefaultInvitationInfo(
+        sendMessage(to, invCompleteExtProv.create(new DefaultInvitationInfo(
             sessionID, invitationID)));
-        msg.setTo(to.toString());
-        connection.sendPacket(msg);
     }
 
     /********************************************************************************
@@ -743,6 +726,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendMessage(JID jid, PacketExtension extension) {
         Message message = new Message();
         message.addExtension(extension);
+        message.setTo(jid.toString());
         sendMessage(jid, message);
     }
 
