@@ -90,6 +90,7 @@ import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.ConnectionSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject;
 import de.fu_berlin.inf.dpp.util.CausedIOException;
 import de.fu_berlin.inf.dpp.util.StackTrace;
 import de.fu_berlin.inf.dpp.util.Util;
@@ -476,7 +477,6 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
 
         String sID = sessionID.getValue();
-
         PacketExtension extensionToSend = activitiesProvider.create(sID,
             timedActivities);
         byte[] data = null;
@@ -670,10 +670,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     /**
-     * TODO use sendMessage
-     * 
-     * @param sharedProject
-     * @param extension
+     * Convenience method for sending the given {@link PacketExtension} to all
+     * participants of the given {@link SharedProject}.
      */
     protected void sendMessageToAll(ISharedProject sharedProject,
         PacketExtension extension) {
@@ -684,35 +682,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
             if (participant.getJID().equals(myJID))
                 continue;
-
-            Message message = new Message();
-            message.addExtension(extension);
-
-            // TODO Why is this here and not in sendMessage()!?
-            if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
-
-                /*
-                 * TODO [CO] 2009-02-07 This probably does not work anymore! See
-                 * Bug #2577390
-                 * https://sourceforge.net/tracker2/?func=detail&aid
-                 * =2577390&group_id=167540&atid=843359
-                 */
-
-                // Offline for too long
-                if (participant.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
-                    XMPPChatTransmitter.log
-                        .info("Removing offline user from session...");
-                    sharedProject.removeUser(participant);
-                } else {
-                    queueMessage(participant.getJID(), message);
-                    XMPPChatTransmitter.log
-                        .info("User known as offline - Message queued!");
-                }
-
-                continue;
-            }
-
-            sendMessage(participant.getJID(), message);
+            sendMessage(participant.getJID(), extension);
         }
     }
 
@@ -730,11 +700,31 @@ public class XMPPChatTransmitter implements ITransmitter,
         sendMessage(jid, message);
     }
 
-    public void sendMessage(JID jid, Message message) {
+    /**
+     * Sends the given {@link Message} to the given {@link JID}. It queues the
+     * Message if the participant is OFFLINE.
+     */
+    protected void sendMessage(JID jid, Message message) {
+        User participant = sharedProject.getValue().getUser(jid);
+        if (participant == null) {
+            log.warn("User not in session:" + Util.prefix(jid));
+            return;
+        }
 
-        // TODO Also queue like in sendMessageToAll if user is offline
-        if (this.connection == null || !this.connection.isConnected()) {
-            queueMessage(jid, message);
+        if (participant.getConnectionState() == UserConnectionState.OFFLINE) {
+            /*
+             * TODO This probably does not work anymore! See Feature Request
+             * #2577390
+             */
+
+            // remove participant if he/she is offline too long
+            if (participant.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
+                log.info("Removing offline user from session...");
+                sharedProject.getValue().removeUser(participant);
+            } else {
+                queueMessage(jid, message);
+                log.info("User known as offline - Message queued!");
+            }
             return;
         }
 
