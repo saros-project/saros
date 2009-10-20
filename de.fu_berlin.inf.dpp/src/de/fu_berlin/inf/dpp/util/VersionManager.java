@@ -302,7 +302,6 @@ public class VersionManager {
             return Compatibility.TOO_NEW;
     }
 
-    
     /**
      * If the remote version is newer than the local one, the remote
      * compatibility comparison result will be returned.

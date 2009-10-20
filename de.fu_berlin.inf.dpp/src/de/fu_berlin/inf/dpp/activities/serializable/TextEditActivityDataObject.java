@@ -64,7 +64,8 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
 
     /**
      * @param offset
-     *            the offset inside the document where this activityDataObject happened.
+     *            the offset inside the document where this activityDataObject
+     *            happened.
      * @param text
      *            the text that was inserted.
      * @param replacedText

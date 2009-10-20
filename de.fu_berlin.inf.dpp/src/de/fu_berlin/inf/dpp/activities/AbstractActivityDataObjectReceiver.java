@@ -15,13 +15,15 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 /**
  * Abstract implementation of IActivityDataObjectReceiver which does nothing
  */
-public class AbstractActivityDataObjectReceiver implements IActivityDataObjectReceiver {
+public class AbstractActivityDataObjectReceiver implements
+    IActivityDataObjectReceiver {
 
     public void receive(ViewportActivityDataObject viewportActivityDataObject) {
         // do nothing
     }
 
-    public void receive(TextSelectionActivityDataObject textSelectionActivityDataObject) {
+    public void receive(
+        TextSelectionActivityDataObject textSelectionActivityDataObject) {
         // do nothing
     }
 
@@ -62,26 +64,29 @@ public class AbstractActivityDataObjectReceiver implements IActivityDataObjectRe
     }
 
     /**
-     * Returns a IActivityDataObjectConsumer from the given IActivityDataObjectReceiver which
-     * returns the given value for all calls to consume after calling receive on
-     * the IActivityDataObjectReceiver.
+     * Returns a IActivityDataObjectConsumer from the given
+     * IActivityDataObjectReceiver which returns the given value for all calls
+     * to consume after calling receive on the IActivityDataObjectReceiver.
      */
     public static IActivityDataObjectConsumer asConsumer(
         final IActivityDataObjectReceiver receiver, final boolean consume) {
 
         return new IActivityDataObjectConsumer() {
 
-            public boolean consume(ViewportActivityDataObject viewportActivityDataObject) {
+            public boolean consume(
+                ViewportActivityDataObject viewportActivityDataObject) {
                 receiver.receive(viewportActivityDataObject);
                 return consume;
             }
 
-            public boolean consume(TextSelectionActivityDataObject textSelectionActivityDataObject) {
+            public boolean consume(
+                TextSelectionActivityDataObject textSelectionActivityDataObject) {
                 receiver.receive(textSelectionActivityDataObject);
                 return consume;
             }
 
-            public boolean consume(TextEditActivityDataObject textEditActivityDataObject) {
+            public boolean consume(
+                TextEditActivityDataObject textEditActivityDataObject) {
                 receiver.receive(textEditActivityDataObject);
                 return consume;
             }
@@ -91,7 +96,8 @@ public class AbstractActivityDataObjectReceiver implements IActivityDataObjectRe
                 return consume;
             }
 
-            public boolean consume(FolderActivityDataObject folderActivityDataObject) {
+            public boolean consume(
+                FolderActivityDataObject folderActivityDataObject) {
                 receiver.receive(folderActivityDataObject);
                 return consume;
             }
@@ -101,7 +107,8 @@ public class AbstractActivityDataObjectReceiver implements IActivityDataObjectRe
                 return consume;
             }
 
-            public boolean consume(EditorActivityDataObject editorActivityDataObject) {
+            public boolean consume(
+                EditorActivityDataObject editorActivityDataObject) {
                 receiver.receive(editorActivityDataObject);
                 return consume;
             }
@@ -116,12 +123,14 @@ public class AbstractActivityDataObjectReceiver implements IActivityDataObjectRe
                 return consume;
             }
 
-            public boolean consume(PingPongActivityDataObject pingPongActivityDataObject) {
+            public boolean consume(
+                PingPongActivityDataObject pingPongActivityDataObject) {
                 receiver.receive(pingPongActivityDataObject);
                 return consume;
             }
 
-            public boolean consume(ChecksumActivityDataObject checksumActivityDataObject) {
+            public boolean consume(
+                ChecksumActivityDataObject checksumActivityDataObject) {
                 receiver.receive(checksumActivityDataObject);
                 return consume;
             }

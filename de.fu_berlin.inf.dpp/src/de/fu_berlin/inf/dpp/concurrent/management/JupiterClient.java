@@ -50,7 +50,8 @@ public class JupiterClient {
             jupiterActivity);
     }
 
-    public synchronized boolean isCurrent(ChecksumActivityDataObject checksumActivityDataObject)
+    public synchronized boolean isCurrent(
+        ChecksumActivityDataObject checksumActivityDataObject)
         throws TransformationException {
         return get(checksumActivityDataObject.path).isCurrent(
             checksumActivityDataObject.getTimestamp());
@@ -64,7 +65,8 @@ public class JupiterClient {
         this.clientDocs.clear();
     }
 
-    public synchronized JupiterActivity generate(TextEditActivityDataObject textEdit) {
+    public synchronized JupiterActivity generate(
+        TextEditActivityDataObject textEdit) {
 
         return get(textEdit.getEditor()).generateJupiterActivity(
             textEdit.toOperation(), sharedProject.getLocalUser().getJID(),
@@ -72,13 +74,15 @@ public class JupiterClient {
     }
 
     /**
-     * Given a checksum, this method will return a new checksum activityDataObject with
-     * the timestamp set to the VectorTime of the Jupiter algorithm used for
-     * managing the document addressed by the checksum.
+     * Given a checksum, this method will return a new checksum
+     * activityDataObject with the timestamp set to the VectorTime of the
+     * Jupiter algorithm used for managing the document addressed by the
+     * checksum.
      */
     public synchronized ChecksumActivityDataObject withTimestamp(
         ChecksumActivityDataObject checksumActivityDataObject) {
-        return get(checksumActivityDataObject.path).withTimestamp(checksumActivityDataObject);
+        return get(checksumActivityDataObject.path).withTimestamp(
+            checksumActivityDataObject);
     }
 
 }

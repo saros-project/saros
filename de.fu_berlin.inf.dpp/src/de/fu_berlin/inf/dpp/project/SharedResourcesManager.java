@@ -64,8 +64,8 @@ import de.fu_berlin.inf.dpp.util.Util;
 /**
  * This manager is responsible for handling all resource changes that aren't
  * handled by the EditorManager, that is for changes that aren't done by
- * entering text in an text editor. It creates and executes file activityDataObjects and
- * folder activityDataObjects.
+ * entering text in an text editor. It creates and executes file
+ * activityDataObjects and folder activityDataObjects.
  * 
  * @author rdjemili
  * 
@@ -125,7 +125,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
     };
 
     /**
-     * Listens for resource changes in shared project and fires activityDataObjects.
+     * Listens for resource changes in shared project and fires
+     * activityDataObjects.
      */
     protected class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
@@ -139,7 +140,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
         protected class PathLengthComparator implements
             Comparator<IResourceActivityDataObject> {
 
-            public int compare(IResourceActivityDataObject a1, IResourceActivityDataObject a2) {
+            public int compare(IResourceActivityDataObject a1,
+                IResourceActivityDataObject a2) {
                 int a1sc = a1.getPath().segmentCount();
                 int a2sc = a2.getPath().segmentCount();
 
@@ -157,14 +159,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
             PathLengthComparator pathLengthComparator = new PathLengthComparator();
 
-            public int compare(IResourceActivityDataObject a1, IResourceActivityDataObject a2) {
+            public int compare(IResourceActivityDataObject a1,
+                IResourceActivityDataObject a2) {
                 return -pathLengthComparator.compare(a1, a2);
             }
         }
 
         /**
-         * To be run before change event ends. It orders activityDataObjects in buffer
-         * and fires them.
+         * To be run before change event ends. It orders activityDataObjects in
+         * buffer and fires them.
          */
         public void finish() {
             for (IActivityDataObject activityDataObject : getOrderedActivities())
@@ -187,8 +190,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             List<IResourceActivityDataObject> orderedList;
 
             /**
-             * split all activityDataObjects in activityDataObjects buffer in groups
-             * ({File,Folder} * {Create, Move, Delete})
+             * split all activityDataObjects in activityDataObjects buffer in
+             * groups ({File,Folder} * {Create, Move, Delete})
              */
             for (IResourceActivityDataObject activity : activitiesBuffer) {
                 FolderActivityDataObject.Type tFolder;
@@ -273,7 +276,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             return delta.getKind() != IResourceDelta.NO_CHANGE;
         }
 
-        protected IResourceActivityDataObject handleFolderDelta(IResourceDelta delta) {
+        protected IResourceActivityDataObject handleFolderDelta(
+            IResourceDelta delta) {
             IResource resource = delta.getResource();
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:
@@ -294,7 +298,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             }
         }
 
-        protected IResourceActivityDataObject handleFileDelta(IResourceDelta delta) {
+        protected IResourceActivityDataObject handleFileDelta(
+            IResourceDelta delta) {
             IResource resource = delta.getResource();
             int kind = delta.getKind();
 
@@ -323,8 +328,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
                     oldPath = oldPath.removeFirstSegments(1);
 
                     try {
-                        return FileActivityDataObject.moved(sharedProject.getProject(),
-                            jid, newPath, oldPath, isContentChange(delta));
+                        return FileActivityDataObject.moved(sharedProject
+                            .getProject(), jid, newPath, oldPath,
+                            isContentChange(delta));
                     } catch (IOException e) {
                         log
                             .warn("Resource could not be read for sending to peers:"
@@ -344,9 +350,10 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 }
                 try {
 
-                    return FileActivityDataObject.created(sharedProject.getProject(),
-                        saros.getMyJID(), resource.getFullPath().makeRelative()
-                            .removeFirstSegments(1), Purpose.ACTIVITY);
+                    return FileActivityDataObject.created(sharedProject
+                        .getProject(), saros.getMyJID(), resource.getFullPath()
+                        .makeRelative().removeFirstSegments(1),
+                        Purpose.ACTIVITY);
                 } catch (IOException e) {
                     log.warn("Resource could not be read for sending to peers:"
                         + resource.getLocation(), e);
@@ -356,8 +363,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceDelta.REMOVED:
                 if (isMoved(delta)) // Ignore "REMOVED" while moving
                     return null;
-                return FileActivityDataObject.removed(saros.getMyJID(), resource
-                    .getProjectRelativePath(), Purpose.ACTIVITY);
+                return FileActivityDataObject.removed(saros.getMyJID(),
+                    resource.getProjectRelativePath(), Purpose.ACTIVITY);
 
             default:
                 return null;
@@ -531,7 +538,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
     protected void exec(FileActivityDataObject activity) throws CoreException {
 
         if (this.sharedProject == null) {
-            log.warn("Project has ended for FileActivityDataObject " + activity);
+            log
+                .warn("Project has ended for FileActivityDataObject "
+                    + activity);
             return;
         }
 

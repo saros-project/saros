@@ -105,8 +105,9 @@ public class ConcurrentDocumentServer implements Disposable {
     };
 
     /**
-     * Transforms the given activityDataObjects on the server side and returns a list of
-     * activityDataObjects to be executed locally and sent to other users.
+     * Transforms the given activityDataObjects on the server side and returns a
+     * list of activityDataObjects to be executed locally and sent to other
+     * users.
      * 
      * @host
      * 
@@ -115,7 +116,8 @@ public class ConcurrentDocumentServer implements Disposable {
      *              * @notSWT This method may not be called from SWT, otherwise
      *              a deadlock might occur!!
      */
-    public TransformationResult transformIncoming(List<IActivityDataObject> activityDataObjects) {
+    public TransformationResult transformIncoming(
+        List<IActivityDataObject> activityDataObjects) {
 
         assert sharedProject.isHost() : "CDS.transformIncoming may not be called on the Client!!";
 
@@ -129,14 +131,17 @@ public class ConcurrentDocumentServer implements Disposable {
                 activityDataObject.dispatch(hostReceiver);
 
                 if (activityDataObject instanceof JupiterActivity) {
-                    result.addAll(receive((JupiterActivity) activityDataObject));
+                    result
+                        .addAll(receive((JupiterActivity) activityDataObject));
                 } else if (activityDataObject instanceof ChecksumActivityDataObject) {
-                    result.addAll(withTimestamp((ChecksumActivityDataObject) activityDataObject));
+                    result
+                        .addAll(withTimestamp((ChecksumActivityDataObject) activityDataObject));
                 } else {
                     result.executeLocally.add(activityDataObject);
                 }
             } catch (Exception e) {
-                log.error("Error while receiving activityDataObject: " + activityDataObject, e);
+                log.error("Error while receiving activityDataObject: "
+                    + activityDataObject, e);
             }
         }
         return result;
@@ -198,7 +203,8 @@ public class ConcurrentDocumentServer implements Disposable {
     /**
      * Does the actual work of transforming a JupiterActivity.
      */
-    protected List<QueueItem> withTimestamp(ChecksumActivityDataObject checksumActivityDataObject) {
+    protected List<QueueItem> withTimestamp(
+        ChecksumActivityDataObject checksumActivityDataObject) {
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
@@ -207,7 +213,8 @@ public class ConcurrentDocumentServer implements Disposable {
         try {
             outgoing = server.withTimestamp(checksumActivityDataObject);
         } catch (TransformationException e) {
-            log.error("Error during transformation of: " + checksumActivityDataObject, e);
+            log.error("Error during transformation of: "
+                + checksumActivityDataObject, e);
             // TODO this should trigger a consistency check
             return result;
         }

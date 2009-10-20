@@ -9,8 +9,8 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * An Operation is a representation of a user activityDataObject for the use by an
- * algorithm like Jupiter.
+ * An Operation is a representation of a user activityDataObject for the use by
+ * an algorithm like Jupiter.
  * 
  * This interface must be implemented by all operations. An operation is
  * application dependent and therefore this interface does not contain any
@@ -19,9 +19,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 public interface Operation {
 
     /**
-     * Returns a sequence of {@link TextEditActivityDataObject}s which represent this
-     * operation if applied in order to the editor denoted by the given path by
-     * the user identified by the given source.
+     * Returns a sequence of {@link TextEditActivityDataObject}s which represent
+     * this operation if applied in order to the editor denoted by the given
+     * path by the user identified by the given source.
      */
     List<TextEditActivityDataObject> toTextEdit(IPath path, JID source);
 

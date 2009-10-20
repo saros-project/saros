@@ -13,19 +13,21 @@ import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 
 /**
- * Abstract implementation of an {@link IActivityDataObjectConsumer} which does nothing
- * and returns false for all consume methods.
+ * Abstract implementation of an {@link IActivityDataObjectConsumer} which does
+ * nothing and returns false for all consume methods.
  * 
  * This class is meant to be sub-classed to implement actual behavior.
  */
-public class AbstractActivityDataObjectConsumer implements IActivityDataObjectConsumer {
+public class AbstractActivityDataObjectConsumer implements
+    IActivityDataObjectConsumer {
 
     public boolean consume(ViewportActivityDataObject viewportActivityDataObject) {
         // empty implementation
         return false;
     }
 
-    public boolean consume(TextSelectionActivityDataObject textSelectionActivityDataObject) {
+    public boolean consume(
+        TextSelectionActivityDataObject textSelectionActivityDataObject) {
         // empty implementation
         return false;
     }
@@ -77,20 +79,25 @@ public class AbstractActivityDataObjectConsumer implements IActivityDataObjectCo
 
     /**
      * Utility method for converting a IActivityDataObjectConsumer into an
-     * IActivityDataObjectReceiver (the result from the calls to consume are ignored)
+     * IActivityDataObjectReceiver (the result from the calls to consume are
+     * ignored)
      */
-    public static IActivityDataObjectReceiver asReceiver(final IActivityDataObjectConsumer consumer) {
+    public static IActivityDataObjectReceiver asReceiver(
+        final IActivityDataObjectConsumer consumer) {
         return new IActivityDataObjectReceiver() {
 
-            public void receive(ViewportActivityDataObject viewportActivityDataObject) {
+            public void receive(
+                ViewportActivityDataObject viewportActivityDataObject) {
                 consumer.consume(viewportActivityDataObject);
             }
 
-            public void receive(TextSelectionActivityDataObject textSelectionActivityDataObject) {
+            public void receive(
+                TextSelectionActivityDataObject textSelectionActivityDataObject) {
                 consumer.consume(textSelectionActivityDataObject);
             }
 
-            public void receive(TextEditActivityDataObject textEditActivityDataObject) {
+            public void receive(
+                TextEditActivityDataObject textEditActivityDataObject) {
                 consumer.consume(textEditActivityDataObject);
             }
 
@@ -98,7 +105,8 @@ public class AbstractActivityDataObjectConsumer implements IActivityDataObjectCo
                 consumer.consume(roleActivityDataObject);
             }
 
-            public void receive(FolderActivityDataObject folderActivityDataObject) {
+            public void receive(
+                FolderActivityDataObject folderActivityDataObject) {
                 consumer.consume(folderActivityDataObject);
             }
 
@@ -106,7 +114,8 @@ public class AbstractActivityDataObjectConsumer implements IActivityDataObjectCo
                 consumer.consume(fileActivityDataObject);
             }
 
-            public void receive(EditorActivityDataObject editorActivityDataObject) {
+            public void receive(
+                EditorActivityDataObject editorActivityDataObject) {
                 consumer.consume(editorActivityDataObject);
             }
 
@@ -118,11 +127,13 @@ public class AbstractActivityDataObjectConsumer implements IActivityDataObjectCo
                 consumer.consume(stopActivityDataObject);
             }
 
-            public void receive(PingPongActivityDataObject pingPongActivityDataObject) {
+            public void receive(
+                PingPongActivityDataObject pingPongActivityDataObject) {
                 consumer.consume(pingPongActivityDataObject);
             }
 
-            public void receive(ChecksumActivityDataObject checksumActivityDataObject) {
+            public void receive(
+                ChecksumActivityDataObject checksumActivityDataObject) {
                 consumer.consume(checksumActivityDataObject);
             }
         };

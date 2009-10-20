@@ -18,8 +18,9 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
  * In our case we want to call one of the specialized receive methods in
  * IActivityDataObjectReceiver for a given IActivityDataObject.
  * 
- * For instance, if an IActivityDataObject is a TextSelectionActivityDataObject, we want the method
- * {@link #receive(TextSelectionActivityDataObject)} to be called.
+ * For instance, if an IActivityDataObject is a TextSelectionActivityDataObject,
+ * we want the method {@link #receive(TextSelectionActivityDataObject)} to be
+ * called.
  * 
  */
 public interface IActivityDataObjectReceiver {

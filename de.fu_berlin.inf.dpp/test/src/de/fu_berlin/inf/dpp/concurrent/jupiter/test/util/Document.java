@@ -67,8 +67,8 @@ public class Document {
      */
     public void execOperation(Operation op) {
 
-        List<TextEditActivityDataObject> activities = op.toTextEdit(new Path("dummy"),
-            new JID("dummy@server"));
+        List<TextEditActivityDataObject> activities = op.toTextEdit(new Path(
+            "dummy"), new JID("dummy@server"));
 
         for (TextEditActivityDataObject activity : activities) {
 

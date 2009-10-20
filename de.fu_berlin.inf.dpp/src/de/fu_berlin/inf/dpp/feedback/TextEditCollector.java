@@ -22,18 +22,20 @@ import de.fu_berlin.inf.dpp.project.SessionManager;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * A collector class that collects local text edit activityDataObjects and compares them
- * in relation to parallelism or rather concurrency with remote text events.<br>
+ * A collector class that collects local text edit activityDataObjects and
+ * compares them in relation to parallelism or rather concurrency with remote
+ * text events.<br>
  * It is measured how many characters the local user wrote in a session
  * (whitespaces are omitted, because Eclipse produces many of them automatically
- * e.g. when a new line is started), how many text edit activityDataObjects he produced
- * (which can be different to the number of characters he wrote, e.g. when
- * copy&paste or Eclipse's method generation was used) and how concurrent the
- * local user's writing was to remote users using different sample intervals. <br>
+ * e.g. when a new line is started), how many text edit activityDataObjects he
+ * produced (which can be different to the number of characters he wrote, e.g.
+ * when copy&paste or Eclipse's method generation was used) and how concurrent
+ * the local user's writing was to remote users using different sample
+ * intervals. <br>
  * <br>
- * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when restoring
- * an editor) are counted as well. And refactorings can produce quite a large
- * number of characters that are counted. <br>
+ * NOTE: Text edit activityDataObjects that are triggered by Eclipse (e.g. when
+ * restoring an editor) are counted as well. And refactorings can produce quite
+ * a large number of characters that are counted. <br>
  * <br>
  * Example:<br>
  * The percent numbers (for all intervals + non-parallel) should add up to

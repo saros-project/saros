@@ -4,8 +4,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 
 /**
  * This observable can be used to check whether there is currently a file
- * replacement activityDataObject in progress by the ConsistencyWatchdog (in this case
- * isReplacementInProgress() returns true).
+ * replacement activityDataObject in progress by the ConsistencyWatchdog (in
+ * this case isReplacementInProgress() returns true).
  * 
  * Internally this class uses reference counting, so you can call
  * startReplacement() repeatedly and it will return true until a matching number

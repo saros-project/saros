@@ -11,8 +11,8 @@ import de.fu_berlin.inf.dpp.activities.IResourceActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("folderActivity")
-public class FolderActivityDataObject extends AbstractActivityDataObject implements
-    IResourceActivityDataObject {
+public class FolderActivityDataObject extends AbstractActivityDataObject
+    implements IResourceActivityDataObject {
     public static enum Type {
         Created, Removed, Moved
     }
@@ -88,10 +88,10 @@ public class FolderActivityDataObject extends AbstractActivityDataObject impleme
     @Override
     public String toString() {
         if (type == Type.Moved)
-            return "FolderActivityDataObject(type: Moved, old path: " + this.oldPath
-                + ", new path: " + this.path + ")";
-        return "FolderActivityDataObject(type: " + this.type + ", path: " + this.path
-            + ")";
+            return "FolderActivityDataObject(type: Moved, old path: "
+                + this.oldPath + ", new path: " + this.path + ")";
+        return "FolderActivityDataObject(type: " + this.type + ", path: "
+            + this.path + ")";
     }
 
     public boolean dispatch(IActivityDataObjectConsumer consumer) {

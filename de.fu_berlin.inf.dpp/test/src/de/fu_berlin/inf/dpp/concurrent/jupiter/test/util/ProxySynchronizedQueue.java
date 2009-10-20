@@ -18,8 +18,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class ProxySynchronizedQueue {
 
-    private static Logger log = Logger
-        .getLogger(ProxySynchronizedQueue.class);
+    private static Logger log = Logger.getLogger(ProxySynchronizedQueue.class);
 
     private Algorithm algorithm;
     private SimulateNetzwork connection;

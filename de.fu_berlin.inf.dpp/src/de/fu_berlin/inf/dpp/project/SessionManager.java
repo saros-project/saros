@@ -283,7 +283,8 @@ public class SessionManager implements IConnectionListener, ISessionManager {
         this.transmitter.sendRemainingFiles();
         this.transmitter.sendRemainingMessages();
 
-        // ask for next expected activityDataObjects (in case I missed something while
+        // ask for next expected activityDataObjects (in case I missed something
+        // while
         // being not available)
 
         // TODO this is currently disabled

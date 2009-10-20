@@ -107,8 +107,8 @@ public class RoleChangeCollector extends AbstractStatisticCollector {
             .getTimeInMinutes(observerDuration));
         data.setTotalRoleDurationDriver(StatisticManager
             .getTimeInMinutes(driverDuration));
-        data.setTotalRolePercentObserver(getPercentage(
-            observerDuration, sessionTime));
+        data.setTotalRolePercentObserver(getPercentage(observerDuration,
+            sessionTime));
         data.setTotalRolePercentDriver(getPercentage(driverDuration,
             sessionTime));
     }

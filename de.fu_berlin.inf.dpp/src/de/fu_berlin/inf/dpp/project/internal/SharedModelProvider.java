@@ -25,7 +25,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
  * 
  * @author rdjemili
  */
-@Component(module = "core") 
+@Component(module = "core")
 public class SharedModelProvider extends ModelProvider {
 
     private static final Logger log = Logger

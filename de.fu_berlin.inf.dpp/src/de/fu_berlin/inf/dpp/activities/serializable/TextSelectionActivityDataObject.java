@@ -43,7 +43,8 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
     @XStreamAsAttribute
     private final IPath editor;
 
-    public TextSelectionActivityDataObject(JID source, int offset, int length, IPath path) {
+    public TextSelectionActivityDataObject(JID source, int offset, int length,
+        IPath path) {
         super(source);
         if (path == null) {
             throw new IllegalArgumentException("path must not be null");
@@ -96,9 +97,9 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
 
     @Override
     public String toString() {
-        return "TextSelectionActivityDataObject(offset:" + this.offset + ",length:"
-            + this.length + ",src:" + getSource() + ",path:" + this.editor
-            + ")";
+        return "TextSelectionActivityDataObject(offset:" + this.offset
+            + ",length:" + this.length + ",src:" + getSource() + ",path:"
+            + this.editor + ")";
     }
 
     public boolean dispatch(IActivityDataObjectConsumer consumer) {

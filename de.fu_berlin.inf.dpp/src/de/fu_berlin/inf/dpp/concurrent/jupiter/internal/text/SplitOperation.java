@@ -155,8 +155,10 @@ public class SplitOperation implements Operation {
             }
 
             if (isReplace(lastOp, operation)) {
-                result.add(new TextEditActivityDataObject(source, lastOp.getPosition(),
-                    operation.getText(), lastOp.getText(), path));
+                result
+                    .add(new TextEditActivityDataObject(source, lastOp
+                        .getPosition(), operation.getText(), lastOp.getText(),
+                        path));
                 lastOp = null;
                 continue;
             } else {

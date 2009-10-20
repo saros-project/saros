@@ -68,8 +68,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             users.add(user);
 
             log.info(Util.prefix(user.getJID())
-                + "joined. Session now contains "
-                + currentNumberOfParticipants + " users.");
+                + "joined. Session now contains " + currentNumberOfParticipants
+                + " users.");
         }
 
         @Override
@@ -78,9 +78,8 @@ public class ParticipantCollector extends AbstractStatisticCollector {
             // handle the event with the former number of users
             handleUserEvent(currentNumberOfParticipants + 1);
 
-            log.info(Util.prefix(user.getJID())
-                + "left. Session now contains " + currentNumberOfParticipants
-                + " users.");
+            log.info(Util.prefix(user.getJID()) + "left. Session now contains "
+                + currentNumberOfParticipants + " users.");
         }
 
     };

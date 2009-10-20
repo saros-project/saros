@@ -22,7 +22,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * This class is responsible of setting the presence of Saros to away if the
  * user deactivates the Eclipse window
  */
-@Component(module = "ui") 
+@Component(module = "ui")
 public class LocalPresenceTracker {
 
     private static final Logger log = Logger

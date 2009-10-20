@@ -44,8 +44,9 @@ import de.fu_berlin.inf.dpp.util.xstream.IPathConverter;
 import de.fu_berlin.inf.dpp.util.xstream.XppReader;
 
 /**
- * Flexible extension provider using XStream to serialize arbitrary data objects.
- *
+ * Flexible extension provider using XStream to serialize arbitrary data
+ * objects.
+ * 
  * Supports PacketExtension and IQPackets
  */
 public class XStreamExtensionProvider<T> implements PacketExtensionProvider,

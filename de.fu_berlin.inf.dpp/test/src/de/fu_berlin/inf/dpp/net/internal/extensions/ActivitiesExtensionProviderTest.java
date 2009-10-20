@@ -57,13 +57,15 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             new SplitOperation(insert, easySplit)));
 
     protected static final IActivityDataObject[] activityDataObjects = new IActivityDataObject[] {
-        new EditorActivityDataObject(jid, EditorActivityDataObject.Type.Activated, path),
-        new FileActivityDataObject(jid, FileActivityDataObject.Type.Created, path, null,
-            new byte[] { 34, 72 }, Purpose.ACTIVITY),
-        new FolderActivityDataObject(jid, FolderActivityDataObject.Type.Created, path),
+        new EditorActivityDataObject(jid,
+            EditorActivityDataObject.Type.Activated, path),
+        new FileActivityDataObject(jid, FileActivityDataObject.Type.Created,
+            path, null, new byte[] { 34, 72 }, Purpose.ACTIVITY),
+        new FolderActivityDataObject(jid,
+            FolderActivityDataObject.Type.Created, path),
         new RoleActivityDataObject(jid, new JID("user@server"), UserRole.DRIVER),
-        new TextEditActivityDataObject(jid, 23, "foo\r\ntest\n\nbla", "bar", path),
-        new TextSelectionActivityDataObject(jid, 1, 2, path),
+        new TextEditActivityDataObject(jid, 23, "foo\r\ntest\n\nbla", "bar",
+            path), new TextSelectionActivityDataObject(jid, 1, 2, path),
         new ViewportActivityDataObject(jid, 5, 10, path) };
 
     protected ActivitiesExtensionProvider aProvider = new ActivitiesExtensionProvider();
@@ -97,7 +99,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     }
 
     public void testEditorActivity() {
-        for (EditorActivityDataObject.Type type : EditorActivityDataObject.Type.values()) {
+        for (EditorActivityDataObject.Type type : EditorActivityDataObject.Type
+            .values()) {
             try {
                 new EditorActivityDataObject(new JID("user@server"), type, null);
                 if (type != EditorActivityDataObject.Type.Activated) {
@@ -121,8 +124,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testGapInSequenceNumbers() throws XmlPullParserException,
         IOException {
-        IActivityDataObject activityDataObject = new EditorActivityDataObject(jid,
-            EditorActivityDataObject.Type.Activated, null);
+        IActivityDataObject activityDataObject = new EditorActivityDataObject(
+            jid, EditorActivityDataObject.Type.Activated, null);
 
         List<TimedActivity> timedActivities = new ArrayList<TimedActivity>(2);
         timedActivities.add(new TimedActivity(activityDataObject, jid, 20));
@@ -136,7 +139,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     public void testLineDelimiters() throws XmlPullParserException, IOException {
         for (String lineEnding : new String[] { "\n", "\r", "\r\n" }) {
-            assertRoundtrip(new TextEditActivityDataObject(jid, 42, lineEnding, "", path));
+            assertRoundtrip(new TextEditActivityDataObject(jid, 42, lineEnding,
+                "", path));
         }
     }
 
@@ -147,10 +151,11 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             .getPayload(parseExtension(xml)));
     }
 
-    protected PacketExtension createPacketExtension(IActivityDataObject activityDataObject) {
-        return aProvider.create("4711",
-            Collections.singletonList(new TimedActivity(activityDataObject, activityDataObject
-                .getSource(), 42)));
+    protected PacketExtension createPacketExtension(
+        IActivityDataObject activityDataObject) {
+        return aProvider.create("4711", Collections
+            .singletonList(new TimedActivity(activityDataObject,
+                activityDataObject.getSource(), 42)));
     }
 
     protected PacketExtension parseExtension(String xml)

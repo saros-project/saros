@@ -330,8 +330,8 @@ public class ConsistencyWatchdogHandler {
 
             try {
                 // Send the file to client
-                project.sendActivity(fromUser, FileActivityDataObject.created(project
-                    .getProject(), myJID, path, Purpose.RECOVERY));
+                project.sendActivity(fromUser, FileActivityDataObject.created(
+                    project.getProject(), myJID, path, Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -348,8 +348,8 @@ public class ConsistencyWatchdogHandler {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             project
-                                .activityCreated(new ChecksumActivityDataObject(myJID,
-                                    path, checksum.getHash(), checksum
+                                .activityCreated(new ChecksumActivityDataObject(
+                                    myJID, path, checksum.getHash(), checksum
                                         .getLength()));
                         }
                     });
@@ -367,12 +367,12 @@ public class ConsistencyWatchdogHandler {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            project.sendActivity(fromUser, FileActivityDataObject.removed(myJID, path,
-                Purpose.RECOVERY));
+            project.sendActivity(fromUser, FileActivityDataObject.removed(
+                myJID, path, Purpose.RECOVERY));
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    project.activityCreated(ChecksumActivityDataObject.missing(myJID,
-                        path));
+                    project.activityCreated(ChecksumActivityDataObject.missing(
+                        myJID, path));
                 }
             });
 

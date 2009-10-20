@@ -14,8 +14,8 @@ import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 public abstract class AbstractActivityDataObject implements IActivityDataObject {
 
     @SuppressWarnings("unused")
-    private static final Logger log = Logger.getLogger(AbstractActivityDataObject.class
-        .getName());
+    private static final Logger log = Logger
+        .getLogger(AbstractActivityDataObject.class.getName());
 
     @XStreamAsAttribute
     @XStreamConverter(JIDConverter.class)

@@ -107,7 +107,8 @@ public class JupiterDocumentServer {
     }
 
     public Map<JID, ChecksumActivityDataObject> withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject) throws TransformationException {
+        ChecksumActivityDataObject checksumActivityDataObject)
+        throws TransformationException {
 
         Map<JID, ChecksumActivityDataObject> result = new HashMap<JID, ChecksumActivityDataObject>();
 

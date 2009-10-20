@@ -11,16 +11,16 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * A checksum activityDataObject is used to communicate checksums from the host to the
- * clients.
+ * A checksum activityDataObject is used to communicate checksums from the host
+ * to the clients.
  * 
- * A checksum activityDataObject always relates to a certain file (given a path) and
- * contains the hash and length of the file.
+ * A checksum activityDataObject always relates to a certain file (given a path)
+ * and contains the hash and length of the file.
  * 
  * To indicate that a file is missing on the host NON_EXISTING_DOC is used.
  * 
- * A checksum activityDataObject also may contain a JupiterTimestamp to indicate at which
- * point of time the checksum was created. A remote user can use this
+ * A checksum activityDataObject also may contain a JupiterTimestamp to indicate
+ * at which point of time the checksum was created. A remote user can use this
  * information to see whether the checksum can be used to check for consistency
  * or whether the local user has already written additional text which
  * invalidates the checksum.
@@ -46,10 +46,11 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     public Timestamp jupiterTimestamp;
 
     /**
-     * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set (such is
-     * used when communicating with users which are observers)
+     * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set
+     * (such is used when communicating with users which are observers)
      */
-    public ChecksumActivityDataObject(JID source, IPath path, long hash, long length) {
+    public ChecksumActivityDataObject(JID source, IPath path, long hash,
+        long length) {
         super(source);
         this.path = path;
         this.hash = hash;
@@ -58,11 +59,11 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     }
 
     /**
-     * Constructor for checksum activityDataObjects including a Timestamp (for users
-     * which are drivers)
+     * Constructor for checksum activityDataObjects including a Timestamp (for
+     * users which are drivers)
      */
-    public ChecksumActivityDataObject(JID source, IPath path, long hash, long length,
-        Timestamp jupiterTimestamp) {
+    public ChecksumActivityDataObject(JID source, IPath path, long hash,
+        long length, Timestamp jupiterTimestamp) {
         super(source);
         this.path = path;
         this.hash = hash;
@@ -71,8 +72,8 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     }
 
     /**
-     * Create a ChecksumActivityDataObject which indicates that the file is missing on the
-     * host.
+     * Create a ChecksumActivityDataObject which indicates that the file is
+     * missing on the host.
      */
     public static ChecksumActivityDataObject missing(JID source, IPath path) {
         return new ChecksumActivityDataObject(source, path, NON_EXISTING_DOC,
@@ -80,8 +81,8 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     }
 
     /**
-     * Returns a new checksum activityDataObject which is identical to this activityDataObject, but
-     * has the timestamp set to the given value.
+     * Returns a new checksum activityDataObject which is identical to this
+     * activityDataObject, but has the timestamp set to the given value.
      */
     public ChecksumActivityDataObject withTimestamp(Timestamp jupiterTimestamp) {
         return new ChecksumActivityDataObject(source, path, hash, length,

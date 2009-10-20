@@ -301,8 +301,8 @@ public interface ITransmitter {
      *            a map containing the sequence number to be requested as a
      *            value and the user to request them from as key
      * @param andUp
-     *            true if all activityDataObjects after the requested one are requested
-     *            too, false if only the activityDataObject with the
+     *            true if all activityDataObjects after the requested one are
+     *            requested too, false if only the activityDataObject with the
      *            requestedSequenceNumber is requested
      */
     public void sendRequestForActivity(ISharedProject sharedProject,
@@ -324,8 +324,9 @@ public interface ITransmitter {
      * Sends given list of TimedActivities to the given recipient.
      * 
      * This list MUST not contain any {@link FileActivityDataObject}s where
-     * {@link FileActivityDataObject#getType()} == {@link FileActivityDataObject.Type#Created} as
-     * binary data is not supported in messages bodies.
+     * {@link FileActivityDataObject#getType()} ==
+     * {@link FileActivityDataObject.Type#Created} as binary data is not
+     * supported in messages bodies.
      * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
@@ -339,8 +340,9 @@ public interface ITransmitter {
      *             null or contains no activityDataObjects.
      * 
      * @throws AssertionError
-     *             if the given list of timed activityDataObjects contains FileActivities
-     *             of type created AND the application is run using asserts.
+     *             if the given list of timed activityDataObjects contains
+     *             FileActivities of type created AND the application is run
+     *             using asserts.
      */
     public void sendTimedActivities(JID recipient,
         List<TimedActivity> timedActivities);

@@ -90,9 +90,11 @@ public class JupiterServer {
     }
 
     public synchronized Map<JID, ChecksumActivityDataObject> withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject) throws TransformationException {
+        ChecksumActivityDataObject checksumActivityDataObject)
+        throws TransformationException {
 
-        JupiterDocumentServer docServer = getServer(checksumActivityDataObject.getPath());
+        JupiterDocumentServer docServer = getServer(checksumActivityDataObject
+            .getPath());
 
         return docServer.withTimestamp(checksumActivityDataObject);
     }

@@ -77,8 +77,8 @@ public interface ISharedProject extends IActivityListener {
         SubMonitor progress) throws CancellationException, InterruptedException;
 
     /**
-     * Set the role of the given user. This is called on incoming activityDataObjects
-     * from the network.
+     * Set the role of the given user. This is called on incoming
+     * activityDataObjects from the network.
      * 
      * @swt This method MUST to be called from the SWT UI thread
      * @param user
@@ -259,8 +259,8 @@ public interface ISharedProject extends IActivityListener {
      * All the ActivityProviders will call this method when new events occurred
      * in the UI.
      * 
-     * The given activityDataObject will be transformed by the ConcurrentDocumentManager
-     * and then send to all remote users.
+     * The given activityDataObject will be transformed by the
+     * ConcurrentDocumentManager and then send to all remote users.
      * 
      * @see IActivityListener
      * 
@@ -273,14 +273,16 @@ public interface ISharedProject extends IActivityListener {
      * 
      * This method will by-pass the ConcurrentDocumentManager.
      */
-    public void sendActivity(List<User> recipient, IActivityDataObject activityDataObject);
+    public void sendActivity(List<User> recipient,
+        IActivityDataObject activityDataObject);
 
     /**
      * Convenience method to address a single recipient.
      * 
      * @see #sendActivity(List, IActivityDataObject)
      */
-    public void sendActivity(User recipient, IActivityDataObject activityDataObject);
+    public void sendActivity(User recipient,
+        IActivityDataObject activityDataObject);
 
     /**
      * Adds an {@link IActivityProvider} and also registers itself as

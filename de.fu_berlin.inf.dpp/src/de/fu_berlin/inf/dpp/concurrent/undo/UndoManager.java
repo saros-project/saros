@@ -332,14 +332,15 @@ public class UndoManager implements Disposable, IActivityProvider {
          * undo history.
          */
         @Override
-        public void receive(TextEditActivityDataObject textEditActivityDataObject) {
+        public void receive(
+            TextEditActivityDataObject textEditActivityDataObject) {
 
             if (!enabled)
                 return;
 
             /*
-             * When performing an undo/redo there are fired activityDataObjects which are
-             * expected and have to be ignored when coming back.
+             * When performing an undo/redo there are fired activityDataObjects
+             * which are expected and have to be ignored when coming back.
              */
             if (expectedActivities.remove(textEditActivityDataObject))
                 return;
@@ -356,10 +357,11 @@ public class UndoManager implements Disposable, IActivityProvider {
                         currentLocalAtomicOperation, operation, Boolean.FALSE);
                 }
                 log.debug("adding remote " + operation + " to history");
-                undoHistory.add(textEditActivityDataObject.getEditor(), Type.REMOTE,
-                    operation);
+                undoHistory.add(textEditActivityDataObject.getEditor(),
+                    Type.REMOTE, operation);
             } else {
-                if (!textEditActivityDataObject.getEditor().equals(currentActiveEditor)) {
+                if (!textEditActivityDataObject.getEditor().equals(
+                    currentActiveEditor)) {
                     log
                         .error("Editor of the local TextEditActivityDataObject is not the current "
                             + "active editor. Possibly the current active editor is not"
@@ -505,8 +507,8 @@ public class UndoManager implements Disposable, IActivityProvider {
             return;
         }
 
-        for (TextEditActivityDataObject activity : op
-            .toTextEdit(editor, saros.getMyJID())) {
+        for (TextEditActivityDataObject activity : op.toTextEdit(editor, saros
+            .getMyJID())) {
             log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -516,8 +518,8 @@ public class UndoManager implements Disposable, IActivityProvider {
 
         Operation op = calcRedoOperation(editor);
 
-        for (TextEditActivityDataObject activity : op
-            .toTextEdit(editor, saros.getMyJID())) {
+        for (TextEditActivityDataObject activity : op.toTextEdit(editor, saros
+            .getMyJID())) {
             log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
         }

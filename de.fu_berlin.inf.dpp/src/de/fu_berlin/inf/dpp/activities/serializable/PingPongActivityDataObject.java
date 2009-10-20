@@ -19,7 +19,8 @@ public class PingPongActivityDataObject extends AbstractActivityDataObject {
         super(source);
     }
 
-    public PingPongActivityDataObject(JID sender, JID initiator, DateTime departureTime) {
+    public PingPongActivityDataObject(JID sender, JID initiator,
+        DateTime departureTime) {
         super(sender);
         this.initiator = initiator;
         this.departureTime = departureTime;
@@ -38,13 +39,13 @@ public class PingPongActivityDataObject extends AbstractActivityDataObject {
     }
 
     public static PingPongActivityDataObject create(User localUser) {
-        return new PingPongActivityDataObject(localUser.getJID(), localUser.getJID(),
-            new DateTime());
+        return new PingPongActivityDataObject(localUser.getJID(), localUser
+            .getJID(), new DateTime());
     }
 
     public IActivityDataObject createPong(User localUser) {
-        return new PingPongActivityDataObject(localUser.getJID(), getInitiator(), this
-            .getDepartureTime());
+        return new PingPongActivityDataObject(localUser.getJID(),
+            getInitiator(), this.getDepartureTime());
     }
 
     @Override

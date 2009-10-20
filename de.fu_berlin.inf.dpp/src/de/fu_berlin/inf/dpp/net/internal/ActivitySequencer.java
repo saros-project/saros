@@ -51,8 +51,8 @@ import de.fu_berlin.inf.dpp.util.AutoHashMap;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * The ActivitySequencer is responsible for making sure that activityDataObjects are sent
- * and received in the right order.
+ * The ActivitySequencer is responsible for making sure that activityDataObjects
+ * are sent and received in the right order.
  * 
  * TODO Remove the dependency of this class on the ConcurrentDocumentManager,
  * push all responsibility up a layer into the SharedProject
@@ -68,7 +68,8 @@ public class ActivitySequencer {
 
     /**
      * Number of milliseconds between each flushing and sending of outgoing
-     * activityDataObjects, and testing for too old queued incoming activityDataObjects.
+     * activityDataObjects, and testing for too old queued incoming
+     * activityDataObjects.
      */
     protected static final int MILLIS_UPDATE = 1000;
 
@@ -77,7 +78,8 @@ public class ActivitySequencer {
         public final List<User> recipients;
         public final IActivityDataObject activityDataObject;
 
-        public QueueItem(List<User> recipients, IActivityDataObject activityDataObject) {
+        public QueueItem(List<User> recipients,
+            IActivityDataObject activityDataObject) {
             this.recipients = recipients;
             this.activityDataObject = activityDataObject;
         }
@@ -98,12 +100,15 @@ public class ActivitySequencer {
      */
     protected class ActivityQueue {
 
-        /** How long to wait until ignore missing activityDataObjects in milliseconds. */
+        /**
+         * How long to wait until ignore missing activityDataObjects in
+         * milliseconds.
+         */
         protected static final long ACTIVITY_TIMEOUT = 30 * 1000;
 
         /**
-         * Sequence numbers for outgoing and incoming activityDataObjects start with this
-         * value.
+         * Sequence numbers for outgoing and incoming activityDataObjects start
+         * with this value.
          */
         protected static final int FIRST_SEQUENCE_NUMBER = 0;
 
@@ -117,8 +122,8 @@ public class ActivitySequencer {
         protected int expectedSequenceNumber = FIRST_SEQUENCE_NUMBER;
 
         /**
-         * Oldest local timestamp for the queued activityDataObjects or 0 if there are no
-         * activityDataObjects queued.
+         * Oldest local timestamp for the queued activityDataObjects or 0 if
+         * there are no activityDataObjects queued.
          * 
          * TODO Is this documentation correct?
          */
@@ -130,8 +135,8 @@ public class ActivitySequencer {
         /**
          * History of activityDataObjects sent.
          * 
-         * TODO Not really used at the moment. File creation activityDataObjects don't
-         * store the content at the time they were sent, so they can't be
+         * TODO Not really used at the moment. File creation activityDataObjects
+         * don't store the content at the time they were sent, so they can't be
          * re-send.
          */
         protected final List<TimedActivity> history = new LinkedList<TimedActivity>();
@@ -144,10 +149,11 @@ public class ActivitySequencer {
          * Create a {@link TimedActivity} and add it to the history of created
          * activityDataObjects.
          */
-        public TimedActivity createTimedActivity(IActivityDataObject activityDataObject) {
+        public TimedActivity createTimedActivity(
+            IActivityDataObject activityDataObject) {
 
-            TimedActivity result = new TimedActivity(activityDataObject, localJID,
-                nextSequenceNumber++);
+            TimedActivity result = new TimedActivity(activityDataObject,
+                localJID, nextSequenceNumber++);
             history.add(result);
             return result;
         }
@@ -157,7 +163,8 @@ public class ActivitySequencer {
          */
         public void add(TimedActivity activity) {
 
-            // Ignore activityDataObjects with sequence numbers we have already seen or
+            // Ignore activityDataObjects with sequence numbers we have already
+            // seen or
             // don't expect anymore.
             if (activity.getSequenceNumber() < expectedSequenceNumber) {
                 log.warn("Ignored activityDataObject. Expected Nr. "
@@ -185,7 +192,8 @@ public class ActivitySequencer {
 
         /**
          * Set {@link ActivityQueue#oldestLocalTimestamp} to the oldest local
-         * timestamp of the queued activityDataObjects or 0 if the queue is empty.
+         * timestamp of the queued activityDataObjects or 0 if the queue is
+         * empty.
          */
         protected void updateOldestLocalTimestamp() {
             oldestLocalTimestamp = Long.MAX_VALUE;
@@ -198,8 +206,8 @@ public class ActivitySequencer {
         }
 
         /**
-         * @return The next activityDataObject if there is one and it carries the expected
-         *         sequence number, otherwise <code>null</code>.
+         * @return The next activityDataObject if there is one and it carries
+         *         the expected sequence number, otherwise <code>null</code>.
          */
         public TimedActivity removeNext() {
 
@@ -228,12 +236,14 @@ public class ActivitySequencer {
             int firstQueuedSequenceNumber = queuedActivities.peek()
                 .getSequenceNumber();
 
-            // Discard all activityDataObjects which we are no longer waiting for
+            // Discard all activityDataObjects which we are no longer waiting
+            // for
             while (firstQueuedSequenceNumber < expectedSequenceNumber) {
 
                 TimedActivity activity = queuedActivities.remove();
 
-                log.error("Expected activityDataObject #" + expectedSequenceNumber
+                log.error("Expected activityDataObject #"
+                    + expectedSequenceNumber
                     + " but an older activityDataObject is still in the queue"
                     + " and will be dropped (#" + firstQueuedSequenceNumber
                     + "): " + activity);
@@ -275,11 +285,11 @@ public class ActivitySequencer {
         }
 
         /**
-         * Returns all activityDataObjects which can be executed. If there are none, an
-         * empty List is returned.
+         * Returns all activityDataObjects which can be executed. If there are
+         * none, an empty List is returned.
          * 
-         * This method also checks for missing activityDataObjects and discards out-dated
-         * or unwanted activityDataObjects.
+         * This method also checks for missing activityDataObjects and discards
+         * out-dated or unwanted activityDataObjects.
          */
         public List<TimedActivity> removeActivities() {
 
@@ -344,7 +354,8 @@ public class ActivitySequencer {
          *            to add to the qeues.
          * 
          * @throws IllegalArgumentException
-         *             if the source of the activityDataObject is <code>null</code>.
+         *             if the source of the activityDataObject is
+         *             <code>null</code>.
          */
         public void add(TimedActivity timedActivity) {
             getActivityQueue(timedActivity.getSender()).add(timedActivity);
@@ -361,11 +372,11 @@ public class ActivitySequencer {
         }
 
         /**
-         * @return all activityDataObjects that can be executed. If there are none, an
-         *         empty List is returned.
+         * @return all activityDataObjects that can be executed. If there are
+         *         none, an empty List is returned.
          * 
-         *         This method also checks for missing activityDataObjects and discards
-         *         out-dated or unwanted activityDataObjects.
+         *         This method also checks for missing activityDataObjects and
+         *         discards out-dated or unwanted activityDataObjects.
          */
         public List<TimedActivity> removeActivities() {
             ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
@@ -439,8 +450,8 @@ public class ActivitySequencer {
     }
 
     /**
-     * Start periodical flushing and sending of outgoing activityDataObjects and checking
-     * for received activityDataObjects that are queued for too long.
+     * Start periodical flushing and sending of outgoing activityDataObjects and
+     * checking for received activityDataObjects that are queued for too long.
      * 
      * @throws IllegalStateException
      *             if this method is called on an already started
@@ -486,13 +497,14 @@ public class ActivitySequencer {
                     }
                 }
 
-                for (Entry<User, List<IActivityDataObject>> e : toSend.entrySet()) {
+                for (Entry<User, List<IActivityDataObject>> e : toSend
+                    .entrySet()) {
                     sendActivities(e.getKey(), optimize(e.getValue()));
                 }
 
                 /*
-                 * Periodically execQueues() because waiting activityDataObjects might
-                 * have timed-out
+                 * Periodically execQueues() because waiting activityDataObjects
+                 * might have timed-out
                  */
                 dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
@@ -508,8 +520,8 @@ public class ActivitySequencer {
              *          else than this TimerTask.
              * 
              * @throws IllegalArgumentException
-             *             if the recipient is the local user or the activityDataObjects
-             *             contain <code>null</code>.
+             *             if the recipient is the local user or the
+             *             activityDataObjects contain <code>null</code>.
              */
             private void sendActivities(User recipient,
                 List<IActivityDataObject> activityDataObjects) {
@@ -537,8 +549,8 @@ public class ActivitySequencer {
     }
 
     /**
-     * Stop periodical flushing and sending of outgoing activityDataObjects and checking
-     * for received activityDataObjects that are queued for too long.
+     * Stop periodical flushing and sending of outgoing activityDataObjects and
+     * checking for received activityDataObjects that are queued for too long.
      * 
      * @see #start()
      */
@@ -560,8 +572,8 @@ public class ActivitySequencer {
      * 
      * The activityDataObjects are sorted (in the queue) and executed in order.
      * 
-     * If an activityDataObject is missing, this method just returns and queues the given
-     * activityDataObject
+     * If an activityDataObject is missing, this method just returns and queues
+     * the given activityDataObject
      */
     public void exec(TimedActivity nextActivity) {
 
@@ -592,7 +604,8 @@ public class ActivitySequencer {
     /**
      * Sends the given activityDataObject to the given recipients.
      */
-    public void sendActivity(List<User> recipients, final IActivityDataObject activityDataObject) {
+    public void sendActivity(List<User> recipients,
+        final IActivityDataObject activityDataObject) {
 
         /**
          * Short cut all messages directed at local user
@@ -602,7 +615,8 @@ public class ActivitySequencer {
             if (user.isLocal()) {
                 dispatchThread.executeAsDispatch(new Runnable() {
                     public void run() {
-                        sharedProject.exec(Collections.singletonList(activityDataObject));
+                        sharedProject.exec(Collections
+                            .singletonList(activityDataObject));
                     }
                 });
             } else {
@@ -610,28 +624,31 @@ public class ActivitySequencer {
             }
         }
 
-        this.outgoingQueue.add(new QueueItem(toSendViaNetwork, activityDataObject));
+        this.outgoingQueue.add(new QueueItem(toSendViaNetwork,
+            activityDataObject));
     }
 
     /**
-     * Create {@link TimedActivity}s for the given recipient and activityDataObjects and
-     * add them to the history of activityDataObjects for the recipient.
+     * Create {@link TimedActivity}s for the given recipient and
+     * activityDataObjects and add them to the history of activityDataObjects
+     * for the recipient.
      * 
-     * This operation is thread safe, i.e. it is guaranteed that all activityDataObjects
-     * get increasing, consecutive sequencer numbers, even if this method is
-     * called from different threads concurrently.
+     * This operation is thread safe, i.e. it is guaranteed that all
+     * activityDataObjects get increasing, consecutive sequencer numbers, even
+     * if this method is called from different threads concurrently.
      */
     protected List<TimedActivity> createTimedActivities(JID recipient,
         List<IActivityDataObject> activityDataObjects) {
-        return incomingQueues.createTimedActivities(recipient, activityDataObjects);
+        return incomingQueues.createTimedActivities(recipient,
+            activityDataObjects);
     }
 
     /**
      * Get the activityDataObject history for given user and given timestamp.
      * 
-     * If andUp is <code>true</code> all activityDataObjects that are equal or greater
-     * than the timestamp are returned, otherwise just the activityDataObject that matches
-     * the timestamp exactly.
+     * If andUp is <code>true</code> all activityDataObjects that are equal or
+     * greater than the timestamp are returned, otherwise just the
+     * activityDataObject that matches the timestamp exactly.
      * 
      * If no activityDataObject matches the criteria an empty list is returned.
      */
@@ -650,13 +667,16 @@ public class ActivitySequencer {
     }
 
     /**
-     * This method tries to reduce the number of activityDataObjects transmitted by
-     * removing activityDataObjects that would overwrite each other and joining
-     * activityDataObjects that can be send as a single activityDataObject.
+     * This method tries to reduce the number of activityDataObjects transmitted
+     * by removing activityDataObjects that would overwrite each other and
+     * joining activityDataObjects that can be send as a single
+     * activityDataObject.
      */
-    private static List<IActivityDataObject> optimize(List<IActivityDataObject> toOptimize) {
+    private static List<IActivityDataObject> optimize(
+        List<IActivityDataObject> toOptimize) {
 
-        List<IActivityDataObject> result = new ArrayList<IActivityDataObject>(toOptimize.size());
+        List<IActivityDataObject> result = new ArrayList<IActivityDataObject>(
+            toOptimize.size());
 
         TextSelectionActivityDataObject selection = null;
         LinkedHashMap<IPath, ViewportActivityDataObject> viewport = new LinkedHashMap<IPath, ViewportActivityDataObject>();
@@ -683,7 +703,8 @@ public class ActivitySequencer {
             result.add(selection);
 
         // Add only one viewport per editor
-        for (Map.Entry<IPath, ViewportActivityDataObject> entry : viewport.entrySet()) {
+        for (Map.Entry<IPath, ViewportActivityDataObject> entry : viewport
+            .entrySet()) {
             result.add(entry.getValue());
         }
 
@@ -692,8 +713,8 @@ public class ActivitySequencer {
         return result;
     }
 
-    private static TextEditActivityDataObject joinTextEdits(List<IActivityDataObject> result,
-        TextEditActivityDataObject textEdit) {
+    private static TextEditActivityDataObject joinTextEdits(
+        List<IActivityDataObject> result, TextEditActivityDataObject textEdit) {
         if (result.size() == 0) {
             return textEdit;
         }
@@ -707,10 +728,10 @@ public class ActivitySequencer {
                 && (textEdit.offset == lastTextEdit.offset
                     + lastTextEdit.text.length())) {
                 result.remove(lastTextEdit);
-                textEdit = new TextEditActivityDataObject(lastTextEdit.getSource(),
-                    lastTextEdit.offset, lastTextEdit.text + textEdit.text,
-                    lastTextEdit.replacedText + textEdit.replacedText,
-                    lastTextEdit.getEditor());
+                textEdit = new TextEditActivityDataObject(lastTextEdit
+                    .getSource(), lastTextEdit.offset, lastTextEdit.text
+                    + textEdit.text, lastTextEdit.replacedText
+                    + textEdit.replacedText, lastTextEdit.getEditor());
             }
         }
 
@@ -720,7 +741,8 @@ public class ActivitySequencer {
     /**
      * Removes queued activityDataObjects from given user.
      * 
-     * TODO Maybe remove outgoing activityDataObjects from {@link #outgoingQueue} too!?
+     * TODO Maybe remove outgoing activityDataObjects from
+     * {@link #outgoingQueue} too!?
      * 
      * @param jid
      *            of the user that left.

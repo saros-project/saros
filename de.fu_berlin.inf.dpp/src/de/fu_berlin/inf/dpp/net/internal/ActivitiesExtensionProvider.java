@@ -48,14 +48,15 @@ public class ActivitiesExtensionProvider extends
     XStreamExtensionProvider<TimedActivities> {
 
     public ActivitiesExtensionProvider() {
-        super("activityDataObjects", TimedActivities.class, AbstractActivityDataObject.class,
-            EditorActivityDataObject.class, FileActivityDataObject.class, FolderActivityDataObject.class,
+        super("activityDataObjects", TimedActivities.class,
+            AbstractActivityDataObject.class, EditorActivityDataObject.class,
+            FileActivityDataObject.class, FolderActivityDataObject.class,
             RoleActivityDataObject.class, TextEditActivityDataObject.class,
-            TextSelectionActivityDataObject.class, ViewportActivityDataObject.class,
-            TimedActivity.class, JupiterActivity.class,
-            JupiterVectorTime.class, DeleteOperation.class,
-            InsertOperation.class, NoOperation.class, SplitOperation.class,
-            TimestampOperation.class, JID.class);
+            TextSelectionActivityDataObject.class,
+            ViewportActivityDataObject.class, TimedActivity.class,
+            JupiterActivity.class, JupiterVectorTime.class,
+            DeleteOperation.class, InsertOperation.class, NoOperation.class,
+            SplitOperation.class, TimestampOperation.class, JID.class);
     }
 
     public PacketExtension create(String sessionID,

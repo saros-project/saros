@@ -30,8 +30,8 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
- * A role activityDataObject indicates that a user has a new Role in the Driver/Observer
- * schemes of things.
+ * A role activityDataObject indicates that a user has a new Role in the
+ * Driver/Observer schemes of things.
  */
 @XStreamAlias("roleActivity")
 public class RoleActivityDataObject extends AbstractActivityDataObject {
@@ -44,8 +44,8 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
     protected final JID affectedUser;
 
     /**
-     * Creates a new RoleActivityDataObject which indicates that the given user should
-     * change into the given role.
+     * Creates a new RoleActivityDataObject which indicates that the given user
+     * should change into the given role.
      */
     public RoleActivityDataObject(JID source, JID affectedUser, UserRole role) {
         super(source);
@@ -57,7 +57,8 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((affectedUser == null) ? 0 : affectedUser.hashCode());
+        result = prime * result
+            + ((affectedUser == null) ? 0 : affectedUser.hashCode());
         result = prime * result + ((role == null) ? 0 : role.hashCode());
         return result;
     }
@@ -94,8 +95,8 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
 
     @Override
     public String toString() {
-        return "RoleActivityDataObject(user:" + this.getAffectedUser() + ",new role:"
-            + this.getRole() + ")";
+        return "RoleActivityDataObject(user:" + this.getAffectedUser()
+            + ",new role:" + this.getRole() + ")";
     }
 
     public boolean dispatch(IActivityDataObjectConsumer consumer) {

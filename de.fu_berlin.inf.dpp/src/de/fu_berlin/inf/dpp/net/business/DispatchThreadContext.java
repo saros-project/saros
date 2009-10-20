@@ -10,7 +10,8 @@ import de.fu_berlin.inf.dpp.util.NamedThreadFactory;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
- * The ExecutorService under which all incoming activityDataObjects should be executed.
+ * The ExecutorService under which all incoming activityDataObjects should be
+ * executed.
  * 
  */
 @Component(module = "Core")

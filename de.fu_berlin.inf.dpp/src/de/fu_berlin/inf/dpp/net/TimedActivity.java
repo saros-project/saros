@@ -48,10 +48,11 @@ public class TimedActivity implements Comparable<TimedActivity> {
      *            the sequence number that belongs to the activityDataObject.
      * 
      * @throws IllegalArgumentException
-     *             if activityDataObject is <code>null</code> or the sequence number is
-     *             {@link TimedActivity#UNKNOWN_SEQUENCE_NR}.
+     *             if activityDataObject is <code>null</code> or the sequence
+     *             number is {@link TimedActivity#UNKNOWN_SEQUENCE_NR}.
      */
-    public TimedActivity(IActivityDataObject activityDataObject, JID sender, int sequenceNumber) {
+    public TimedActivity(IActivityDataObject activityDataObject, JID sender,
+        int sequenceNumber) {
 
         if (sender == null) {
             throw new IllegalArgumentException("Source cannot be null");
@@ -79,8 +80,8 @@ public class TimedActivity implements Comparable<TimedActivity> {
     /**
      * @return the user who sent this time activityDataObject
      * 
-     *         CAUTION: The Source of the activityDataObject contained in this timed
-     *         activityDataObject might be somebody else.
+     *         CAUTION: The Source of the activityDataObject contained in this
+     *         timed activityDataObject might be somebody else.
      */
     public JID getSender() {
         return this.sender;
@@ -102,7 +103,8 @@ public class TimedActivity implements Comparable<TimedActivity> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
+        result = prime
+            * result
             + ((activityDataObject == null) ? 0 : activityDataObject.hashCode());
         result = prime * result + sequenceNumber;
         return result;
@@ -148,11 +150,12 @@ public class TimedActivity implements Comparable<TimedActivity> {
 
         for (TimedActivity timedActivity : timedActivities) {
 
-            IActivityDataObject activityDataObject = timedActivity.getActivity();
+            IActivityDataObject activityDataObject = timedActivity
+                .getActivity();
 
             if (activityDataObject instanceof FileActivityDataObject
-                && ((FileActivityDataObject) activityDataObject).getType().equals(
-                    FileActivityDataObject.Type.Created)) {
+                && ((FileActivityDataObject) activityDataObject).getType()
+                    .equals(FileActivityDataObject.Type.Created)) {
                 return false;
             }
         }

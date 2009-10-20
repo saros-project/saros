@@ -17,11 +17,13 @@ import de.fu_berlin.inf.dpp.activities.IResourceActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("fileActivity")
-public class FileActivityDataObject extends AbstractActivityDataObject implements IResourceActivityDataObject {
+public class FileActivityDataObject extends AbstractActivityDataObject
+    implements IResourceActivityDataObject {
 
     /**
-     * Enum used to distinguish file activityDataObjects which are caused as part of a
-     * consistency recovery and those used as regular activityDataObjects.
+     * Enum used to distinguish file activityDataObjects which are caused as
+     * part of a consistency recovery and those used as regular
+     * activityDataObjects.
      */
     public static enum Purpose {
         ACTIVITY, RECOVERY;
@@ -46,8 +48,8 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
     protected byte[] data;
 
     /**
-     * Utility method for creating a file activityDataObject of type == Created from a
-     * given path.
+     * Utility method for creating a file activityDataObject of type == Created
+     * from a given path.
      * 
      * This method will make a snapshot copy of the file at this point in time.
      * 
@@ -75,14 +77,15 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
         // IOUtils.closeQuietly(in);
         // }
         //
-        // return new FileActivityDataObject(source, Type.Created, npath, null, content,
+        // return new FileActivityDataObject(source, Type.Created, npath, null,
+        // content,
         // purpose);
 
         File f = new File(project.getFile(path).getLocation().toOSString());
         byte[] content = FileUtils.readFileToByteArray(f);
 
-        return new FileActivityDataObject(source, Type.Created, path, null, content,
-            purpose);
+        return new FileActivityDataObject(source, Type.Created, path, null,
+            content, purpose);
     }
 
     /**
@@ -111,8 +114,8 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
                 .toOSString());
             content = FileUtils.readFileToByteArray(file);
         }
-        return new FileActivityDataObject(source, Type.Moved, destPath, sourcePath,
-            content, Purpose.ACTIVITY);
+        return new FileActivityDataObject(source, Type.Moved, destPath,
+            sourcePath, content, Purpose.ACTIVITY);
     }
 
     /**
@@ -121,15 +124,18 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
      * @param path
      *            the path of the file to remove
      */
-    public static FileActivityDataObject removed(JID source, IPath path, Purpose purpose) {
-        return new FileActivityDataObject(source, Type.Removed, path, null, null, purpose);
+    public static FileActivityDataObject removed(JID source, IPath path,
+        Purpose purpose) {
+        return new FileActivityDataObject(source, Type.Removed, path, null,
+            null, purpose);
     }
 
     /**
      * Generic constructor for {@link FileActivityDataObject}s
      * 
      * @param source
-     *            JID the user who is the source (originator) of this activityDataObject
+     *            JID the user who is the source (originator) of this
+     *            activityDataObject
      * @param newPath
      *            where to save the data, destination of a move, file to to
      *            remove depending on type
@@ -140,8 +146,8 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivityDataObject(JID source, Type type, IPath newPath, IPath oldPath,
-        byte[] data, Purpose purpose) {
+    public FileActivityDataObject(JID source, Type type, IPath newPath,
+        IPath oldPath, byte[] data, Purpose purpose) {
         super(source);
 
         if (type == null || purpose == null)
@@ -182,9 +188,9 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
     }
 
     /**
-     * @return the contents of this file for incoming file creation activityDataObjects (
-     *         {@link #getType()} == {@link Type#Created}. <code>null</code>
-     *         otherwise.
+     * @return the contents of this file for incoming file creation
+     *         activityDataObjects ( {@link #getType()} == {@link Type#Created}.
+     *         <code>null</code> otherwise.
      */
     public byte[] getContents() {
         return this.data;
@@ -193,9 +199,10 @@ public class FileActivityDataObject extends AbstractActivityDataObject implement
     @Override
     public String toString() {
         if (type == Type.Moved)
-            return "FileActivityDataObject(type: Moved, old path: " + this.oldPath
-                + ", new path: " + this.path + ")";
-        return "FileActivityDataObject(type: " + this.type + ", path: " + this.path + ")";
+            return "FileActivityDataObject(type: Moved, old path: "
+                + this.oldPath + ", new path: " + this.path + ")";
+        return "FileActivityDataObject(type: " + this.type + ", path: "
+            + this.path + ")";
     }
 
     @Override

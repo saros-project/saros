@@ -3,7 +3,8 @@ package de.fu_berlin.inf.dpp.project;
 import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 
 /**
- * Every activityDataObject provider is responsible for one or more activityDataObject types.
+ * Every activityDataObject provider is responsible for one or more
+ * activityDataObject types.
  * 
  * It can...
  * 
@@ -17,7 +18,8 @@ import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
 public interface IActivityProvider {
 
     /**
-     * Will cause implementor of the interface to execute the given activityDataObject.
+     * Will cause implementor of the interface to execute the given
+     * activityDataObject.
      * 
      * @swt The implementor may expect that this method is called from the SWT
      *      thread.

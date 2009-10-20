@@ -71,8 +71,10 @@ public class RequestForActivityHandler {
             ISharedProject sharedProject = sessionManager.getSharedProject();
 
             if (sharedProject.getUser(fromJID) == null) {
-                log.warn("Received Request for activityDataObject from user which"
-                    + " is not part of our shared project session: " + fromJID);
+                log
+                    .warn("Received Request for activityDataObject from user which"
+                        + " is not part of our shared project session: "
+                        + fromJID);
                 return;
             }
 

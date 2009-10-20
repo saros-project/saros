@@ -24,8 +24,8 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     protected final IPath editor;
 
-    public ViewportActivityDataObject(JID source, int topIndex, int bottomIndex,
-        IPath editor) {
+    public ViewportActivityDataObject(JID source, int topIndex,
+        int bottomIndex, IPath editor) {
         super(source);
 
         if (editor == null) {
@@ -40,7 +40,8 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         this.editor = editor;
     }
 
-    public ViewportActivityDataObject(JID source, ILineRange viewport, IPath editor) {
+    public ViewportActivityDataObject(JID source, ILineRange viewport,
+        IPath editor) {
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);

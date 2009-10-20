@@ -153,12 +153,12 @@ public class ActivitiesHandler {
 
     /**
      * This method is called from all the different transfer methods, when an
-     * activityDataObject arrives. This method puts the activityDataObject into the
-     * ActivitySequencer which will execute it.
+     * activityDataObject arrives. This method puts the activityDataObject into
+     * the ActivitySequencer which will execute it.
      * 
      * @param fromJID
-     *            The JID which sent these activityDataObjects (the source in the
-     *            activityDataObjects might be different!)
+     *            The JID which sent these activityDataObjects (the source in
+     *            the activityDataObjects might be different!)
      * @param timedActivities
      *            The received activityDataObjects including sequence numbers.
      * 
@@ -181,17 +181,19 @@ public class ActivitiesHandler {
 
         for (TimedActivity timedActivity : timedActivities) {
 
-            IActivityDataObject activityDataObject = timedActivity.getActivity();
+            IActivityDataObject activityDataObject = timedActivity
+                .getActivity();
 
             /*
-             * Some activityDataObjects save space in the message by not setting the
-             * source and the XML parser needs to provide the source
+             * Some activityDataObjects save space in the message by not setting
+             * the source and the XML parser needs to provide the source
              */
             assert activityDataObject.getSource() != null : "Received activityDataObject without source:"
                 + activityDataObject;
 
             try {
-                // Ask sequencer to execute or queue until missing activityDataObjects
+                // Ask sequencer to execute or queue until missing
+                // activityDataObjects
                 // arrive
                 project.getSequencer().exec(timedActivity);
             } catch (Exception e) {

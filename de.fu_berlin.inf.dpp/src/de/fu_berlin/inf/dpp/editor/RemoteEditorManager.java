@@ -25,8 +25,8 @@ import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * This class contains the state of the editors, viewports and selections of all
- * remote users as we believe it to be by listening to the activityDataObjects we
- * receive.
+ * remote users as we believe it to be by listening to the activityDataObjects
+ * we receive.
  */
 public class RemoteEditorManager {
 
@@ -174,7 +174,8 @@ public class RemoteEditorManager {
 
         protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
             @Override
-            public void receive(EditorActivityDataObject editorActivityDataObject) {
+            public void receive(
+                EditorActivityDataObject editorActivityDataObject) {
 
                 switch (editorActivityDataObject.getType()) {
                 case Activated:
@@ -189,14 +190,16 @@ public class RemoteEditorManager {
             }
 
             @Override
-            public void receive(ViewportActivityDataObject viewportActivityDataObject) {
+            public void receive(
+                ViewportActivityDataObject viewportActivityDataObject) {
 
-                setViewport(viewportActivityDataObject.getEditor(), viewportActivityDataObject
-                    .getLineRange());
+                setViewport(viewportActivityDataObject.getEditor(),
+                    viewportActivityDataObject.getLineRange());
             }
 
             @Override
-            public void receive(TextSelectionActivityDataObject textSelectionActivityDataObject) {
+            public void receive(
+                TextSelectionActivityDataObject textSelectionActivityDataObject) {
 
                 setSelection(textSelectionActivityDataObject.getEditor(),
                     textSelectionActivityDataObject.getSelection());

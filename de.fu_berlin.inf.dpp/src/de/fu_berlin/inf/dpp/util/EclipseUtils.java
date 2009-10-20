@@ -103,7 +103,7 @@ public class EclipseUtils {
         String dialogTitle, String dialogMessage) {
         MessageDialog md = new MessageDialog(shell, dialogTitle, null,
             dialogMessage, MessageDialog.QUESTION, new String[] {
-                IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL}, 0);
+                IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
         return openWindow(md) == 0;
     }
 
