@@ -452,9 +452,9 @@ public class OutgoingInvitationProcess extends InvitationProcess {
         SarosPacketCollector userListConfirmationCollector = transmitter
             .getUserListConfirmationCollector();
 
-        for (User user : sharedProject.getParticipants()) {
+        for (User user : sharedProject.getRemoteUsers()) {
             transmitter.sendUserList(user.getJID(), invitationID, sharedProject
-                .getRemoteUsers());
+                .getParticipants());
         }
 
         log.debug("Inv" + Util.prefix(peer)
