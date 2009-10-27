@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.eclipse.core.runtime.SubMonitor;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
@@ -15,7 +15,7 @@ import de.fu_berlin.inf.dpp.net.internal.DataTransferManager.NetTransferMode;
 public interface IncomingTransferObject {
 
     /**
-     * @throws UserCancellationException
+     * @throws SarosCancellationException
      *             If an user (remote or local) has canceled.
      * @throws IOException
      *             If there was a technical problem.
@@ -24,7 +24,7 @@ public interface IncomingTransferObject {
      *           for instance). So do not call this from the
      *           {@link DispatchThreadContext} or from the SWT Thread.
      */
-    public byte[] accept(SubMonitor progress) throws UserCancellationException,
+    public byte[] accept(SubMonitor progress) throws SarosCancellationException,
         IOException;
 
     /**

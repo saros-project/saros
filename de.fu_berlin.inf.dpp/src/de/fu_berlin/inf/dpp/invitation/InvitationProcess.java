@@ -25,13 +25,12 @@ import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 
 /**
  * @author rdjemili
+ * @author sotitas
  */
-public abstract class InvitationProcess implements IInvitationProcess {
+public abstract class InvitationProcess {
 
     protected final ITransmitter transmitter;
-    protected State state;
     protected JID peer;
-    protected IInvitationUI invitationUI = null;
     protected String description;
     protected final int colorID;
 
@@ -48,27 +47,18 @@ public abstract class InvitationProcess implements IInvitationProcess {
         this.invitationProcesses.addInvitationProcess(this);
     }
 
-    public State getState() {
-        return this.state;
-    }
-
-    public void setState(State newstate) {
-        this.state = newstate;
-
-        if (this.invitationUI != null) {
-            this.invitationUI.updateInvitationProgress(this.peer);
-        }
-    }
-
     /**
-     * {@inheritDoc}
+     * @return the peer that is participating with us in this process. For an
+     *         incoming invitation this is the inviter. For an outgoing
+     *         invitation this is the invitee.
      */
     public JID getPeer() {
         return this.peer;
     }
 
     /**
-     * {@inheritDoc}
+     * @return the user-provided informal description that can be provided with
+     *         an invitation.
      */
     public String getDescription() {
         return this.description;
@@ -76,22 +66,14 @@ public abstract class InvitationProcess implements IInvitationProcess {
 
     @Override
     public String toString() {
-        return "InvitationProcess(peer:" + this.peer + ", state:" + this.state
-            + ")";
+        return "InvitationProcess(peer:" + this.peer + ")";
     }
 
     /**
-     * Assert that the process is in given state or throw an exception
-     * otherwise.
      * 
-     * @param expected
-     *            the state that the process should currently have.
+     * @return the name of the project that is shared by the peer.
      */
-    protected void assertState(State expected) {
-        if (this.state != expected) {
-            cancel(null, CancelLocation.LOCAL, CancelOption.NOTIFY_PEER);
-        }
-    }
+    public abstract String getProjectName();
 
     public enum CancelOption {
         /**
@@ -119,4 +101,5 @@ public abstract class InvitationProcess implements IInvitationProcess {
         REMOTE;
     }
 
+    public abstract void remoteCancel(String errorMsg);
 }

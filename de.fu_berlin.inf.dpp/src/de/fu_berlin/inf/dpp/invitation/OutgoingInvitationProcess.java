@@ -21,31 +21,37 @@ package de.fu_berlin.inf.dpp.invitation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 
 import de.fu_berlin.inf.dpp.FileList;
+import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.synchronize.StartHandle;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
+import de.fu_berlin.inf.dpp.ui.wizards.InvitationWizard;
 import de.fu_berlin.inf.dpp.util.FileZipper;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.VersionManager;
@@ -53,77 +59,109 @@ import de.fu_berlin.inf.dpp.util.VersionManager.Compatibility;
 import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
 
 /**
- * TODO Use {@link WorkspaceModifyOperation}s to wrap the whole invitation
- * process, so that background activityDataObjects such as autoBuilding do not
- * interfere with the InvitationProcess
- * 
+ * @author rdjemili
+ * @author sotitas
  */
+
 public class OutgoingInvitationProcess extends InvitationProcess {
 
     private final static Logger log = Logger
         .getLogger(OutgoingInvitationProcess.class);
 
     protected ISharedProject sharedProject;
+    protected List<IResource> partialProjectResources;
     protected FileList remoteFileList;
-    protected FileList localFileList;
     protected File archive;
+    /**
+     * A {@link VersionInfo} object with ultimate {@link Compatibility}
+     * information, so the peer can use it without further compatibility check,
+     * unless {@link Compatibility} is null (the host could not determine
+     * compatibility).
+     */
+    protected VersionInfo versionInfo;
     protected List<IPath> toSend = new LinkedList<IPath>();
+
     protected SubMonitor monitor;
     protected VersionManager versionManager;
     protected StopManager stopManager;
-    protected IOutgoingInvitationUI outInvitationUI;
+    protected DiscoveryManager discoveryManager;
     protected String invitationID;
     protected AtomicBoolean cancelled = new AtomicBoolean(false);
-    protected String cancelMessage = "";
+    protected SarosCancellationException cancellationCause;
     protected SarosPacketCollector invitationCompleteCollector;
+    protected final static Random INVITATION_RAND = new Random();
 
     public OutgoingInvitationProcess(ITransmitter transmitter, JID to,
-        ISharedProject sharedProject, String description,
-        IOutgoingInvitationUI inviteUI, int colorID, FileList localFileList,
-        SubMonitor monitor, InvitationProcessObservable invitationProcesses,
-        VersionManager versionManager, StopManager stopManager) {
+        ISharedProject sharedProject, List<IResource> partialProjectResources,
+        String description, int colorID,
+        InvitationProcessObservable invitationProcesses,
+        VersionManager versionManager, StopManager stopManager,
+        DiscoveryManager discoveryManager) {
 
         super(transmitter, to, description, colorID, invitationProcesses);
 
-        this.localFileList = localFileList;
-        this.invitationUI = inviteUI;
-        this.outInvitationUI = inviteUI;
         this.sharedProject = sharedProject;
+        this.partialProjectResources = partialProjectResources;
         this.versionManager = versionManager;
         this.stopManager = stopManager;
-        this.monitor = monitor;
-        setState(State.INITIALIZED);
+        this.discoveryManager = discoveryManager;
     }
 
-    public void start() {
-        monitor.beginTask("Invitation started...", 100);
-        Random myRand = new Random();
-        this.invitationID = String.valueOf(myRand.nextLong());
+    public void start(SubMonitor monitor) throws SarosCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": Invitation has started.");
+
+        this.monitor = monitor;
+        monitor.beginTask("Invitation has started.", 100);
+        this.invitationID = String.valueOf(INVITATION_RAND.nextLong());
         try {
-            checkAvailability(monitor.newChild(2));
+            checkAvailability(monitor.newChild(1));
 
-            VersionInfo versionInfo = checkVersion(monitor.newChild(3));
+            checkVersion(monitor.newChild(1));
 
-            sendInvitation(versionInfo, monitor.newChild(5));
+            sendInvitation(monitor.newChild(1));
 
-            getFileListDiff(monitor.newChild(10));
+            getFileListDiff(monitor.newChild(1));
 
-            createArchive(monitor.newChild(5));
+            createArchive(monitor.newChild(3));
 
-            sendArchive(monitor.newChild(70));
+            sendArchive(monitor.newChild(90));
 
-            done(monitor.newChild(5));
+            completeInvitation(monitor.newChild(3));
         } catch (LocalCancellationException e) {
-            cancel(null, CancelLocation.LOCAL, CancelOption.NOTIFY_PEER);
-        } catch (UserCancellationException e) {
-            // This must be a RemoteCancellationException
-            // ignore because we will a cancel extension
+            localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
+            executeCancellation();
+        } catch (RemoteCancellationException e) {
+            remoteCancel(e.getMessage());
+            executeCancellation();
+        } catch (SarosCancellationException e) {
+            /**
+             * If this exception is thrown because of a local cancellation, we
+             * initiate a localCancel here.
+             * 
+             * If this exception is thrown because of a remote cancellation, the
+             * call of localCancel will be ignored.
+             */
+            localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
+            executeCancellation();
         } catch (IOException e) {
-            cancel(null, CancelLocation.LOCAL, CancelOption.NOTIFY_PEER);
+            String errorMsg = "Unknown error: " + e;
+            if (e.getMessage() != null)
+                errorMsg = e.getMessage();
+            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
+            executeCancellation();
+        } catch (Exception e) {
+            log.warn("Inv" + Util.prefix(peer)
+                + ": This type of Exception is not expected: ", e);
+            String errorMsg = "Unknown error: " + e;
+            if (e.getMessage() != null)
+                errorMsg = e.getMessage();
+            localCancel(errorMsg, CancelOption.NOTIFY_PEER);
+            executeCancellation();
         } finally {
             // Delete Archive
             if (archive != null && !archive.delete()) {
-                log.warn("Inv " + Util.prefix(peer)
+                log.warn("Inv" + Util.prefix(peer)
                     + ": Could not delete archive: "
                     + archive.getAbsolutePath());
             }
@@ -134,28 +172,29 @@ public class OutgoingInvitationProcess extends InvitationProcess {
     /**
      * Check whether the peer's client has Saros support.
      */
-    protected void checkAvailability(SubMonitor subMonitor) {
-        subMonitor.setTaskName("Checking presence...");
-        JID rqPeer = outInvitationUI.hasSaros(peer);
+    protected void checkAvailability(SubMonitor subMonitor)
+        throws LocalCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": Checking Saros support...");
+        subMonitor.setTaskName("Checking Saros support...");
+
+        JID rqPeer = discoveryManager.getSupportingPresence(peer,
+            Saros.NAMESPACE);
         if (rqPeer == null) {
-            /**
-             * TODO: we should check whether the user is online. How can we do
-             * that? hasSaros(peer) returns null if the user is offline or if
-             * the user does not have Saros, but we should distinguish these two
-             * cases. If the user is offline, we can cancel the invitation.
-             * 
-             * (!outInvitationUI.isOnline(peer)) { cancel(null,
-             * CancelLocation.LOCAL, CancelOption.DO_NOT_NOTIFY_PEER); throw new
-             * CancellationException(); }
-             */
-            if (!outInvitationUI.confirmUnsupportedSaros(peer)) {
-                cancel(null, CancelLocation.LOCAL,
-                    CancelOption.DO_NOT_NOTIFY_PEER);
-                throw new CancellationException();
+            log.debug("Inv" + Util.prefix(peer) + ": Saros is not supported.");
+            if (!InvitationWizard.confirmUnsupportedSaros(peer)) {
+                localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
+                throw new LocalCancellationException();
             }
+            /**
+             * In order to avoid inviting other XMPP clients, we construct an
+             * RQ-JID.
+             */
+            rqPeer = new JID(peer.getBareJID() + "/" + Saros.RESOURCE);
         } else {
-            peer = rqPeer;
+            log.debug("Inv" + Util.prefix(peer) + ": Saros is supported.");
         }
+        peer = rqPeer;
     }
 
     /**
@@ -163,15 +202,14 @@ public class OutgoingInvitationProcess extends InvitationProcess {
      * If the versions are compatible, the invitation continues, otherwise a
      * confirmation of the user is required (a {@link MessageDialog} pops up).
      */
-    protected VersionInfo checkVersion(SubMonitor subMonitor) {
-        log.debug("Inv " + Util.prefix(peer) + ": Checking peer's version...");
+    protected void checkVersion(SubMonitor subMonitor)
+        throws SarosCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": Checking peer's version...");
         subMonitor.setTaskName("Checking version...");
         VersionInfo versionInfo = versionManager.determineCompatibility(peer);
 
-        if (checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            return null;
-        }
+        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
 
         Compatibility comp = null;
 
@@ -179,289 +217,382 @@ public class OutgoingInvitationProcess extends InvitationProcess {
             comp = versionInfo.compatibility;
 
         if (comp == VersionManager.Compatibility.OK) {
-            log.debug("Inv " + Util.prefix(peer)
+            log.debug("Inv" + Util.prefix(peer)
                 + ": Saros versions are compatible, proceeding...");
-            return versionInfo;
+            this.versionInfo = versionInfo;
         } else {
-            if ((outInvitationUI).confirmVersionConflict(versionInfo, peer))
-                return versionInfo;
+            log.debug("Inv" + Util.prefix(peer)
+                + ": Saros versions are not compatible.");
+            if (InvitationWizard.confirmVersionConflict(versionInfo, peer,
+                versionManager.getVersion()))
+                this.versionInfo = versionInfo;
             else {
-                cancel(null, CancelLocation.LOCAL,
-                    CancelOption.DO_NOT_NOTIFY_PEER);
-                throw new CancellationException();
+                localCancel(null, CancelOption.DO_NOT_NOTIFY_PEER);
+                throw new LocalCancellationException();
             }
         }
     }
 
-    /**
-     * 
-     * @param versionInfo
-     *            a {@link VersionInfo} object with ultimate
-     *            {@link Compatibility} information, so the peer can use it
-     *            without further compatibility check, unless
-     *            {@link Compatibility} is null (the host could not determine
-     *            compatibility).
-     * @throws IOException
-     * @throws CancellationException
-     */
-    protected void sendInvitation(VersionInfo versionInfo, SubMonitor subMonitor)
-        throws LocalCancellationException, IOException {
-        if (checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new CancellationException();
-        }
+    protected void sendInvitation(SubMonitor subMonitor)
+        throws SarosCancellationException, IOException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": Sending invitation...");
+        checkCancellation(CancelOption.DO_NOT_NOTIFY_PEER);
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Sending invitation...");
 
+        /*
+         * TODO: this method should get a complete VersionInfo object from the
+         * checkVersion() method.
+         */
         VersionInfo hostVersionInfo = versionInfo;
-        if (versionInfo == null) {
+        if (hostVersionInfo == null) {
             hostVersionInfo = new VersionInfo();
             hostVersionInfo.compatibility = null;
-            hostVersionInfo.version = versionManager.getVersion();
-        } else {
-            versionInfo.version = versionManager.getVersion();
         }
-        setState(State.INVITATION_SENT);
+
+        hostVersionInfo.version = versionManager.getVersion();
+
+        SarosPacketCollector fileListRequestCollector = transmitter
+            .getFileListRequestCollector(invitationID);
 
         transmitter.sendInvitation(sharedProject, peer, description, colorID,
             hostVersionInfo, invitationID);
-        log.debug("Inv " + Util.prefix(peer) + ": Invitation sent.");
+
         subMonitor.worked(25);
         subMonitor
             .setTaskName("Invitation sent. Waiting for acknowledgement...");
 
-        transmitter.receiveFileListRequest(invitationID, subMonitor
-            .newChild(75));
-        log.debug("Inv " + Util.prefix(peer) + ": FileListRequest received.");
+        transmitter.receiveFileListRequest(fileListRequestCollector,
+            invitationID, subMonitor.newChild(75,
+                SubMonitor.SUPPRESS_ALL_LABELS));
+        log.debug("Inv" + Util.prefix(peer)
+            + ": File list request has received.");
     }
 
     protected void getFileListDiff(SubMonitor subMonitor) throws IOException,
-        UserCancellationException {
-        if (checkCancellation(CancelOption.NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new CancellationException();
-        }
-        subMonitor.setWorkRemaining(100);
-        subMonitor.setTaskName("Sending file list...");
+        SarosCancellationException {
 
-        assertState(State.INVITATION_SENT);
+        checkCancellation(CancelOption.NOTIFY_PEER);
+
+        subMonitor.setWorkRemaining(100);
+        subMonitor.setTaskName("Initializing Jingle...");
 
         // Wait for Jingle before we send the file list...
         transmitter.awaitJingleManager(this.peer);
         subMonitor.worked(25);
 
-        if (checkCancellation(CancelOption.NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new LocalCancellationException();
-        }
+        checkCancellation(CancelOption.NOTIFY_PEER);
 
-        setState(State.HOST_FILELIST_SENT);
         SarosPacketCollector fileListCollector = transmitter
             .getInvitationCollector(invitationID,
                 FileTransferType.FILELIST_TRANSFER);
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Waiting for remote file list...");
 
-        transmitter.sendFileList(peer, invitationID, localFileList, subMonitor
-            .newChild(25, SubMonitor.SUPPRESS_ALL_LABELS));
-        subMonitor
-            .setTaskName("File list sent. Waiting for the peer's file list...");
+        subMonitor.setTaskName("Creating file list...");
+        FileList localFileList;
+        try {
+            if (partialProjectResources != null) {
+                localFileList = new FileList(partialProjectResources
+                    .toArray(new IResource[partialProjectResources.size()]));
+            } else {
+                localFileList = new FileList(sharedProject.getProject());
+            }
 
-        if (checkCancellation(CancelOption.NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new LocalCancellationException();
+        } catch (CoreException e) {
+            throw new LocalCancellationException(e.getMessage(),
+                CancelOption.NOTIFY_PEER);
         }
+
+        log.debug("Inv" + Util.prefix(peer) + ": Sending file list...");
+        subMonitor.setTaskName("Sending file list...");
+        transmitter.sendFileList(peer, invitationID, localFileList, subMonitor
+            .newChild(50, SubMonitor.SUPPRESS_ALL_LABELS));
+        subMonitor.setTaskName("Waiting for the peer's file list...");
+
+        checkCancellation(CancelOption.NOTIFY_PEER);
 
         remoteFileList = transmitter.receiveFileList(fileListCollector,
             subMonitor, true);
-        subMonitor.setTaskName("Peer's file list received.");
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Remote file list has been received.");
 
-        if (checkCancellation(CancelOption.NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new LocalCancellationException();
-        }
+        checkCancellation(CancelOption.NOTIFY_PEER);
 
-        log.debug("Inv " + Util.prefix(peer) + ": Received FileList.");
-        assertState(State.HOST_FILELIST_SENT);
-        setState(State.GUEST_FILELIST_SENT);
-
-        assertState(State.GUEST_FILELIST_SENT);
-        setState(State.SYNCHRONIZING);
         toSend.addAll(remoteFileList.getAddedPaths());
         toSend.addAll(remoteFileList.getAlteredPaths());
     }
 
     protected void createArchive(SubMonitor subMonitor) throws IOException,
-        CancellationException {
-        if (checkCancellation(CancelOption.NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new CancellationException();
-        }
+        SarosCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": Creating archive...");
+        checkCancellation(CancelOption.NOTIFY_PEER);
 
         subMonitor.setWorkRemaining(100);
         subMonitor.setTaskName("Creating archive...");
-        archive = null;
 
-        // STOP all users
-        log.debug("Inv " + Util.prefix(peer) + ": Stopping users: "
-            + sharedProject.getParticipants());
+        /*
+         * STOP users
+         * 
+         * TODO: stop all users. If we stop users which are currently joining,
+         * it can cause a deadlock, because the StopManager does not answer if
+         * someone is already stopped.
+         */
+        Collection<User> usersToStop = new ArrayList<User>();
+        for (User user : sharedProject.getParticipants()) {
+            if (user.isInvitationComplete())
+                usersToStop.add(user);
+        }
+        log.debug("Inv" + Util.prefix(peer) + ": Stopping users: "
+            + usersToStop);
         // TODO: startHandles outside of sync block?
         List<StartHandle> startHandles;
         synchronized (sharedProject) {
-            startHandles = stopManager.stop(sharedProject.getParticipants(),
+            startHandles = stopManager.stop(usersToStop,
                 "Synchronizing invitation", subMonitor.newChild(25,
                     SubMonitor.SUPPRESS_ALL_LABELS));
         }
-        EditorAPI.saveProject(sharedProject.getProject());
 
-        /**
-         * If the filelist <code>toSend</code> is empty, the projects are
-         * identical. We do not have to send anything, so we do not create an
-         * archive either.
-         */
-        SubMonitor archiveMonitor = subMonitor.newChild(25,
-            SubMonitor.SUPPRESS_ALL_LABELS);
-        if (toSend.size() != 0) {
-            /*
-             * FIX #2836964: Prefix string too short
-             * 
-             * Do not delete the "SarosSyncArchive" prefix.
+        try {
+            // TODO: Ask the user whether to save the resources, but only if
+            // they have changed. How to ask Eclipse whether there are resource
+            // changes?
+            // if (outInvitationUI.confirmProjectSave(peer))
+            EditorAPI.saveProject(sharedProject.getProject(), false);
+            // else
+            // throw new LocalCancellationException();
+
+            /**
+             * If the filelist <code>toSend</code> is empty, the projects are
+             * identical, so we only send a "empty" archive.
              */
-            archive = File.createTempFile("SarosSyncArchive-"
-                + getPeer().getName(), ".zip");
-            FileZipper.createProjectZipArchive(toSend, archive, sharedProject
-                .getProject(), archiveMonitor);
-        }
-        archiveMonitor.done();
+            archive = null;
+            SubMonitor archiveMonitor = subMonitor.newChild(25,
+                SubMonitor.SUPPRESS_ALL_LABELS);
+            if (toSend.size() != 0) {
+                /*
+                 * FIX #2836964: Prefix string too short
+                 * 
+                 * Do not delete the "SarosSyncArchive" prefix.
+                 */
+                archive = File.createTempFile("SarosSyncArchive-"
+                    + getPeer().getName(), ".zip");
+                FileZipper.createProjectZipArchive(toSend, archive,
+                    sharedProject.getProject(), archiveMonitor);
+            }
+            archiveMonitor.done();
 
-        User newUser = new User(sharedProject, peer, colorID);
-        this.sharedProject.addUser(newUser);
-        log.debug(Util.prefix(peer) + " added to project, colorID: " + colorID);
-
-        synchronized (sharedProject) {
-            synchronizeUserList();
+            synchronized (sharedProject) {
+                User newUser = new User(sharedProject, peer, colorID);
+                this.sharedProject.addUser(newUser);
+                log.debug(Util.prefix(peer) + " added to project, colorID: "
+                    + colorID);
+                synchronizeUserList();
+            }
+            subMonitor.worked(25);
+        } finally {
+            // START all users
+            for (StartHandle startHandle : startHandles) {
+                log.debug("Inv" + Util.prefix(peer) + ": Starting user "
+                    + Util.prefix(startHandle.getUser().getJID()));
+                startHandle.start();
+            }
         }
-        subMonitor.worked(25);
-        // START all users
-        for (StartHandle startHandle : startHandles) {
-            log.debug("Inv " + Util.prefix(peer) + ": Starting user "
-                + Util.prefix(startHandle.getUser().getJID()));
-            startHandle.start();
-        }
-        subMonitor.done();
     }
 
     protected void sendArchive(SubMonitor subMonitor)
-        throws UserCancellationException, IOException {
+        throws SarosCancellationException, IOException {
 
+        subMonitor.setWorkRemaining(100);
         invitationCompleteCollector = transmitter
             .getInvitationCompleteCollector(invitationID);
 
-        if (archive == null)
-            log.debug("Inv " + Util.prefix(peer)
-                + ": No archive to send. The projects must be 100% identical.");
-
+        log.debug("Inv" + Util.prefix(peer) + ": Sending archive...");
         subMonitor.setTaskName("Sending archive...");
-        transmitter.sendProjectArchive(this.peer, invitationID,
-            this.sharedProject.getProject(), archive, subMonitor);
-
-        if (getState() == State.SYNCHRONIZING) {
-            setState(State.SYNCHRONIZING_DONE);
-        }
-
+        if (archive == null)
+            log.debug("Inv" + Util.prefix(peer) + ": The archive is empty.");
+        transmitter.sendProjectArchive(peer, invitationID, sharedProject
+            .getProject(), archive, subMonitor.newChild(100,
+            SubMonitor.SUPPRESS_ALL_LABELS));
     }
 
-    protected void synchronizeUserList() throws CancellationException,
-        IOException {
-        if (checkCancellation(CancelOption.NOTIFY_PEER)) {
-            log.debug("Inv " + Util.prefix(peer) + ": Cancellation checkpoint");
-            throw new CancellationException();
+    protected void completeInvitation(SubMonitor subMonitor)
+        throws IOException, SarosCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Waiting for invitation complete confirmation...");
+        subMonitor.setWorkRemaining(100);
+        subMonitor.setTaskName("Waiting for peer to complete invitation...");
+
+        transmitter.receiveInvitationCompleteConfirmation(monitor.newChild(50,
+            SubMonitor.SUPPRESS_ALL_LABELS), invitationCompleteCollector);
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Notifying participants that the invitation is complete.");
+
+        subMonitor.setTaskName("Completing invitation...");
+        synchronized (sharedProject) {
+            sharedProject.userInvitationCompleted(sharedProject.getUser(peer));
+            synchronizeUserList();
         }
-        monitor.subTask("Waiting for peer to join...");
-        for (User user : sharedProject.getRemoteUsers()) {
+        subMonitor.setTaskName("Invitation has completed successfully.");
+
+        invitationProcesses.removeInvitationProcess(this);
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Invitation has completed successfully.");
+    }
+
+    protected void synchronizeUserList() throws SarosCancellationException {
+        checkCancellation(CancelOption.NOTIFY_PEER);
+
+        log.debug("Inv" + Util.prefix(peer) + ": Synchronizing userlist "
+            + sharedProject.getParticipants());
+
+        SarosPacketCollector userListConfirmationCollector = transmitter
+            .getUserListConfirmationCollector();
+
+        for (User user : sharedProject.getParticipants()) {
             transmitter.sendUserList(user.getJID(), invitationID, sharedProject
                 .getRemoteUsers());
         }
-        transmitter.receiveUserListConfirmation(sharedProject.getRemoteUsers(),
-            monitor);
-        log.debug("Inv " + Util.prefix(peer)
-            + ": All userListConfirmations arrived.");
+
+        log.debug("Inv" + Util.prefix(peer)
+            + ": Waiting for user list confirmations...");
+        transmitter.receiveUserListConfirmation(userListConfirmationCollector,
+            sharedProject.getRemoteUsers(), monitor);
+        log.debug("Inv" + Util.prefix(peer)
+            + ": All user list confirmations have arrived.");
     }
 
-    protected void done(SubMonitor subMonitor) throws CancellationException,
-        IOException, LocalCancellationException {
-        subMonitor.setWorkRemaining(100);
-        subMonitor.setTaskName("Completing invitation...");
-
-        transmitter.receiveInvitationCompleteConfirmation(monitor.newChild(50),
-            invitationCompleteCollector);
-        log.debug("Inv " + Util.prefix(peer)
-            + ": Notifying participants that the invitation is complete.");
-        sharedProject.userInvitationCompleted(sharedProject.getUser(peer));
-        synchronized (sharedProject) {
-            synchronizeUserList();
-        }
-        assertState(State.SYNCHRONIZING_DONE);
-        setState(State.DONE);
-        // TODO Find a more reliable way to remove InvitationProcess
-        // Why is this not reliable?
-        invitationProcesses.removeInvitationProcess(this);
-    }
-
-    public void cancel(String errorMsg, CancelLocation cancelLocation,
-        CancelOption notification) {
-
+    /**
+     * This method does <strong>not</strong> execute the cancellation but only
+     * sets the {@link #cancellationCause}. It should be called if the
+     * cancellation was initated by the <strong>local</strong> user. The
+     * cancellation will be ignored if the invitation has already been cancelled
+     * before. <br>
+     * In order to cancel the invitation process {@link #executeCancellation()}
+     * should be called.
+     * 
+     * @param errorMsg
+     *            the error that caused the cancellation. This should be some
+     *            user-friendly text as it might be presented to the user.
+     *            <code>null</code> if the cancellation was caused by the user's
+     *            request and not by some error.
+     * 
+     * @param cancelOption
+     *            If <code>NOTIFY_PEER</code> we send a cancellation message to
+     *            our peer.
+     */
+    public void localCancel(String errorMsg, CancelOption cancelOption) {
         if (!cancelled.compareAndSet(false, true))
             return;
-
+        log.debug("Inv" + Util.prefix(peer) + ": localCancel: " + errorMsg);
         if (monitor != null)
             monitor.setCanceled(true);
+        cancellationCause = new LocalCancellationException(errorMsg,
+            cancelOption);
+    }
 
-        switch (cancelLocation) {
-        case LOCAL:
+    /**
+     * This method does <strong>not</strong> execute the cancellation but only
+     * sets the {@link #cancellationCause}. It should be called if the
+     * cancellation was initated by the <strong>remote</strong> user. The
+     * cancellation will be ignored if the invitation has already been cancelled
+     * before. <br>
+     * In order to cancel the invitation process {@link #executeCancellation()}
+     * should be called.
+     * 
+     * @param errorMsg
+     *            the error that caused the cancellation. This should be some
+     *            user-friendly text as it might be presented to the user.
+     *            <code>null</code> if the cancellation was caused by the user's
+     *            request and not by some error.
+     */
+    @Override
+    public void remoteCancel(String errorMsg) {
+        if (!cancelled.compareAndSet(false, true))
+            return;
+        log.debug("Inv" + Util.prefix(peer) + ": remoteCancel: " + errorMsg);
+        if (monitor != null)
+            monitor.setCanceled(true);
+        cancellationCause = new RemoteCancellationException(errorMsg);
+    }
+
+    /**
+     * Cancels the invitation process based on the exception stored in
+     * {@link #cancellationCause}. This method is always called by this local
+     * object, so even if an another object "cancels" the invitation (
+     * {@link #localCancel(String, CancelOption)}, {@link #remoteCancel(String)}
+     * ), the exceptions will be thrown up on the stack to the caller of
+     * {@link #start(SubMonitor)}, and not to the object which has "cancelled"
+     * the process. The cancel methods (
+     * {@link #localCancel(String, CancelOption)}, {@link #remoteCancel(String)}
+     * ) do not cancel the invitation alone, but they set the
+     * {@link #cancellationCause} and cancel the {@link #monitor}. Now it is the
+     * responsibility of the objects which use the {@link #monitor} to throw a
+     * {@link SarosCancellationException} (or it's subclasses), which will be
+     * caught by this object causing a call to this method. If this does not
+     * happen, the next {@link #checkCancellation(CancelOption)} cancels the
+     * invitation.
+     */
+    protected void executeCancellation() throws SarosCancellationException {
+
+        log.debug("Inv" + Util.prefix(peer) + ": executeCancellation");
+        if (!cancelled.get())
+            throw new IllegalStateException(
+                "executeCancellation should only be called after localCancel or remoteCancel!");
+
+        String errorMsg;
+        String cancelMessage;
+        if (cancellationCause instanceof LocalCancellationException) {
+            LocalCancellationException e = (LocalCancellationException) cancellationCause;
+            errorMsg = e.getMessage();
+
+            switch (e.getCancelOption()) {
+            case NOTIFY_PEER:
+                transmitter.sendCancelInvitationMessage(peer, errorMsg);
+                break;
+            case DO_NOT_NOTIFY_PEER:
+                break;
+            default:
+                log.warn("Inv" + Util.prefix(peer)
+                    + ": This case is not expected here.");
+            }
+
             if (errorMsg != null) {
                 cancelMessage = "Invitation was cancelled locally"
                     + " because of an error: " + errorMsg;
-                log.error("Inv " + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                monitor.setTaskName("Invitation failed.");
             } else {
                 cancelMessage = "Invitation was cancelled by local user.";
-                log.debug("Inv " + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                monitor.setTaskName("Invitation has been cancelled.");
             }
-            break;
-        case REMOTE:
+
+        } else if (cancellationCause instanceof RemoteCancellationException) {
+            RemoteCancellationException e = (RemoteCancellationException) cancellationCause;
+
+            errorMsg = e.getMessage();
             if (errorMsg != null) {
                 cancelMessage = "Invitation was cancelled by the remote user "
                     + " because of an error on his/her side: " + errorMsg;
-                log.error("Inv " + Util.prefix(peer) + ": " + cancelMessage);
+                log.error("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                monitor.setTaskName("Invitation failed.");
             } else {
                 cancelMessage = "Invitation was cancelled by the remote user.";
-                log.debug("Inv " + Util.prefix(peer) + ": " + cancelMessage);
+                log.debug("Inv" + Util.prefix(peer) + ": " + cancelMessage);
+                monitor.setTaskName("Invitation has been cancelled.");
             }
+        } else {
+            log.error("This type of exception is not expected here: ",
+                cancellationCause);
+            monitor.setTaskName("Invitation failed.");
         }
-
-        synchronized (this) {
-            if (this.state == State.CANCELED) {
-                return;
-            }
-            setState(State.CANCELED);
-        }
-
-        if (!this.monitor.isCanceled())
-            this.monitor.setCanceled(true);
-
-        // The leaveHandler solves this. Is it okay that way?
-        // sharedProject.removeUser(sharedProject.getUser(peer));
         sharedProject.returnColor(this.colorID);
-
-        switch (notification) {
-        case NOTIFY_PEER:
-            transmitter.sendCancelInvitationMessage(peer, errorMsg);
-            break;
-        case DO_NOT_NOTIFY_PEER:
-        }
-
         invitationProcesses.removeInvitationProcess(this);
-
-        if (outInvitationUI != null)
-            outInvitationUI.cancel(peer, errorMsg, cancelLocation);
+        throw cancellationCause;
     }
 
     /**
@@ -469,28 +600,31 @@ public class OutgoingInvitationProcess extends InvitationProcess {
      * If the monitor has been cancelled but the invitation process has not yet,
      * it cancels the invitation process.
      * 
-     * @return <code>true</code> if either the invitation process or the monitor
-     *         has been cancelled, <code>false</code> otherwise.
+     * @throws SarosCancellationException
+     *             if the invitation process or the monitor has already been
+     *             cancelled.
      */
-    public boolean checkCancellation(CancelOption notification) {
-        if (cancelled.get())
-            return true;
+    protected void checkCancellation(CancelOption cancelOption)
+        throws SarosCancellationException {
+        if (cancelled.get()) {
+            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            throw new SarosCancellationException();
+        }
 
-        if (monitor == null)
-            return false;
+        if (monitor == null) {
+            log.warn("Inv" + Util.prefix(peer) + ": The monitor is null.");
+            return;
+        }
 
         if (monitor.isCanceled()) {
-            cancel(null, CancelLocation.LOCAL, notification);
-            return true;
+            log.debug("Inv" + Util.prefix(peer) + ": Cancellation checkpoint");
+            localCancel(null, cancelOption);
+            throw new SarosCancellationException();
         }
-        return false;
     }
 
+    @Override
     public String getProjectName() {
         return this.sharedProject.getProject().getName();
-    }
-
-    public String getCancelMessage() {
-        return cancelMessage;
     }
 }

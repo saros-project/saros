@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.concurrent.CancellationException;
 import java.util.zip.Adler32;
 import java.util.zip.CheckedOutputStream;
 import java.util.zip.ZipEntry;
@@ -24,6 +23,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.SubMonitor;
+
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 
 /**
  * This class contains method to create a zip archive out of a list of files.
@@ -65,7 +66,8 @@ public class FileZipper {
      *             if empty list of files given
      */
     public static void createProjectZipArchive(List<IPath> files, File archive,
-        IProject project, SubMonitor progress) throws IOException {
+        IProject project, SubMonitor progress) throws IOException,
+        SarosCancellationException {
 
         StoppWatch stoppWatch = new StoppWatch();
         stoppWatch.start();
@@ -90,7 +92,7 @@ public class FileZipper {
             try {
                 zipSingleFile(new WrappedIFile(file), path.toPortableString(),
                     zipStream, progress.newChild(1));
-            } catch (CancellationException e) {
+            } catch (SarosCancellationException e) {
                 cleanup(archive);
                 throw e;
             } catch (IllegalArgumentException e) {
@@ -131,7 +133,7 @@ public class FileZipper {
      * @blocking
      * @cancelable This operation can be canceled via the given progress
      *             monitor. If the operation was canceled, the archive file is
-     *             deleted and an CancellationException is thrown
+     *             deleted and an SarosCancellationException is thrown
      * @throws IOException
      *             if an error occurred while trying to zip a file. The archive
      *             is then deleted.
@@ -139,7 +141,7 @@ public class FileZipper {
      *             if the list of files is empty. The archive is then deleted.
      */
     public static void zipFiles(List<File> files, File archive,
-        SubMonitor progress) throws IOException {
+        SubMonitor progress) throws IOException, SarosCancellationException {
         try {
             if (files.isEmpty()) {
                 log.warn("The list with files to zip was empty.");
@@ -158,7 +160,7 @@ public class FileZipper {
                     zipSingleFile(new WrappedFile(file), file.getName(),
                         zipStream, progress.newChild(1));
                     ++filesZipped;
-                } catch (CancellationException e) {
+                } catch (SarosCancellationException e) {
                     cleanup(archive);
                     throw e;
                 } catch (IllegalArgumentException e) {
@@ -194,12 +196,13 @@ public class FileZipper {
      *             if the file was null or a directory or didn't exist
      */
     protected static void zipSingleFile(FileWrapper file, String filename,
-        ZipOutputStream zipStream, SubMonitor progress) throws IOException {
+        ZipOutputStream zipStream, SubMonitor progress) throws IOException,
+        SarosCancellationException {
 
         try {
 
             if (progress.isCanceled()) {
-                throw new CancellationException();
+                throw new SarosCancellationException();
             }
 
             progress.beginTask("Compressing: " + filename, 1);

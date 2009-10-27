@@ -7,9 +7,9 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.IXMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -27,7 +27,7 @@ public class InvitationHandler {
         .getName());
 
     @Inject
-    protected IXMPPTransmitter transmitter;
+    protected XMPPChatTransmitter transmitter;
 
     @Inject
     protected SessionManager sessionManager;
@@ -78,10 +78,10 @@ public class InvitationHandler {
                         invInfo.colorID, invInfo.versionInfo,
                         invInfo.sessionStart, sarosUI, invitationID);
                 } else {
-                    transmitter.sendMessage(new JID(packet.getFrom()),
-                        cancelInviteExtension.create(sessionID,
-                            "I am already in a Saros-Session,"
-                                + "try to contact me by chat first."));
+                    transmitter.sendMessageToArbitraryUser(new JID(packet
+                        .getFrom()), cancelInviteExtension.create(sessionID,
+                        "I am already in a Saros-Session,"
+                            + "try to contact me by chat first."));
                 }
             }
         }, invExtProv.getPacketFilter());

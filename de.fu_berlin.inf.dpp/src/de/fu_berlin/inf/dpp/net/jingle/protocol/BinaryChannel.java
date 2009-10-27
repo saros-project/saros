@@ -11,7 +11,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.IOUtils;
@@ -22,7 +21,7 @@ import org.jivesoftware.smack.packet.Packet;
 
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
 import de.fu_berlin.inf.dpp.exceptions.RemoteCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
@@ -58,7 +57,7 @@ public class BinaryChannel {
         }
 
         public byte[] accept(SubMonitor progress)
-            throws UserCancellationException, IOException {
+            throws SarosCancellationException, IOException {
 
             try {
 
@@ -229,7 +228,7 @@ public class BinaryChannel {
     }
 
     public IncomingTransferObject receiveIncomingTransferObject(
-        SubMonitor progress) throws UserCancellationException, IOException,
+        SubMonitor progress) throws SarosCancellationException, IOException,
         ClassNotFoundException {
 
         try {
@@ -356,14 +355,14 @@ public class BinaryChannel {
      *             If there was an error sending (for instance the socket is
      *             closed) or
      * 
-     * @throws CancellationException
+     * @throws LocalCancellationException
      *             If the local user canceled and this cancellation was
      *             performed by this method.
-     * @throws UserCancellationException
+     * @throws SarosCancellationException
      */
     public void sendDirect(TransferDescription transferDescription,
         byte[] data, SubMonitor progress) throws IOException,
-        UserCancellationException {
+        SarosCancellationException {
 
         int countData = Math.max(0, data.length / CHUNKSIZE) + 1;
         progress.beginTask("send direct", countData + 1);
@@ -435,7 +434,7 @@ public class BinaryChannel {
      */
     protected void sendDirect(BinaryHeaderType type, int remaining,
         int objectid, byte[] data, SubMonitor progress)
-        throws UserCancellationException, IOException {
+        throws SarosCancellationException, IOException {
 
         int offset = 0;
         // splits into chunks with BinaryHeader.remaining=0 is the last packet

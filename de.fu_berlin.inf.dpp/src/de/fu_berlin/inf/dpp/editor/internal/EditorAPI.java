@@ -824,7 +824,8 @@ public class EditorAPI implements IEditorAPI {
      * 
      * TODO Tell the user why we do want to save!
      */
-    public static boolean saveProject(final IProject projectToSave) {
+    public static boolean saveProject(final IProject projectToSave,
+        final boolean confirm) {
         try {
             return Util.runSWTSync(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
@@ -833,7 +834,7 @@ public class EditorAPI implements IEditorAPI {
                      * are modifying in the background
                      */
                     return IDE.saveAllEditors(
-                        new IResource[] { projectToSave }, true);
+                        new IResource[] { projectToSave }, confirm);
                 }
             });
         } catch (Exception e) {

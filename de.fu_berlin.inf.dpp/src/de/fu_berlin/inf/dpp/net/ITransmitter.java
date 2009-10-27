@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
@@ -39,8 +38,8 @@ import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
@@ -104,7 +103,7 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws UserCancellationException
+     * @throws SarosCancellationException
      *             if the operation was canceled via the given progress monitor
      *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
@@ -119,32 +118,29 @@ public interface ITransmitter {
      *             Connection.
      */
     public void sendFileList(JID jid, String invitationID, FileList fileList,
-        SubMonitor monitor) throws IOException, UserCancellationException;
+        SubMonitor monitor) throws IOException, SarosCancellationException;
 
     /**
-     * @throws CancellationException
-     *             A User canceled.
      * @throws IOException
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
      * @throws LocalCancellationException
      */
-    public DefaultInvitationInfo receiveFileListRequest(String invitationID,
-        SubMonitor monitor) throws IOException, LocalCancellationException;
+    public DefaultInvitationInfo receiveFileListRequest(
+        SarosPacketCollector collector, String invitationID, SubMonitor monitor)
+        throws IOException, LocalCancellationException;
 
     /**
      * @param archiveCollector
      * @blocking If forceWait is true.
      * 
-     * @throws CancellationException
-     *             A User canceled.
      * @throws IOException
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
      */
     public FileList receiveFileList(SarosPacketCollector archiveCollector,
         SubMonitor monitor, boolean forceWait)
-        throws UserCancellationException, IOException;
+        throws SarosCancellationException, IOException;
 
     /**
      * @param b
@@ -152,16 +148,17 @@ public interface ITransmitter {
      * @throws IOException
      *             If the operation fails because of a problem with the XMPP
      *             Connection.
-     * @throws UserCancellationException
+     * @throws SarosCancellationException
      */
     public InputStream receiveArchive(SarosPacketCollector archiveCollector,
         SubMonitor monitor, boolean b) throws IOException,
-        UserCancellationException;
+        SarosCancellationException;
 
     public void sendUserList(JID to, String invitationID, Collection<User> user);
 
-    public boolean receiveUserListConfirmation(List<User> fromUsers,
-        SubMonitor monitor) throws CancellationException, IOException;
+    public boolean receiveUserListConfirmation(SarosPacketCollector collector,
+        List<User> fromUsers, SubMonitor monitor)
+        throws LocalCancellationException;
 
     /**
      * Sends a request-for-file-list-message to given user.
@@ -194,13 +191,6 @@ public interface ITransmitter {
      * @throws IOException
      *             If the file could not be read, other errors are reported to
      *             the call-back.
-     * 
-     * @throws CancellationException
-     *             if the operation was canceled via the given progress monitor
-     *             an CancellationException is thrown. If the operation was
-     *             canceled via the monitor and the exception is not received,
-     *             the operation completed successfully, before noticing the
-     *             cancellation.
      */
     public void sendFileAsync(JID recipient, IProject project, IPath path,
         int sequenceNumber, IFileTransferCallback callback, SubMonitor monitor)
@@ -226,7 +216,7 @@ public interface ITransmitter {
      *            a monitor to which progress will be reported and which is
      *            queried for cancellation.
      * 
-     * @throws UserCancellationException
+     * @throws SarosCancellationException
      *             if the operation was canceled via the given progress monitor
      *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
@@ -242,7 +232,7 @@ public interface ITransmitter {
      */
     public void sendFile(JID to, IProject project, IPath path,
         int sequenceNumber, SubMonitor monitor) throws IOException,
-        UserCancellationException;
+        SarosCancellationException;
 
     /**
      * Sends given archive file to given recipient.
@@ -263,7 +253,7 @@ public interface ITransmitter {
      * @throws IOException
      *             If the file could not be read or an error occurred while
      *             sending or a technical error happened.
-     * @throws UserCancellationException
+     * @throws SarosCancellationException
      *             if the operation was canceled via the given progress monitor
      *             an LocalCancellationException is thrown. If the operation was
      *             canceled via the monitor and the exception is not received,
@@ -277,7 +267,7 @@ public interface ITransmitter {
      */
     public void sendProjectArchive(JID recipient, String invitationID,
         IProject project, File archive, SubMonitor monitor) throws IOException,
-        UserCancellationException;
+        SarosCancellationException;
 
     /**
      * Sends queued file transfers.
@@ -312,7 +302,7 @@ public interface ITransmitter {
 
     /**
      * Sends a leave message to the participants of given shared project. See
-     * {@link IInvitationProcess} for more information when this is supposed be
+     * {@link InvitationProcess} for more information when this is supposed be
      * sent.
      * 
      * @param sharedProject
@@ -409,8 +399,12 @@ public interface ITransmitter {
         SarosPacketCollector collector) throws LocalCancellationException,
         IOException;
 
+    public SarosPacketCollector getFileListRequestCollector(String invitationID);
+
     public SarosPacketCollector getInvitationCompleteCollector(
         String invitationID);
+
+    public SarosPacketCollector getUserListConfirmationCollector();
 
     public void sendInvitationCompleteConfirmation(JID to, String invitationID);
 }

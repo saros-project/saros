@@ -31,6 +31,7 @@ import org.eclipse.ui.actions.SelectionProviderAction;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
+import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
@@ -65,20 +66,21 @@ public class InviteAction extends SelectionProviderAction {
     };
 
     protected SessionManager sessionManager;
-
     protected Saros saros;
+    protected InvitationProcessObservable invitationProcesses;
 
     public InviteAction(SessionManager sessionManager, Saros saros,
-        ISelectionProvider provider, DiscoveryManager discoManager) {
+        ISelectionProvider provider, DiscoveryManager discoManager,
+        InvitationProcessObservable invitationProcesses) {
         super(provider, "Invite user to shared project..");
         setToolTipText("Invite user to shared project..");
 
-        setImageDescriptor(SarosUI
-            .getImageDescriptor("icons/transmit_blue.png"));
+        setImageDescriptor(SarosUI.getImageDescriptor("icons/invites.png"));
 
         this.sessionManager = sessionManager;
         this.saros = saros;
         this.discoManager = discoManager;
+        this.invitationProcesses = invitationProcesses;
         sessionManager.addSessionListener(sessionListener);
 
         updateEnablement();
@@ -91,7 +93,7 @@ public class InviteAction extends SelectionProviderAction {
     public void run() {
         Util.runSafeSync(log, new Runnable() {
             public void run() {
-                sessionManager.openInviteDialog(getSelected());
+                sessionManager.invite(getSelected());
             }
         });
     }
@@ -142,9 +144,11 @@ public class InviteAction extends SelectionProviderAction {
             // ...available
             // ...not in a session already
             // ...to have saros
+            // ...not currently in a invitation
             if (!saros.getRoster().getPresence(jid.toString()).isAvailable()
                 || project.getResourceQualifiedJID(jid) != null
-                || !discoManager.isSarosSupported(jid))
+                || !discoManager.isSarosSupported(jid)
+                || invitationProcesses.getInvitationProcess(jid) != null)
                 return false;
 
         }

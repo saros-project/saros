@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -65,8 +64,8 @@ import de.fu_berlin.inf.dpp.User.UserConnectionState;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
-import de.fu_berlin.inf.dpp.invitation.IInvitationProcess;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
+import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
@@ -119,7 +118,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     protected Map<JID, Chat> chats;
 
-    protected Map<JID, IInvitationProcess> processes;
+    protected Map<JID, InvitationProcess> processes;
 
     protected List<MessageTransfer> messageTransferQueue;
 
@@ -201,44 +200,38 @@ public class XMPPChatTransmitter implements ITransmitter,
             sharedProject.getProject().getName(), description, colorID,
             versionInfo, sharedProject.getSessionStart());
 
-        sendMessage(guest, invExtProv.create(invInfo));
+        sendMessageToArbitraryUser(guest, invExtProv.create(invInfo));
     }
 
-    /**
-     * TODO: think about handling timeouts.
-     */
-    public DefaultInvitationInfo receiveFileListRequest(String invitationID,
-        SubMonitor monitor) throws LocalCancellationException, IOException {
-
-        log.trace("Waiting for FileListRequest...");
-
+    public SarosPacketCollector getFileListRequestCollector(String invitationID) {
         PacketFilter filter = PacketExtensionUtils.getInvitationFilter(
             fileListRequestExtProv, sessionID, invitationID);
 
-        Packet result = receive(monitor, installReceiver(filter), 500, true);
+        return installReceiver(filter);
+    }
+
+    public DefaultInvitationInfo receiveFileListRequest(
+        SarosPacketCollector collector, String invitationID, SubMonitor monitor)
+        throws LocalCancellationException, IOException {
+
+        Packet result = receive(monitor, collector, 500, true);
         return fileListRequestExtProv.getPayload(result);
     }
 
-    /**
-     * Sends a request for @link{FileList} direct over the XMPP connection.
-     */
     public void sendFileListRequest(JID to, String invitationID) {
         log.trace("Sending request for FileList to " + Util.prefix(to));
-        sendMessage(to, fileListRequestExtProv
+        sendMessageToArbitraryUser(to, fileListRequestExtProv
             .create(new DefaultInvitationInfo(sessionID, invitationID)));
     }
 
-    /**
-     * TODO: think about handling timeouts.
-     */
     public FileList receiveFileList(SarosPacketCollector collector,
         SubMonitor monitor, boolean forceWait)
-        throws UserCancellationException, IOException {
+        throws SarosCancellationException, IOException {
 
         log.trace("Waiting for FileList from ");
 
         IncomingTransferObject result = incomingExtProv.getPayload(receive(
-            monitor, collector, 1000, true));
+            monitor, collector, 500, true));
 
         if (monitor.isCanceled()) {
             result.reject();
@@ -272,7 +265,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     public InputStream receiveArchive(SarosPacketCollector collector,
         SubMonitor monitor, boolean forceWait) throws IOException,
-        UserCancellationException {
+        SarosCancellationException {
 
         monitor.beginTask("Receiving archive", 100);
 
@@ -337,16 +330,21 @@ public class XMPPChatTransmitter implements ITransmitter,
             sessionID)));
     }
 
-    public boolean receiveUserListConfirmation(List<User> fromUsers,
-        SubMonitor monitor) throws CancellationException, IOException {
-        log.trace("Waiting for UserListConfirmations...");
+    public SarosPacketCollector getUserListConfirmationCollector() {
+
         PacketFilter filter = PacketExtensionUtils.getSessionIDFilter(
             userListConfExtProv, sessionID);
+
+        return installReceiver(filter);
+    }
+
+    public boolean receiveUserListConfirmation(SarosPacketCollector collector,
+        List<User> fromUsers, SubMonitor monitor)
+        throws LocalCancellationException {
 
         if (connection == null || !connection.isConnected())
             return false;
 
-        SarosPacketCollector collector = receiver.createCollector(filter);
         ArrayList<JID> fromUserJIDs = new ArrayList<JID>();
         for (User user : fromUsers) {
             fromUserJIDs.add(user.getJID());
@@ -356,7 +354,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             JID jid;
             do {
                 if (monitor.isCanceled())
-                    throw new CancellationException();
+                    throw new LocalCancellationException();
 
                 // Wait up to [timeout] seconds for a result.
                 result = collector.nextResult(100);
@@ -370,6 +368,10 @@ public class XMPPChatTransmitter implements ITransmitter,
                 } else {
                     log.debug("UserListConfirmation from: " + Util.prefix(jid));
                 }
+                /*
+                 * TODO: what if a user goes offline during the invitation? The
+                 * confirmation will never arrive!
+                 */
             } while (fromUserJIDs.size() > 0);
             return true;
         } finally {
@@ -414,10 +416,11 @@ public class XMPPChatTransmitter implements ITransmitter,
             + Util.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
-        sendMessage(user, cancelInviteExtension.create(sessionID.getValue(),
-            errorMsg));
+        sendMessageToArbitraryUser(user, cancelInviteExtension.create(sessionID
+            .getValue(), errorMsg));
     }
 
+    // TODO: Remove this method.
     public void awaitJingleManager(JID peer) {
         // If other user supports Jingle, make sure that we are done starting
         // the JingleManager
@@ -510,7 +513,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                         + Util.formatByte(data.length) + "): "
                         + timedActivities, e);
                 return;
-            } catch (UserCancellationException e) {
+            } catch (SarosCancellationException e) {
                 log.error(
                     "Cancellation cannot occur, because NullProgressMonitors"
                         + " are used on both sides!", e);
@@ -526,7 +529,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      */
     public void sendFileList(JID recipient, String invitationID,
         FileList fileList, SubMonitor progress) throws IOException,
-        UserCancellationException {
+        SarosCancellationException {
 
         String user = connection.getUser();
         if (user == null) {
@@ -554,7 +557,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendFile(JID to, IProject project, IPath path,
         int sequenceNumber, SubMonitor progress) throws IOException,
-        UserCancellationException {
+        SarosCancellationException {
 
         String user = connection.getUser();
         if (user == null) {
@@ -584,7 +587,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendProjectArchive(JID recipient, String invitationID,
         IProject project, File archive, SubMonitor progress)
-        throws UserCancellationException, IOException {
+        throws SarosCancellationException, IOException {
 
         String user = connection.getUser();
         if (user == null) {
@@ -701,10 +704,27 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     /**
+     * Sends a message to an arbitrary user. Arbitrary menas that the recipient
+     * does not have to be in the session.
+     */
+    public void sendMessageToArbitraryUser(JID jid, PacketExtension extension) {
+        Message message = new Message();
+        message.addExtension(extension);
+        message.setTo(jid.toString());
+        try {
+            sendMessageWithoutQueueing(jid, message);
+        } catch (IOException e) {
+            log.info("Could not send message, thus queueing", e);
+            queueMessage(jid, message);
+        }
+    }
+
+    /**
      * Sends the given {@link Message} to the given {@link JID}. It queues the
      * Message if the participant is OFFLINE.
      */
     protected void sendMessage(JID jid, Message message) {
+
         User participant = sharedProject.getValue().getUser(jid);
         if (participant == null) {
             log.warn("User not in session:" + Util.prefix(jid));
@@ -716,7 +736,6 @@ public class XMPPChatTransmitter implements ITransmitter,
              * TODO This probably does not work anymore! See Feature Request
              * #2577390
              */
-
             // remove participant if he/she is offline too long
             if (participant.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
                 log.info("Removing offline user from session...");
@@ -731,7 +750,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         try {
             sendMessageWithoutQueueing(jid, message);
         } catch (IOException e) {
-            log.info("Could not send message, thus queuing", e);
+            log.info("Could not send message, thus queueing", e);
             queueMessage(jid, message);
         }
     }
@@ -807,8 +826,10 @@ public class XMPPChatTransmitter implements ITransmitter,
                 chat = this.chatmanager.createChat(jid.toString(),
                     new MessageListener() {
                         public void processMessage(Chat arg0, Message arg1) {
-                            // We don't care about the messages here, because we
-                            // are registered as a PacketListener
+                            /*
+                             * We don't care about the messages here, because we
+                             * are registered as a PacketListener
+                             */
                         }
                     });
                 this.chats.put(jid, chat);
@@ -882,7 +903,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         // Create Containers
         this.chats = new HashMap<JID, Chat>();
         this.processes = Collections
-            .synchronizedMap(new HashMap<JID, IInvitationProcess>());
+            .synchronizedMap(new HashMap<JID, InvitationProcess>());
         this.messageTransferQueue = Collections
             .synchronizedList(new LinkedList<MessageTransfer>());
 

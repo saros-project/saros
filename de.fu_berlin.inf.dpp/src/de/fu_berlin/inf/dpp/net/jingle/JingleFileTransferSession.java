@@ -12,7 +12,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Executors;
@@ -36,7 +35,8 @@ import org.limewire.rudp.UDPSelectorProvider;
 import org.limewire.rudp.messages.RUDPMessageFactory;
 import org.limewire.rudp.messages.impl.DefaultMessageFactory;
 
-import de.fu_berlin.inf.dpp.exceptions.UserCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.LocalCancellationException;
+import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
@@ -105,7 +105,7 @@ public class JingleFileTransferSession extends JingleMediaSession {
 
                         fileTransferListener.incomingData(transferObject);
 
-                    } catch (UserCancellationException e) {
+                    } catch (SarosCancellationException e) {
                         log.info("canceled transfer");
                         if (!progress.isCanceled())
                             progress.setCanceled(true);
@@ -422,11 +422,11 @@ public class JingleFileTransferSession extends JingleMediaSession {
      * @throws IOException
      */
     public NetTransferMode send(TransferDescription transferDescription,
-        byte[] content, SubMonitor progress) throws UserCancellationException,
+        byte[] content, SubMonitor progress) throws SarosCancellationException,
         JingleSessionException, IOException {
 
         if (progress.isCanceled())
-            throw new CancellationException();
+            throw new LocalCancellationException();
 
         if (!binaryChannel.isConnected()) {
             throw new JingleSessionException("Failed to send files with Jingle");
