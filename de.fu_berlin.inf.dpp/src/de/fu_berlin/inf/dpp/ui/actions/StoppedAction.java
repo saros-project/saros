@@ -43,7 +43,7 @@ public class StoppedAction extends Action {
     public void run() {
         // Attention: Assertion with side effect ahead.
         boolean isDebug = false;
-        assert isDebug = true;
+        assert (isDebug = true) == true;
         if (isDebug) {
             log.warn("Manually unblocking project.");
             stopManager.lockProject(false);
