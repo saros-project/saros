@@ -4,9 +4,9 @@ import java.util.HashMap;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
@@ -51,7 +51,7 @@ public class JupiterClient {
     }
 
     public synchronized boolean isCurrent(
-        ChecksumActivityDataObject checksumActivityDataObject)
+        ChecksumActivity checksumActivityDataObject)
         throws TransformationException {
         return get(checksumActivityDataObject.path).isCurrent(
             checksumActivityDataObject.getTimestamp());
@@ -65,8 +65,7 @@ public class JupiterClient {
         this.clientDocs.clear();
     }
 
-    public synchronized JupiterActivity generate(
-        TextEditActivityDataObject textEdit) {
+    public synchronized JupiterActivity generate(TextEditActivity textEdit) {
 
         return get(textEdit.getEditor()).generateJupiterActivity(
             textEdit.toOperation(), sharedProject.getLocalUser().getJID(),
@@ -79,8 +78,8 @@ public class JupiterClient {
      * Jupiter algorithm used for managing the document addressed by the
      * checksum.
      */
-    public synchronized ChecksumActivityDataObject withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject) {
+    public synchronized ChecksumActivity withTimestamp(
+        ChecksumActivity checksumActivityDataObject) {
         return get(checksumActivityDataObject.path).withTimestamp(
             checksumActivityDataObject);
     }

@@ -30,10 +30,10 @@ import javax.swing.undo.CannotUndoException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
@@ -150,7 +150,7 @@ public class Jupiter implements Algorithm {
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#receiveJupiterActivity(de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity)
+     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#receiveJupiterActivity(de.fu_berlin.inf.dpp.activities.business.JupiterActivity)
      */
     public Operation receiveJupiterActivity(JupiterActivity jupiterActivity)
         throws TransformationException {
@@ -287,7 +287,8 @@ public class Jupiter implements Algorithm {
      * taken from the Jupiter paper.
      * 
      * @param time
-     *            the JupiterActivity to be tested.
+     *            the JupiterVectorTime to test whether it makes sense in the
+     *            current situation.
      */
     protected void checkPreconditions(JupiterVectorTime time)
         throws TransformationException {
@@ -395,8 +396,8 @@ public class Jupiter implements Algorithm {
 
     }
 
-    public ChecksumActivityDataObject withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject) {
+    public ChecksumActivity withTimestamp(
+        ChecksumActivity checksumActivityDataObject) {
         return checksumActivityDataObject.withTimestamp(this.vectorTime);
     }
 }

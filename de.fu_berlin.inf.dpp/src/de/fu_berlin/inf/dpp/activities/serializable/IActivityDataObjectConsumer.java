@@ -1,16 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
-
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 /**
  * An IActivityDataObjectConsumer is an interface for handling multiple dispatch
@@ -40,7 +28,7 @@ public interface IActivityDataObjectConsumer {
 
     boolean consume(EditorActivityDataObject editorActivityDataObject);
 
-    boolean consume(JupiterActivity jupiterActivity);
+    boolean consume(JupiterActivityDataObject jupiterActivity);
 
     boolean consume(StopActivityDataObject stopActivityDataObject);
 

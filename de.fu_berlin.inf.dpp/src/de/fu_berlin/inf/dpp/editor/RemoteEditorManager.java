@@ -15,12 +15,12 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
@@ -172,10 +172,9 @@ public class RemoteEditorManager {
             }
         }
 
-        protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
+        protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
             @Override
-            public void receive(
-                EditorActivityDataObject editorActivityDataObject) {
+            public void receive(EditorActivity editorActivityDataObject) {
 
                 switch (editorActivityDataObject.getType()) {
                 case Activated:
@@ -190,8 +189,7 @@ public class RemoteEditorManager {
             }
 
             @Override
-            public void receive(
-                ViewportActivityDataObject viewportActivityDataObject) {
+            public void receive(ViewportActivity viewportActivityDataObject) {
 
                 setViewport(viewportActivityDataObject.getEditor(),
                     viewportActivityDataObject.getLineRange());
@@ -199,7 +197,7 @@ public class RemoteEditorManager {
 
             @Override
             public void receive(
-                TextSelectionActivityDataObject textSelectionActivityDataObject) {
+                TextSelectionActivity textSelectionActivityDataObject) {
 
                 setSelection(textSelectionActivityDataObject.getEditor(),
                     textSelectionActivityDataObject.getSelection());
@@ -236,7 +234,7 @@ public class RemoteEditorManager {
             return new HashSet<IPath>(openEditors.keySet());
         }
 
-        public void exec(IActivityDataObject activityDataObject) {
+        public void exec(IActivity activityDataObject) {
             activityDataObject.dispatch(activityDataObjectReceiver);
         }
     }
@@ -255,7 +253,7 @@ public class RemoteEditorManager {
         return result;
     }
 
-    public void exec(IActivityDataObject activityDataObject) {
+    public void exec(IActivity activityDataObject) {
 
         User sender = sharedProject.getUser(activityDataObject.getSource());
 

@@ -24,8 +24,9 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -36,10 +37,6 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 @XStreamAlias("editorActivity")
 public class EditorActivityDataObject extends AbstractActivityDataObject {
-
-    public static enum Type {
-        Activated, Closed, Saved
-    }
 
     @XStreamAsAttribute
     protected final Type type;
@@ -119,5 +116,9 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
 
     public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivity getActivity() {
+        return new EditorActivity(source, type, path);
     }
 }

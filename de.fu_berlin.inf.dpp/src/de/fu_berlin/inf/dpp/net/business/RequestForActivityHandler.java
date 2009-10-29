@@ -9,7 +9,7 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
 import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
@@ -78,8 +78,9 @@ public class RequestForActivityHandler {
                 return;
             }
 
-            List<TimedActivity> activities = sharedProject.getSequencer()
-                .getActivityHistory(fromJID, sequenceNumber, andUp);
+            List<TimedActivityDataObject> activities = sharedProject
+                .getSequencer().getActivityHistory(fromJID, sequenceNumber,
+                    andUp);
 
             log.info(String.format(
                 "Received request for resending of timestamp%s %d%s.",

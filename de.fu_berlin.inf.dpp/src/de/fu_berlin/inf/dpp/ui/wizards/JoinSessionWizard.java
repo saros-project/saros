@@ -180,8 +180,8 @@ public class JoinSessionWizard extends Wizard {
                 public void run(IProgressMonitor monitor)
                     throws InvocationTargetException, InterruptedException {
                     try {
-                        JoinSessionWizard.this.process.accept(source, target, skip,
-                            SubMonitor.convert(monitor));
+                        JoinSessionWizard.this.process.accept(source, target,
+                            skip, SubMonitor.convert(monitor));
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }

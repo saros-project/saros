@@ -70,7 +70,7 @@ import de.fu_berlin.inf.dpp.net.IFileTransferCallback;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DefaultInvitationInfo.FileListRequestExtensionProvider;
@@ -468,7 +468,7 @@ public class XMPPChatTransmitter implements ITransmitter,
      * TODO: Add Progress
      */
     public void sendTimedActivities(JID recipient,
-        List<TimedActivity> timedActivities) {
+        List<TimedActivityDataObject> timedActivities) {
 
         if (recipient == null || recipient.equals(saros.getMyJID())) {
             throw new IllegalArgumentException(

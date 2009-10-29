@@ -11,33 +11,21 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IResourceActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("fileActivity")
 public class FileActivityDataObject extends AbstractActivityDataObject
     implements IResourceActivityDataObject {
 
-    /**
-     * Enum used to distinguish file activityDataObjects which are caused as
-     * part of a consistency recovery and those used as regular
-     * activityDataObjects.
-     */
-    public static enum Purpose {
-        ACTIVITY, RECOVERY;
-    }
-
-    public static enum Type {
-        Created, Removed, Moved
-    }
-
     @XStreamAsAttribute
     protected Type type;
 
     @XStreamAsAttribute
-    protected IPath path;
+    protected IPath newPath;
 
     @XStreamAsAttribute
     protected IPath oldPath;
@@ -169,14 +157,14 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         }
 
         this.type = type;
-        this.path = newPath;
+        this.newPath = newPath;
         this.oldPath = oldPath;
         this.data = data;
         this.purpose = purpose;
     }
 
     public IPath getPath() {
-        return this.path;
+        return this.newPath;
     }
 
     public IPath getOldPath() {
@@ -200,9 +188,9 @@ public class FileActivityDataObject extends AbstractActivityDataObject
     public String toString() {
         if (type == Type.Moved)
             return "FileActivityDataObject(type: Moved, old path: "
-                + this.oldPath + ", new path: " + this.path + ")";
+                + this.oldPath + ", new path: " + this.newPath + ")";
         return "FileActivityDataObject(type: " + this.type + ", path: "
-            + this.path + ")";
+            + this.newPath + ")";
     }
 
     @Override
@@ -211,7 +199,7 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         int result = super.hashCode();
         result = prime * result + Arrays.hashCode(data);
         result = prime * result + ((oldPath == null) ? 0 : oldPath.hashCode());
-        result = prime * result + ((path == null) ? 0 : path.hashCode());
+        result = prime * result + ((newPath == null) ? 0 : newPath.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
     }
@@ -230,10 +218,10 @@ public class FileActivityDataObject extends AbstractActivityDataObject
                 return false;
         } else if (!oldPath.equals(other.oldPath))
             return false;
-        if (path == null) {
-            if (other.path != null)
+        if (newPath == null) {
+            if (other.newPath != null)
                 return false;
-        } else if (!path.equals(other.path))
+        } else if (!newPath.equals(other.newPath))
             return false;
         if (type == null) {
             if (other.type != null)
@@ -255,5 +243,9 @@ public class FileActivityDataObject extends AbstractActivityDataObject
 
     public boolean isRecovery() {
         return Purpose.RECOVERY.equals(purpose);
+    }
+
+    public IActivity getActivity() {
+        return new FileActivity(source, type, newPath, oldPath, data, purpose);
     }
 }

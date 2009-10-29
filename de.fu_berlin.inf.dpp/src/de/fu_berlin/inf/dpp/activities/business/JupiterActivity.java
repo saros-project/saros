@@ -1,13 +1,14 @@
-package de.fu_berlin.inf.dpp.concurrent.jupiter;
+package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -15,7 +16,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * Algorithm.
  */
 @XStreamAlias("jupiterActivity")
-public class JupiterActivity extends AbstractActivityDataObject {
+public class JupiterActivity extends AbstractActivity {
 
     /**
      * Timestamp that specifies the definition context of the enclosed
@@ -115,11 +116,16 @@ public class JupiterActivity extends AbstractActivityDataObject {
         return this.editor;
     }
 
-    public boolean dispatch(IActivityDataObjectConsumer consumer) {
+    public boolean dispatch(IActivityConsumer consumer) {
         return consumer.consume(this);
     }
 
-    public void dispatch(IActivityDataObjectReceiver receiver) {
+    public void dispatch(IActivityReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivityDataObject getActivityDataObject() {
+        return new JupiterActivityDataObject(timestamp, operation, source,
+            editor);
     }
 }

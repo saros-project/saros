@@ -38,13 +38,13 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.AutoHashMap;
@@ -73,24 +73,25 @@ public class ActivitySequencer {
      */
     protected static final int MILLIS_UPDATE = 1000;
 
-    public static class QueueItem {
+    public static class DataObjectQueueItem {
 
         public final List<User> recipients;
         public final IActivityDataObject activityDataObject;
 
-        public QueueItem(List<User> recipients,
+        public DataObjectQueueItem(List<User> recipients,
             IActivityDataObject activityDataObject) {
             this.recipients = recipients;
             this.activityDataObject = activityDataObject;
         }
 
-        public QueueItem(User host, IActivityDataObject transformedActivity) {
+        public DataObjectQueueItem(User host,
+            IActivityDataObject transformedActivity) {
             this(Collections.singletonList(host), transformedActivity);
         }
     }
 
     /** Buffer for outgoing activityDataObjects. */
-    protected final BlockingQueue<QueueItem> outgoingQueue = new LinkedBlockingQueue<QueueItem>();
+    protected final BlockingQueue<DataObjectQueueItem> outgoingQueue = new LinkedBlockingQueue<DataObjectQueueItem>();
 
     /**
      * A priority queue for timed activityDataObjects.
@@ -130,7 +131,7 @@ public class ActivitySequencer {
         protected long oldestLocalTimestamp = Long.MAX_VALUE;
 
         /** Queue of activityDataObjects received. */
-        protected final PriorityQueue<TimedActivity> queuedActivities = new PriorityQueue<TimedActivity>();
+        protected final PriorityQueue<TimedActivityDataObject> queuedActivities = new PriorityQueue<TimedActivityDataObject>();
 
         /**
          * History of activityDataObjects sent.
@@ -139,21 +140,21 @@ public class ActivitySequencer {
          * don't store the content at the time they were sent, so they can't be
          * re-send.
          */
-        protected final List<TimedActivity> history = new LinkedList<TimedActivity>();
+        protected final List<TimedActivityDataObject> history = new LinkedList<TimedActivityDataObject>();
 
         public ActivityQueue(JID jid) {
             this.jid = jid;
         }
 
         /**
-         * Create a {@link TimedActivity} and add it to the history of created
-         * activityDataObjects.
+         * Create a {@link TimedActivityDataObject} and add it to the history of
+         * created activityDataObjects.
          */
-        public TimedActivity createTimedActivity(
+        public TimedActivityDataObject createTimedActivity(
             IActivityDataObject activityDataObject) {
 
-            TimedActivity result = new TimedActivity(activityDataObject,
-                localJID, nextSequenceNumber++);
+            TimedActivityDataObject result = new TimedActivityDataObject(
+                activityDataObject, localJID, nextSequenceNumber++);
             history.add(result);
             return result;
         }
@@ -161,7 +162,7 @@ public class ActivitySequencer {
         /**
          * Add a received activityDataObject to the priority queue.
          */
-        public void add(TimedActivity activity) {
+        public void add(TimedActivityDataObject activity) {
 
             // Ignore activityDataObjects with sequence numbers we have already
             // seen or
@@ -197,7 +198,7 @@ public class ActivitySequencer {
          */
         protected void updateOldestLocalTimestamp() {
             oldestLocalTimestamp = Long.MAX_VALUE;
-            for (TimedActivity timedActivity : queuedActivities) {
+            for (TimedActivityDataObject timedActivity : queuedActivities) {
                 long localTimestamp = timedActivity.getLocalTimestamp();
                 if (localTimestamp < oldestLocalTimestamp) {
                     oldestLocalTimestamp = localTimestamp;
@@ -209,13 +210,13 @@ public class ActivitySequencer {
          * @return The next activityDataObject if there is one and it carries
          *         the expected sequence number, otherwise <code>null</code>.
          */
-        public TimedActivity removeNext() {
+        public TimedActivityDataObject removeNext() {
 
             if (!queuedActivities.isEmpty()
                 && queuedActivities.peek().getSequenceNumber() == expectedSequenceNumber) {
 
                 expectedSequenceNumber++;
-                TimedActivity result = queuedActivities.remove();
+                TimedActivityDataObject result = queuedActivities.remove();
                 updateOldestLocalTimestamp();
                 return result;
             }
@@ -240,7 +241,7 @@ public class ActivitySequencer {
             // for
             while (firstQueuedSequenceNumber < expectedSequenceNumber) {
 
-                TimedActivity activity = queuedActivities.remove();
+                TimedActivityDataObject activity = queuedActivities.remove();
 
                 log.error("Expected activityDataObject #"
                     + expectedSequenceNumber
@@ -291,13 +292,13 @@ public class ActivitySequencer {
          * This method also checks for missing activityDataObjects and discards
          * out-dated or unwanted activityDataObjects.
          */
-        public List<TimedActivity> removeActivities() {
+        public List<TimedActivityDataObject> removeActivities() {
 
             checkForMissingActivities();
 
-            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
+            ArrayList<TimedActivityDataObject> result = new ArrayList<TimedActivityDataObject>();
 
-            TimedActivity activity;
+            TimedActivityDataObject activity;
             while ((activity = removeNext()) != null) {
                 result.add(activity);
             }
@@ -334,10 +335,10 @@ public class ActivitySequencer {
         /**
          * @see ActivitySequencer#createTimedActivities(JID, List)
          */
-        public synchronized List<TimedActivity> createTimedActivities(
+        public synchronized List<TimedActivityDataObject> createTimedActivities(
             JID recipient, List<IActivityDataObject> activityDataObjects) {
 
-            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>(
+            ArrayList<TimedActivityDataObject> result = new ArrayList<TimedActivityDataObject>(
                 activityDataObjects.size());
             ActivityQueue queue = getActivityQueue(recipient);
             for (IActivityDataObject activityDataObject : activityDataObjects) {
@@ -347,8 +348,8 @@ public class ActivitySequencer {
         }
 
         /**
-         * Adds a received {@link TimedActivity}. There must be a source set on
-         * the activityDataObject.
+         * Adds a received {@link TimedActivityDataObject}. There must be a
+         * source set on the activityDataObject.
          * 
          * @param timedActivity
          *            to add to the qeues.
@@ -357,7 +358,7 @@ public class ActivitySequencer {
          *             if the source of the activityDataObject is
          *             <code>null</code>.
          */
-        public void add(TimedActivity timedActivity) {
+        public void add(TimedActivityDataObject timedActivity) {
             getActivityQueue(timedActivity.getSender()).add(timedActivity);
         }
 
@@ -378,8 +379,8 @@ public class ActivitySequencer {
          *         This method also checks for missing activityDataObjects and
          *         discards out-dated or unwanted activityDataObjects.
          */
-        public List<TimedActivity> removeActivities() {
-            ArrayList<TimedActivity> result = new ArrayList<TimedActivity>();
+        public List<TimedActivityDataObject> removeActivities() {
+            ArrayList<TimedActivityDataObject> result = new ArrayList<TimedActivityDataObject>();
             for (ActivityQueue queue : jid2queue.values()) {
                 result.addAll(queue.removeActivities());
             }
@@ -389,11 +390,11 @@ public class ActivitySequencer {
         /**
          * @see ActivitySequencer#getActivityHistory(JID, int, boolean)
          */
-        public List<TimedActivity> getHistory(JID user, int fromSequenceNumber,
-            boolean andUp) {
+        public List<TimedActivityDataObject> getHistory(JID user,
+            int fromSequenceNumber, boolean andUp) {
 
-            LinkedList<TimedActivity> result = new LinkedList<TimedActivity>();
-            for (TimedActivity activity : getActivityQueue(user).history) {
+            LinkedList<TimedActivityDataObject> result = new LinkedList<TimedActivityDataObject>();
+            for (TimedActivityDataObject activity : getActivityQueue(user).history) {
                 if (activity.getSequenceNumber() >= fromSequenceNumber) {
                     result.add(activity);
                     if (!andUp) {
@@ -484,14 +485,14 @@ public class ActivitySequencer {
                 if (!started)
                     return;
 
-                List<QueueItem> activities = new ArrayList<QueueItem>(
+                List<DataObjectQueueItem> activities = new ArrayList<DataObjectQueueItem>(
                     outgoingQueue.size());
                 outgoingQueue.drainTo(activities);
 
                 Map<User, List<IActivityDataObject>> toSend = AutoHashMap
                     .getListHashMap();
 
-                for (QueueItem item : activities) {
+                for (DataObjectQueueItem item : activities) {
                     for (User recipient : item.recipients) {
                         toSend.get(recipient).add(item.activityDataObject);
                     }
@@ -537,7 +538,7 @@ public class ActivitySequencer {
                 }
 
                 JID recipientJID = recipient.getJID();
-                List<TimedActivity> timedActivities = createTimedActivities(
+                List<TimedActivityDataObject> timedActivities = createTimedActivities(
                     recipientJID, activityDataObjects);
 
                 log.trace("Sending Activities to " + recipientJID + ": "
@@ -575,7 +576,7 @@ public class ActivitySequencer {
      * If an activityDataObject is missing, this method just returns and queues
      * the given activityDataObject
      */
-    public void exec(TimedActivity nextActivity) {
+    public void exec(TimedActivityDataObject nextActivity) {
 
         assert nextActivity != null;
 
@@ -595,7 +596,8 @@ public class ActivitySequencer {
      */
     protected void execQueue() {
         List<IActivityDataObject> activityDataObjects = new ArrayList<IActivityDataObject>();
-        for (TimedActivity timedActivity : incomingQueues.removeActivities()) {
+        for (TimedActivityDataObject timedActivity : incomingQueues
+            .removeActivities()) {
             activityDataObjects.add(timedActivity.getActivity());
         }
         sharedProject.exec(activityDataObjects);
@@ -624,12 +626,12 @@ public class ActivitySequencer {
             }
         }
 
-        this.outgoingQueue.add(new QueueItem(toSendViaNetwork,
+        this.outgoingQueue.add(new DataObjectQueueItem(toSendViaNetwork,
             activityDataObject));
     }
 
     /**
-     * Create {@link TimedActivity}s for the given recipient and
+     * Create {@link TimedActivityDataObject}s for the given recipient and
      * activityDataObjects and add them to the history of activityDataObjects
      * for the recipient.
      * 
@@ -637,8 +639,8 @@ public class ActivitySequencer {
      * activityDataObjects get increasing, consecutive sequencer numbers, even
      * if this method is called from different threads concurrently.
      */
-    protected List<TimedActivity> createTimedActivities(JID recipient,
-        List<IActivityDataObject> activityDataObjects) {
+    protected List<TimedActivityDataObject> createTimedActivities(
+        JID recipient, List<IActivityDataObject> activityDataObjects) {
         return incomingQueues.createTimedActivities(recipient,
             activityDataObjects);
     }
@@ -652,7 +654,7 @@ public class ActivitySequencer {
      * 
      * If no activityDataObject matches the criteria an empty list is returned.
      */
-    public List<TimedActivity> getActivityHistory(JID user,
+    public List<TimedActivityDataObject> getActivityHistory(JID user,
         int fromSequenceNumber, boolean andUp) {
 
         return incomingQueues.getHistory(user, fromSequenceNumber, andUp);

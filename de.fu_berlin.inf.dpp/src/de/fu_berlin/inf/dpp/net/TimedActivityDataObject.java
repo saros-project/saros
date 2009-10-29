@@ -6,8 +6,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 
 /**
  * A simple {@link IActivityDataObject} wrapper that add an time stamp.
@@ -15,13 +16,14 @@ import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
  * @author rdjemili
  */
 @XStreamAlias("timedActivity")
-public class TimedActivity implements Comparable<TimedActivity> {
+public class TimedActivityDataObject implements
+    Comparable<TimedActivityDataObject> {
 
     /** Sequence number for Activities that don't have to wait. */
     public static final int NO_SEQUENCE_NR = -1;
     /**
-     * Unknown sequence number. It is illegal to use it in {@link TimedActivity}
-     * instances.
+     * Unknown sequence number. It is illegal to use it in
+     * {@link TimedActivityDataObject} instances.
      */
     public static final int UNKNOWN_SEQUENCE_NR = -2;
 
@@ -35,12 +37,12 @@ public class TimedActivity implements Comparable<TimedActivity> {
     protected long localTimestamp = 0;
 
     /**
-     * The JID of the user who sent this TimedActivity
+     * The JID of the user who sent this TimedActivityDataObject
      */
     protected final JID sender;
 
     /**
-     * Constructs a new TimedActivity.
+     * Constructs a new TimedActivityDataObject.
      * 
      * @param activityDataObject
      *            the activityDataObject to wrap
@@ -49,10 +51,11 @@ public class TimedActivity implements Comparable<TimedActivity> {
      * 
      * @throws IllegalArgumentException
      *             if activityDataObject is <code>null</code> or the sequence
-     *             number is {@link TimedActivity#UNKNOWN_SEQUENCE_NR}.
+     *             number is {@link TimedActivityDataObject#UNKNOWN_SEQUENCE_NR}
+     *             .
      */
-    public TimedActivity(IActivityDataObject activityDataObject, JID sender,
-        int sequenceNumber) {
+    public TimedActivityDataObject(IActivityDataObject activityDataObject,
+        JID sender, int sequenceNumber) {
 
         if (sender == null) {
             throw new IllegalArgumentException("Source cannot be null");
@@ -118,15 +121,15 @@ public class TimedActivity implements Comparable<TimedActivity> {
         if (obj == null)
             return false;
 
-        if (!(obj instanceof TimedActivity))
+        if (!(obj instanceof TimedActivityDataObject))
             return false;
 
-        TimedActivity other = (TimedActivity) obj;
+        TimedActivityDataObject other = (TimedActivityDataObject) obj;
         return (other.sequenceNumber == this.sequenceNumber)
             && other.activityDataObject.equals(this.activityDataObject);
     }
 
-    public int compareTo(TimedActivity other) {
+    public int compareTo(TimedActivityDataObject other) {
         if (other == null) {
             throw new NullPointerException();
         }
@@ -146,16 +149,16 @@ public class TimedActivity implements Comparable<TimedActivity> {
      * create files
      */
     public static boolean containsNoFileCreationActivities(
-        List<TimedActivity> timedActivities) {
+        List<TimedActivityDataObject> timedActivities) {
 
-        for (TimedActivity timedActivity : timedActivities) {
+        for (TimedActivityDataObject timedActivity : timedActivities) {
 
             IActivityDataObject activityDataObject = timedActivity
                 .getActivity();
 
             if (activityDataObject instanceof FileActivityDataObject
                 && ((FileActivityDataObject) activityDataObject).getType()
-                    .equals(FileActivityDataObject.Type.Created)) {
+                    .equals(FileActivity.Type.Created)) {
                 return false;
             }
         }

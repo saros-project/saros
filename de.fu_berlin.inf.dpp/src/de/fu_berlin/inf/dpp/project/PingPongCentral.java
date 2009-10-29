@@ -15,10 +15,10 @@ import org.joda.time.Duration;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.PingPongActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.preferences.PreferenceUtils;
@@ -63,7 +63,7 @@ public class PingPongCentral extends AbstractActivityProvider {
             this.user = user;
         }
 
-        public void add(PingPongActivityDataObject pingPongActivityDataObject) {
+        public void add(PingPongActivity pingPongActivityDataObject) {
 
             // This is the reply to a ping the local user sent himself
             Duration rtt = pingPongActivityDataObject.getRoundtripTime();
@@ -190,10 +190,9 @@ public class PingPongCentral extends AbstractActivityProvider {
         this.sessionManager.removeSessionListener(sessionListener);
     }
 
-    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
+    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(
-            PingPongActivityDataObject pingPongActivityDataObject) {
+        public void receive(PingPongActivity pingPongActivityDataObject) {
 
             User initiator = sharedProject.getUser(pingPongActivityDataObject
                 .getInitiator());
@@ -214,7 +213,7 @@ public class PingPongCentral extends AbstractActivityProvider {
     };
 
     @Override
-    public void exec(IActivityDataObject activityDataObject) {
+    public void exec(IActivity activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
@@ -232,7 +231,7 @@ public class PingPongCentral extends AbstractActivityProvider {
 
             stats.get(remoteUser).pingsSent++;
 
-            sharedProject.sendActivity(remoteUser, PingPongActivityDataObject
+            sharedProject.sendActivity(remoteUser, PingPongActivity
                 .create(sharedProject.getLocalUser()));
 
         }

@@ -5,8 +5,8 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -155,5 +155,10 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
 
     public boolean existsFile() {
         return !(this.length == NON_EXISTING_DOC && this.hash == NON_EXISTING_DOC);
+    }
+
+    public IActivity getActivity() {
+        return new ChecksumActivity(source, path, hash, length,
+            jupiterTimestamp);
     }
 }

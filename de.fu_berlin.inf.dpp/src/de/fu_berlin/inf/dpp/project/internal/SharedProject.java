@@ -36,8 +36,9 @@ import org.picocontainer.Disposable;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.concurrent.management.TransformationResult;
@@ -46,7 +47,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer.QueueItem;
 import de.fu_berlin.inf.dpp.project.IActivityProvider;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -108,6 +108,21 @@ public class SharedProject implements ISharedProject, Disposable {
             // TODO find a way to effectively block the user from doing anything
         }
     };
+
+    public static class QueueItem {
+
+        public final List<User> recipients;
+        public final IActivity activity;
+
+        public QueueItem(List<User> recipients, IActivity activity) {
+            this.recipients = recipients;
+            this.activity = activity;
+        }
+
+        public QueueItem(User host, IActivity activity) {
+            this(Collections.singletonList(host), activity);
+        }
+    }
 
     /**
      * Common constructor code for host and client side.
@@ -249,8 +264,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivityDataObject(getLocalUser()
-                        .getJID(), user.getJID(), newRole));
+                    activityCreated(new RoleActivity(getLocalUser().getJID(),
+                        user.getJID(), newRole));
 
                     setUserRole(user, newRole);
                 }
@@ -262,8 +277,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivityDataObject(getLocalUser()
-                        .getJID(), user.getJID(), newRole));
+                    activityCreated(new RoleActivity(getLocalUser().getJID(),
+                        user.getJID(), newRole));
 
                     setUserRole(user, newRole);
                 }
@@ -543,18 +558,21 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public void exec(List<IActivityDataObject> activityDataObjects) {
 
+        // Convert me
+        List<IActivity> activities = convert(activityDataObjects);
+
         if (isHost()) {
             TransformationResult transformed = concurrentDocumentServer
-                .transformIncoming(activityDataObjects);
+                .transformIncoming(activities);
 
-            activityDataObjects = transformed.getLocalActivities();
+            activities = transformed.getLocalActivities();
 
             for (QueueItem item : transformed.getSendToPeers()) {
-                sendActivity(item.recipients, item.activityDataObject);
+                sendActivity(item.recipients, item.activity);
             }
         }
 
-        final List<IActivityDataObject> stillToExecute = activityDataObjects;
+        final List<IActivity> stillToExecute = activities;
 
         Util.runSafeSWTAsync(log, new Runnable() {
             public void run() {
@@ -563,10 +581,10 @@ public class SharedProject implements ISharedProject, Disposable {
                     .transformIncoming(stillToExecute);
 
                 for (QueueItem item : transformed.getSendToPeers()) {
-                    sendActivity(item.recipients, item.activityDataObject);
+                    sendActivity(item.recipients, item.activity);
                 }
 
-                for (IActivityDataObject activityDataObject : transformed.executeLocally) {
+                for (IActivity activityDataObject : transformed.executeLocally) {
                     for (IActivityProvider executor : activityProviders) {
                         executor.exec(activityDataObject);
                     }
@@ -575,11 +593,24 @@ public class SharedProject implements ISharedProject, Disposable {
         });
     }
 
-    public void activityCreated(IActivityDataObject activityDataObject) {
+    private List<IActivity> convert(
+        List<IActivityDataObject> activityDataObjects) {
+
+        List<IActivity> result = new ArrayList<IActivity>(activityDataObjects
+            .size());
+
+        for (IActivityDataObject dataObject : activityDataObjects) {
+            result.add(dataObject.getActivity());
+        }
+
+        return result;
+    }
+
+    public void activityCreated(IActivity activity) {
 
         assert Util.isSWT() : "Must be called from the SWT Thread";
 
-        if (activityDataObject == null)
+        if (activity == null)
             throw new IllegalArgumentException("Activity cannot be null");
 
         /*
@@ -587,32 +618,31 @@ public class SharedProject implements ISharedProject, Disposable {
          * first
          */
         List<QueueItem> toSend = this.concurrentDocumentClient
-            .transformOutgoing(activityDataObject);
+            .transformOutgoing(activity);
 
         for (QueueItem item : toSend) {
-            sendActivity(item.recipients, item.activityDataObject);
+            sendActivity(item.recipients, item.activity);
         }
     }
 
     /**
      * Convenience method to address a single recipient.
      * 
-     * @see #sendActivity(List, IActivityDataObject)
+     * @see #sendActivity(List, IActivity)
      */
-    public void sendActivity(User recipient,
-        IActivityDataObject activityDataObject) {
+    public void sendActivity(User recipient, IActivity activityDataObject) {
         sendActivity(Collections.singletonList(recipient), activityDataObject);
     }
 
-    public void sendActivity(List<User> toWhom,
-        final IActivityDataObject activityDataObject) {
+    public void sendActivity(List<User> toWhom, final IActivity activity) {
         if (toWhom == null)
             throw new IllegalArgumentException();
 
-        if (activityDataObject == null)
+        if (activity == null)
             throw new IllegalArgumentException();
 
-        activitySequencer.sendActivity(toWhom, activityDataObject);
+        activitySequencer
+            .sendActivity(toWhom, activity.getActivityDataObject());
     }
 
     public void addActivityProvider(IActivityProvider provider) {

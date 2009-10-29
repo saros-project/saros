@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public class NetworkRequest {

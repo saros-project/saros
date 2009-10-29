@@ -10,18 +10,18 @@ import org.eclipse.core.runtime.IPath;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.ActivitySequencer.QueueItem;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
+import de.fu_berlin.inf.dpp.project.internal.SharedProject.QueueItem;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -95,10 +95,10 @@ public class ConcurrentDocumentServer implements Disposable {
         }
     }
 
-    protected final IActivityDataObjectReceiver hostReceiver = new AbstractActivityDataObjectReceiver() {
+    protected final IActivityReceiver hostReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(FileActivityDataObject fileActivityDataObject) {
-            if (fileActivityDataObject.getType() == FileActivityDataObject.Type.Removed) {
+        public void receive(FileActivity fileActivityDataObject) {
+            if (fileActivityDataObject.getType() == FileActivity.Type.Removed) {
                 server.removePath(fileActivityDataObject.getPath());
             }
         }
@@ -117,7 +117,7 @@ public class ConcurrentDocumentServer implements Disposable {
      *              a deadlock might occur!!
      */
     public TransformationResult transformIncoming(
-        List<IActivityDataObject> activityDataObjects) {
+        List<IActivity> activityDataObjects) {
 
         assert sharedProject.isHost() : "CDS.transformIncoming may not be called on the Client!!";
 
@@ -126,16 +126,16 @@ public class ConcurrentDocumentServer implements Disposable {
         TransformationResult result = new TransformationResult(sharedProject
             .getLocalUser());
 
-        for (IActivityDataObject activityDataObject : activityDataObjects) {
+        for (IActivity activityDataObject : activityDataObjects) {
             try {
                 activityDataObject.dispatch(hostReceiver);
 
                 if (activityDataObject instanceof JupiterActivity) {
                     result
                         .addAll(receive((JupiterActivity) activityDataObject));
-                } else if (activityDataObject instanceof ChecksumActivityDataObject) {
+                } else if (activityDataObject instanceof ChecksumActivity) {
                     result
-                        .addAll(withTimestamp((ChecksumActivityDataObject) activityDataObject));
+                        .addAll(withTimestamp((ChecksumActivity) activityDataObject));
                 } else {
                     result.executeLocally.add(activityDataObject);
                 }
@@ -203,23 +203,21 @@ public class ConcurrentDocumentServer implements Disposable {
     /**
      * Does the actual work of transforming a JupiterActivity.
      */
-    protected List<QueueItem> withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject) {
+    protected List<QueueItem> withTimestamp(ChecksumActivity checksumActivity) {
 
         List<QueueItem> result = new ArrayList<QueueItem>();
 
         // Timestamp checksumActivity with jupiter document server
-        Map<JID, ChecksumActivityDataObject> outgoing;
+        Map<JID, ChecksumActivity> outgoing;
         try {
-            outgoing = server.withTimestamp(checksumActivityDataObject);
+            outgoing = server.withTimestamp(checksumActivity);
         } catch (TransformationException e) {
-            log.error("Error during transformation of: "
-                + checksumActivityDataObject, e);
+            log.error("Error during transformation of: " + checksumActivity, e);
             // TODO this should trigger a consistency check
             return result;
         }
 
-        for (Entry<JID, ChecksumActivityDataObject> entry : outgoing.entrySet()) {
+        for (Entry<JID, ChecksumActivity> entry : outgoing.entrySet()) {
 
             JID jid = entry.getKey();
             User to = sharedProject.getUser(jid);
@@ -230,7 +228,7 @@ public class ConcurrentDocumentServer implements Disposable {
                 continue;
             }
 
-            ChecksumActivityDataObject transformed = entry.getValue();
+            ChecksumActivity transformed = entry.getValue();
 
             result.add(new QueueItem(to, transformed));
         }

@@ -7,8 +7,8 @@ import org.eclipse.jface.text.source.LineRange;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("viewportActivity")
@@ -22,13 +22,13 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
     protected final int bottomIndex;
 
     @XStreamAsAttribute
-    protected final IPath editor;
+    protected final IPath path;
 
     public ViewportActivityDataObject(JID source, int topIndex,
-        int bottomIndex, IPath editor) {
+        int bottomIndex, IPath path) {
         super(source);
 
-        if (editor == null) {
+        if (path == null) {
             throw new IllegalArgumentException("editor must not be null");
         }
 
@@ -37,7 +37,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
 
         this.topIndex = topIndex;
         this.bottomIndex = bottomIndex;
-        this.editor = editor;
+        this.path = path;
     }
 
     public ViewportActivityDataObject(JID source, ILineRange viewport,
@@ -60,7 +60,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IPath getEditor() {
-        return this.editor;
+        return this.path;
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + bottomIndex;
-        result = prime * result + ((editor == null) ? 0 : editor.hashCode());
+        result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + topIndex;
         return result;
     }
@@ -84,10 +84,10 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         ViewportActivityDataObject other = (ViewportActivityDataObject) obj;
         if (bottomIndex != other.bottomIndex)
             return false;
-        if (editor == null) {
-            if (other.editor != null)
+        if (path == null) {
+            if (other.path != null)
                 return false;
-        } else if (!editor.equals(other.editor))
+        } else if (!path.equals(other.path))
             return false;
         if (topIndex != other.topIndex)
             return false;
@@ -96,7 +96,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
 
     @Override
     public String toString() {
-        return "ViewportActivityDataObject(path:" + this.editor + ",range:("
+        return "ViewportActivityDataObject(path:" + this.path + ",range:("
             + this.topIndex + "," + this.bottomIndex + "))";
     }
 
@@ -106,5 +106,9 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
 
     public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivity getActivity() {
+        return new ViewportActivity(source, topIndex, bottomIndex, path);
     }
 }

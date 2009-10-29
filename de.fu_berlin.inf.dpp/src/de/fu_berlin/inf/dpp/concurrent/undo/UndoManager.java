@@ -30,10 +30,10 @@ import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.InclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -76,7 +76,7 @@ public class UndoManager implements Disposable, IActivityProvider {
 
     private static Logger log = Logger.getLogger(UndoManager.class.getName());
 
-    protected List<TextEditActivityDataObject> expectedActivities = new LinkedList<TextEditActivityDataObject>();
+    protected List<TextEditActivity> expectedActivities = new LinkedList<TextEditActivity>();
 
     /**
      * Every IUndoableOperation has a label to classify it. Typing operations
@@ -313,17 +313,17 @@ public class UndoManager implements Disposable, IActivityProvider {
 
     protected IActivityListener activityListener = new IActivityListener() {
 
-        public void activityCreated(IActivityDataObject activityDataObject) {
+        public void activityCreated(IActivity activityDataObject) {
             activityDataObject.dispatch(activityDataObjectReceiver);
         }
     };
 
-    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
+    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
 
         /**
          * @return true if the given activityDataObject was created locally
          */
-        protected boolean local(IActivityDataObject activityDataObject) {
+        protected boolean local(IActivity activityDataObject) {
             return activityDataObject.getSource().equals(saros.getMyJID());
         }
 
@@ -332,8 +332,7 @@ public class UndoManager implements Disposable, IActivityProvider {
          * undo history.
          */
         @Override
-        public void receive(
-            TextEditActivityDataObject textEditActivityDataObject) {
+        public void receive(TextEditActivity textEditActivityDataObject) {
 
             if (!enabled)
                 return;
@@ -363,7 +362,7 @@ public class UndoManager implements Disposable, IActivityProvider {
                 if (!textEditActivityDataObject.getEditor().equals(
                     currentActiveEditor)) {
                     log
-                        .error("Editor of the local TextEditActivityDataObject is not the current "
+                        .error("Editor of the local TextEditActivity is not the current "
                             + "active editor. Possibly the current active editor is not"
                             + " up to date.");
                     return;
@@ -507,8 +506,8 @@ public class UndoManager implements Disposable, IActivityProvider {
             return;
         }
 
-        for (TextEditActivityDataObject activity : op.toTextEdit(editor, saros
-            .getMyJID())) {
+        for (TextEditActivity activity : op
+            .toTextEdit(editor, saros.getMyJID())) {
             log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -518,8 +517,8 @@ public class UndoManager implements Disposable, IActivityProvider {
 
         Operation op = calcRedoOperation(editor);
 
-        for (TextEditActivityDataObject activity : op.toTextEdit(editor, saros
-            .getMyJID())) {
+        for (TextEditActivity activity : op
+            .toTextEdit(editor, saros.getMyJID())) {
             log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -548,7 +547,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         providers.remove(provider);
     }
 
-    protected void fireActivity(TextEditActivityDataObject activity) {
+    protected void fireActivity(TextEditActivity activity) {
 
         expectedActivities.add(activity);
 
@@ -598,7 +597,7 @@ public class UndoManager implements Disposable, IActivityProvider {
         }
     }
 
-    public void exec(IActivityDataObject activityDataObject) {
+    public void exec(IActivity activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
     }
 

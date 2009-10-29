@@ -15,12 +15,12 @@ import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.packet.Packet;
 import org.picocontainer.annotations.Inject;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.exceptions.SarosCancellationException;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
@@ -58,7 +58,7 @@ public class ActivitiesHandler {
         final SessionIDObservable sessionID) {
 
         /**
-         * Add a PacketListener for all TimedActivity packets
+         * Add a PacketListener for all TimedActivityDataObject packets
          */
         receiver.addPacketListener(new PacketListener() {
             public void processPacket(Packet packet) {
@@ -70,7 +70,7 @@ public class ActivitiesHandler {
                         return;
                     }
                     JID from = new JID(packet.getFrom());
-                    List<TimedActivity> timedActivities = payload
+                    List<TimedActivityDataObject> timedActivities = payload
                         .getTimedActivities();
 
                     if (!ObjectUtils.equals(sessionID.getValue(), payload
@@ -165,7 +165,7 @@ public class ActivitiesHandler {
      * @sarosThread must be called from the Dispatch Thread
      */
     public void receiveActivities(JID fromJID,
-        List<TimedActivity> timedActivities) {
+        List<TimedActivityDataObject> timedActivities) {
 
         final ISharedProject project = sharedProject.getValue();
 
@@ -179,7 +179,7 @@ public class ActivitiesHandler {
                 + ") " + Util.prefix(fromJID) + ": " + timedActivities);
         }
 
-        for (TimedActivity timedActivity : timedActivities) {
+        for (TimedActivityDataObject timedActivity : timedActivities) {
 
             IActivityDataObject activityDataObject = timedActivity
                 .getActivity();

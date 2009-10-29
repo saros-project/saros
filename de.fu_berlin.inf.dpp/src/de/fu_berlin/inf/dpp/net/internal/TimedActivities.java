@@ -7,10 +7,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 
 /**
- * Data Object for (de)serializion of {@link TimedActivity}s with
+ * Data Object for (de)serializion of {@link TimedActivityDataObject}s with
  * {@link XStream}.
  */
 @XStreamAlias("TimedActivities")
@@ -20,16 +20,17 @@ public class TimedActivities {
     protected String sessionID;
 
     @XStreamImplicit
-    protected List<TimedActivity> activities;
+    protected List<TimedActivityDataObject> activities;
 
     /**
      * @param sessionID
      *            The session ID these timed activityDataObjects belong to.
-     * @param activityDataObjects
+     * @param activities
      *            The activityDataObjects wrapped by this container. Must not be
      *            null or an empty {@link List}.
      */
-    public TimedActivities(String sessionID, List<TimedActivity> activities) {
+    public TimedActivities(String sessionID,
+        List<TimedActivityDataObject> activities) {
         if (activities.isEmpty()) {
             throw new IllegalArgumentException("Activities must not be empty");
         }
@@ -41,7 +42,7 @@ public class TimedActivities {
         return sessionID;
     }
 
-    public List<TimedActivity> getTimedActivities() {
+    public List<TimedActivityDataObject> getTimedActivities() {
         return activities;
     }
 

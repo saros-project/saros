@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public interface Algorithm {

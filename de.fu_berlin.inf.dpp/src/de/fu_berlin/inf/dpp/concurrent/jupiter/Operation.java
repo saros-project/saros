@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.ITextOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -19,11 +19,11 @@ import de.fu_berlin.inf.dpp.net.JID;
 public interface Operation {
 
     /**
-     * Returns a sequence of {@link TextEditActivityDataObject}s which represent
-     * this operation if applied in order to the editor denoted by the given
-     * path by the user identified by the given source.
+     * Returns a sequence of {@link TextEditActivity}s which represent this
+     * operation if applied in order to the editor denoted by the given path by
+     * the user identified by the given source.
      */
-    List<TextEditActivityDataObject> toTextEdit(IPath path, JID source);
+    List<TextEditActivity> toTextEdit(IPath path, JID source);
 
     /**
      * Returns a list of all operations represented by this operation that

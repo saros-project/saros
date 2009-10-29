@@ -13,10 +13,10 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.ISharedProjectListener;
@@ -78,11 +78,10 @@ public class RemoteDriverManager {
         }
     };
 
-    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
+    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
 
         @Override
-        public void receive(
-            final EditorActivityDataObject editorActivityDataObject) {
+        public void receive(final EditorActivity editorActivityDataObject) {
             User sender = sharedProject.getUser(editorActivityDataObject
                 .getSource());
             IPath path = editorActivityDataObject.getPath();
@@ -116,7 +115,7 @@ public class RemoteDriverManager {
      * This method is called from the shared project when a new
      * activityDataObject arrives
      */
-    public void exec(final IActivityDataObject activityDataObject) {
+    public void exec(final IActivity activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
     }
 

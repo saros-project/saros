@@ -27,8 +27,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -190,5 +190,9 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
 
     public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivity getActivity() {
+        return new TextEditActivity(source, offset, text, replacedText, editor);
     }
 }

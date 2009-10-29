@@ -5,17 +5,14 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IResourceActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("folderActivity")
 public class FolderActivityDataObject extends AbstractActivityDataObject
     implements IResourceActivityDataObject {
-    public static enum Type {
-        Created, Removed, Moved
-    }
 
     @XStreamAsAttribute
     private final Type type;
@@ -100,5 +97,9 @@ public class FolderActivityDataObject extends AbstractActivityDataObject
 
     public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivity getActivity() {
+        return new FolderActivity(source, type, path);
     }
 }

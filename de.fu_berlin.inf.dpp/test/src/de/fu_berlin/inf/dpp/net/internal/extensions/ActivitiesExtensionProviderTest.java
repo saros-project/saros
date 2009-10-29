@@ -15,16 +15,19 @@ import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
+import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject.Purpose;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
@@ -34,7 +37,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 
 public class ActivitiesExtensionProviderTest extends TestCase {
@@ -46,9 +49,11 @@ public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected static final Operation timestamp = new TimestampOperation();
     protected static final Operation noOp = new NoOperation();
-    protected static final Operation insert = new InsertOperation(34,
+    protected static final Operation insert = new InsertOperation(
+        34,
         "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test�������");
-    protected static final Operation delete = new DeleteOperation(37,
+    protected static final Operation delete = new DeleteOperation(
+        37,
         "One Line Delimiters\r\nLinux\nSeveral\n\nTabs\t\t\tEncoding Test�������");
     protected static final Operation easySplit = new SplitOperation(insert,
         delete);
@@ -57,12 +62,10 @@ public class ActivitiesExtensionProviderTest extends TestCase {
             new SplitOperation(insert, easySplit)));
 
     protected static final IActivityDataObject[] activityDataObjects = new IActivityDataObject[] {
-        new EditorActivityDataObject(jid,
-            EditorActivityDataObject.Type.Activated, path),
-        new FileActivityDataObject(jid, FileActivityDataObject.Type.Created,
-            path, null, new byte[] { 34, 72 }, Purpose.ACTIVITY),
-        new FolderActivityDataObject(jid,
-            FolderActivityDataObject.Type.Created, path),
+        new EditorActivityDataObject(jid, EditorActivity.Type.Activated, path),
+        new FileActivityDataObject(jid, FileActivity.Type.Created, path, null,
+            new byte[] { 34, 72 }, Purpose.ACTIVITY),
+        new FolderActivityDataObject(jid, FolderActivity.Type.Created, path),
         new RoleActivityDataObject(jid, new JID("user@server"), UserRole.DRIVER),
         new TextEditActivityDataObject(jid, 23, "foo\r\ntest\n\nbla", "bar",
             path), new TextSelectionActivityDataObject(jid, 1, 2, path),
@@ -83,7 +86,8 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     public void assertRoundtrip(Operation op) throws XmlPullParserException,
         IOException {
 
-        assertRoundtrip(new JupiterActivity(jupiterTime, op, jid, path));
+        assertRoundtrip(new JupiterActivityDataObject(jupiterTime, op, jid,
+            path));
     }
 
     public void assertRoundtrip(IActivityDataObject activityDataObject)
@@ -99,11 +103,10 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     }
 
     public void testEditorActivity() {
-        for (EditorActivityDataObject.Type type : EditorActivityDataObject.Type
-            .values()) {
+        for (EditorActivity.Type type : EditorActivity.Type.values()) {
             try {
-                new EditorActivityDataObject(new JID("user@server"), type, null);
-                if (type != EditorActivityDataObject.Type.Activated) {
+                new EditorActivity(new JID("user@server"), type, null);
+                if (type != EditorActivity.Type.Activated) {
                     fail();
                 }
             } catch (IllegalArgumentException e) {
@@ -113,7 +116,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     }
 
     public void testEmptyExtension() {
-        List<TimedActivity> activities = Collections.emptyList();
+        List<TimedActivityDataObject> activities = Collections.emptyList();
         try {
             aProvider.create("Session-ID", activities);
             fail();
@@ -125,11 +128,14 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     public void testGapInSequenceNumbers() throws XmlPullParserException,
         IOException {
         IActivityDataObject activityDataObject = new EditorActivityDataObject(
-            jid, EditorActivityDataObject.Type.Activated, null);
+            jid, EditorActivity.Type.Activated, null);
 
-        List<TimedActivity> timedActivities = new ArrayList<TimedActivity>(2);
-        timedActivities.add(new TimedActivity(activityDataObject, jid, 20));
-        timedActivities.add(new TimedActivity(activityDataObject, jid, 22));
+        List<TimedActivityDataObject> timedActivities = new ArrayList<TimedActivityDataObject>(
+            2);
+        timedActivities.add(new TimedActivityDataObject(activityDataObject,
+            jid, 20));
+        timedActivities.add(new TimedActivityDataObject(activityDataObject,
+            jid, 22));
 
         PacketExtension extension = aProvider.create("Session-ID",
             timedActivities);
@@ -154,7 +160,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     protected PacketExtension createPacketExtension(
         IActivityDataObject activityDataObject) {
         return aProvider.create("4711", Collections
-            .singletonList(new TimedActivity(activityDataObject,
+            .singletonList(new TimedActivityDataObject(activityDataObject,
                 activityDataObject.getSource(), 42)));
     }
 

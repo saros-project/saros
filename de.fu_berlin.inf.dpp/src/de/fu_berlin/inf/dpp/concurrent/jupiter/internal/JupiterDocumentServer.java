@@ -6,8 +6,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
@@ -106,11 +106,11 @@ public class JupiterDocumentServer {
             addProxyClient(jid);
     }
 
-    public Map<JID, ChecksumActivityDataObject> withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject)
+    public Map<JID, ChecksumActivity> withTimestamp(
+        ChecksumActivity checksumActivityDataObject)
         throws TransformationException {
 
-        Map<JID, ChecksumActivityDataObject> result = new HashMap<JID, ChecksumActivityDataObject>();
+        Map<JID, ChecksumActivity> result = new HashMap<JID, ChecksumActivity>();
 
         JID source = checksumActivityDataObject.getSource();
 
@@ -134,7 +134,7 @@ public class JupiterDocumentServer {
 
             Jupiter remoteProxy = entry.getValue();
 
-            ChecksumActivityDataObject timestamped = checksumActivityDataObject
+            ChecksumActivity timestamped = checksumActivityDataObject
                 .withTimestamp(remoteProxy.getTimestamp());
             result.put(jid, timestamped);
         }

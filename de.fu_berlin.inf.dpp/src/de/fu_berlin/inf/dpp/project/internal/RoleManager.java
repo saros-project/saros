@@ -8,8 +8,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.AbstractSharedProjectListener;
@@ -112,9 +112,9 @@ public class RoleManager implements IActivityProvider {
      * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
-    public void exec(IActivityDataObject activityDataObject) {
-        if (activityDataObject instanceof RoleActivityDataObject) {
-            RoleActivityDataObject roleActivityDataObject = (RoleActivityDataObject) activityDataObject;
+    public void exec(IActivity activityDataObject) {
+        if (activityDataObject instanceof RoleActivity) {
+            RoleActivity roleActivityDataObject = (RoleActivity) activityDataObject;
             User user = this.sharedProject.getUser(roleActivityDataObject
                 .getAffectedUser());
             if (user == null) {

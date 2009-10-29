@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -112,9 +112,9 @@ public class SplitOperation implements Operation {
         return result;
     }
 
-    public List<TextEditActivityDataObject> toTextEdit(IPath path, JID source) {
+    public List<TextEditActivity> toTextEdit(IPath path, JID source) {
 
-        List<TextEditActivityDataObject> result = new ArrayList<TextEditActivityDataObject>();
+        List<TextEditActivity> result = new ArrayList<TextEditActivity>();
 
         /*
          * remember the last operation for trying to combine it with the next
@@ -155,10 +155,8 @@ public class SplitOperation implements Operation {
             }
 
             if (isReplace(lastOp, operation)) {
-                result
-                    .add(new TextEditActivityDataObject(source, lastOp
-                        .getPosition(), operation.getText(), lastOp.getText(),
-                        path));
+                result.add(new TextEditActivity(source, lastOp.getPosition(),
+                    operation.getText(), lastOp.getText(), path));
                 lastOp = null;
                 continue;
             } else {

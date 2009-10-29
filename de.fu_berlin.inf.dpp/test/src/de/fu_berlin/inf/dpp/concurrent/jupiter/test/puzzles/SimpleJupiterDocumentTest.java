@@ -4,8 +4,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
  * This test class represent local execution of document changes and 
  * appropriate jupiter operations.
  */
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;

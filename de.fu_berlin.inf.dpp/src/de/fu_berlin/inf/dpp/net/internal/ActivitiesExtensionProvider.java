@@ -28,12 +28,12 @@ import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterVectorTime;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
@@ -41,7 +41,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.TimedActivity;
+import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 
 @Component(module = "net")
 public class ActivitiesExtensionProvider extends
@@ -53,15 +53,15 @@ public class ActivitiesExtensionProvider extends
             FileActivityDataObject.class, FolderActivityDataObject.class,
             RoleActivityDataObject.class, TextEditActivityDataObject.class,
             TextSelectionActivityDataObject.class,
-            ViewportActivityDataObject.class, TimedActivity.class,
-            JupiterActivity.class, JupiterVectorTime.class,
+            ViewportActivityDataObject.class, TimedActivityDataObject.class,
+            JupiterActivityDataObject.class, JupiterVectorTime.class,
             DeleteOperation.class, InsertOperation.class, NoOperation.class,
             SplitOperation.class, TimestampOperation.class, JID.class);
     }
 
     public PacketExtension create(String sessionID,
-        List<TimedActivity> activities) {
+        List<TimedActivityDataObject> activities) {
         return create(new TimedActivities(sessionID,
-            new ArrayList<TimedActivity>(activities)));
+            new ArrayList<TimedActivityDataObject>(activities)));
     }
 }

@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.net.JID;
 
@@ -71,7 +71,7 @@ public class NoOperation implements Operation {
         return hashcode;
     }
 
-    public List<TextEditActivityDataObject> toTextEdit(IPath path, JID source) {
+    public List<TextEditActivity> toTextEdit(IPath path, JID source) {
         return Collections.emptyList();
     }
 

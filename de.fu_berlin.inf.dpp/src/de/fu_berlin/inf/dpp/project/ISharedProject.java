@@ -30,7 +30,8 @@ import org.joda.time.DateTime;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentClient;
 import de.fu_berlin.inf.dpp.concurrent.management.ConcurrentDocumentServer;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
@@ -266,23 +267,21 @@ public interface ISharedProject extends IActivityListener {
      * 
      * @swt MUST be called from the SWT thread to ensure synchronization!
      */
-    public void activityCreated(IActivityDataObject activityDataObject);
+    public void activityCreated(IActivity activityDataObject);
 
     /**
      * Sends the given activityDataObject to the given list of users.
      * 
      * This method will by-pass the ConcurrentDocumentManager.
      */
-    public void sendActivity(List<User> recipient,
-        IActivityDataObject activityDataObject);
+    public void sendActivity(List<User> recipient, IActivity activityDataObject);
 
     /**
      * Convenience method to address a single recipient.
      * 
-     * @see #sendActivity(List, IActivityDataObject)
+     * @see #sendActivity(List, IActivity)
      */
-    public void sendActivity(User recipient,
-        IActivityDataObject activityDataObject);
+    public void sendActivity(User recipient, IActivity activityDataObject);
 
     /**
      * Adds an {@link IActivityProvider} and also registers itself as

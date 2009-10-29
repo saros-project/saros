@@ -3,7 +3,7 @@ package de.fu_berlin.inf.dpp.project;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 
 public abstract class AbstractActivityProvider implements IActivityProvider {
 
@@ -15,13 +15,13 @@ public abstract class AbstractActivityProvider implements IActivityProvider {
         }
     }
 
-    public abstract void exec(IActivityDataObject activityDataObject);
+    public abstract void exec(IActivity activityDataObject);
 
     public void removeActivityListener(IActivityListener listener) {
         this.activityListeners.remove(listener);
     }
 
-    public void fireActivity(IActivityDataObject activityDataObject) {
+    public void fireActivity(IActivity activityDataObject) {
         for (IActivityListener activityListener : activityListeners) {
             activityListener.activityCreated(activityDataObject);
         }

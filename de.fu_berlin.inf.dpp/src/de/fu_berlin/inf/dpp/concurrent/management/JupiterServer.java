@@ -6,8 +6,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
+import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.JupiterDocumentServer;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -89,8 +89,8 @@ public class JupiterServer {
         return docServer.transformJupiterActivity(jupiterActivity);
     }
 
-    public synchronized Map<JID, ChecksumActivityDataObject> withTimestamp(
-        ChecksumActivityDataObject checksumActivityDataObject)
+    public synchronized Map<JID, ChecksumActivity> withTimestamp(
+        ChecksumActivity checksumActivityDataObject)
         throws TransformationException {
 
         JupiterDocumentServer docServer = getServer(checksumActivityDataObject

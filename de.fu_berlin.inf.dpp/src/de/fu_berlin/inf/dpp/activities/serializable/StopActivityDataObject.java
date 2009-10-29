@@ -1,15 +1,13 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Random;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
@@ -30,16 +28,8 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     @XStreamConverter(JIDConverter.class)
     protected JID user;
 
-    public enum Type {
-        LOCKREQUEST, UNLOCKREQUEST
-    }
-
     @XStreamAsAttribute
     protected Type type;
-
-    public enum State {
-        INITIATED, ACKNOWLEDGED
-    }
 
     @XStreamAsAttribute
     protected State state;
@@ -48,25 +38,15 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     protected String stopActivityID;
 
-    protected static Random random = new Random();
-
     public StopActivityDataObject(JID source, JID initiator, JID user,
-        Type type, State state) {
+        Type type, State state, String stopActivityID) {
 
         super(source);
+
         this.initiator = initiator;
         this.user = user;
         this.state = state;
         this.type = type;
-        this.stopActivityID = new SimpleDateFormat("HHmmssSS")
-            .format(new Date())
-            + random.nextLong();
-    }
-
-    public StopActivityDataObject(JID source, JID initiator, JID user,
-        Type type, State state, String stopActivityID) {
-
-        this(source, initiator, user, type, state);
         this.stopActivityID = stopActivityID;
     }
 
@@ -191,5 +171,10 @@ public class StopActivityDataObject extends AbstractActivityDataObject {
 
     public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivity getActivity() {
+        return new StopActivity(source, initiator, user, type, state,
+            stopActivityID);
     }
 }

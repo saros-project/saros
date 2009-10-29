@@ -1,12 +1,12 @@
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
 /**
  * An interface for activityDataObjects that are resource related (e.g.
- * FileActivityDataObject)
+ * FileActivity)
  */
-public interface IResourceActivityDataObject extends IActivityDataObject {
+public interface IResourceObject extends IActivity {
 
     /**
      * The path to the file that this activityDataObject is about. For instance

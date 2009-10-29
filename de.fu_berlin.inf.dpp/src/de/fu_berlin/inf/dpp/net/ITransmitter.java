@@ -34,6 +34,7 @@ import org.jivesoftware.smack.packet.IQ;
 import de.fu_berlin.inf.dpp.FileList;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
@@ -315,8 +316,8 @@ public interface ITransmitter {
      * 
      * This list MUST not contain any {@link FileActivityDataObject}s where
      * {@link FileActivityDataObject#getType()} ==
-     * {@link FileActivityDataObject.Type#Created} as binary data is not
-     * supported in messages bodies.
+     * {@link FileActivity.Type#Created} as binary data is not supported in
+     * messages bodies.
      * 
      * @param recipient
      *            The JID of the user who is to receive the given list of timed
@@ -335,7 +336,7 @@ public interface ITransmitter {
      *             using asserts.
      */
     public void sendTimedActivities(JID recipient,
-        List<TimedActivity> timedActivities);
+        List<TimedActivityDataObject> timedActivities);
 
     /**
      * Sends a FileChecksumErrorMessage with the given path to the given list of

@@ -1,12 +1,15 @@
 package de.fu_berlin.inf.dpp.synchronize;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,12 +25,12 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.picocontainer.Disposable;
 
 import de.fu_berlin.inf.dpp.User;
-import de.fu_berlin.inf.dpp.activities.AbstractActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
-import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject.State;
-import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject.Type;
+import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.IActivityReceiver;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity.State;
+import de.fu_berlin.inf.dpp.activities.business.StopActivity.Type;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
 import de.fu_berlin.inf.dpp.project.IActivityListener;
@@ -42,6 +45,8 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
 public class StopManager implements IActivityProvider, Disposable {
 
     private static Logger log = Logger.getLogger(StopManager.class.getName());
+
+    protected static Random random = new Random();
 
     // Waits MILLISTOWAIT ms until the next test for progress cancellation
     public final int MILLISTOWAIT = 100;
@@ -65,8 +70,8 @@ public class StopManager implements IActivityProvider, Disposable {
         .synchronizedMap(new HashMap<User, List<StartHandle>>());
 
     /**
-     * For every initiated unlock (identified by its StopActivityDataObject id)
-     * there is one acknowledgment expected.
+     * For every initiated unlock (identified by its StopActivity id) there is
+     * one acknowledgment expected.
      */
     private Map<String, StartHandle> startsToBeAcknowledged = Collections
         .synchronizedMap(new HashMap<String, StartHandle>());
@@ -76,11 +81,11 @@ public class StopManager implements IActivityProvider, Disposable {
     protected final Condition acknowledged = reentrantLock.newCondition();
 
     /**
-     * For every initiated StopActivityDataObject (type: LockRequest) there is
-     * one acknowledgment expected.
+     * For every initiated StopActivity (type: LockRequest) there is one
+     * acknowledgment expected.
      */
-    protected Set<StopActivityDataObject> expectedAcknowledgments = Collections
-        .synchronizedSet(new HashSet<StopActivityDataObject>());
+    protected Set<StopActivity> expectedAcknowledgments = Collections
+        .synchronizedSet(new HashSet<StopActivity>());
 
     protected ValueChangeListener<SharedProject> sharedProjectObserver = new ValueChangeListener<SharedProject>() {
         public void setValue(SharedProject newSharedProject) {
@@ -116,10 +121,10 @@ public class StopManager implements IActivityProvider, Disposable {
         observable.add(sharedProjectObserver);
     }
 
-    protected IActivityDataObjectReceiver activityDataObjectReceiver = new AbstractActivityDataObjectReceiver() {
+    protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
 
         @Override
-        public void receive(final StopActivityDataObject stopActivityDataObject) {
+        public void receive(final StopActivity stopActivityDataObject) {
 
             if (sharedProject == null)
                 throw new IllegalStateException(
@@ -129,7 +134,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 .getRecipient());
             if (user == null || !user.isLocal())
                 throw new IllegalArgumentException(
-                    "Received StopActivityDataObject which is not for the local user");
+                    "Received StopActivity which is not for the local user");
 
             if (stopActivityDataObject.getType() == Type.LOCKREQUEST) {
 
@@ -153,7 +158,7 @@ public class StopManager implements IActivityProvider, Disposable {
                 if (stopActivityDataObject.getState() == State.ACKNOWLEDGED) {
                     if (!expectedAcknowledgments
                         .contains(stopActivityDataObject)) {
-                        log.warn("Received unexpected StopActivityDataObject: "
+                        log.warn("Received unexpected StopActivity: "
                             + stopActivityDataObject);
                         return;
                     }
@@ -167,7 +172,7 @@ public class StopManager implements IActivityProvider, Disposable {
                         return;
                     } else {
                         log.warn("Received unexpected "
-                            + "StopActivityDataObject acknowledgement: "
+                            + "StopActivity acknowledgement: "
                             + stopActivityDataObject);
                         return;
                     }
@@ -199,8 +204,7 @@ public class StopManager implements IActivityProvider, Disposable {
             }
 
             throw new IllegalArgumentException(
-                "StopActivityDataObject is of unknown type: "
-                    + stopActivityDataObject);
+                "StopActivity is of unknown type: " + stopActivityDataObject);
         }
     };
 
@@ -310,10 +314,12 @@ public class StopManager implements IActivityProvider, Disposable {
             throw new IllegalStateException(
                 "Stop cannot be called without a shared project");
 
-        // Creating StopActivityDataObject for asking user to stop
-        final StopActivityDataObject stopActivityDataObject = new StopActivityDataObject(
+        // Creating StopActivity for asking user to stop
+        final StopActivity stopActivityDataObject = new StopActivity(
             sharedProject.getLocalUser().getJID(), sharedProject.getLocalUser()
-                .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED);
+                .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED,
+            new SimpleDateFormat("HHmmssSS").format(new Date())
+                + random.nextLong());
 
         StartHandle handle = generateStartHandle(stopActivityDataObject);
         addStartHandle(handle);
@@ -328,7 +334,7 @@ public class StopManager implements IActivityProvider, Disposable {
             return handle;
         }
 
-        StopActivityDataObject expectedAck = stopActivityDataObject
+        StopActivity expectedAck = stopActivityDataObject
             .generateAcknowledgment(user.getJID());
         expectedAcknowledgments.add(expectedAck);
 
@@ -438,10 +444,10 @@ public class StopManager implements IActivityProvider, Disposable {
 
         startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
-        final StopActivityDataObject activity = new StopActivityDataObject(
-            sharedProject.getLocalUser().getJID(), sharedProject.getLocalUser()
-                .getJID(), handle.getUser().getJID(), Type.UNLOCKREQUEST,
-            State.INITIATED, handle.getHandleID());
+        final StopActivity activity = new StopActivity(sharedProject
+            .getLocalUser().getJID(), sharedProject.getLocalUser().getJID(),
+            handle.getUser().getJID(), Type.UNLOCKREQUEST, State.INITIATED,
+            handle.getHandleID());
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -460,7 +466,7 @@ public class StopManager implements IActivityProvider, Disposable {
     /**
      * {@inheritDoc}
      */
-    public void exec(IActivityDataObject activityDataObject) {
+    public void exec(IActivity activityDataObject) {
         activityDataObject.dispatch(activityDataObjectReceiver);
     }
 
@@ -471,15 +477,13 @@ public class StopManager implements IActivityProvider, Disposable {
         activityListeners.remove(listener);
     }
 
-    public void fireActivity(StopActivityDataObject stopActivityDataObject) {
+    public void fireActivity(StopActivity stopActivityDataObject) {
 
         User recipient = sharedProject.getUser(stopActivityDataObject
             .getRecipient());
         if (recipient == null)
-            throw new IllegalArgumentException(
-                "StopActivityDataObject contains"
-                    + " recipient which already left: "
-                    + stopActivityDataObject);
+            throw new IllegalArgumentException("StopActivity contains"
+                + " recipient which already left: " + stopActivityDataObject);
 
         sharedProject.sendActivity(recipient, stopActivityDataObject);
     }
@@ -513,8 +517,7 @@ public class StopManager implements IActivityProvider, Disposable {
         return result;
     }
 
-    public StartHandle generateStartHandle(
-        StopActivityDataObject stopActivityDataObject) {
+    public StartHandle generateStartHandle(StopActivity stopActivityDataObject) {
         User user = sharedProject.getUser(stopActivityDataObject.getUser());
         return new StartHandle(user, this, stopActivityDataObject
             .getActivityID());

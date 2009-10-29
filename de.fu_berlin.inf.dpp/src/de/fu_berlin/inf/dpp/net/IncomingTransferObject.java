@@ -24,8 +24,8 @@ public interface IncomingTransferObject {
      *           for instance). So do not call this from the
      *           {@link DispatchThreadContext} or from the SWT Thread.
      */
-    public byte[] accept(SubMonitor progress) throws SarosCancellationException,
-        IOException;
+    public byte[] accept(SubMonitor progress)
+        throws SarosCancellationException, IOException;
 
     /**
      * Returns the transfer description of this transfer object (which you can

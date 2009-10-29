@@ -1,16 +1,4 @@
-package de.fu_berlin.inf.dpp.activities;
-
-import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
-import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.concurrent.jupiter.JupiterActivity;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
 /**
  * Abstract implementation of IActivityDataObjectReceiver which does nothing
@@ -47,7 +35,7 @@ public class AbstractActivityDataObjectReceiver implements
         // do nothing
     }
 
-    public void receive(JupiterActivity jupiterActivity) {
+    public void receive(JupiterActivityDataObject jupiterActivity) {
         // do nothing
     }
 
@@ -113,7 +101,7 @@ public class AbstractActivityDataObjectReceiver implements
                 return consume;
             }
 
-            public boolean consume(JupiterActivity jupiterActivity) {
+            public boolean consume(JupiterActivityDataObject jupiterActivity) {
                 receiver.receive(jupiterActivity);
                 return consume;
             }

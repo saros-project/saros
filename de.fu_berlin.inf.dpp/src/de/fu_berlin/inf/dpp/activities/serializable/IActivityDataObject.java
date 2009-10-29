@@ -17,9 +17,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-package de.fu_berlin.inf.dpp.activities;
+package de.fu_berlin.inf.dpp.activities.serializable;
 
-import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
@@ -65,5 +65,7 @@ public interface IActivityDataObject {
      * {@link IActivityDataObjectReceiver#receive(FolderActivityDataObject)}
      */
     public void dispatch(IActivityDataObjectReceiver receiver);
+
+    public IActivity getActivity();
 
 }

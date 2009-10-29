@@ -27,8 +27,8 @@ import org.eclipse.jface.text.TextSelection;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectConsumer;
-import de.fu_berlin.inf.dpp.activities.IActivityDataObjectReceiver;
+import de.fu_berlin.inf.dpp.activities.business.IActivity;
+import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
 @XStreamAlias("textSelectionActivity")
@@ -108,5 +108,9 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
 
     public void dispatch(IActivityDataObjectReceiver receiver) {
         receiver.receive(this);
+    }
+
+    public IActivity getActivity() {
+        return new TextSelectionActivity(source, offset, length, editor);
     }
 }
