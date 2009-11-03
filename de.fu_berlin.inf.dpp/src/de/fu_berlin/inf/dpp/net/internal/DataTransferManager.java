@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
@@ -279,6 +281,16 @@ public class DataTransferManager implements ConnectionSessionListener {
 
             final IncomingTransferObject transferObject = new IncomingTransferObject() {
 
+                /**
+                 * @throws SarosCancellationException
+                 *             It will be thrown if the user (locally or
+                 *             remotely) has canceled the transfer.
+                 * 
+                 * @throws IOException
+                 *             It will be thrown if the stream negotiation, the
+                 *             read from InputStream or the inflation failed
+                 *             during I/O operations or Timeout.
+                 */
                 public byte[] accept(SubMonitor monitor)
                     throws SarosCancellationException, IOException {
 
@@ -311,12 +323,31 @@ public class DataTransferManager implements ConnectionSessionListener {
                         log.info("Local monitor was cancelled.");
                         throw e;
                     } catch (IOException e) {
+                        if (monitor.isCanceled())
+                            throw new LocalCancellationException();
                         log.error("Incoming File Transfer via IBB failed: ", e);
                         throw e;
                     } catch (XMPPException e) {
-                        log.error("Incoming File Transfer via IBB failed: ", e);
+                        if (monitor.isCanceled())
+                            throw new LocalCancellationException();
+
+                        Throwable tmp = e.getWrappedThrowable();
+                        Exception cause = (tmp != null) ? (Exception) tmp : e;
+
+                        if (cause instanceof InterruptedException) {
+                            log.warn("Interrupted on IBB stream negotiation.");
+                        } else if (e.getCause() instanceof TimeoutException) {
+                            log
+                                .warn("Timeout while waiting for incoming File ransfer via IBB.");
+                        } else if (cause instanceof ExecutionException) {
+                            // unwrap
+                            Throwable t = cause.getCause();
+                            if (t != null)
+                                log.warn(t.getMessage(), t);
+                        }
+
                         throw new IOException(
-                            "Incoming File Transfer via IBB failed.");
+                            "Failed to negotiate Stream via IBB.");
                     }
 
                     monitor.worked(100);
