@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.security.sasl.SaslException;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.helpers.LogLog;
@@ -640,22 +642,67 @@ public class Saros extends AbstractUIPlugin {
             this.myJID = new JID(this.connection.getUser());
             setConnectionState(ConnectionState.CONNECTED, null);
 
-        } catch (final Exception e) {
+        } catch (URISyntaxException e) {
+            log.info("URI not parseable: " + e.getInput());
+            popUpFailureMessage("URI not parseable", e.getInput()
+                + " is not a valid URI.", failSilently);
 
-            setConnectionState(ConnectionState.ERROR, e);
+        } catch (IllegalArgumentException e) {
+            log.info("Illegal argument: " + e.getMessage());
+            setConnectionState(ConnectionState.ERROR, null);
+            popUpFailureMessage("Illegal argument", e.getMessage(),
+                failSilently);
 
-            if (!failSilently) {
-                Util.runSafeSWTSync(log, new Runnable() {
-                    public void run() {
-                        MessageDialog.openError(EditorAPI.getShell(),
-                            "Error Connecting",
-                            " could not connect to server '" + server
-                                + "' as user '" + username
-                                + "'.\nErrorMessage was:\n" + e.getMessage());
-                    }
-                });
+        } catch (XMPPException e) {
+            Throwable t = e.getWrappedThrowable();
+            Exception cause = (t != null) ? (Exception) t : e;
+
+            setConnectionState(ConnectionState.ERROR, cause);
+
+            if (cause instanceof SaslException) {
+                popUpFailureMessage("Error Connecting via SASL", cause
+                    .getMessage(), failSilently);
+            } else if (cause instanceof UnknownHostException) {
+                log.info("Unknown host: " + cause);
+                popUpFailureMessage("Error Connecting",
+                    "Error Connecting to XMPP server: " + cause.getMessage(),
+                    failSilently);
+            } else {
+                log.info("xmpp: " + cause.getMessage(), cause);
+                popUpFailureMessage(
+                    "Error Connecting",
+                    "Could not connect to server '"
+                        + server
+                        + "' as user '"
+                        + username
+                        + ". Please check your username and password in the preferences.",
+                    failSilently);
             }
+
+        } catch (Exception e) {
+            log.warn("Unhandled exception:", e);
+            setConnectionState(ConnectionState.ERROR, e);
+            popUpFailureMessage("Error Connecting",
+                "Could not connect to server '" + server + "' as user '"
+                    + username + "'.\nErrorMessage was:\n" + e.getMessage(),
+                failSilently);
         }
+    }
+
+    /**
+     * Indicate the User that there was an error. It pops up an ErrorDialog with
+     * given title and message.
+     */
+    protected void popUpFailureMessage(final String title,
+        final String message, boolean failSilently) {
+        if (failSilently)
+            return;
+
+        Util.runSafeSWTSync(log, new Runnable() {
+            public void run() {
+                MessageDialog.openError(EditorAPI.getShell(), title, message);
+            }
+        });
     }
 
     /**
@@ -1092,7 +1139,7 @@ public class Saros extends AbstractUIPlugin {
 
         public void connectionClosedOnError(Exception e) {
 
-            log.error("XMPP Connection Error: " + e.toString(), e);
+            log.error("XMPP Connection Error: ", e);
 
             if (e.toString().equals("stream:error (conflict)")) {
 
