@@ -663,7 +663,7 @@ public class Saros extends AbstractUIPlugin {
                 popUpFailureMessage("Error Connecting via SASL", cause
                     .getMessage(), failSilently);
             } else if (cause instanceof UnknownHostException) {
-                log.info("Unknown host: " + e.getWrappedThrowable());
+                log.info("Unknown host: " + cause);
                 popUpFailureMessage("Error Connecting",
                     "Error Connecting to XMPP server: " + cause.getMessage(),
                     failSilently);
@@ -675,7 +675,7 @@ public class Saros extends AbstractUIPlugin {
                         + server
                         + "' as user '"
                         + username
-                        + ". Please, proof your username and password in the Preferences.",
+                        + ". Please check your username and password in the preferences.",
                     failSilently);
             }
 
@@ -690,7 +690,7 @@ public class Saros extends AbstractUIPlugin {
     }
 
     /**
-     * Indicate the User that there was an error. It popups an ErrorDialog with
+     * Indicate the User that there was an error. It pops up an ErrorDialog with
      * given title and message.
      */
     protected void popUpFailureMessage(final String title,
