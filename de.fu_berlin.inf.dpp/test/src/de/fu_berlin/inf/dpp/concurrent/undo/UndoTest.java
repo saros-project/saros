@@ -193,4 +193,15 @@ public class UndoTest extends TestCase {
         expected = new InsertOperation(5, "cde");
         assertEquals(expected, undo(path1));
     }
+
+    public void testBackspaceUndo() {
+        history.add(path1, Type.LOCAL, new InsertOperation(3, "abc"));
+        history.add(path1, Type.LOCAL, new DeleteOperation(3, "abc"));
+
+        Operation expected = new InsertOperation(3, "abc");
+        assertEquals(expected, undo(path1));
+
+        expected = new DeleteOperation(3, "abc");
+        assertEquals(expected, undo(path1));
+    }
 }
