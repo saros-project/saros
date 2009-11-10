@@ -366,7 +366,7 @@ public class SessionManager implements IConnectionListener, ISessionManager {
      * concurrently, a lots of dialogs pop up. Can they integrated in one
      * dialog?
      */
-    protected class OutgoingInvitationJob extends Job {
+    protected static class OutgoingInvitationJob extends Job {
         protected OutgoingInvitationProcess process;
         protected String peer;
         protected Shell dialogShell;
