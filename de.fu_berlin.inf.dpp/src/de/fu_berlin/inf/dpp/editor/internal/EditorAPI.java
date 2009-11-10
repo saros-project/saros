@@ -823,6 +823,10 @@ public class EditorAPI implements IEditorAPI {
      * or false if the user canceled.
      * 
      * TODO Tell the user why we do want to save!
+     * 
+     * @param confirm
+     *            true to ask the user before saving unsaved changes, and false
+     *            to save unsaved changes without asking
      */
     public static boolean saveProject(final IProject projectToSave,
         final boolean confirm) {

@@ -645,17 +645,13 @@ public class IncomingInvitationProcess extends InvitationProcess {
         return;
     }
 
-    protected void processException(Exception ex)
+    protected void processException(Exception e)
         throws SarosCancellationException {
-        try {
-            throw ex;
-        } catch (LocalCancellationException e) {
+        if (e instanceof LocalCancellationException) {
             localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (RemoteCancellationException e) {
+        } else if (e instanceof RemoteCancellationException) {
             remoteCancel(e.getMessage());
-            executeCancellation();
-        } catch (SarosCancellationException e) {
+        } else if (e instanceof SarosCancellationException) {
             /**
              * If this exception is thrown because of a local cancellation, we
              * initiate a localCancel here.
@@ -664,22 +660,20 @@ public class IncomingInvitationProcess extends InvitationProcess {
              * call of localCancel will be ignored.
              */
             localCancel(e.getMessage(), CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (IOException e) {
+        } else if (e instanceof IOException) {
             String errorMsg = "Unknown error: " + e;
             if (e.getMessage() != null)
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-            executeCancellation();
-        } catch (Exception e) {
+        } else {
             log.warn("Inv" + Util.prefix(peer)
                 + ": This type of Exception is not expected: ", e);
             String errorMsg = "Unknown error: " + e;
             if (e.getMessage() != null)
                 errorMsg = e.getMessage();
             localCancel(errorMsg, CancelOption.NOTIFY_PEER);
-            executeCancellation();
         }
+        executeCancellation();
     }
 
     public FileList getRemoteFileList() {
