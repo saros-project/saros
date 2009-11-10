@@ -14,6 +14,6 @@ import de.fu_berlin.inf.dpp.net.JID;
 @Component(module = "net")
 public interface IXMPPTransmitter {
 
-    public void sendMessage(JID recipient, PacketExtension data);
+    public void sendMessageToProjectUser(JID recipient, PacketExtension data);
 
 }

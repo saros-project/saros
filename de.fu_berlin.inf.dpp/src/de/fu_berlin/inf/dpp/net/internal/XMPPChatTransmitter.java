@@ -200,7 +200,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             sharedProject.getProject().getName(), description, colorID,
             versionInfo, sharedProject.getSessionStart());
 
-        sendMessageToArbitraryUser(guest, invExtProv.create(invInfo));
+        sendMessageToUser(guest, invExtProv.create(invInfo));
     }
 
     public SarosPacketCollector getFileListRequestCollector(String invitationID) {
@@ -220,7 +220,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendFileListRequest(JID to, String invitationID) {
         log.trace("Sending request for FileList to " + Util.prefix(to));
-        sendMessageToArbitraryUser(to, fileListRequestExtProv
+        sendMessageToUser(to, fileListRequestExtProv
             .create(new DefaultInvitationInfo(sessionID, invitationID)));
     }
 
@@ -320,14 +320,14 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     public void sendUserList(JID to, String invitationID, Collection<User> users) {
         log.trace("Sending userList to " + Util.prefix(to));
-        sendMessage(to, userListExtProv.create(new UserListInfo(sessionID,
-            invitationID, users)));
+        sendMessageToProjectUser(to, userListExtProv.create(new UserListInfo(
+            sessionID, invitationID, users)));
     }
 
     public void sendUserListConfirmation(JID to) {
         log.trace("Sending userListConfirmation to " + Util.prefix(to));
-        sendMessage(to, userListConfExtProv.create(new DefaultSessionInfo(
-            sessionID)));
+        sendMessageToProjectUser(to, userListConfExtProv
+            .create(new DefaultSessionInfo(sessionID)));
     }
 
     public SarosPacketCollector getUserListConfirmationCollector() {
@@ -352,18 +352,18 @@ public class XMPPChatTransmitter implements ITransmitter,
         try {
             Packet result;
             JID jid;
-            do {
+            while (fromUserJIDs.size() > 0) {
                 if (monitor.isCanceled())
                     throw new LocalCancellationException();
 
-                // Wait up to [timeout] seconds for a result.
+                // Wait up to [timeout] milliseconds for a result.
                 result = collector.nextResult(100);
                 if (result == null)
                     continue;
 
                 jid = new JID(result.getFrom());
                 if (!fromUserJIDs.remove(jid)) {
-                    log.debug("UserListConfirmation from unknown user: "
+                    log.warn("UserListConfirmation from unknown user: "
                         + Util.prefix(jid));
                 } else {
                     log.debug("UserListConfirmation from: " + Util.prefix(jid));
@@ -372,7 +372,7 @@ public class XMPPChatTransmitter implements ITransmitter,
                  * TODO: what if a user goes offline during the invitation? The
                  * confirmation will never arrive!
                  */
-            } while (fromUserJIDs.size() > 0);
+            }
             return true;
         } finally {
             collector.cancel();
@@ -395,8 +395,8 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     public void sendInvitationCompleteConfirmation(JID to, String invitationID) {
-        sendMessage(to, invCompleteExtProv.create(new DefaultInvitationInfo(
-            sessionID, invitationID)));
+        sendMessageToProjectUser(to, invCompleteExtProv
+            .create(new DefaultInvitationInfo(sessionID, invitationID)));
     }
 
     /********************************************************************************
@@ -416,7 +416,7 @@ public class XMPPChatTransmitter implements ITransmitter,
             + Util.prefix(user)
             + (errorMsg == null ? "on user request" : "with message: "
                 + errorMsg));
-        sendMessageToArbitraryUser(user, cancelInviteExtension.create(sessionID
+        sendMessageToUser(user, cancelInviteExtension.create(sessionID
             .getValue(), errorMsg));
     }
 
@@ -444,8 +444,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             log.info("Requesting old activityDataObject (sequence number="
                 + expectedSequenceNumber + "," + andup + ") from "
                 + Util.prefix(recipient));
-            sendMessage(recipient, requestActivityExtension.create(
-                expectedSequenceNumber, andup));
+            sendMessageToProjectUser(recipient, requestActivityExtension
+                .create(expectedSequenceNumber, andup));
         }
     }
 
@@ -491,7 +491,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
         if (data == null || data.length < MAX_XMPP_MESSAGE_SIZE) {
             // send as XMPP Message
-            sendMessage(recipient, extensionToSend);
+            sendMessageToProjectUser(recipient, extensionToSend);
         } else {
             // send using DataTransferManager
             try {
@@ -620,8 +620,8 @@ public class XMPPChatTransmitter implements ITransmitter,
             + Util.toOSString(paths) + " to " + recipients);
 
         for (JID recipient : recipients) {
-            sendMessage(recipient, checksumErrorExtension.create(paths,
-                resolved));
+            sendMessageToProjectUser(recipient, checksumErrorExtension.create(
+                paths, resolved));
         }
     }
 
@@ -668,7 +668,7 @@ public class XMPPChatTransmitter implements ITransmitter,
         }
 
         for (MessageTransfer pex : toTransfer) {
-            sendMessage(pex.receipient, pex.message);
+            sendMessageToProjectUser(pex.receipient, pex.message);
         }
     }
 
@@ -685,7 +685,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
             if (participant.getJID().equals(myJID))
                 continue;
-            sendMessage(participant.getJID(), extension);
+            sendMessageToProjectUser(participant.getJID(), extension);
         }
     }
 
@@ -696,18 +696,20 @@ public class XMPPChatTransmitter implements ITransmitter,
         this.messageTransferQueue.add(msg);
     }
 
-    public void sendMessage(JID jid, PacketExtension extension) {
+    /**
+     * The recipient has to be in the session or the message will not be sent.
+     */
+    public void sendMessageToProjectUser(JID jid, PacketExtension extension) {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());
-        sendMessage(jid, message);
+        sendMessageToProjectUser(jid, message);
     }
 
     /**
-     * Sends a message to an arbitrary user. Arbitrary menas that the recipient
-     * does not have to be in the session.
+     * Sends a message to a user who is not necessarily in the session.
      */
-    public void sendMessageToArbitraryUser(JID jid, PacketExtension extension) {
+    public void sendMessageToUser(JID jid, PacketExtension extension) {
         Message message = new Message();
         message.addExtension(extension);
         message.setTo(jid.toString());
@@ -720,10 +722,11 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     /**
-     * Sends the given {@link Message} to the given {@link JID}. It queues the
+     * Sends the given {@link Message} to the given {@link JID}. The recipient
+     * has to be in the session or the message will not be sent. It queues the
      * Message if the participant is OFFLINE.
      */
-    protected void sendMessage(JID jid, Message message) {
+    protected void sendMessageToProjectUser(JID jid, Message message) {
 
         User participant = sharedProject.getValue().getUser(jid);
         if (participant == null) {

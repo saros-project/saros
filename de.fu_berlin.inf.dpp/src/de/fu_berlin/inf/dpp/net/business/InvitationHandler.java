@@ -78,7 +78,7 @@ public class InvitationHandler {
                         invInfo.colorID, invInfo.versionInfo,
                         invInfo.sessionStart, sarosUI, invitationID);
                 } else {
-                    transmitter.sendMessageToArbitraryUser(new JID(packet
+                    transmitter.sendMessageToUser(new JID(packet
                         .getFrom()), cancelInviteExtension.create(sessionID,
                         "I am already in a Saros-Session,"
                             + "try to contact me by chat first."));
