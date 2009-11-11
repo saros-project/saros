@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.annotations.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -34,16 +35,16 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     public static final int NON_EXISTING_DOC = -1;
 
     @XStreamAsAttribute
-    public IPath path;
+    protected IPath path;
 
     @XStreamAsAttribute
-    public long hash;
+    protected long hash;
 
     @XStreamAsAttribute
-    public long length;
+    protected long length;
 
     @XStreamAsAttribute
-    public Timestamp jupiterTimestamp;
+    protected Timestamp jupiterTimestamp;
 
     /**
      * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set
@@ -51,11 +52,7 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
      */
     public ChecksumActivityDataObject(JID source, IPath path, long hash,
         long length) {
-        super(source);
-        this.path = path;
-        this.hash = hash;
-        this.length = length;
-        this.jupiterTimestamp = null;
+        this(source, path, hash, length, null);
     }
 
     /**
@@ -63,7 +60,8 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
      * users which are drivers)
      */
     public ChecksumActivityDataObject(JID source, IPath path, long hash,
-        long length, Timestamp jupiterTimestamp) {
+        long length, @Nullable Timestamp jupiterTimestamp) {
+        
         super(source);
         this.path = path;
         this.hash = hash;
@@ -98,8 +96,8 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
 
     @Override
     public String toString() {
-        return "Checksum(path:" + this.path + ", hash:" + hash + ", length:"
-            + length + ")";
+        return "Checksum(path:" + this.path + ",hash:" + hash + ",length:"
+            + length + ",vectorTime:" + jupiterTimestamp + ")";
     }
 
     public boolean dispatch(IActivityDataObjectConsumer consumer) {

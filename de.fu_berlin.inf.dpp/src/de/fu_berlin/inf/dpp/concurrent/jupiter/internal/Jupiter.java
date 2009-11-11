@@ -124,29 +124,36 @@ public class Jupiter implements Algorithm {
     public boolean isCurrent(Timestamp timestamp)
         throws TransformationException {
 
+        int localOperationCount = this.vectorTime.getLocalOperationCount();
         if (timestamp == null) {
             /*
              * If this timestamp is null, this means it was sent to us while we
              * were still an observer
              */
-            return this.vectorTime.getLocalOperationCount() == 0;
+            return localOperationCount == 0;
         }
 
         if (!(timestamp instanceof JupiterVectorTime)) {
+            /*
+             * TODO Should never happen because JupiterVectorTime implements
+             * VectorTime and that interface extends TimeStamp. There are no
+             * other branches in this hierarchy. Should be simplified.
+             */
             throw new IllegalArgumentException(
                 "Jupiter expects timestamps of type JupiterVectorTime but is "
                     + timestamp.getClass());
         }
         JupiterVectorTime remoteVectorTime = (JupiterVectorTime) timestamp;
 
-        if (remoteVectorTime.getRemoteOperationCount() > this.vectorTime
-            .getLocalOperationCount()) {
+        int remoteOperationCount = remoteVectorTime.getRemoteOperationCount();
+        if (remoteOperationCount > localOperationCount) {
             throw new TransformationException(
-                "precondition #2 violated (Remote vector time is greater than local vector time).");
+                "precondition #2 violated (Remote vector time ("
+                    + remoteOperationCount + ") is greater than"
+                    + " local vector time (" + localOperationCount + ")).");
         }
 
-        return remoteVectorTime.getRemoteOperationCount() == this.vectorTime
-            .getLocalOperationCount();
+        return remoteOperationCount == localOperationCount;
     }
 
     /**

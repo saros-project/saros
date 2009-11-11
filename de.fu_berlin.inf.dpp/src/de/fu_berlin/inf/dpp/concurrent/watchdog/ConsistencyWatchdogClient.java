@@ -396,9 +396,9 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             return;
 
         if (isInconsistent(checksumActivity)) {
-            pathsWithWrongChecksums.add(checksumActivity.path);
+            pathsWithWrongChecksums.add(checksumActivity.getPath());
         } else {
-            pathsWithWrongChecksums.remove(checksumActivity.path);
+            pathsWithWrongChecksums.remove(checksumActivity.getPath());
         }
 
         if (pathsWithWrongChecksums.isEmpty()) {

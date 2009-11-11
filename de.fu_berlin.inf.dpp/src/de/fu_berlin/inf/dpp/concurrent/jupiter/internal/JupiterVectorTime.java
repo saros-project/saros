@@ -17,34 +17,34 @@ public class JupiterVectorTime implements VectorTime {
      */
     @XStreamAlias("local")
     @XStreamAsAttribute
-    private int localOperationCnt;
+    private int localOperationCount;
 
     /**
      * Counter for the number of remote operations.
      */
     @XStreamAlias("remote")
     @XStreamAsAttribute
-    private int remoteOperationCnt;
+    private int remoteOperationCount;
 
     /**
      * Create a new JupiterVectorTime.
      * 
-     * @param localCnt
+     * @param localCount
      *            the local operation count.
-     * @param remoteCnt
+     * @param remoteCount
      *            the remote operation count.
      */
-    public JupiterVectorTime(int localCnt, int remoteCnt) {
-        if (localCnt < 0) {
+    public JupiterVectorTime(int localCount, int remoteCount) {
+        if (localCount < 0) {
             throw new IllegalArgumentException(
                 "local operation count cannot be negative");
         }
-        if (remoteCnt < 0) {
+        if (remoteCount < 0) {
             throw new IllegalArgumentException(
                 "remote operation count cannot be negative");
         }
-        this.localOperationCnt = localCnt;
-        this.remoteOperationCnt = remoteCnt;
+        this.localOperationCount = localCount;
+        this.remoteOperationCount = remoteCount;
     }
 
     /**
@@ -78,14 +78,14 @@ public class JupiterVectorTime implements VectorTime {
      * @return Returns the local operation count.
      */
     public int getLocalOperationCount() {
-        return this.localOperationCnt;
+        return this.localOperationCount;
     }
 
     /**
      * @return Returns the remote operation count.
      */
     public int getRemoteOperationCount() {
-        return this.remoteOperationCnt;
+        return this.remoteOperationCount;
     }
 
     /**
@@ -94,7 +94,8 @@ public class JupiterVectorTime implements VectorTime {
      * @return the counter after increment.
      */
     public JupiterVectorTime incrementLocalOperationCount() {
-        return new JupiterVectorTime(localOperationCnt + 1, remoteOperationCnt);
+        return new JupiterVectorTime(localOperationCount + 1,
+            remoteOperationCount);
     }
 
     /**
@@ -103,7 +104,8 @@ public class JupiterVectorTime implements VectorTime {
      * @return the counter after increment.
      */
     public JupiterVectorTime incrementRemoteOperationCount() {
-        return new JupiterVectorTime(localOperationCnt, remoteOperationCnt + 1);
+        return new JupiterVectorTime(localOperationCount,
+            remoteOperationCount + 1);
     }
 
     /**
@@ -113,9 +115,9 @@ public class JupiterVectorTime implements VectorTime {
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("[");
-        buffer.append(this.localOperationCnt);
+        buffer.append(this.localOperationCount);
         buffer.append(",");
-        buffer.append(this.remoteOperationCnt);
+        buffer.append(this.remoteOperationCount);
         buffer.append("]");
         return buffer.toString();
     }
@@ -131,8 +133,8 @@ public class JupiterVectorTime implements VectorTime {
             return false;
         } else if (obj.getClass().equals(getClass())) {
             JupiterVectorTime vector = (JupiterVectorTime) obj;
-            return (vector.localOperationCnt == this.localOperationCnt)
-                && (vector.remoteOperationCnt == this.remoteOperationCnt);
+            return (vector.localOperationCount == this.localOperationCount)
+                && (vector.remoteOperationCount == this.remoteOperationCount);
         } else {
             return false;
         }
@@ -144,8 +146,8 @@ public class JupiterVectorTime implements VectorTime {
     @Override
     public int hashCode() {
         int hashcode = 17;
-        hashcode = 37 * hashcode + this.localOperationCnt;
-        hashcode = 37 * hashcode + this.remoteOperationCnt;
+        hashcode = 37 * hashcode + this.localOperationCount;
+        hashcode = 37 * hashcode + this.remoteOperationCount;
         return hashcode;
     }
 

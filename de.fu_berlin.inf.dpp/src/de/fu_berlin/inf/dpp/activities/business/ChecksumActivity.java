@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.annotations.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -34,27 +35,23 @@ public class ChecksumActivity extends AbstractActivity {
     public static final int NON_EXISTING_DOC = -1;
 
     @XStreamAsAttribute
-    public IPath path;
+    protected IPath path;
 
     @XStreamAsAttribute
-    public long hash;
+    protected long hash;
 
     @XStreamAsAttribute
-    public long length;
+    protected long length;
 
     @XStreamAsAttribute
-    public Timestamp jupiterTimestamp;
+    protected Timestamp jupiterTimestamp;
 
     /**
      * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
      * used when communicating with users which are observers)
      */
     public ChecksumActivity(JID source, IPath path, long hash, long length) {
-        super(source);
-        this.path = path;
-        this.hash = hash;
-        this.length = length;
-        this.jupiterTimestamp = null;
+        this(source, path, hash, length, null);
     }
 
     /**
@@ -62,7 +59,8 @@ public class ChecksumActivity extends AbstractActivity {
      * users which are drivers)
      */
     public ChecksumActivity(JID source, IPath path, long hash, long length,
-        Timestamp jupiterTimestamp) {
+        @Nullable Timestamp jupiterTimestamp) {
+        
         super(source);
         this.path = path;
         this.hash = hash;
@@ -97,8 +95,8 @@ public class ChecksumActivity extends AbstractActivity {
 
     @Override
     public String toString() {
-        return "Checksum(path:" + this.path + ", hash:" + hash + ", length:"
-            + length + ")";
+        return "Checksum(path:" + this.path + ",hash:" + hash + ",length:"
+            + length + ",vectorTime:" + jupiterTimestamp + ")";
     }
 
     public boolean dispatch(IActivityConsumer consumer) {
