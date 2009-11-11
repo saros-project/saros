@@ -939,12 +939,12 @@ public class Util {
             print.print_script(script);
 
             String diffAsString = writer.toString();
-
-            if (diffAsString == null || diffAsString.trim().length() == 0) {
+            if (diffAsString.trim().length() == 0) {
                 log.error("No inconsistency found in file [" + from.getName()
-                    + "] " + path.toString());
+                    + "] " + path);
             } else {
-                log.info("Diff of inconsistency: \n" + writer);
+                log.info("Diff of inconsistency: \nPath: " + path + "\n"
+                    + diffAsString);
             }
         } catch (CoreException e) {
             log.error("Can't read file content", e);
