@@ -23,10 +23,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IPath;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -35,27 +31,17 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
-import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
 /**
  * An immutable text activityDataObject.
  * 
  * @author rdjemili
  */
-@XStreamAlias("textEditActivity")
 public class TextEditActivity extends AbstractActivity {
 
-    @XStreamAsAttribute
     public final int offset;
-
-    @XStreamConverter(UrlEncodingStringConverter.class)
     public final String text;
-
-    @XStreamAlias("replaced")
-    @XStreamConverter(UrlEncodingStringConverter.class)
     public final String replacedText;
-
-    @XStreamAsAttribute
     protected final IPath editor;
 
     public IPath getEditor() {

@@ -3,9 +3,6 @@ package de.fu_berlin.inf.dpp.activities.business;
 import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -26,7 +23,6 @@ import de.fu_berlin.inf.dpp.net.JID;
  * or whether the local user has already written additional text which
  * invalidates the checksum.
  */
-@XStreamAlias("fileActivity")
 public class ChecksumActivity extends AbstractActivity {
 
     /**
@@ -34,16 +30,9 @@ public class ChecksumActivity extends AbstractActivity {
      */
     public static final int NON_EXISTING_DOC = -1;
 
-    @XStreamAsAttribute
     protected IPath path;
-
-    @XStreamAsAttribute
     protected long hash;
-
-    @XStreamAsAttribute
     protected long length;
-
-    @XStreamAsAttribute
     protected Timestamp jupiterTimestamp;
 
     /**
@@ -60,7 +49,7 @@ public class ChecksumActivity extends AbstractActivity {
      */
     public ChecksumActivity(JID source, IPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
-        
+
         super(source);
         this.path = path;
         this.hash = hash;

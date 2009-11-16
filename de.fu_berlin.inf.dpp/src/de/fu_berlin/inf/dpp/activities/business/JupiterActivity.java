@@ -2,9 +2,6 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -15,7 +12,6 @@ import de.fu_berlin.inf.dpp.net.JID;
  * A JupiterActivity is an Activity that can be handled by the Jupiter
  * Algorithm.
  */
-@XStreamAlias("jupiterActivity")
 public class JupiterActivity extends AbstractActivity {
 
     /**
@@ -26,7 +22,6 @@ public class JupiterActivity extends AbstractActivity {
 
     private final Operation operation;
 
-    @XStreamAsAttribute
     private IPath editor;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
@@ -37,20 +32,10 @@ public class JupiterActivity extends AbstractActivity {
         this.editor = editor;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.jupiter.Request#getOperation()
-     */
     public Operation getOperation() {
         return this.operation;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see de.fu_berlin.inf.dpp.jupiter.Request#getTimestamp()
-     */
     public Timestamp getTimestamp() {
         return this.timestamp;
     }
@@ -94,11 +79,6 @@ public class JupiterActivity extends AbstractActivity {
         return result;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();

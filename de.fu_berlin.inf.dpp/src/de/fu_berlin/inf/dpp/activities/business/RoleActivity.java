@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -19,28 +19,18 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-import com.thoughtworks.xstream.annotations.XStreamConverter;
-
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
  * A role activityDataObject indicates that a user has a new Role in the
  * Driver/Observer schemes of things.
  */
-@XStreamAlias("roleActivity")
 public class RoleActivity extends AbstractActivity {
 
-    @XStreamAsAttribute
     protected final UserRole role;
-
-    @XStreamAsAttribute
-    @XStreamConverter(JIDConverter.class)
     protected final JID affectedUser;
 
     /**

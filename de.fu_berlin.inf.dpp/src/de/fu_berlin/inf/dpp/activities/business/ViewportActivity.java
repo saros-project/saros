@@ -4,24 +4,14 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
-@XStreamAlias("viewportActivity")
 public class ViewportActivity extends AbstractActivity {
-    @XStreamAsAttribute
-    @XStreamAlias("top")
+
     protected final int topIndex;
-
-    @XStreamAsAttribute
-    @XStreamAlias("bottom")
     protected final int bottomIndex;
-
-    @XStreamAsAttribute
     protected final IPath path;
 
     public ViewportActivity(JID source, int topIndex, int bottomIndex,

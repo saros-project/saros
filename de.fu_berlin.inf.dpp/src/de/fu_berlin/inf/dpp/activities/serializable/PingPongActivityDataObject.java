@@ -8,10 +8,13 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PingPongActivity;
 import de.fu_berlin.inf.dpp.net.JID;
 
+/**
+ * TODO No XStream annotations. How does this look like when serialized!?
+ * Especially the DateTime instance.
+ */
 public class PingPongActivityDataObject extends AbstractActivityDataObject {
 
     public JID initiator;
-
     public DateTime departureTime;
 
     public PingPongActivityDataObject(JID source) {

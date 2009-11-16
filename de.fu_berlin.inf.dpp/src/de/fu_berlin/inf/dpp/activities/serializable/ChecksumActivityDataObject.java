@@ -26,7 +26,7 @@ import de.fu_berlin.inf.dpp.net.JID;
  * or whether the local user has already written additional text which
  * invalidates the checksum.
  */
-@XStreamAlias("fileActivity")
+@XStreamAlias("checksumActivity")
 public class ChecksumActivityDataObject extends AbstractActivityDataObject {
 
     /**

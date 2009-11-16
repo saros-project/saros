@@ -8,14 +8,10 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
-@XStreamAlias("fileActivity")
 public class FileActivity extends AbstractActivity implements IResourceObject {
 
     /**
@@ -31,18 +27,10 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
         Created, Removed, Moved
     }
 
-    @XStreamAsAttribute
     protected Type type;
-
-    @XStreamAsAttribute
     protected IPath newPath;
-
-    @XStreamAsAttribute
     protected IPath oldPath;
-
-    @XStreamAsAttribute
     protected Purpose purpose;
-
     protected byte[] data;
 
     /**

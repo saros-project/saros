@@ -2,26 +2,18 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.net.JID;
 
-@XStreamAlias("folderActivity")
 public class FolderActivity extends AbstractActivity implements IResourceObject {
+
     public static enum Type {
         Created, Removed, Moved
     }
 
-    @XStreamAsAttribute
     private final Type type;
-
-    @XStreamAsAttribute
     private final IPath path;
-
-    @XStreamAsAttribute
     private IPath oldPath;
 
     public FolderActivity(JID source, Type type, IPath path) {
