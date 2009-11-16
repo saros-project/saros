@@ -108,8 +108,8 @@ import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
 import de.fu_berlin.inf.dpp.net.internal.MultiUserChatManager;
 import de.fu_berlin.inf.dpp.net.internal.SubscriptionListener;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumExtension;
@@ -303,8 +303,8 @@ public class Saros extends AbstractUIPlugin {
         this.container.addComponent(SubscriptionListener.class);
         this.container.addComponent(UndoManager.class);
         this.container.addComponent(VersionManager.class);
-        this.container.addComponent(XMPPChatReceiver.class);
-        this.container.addComponent(XMPPChatTransmitter.class);
+        this.container.addComponent(XMPPReceiver.class);
+        this.container.addComponent(XMPPTransmitter.class);
 
         // Observables
         this.container.addComponent(FileReplacementInProgressObservable.class);

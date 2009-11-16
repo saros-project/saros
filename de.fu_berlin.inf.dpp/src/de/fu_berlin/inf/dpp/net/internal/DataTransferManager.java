@@ -130,7 +130,7 @@ public class DataTransferManager implements ConnectionSessionListener {
     protected JingleFileTransferManagerObservable jingleManager;
 
     @Inject
-    protected XMPPChatReceiver receiver;
+    protected XMPPReceiver receiver;
 
     @Inject
     protected ActivitiesHandler activitiesHandler;
@@ -192,7 +192,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         /**
          * It changes to the Thread context of XMPPChatTransmiter before calling
-         * XMPPChatReceiver's processPacket.
+         * XMPPReceiver's processPacket.
          */
         public void incomingData(final IncomingTransferObject transferObject) {
             addIncomingTransferObject(transferObject);
@@ -266,7 +266,7 @@ public class DataTransferManager implements ConnectionSessionListener {
         });
     }
 
-    protected class IBBTransferListener implements FileTransferListener {
+    protected class XMPPFileTransferListener implements FileTransferListener {
 
         public void fileTransferRequest(final FileTransferRequest request) {
 
@@ -404,7 +404,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
     }
 
-    protected Transmitter ibb = new Transmitter() {
+    protected Transmitter xmppFileTransfer = new Transmitter() {
 
         public NetTransferMode send(TransferDescription data, byte[] content,
             SubMonitor progress) throws IOException, LocalCancellationException {
@@ -552,9 +552,9 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         Transmitter[] transmitters;
         if (forceFileTransferByChat) {
-            transmitters = new Transmitter[] { ibb };
+            transmitters = new Transmitter[] { xmppFileTransfer };
         } else {
-            transmitters = new Transmitter[] { jingle, ibb };
+            transmitters = new Transmitter[] { jingle, xmppFileTransfer };
         }
 
         progress.beginTask("Sending Data", transmitters.length * 70 + 15);
@@ -667,7 +667,7 @@ public class DataTransferManager implements ConnectionSessionListener {
 
         this.fileTransferManager = new FileTransferManager(connection);
         this.fileTransferManager
-            .addFileTransferListener(new IBBTransferListener());
+            .addFileTransferListener(new XMPPFileTransferListener());
 
         if (!preferenceUtils.forceFileTranserByChat()) {
             // Start Jingle Manager asynchronous

@@ -8,8 +8,8 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.InvitationInfo.InvitationExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -27,7 +27,7 @@ public class InvitationHandler {
         .getName());
 
     @Inject
-    protected XMPPChatTransmitter transmitter;
+    protected XMPPTransmitter transmitter;
 
     @Inject
     protected SessionManager sessionManager;
@@ -40,7 +40,7 @@ public class InvitationHandler {
 
     protected final SessionIDObservable sessionIDObservable;
 
-    public InvitationHandler(XMPPChatReceiver receiver,
+    public InvitationHandler(XMPPReceiver receiver,
         SessionIDObservable sessionIDObservablePar,
         final InvitationExtensionProvider invExtProv) {
         this.sessionIDObservable = sessionIDObservablePar;

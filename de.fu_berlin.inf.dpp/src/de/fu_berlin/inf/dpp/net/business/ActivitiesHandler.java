@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.IncomingTransferObject.IncomingTransferObjectExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.TimedActivities;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.TransferDescription.FileTransferType;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -52,7 +52,7 @@ public class ActivitiesHandler {
         .newCachedThreadPool(new NamedThreadFactory(
             "ActivitiesHandler-receiver-"));
 
-    public ActivitiesHandler(XMPPChatReceiver receiver,
+    public ActivitiesHandler(XMPPReceiver receiver,
         final ActivitiesExtensionProvider provider,
         final IncomingTransferObjectExtensionProvider incomingExtProv,
         final SessionIDObservable sessionID) {

@@ -38,7 +38,7 @@ import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.net.ITransmitter;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.ChecksumErrorExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -85,7 +85,7 @@ public class ConsistencyWatchdogHandler {
     protected Handler handler;
 
     public ConsistencyWatchdogHandler(SessionManager sessionManager,
-        XMPPChatReceiver receiver, SessionIDObservable sessionID) {
+        XMPPReceiver receiver, SessionIDObservable sessionID) {
 
         this.sessionIDObservable = sessionID;
         this.sessionManager = sessionManager;

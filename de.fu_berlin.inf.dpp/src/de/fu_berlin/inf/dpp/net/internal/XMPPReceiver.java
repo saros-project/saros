@@ -15,14 +15,14 @@ import de.fu_berlin.inf.dpp.net.internal.SarosPacketCollector.CancelHook;
 /**
  * Facade for receiving XMPP Packages. Kind of like the GodPacketListener!
  * 
- * XMPPChatReceiver implements addPacketListener and removePacketListener just
+ * XMPPReceiver implements addPacketListener and removePacketListener just
  * like a XMPPConnection but hides the complexity of dealing with new connection
  * objects appearing and old one's disappearing. Users can just register with
- * the XMPPChatReceiver for the whole application life-cycle.
+ * the XMPPReceiver for the whole application life-cycle.
  * 
  */
 @Component(module = "net")
-public class XMPPChatReceiver {
+public class XMPPReceiver {
 
     protected Map<PacketListener, PacketFilter> listeners = Collections
         .synchronizedMap(new HashMap<PacketListener, PacketFilter>());

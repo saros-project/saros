@@ -60,8 +60,8 @@ import de.fu_berlin.inf.dpp.net.RosterTracker;
 import de.fu_berlin.inf.dpp.net.business.DispatchThreadContext;
 import de.fu_berlin.inf.dpp.net.internal.DataTransferManager;
 import de.fu_berlin.inf.dpp.net.internal.DiscoveryManager;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
 import de.fu_berlin.inf.dpp.observables.SharedProjectObservable;
@@ -94,10 +94,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
     protected DiscoveryManager discoveryManager;
 
     @Inject
-    protected XMPPChatReceiver xmppReceiver;
+    protected XMPPReceiver xmppReceiver;
 
     @Inject
-    protected XMPPChatTransmitter transmitter;
+    protected XMPPTransmitter transmitter;
 
     @Inject
     protected DataTransferManager transferManager;

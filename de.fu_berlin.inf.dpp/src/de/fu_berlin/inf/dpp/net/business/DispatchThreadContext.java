@@ -22,7 +22,7 @@ public class DispatchThreadContext {
 
     protected ExecutorService dispatch = Executors
         .newSingleThreadExecutor(new NamedThreadFactory(
-            "XMPPChatTransmitter-Dispatch-"));
+            "XMPPTransmitter-Dispatch-"));
 
     /**
      * Execute the given runnable as if it was received via the network

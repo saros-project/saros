@@ -102,10 +102,10 @@ import de.fu_berlin.inf.dpp.util.VersionManager.VersionInfo;
  * provides convenience functions for sending messages.
  */
 @Component(module = "net")
-public class XMPPChatTransmitter implements ITransmitter,
+public class XMPPTransmitter implements ITransmitter,
     ConnectionSessionListener, IXMPPTransmitter {
 
-    private static Logger log = Logger.getLogger(XMPPChatTransmitter.class);
+    private static Logger log = Logger.getLogger(XMPPTransmitter.class);
 
     public static final int MAX_PARALLEL_SENDS = 10;
     public static final int MAX_TRANSFER_RETRIES = 5;
@@ -123,7 +123,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     protected List<MessageTransfer> messageTransferQueue;
 
     @Inject
-    protected XMPPChatReceiver receiver;
+    protected XMPPReceiver receiver;
 
     @Inject
     protected Saros saros;
@@ -178,7 +178,7 @@ public class XMPPChatTransmitter implements ITransmitter,
 
     protected DataTransferManager dataManager;
 
-    public XMPPChatTransmitter(SessionIDObservable sessionID,
+    public XMPPTransmitter(SessionIDObservable sessionID,
         DataTransferManager dataManager) {
 
         this.dataManager = dataManager;
@@ -286,7 +286,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     }
 
     /**
-     * Helper for receiving a Packet via XMPPChatReceiver using
+     * Helper for receiving a Packet via XMPPReceiver using
      * SarosPacketCollector.
      */
     protected SarosPacketCollector installReceiver(PacketFilter filter) {
@@ -615,7 +615,7 @@ public class XMPPChatTransmitter implements ITransmitter,
     public void sendFileChecksumErrorMessage(List<JID> recipients,
         Set<IPath> paths, boolean resolved) {
 
-        XMPPChatTransmitter.log.debug("Sending checksum message ("
+        XMPPTransmitter.log.debug("Sending checksum message ("
             + (resolved ? "resolved" : "error") + ") message of files "
             + Util.toOSString(paths) + " to " + recipients);
 
@@ -740,7 +740,7 @@ public class XMPPChatTransmitter implements ITransmitter,
              * #2577390
              */
             // remove participant if he/she is offline too long
-            if (participant.getOfflineSeconds() > XMPPChatTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
+            if (participant.getOfflineSeconds() > XMPPTransmitter.FORCEDPART_OFFLINEUSER_AFTERSECS) {
                 log.info("Removing offline user from session...");
                 sharedProject.getValue().removeUser(participant);
             } else {

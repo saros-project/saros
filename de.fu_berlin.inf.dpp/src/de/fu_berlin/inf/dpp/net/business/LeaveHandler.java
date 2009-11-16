@@ -7,7 +7,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.LeaveExtension;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -31,7 +31,7 @@ public class LeaveHandler {
     protected Handler handler;
 
     public LeaveHandler(SessionManager sessionManager,
-        XMPPChatReceiver receiver, SessionIDObservable sessionIDObservable) {
+        XMPPReceiver receiver, SessionIDObservable sessionIDObservable) {
 
         this.sessionManager = sessionManager;
         this.handler = new Handler(sessionIDObservable);

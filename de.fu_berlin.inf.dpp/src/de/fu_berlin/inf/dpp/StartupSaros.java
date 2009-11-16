@@ -32,7 +32,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 @Component(module = "integration")
 public class StartupSaros implements IStartup {
 
-    private Logger log = Logger.getLogger(StartupSaros.class.getName());
+    private static final Logger log = Logger.getLogger(StartupSaros.class);
 
     @Inject
     protected Saros saros;

@@ -11,7 +11,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A Saros Packet Extension is responsible for converting between the network
- * component (XMPPChatTransmitter) and the business logic
+ * component (XMPPTransmitter) and the business logic
  */
 public abstract class SarosDefaultPacketExtension implements PacketListener {
 

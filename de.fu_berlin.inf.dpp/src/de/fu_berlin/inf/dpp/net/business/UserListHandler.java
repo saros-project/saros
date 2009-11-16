@@ -9,8 +9,8 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.JoinExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.UserListInfo.UserListEntry;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
@@ -30,7 +30,7 @@ public class UserListHandler {
         .getName());
 
     @Inject
-    protected XMPPChatTransmitter transmitter;
+    protected XMPPTransmitter transmitter;
 
     @Inject
     protected SessionManager sessionManager;
@@ -43,7 +43,7 @@ public class UserListHandler {
 
     protected final SessionIDObservable sessionIDObservable;
 
-    public UserListHandler(XMPPChatReceiver receiver,
+    public UserListHandler(XMPPReceiver receiver,
         SessionIDObservable sessionIDObservablePar,
         final JoinExtensionProvider userListExtProv) {
         this.sessionIDObservable = sessionIDObservablePar;

@@ -9,7 +9,7 @@ import org.picocontainer.annotations.Inject;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.invitation.InvitationProcess;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
 import de.fu_berlin.inf.dpp.net.internal.extensions.CancelInviteExtension;
 import de.fu_berlin.inf.dpp.observables.InvitationProcessObservable;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -25,7 +25,7 @@ public class CancelInviteHandler extends CancelInviteExtension {
     protected InvitationProcessObservable invitationProcesses;
 
     public CancelInviteHandler(SessionIDObservable sessionID,
-        XMPPChatReceiver receiver) {
+        XMPPReceiver receiver) {
         super(sessionID);
         receiver.addPacketListener(this, getFilter());
     }

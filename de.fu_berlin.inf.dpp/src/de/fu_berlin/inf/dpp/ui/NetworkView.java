@@ -93,7 +93,7 @@ public class NetworkView extends ViewPart implements IConnectionListener {
     public void connectionStateChanged(XMPPConnection connection,
         ConnectionState newState) {
         if (newState == ConnectionState.CONNECTED) {
-            // ((XMPPChatTransmitter) Saros.getDefault().getSessionManager()
+            // ((XMPPTransmitter) Saros.getDefault().getSessionManager()
             // .getTransmitter()).getJingleManager()
             // .addJingleFileTransferListener(this);
 

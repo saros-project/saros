@@ -11,8 +11,8 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.net.TimedActivityDataObject;
 import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.extensions.PacketExtensionUtils;
 import de.fu_berlin.inf.dpp.net.internal.extensions.RequestActivityExtension;
 import de.fu_berlin.inf.dpp.observables.SessionIDObservable;
@@ -31,7 +31,7 @@ public class RequestForActivityHandler {
         .getLogger(RequestForActivityHandler.class.getName());
 
     @Inject
-    protected XMPPChatTransmitter transmitter;
+    protected XMPPTransmitter transmitter;
 
     @Inject
     protected ActivitiesExtensionProvider activitiesProvider;
@@ -43,7 +43,7 @@ public class RequestForActivityHandler {
     protected Handler handler;
 
     public RequestForActivityHandler(SessionManager sessionManager,
-        XMPPChatReceiver receiver, SessionIDObservable sessionID) {
+        XMPPReceiver receiver, SessionIDObservable sessionID) {
 
         this.sessionID = sessionID;
         this.sessionManager = sessionManager;

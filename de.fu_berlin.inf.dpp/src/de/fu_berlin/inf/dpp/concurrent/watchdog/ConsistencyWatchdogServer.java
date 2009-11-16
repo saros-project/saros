@@ -24,7 +24,7 @@ import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
 import de.fu_berlin.inf.dpp.net.ConnectionState;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
 import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.project.SessionManager;
@@ -65,7 +65,7 @@ public class ConsistencyWatchdogServer extends Job {
     protected EditorManager editorManager;
 
     @Inject
-    protected XMPPChatTransmitter transmitter;
+    protected XMPPTransmitter transmitter;
 
     protected SessionManager sessionManager;
 

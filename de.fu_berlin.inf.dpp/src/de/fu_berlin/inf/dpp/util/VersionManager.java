@@ -16,8 +16,8 @@ import org.osgi.framework.Version;
 import de.fu_berlin.inf.dpp.Saros;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.net.JID;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatReceiver;
-import de.fu_berlin.inf.dpp.net.internal.XMPPChatTransmitter;
+import de.fu_berlin.inf.dpp.net.internal.XMPPReceiver;
+import de.fu_berlin.inf.dpp.net.internal.XMPPTransmitter;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider;
 import de.fu_berlin.inf.dpp.net.internal.XStreamExtensionProvider.XStreamIQPacket;
 
@@ -208,13 +208,13 @@ public class VersionManager {
     /**
      * @Inject
      */
-    protected XMPPChatTransmitter transmitter;
+    protected XMPPTransmitter transmitter;
 
     protected XStreamExtensionProvider<VersionInfo> versionProvider = new XStreamExtensionProvider<VersionInfo>(
         "sarosVersion", VersionInfo.class, Version.class, Compatibility.class);
 
     public VersionManager(Bundle bundle, final Saros saros,
-        final XMPPChatReceiver receiver, XMPPChatTransmitter transmitter) {
+        final XMPPReceiver receiver, XMPPTransmitter transmitter) {
 
         this.bundle = bundle;
         this.saros = saros;
