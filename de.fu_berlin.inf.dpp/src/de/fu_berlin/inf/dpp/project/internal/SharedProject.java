@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.resources.IProject;
@@ -97,6 +98,8 @@ public class SharedProject implements ISharedProject, Disposable {
     protected FreeColors freeColors = null;
 
     protected DateTime sessionStart;
+
+    protected Object startStopSyncExternal = new Object();
 
     protected Blockable stopManagerListener = new Blockable() {
 
@@ -450,18 +453,22 @@ public class SharedProject implements ISharedProject, Disposable {
     public Thread requestTransmitter = null;
 
     public void start() {
-        if (!stopped) {
-            throw new IllegalStateException();
+        synchronized (stopped) {
+            if (!stopped.get()) {
+                throw new IllegalStateException();
+            }
+
+            activitySequencer.start();
+
+            stopped.set(false);
         }
-
-        activitySequencer.start();
-
-        stopped = false;
-
     }
 
     // TODO Review sendRequest for InterruptedException and remove this flag.
-    boolean stopped = true;
+    /**
+     * All accesses should be synchronized over {@link #stopped}.
+     */
+    protected AtomicBoolean stopped = new AtomicBoolean(true);
 
     /**
      * Stops the associated activityDataObject sequencer.
@@ -470,13 +477,19 @@ public class SharedProject implements ISharedProject, Disposable {
      *             if the shared project is already stopped.
      */
     public void stop() {
-        if (stopped) {
-            throw new IllegalStateException();
+        synchronized (stopped) {
+            if (stopped.get()) {
+                throw new IllegalStateException();
+            }
+
+            activitySequencer.stop();
+
+            stopped.set(true);
         }
+    }
 
-        activitySequencer.stop();
-
-        stopped = true;
+    public boolean isStopped() {
+        return stopped.get();
     }
 
     public void dispose() {
@@ -659,5 +672,9 @@ public class SharedProject implements ISharedProject, Disposable {
 
     public DateTime getSessionStart() {
         return sessionStart;
+    }
+
+    public Object getSartStopSyncObject() {
+        return startStopSyncExternal;
     }
 }

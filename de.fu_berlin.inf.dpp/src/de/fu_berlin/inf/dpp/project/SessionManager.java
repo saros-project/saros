@@ -153,7 +153,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
 
         this.currentlySharedProject.setValue(sharedProject);
 
-        sharedProject.start();
+        synchronized (sharedProject.getSartStopSyncObject()) {
+            if (!sharedProject.isStopped())
+                sharedProject.start();
+        }
 
         for (ISessionListener listener : this.listeners) {
             listener.sessionStarted(sharedProject);
@@ -211,7 +214,10 @@ public class SessionManager implements IConnectionListener, ISessionManager {
             this.transmitter.sendLeaveMessage(project);
 
             try {
-                project.stop();
+                synchronized (project.getSartStopSyncObject()) {
+                    if (!project.isStopped())
+                        project.stop();
+                }
                 project.dispose();
             } catch (RuntimeException e) {
                 log.error("Error stopping project: ", e);
