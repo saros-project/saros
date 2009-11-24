@@ -4,9 +4,9 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public class ViewportActivity extends AbstractActivity {
 
@@ -14,8 +14,9 @@ public class ViewportActivity extends AbstractActivity {
     protected final int bottomIndex;
     protected final IPath path;
 
-    public ViewportActivity(JID source, int topIndex, int bottomIndex,
+    public ViewportActivity(User source, int topIndex, int bottomIndex,
         IPath editor) {
+
         super(source);
 
         if (editor == null) {
@@ -30,7 +31,8 @@ public class ViewportActivity extends AbstractActivity {
         this.path = editor;
     }
 
-    public ViewportActivity(JID source, ILineRange viewport, IPath editor) {
+    public ViewportActivity(User source, ILineRange viewport, IPath editor) {
+
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);
@@ -98,7 +100,7 @@ public class ViewportActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new ViewportActivityDataObject(source, topIndex, bottomIndex,
-            path);
+        return new ViewportActivityDataObject(source.getJID(), topIndex,
+            bottomIndex, path);
     }
 }

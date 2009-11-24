@@ -231,9 +231,8 @@ public class ConsistencyWatchdogServer extends Job {
 
                     // Sent an checksum to everybody
                     ChecksumActivity checksumActivity = new ChecksumActivity(
-                        sharedProject.getLocalUser().getJID(), checksum
-                            .getPath(), checksum.getHash(), checksum
-                            .getLength());
+                        sharedProject.getLocalUser(), checksum.getPath(),
+                        checksum.getHash(), checksum.getLength());
 
                     sharedProject.activityCreated(checksumActivity);
 

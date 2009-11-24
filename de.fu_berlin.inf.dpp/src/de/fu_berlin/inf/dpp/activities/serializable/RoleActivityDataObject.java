@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -27,6 +27,7 @@ import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.RoleActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.xstream.JIDConverter;
 
 /**
@@ -107,7 +108,8 @@ public class RoleActivityDataObject extends AbstractActivityDataObject {
         receiver.receive(this);
     }
 
-    public IActivity getActivity() {
-        return new RoleActivity(source, affectedUser, role);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new RoleActivity(sharedProject.getUser(source), sharedProject
+            .getUser(affectedUser), role);
     }
 }

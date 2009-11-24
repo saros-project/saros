@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.User;
 
 /**
  * handler for simulated network events.
@@ -18,7 +18,7 @@ public interface NetworkEventHandler {
     public void receiveNetworkEvent(NetworkRequest req);
 
     /**
-     * network Jabber id of appropriate client.
+     * User of appropriate client.
      */
-    public JID getJID();
+    public User getUser();
 }

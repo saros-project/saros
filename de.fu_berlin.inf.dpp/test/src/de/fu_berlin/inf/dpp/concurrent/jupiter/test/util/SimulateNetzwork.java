@@ -52,13 +52,13 @@ public class SimulateNetzwork {
     }
 
     public void addClient(NetworkEventHandler remote) {
-        if (!clients.containsKey(remote.getJID())) {
-            clients.put(remote.getJID(), remote);
+        if (!clients.containsKey(remote.getUser().getJID())) {
+            clients.put(remote.getUser().getJID(), remote);
         }
     }
 
     public void removeClient(NetworkEventHandler remote) {
-        clients.remove(remote.getJID());
+        clients.remove(remote.getUser().getJID());
     }
 
     public RuntimeException getLastError() {

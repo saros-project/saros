@@ -192,22 +192,17 @@ public class PingPongCentral extends AbstractActivityProvider {
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(PingPongActivity pingPongActivityDataObject) {
+        public void receive(PingPongActivity pingPongActivity) {
 
-            User initiator = sharedProject.getUser(pingPongActivityDataObject
-                .getInitiator());
-            User sender = sharedProject.getUser(pingPongActivityDataObject
-                .getSource());
+            User initiator = pingPongActivity.getInitiator();
 
             if (initiator.isLocal()) {
-
-                stats.get(sender).add(pingPongActivityDataObject);
-
+                User sender = pingPongActivity.getSource();
+                stats.get(sender).add(pingPongActivity);
             } else {
                 // This is the ping from another user
-                sharedProject.sendActivity(initiator,
-                    pingPongActivityDataObject.createPong(sharedProject
-                        .getLocalUser()));
+                sharedProject.sendActivity(initiator, pingPongActivity
+                    .createPong(sharedProject.getLocalUser()));
             }
         }
     };

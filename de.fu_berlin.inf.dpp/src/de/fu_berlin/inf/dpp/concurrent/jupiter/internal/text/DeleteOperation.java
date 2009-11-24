@@ -31,8 +31,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
@@ -126,7 +126,7 @@ public class DeleteOperation implements ITextOperation {
         return result;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, JID source) {
+    public List<TextEditActivity> toTextEdit(IPath path, User source) {
         return Collections.singletonList(new TextEditActivity(source,
             getPosition(), "", getText(), path));
     }

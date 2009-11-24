@@ -506,8 +506,8 @@ public class UndoManager implements Disposable, IActivityProvider {
             return;
         }
 
-        for (TextEditActivity activity : op
-            .toTextEdit(editor, saros.getMyJID())) {
+        for (TextEditActivity activity : op.toTextEdit(editor, sharedProject
+            .getLocalUser())) {
             log.debug("undone: " + activity + " in " + editor);
             fireActivity(activity);
         }
@@ -517,8 +517,8 @@ public class UndoManager implements Disposable, IActivityProvider {
 
         Operation op = calcRedoOperation(editor);
 
-        for (TextEditActivity activity : op
-            .toTextEdit(editor, saros.getMyJID())) {
+        for (TextEditActivity activity : op.toTextEdit(editor, sharedProject
+            .getLocalUser())) {
             log.debug("redone: " + activity + " in " + editor);
             fireActivity(activity);
         }

@@ -1,8 +1,8 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.StopActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A StopActivity is used for signaling to a user that he should be stopped or
@@ -11,10 +11,10 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class StopActivity extends AbstractActivity {
 
-    protected JID initiator;
+    protected User initiator;
 
     // the user who has to be locked / unlocked
-    protected JID user;
+    protected User user;
 
     public enum Type {
         LOCKREQUEST, UNLOCKREQUEST
@@ -31,7 +31,7 @@ public class StopActivity extends AbstractActivity {
     // a stop activityDataObject has a unique id
     protected String stopActivityID;
 
-    public StopActivity(JID source, JID initiator, JID user, Type type,
+    public StopActivity(User source, User initiator, User user, Type type,
         State state, String stopActivityID) {
 
         super(source);
@@ -97,7 +97,7 @@ public class StopActivity extends AbstractActivity {
     /**
      * The user to be locked/unlocked by this activityDataObject
      */
-    public JID getUser() {
+    public User getUser() {
         return user;
     }
 
@@ -106,7 +106,7 @@ public class StopActivity extends AbstractActivity {
      * 
      * (in most cases this should be the host)
      */
-    public JID getInitiator() {
+    public User getInitiator() {
         return initiator;
     }
 
@@ -116,7 +116,7 @@ public class StopActivity extends AbstractActivity {
      * This method is a convenience method for getting the user or initiator
      * based on the state of this stop activityDataObject.
      */
-    public JID getRecipient() {
+    public User getRecipient() {
         switch (getState()) {
         case INITIATED:
             return getUser();
@@ -132,7 +132,7 @@ public class StopActivity extends AbstractActivity {
         return state;
     }
 
-    public StopActivity generateAcknowledgment(JID source) {
+    public StopActivity generateAcknowledgment(User source) {
         return new StopActivity(source, initiator, user, type,
             State.ACKNOWLEDGED, stopActivityID);
     }
@@ -166,7 +166,7 @@ public class StopActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new StopActivityDataObject(source, initiator, user, type, state,
-            stopActivityID);
+        return new StopActivityDataObject(source.getJID(), initiator.getJID(),
+            user.getJID(), type, state, stopActivityID);
     }
 }

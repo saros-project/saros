@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -28,46 +29,46 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     private Document doc;
     private Algorithm algorithm;
 
-    protected JID jid;
+    protected User user;
     private JID server_jid;
     private SimulateNetzwork connection;
 
     private HashMap<String, JupiterDocumentListener> documentListener = new HashMap<String, JupiterDocumentListener>();
 
     public ClientSynchronizedDocument(JID server, String content,
-        SimulateNetzwork con, JID jid) {
+        SimulateNetzwork con, User user) {
         this.server_jid = server;
         this.doc = new Document(content);
         this.algorithm = new Jupiter(true);
         this.connection = con;
-        this.jid = jid;
+        this.user = user;
     }
 
     public JID getJID() {
-        return this.jid;
+        return user.getJID();
     }
 
-    public void setJID(JID jid) {
-        this.jid = jid;
+    public User getUser() {
+        return this.user;
     }
 
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            log.debug("Client: " + jid + " receive "
+            log.debug("Client: " + user + " receive "
                 + jupiterActivity.getOperation().toString());
             /* 1. transform operation. */
             op = algorithm.receiveJupiterActivity(jupiterActivity);
             // op =
             // algorithm.receiveTransformedJupiterActivity(jupiterActivity);
             /* 2. execution on server document */
-            log.info("" + jid + " exec: " + op.toString());
+            log.info("" + user + " exec: " + op.toString());
             doc.execOperation(op);
         } catch (RuntimeException e) {
-            log.error("" + jid + " fail: ", e);
+            log.error("" + user + " fail: ", e);
             throw e;
         } catch (Exception e) {
-            log.error("" + jid + " fail: ", e);
+            log.error("" + user + " fail: ", e);
             throw new RuntimeException(e);
         }
         return op;
@@ -78,7 +79,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void sendOperation(Operation op, int delay) {
-        log.info(jid + " send: " + op.toString());
+        log.info(user + " send: " + op.toString());
         sendOperation(server_jid, op, delay);
     }
 
@@ -89,17 +90,17 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
 
         /* 2. transform operation. */
         JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
-            jid, null);
+            user, null);
 
         /* 3. send operation. */
-        connection.sendOperation(new NetworkRequest(this.jid, remoteJid,
+        connection.sendOperation(new NetworkRequest(this.user, remoteJid,
             jupiterActivity), delay);
 
         informListener();
     }
 
     public void receiveNetworkEvent(JupiterActivity jupiterActivity) {
-        log.info(this.jid + " receive operation : "
+        log.info(this.user + " receive operation : "
             + jupiterActivity.getOperation().toString());
         receiveOperation(jupiterActivity);
         informListener();
@@ -110,7 +111,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
     }
 
     public void receiveNetworkEvent(NetworkRequest req) {
-        log.info(this.jid + " recv: "
+        log.info(this.user + " recv: "
             + req.getJupiterActivity().getOperation().toString()
             + " timestamp : " + req.getJupiterActivity().getTimestamp());
         receiveOperation(req.getJupiterActivity());
@@ -123,7 +124,7 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
 
     private void informListener() {
         for (String key : documentListener.keySet()) {
-            documentListener.get(key).documentAction(jid);
+            documentListener.get(key).documentAction(user.getJID());
         }
     }
 

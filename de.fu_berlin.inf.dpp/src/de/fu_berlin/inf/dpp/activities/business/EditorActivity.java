@@ -21,9 +21,9 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A text load activityDataObject activates a new resource. If the path is
@@ -45,7 +45,8 @@ public class EditorActivity extends AbstractActivity {
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivity(JID source, Type type, IPath path) {
+    public EditorActivity(User source, Type type, IPath path) {
+
         super(source);
         if ((type != Type.Activated) && (path == null)) {
             throw new IllegalArgumentException(
@@ -114,6 +115,6 @@ public class EditorActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new EditorActivityDataObject(source, type, path);
+        return new EditorActivityDataObject(source.getJID(), type, path);
     }
 }

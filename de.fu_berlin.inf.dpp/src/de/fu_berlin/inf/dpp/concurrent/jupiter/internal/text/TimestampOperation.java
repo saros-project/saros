@@ -7,9 +7,9 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This operation contains a new vector time for the algorithm.
@@ -54,7 +54,7 @@ public class TimestampOperation implements Operation {
         return hashcode;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, JID source) {
+    public List<TextEditActivity> toTextEdit(IPath path, User source) {
         return Collections.emptyList();
     }
 

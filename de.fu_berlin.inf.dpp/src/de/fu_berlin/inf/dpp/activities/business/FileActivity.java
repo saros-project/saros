@@ -8,9 +8,9 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public class FileActivity extends AbstractActivity implements IResourceObject {
 
@@ -42,7 +42,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      * @param path
      *            the path of the file to copy the data from
      */
-    public static FileActivity created(IProject project, JID source,
+    public static FileActivity created(IProject project, User source,
         IPath path, Purpose purpose) throws IOException {
 
         // TODO Use Eclipse Method of getting the contents of a file:
@@ -90,7 +90,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      * @throws IOException
      *             the new content of the file could not be read
      */
-    public static FileActivity moved(IProject project, JID source,
+    public static FileActivity moved(IProject project, User source,
         IPath destPath, IPath sourcePath, boolean contentChange)
         throws IOException {
 
@@ -110,7 +110,8 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      * @param path
      *            the path of the file to remove
      */
-    public static FileActivity removed(JID source, IPath path, Purpose purpose) {
+    public static FileActivity removed(User source, IPath path, Purpose purpose) {
+
         return new FileActivity(source, Type.Removed, path, null, null, purpose);
     }
 
@@ -130,8 +131,9 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivity(JID source, Type type, IPath newPath, IPath oldPath,
+    public FileActivity(User source, Type type, IPath newPath, IPath oldPath,
         byte[] data, Purpose purpose) {
+
         super(source);
 
         if (type == null || purpose == null)
@@ -242,7 +244,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new FileActivityDataObject(source, type, newPath, oldPath, data,
-            purpose);
+        return new FileActivityDataObject(source.getJID(), type, newPath,
+            oldPath, data, purpose);
     }
 }

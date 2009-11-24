@@ -1,13 +1,13 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.User;
 
 public class TwoWayJupiterClientDocument extends ClientSynchronizedDocument {
 
-    public static final JID jidClient = new JID("Client");
+    public static final User client = JupiterTestCase.createUserMock("Client");
 
     public TwoWayJupiterClientDocument(String content, SimulateNetzwork con) {
-        super(TwoWayJupiterServerDocument.jidServer, content, con, jidClient);
+        super(TwoWayJupiterServerDocument.server.getJID(), content, con, client);
     }
 
 }

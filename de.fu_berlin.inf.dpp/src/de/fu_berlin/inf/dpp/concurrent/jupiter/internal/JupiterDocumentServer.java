@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -48,10 +49,10 @@ public class JupiterDocumentServer {
 
         Map<JID, JupiterActivity> result = new HashMap<JID, JupiterActivity>();
 
-        JID source = jupiterActivity.getSource();
+        User source = jupiterActivity.getSource();
 
         // 1. Use JupiterClient of sender to transform JupiterActivity
-        Jupiter sourceProxy = proxies.get(source);
+        Jupiter sourceProxy = proxies.get(source.getJID());
         Operation op = sourceProxy.receiveJupiterActivity(jupiterActivity);
 
         // 2. Generate outgoing JupiterActivities for all other clients and the
@@ -61,7 +62,7 @@ public class JupiterDocumentServer {
             JID jid = entry.getKey();
 
             // Skip sender
-            if (jid.equals(source))
+            if (jid.equals(source.getJID()))
                 continue;
 
             Jupiter remoteProxy = entry.getValue();
@@ -107,17 +108,16 @@ public class JupiterDocumentServer {
     }
 
     public Map<JID, ChecksumActivity> withTimestamp(
-        ChecksumActivity checksumActivityDataObject)
-        throws TransformationException {
+        ChecksumActivity checksumActivity) throws TransformationException {
 
         Map<JID, ChecksumActivity> result = new HashMap<JID, ChecksumActivity>();
 
-        JID source = checksumActivityDataObject.getSource();
+        User source = checksumActivity.getSource();
 
         // 1. Verify that this checksum can still be sent to others...
-        Jupiter sourceProxy = proxies.get(source);
+        Jupiter sourceProxy = proxies.get(source.getJID());
 
-        boolean isCurrent = sourceProxy.isCurrent(checksumActivityDataObject
+        boolean isCurrent = sourceProxy.isCurrent(checksumActivity
             .getTimestamp());
 
         if (!isCurrent)
@@ -129,12 +129,12 @@ public class JupiterDocumentServer {
             JID jid = entry.getKey();
 
             // Skip sender
-            if (jid.equals(source))
+            if (jid.equals(source.getJID()))
                 continue;
 
             Jupiter remoteProxy = entry.getValue();
 
-            ChecksumActivity timestamped = checksumActivityDataObject
+            ChecksumActivity timestamped = checksumActivity
                 .withTimestamp(remoteProxy.getTimestamp());
             result.put(jid, timestamped);
         }

@@ -253,11 +253,8 @@ public class RemoteEditorManager {
         return result;
     }
 
-    public void exec(IActivity activityDataObject) {
-
-        User sender = sharedProject.getUser(activityDataObject.getSource());
-
-        getEditorState(sender).exec(activityDataObject);
+    public void exec(IActivity activity) {
+        getEditorState(activity.getSource()).exec(activity);
     }
 
     /**

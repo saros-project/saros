@@ -19,8 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * An interface for all things that occur in a shared project session such as
@@ -37,10 +37,9 @@ import de.fu_berlin.inf.dpp.net.JID;
 public interface IActivity {
 
     /**
-     * Returns the Jabber ID of the user which has caused this
-     * activityDataObject.
+     * Returns the the user which has caused this activityDataObject.
      */
-    public JID getSource();
+    public User getSource();
 
     /**
      * The activityDataObject will call the receive method of the given receiver

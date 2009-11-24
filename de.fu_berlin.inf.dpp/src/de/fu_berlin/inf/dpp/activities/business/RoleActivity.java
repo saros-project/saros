@@ -19,10 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.User.UserRole;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.RoleActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A role activityDataObject indicates that a user has a new Role in the
@@ -31,13 +31,14 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class RoleActivity extends AbstractActivity {
 
     protected final UserRole role;
-    protected final JID affectedUser;
+    protected final User affectedUser;
 
     /**
      * Creates a new RoleActivity which indicates that the given user should
      * change into the given role.
      */
-    public RoleActivity(JID source, JID affectedUser, UserRole role) {
+    public RoleActivity(User source, User affectedUser, UserRole role) {
+
         super(source);
         this.affectedUser = affectedUser;
         this.role = role;
@@ -75,7 +76,7 @@ public class RoleActivity extends AbstractActivity {
         return true;
     }
 
-    public JID getAffectedUser() {
+    public User getAffectedUser() {
         return affectedUser;
     }
 
@@ -98,6 +99,7 @@ public class RoleActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new RoleActivityDataObject(source, affectedUser, role);
+        return new RoleActivityDataObject(source.getJID(), affectedUser
+            .getJID(), role);
     }
 }

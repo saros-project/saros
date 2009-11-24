@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -30,6 +30,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 @XStreamAlias("textSelectionActivity")
 public class TextSelectionActivityDataObject extends AbstractActivityDataObject {
@@ -110,7 +111,8 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
         receiver.receive(this);
     }
 
-    public IActivity getActivity() {
-        return new TextSelectionActivity(source, offset, length, editor);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new TextSelectionActivity(sharedProject.getUser(source), offset,
+            length, editor);
     }
 }

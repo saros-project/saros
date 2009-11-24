@@ -112,17 +112,15 @@ public class RoleManager implements IActivityProvider {
      * 
      * @see de.fu_berlin.inf.dpp.IActivityProvider
      */
-    public void exec(IActivity activityDataObject) {
-        if (activityDataObject instanceof RoleActivity) {
-            RoleActivity roleActivityDataObject = (RoleActivity) activityDataObject;
-            User user = this.sharedProject.getUser(roleActivityDataObject
-                .getAffectedUser());
-            if (user == null) {
-                throw new IllegalArgumentException("User "
-                    + roleActivityDataObject.getAffectedUser()
+    public void exec(IActivity activity) {
+        if (activity instanceof RoleActivity) {
+            RoleActivity roleActivity = (RoleActivity) activity;
+            User user = roleActivity.getAffectedUser();
+            if (!user.isInSharedProject()) {
+                throw new IllegalArgumentException("User " + user
                     + " is not a participant in this shared project");
             }
-            UserRole role = roleActivityDataObject.getRole();
+            UserRole role = roleActivity.getRole();
             this.sharedProject.setUserRole(user, role);
         }
     }

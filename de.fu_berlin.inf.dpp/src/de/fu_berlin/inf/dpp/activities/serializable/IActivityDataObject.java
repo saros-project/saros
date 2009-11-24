@@ -21,6 +21,7 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * An interface for all things that occur in a shared project session such as
@@ -66,6 +67,5 @@ public interface IActivityDataObject {
      */
     public void dispatch(IActivityDataObjectReceiver receiver);
 
-    public IActivity getActivity();
-
+    public IActivity getActivity(ISharedProject sharedProject);
 }

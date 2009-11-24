@@ -1,30 +1,41 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.replay;
 import junit.framework.TestCase;
 
 import org.apache.log4j.PropertyConfigurator;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.net.JID;
 
 public abstract class JupiterTestCase extends TestCase {
 
-    public JID jidServer = new JID("Server");
-    public JID jidC1 = new JID("Alice");
-    public JID jidAlice = jidC1;
-    public JID jidC2 = new JID("Bob");
-    public JID jidBob = jidC2;
-    public JID jidC3 = new JID("Carl");
-    public JID jidCarl = jidC3;
+    /**
+     * User mock objects that expect calls to User#getJID any number of times.
+     * 
+     * @see JupiterTestCase#setUp()
+     */
+    public User alice;
+    public User bob;
+    public User carl;
+    public User host;
+
+    protected SimulateNetzwork network;
 
     static {
         PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
     }
 
-    protected SimulateNetzwork network;
-
     @Override
     public void setUp() {
         network = new SimulateNetzwork();
+
+        alice = createUserMock("alice");
+        bob = createUserMock("bob");
+        carl = createUserMock("carl");
+        host = createUserMock("host");
     }
 
     public static void assertEqualDocs(String s, DocumentTestChecker... docs) {
@@ -39,20 +50,28 @@ public abstract class JupiterTestCase extends TestCase {
 
         // Create Server
         ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(network,
-            jidServer);
+            host);
 
         network.addClient(s1);
 
         ClientSynchronizedDocument[] result = new ClientSynchronizedDocument[number];
 
         for (int i = 0; i < result.length; i++) {
-            result[i] = new ClientSynchronizedDocument(jidServer, initialText,
-                network, new JID("C" + i));
+            result[i] = new ClientSynchronizedDocument(host.getJID(),
+                initialText, network, createUserMock("Client" + i));
             network.addClient(result[i]);
-            s1.addProxyClient(result[i].getJID());
+            s1.addProxyClient(result[i].getUser());
         }
 
         Thread.sleep(100);
+        return result;
+    }
+
+    public static User createUserMock(String name) {
+        User result = createMock(User.class);
+        expect(result.getJID()).andReturn(new JID(name + "@jabber.org"))
+            .anyTimes();
+        replay(result);
         return result;
     }
 }

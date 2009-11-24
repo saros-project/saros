@@ -1,9 +1,10 @@
 package de.fu_berlin.inf.dpp.concurrent.jupiter.test.puzzles;
 
 /**
- * This test class represent local execution of document changes and 
+ * This test class represent local execution of document changes and
  * appropriate jupiter operations.
  */
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -11,7 +12,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.Document;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public class SimpleJupiterDocumentTest extends JupiterTestCase {
 
@@ -30,8 +30,10 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
         doc.execOperation(op);
         assertEquals("abdc", doc.getDocument());
 
+        User user = JupiterTestCase.createUserMock("user");
+
         JupiterActivity jupiterActivity = algo.generateJupiterActivity(op,
-            new JID("jid@jabber.cc"), null);
+            user, null);
         assertTrue(jupiterActivity.getOperation().equals(op));
 
         /* insert one short string. */
@@ -39,8 +41,7 @@ public class SimpleJupiterDocumentTest extends JupiterTestCase {
         doc.execOperation(op);
         assertEquals("abinsertdc", doc.getDocument());
 
-        jupiterActivity = algo.generateJupiterActivity(op, new JID(
-            "jid@jabber.cc"), null);
+        jupiterActivity = algo.generateJupiterActivity(op, user, null);
         System.out.println(jupiterActivity.getOperation().toString());
 
     }

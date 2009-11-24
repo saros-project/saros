@@ -2,11 +2,11 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A JupiterActivity is an Activity that can be handled by the Jupiter
@@ -25,7 +25,8 @@ public class JupiterActivity extends AbstractActivity {
     private IPath editor;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
-        JID source, IPath editor) {
+        User source, IPath editor) {
+
         super(source);
         this.timestamp = timestamp;
         this.operation = operation;
@@ -105,7 +106,7 @@ public class JupiterActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new JupiterActivityDataObject(timestamp, operation, source,
-            editor);
+        return new JupiterActivityDataObject(timestamp, operation, source
+            .getJID(), editor);
     }
 }

@@ -5,7 +5,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ServerSynchronizedDocument;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * this test case simulate the unsolved dOPT Puzzle scenario which described in
@@ -24,47 +23,42 @@ public class DOptPuzzleTest extends JupiterTestCase {
      * @throws Exception
      */
     public void testThreeConcurrentInsertOperations() throws Exception {
-        JID jid_c1 = new JID("ori79@jabber.cc");
-        JID jid_c2 = new JID("ori80@jabber.cc");
-        JID jid_c3 = new JID("ori81@jabber.cc");
-        JID jid_server = new JID("ori78@jabber.cc");
-
         /* init simulated client and server components. */
-        ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(
-            jid_server, "abcd", network, jid_c1);
-        ClientSynchronizedDocument c2 = new ClientSynchronizedDocument(
-            jid_server, "abcd", network, jid_c2);
-        ClientSynchronizedDocument c3 = new ClientSynchronizedDocument(
-            jid_server, "abcd", network, jid_c3);
-        ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(network,
-            jid_server);
+        ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
+            host.getJID(), "abcd", network, alice);
+        ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
+            host.getJID(), "abcd", network, bob);
+        ClientSynchronizedDocument client_3 = new ClientSynchronizedDocument(
+            host.getJID(), "abcd", network, carl);
+        ServerSynchronizedDocument server = new ServerSynchronizedDocument(
+            network, host);
 
         /* connect all with simulated network. */
-        network.addClient(c1);
-        network.addClient(c2);
-        network.addClient(c3);
-        network.addClient(s1);
+        network.addClient(client_1);
+        network.addClient(client_2);
+        network.addClient(client_3);
+        network.addClient(server);
 
         /* create proxyqueues. */
-        s1.addProxyClient(jid_c1);
-        s1.addProxyClient(jid_c2);
-        s1.addProxyClient(jid_c3);
+        server.addProxyClient(alice);
+        server.addProxyClient(bob);
+        server.addProxyClient(carl);
 
         Thread.sleep(100);
 
         /* O3 || O2 */
-        c3.sendOperation(new InsertOperation(0, "z"), 100);
-        c2.sendOperation(new InsertOperation(0, "x"), 700);
+        client_3.sendOperation(new InsertOperation(0, "z"), 100);
+        client_2.sendOperation(new InsertOperation(0, "x"), 700);
 
         Thread.sleep(300);
         /* O1 -> O3 */
-        c1.sendOperation(new InsertOperation(0, "y"), 100);
+        client_1.sendOperation(new InsertOperation(0, "y"), 100);
 
         Thread.sleep(700);
 
-        assertEquals(c1.getDocument(), c2.getDocument());
-        assertEquals(c2.getDocument(), c3.getDocument());
-        System.out.println(c1.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
+        assertEquals(client_2.getDocument(), client_3.getDocument());
+        System.out.println(client_1.getDocument());
     }
 
     /**
@@ -75,19 +69,19 @@ public class DOptPuzzleTest extends JupiterTestCase {
      */
     public void testThreeConcurrentInsertStringOperations() throws Exception {
 
-        ClientSynchronizedDocument[] c = setUp(3, "abcd");
+        ClientSynchronizedDocument[] clients = setUp(3, "abcd");
 
         /* O2 || O1 */
-        c[2].sendOperation(new InsertOperation(0, "zzz"), 100);
-        c[1].sendOperation(new InsertOperation(0, "x"), 700);
+        clients[2].sendOperation(new InsertOperation(0, "zzz"), 100);
+        clients[1].sendOperation(new InsertOperation(0, "x"), 700);
 
         Thread.sleep(300);
         /* O0 -> O2 */
-        c[0].sendOperation(new InsertOperation(0, "yy"), 100);
+        clients[0].sendOperation(new InsertOperation(0, "yy"), 100);
 
         Thread.sleep(700);
 
-        assertEqualDocs("yyzzzxabcd", c);
+        assertEqualDocs("yyzzzxabcd", clients);
     }
 
     /**
@@ -98,16 +92,16 @@ public class DOptPuzzleTest extends JupiterTestCase {
      */
     public void testThreeConcurrentDeleteOperations() throws Exception {
 
-        ClientSynchronizedDocument[] c = setUp(3, "abcdefg");
+        ClientSynchronizedDocument[] clients = setUp(3, "abcdefg");
 
-        c[0].sendOperation(new DeleteOperation(0, "a"), 100);
+        clients[0].sendOperation(new DeleteOperation(0, "a"), 100);
         Thread.sleep(300);
-        c[2].sendOperation(new DeleteOperation(1, "cde"), 500);
-        c[1].sendOperation(new DeleteOperation(3, "e"), 300);
+        clients[2].sendOperation(new DeleteOperation(1, "cde"), 500);
+        clients[1].sendOperation(new DeleteOperation(3, "e"), 300);
 
         Thread.sleep(1000);
 
-        assertEqualDocs("bfg", c);
+        assertEqualDocs("bfg", clients);
     }
 
     /**
@@ -117,18 +111,18 @@ public class DOptPuzzleTest extends JupiterTestCase {
      */
     public void testConcurrentInsertDeleteOperations() throws Exception {
 
-        ClientSynchronizedDocument[] c = setUp(3, "abc");
+        ClientSynchronizedDocument[] clients = setUp(3, "abc");
 
-        c[0].sendOperation(new InsertOperation(0, "a"), 0);
-        c[1].sendOperation(new InsertOperation(1, "b"), 100);
+        clients[0].sendOperation(new InsertOperation(0, "a"), 0);
+        clients[1].sendOperation(new InsertOperation(1, "b"), 100);
 
         Thread.sleep(200);
-        c[2].sendOperation(new DeleteOperation(1, "ab"), 700);
-        c[1].sendOperation(new InsertOperation(2, "by"), 100);
-        c[0].sendOperation(new InsertOperation(1, "x"), 400);
+        clients[2].sendOperation(new DeleteOperation(1, "ab"), 700);
+        clients[1].sendOperation(new InsertOperation(2, "by"), 100);
+        clients[0].sendOperation(new InsertOperation(1, "x"), 400);
 
         Thread.sleep(1000);
 
-        assertEqualDocs("axbybc", c);
+        assertEqualDocs("axbybc", clients);
     }
 }

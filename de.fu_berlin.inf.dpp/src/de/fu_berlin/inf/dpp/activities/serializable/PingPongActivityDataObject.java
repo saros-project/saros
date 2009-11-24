@@ -7,6 +7,7 @@ import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.PingPongActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 /**
  * TODO No XStream annotations. How does this look like when serialized!?
@@ -14,8 +15,8 @@ import de.fu_berlin.inf.dpp.net.JID;
  */
 public class PingPongActivityDataObject extends AbstractActivityDataObject {
 
-    public JID initiator;
-    public DateTime departureTime;
+    protected JID initiator;
+    protected DateTime departureTime;
 
     public PingPongActivityDataObject(JID source) {
         super(source);
@@ -65,7 +66,8 @@ public class PingPongActivityDataObject extends AbstractActivityDataObject {
         receiver.receive(this);
     }
 
-    public IActivity getActivity() {
-        return new PingPongActivity(source, initiator, departureTime);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new PingPongActivity(sharedProject.getUser(source),
+            sharedProject.getUser(initiator), departureTime);
     }
 }

@@ -2,9 +2,9 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public class FolderActivity extends AbstractActivity implements IResourceObject {
 
@@ -16,7 +16,7 @@ public class FolderActivity extends AbstractActivity implements IResourceObject 
     private final IPath path;
     private IPath oldPath;
 
-    public FolderActivity(JID source, Type type, IPath path) {
+    public FolderActivity(User source, Type type, IPath path) {
         super(source);
         this.type = type;
         this.path = path;
@@ -93,7 +93,7 @@ public class FolderActivity extends AbstractActivity implements IResourceObject 
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new FolderActivityDataObject(source, type, oldPath);
+        return new FolderActivityDataObject(source.getJID(), type, oldPath);
     }
 
 }

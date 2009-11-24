@@ -2,6 +2,7 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter.test.util;
 
 import org.apache.log4j.Logger;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -22,27 +23,27 @@ public class ProxySynchronizedQueue {
 
     private Algorithm algorithm;
     private SimulateNetzwork connection;
-    private JID jid;
+    private User user;
 
-    public ProxySynchronizedQueue(JID jid, SimulateNetzwork con) {
-        this.jid = jid;
+    public ProxySynchronizedQueue(User user, SimulateNetzwork connection) {
+        this.user = user;
         this.algorithm = new Jupiter(false);
-        this.connection = con;
+        this.connection = connection;
     }
 
     public JID getJID() {
-        return jid;
+        return user.getJID();
     }
 
     public Operation receiveOperation(JupiterActivity jupiterActivity) {
         Operation op = null;
         try {
-            log.debug(jid + ": Operation before OT:"
+            log.debug(user + ": Operation before OT:"
                 + jupiterActivity.getOperation().toString());
 
             op = algorithm.receiveJupiterActivity(jupiterActivity);
 
-            log.debug(jid + ": Operation after OT: " + op.toString());
+            log.debug(user + ": Operation after OT: " + op.toString());
         } catch (TransformationException e) {
             throw new RuntimeException(e);
         }
@@ -51,8 +52,8 @@ public class ProxySynchronizedQueue {
 
     public void sendOperation(Operation op) {
         JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
-            this.jid, null);
-        connection.sendOperation(new NetworkRequest(this.jid, jid,
+            this.user, null);
+        connection.sendOperation(new NetworkRequest(this.user, user.getJID(),
             jupiterActivity), 0);
     }
 

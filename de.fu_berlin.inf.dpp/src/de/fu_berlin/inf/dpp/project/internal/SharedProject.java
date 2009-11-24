@@ -264,8 +264,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivity(getLocalUser().getJID(),
-                        user.getJID(), newRole));
+                    activityCreated(new RoleActivity(getLocalUser(), user,
+                        newRole));
 
                     setUserRole(user, newRole);
                 }
@@ -277,8 +277,8 @@ public class SharedProject implements ISharedProject, Disposable {
 
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    activityCreated(new RoleActivity(getLocalUser().getJID(),
-                        user.getJID(), newRole));
+                    activityCreated(new RoleActivity(getLocalUser(), user,
+                        newRole));
 
                     setUserRole(user, newRole);
                 }
@@ -600,7 +600,7 @@ public class SharedProject implements ISharedProject, Disposable {
             .size());
 
         for (IActivityDataObject dataObject : activityDataObjects) {
-            result.add(dataObject.getActivity());
+            result.add(dataObject.getActivity(this));
         }
 
         return result;

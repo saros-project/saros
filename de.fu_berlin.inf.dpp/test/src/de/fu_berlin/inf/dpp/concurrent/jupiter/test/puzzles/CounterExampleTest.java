@@ -5,12 +5,13 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ClientSynchronizedDocument;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.ServerSynchronizedDocument;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This class contains three test scenarios to verify transformation functions
  * out of "Providing Correctness of Transformation Functions in Real-Time
  * Groupware"
+ * 
+ * TODO Setup of all three methods looks very similar -> refactor.
  * 
  * @author orieger
  * 
@@ -23,43 +24,38 @@ public class CounterExampleTest extends JupiterTestCase {
      * @throws Exception
      */
     public void testCounterExampleViolatingConditionC1() throws Exception {
-        JID jid_c1 = new JID("ori79@jabber.cc");
-        JID jid_c2 = new JID("ori80@jabber.cc");
-
-        JID jid_server = new JID("ori78@jabber.cc");
-
         String initDocumentState = "abc";
 
         /* init simulated client and server components. */
-        ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c1);
-        ClientSynchronizedDocument c2 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c2);
+        ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, alice);
+        ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, bob);
 
-        ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(network,
-            jid_server);
+        ServerSynchronizedDocument server = new ServerSynchronizedDocument(
+            network, host);
 
         /* connect all with simulated network. */
-        network.addClient(c1);
-        network.addClient(c2);
+        network.addClient(client_1);
+        network.addClient(client_2);
 
-        network.addClient(s1);
+        network.addClient(server);
 
         /* create proxyqueues. */
-        s1.addProxyClient(jid_c1);
-        s1.addProxyClient(jid_c2);
+        server.addProxyClient(alice);
+        server.addProxyClient(bob);
 
         Thread.sleep(100);
 
         /* O3 || O2 */
 
-        c1.sendOperation(new InsertOperation(1, "x"), 100);
-        c2.sendOperation(new DeleteOperation(1, "b"), 200);
+        client_1.sendOperation(new InsertOperation(1, "x"), 100);
+        client_2.sendOperation(new DeleteOperation(1, "b"), 200);
 
         Thread.sleep(400);
 
-        assertEquals(c1.getDocument(), c2.getDocument());
-        assertEquals("axc", c1.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
+        assertEquals("axc", client_1.getDocument());
     }
 
     /**
@@ -68,46 +64,41 @@ public class CounterExampleTest extends JupiterTestCase {
      * @throws Exception
      */
     public void testCounterExampleViolatingConditionC2() throws Exception {
-        JID jid_c1 = new JID("ori79@jabber.cc");
-        JID jid_c2 = new JID("ori80@jabber.cc");
-        JID jid_c3 = new JID("ori81@jabber.cc");
-        JID jid_server = new JID("ori78@jabber.cc");
-
         String initDocumentState = "abc";
 
         /* init simulated client and server components. */
-        ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c1);
-        ClientSynchronizedDocument c2 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c2);
-        ClientSynchronizedDocument c3 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c3);
-        ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(network,
-            jid_server);
+        ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, alice);
+        ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, bob);
+        ClientSynchronizedDocument client_3 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, carl);
+        ServerSynchronizedDocument server = new ServerSynchronizedDocument(
+            network, host);
 
         /* connect all with simulated network. */
-        network.addClient(c1);
-        network.addClient(c2);
-        network.addClient(c3);
-        network.addClient(s1);
+        network.addClient(client_1);
+        network.addClient(client_2);
+        network.addClient(client_3);
+        network.addClient(server);
 
         /* create proxyqueues. */
-        s1.addProxyClient(jid_c1);
-        s1.addProxyClient(jid_c2);
-        s1.addProxyClient(jid_c3);
+        server.addProxyClient(alice);
+        server.addProxyClient(bob);
+        server.addProxyClient(carl);
 
         Thread.sleep(100);
 
         /* O3 || O2 */
-        c1.sendOperation(new InsertOperation(1, "x"), 100);
-        c2.sendOperation(new DeleteOperation(1, "b"), 200);
-        c3.sendOperation(new InsertOperation(2, "y"), 1000);
+        client_1.sendOperation(new InsertOperation(1, "x"), 100);
+        client_2.sendOperation(new DeleteOperation(1, "b"), 200);
+        client_3.sendOperation(new InsertOperation(2, "y"), 1000);
 
         Thread.sleep(2000);
 
-        assertEquals(c1.getDocument(), c2.getDocument());
-        assertEquals(c2.getDocument(), c3.getDocument());
-        System.out.println(c1.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
+        assertEquals(client_2.getDocument(), client_3.getDocument());
+        System.out.println(client_1.getDocument());
     }
 
     /**
@@ -116,45 +107,39 @@ public class CounterExampleTest extends JupiterTestCase {
      * @throws Exception
      */
     public void testCounterExample2ViolatingConditionC2() throws Exception {
-        JID jid_c1 = new JID("ori79@jabber.cc");
-        JID jid_c2 = new JID("ori80@jabber.cc");
-        JID jid_c3 = new JID("ori81@jabber.cc");
-        JID jid_server = new JID("ori78@jabber.cc");
-
         String initDocumentState = "abc";
 
         /* init simulated client and server components. */
-        ClientSynchronizedDocument c1 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c1);
-        ClientSynchronizedDocument c2 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c2);
-        ClientSynchronizedDocument c3 = new ClientSynchronizedDocument(
-            jid_server, initDocumentState, network, jid_c3);
-        ServerSynchronizedDocument s1 = new ServerSynchronizedDocument(network,
-            jid_server);
+        ClientSynchronizedDocument client_1 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, alice);
+        ClientSynchronizedDocument client_2 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, bob);
+        ClientSynchronizedDocument client_3 = new ClientSynchronizedDocument(
+            host.getJID(), initDocumentState, network, carl);
+        ServerSynchronizedDocument server = new ServerSynchronizedDocument(
+            network, host);
 
         /* connect all with simulated network. */
-        network.addClient(c1);
-        network.addClient(c2);
-        network.addClient(c3);
-        network.addClient(s1);
+        network.addClient(client_1);
+        network.addClient(client_2);
+        network.addClient(client_3);
+        network.addClient(server);
 
         /* create proxyqueues. */
-        s1.addProxyClient(jid_c1);
-        s1.addProxyClient(jid_c2);
-        s1.addProxyClient(jid_c3);
+        server.addProxyClient(alice);
+        server.addProxyClient(bob);
+        server.addProxyClient(carl);
 
         Thread.sleep(100);
 
         /* O3 || O2 */
-        c1.sendOperation(new InsertOperation(1, "y"), 100);
-        c2.sendOperation(new DeleteOperation(1, "b"), 200);
-        c3.sendOperation(new InsertOperation(2, "y"), 1000);
+        client_1.sendOperation(new InsertOperation(1, "y"), 100);
+        client_2.sendOperation(new DeleteOperation(1, "b"), 200);
+        client_3.sendOperation(new InsertOperation(2, "y"), 1000);
 
         Thread.sleep(1200);
 
-        assertEquals(c1.getDocument(), c2.getDocument());
-        assertEquals(c2.getDocument(), c3.getDocument());
-        System.out.println(c1.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
+        assertEquals(client_2.getDocument(), client_3.getDocument());
     }
 }

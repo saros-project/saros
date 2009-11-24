@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Path;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -66,9 +67,10 @@ public class Document {
      * @param op
      */
     public void execOperation(Operation op) {
+        User dummy = JupiterTestCase.createUserMock("dummy");
 
         List<TextEditActivity> activities = op.toTextEdit(new Path("dummy"),
-            new JID("dummy@server"));
+            dummy);
 
         for (TextEditActivity activity : activities) {
 

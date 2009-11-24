@@ -9,6 +9,7 @@ import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 @XStreamAlias("folderActivity")
 public class FolderActivityDataObject extends AbstractActivityDataObject
@@ -99,7 +100,7 @@ public class FolderActivityDataObject extends AbstractActivityDataObject
         receiver.receive(this);
     }
 
-    public IActivity getActivity() {
-        return new FolderActivity(source, type, path);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new FolderActivity(sharedProject.getUser(source), type, path);
     }
 }

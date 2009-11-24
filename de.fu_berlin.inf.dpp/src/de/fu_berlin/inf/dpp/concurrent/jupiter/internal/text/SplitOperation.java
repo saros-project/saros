@@ -27,9 +27,9 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * The SplitOperation contains two operations to be performed after each other.
@@ -112,7 +112,7 @@ public class SplitOperation implements Operation {
         return result;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, JID source) {
+    public List<TextEditActivity> toTextEdit(IPath path, User source) {
 
         List<TextEditActivity> result = new ArrayList<TextEditActivity>();
 

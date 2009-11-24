@@ -6,19 +6,20 @@ import org.joda.time.Duration;
 import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public class PingPongActivity extends AbstractActivity {
 
-    public JID initiator;
+    public User initiator;
 
     public DateTime departureTime;
 
-    public PingPongActivity(JID source) {
+    // TODO Remove this constructor.
+    public PingPongActivity(User source) {
         super(source);
     }
 
-    public PingPongActivity(JID source, JID initiator, DateTime departureTime) {
+    public PingPongActivity(User source, User initiator, DateTime departureTime) {
+
         super(source);
         this.initiator = initiator;
         this.departureTime = departureTime;
@@ -28,7 +29,7 @@ public class PingPongActivity extends AbstractActivity {
         return new Duration(departureTime, new DateTime());
     }
 
-    public JID getInitiator() {
+    public User getInitiator() {
         return initiator;
     }
 
@@ -37,12 +38,11 @@ public class PingPongActivity extends AbstractActivity {
     }
 
     public static PingPongActivity create(User localUser) {
-        return new PingPongActivity(localUser.getJID(), localUser.getJID(),
-            new DateTime());
+        return new PingPongActivity(localUser, localUser, new DateTime());
     }
 
     public IActivity createPong(User localUser) {
-        return new PingPongActivity(localUser.getJID(), getInitiator(), this
+        return new PingPongActivity(localUser, getInitiator(), this
             .getDepartureTime());
     }
 
@@ -62,6 +62,7 @@ public class PingPongActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new PingPongActivityDataObject(source, initiator, departureTime);
+        return new PingPongActivityDataObject(source.getJID(), initiator
+            .getJID(), departureTime);
     }
 }

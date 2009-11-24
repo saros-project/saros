@@ -30,6 +30,7 @@ import javax.swing.undo.CannotUndoException;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
@@ -89,15 +90,14 @@ public class Jupiter implements Algorithm {
     }
 
     /**
-     * @see de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm#generateJupiterActivity(de.fu_berlin.inf.dpp.concurrent.jupiter.Operation,
-     *      de.fu_berlin.inf.dpp.net.JID, IPath)
+     * @see Algorithm#generateJupiterActivity(Operation, User, IPath)
      */
-    public JupiterActivity generateJupiterActivity(Operation op,
-        JID originator, IPath editor) {
+    public JupiterActivity generateJupiterActivity(Operation op, User source,
+        IPath editor) {
 
         // send(op, myMsgs, otherMsgs);
         JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime,
-            op, originator, editor);
+            op, source, editor);
 
         // add(op, myMsgs) to outgoing;
         this.ackJupiterActivityList.add(new OperationWrapper(op,

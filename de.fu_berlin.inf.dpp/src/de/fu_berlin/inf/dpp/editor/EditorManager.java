@@ -76,7 +76,6 @@ import de.fu_berlin.inf.dpp.editor.internal.ContributionAnnotationManager;
 import de.fu_berlin.inf.dpp.editor.internal.EditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.IEditorAPI;
 import de.fu_berlin.inf.dpp.editor.internal.RevertBufferListener;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.preferences.PreferenceConstants;
 import de.fu_berlin.inf.dpp.project.AbstractSessionListener;
@@ -168,12 +167,11 @@ public class EditorManager implements IActivityProvider, Disposable {
 
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(EditorActivity editorActivityDataObject) {
+        public void receive(EditorActivity editorActivity) {
 
-            User sender = sharedProject.getUser(editorActivityDataObject
-                .getSource());
-            IPath path = editorActivityDataObject.getPath();
-            switch (editorActivityDataObject.getType()) {
+            User sender = editorActivity.getSource();
+            IPath path = editorActivity.getPath();
+            switch (editorActivity.getType()) {
             case Activated:
                 execActivated(sender, path);
                 break;
@@ -184,8 +182,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                 saveText(path);
                 break;
             default:
-                log.warn("Unexpected type: "
-                    + editorActivityDataObject.getType());
+                log.warn("Unexpected type: " + editorActivity.getType());
             }
         }
 
@@ -277,20 +274,21 @@ public class EditorManager implements IActivityProvider, Disposable {
             // Let the new user know where we are
             List<User> recipient = Collections.singletonList(user);
 
+            User localUser = sharedProject.getLocalUser();
             for (IPath path : getLocallyOpenEditors()) {
-                sharedProject.sendActivity(recipient, new EditorActivity(saros
-                    .getMyJID(), Type.Activated, path));
+                sharedProject.sendActivity(recipient, new EditorActivity(
+                    localUser, Type.Activated, path));
             }
 
             if (locallyActiveEditor == null)
                 return;
 
-            sharedProject.sendActivity(recipient, new EditorActivity(saros
-                .getMyJID(), Type.Activated, locallyActiveEditor));
+            sharedProject.sendActivity(recipient, new EditorActivity(localUser,
+                Type.Activated, locallyActiveEditor));
 
             if (localViewport != null) {
                 sharedProject.sendActivity(recipient, new ViewportActivity(
-                    saros.getMyJID(), localViewport, locallyActiveEditor));
+                    localUser, localViewport, locallyActiveEditor));
             } else {
                 log.warn("No viewport for locallyActivateEditor: "
                     + locallyActiveEditor);
@@ -301,7 +299,7 @@ public class EditorManager implements IActivityProvider, Disposable {
                 int length = localSelection.getLength();
 
                 sharedProject.sendActivity(recipient,
-                    new TextSelectionActivity(saros.getMyJID(), offset, length,
+                    new TextSelectionActivity(localUser, offset, length,
                         locallyActiveEditor));
             } else {
                 log.warn("No selection for locallyActivateEditor: "
@@ -545,7 +543,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.activeEditorChanged(sharedProject.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID(),
+        fireActivity(new EditorActivity(sharedProject.getLocalUser(),
             Type.Activated, path));
     }
 
@@ -584,8 +582,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         if (path.equals(locallyActiveEditor))
             this.localViewport = viewport;
 
-        fireActivity(new ViewportActivity(
-            sharedProject.getLocalUser().getJID(), viewport, path));
+        fireActivity(new ViewportActivity(sharedProject.getLocalUser(),
+            viewport, path));
     }
 
     /**
@@ -614,8 +612,8 @@ public class EditorManager implements IActivityProvider, Disposable {
         int offset = newSelection.getOffset();
         int length = newSelection.getLength();
 
-        fireActivity(new TextSelectionActivity(sharedProject.getLocalUser()
-            .getJID(), offset, length, path));
+        fireActivity(new TextSelectionActivity(sharedProject.getLocalUser(),
+            offset, length, path));
     }
 
     /**
@@ -695,9 +693,8 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         EditorManager.this.lastEditTimes.put(path, System.currentTimeMillis());
 
-        fireActivity(new TextEditActivity(
-            sharedProject.getLocalUser().getJID(), offset, text, replacedText,
-            path));
+        fireActivity(new TextEditActivity(sharedProject.getLocalUser(), offset,
+            text, replacedText, path));
 
         // inform all registered ISharedEditorListeners about this text edit
         editorListener.textEditRecieved(sharedProject.getLocalUser(), path,
@@ -727,30 +724,28 @@ public class EditorManager implements IActivityProvider, Disposable {
      * 
      * @swt This must be called from the SWT thread.
      */
-    public void exec(final IActivity activityDataObject) {
+    public void exec(final IActivity activity) {
 
         assert Util.isSWT();
 
-        User sender = sharedProject.getUser(activityDataObject.getSource());
-        if (sender == null) {
+        User sender = activity.getSource();
+        if (!sender.isInSharedProject()) {
             log.warn("Trying to execute activityDataObject for unknown user: "
-                + activityDataObject);
+                + activity);
             return;
         }
 
         // First let the remote managers update itself based on the
         // activityDataObject
-        remoteEditorManager.exec(activityDataObject);
-        remoteDriverManager.exec(activityDataObject);
+        remoteEditorManager.exec(activity);
+        remoteDriverManager.exec(activity);
 
-        activityDataObject.dispatch(activityDataObjectReceiver);
+        activity.dispatch(activityDataObjectReceiver);
     }
 
     protected void execTextEdit(TextEditActivity textEdit) {
 
         wpLog.trace("EditorManager.execTextEdit invoked");
-
-        User user = sharedProject.getUser(textEdit.getSource());
 
         IPath path = textEdit.getEditor();
         IFile file = sharedProject.getProject().getFile(path);
@@ -761,6 +756,8 @@ public class EditorManager implements IActivityProvider, Disposable {
             // TODO A consistency check can be started here
             return;
         }
+
+        User user = textEdit.getSource();
 
         /*
          * Disable documentListener temporarily to avoid being notified of the
@@ -815,7 +812,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         TextSelection textSelection = new TextSelection(selection.getOffset(),
             selection.getLength());
 
-        User user = sharedProject.getUser(selection.getSource());
+        User user = selection.getSource();
 
         Set<IEditorPart> editors = EditorManager.this.editorPool
             .getEditors(path);
@@ -829,7 +826,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         wpLog.trace("EditorManager.execViewport invoked");
 
-        User user = sharedProject.getUser(viewport.getSource());
+        User user = viewport.getSource();
         boolean following = user.equals(getFollowedUser());
 
         {
@@ -1048,7 +1045,7 @@ public class EditorManager implements IActivityProvider, Disposable {
 
         editorListener.editorRemoved(sharedProject.getLocalUser(), path);
 
-        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID(),
+        fireActivity(new EditorActivity(sharedProject.getLocalUser(),
             Type.Closed, path));
 
         /**
@@ -1383,7 +1380,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         // What is the reason of this?
 
         editorListener.driverEditorSaved(path, false);
-        fireActivity(new EditorActivity(sharedProject.getLocalUser().getJID(),
+        fireActivity(new EditorActivity(sharedProject.getLocalUser(),
             Type.Saved, path));
     }
 
@@ -1719,7 +1716,7 @@ public class EditorManager implements IActivityProvider, Disposable {
         wpLog.trace(".triggerRevert invoked");
         wpLog.trace(".triggerRevert File: " + path.toOSString());
 
-        JID source = sharedProject.getLocalUser().getJID();
+        User localUser = sharedProject.getLocalUser();
         int offset = 0;
 
         /**
@@ -1729,10 +1726,10 @@ public class EditorManager implements IActivityProvider, Disposable {
          * TODO If the UndoManager knows which changes were ours, we could
          * revert just those
          */
-        IActivity textEditActivity = new TextEditActivity(source, offset,
+        IActivity textEditActivity = new TextEditActivity(localUser, offset,
             newContent, oldContent, path);
 
-        IActivity saveActivity = new EditorActivity(source, Type.Saved, path);
+        IActivity saveActivity = new EditorActivity(localUser, Type.Saved, path);
 
         fireActivity(textEditActivity);
         fireActivity(saveActivity);

@@ -16,6 +16,7 @@ import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Type;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 @XStreamAlias("fileActivity")
 public class FileActivityDataObject extends AbstractActivityDataObject
@@ -245,7 +246,8 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         return Purpose.RECOVERY.equals(purpose);
     }
 
-    public IActivity getActivity() {
-        return new FileActivity(source, type, newPath, oldPath, data, purpose);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new FileActivity(sharedProject.getUser(source), type, newPath,
+            oldPath, data, purpose);
     }
 }

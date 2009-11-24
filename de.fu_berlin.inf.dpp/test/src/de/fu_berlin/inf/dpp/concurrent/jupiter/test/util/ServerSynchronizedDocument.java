@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -22,17 +23,16 @@ public class ServerSynchronizedDocument implements JupiterServer,
     /* sync algorithm with ack-operation list. */
     private Algorithm algorithm;
 
-    private JID jid;
+    private User user;
     private SimulateNetzwork connection;
 
     private boolean accessDenied = false;
 
     private HashMap<JID, ProxySynchronizedQueue> proxyQueues;
 
-    public ServerSynchronizedDocument(SimulateNetzwork con, JID jid) {
-        this.jid = jid;
-        /* init network connection. */
-        init(con);
+    public ServerSynchronizedDocument(SimulateNetzwork connection, User user) {
+        this.user = user;
+        init(connection);
     }
 
     /**
@@ -45,12 +45,12 @@ public class ServerSynchronizedDocument implements JupiterServer,
         this.proxyQueues = new HashMap<JID, ProxySynchronizedQueue>();
     }
 
-    public void setJID(JID jid) {
-        this.jid = jid;
+    public JID getJID() {
+        return user.getJID();
     }
 
-    public JID getJID() {
-        return jid;
+    public User getUser() {
+        return user;
     }
 
     /**
@@ -170,10 +170,10 @@ public class ServerSynchronizedDocument implements JupiterServer,
         doc.execOperation(op);
         /* 2. transform operation. */
         JupiterActivity jupiterActivity = algorithm.generateJupiterActivity(op,
-            this.jid, null);
+            this.user, null);
         /* sent to client */
         // connection.sendOperation(jid, req,delay);
-        connection.sendOperation(new NetworkRequest(this.jid, jid,
+        connection.sendOperation(new NetworkRequest(this.user, jid,
             jupiterActivity), delay);
 
     }
@@ -189,10 +189,10 @@ public class ServerSynchronizedDocument implements JupiterServer,
         return doc.getDocument();
     }
 
-    public void addProxyClient(JID jid) {
-        ProxySynchronizedQueue queue = new ProxySynchronizedQueue(jid,
+    public void addProxyClient(User user) {
+        ProxySynchronizedQueue queue = new ProxySynchronizedQueue(user,
             this.connection);
-        proxyQueues.put(jid, queue);
+        proxyQueues.put(user.getJID(), queue);
     }
 
     public void removeProxyClient(JID jid) {
@@ -205,7 +205,7 @@ public class ServerSynchronizedDocument implements JupiterServer,
     }
 
     public void receiveNetworkEvent(NetworkRequest req) {
-        receiveOperation(req.getJupiterActivity(), req.getFrom());
+        receiveOperation(req.getJupiterActivity(), req.getFrom().getJID());
     }
 
     public Algorithm getAlgorithm() {

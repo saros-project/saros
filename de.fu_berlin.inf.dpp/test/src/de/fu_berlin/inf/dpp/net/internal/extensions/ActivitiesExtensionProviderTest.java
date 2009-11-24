@@ -105,7 +105,7 @@ public class ActivitiesExtensionProviderTest extends TestCase {
     public void testEditorActivity() {
         for (EditorActivity.Type type : EditorActivity.Type.values()) {
             try {
-                new EditorActivity(new JID("user@server"), type, null);
+                new EditorActivity(null, type, null);
                 if (type != EditorActivity.Type.Activated) {
                     fail();
                 }

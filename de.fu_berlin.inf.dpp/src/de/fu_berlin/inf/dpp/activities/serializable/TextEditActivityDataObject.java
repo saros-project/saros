@@ -34,6 +34,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 import de.fu_berlin.inf.dpp.util.Util;
 import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 
@@ -192,7 +193,8 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
         receiver.receive(this);
     }
 
-    public IActivity getActivity() {
-        return new TextEditActivity(source, offset, text, replacedText, editor);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new TextEditActivity(sharedProject.getUser(source), offset,
+            text, replacedText, editor);
     }
 }

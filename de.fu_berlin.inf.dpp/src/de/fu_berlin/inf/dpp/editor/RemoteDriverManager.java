@@ -81,10 +81,9 @@ public class RemoteDriverManager {
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
 
         @Override
-        public void receive(final EditorActivity editorActivityDataObject) {
-            User sender = sharedProject.getUser(editorActivityDataObject
-                .getSource());
-            IPath path = editorActivityDataObject.getPath();
+        public void receive(final EditorActivity editorActivity) {
+            User sender = editorActivity.getSource();
+            IPath path = editorActivity.getPath();
 
             if (path == null) {
                 /**
@@ -94,7 +93,7 @@ public class RemoteDriverManager {
                 return;
             }
 
-            switch (editorActivityDataObject.getType()) {
+            switch (editorActivity.getType()) {
             case Activated:
                 editorStates.get(path).add(sender);
                 break;

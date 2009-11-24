@@ -9,13 +9,14 @@ import junit.framework.TestCase;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
-import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
 
 /**
  * testing SplitOperation.toTextEdit()
@@ -23,7 +24,7 @@ import de.fu_berlin.inf.dpp.net.JID;
 public class SplitOperationTest extends TestCase {
 
     protected IPath path = new Path("path");
-    protected JID source = new JID("source@server");
+    protected User source = JupiterTestCase.createUserMock("source");
 
     public static Operation S(Operation one, Operation two) {
         return new SplitOperation(one, two);

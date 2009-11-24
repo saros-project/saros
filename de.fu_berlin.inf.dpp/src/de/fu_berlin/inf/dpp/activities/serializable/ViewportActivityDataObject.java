@@ -10,6 +10,7 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.net.JID;
+import de.fu_berlin.inf.dpp.project.ISharedProject;
 
 @XStreamAlias("viewportActivity")
 public class ViewportActivityDataObject extends AbstractActivityDataObject {
@@ -108,7 +109,8 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         receiver.receive(this);
     }
 
-    public IActivity getActivity() {
-        return new ViewportActivity(source, topIndex, bottomIndex, path);
+    public IActivity getActivity(ISharedProject sharedProject) {
+        return new ViewportActivity(sharedProject.getUser(source), topIndex,
+            bottomIndex, path);
     }
 }

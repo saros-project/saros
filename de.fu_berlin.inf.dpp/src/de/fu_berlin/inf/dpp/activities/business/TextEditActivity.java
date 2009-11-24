@@ -23,13 +23,13 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.InsertOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.SplitOperation;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.util.Util;
 
 /**
@@ -61,8 +61,9 @@ public class TextEditActivity extends AbstractActivity {
      * @param source
      *            JID of the user that caused this activityDataObject
      */
-    public TextEditActivity(JID source, int offset, String text,
+    public TextEditActivity(User source, int offset, String text,
         String replacedText, IPath editor) {
+
         super(source);
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
@@ -181,7 +182,7 @@ public class TextEditActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new TextEditActivityDataObject(source, offset, text,
+        return new TextEditActivityDataObject(source.getJID(), offset, text,
             replacedText, editor);
     }
 }

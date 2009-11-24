@@ -53,7 +53,7 @@ public class JupiterClient {
     public synchronized boolean isCurrent(
         ChecksumActivity checksumActivityDataObject)
         throws TransformationException {
-        
+
         return get(checksumActivityDataObject.getPath()).isCurrent(
             checksumActivityDataObject.getTimestamp());
     }
@@ -69,7 +69,7 @@ public class JupiterClient {
     public synchronized JupiterActivity generate(TextEditActivity textEdit) {
 
         return get(textEdit.getEditor()).generateJupiterActivity(
-            textEdit.toOperation(), sharedProject.getLocalUser().getJID(),
+            textEdit.toOperation(), sharedProject.getLocalUser(),
             textEdit.getEditor());
     }
 
@@ -81,7 +81,7 @@ public class JupiterClient {
      */
     public synchronized ChecksumActivity withTimestamp(
         ChecksumActivity checksumActivityDataObject) {
-        
+
         return get(checksumActivityDataObject.getPath()).withTimestamp(
             checksumActivityDataObject);
     }

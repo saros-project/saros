@@ -20,9 +20,9 @@ public class SimpleServerProxyTest extends JupiterTestCase {
         setName("Test for Proxy Test.");
     }
 
-    ClientSynchronizedDocument alice, c1;
-    ClientSynchronizedDocument bob, c2;
-    ServerSynchronizedDocument server;
+    protected ClientSynchronizedDocument client_1;
+    protected ClientSynchronizedDocument client_2;
+    protected ServerSynchronizedDocument server;
 
     public void setUp(String text) {
         super.setUp();
@@ -30,19 +30,19 @@ public class SimpleServerProxyTest extends JupiterTestCase {
         // 01234567890123456789012345
         // abcdefghijklmnopqrstuvwxyz
 
-        c1 = alice = new ClientSynchronizedDocument(jidServer, text, network,
-            jidAlice);
-        c2 = bob = new ClientSynchronizedDocument(jidServer, text, network,
-            jidBob);
-        server = new ServerSynchronizedDocument(network, jidServer);
+        client_1 = new ClientSynchronizedDocument(host.getJID(), text, network,
+            alice);
+        client_2 = new ClientSynchronizedDocument(host.getJID(), text, network,
+            bob);
+        server = new ServerSynchronizedDocument(network, host);
 
-        network.addClient(alice);
-        network.addClient(bob);
+        network.addClient(client_1);
+        network.addClient(client_2);
         network.addClient(server);
 
         /* create proxyqueues. */
-        server.addProxyClient(jidAlice);
-        server.addProxyClient(jidBob);
+        server.addProxyClient(alice);
+        server.addProxyClient(bob);
     }
 
     /**
@@ -54,13 +54,13 @@ public class SimpleServerProxyTest extends JupiterTestCase {
         System.out.println("START: testTwoConcurrentInsertOperations");
         setUp("X");
 
-        c1.sendOperation(new InsertOperation(0, "a"), 100);
-        c2.sendOperation(new InsertOperation(1, "b"), 200);
+        client_1.sendOperation(new InsertOperation(0, "a"), 100);
+        client_2.sendOperation(new InsertOperation(1, "b"), 200);
         Thread.sleep(400);
 
-        assertEquals("aXb", c1.getDocument());
-        assertEquals("aXb", c2.getDocument());
-        assertEquals(c1.getDocument(), c2.getDocument());
+        assertEquals("aXb", client_1.getDocument());
+        assertEquals("aXb", client_2.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
         System.out.println("END OF METHOD: testTwoConcurrentInsertOperations");
     }
 
@@ -72,14 +72,14 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
         setUp("X");
 
-        c1.sendOperation(new InsertOperation(0, "a"), 100);
-        c1.sendOperation(new InsertOperation(1, "b"), 200);
-        c2.sendOperation(new InsertOperation(1, "c"), 300);
+        client_1.sendOperation(new InsertOperation(0, "a"), 100);
+        client_1.sendOperation(new InsertOperation(1, "b"), 200);
+        client_2.sendOperation(new InsertOperation(1, "c"), 300);
 
         Thread.sleep(500);
 
-        assertEquals(c1.getDocument(), c2.getDocument());
-        assertEquals("abXc", c1.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
+        assertEquals("abXc", client_1.getDocument());
     }
 
     /**
@@ -91,31 +91,31 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
         setUp("abcdefg");
 
-        c1.sendOperation(new InsertOperation(1, "c"), 0);
+        client_1.sendOperation(new InsertOperation(1, "c"), 0);
         Thread.sleep(200);
 
-        assertEquals("acbcdefg", c1.getDocument());
-        assertEquals("acbcdefg", c2.getDocument());
+        assertEquals("acbcdefg", client_1.getDocument());
+        assertEquals("acbcdefg", client_2.getDocument());
 
         /* send two concurrent operations. */
-        c1.sendOperation(new InsertOperation(1, "x"), 100);
-        c2.sendOperation(new InsertOperation(2, "t"), 500);
+        client_1.sendOperation(new InsertOperation(1, "x"), 100);
+        client_2.sendOperation(new InsertOperation(2, "t"), 500);
         Thread.sleep(300);
         /* assert local execution. */
-        assertEquals("axcbcdefg", c1.getDocument());
-        assertEquals("axctbcdefg", c2.getDocument());
+        assertEquals("axcbcdefg", client_1.getDocument());
+        assertEquals("axctbcdefg", client_2.getDocument());
         Thread.sleep(500);
 
         /* assert remote operations. */
-        assertEquals(c1.getDocument(), c2.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
 
         /* send two concurrent operations. */
-        c1.sendOperation(new InsertOperation(1, "t"), 100);
-        c2.sendOperation(new InsertOperation(3, "x"), 300);
+        client_1.sendOperation(new InsertOperation(1, "t"), 100);
+        client_2.sendOperation(new InsertOperation(3, "x"), 300);
 
         Thread.sleep(500);
         /* assert remote operations. */
-        assertEquals(c1.getDocument(), c2.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
         System.out.println("END OF METHOD: testTwoClientWithJupiterProxy");
     }
 
@@ -131,15 +131,15 @@ public class SimpleServerProxyTest extends JupiterTestCase {
         setUp("abcdefg");
 
         /* send two concurrent operations. */
-        c1.sendOperation(new DeleteOperation(0, "abc"), 300);
-        c2.sendOperation(new InsertOperation(1, "t"), 400);
+        client_1.sendOperation(new DeleteOperation(0, "abc"), 300);
+        client_2.sendOperation(new InsertOperation(1, "t"), 400);
 
         Thread.sleep(100);
         /* assert local execution. */
-        assertEquals("defg", c1.getDocument());
-        assertEquals("atbcdefg", c2.getDocument());
+        assertEquals("defg", client_1.getDocument());
+        assertEquals("atbcdefg", client_2.getDocument());
         Thread.sleep(500);
         /* assert remote operations. */
-        assertEquals(c1.getDocument(), c2.getDocument());
+        assertEquals(client_1.getDocument(), client_2.getDocument());
     }
 }

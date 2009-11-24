@@ -28,9 +28,9 @@ import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * The NoOperation is used to hold a empty text together with the position zero.
@@ -71,7 +71,7 @@ public class NoOperation implements Operation {
         return hashcode;
     }
 
-    public List<TextEditActivity> toTextEdit(IPath path, JID source) {
+    public List<TextEditActivity> toTextEdit(IPath path, User source) {
         return Collections.emptyList();
     }
 

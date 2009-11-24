@@ -45,7 +45,8 @@ public class SimpleClientServerTest extends JupiterTestCase {
         assertEquals("xeabc", client.getDocument());
         assertEquals("abc", server.getDocument());
 
-        server.sendOperation(client.getJID(), new DeleteOperation(0, "a"), 0);
+        server.sendOperation(client.getUser().getJID(), new DeleteOperation(0,
+            "a"), 0);
 
         Thread.sleep(100);
         assertEquals("xebc", client.getDocument());
@@ -67,8 +68,8 @@ public class SimpleClientServerTest extends JupiterTestCase {
         setUp("abcdefg");
 
         client.sendOperation(new InsertOperation(3, "x"), 100);
-        server.sendOperation(client.getJID(), new DeleteOperation(1, "bcde"),
-            400);
+        server.sendOperation(client.getUser().getJID(), new DeleteOperation(1,
+            "bcde"), 400);
         Thread.sleep(300);
         assertEquals("abcxdefg", client.getDocument());
 

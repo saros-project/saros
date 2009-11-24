@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -53,7 +53,6 @@ import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
 import de.fu_berlin.inf.dpp.editor.EditorManager;
-import de.fu_berlin.inf.dpp.net.JID;
 import de.fu_berlin.inf.dpp.observables.FileReplacementInProgressObservable;
 import de.fu_berlin.inf.dpp.synchronize.Blockable;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
@@ -279,14 +278,14 @@ public class SharedResourcesManager implements IResourceChangeListener,
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:
 
-                return new FolderActivity(saros.getMyJID(),
+                return new FolderActivity(sharedProject.getLocalUser(),
                     FolderActivity.Type.Created, resource
                         .getProjectRelativePath());
 
             case IResourceDelta.REMOVED:
                 if (isMoved(delta))
                     return null;
-                return new FolderActivity(saros.getMyJID(),
+                return new FolderActivity(sharedProject.getLocalUser(),
                     FolderActivity.Type.Removed, resource
                         .getProjectRelativePath());
 
@@ -315,8 +314,6 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 // is this an "ADD" while moving/renaming a file?
                 if (isMovedFrom(delta)) {
 
-                    JID jid = saros.getMyJID();
-
                     IPath newPath = resource.getFullPath().makeRelative();
                     IPath oldPath = delta.getMovedFromPath().makeRelative();
 
@@ -325,7 +322,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
                     try {
                         return FileActivity.moved(sharedProject.getProject(),
-                            jid, newPath, oldPath, isContentChange(delta));
+                            sharedProject.getLocalUser(), newPath, oldPath,
+                            isContentChange(delta));
                     } catch (IOException e) {
                         log
                             .warn("Resource could not be read for sending to peers:"
@@ -346,8 +344,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 try {
 
                     return FileActivity.created(sharedProject.getProject(),
-                        saros.getMyJID(), resource.getFullPath().makeRelative()
-                            .removeFirstSegments(1), Purpose.ACTIVITY);
+                        sharedProject.getLocalUser(), resource.getFullPath()
+                            .makeRelative().removeFirstSegments(1),
+                        Purpose.ACTIVITY);
                 } catch (IOException e) {
                     log.warn("Resource could not be read for sending to peers:"
                         + resource.getLocation(), e);
@@ -357,8 +356,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
             case IResourceDelta.REMOVED:
                 if (isMoved(delta)) // Ignore "REMOVED" while moving
                     return null;
-                return FileActivity.removed(saros.getMyJID(), resource
-                    .getProjectRelativePath(), Purpose.ACTIVITY);
+                return FileActivity.removed(sharedProject.getLocalUser(),
+                    resource.getProjectRelativePath(), Purpose.ACTIVITY);
 
             default:
                 return null;
@@ -545,7 +544,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             log.info("Received consistency file: " + activity);
 
             if (log.isInfoEnabled() && (activity.getContents() != null)) {
-                Util.logDiff(log, activity.getSource(), path, activity
+                Util.logDiff(log, activity.getSource().getJID(), path, activity
                     .getContents(), file);
             }
         }

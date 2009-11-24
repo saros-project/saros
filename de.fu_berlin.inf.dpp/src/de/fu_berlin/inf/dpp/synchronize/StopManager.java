@@ -124,77 +124,73 @@ public class StopManager implements IActivityProvider, Disposable {
     protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
 
         @Override
-        public void receive(final StopActivity stopActivityDataObject) {
+        public void receive(final StopActivity stopActivity) {
 
             if (sharedProject == null)
                 throw new IllegalStateException(
                     "Cannot receive StopActivities without a shared project");
 
-            User user = sharedProject.getUser(stopActivityDataObject
-                .getRecipient());
-            if (user == null || !user.isLocal())
+            User user = stopActivity.getRecipient();
+            if (!user.isInSharedProject() || user.isRemote())
                 throw new IllegalArgumentException(
                     "Received StopActivity which is not for the local user");
 
-            if (stopActivityDataObject.getType() == Type.LOCKREQUEST) {
+            if (stopActivity.getType() == Type.LOCKREQUEST) {
 
                 /*
                  * local user locks his project and adds a startHandle so he
                  * knows he is locked. Then he acknowledges
                  */
-                if (stopActivityDataObject.getState() == State.INITIATED) {
-                    addStartHandle(generateStartHandle(stopActivityDataObject));
+                if (stopActivity.getState() == State.INITIATED) {
+                    addStartHandle(generateStartHandle(stopActivity));
                     // locks project and acknowledges
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             lockProject(true);
-                            fireActivity(stopActivityDataObject
+                            fireActivity(stopActivity
                                 .generateAcknowledgment(sharedProject
-                                    .getLocalUser().getJID()));
+                                    .getLocalUser()));
                         }
                     });
                     return;
                 }
-                if (stopActivityDataObject.getState() == State.ACKNOWLEDGED) {
-                    if (!expectedAcknowledgments
-                        .contains(stopActivityDataObject)) {
+                if (stopActivity.getState() == State.ACKNOWLEDGED) {
+                    if (!expectedAcknowledgments.contains(stopActivity)) {
                         log.warn("Received unexpected StopActivity: "
-                            + stopActivityDataObject);
+                            + stopActivity);
                         return;
                     }
 
                     // it has to be removed from the expected ack list
                     // because it already arrived
-                    if (expectedAcknowledgments.remove(stopActivityDataObject)) {
+                    if (expectedAcknowledgments.remove(stopActivity)) {
                         reentrantLock.lock();
                         acknowledged.signalAll();
                         reentrantLock.unlock();
                         return;
                     } else {
                         log.warn("Received unexpected "
-                            + "StopActivity acknowledgement: "
-                            + stopActivityDataObject);
+                            + "StopActivity acknowledgement: " + stopActivity);
                         return;
                     }
                 }
             }
 
-            if (stopActivityDataObject.getType() == Type.UNLOCKREQUEST) {
-                if (stopActivityDataObject.getState() == State.INITIATED) {
+            if (stopActivity.getType() == Type.UNLOCKREQUEST) {
+                if (stopActivity.getState() == State.INITIATED) {
 
-                    executeUnlock(generateStartHandle(stopActivityDataObject));
+                    executeUnlock(generateStartHandle(stopActivity));
                     // sends an acknowledgment
-                    fireActivity(stopActivityDataObject
-                        .generateAcknowledgment(sharedProject.getLocalUser()
-                            .getJID()));
+                    fireActivity(stopActivity
+                        .generateAcknowledgment(sharedProject.getLocalUser()));
                     return;
                 }
 
-                if (stopActivityDataObject.getState() == State.ACKNOWLEDGED) {
+                if (stopActivity.getState() == State.ACKNOWLEDGED) {
                     StartHandle handle = startsToBeAcknowledged
-                        .remove(stopActivityDataObject.getActivityID());
+                        .remove(stopActivity.getActivityID());
                     if (handle == null) {
-                        log.error("StartHandle for " + stopActivityDataObject
+                        log.error("StartHandle for " + stopActivity
                             + " could not be found.");
                         return;
                     }
@@ -204,7 +200,7 @@ public class StopManager implements IActivityProvider, Disposable {
             }
 
             throw new IllegalArgumentException(
-                "StopActivity is of unknown type: " + stopActivityDataObject);
+                "StopActivity is of unknown type: " + stopActivity);
         }
     };
 
@@ -315,13 +311,13 @@ public class StopManager implements IActivityProvider, Disposable {
                 "Stop cannot be called without a shared project");
 
         // Creating StopActivity for asking user to stop
-        final StopActivity stopActivityDataObject = new StopActivity(
-            sharedProject.getLocalUser().getJID(), sharedProject.getLocalUser()
-                .getJID(), user.getJID(), Type.LOCKREQUEST, State.INITIATED,
+        User localUser = sharedProject.getLocalUser();
+        final StopActivity stopActivity = new StopActivity(localUser,
+            localUser, user, Type.LOCKREQUEST, State.INITIATED,
             new SimpleDateFormat("HHmmssSS").format(new Date())
                 + random.nextLong());
 
-        StartHandle handle = generateStartHandle(stopActivityDataObject);
+        StartHandle handle = generateStartHandle(stopActivity);
         addStartHandle(handle);
 
         // Short cut if affected user is local
@@ -334,13 +330,12 @@ public class StopManager implements IActivityProvider, Disposable {
             return handle;
         }
 
-        StopActivity expectedAck = stopActivityDataObject
-            .generateAcknowledgment(user.getJID());
+        StopActivity expectedAck = stopActivity.generateAcknowledgment(user);
         expectedAcknowledgments.add(expectedAck);
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
-                fireActivity(stopActivityDataObject);
+                fireActivity(stopActivity);
             }
         });
 
@@ -445,9 +440,8 @@ public class StopManager implements IActivityProvider, Disposable {
         startsToBeAcknowledged.put(handle.getHandleID(), handle);
 
         final StopActivity activity = new StopActivity(sharedProject
-            .getLocalUser().getJID(), sharedProject.getLocalUser().getJID(),
-            handle.getUser().getJID(), Type.UNLOCKREQUEST, State.INITIATED,
-            handle.getHandleID());
+            .getLocalUser(), sharedProject.getLocalUser(), handle.getUser(),
+            Type.UNLOCKREQUEST, State.INITIATED, handle.getHandleID());
 
         Util.runSafeSWTSync(log, new Runnable() {
             public void run() {
@@ -477,15 +471,14 @@ public class StopManager implements IActivityProvider, Disposable {
         activityListeners.remove(listener);
     }
 
-    public void fireActivity(StopActivity stopActivityDataObject) {
+    public void fireActivity(StopActivity stopActivity) {
 
-        User recipient = sharedProject.getUser(stopActivityDataObject
-            .getRecipient());
-        if (recipient == null)
+        User recipient = stopActivity.getRecipient();
+        if (!recipient.isInSharedProject())
             throw new IllegalArgumentException("StopActivity contains"
-                + " recipient which already left: " + stopActivityDataObject);
+                + " recipient which already left: " + stopActivity);
 
-        sharedProject.sendActivity(recipient, stopActivityDataObject);
+        sharedProject.sendActivity(recipient, stopActivity);
     }
 
     /**
@@ -517,10 +510,9 @@ public class StopManager implements IActivityProvider, Disposable {
         return result;
     }
 
-    public StartHandle generateStartHandle(StopActivity stopActivityDataObject) {
-        User user = sharedProject.getUser(stopActivityDataObject.getUser());
-        return new StartHandle(user, this, stopActivityDataObject
-            .getActivityID());
+    public StartHandle generateStartHandle(StopActivity stopActivity) {
+        User user = stopActivity.getUser();
+        return new StartHandle(user, this, stopActivity.getActivityID());
     }
 
     public void addBlockable(Blockable stoppable) {

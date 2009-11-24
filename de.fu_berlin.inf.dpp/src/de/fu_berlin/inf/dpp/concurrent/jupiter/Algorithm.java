@@ -2,8 +2,8 @@ package de.fu_berlin.inf.dpp.concurrent.jupiter;
 
 import org.eclipse.core.runtime.IPath;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public interface Algorithm {
 
@@ -24,7 +24,8 @@ public interface Algorithm {
      * @return the generated JupiterActivity
      * @see JupiterActivity
      */
-    JupiterActivity generateJupiterActivity(Operation op, JID jid, IPath editor);
+    JupiterActivity generateJupiterActivity(Operation op, User user,
+        IPath editor);
 
     /**
      * Receives a JupiterActivity from a remote site. The JupiterActivity must

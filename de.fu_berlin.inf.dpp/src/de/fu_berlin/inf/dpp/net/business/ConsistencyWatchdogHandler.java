@@ -290,48 +290,48 @@ public class ConsistencyWatchdogHandler {
 
     protected void recoverFiles(JID from, Set<IPath> paths, SubMonitor progress) {
 
-        ISharedProject project = sessionManager.getSharedProject();
-        JID myJID = project.getLocalUser().getJID();
-
+        ISharedProject sharedProject = sessionManager.getSharedProject();
         progress.beginTask("Sending files", paths.size());
 
         for (IPath path : paths) {
             progress.subTask("Recovering file: " + path.lastSegment());
-            recoverFile(from, project, myJID, path, progress.newChild(1));
+            recoverFile(from, sharedProject, path, progress.newChild(1));
         }
         progress.done();
     }
 
-    protected void recoverFile(JID from, final ISharedProject project,
-        final JID myJID, final IPath path, SubMonitor progress) {
+    protected void recoverFile(JID from, final ISharedProject sharedProject,
+        final IPath path, SubMonitor progress) {
 
-        User fromUser = project.getUser(from);
+        User fromUser = sharedProject.getUser(from);
 
         progress.beginTask("Handling file: " + path.toOSString(), 10);
 
-        IFile file = project.getProject().getFile(path);
+        IFile file = sharedProject.getProject().getFile(path);
 
         // Save document before sending to clients
-        if (file.exists())
+        if (file.exists()) {
             try {
                 editorManager.saveLazy(path);
             } catch (FileNotFoundException e) {
                 log.error("File could not be found, despite existing: " + path,
                     e);
             }
+        }
         progress.worked(1);
 
         // Reset jupiter
-        project.getConcurrentDocumentServer().reset(from, path);
+        sharedProject.getConcurrentDocumentServer().reset(from, path);
 
         progress.worked(1);
+        final User user = sharedProject.getLocalUser();
 
         if (file.exists()) {
 
             try {
                 // Send the file to client
-                project.sendActivity(fromUser, FileActivity.created(project
-                    .getProject(), myJID, path, Purpose.RECOVERY));
+                sharedProject.sendActivity(fromUser, FileActivity.created(
+                    sharedProject.getProject(), user, path, Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -347,10 +347,9 @@ public class ConsistencyWatchdogHandler {
                     checksum.update();
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
-                            project
-                                .activityCreated(new ChecksumActivity(myJID,
-                                    path, checksum.getHash(), checksum
-                                        .getLength()));
+                            sharedProject.activityCreated(new ChecksumActivity(
+                                user, path, checksum.getHash(), checksum
+                                    .getLength()));
                         }
                     });
                 } catch (CoreException e) {
@@ -367,12 +366,12 @@ public class ConsistencyWatchdogHandler {
         } else {
             // TODO Warn the user...
             // Tell the client to delete the file
-            project.sendActivity(fromUser, FileActivity.removed(myJID, path,
-                Purpose.RECOVERY));
+            sharedProject.sendActivity(fromUser, FileActivity.removed(user,
+                path, Purpose.RECOVERY));
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
-                    project.activityCreated(ChecksumActivity.missing(myJID,
-                        path));
+                    sharedProject.activityCreated(ChecksumActivity.missing(
+                        user, path));
                 }
             });
 

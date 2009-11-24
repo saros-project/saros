@@ -3,10 +3,10 @@ package de.fu_berlin.inf.dpp.activities.business;
 import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * A checksum activityDataObject is used to communicate checksums from the host
@@ -39,7 +39,7 @@ public class ChecksumActivity extends AbstractActivity {
      * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
      * used when communicating with users which are observers)
      */
-    public ChecksumActivity(JID source, IPath path, long hash, long length) {
+    public ChecksumActivity(User source, IPath path, long hash, long length) {
         this(source, path, hash, length, null);
     }
 
@@ -47,7 +47,7 @@ public class ChecksumActivity extends AbstractActivity {
      * Constructor for checksum activityDataObjects including a Timestamp (for
      * users which are drivers)
      */
-    public ChecksumActivity(JID source, IPath path, long hash, long length,
+    public ChecksumActivity(User source, IPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
 
         super(source);
@@ -61,7 +61,7 @@ public class ChecksumActivity extends AbstractActivity {
      * Create a ChecksumActivity which indicates that the file is missing on the
      * host.
      */
-    public static ChecksumActivity missing(JID source, IPath path) {
+    public static ChecksumActivity missing(User source, IPath path) {
         return new ChecksumActivity(source, path, NON_EXISTING_DOC,
             NON_EXISTING_DOC);
     }
@@ -144,6 +144,7 @@ public class ChecksumActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new ChecksumActivityDataObject(source, path, hash, length);
+        return new ChecksumActivityDataObject(source.getJID(), path, hash,
+            length);
     }
 }

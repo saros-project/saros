@@ -8,12 +8,12 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.Path;
 
+import de.fu_berlin.inf.dpp.User;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.Jupiter;
-import de.fu_berlin.inf.dpp.net.JID;
 
 public class JupiterSimulator {
 
@@ -42,13 +42,15 @@ public class JupiterSimulator {
 
         Document document;
 
-        public void generate(Operation o) {
+        public void generate(Operation operation) {
 
             /* 1. execute locally */
-            document.execOperation(o);
+            document.execOperation(operation);
+
+            User user = JupiterTestCase.createUserMock("DUMMY");
 
             JupiterActivity jupiterActivity = algorithm
-                .generateJupiterActivity(o, new JID("DUMMY"), new Path("DUMMY"));
+                .generateJupiterActivity(operation, user, new Path("DUMMY"));
 
             if (this == client) {
                 server.inQueue.add(jupiterActivity);
