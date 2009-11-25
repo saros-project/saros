@@ -5,6 +5,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.synchronize.StopManager;
 import de.fu_berlin.inf.dpp.util.ObservableValue;
 import de.fu_berlin.inf.dpp.util.ValueChangeListener;
@@ -17,6 +18,7 @@ import de.fu_berlin.inf.dpp.util.ValueChangeListener;
  * assertions enabled. Then it is possible to manually unblock the project for
  * debugging purposes.
  */
+@Component(module = "action")
 public class StoppedAction extends Action {
 
     private static final Logger log = Logger.getLogger(StoppedAction.class);
