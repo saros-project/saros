@@ -417,7 +417,6 @@ public class BinaryChannel {
 
         } finally {
             remoteTransfers.remove(objectid);
-            progress.done();
         }
     }
 

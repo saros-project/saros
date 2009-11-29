@@ -557,18 +557,20 @@ public class DataTransferManager implements ConnectionSessionListener {
             transmitters = new Transmitter[] { jingle, xmppFileTransfer };
         }
 
-        progress.beginTask("Sending Data", transmitters.length * 70 + 15);
+        progress.beginTask("Sending Data", 100);
 
         if (transferData.compressInDataTransferManager()) {
             input = Util.deflate(input, progress.newChild(15));
         }
 
+        SubMonitor transferProgress = progress.newChild(85);
+
         try {
             // Try all transmitters
             for (Transmitter transmitter : transmitters) {
-                if (sendData(transmitter, transferData, input, progress
-                    .newChild(70))) {
+                if (sendData(transmitter, transferData, input, transferProgress)) {
                     // Successfully sent!
+                    transferProgress.done();
                     return;
                 }
             }
