@@ -166,6 +166,7 @@ public class SharedProject implements ISharedProject, Disposable {
         this.freeColors = new FreeColors(MAX_USERCOLORS - 1);
         this.localUser.setUserRole(UserRole.DRIVER);
         this.host = localUser;
+        this.host.invitationCompleted();
 
         this.participants.put(this.host.getJID(), this.host);
 
@@ -187,6 +188,7 @@ public class SharedProject implements ISharedProject, Disposable {
             stopManager, myID, myColorID, sessionStart);
 
         this.host = new User(this, hostID, 0);
+        this.host.invitationCompleted();
         this.host.setUserRole(UserRole.DRIVER);
 
         this.participants.put(hostID, host);

@@ -166,8 +166,6 @@ public class User {
      *         <code>false</code> if the invitation process is complete
      */
     public boolean isInvitationComplete() {
-        if (isHost())
-            return true;
         return this.invitationComplete;
     }
 
