@@ -109,7 +109,7 @@ public class InvitationWizardUserSelection extends WizardPage {
         PresenceFilter presenceFilter = new PresenceFilter();
         SessionFilter sessionFilter = new SessionFilter();
         final SarosSupportFilter sarosFilter = new SarosSupportFilter();
-        ViewerFilter[] filters = { presenceFilter, sarosFilter, sessionFilter };
+        ViewerFilter[] filters = { presenceFilter, sessionFilter };
         userListViewer.setFilters(filters);
 
         rosterListener = getRosterListener(userListViewer);
@@ -126,7 +126,7 @@ public class InvitationWizardUserSelection extends WizardPage {
 
         // CheckBox to show only users with Saros support.
         onlySaros = new Button(composite, SWT.CHECK);
-        onlySaros.setSelection(true);
+        onlySaros.setSelection(false);
         onlySaros.setText("Hide users without Saros support");
         onlySarosListener = new SelectionListener() {
             public void widgetDefaultSelected(SelectionEvent e) {
