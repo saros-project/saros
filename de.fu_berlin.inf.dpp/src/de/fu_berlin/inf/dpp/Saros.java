@@ -669,14 +669,11 @@ public class Saros extends AbstractUIPlugin {
                     failSilently);
             } else {
                 log.info("xmpp: " + cause.getMessage(), cause);
-                popUpFailureMessage(
-                    "Error Connecting",
-                    "Could not connect to server '"
-                        + server
-                        + "' as user '"
+                popUpFailureMessage("Error Connecting",
+                    "Could not connect to server '" + server + "' as user '"
                         + username
-                        + ". Please check your username and password in the preferences.",
-                    failSilently);
+                        + "'. Please check your username and password in the"
+                        + " preferences.", failSilently);
             }
 
         } catch (Exception e) {
