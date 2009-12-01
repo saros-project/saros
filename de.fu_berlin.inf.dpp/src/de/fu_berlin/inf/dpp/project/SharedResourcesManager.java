@@ -284,8 +284,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                         .getProjectRelativePath()));
 
             case IResourceDelta.REMOVED:
-                if (isMoved(delta))
-                    return null;
+
                 return new FolderActivity(sharedProject.getLocalUser(),
                     FolderActivity.Type.Removed, new SPath(resource
                         .getProjectRelativePath()));
