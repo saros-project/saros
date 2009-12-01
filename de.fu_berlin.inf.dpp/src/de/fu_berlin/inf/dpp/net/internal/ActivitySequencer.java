@@ -35,9 +35,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
@@ -681,7 +681,7 @@ public class ActivitySequencer {
             toOptimize.size());
 
         TextSelectionActivityDataObject selection = null;
-        LinkedHashMap<IPath, ViewportActivityDataObject> viewport = new LinkedHashMap<IPath, ViewportActivityDataObject>();
+        LinkedHashMap<SPathDataObject, ViewportActivityDataObject> viewport = new LinkedHashMap<SPathDataObject, ViewportActivityDataObject>();
 
         for (IActivityDataObject activityDataObject : toOptimize) {
 
@@ -705,7 +705,7 @@ public class ActivitySequencer {
             result.add(selection);
 
         // Add only one viewport per editor
-        for (Map.Entry<IPath, ViewportActivityDataObject> entry : viewport
+        for (Entry<SPathDataObject, ViewportActivityDataObject> entry : viewport
             .entrySet()) {
             result.add(entry.getValue());
         }
@@ -727,13 +727,14 @@ public class ActivitySequencer {
 
             if (((lastTextEdit.getSource() == null) || lastTextEdit.getSource()
                 .equals(textEdit.getSource()))
-                && (textEdit.offset == lastTextEdit.offset
-                    + lastTextEdit.text.length())) {
+                && (textEdit.getOffset() == lastTextEdit.getOffset()
+                    + lastTextEdit.getText().length())) {
                 result.remove(lastTextEdit);
                 textEdit = new TextEditActivityDataObject(lastTextEdit
-                    .getSource(), lastTextEdit.offset, lastTextEdit.text
-                    + textEdit.text, lastTextEdit.replacedText
-                    + textEdit.replacedText, lastTextEdit.getEditor());
+                    .getSource(), lastTextEdit.getOffset(), lastTextEdit
+                    .getText()
+                    + textEdit.getText(), lastTextEdit.getReplacedText()
+                    + textEdit.getReplacedText(), lastTextEdit.getEditor());
             }
         }
 

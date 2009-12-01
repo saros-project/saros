@@ -1,10 +1,10 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.ViewportActivityDataObject;
 
@@ -12,10 +12,10 @@ public class ViewportActivity extends AbstractActivity {
 
     protected final int topIndex;
     protected final int bottomIndex;
-    protected final IPath path;
+    protected final SPath path;
 
     public ViewportActivity(User source, int topIndex, int bottomIndex,
-        IPath editor) {
+        SPath editor) {
 
         super(source);
 
@@ -31,7 +31,7 @@ public class ViewportActivity extends AbstractActivity {
         this.path = editor;
     }
 
-    public ViewportActivity(User source, ILineRange viewport, IPath editor) {
+    public ViewportActivity(User source, ILineRange viewport, SPath editor) {
 
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
@@ -50,7 +50,7 @@ public class ViewportActivity extends AbstractActivity {
         return this.topIndex;
     }
 
-    public IPath getEditor() {
+    public SPath getEditor() {
         return this.path;
     }
 
@@ -101,6 +101,6 @@ public class ViewportActivity extends AbstractActivity {
 
     public IActivityDataObject getActivityDataObject() {
         return new ViewportActivityDataObject(source.getJID(), topIndex,
-            bottomIndex, path);
+            bottomIndex, path.toSPathDataObject());
     }
 }

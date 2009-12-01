@@ -202,9 +202,10 @@ public class ConcurrentDocumentClient implements Disposable {
 
     protected final IActivityReceiver clientReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(FileActivity fileActivityDataObject) {
-            if (fileActivityDataObject.getType() == FileActivity.Type.Removed) {
-                jupiterClient.reset(fileActivityDataObject.getPath());
+        public void receive(FileActivity fileActivity) {
+            if (fileActivity.getType() == FileActivity.Type.Removed) {
+                jupiterClient.reset(fileActivity.getPath()
+                    .getProjectRelativePath());
             }
         }
     };
@@ -229,7 +230,8 @@ public class ConcurrentDocumentClient implements Disposable {
 
         // Transform to TextEdit so it can be executed locally
         for (TextEditActivity textEdit : op.toTextEdit(jupiterActivity
-            .getEditorPath(), jupiterActivity.getSource())) {
+            .getEditorPath().getProjectRelativePath(), jupiterActivity
+            .getSource())) {
 
             result.executeLocally.add(textEdit);
         }

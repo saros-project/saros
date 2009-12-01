@@ -6,8 +6,7 @@ public class TwoWayJupiterClientDocument extends ClientSynchronizedDocument {
 
     public static final User client = JupiterTestCase.createUserMock("Client");
 
-    public TwoWayJupiterClientDocument(String content, SimulateNetzwork con) {
+    public TwoWayJupiterClientDocument(String content, NetworkSimulator con) {
         super(TwoWayJupiterServerDocument.server.getJID(), content, con, client);
     }
-
 }

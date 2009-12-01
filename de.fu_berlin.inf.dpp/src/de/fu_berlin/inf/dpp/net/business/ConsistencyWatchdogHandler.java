@@ -28,6 +28,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
@@ -331,7 +332,8 @@ public class ConsistencyWatchdogHandler {
             try {
                 // Send the file to client
                 sharedProject.sendActivity(fromUser, FileActivity.created(
-                    sharedProject.getProject(), user, path, Purpose.RECOVERY));
+                    sharedProject.getProject(), user, new SPath(path),
+                    Purpose.RECOVERY));
 
                 // Immediately follow up with a new checksum
                 IDocument doc;
@@ -348,8 +350,8 @@ public class ConsistencyWatchdogHandler {
                     Util.runSafeSWTSync(log, new Runnable() {
                         public void run() {
                             sharedProject.activityCreated(new ChecksumActivity(
-                                user, path, checksum.getHash(), checksum
-                                    .getLength()));
+                                user, new SPath(path), checksum.getHash(),
+                                checksum.getLength()));
                         }
                     });
                 } catch (CoreException e) {
@@ -367,11 +369,11 @@ public class ConsistencyWatchdogHandler {
             // TODO Warn the user...
             // Tell the client to delete the file
             sharedProject.sendActivity(fromUser, FileActivity.removed(user,
-                path, Purpose.RECOVERY));
+                new SPath(path), Purpose.RECOVERY));
             Util.runSafeSWTSync(log, new Runnable() {
                 public void run() {
                     sharedProject.activityCreated(ChecksumActivity.missing(
-                        user, path));
+                        user, new SPath(path)));
                 }
             });
 

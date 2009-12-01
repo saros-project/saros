@@ -24,14 +24,9 @@ public class TwoWayJupiterServerDocument implements NetworkEventHandler,
     /* sync algorithm with ack-operation list. */
     private Algorithm algorithm;
 
-    private SimulateNetzwork connection;
+    private NetworkSimulator connection;
 
-    public TwoWayJupiterServerDocument(String content, SimulateNetzwork con) {
-        init(content, con);
-    }
-
-    /* init proxy queue and all necessary objects. */
-    private void init(String content, SimulateNetzwork con) {
+    public TwoWayJupiterServerDocument(String content, NetworkSimulator con) {
         this.doc = new Document(content);
         this.algorithm = new Jupiter(false);
         this.connection = con;

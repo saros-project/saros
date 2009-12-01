@@ -8,13 +8,13 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.jivesoftware.smack.packet.PacketExtension;
 import org.xmlpull.mxp1.MXParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import de.fu_berlin.inf.dpp.User.UserRole;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
@@ -43,7 +43,8 @@ import de.fu_berlin.inf.dpp.net.internal.ActivitiesExtensionProvider;
 public class ActivitiesExtensionProviderTest extends TestCase {
 
     protected static final JID jid = new JID("testman@jabber.cc");
-    protected static final IPath path = new Path("testpath");
+    protected static final SPathDataObject path = new SPathDataObject("pid",
+        new Path("testpath"), "xtx");
     protected static final Timestamp jupiterTime = new JupiterVectorTime(1, 3);
     protected static final ActivitiesExtensionProvider provider = new ActivitiesExtensionProvider();
 

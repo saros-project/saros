@@ -1,12 +1,12 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.source.ILineRange;
 import org.eclipse.jface.text.source.LineRange;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.ViewportActivity;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -22,14 +22,13 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
     @XStreamAlias("bottom")
     protected final int bottomIndex;
 
-    @XStreamAsAttribute
-    protected final IPath path;
+    protected final SPathDataObject path;
 
     public ViewportActivityDataObject(JID source, int topIndex,
-        int bottomIndex, IPath path) {
+        int bottomIndex, SPathDataObject sPathDataObject) {
         super(source);
 
-        if (path == null) {
+        if (sPathDataObject == null) {
             throw new IllegalArgumentException("editor must not be null");
         }
 
@@ -38,11 +37,12 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
 
         this.topIndex = topIndex;
         this.bottomIndex = bottomIndex;
-        this.path = path;
+        this.path = sPathDataObject;
     }
 
     public ViewportActivityDataObject(JID source, ILineRange viewport,
-        IPath editor) {
+        SPathDataObject editor) {
+
         this(source, Math.max(0, viewport.getStartLine()), Math.max(0, viewport
             .getStartLine())
             + Math.max(0, viewport.getNumberOfLines()), editor);
@@ -60,7 +60,7 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
         return this.topIndex;
     }
 
-    public IPath getEditor() {
+    public SPathDataObject getEditor() {
         return this.path;
     }
 
@@ -111,6 +111,6 @@ public class ViewportActivityDataObject extends AbstractActivityDataObject {
 
     public IActivity getActivity(ISharedProject sharedProject) {
         return new ViewportActivity(sharedProject.getUser(source), topIndex,
-            bottomIndex, path);
+            bottomIndex, path.toSPath(sharedProject));
     }
 }

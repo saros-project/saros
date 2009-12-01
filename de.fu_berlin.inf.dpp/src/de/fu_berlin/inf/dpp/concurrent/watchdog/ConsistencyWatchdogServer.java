@@ -19,6 +19,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.management.DocumentChecksum;
@@ -231,8 +232,9 @@ public class ConsistencyWatchdogServer extends Job {
 
                     // Sent an checksum to everybody
                     ChecksumActivity checksumActivity = new ChecksumActivity(
-                        sharedProject.getLocalUser(), checksum.getPath(),
-                        checksum.getHash(), checksum.getLength());
+                        sharedProject.getLocalUser(), new SPath(checksum
+                            .getPath()), checksum.getHash(), checksum
+                            .getLength());
 
                     sharedProject.activityCreated(checksumActivity);
 

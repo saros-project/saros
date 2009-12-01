@@ -2,7 +2,7 @@
  * DPP - Serious Distributed Pair Programming
  * (c) Freie Universitaet Berlin - Fachbereich Mathematik und Informatik - 2006
  * (c) Riad Djemili - 2006
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 1, or (at your option)
@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.jivesoftware.smack.packet.PacketExtension;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.AbstractActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
@@ -56,7 +57,8 @@ public class ActivitiesExtensionProvider extends
             ViewportActivityDataObject.class, TimedActivityDataObject.class,
             JupiterActivityDataObject.class, JupiterVectorTime.class,
             DeleteOperation.class, InsertOperation.class, NoOperation.class,
-            SplitOperation.class, TimestampOperation.class, JID.class);
+            SplitOperation.class, TimestampOperation.class, JID.class,
+            SPathDataObject.class);
     }
 
     public PacketExtension create(String sessionID,

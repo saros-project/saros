@@ -46,16 +46,17 @@ public class JupiterClient {
 
     public synchronized Operation receive(JupiterActivity jupiterActivity)
         throws TransformationException {
-        return get(jupiterActivity.getEditorPath()).receiveJupiterActivity(
-            jupiterActivity);
+        return get(jupiterActivity.getEditorPath().getProjectRelativePath())
+            .receiveJupiterActivity(jupiterActivity);
     }
 
     public synchronized boolean isCurrent(
         ChecksumActivity checksumActivityDataObject)
         throws TransformationException {
 
-        return get(checksumActivityDataObject.getPath()).isCurrent(
-            checksumActivityDataObject.getTimestamp());
+        return get(
+            checksumActivityDataObject.getPath().getProjectRelativePath())
+            .isCurrent(checksumActivityDataObject.getTimestamp());
     }
 
     public synchronized void reset(IPath path) {
@@ -68,9 +69,11 @@ public class JupiterClient {
 
     public synchronized JupiterActivity generate(TextEditActivity textEdit) {
 
-        return get(textEdit.getEditor()).generateJupiterActivity(
+        IPath projectRelativePath = textEdit.getEditor()
+            .getProjectRelativePath();
+        return get(projectRelativePath).generateJupiterActivity(
             textEdit.toOperation(), sharedProject.getLocalUser(),
-            textEdit.getEditor());
+            projectRelativePath);
     }
 
     /**
@@ -82,8 +85,9 @@ public class JupiterClient {
     public synchronized ChecksumActivity withTimestamp(
         ChecksumActivity checksumActivityDataObject) {
 
-        return get(checksumActivityDataObject.getPath()).withTimestamp(
-            checksumActivityDataObject);
+        return get(
+            checksumActivityDataObject.getPath().getProjectRelativePath())
+            .withTimestamp(checksumActivityDataObject);
     }
 
 }

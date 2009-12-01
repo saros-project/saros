@@ -1,10 +1,8 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.eclipse.core.runtime.IPath;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -27,15 +25,14 @@ public class JupiterActivityDataObject extends AbstractActivityDataObject {
 
     protected final Operation operation;
 
-    @XStreamAsAttribute
-    protected final IPath editor;
+    protected final SPathDataObject editor;
 
     public JupiterActivityDataObject(Timestamp timestamp, Operation operation,
-        JID source, IPath editor) {
+        JID source, SPathDataObject sPathDataObject) {
         super(source);
         this.timestamp = timestamp;
         this.operation = operation;
-        this.editor = editor;
+        this.editor = sPathDataObject;
     }
 
     /*
@@ -56,7 +53,7 @@ public class JupiterActivityDataObject extends AbstractActivityDataObject {
         return this.timestamp;
     }
 
-    public IPath getEditorPath() {
+    public SPathDataObject getEditorPath() {
         return this.editor;
     }
 
@@ -127,6 +124,6 @@ public class JupiterActivityDataObject extends AbstractActivityDataObject {
 
     public IActivity getActivity(ISharedProject sharedProject) {
         return new JupiterActivity(timestamp, operation, sharedProject
-            .getUser(source), editor);
+            .getUser(source), editor.toSPath(sharedProject));
     }
 }

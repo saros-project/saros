@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.JupiterActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Algorithm;
@@ -41,7 +42,6 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.TransformationException;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.GOTOInclusionTransformation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.NoOperation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.TimestampOperation;
-import de.fu_berlin.inf.dpp.net.JID;
 
 /**
  * This class implements the client-side core of the Jupiter control algorithm.
@@ -97,7 +97,7 @@ public class Jupiter implements Algorithm {
 
         // send(op, myMsgs, otherMsgs);
         JupiterActivity jupiterActivity = new JupiterActivity(this.vectorTime,
-            op, source, editor);
+            op, source, new SPath(editor));
 
         // add(op, myMsgs) to outgoing;
         this.ackJupiterActivityList.add(new OperationWrapper(op,
@@ -324,7 +324,7 @@ public class Jupiter implements Algorithm {
      * @valueObject Instances of this class should be treated as value objects
      *              and should be treated as immutable.
      * 
-     * @see Jupiter#generateJupiterActivity(Operation, JID, IPath)
+     * @see Jupiter#generateJupiterActivity(Operation, User, IPath)
      * @see Jupiter#receiveJupiterActivity(JupiterActivity)
      */
     protected static class OperationWrapper {

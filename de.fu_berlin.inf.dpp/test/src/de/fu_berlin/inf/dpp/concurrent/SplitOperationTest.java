@@ -6,10 +6,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.internal.text.DeleteOperation;
@@ -23,7 +23,7 @@ import de.fu_berlin.inf.dpp.concurrent.jupiter.test.util.JupiterTestCase;
  */
 public class SplitOperationTest extends TestCase {
 
-    protected IPath path = new Path("path");
+    protected SPath path = new SPath(new Path("path"));
     protected User source = JupiterTestCase.createUserMock("source");
 
     public static Operation S(Operation one, Operation two) {
@@ -48,14 +48,14 @@ public class SplitOperationTest extends TestCase {
         TextEditActivity expected1 = new TextEditActivity(source, 4, "0abcd",
             "", path);
         assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
 
         // vice versa
         Operation split2 = S(I(6, "0ab"), I(4, "cd"));
         TextEditActivity expected2 = new TextEditActivity(source, 4, "cd0ab",
             "", path);
         assertEquals(Collections.singletonList(expected2), split2.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
     }
 
     public void testDeleteDelete() {
@@ -64,13 +64,13 @@ public class SplitOperationTest extends TestCase {
         TextEditActivity expected1 = new TextEditActivity(source, 5, "",
             "abcde", path);
         assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
 
         Operation split2 = S(D(5, "cde"), D(5, "ab"));
         TextEditActivity expected2 = new TextEditActivity(source, 5, "",
             "cdeab", path);
         assertEquals(Collections.singletonList(expected2), split2.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
     }
 
     public void testInsertDelete() {
@@ -79,13 +79,13 @@ public class SplitOperationTest extends TestCase {
         TextEditActivity expected1 = new TextEditActivity(source, 5, "", "cd",
             path);
         assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
 
         Operation split2 = S(I(5, "abcde"), D(5, "abcd"));
         TextEditActivity expected2 = new TextEditActivity(source, 5, "e", "",
             path);
         assertEquals(Collections.singletonList(expected2), split2.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
     }
 
     public void testDeleteInsert() {
@@ -94,7 +94,7 @@ public class SplitOperationTest extends TestCase {
         TextEditActivity expected1 = new TextEditActivity(source, 8, "ghijk",
             "abc", path);
         assertEquals(Collections.singletonList(expected1), split1.toTextEdit(
-            path, source));
+            path.getProjectRelativePath(), source));
     }
 
     public void testDelSplit() {
@@ -102,8 +102,8 @@ public class SplitOperationTest extends TestCase {
         Operation split = S(D(8, "abc"), S(nop(), I(8, "ghijk")));
         TextEditActivity expected = new TextEditActivity(source, 8, "ghijk",
             "abc", path);
-        assertEquals(Collections.singletonList(expected), split.toTextEdit(
-            path, source));
+        assertEquals(Collections.singletonList(expected), split.toTextEdit(path
+            .getProjectRelativePath(), source));
     }
 
     public void testSplitChain1() {
@@ -116,7 +116,8 @@ public class SplitOperationTest extends TestCase {
         expected.add(new TextEditActivity(source, 2, "e", "", path));
         expected.add(new TextEditActivity(source, 15, "", "xyz", path));
 
-        assertEquals(expected, split.toTextEdit(path, source));
+        assertEquals(expected, split.toTextEdit(path.getProjectRelativePath(),
+            source));
     }
 
     public void testSplitChain2() {
@@ -128,7 +129,8 @@ public class SplitOperationTest extends TestCase {
         expected.add(new TextEditActivity(source, 8, "", "uvw", path));
         expected.add(new TextEditActivity(source, 2, "exyz", "", path));
 
-        assertEquals(expected, split.toTextEdit(path, source));
+        assertEquals(expected, split.toTextEdit(path.getProjectRelativePath(),
+            source));
 
     }
 
@@ -141,7 +143,8 @@ public class SplitOperationTest extends TestCase {
         expected
             .add(new TextEditActivity(source, 8, "123456", "abcdefg", path));
 
-        assertEquals(expected, split.toTextEdit(path, source));
+        assertEquals(expected, split.toTextEdit(path.getProjectRelativePath(),
+            source));
 
     }
 }

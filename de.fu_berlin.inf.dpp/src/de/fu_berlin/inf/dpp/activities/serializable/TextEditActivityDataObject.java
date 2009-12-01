@@ -21,12 +21,12 @@ package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 import com.thoughtworks.xstream.annotations.XStreamConverter;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -47,21 +47,16 @@ import de.fu_berlin.inf.dpp.util.xstream.UrlEncodingStringConverter;
 public class TextEditActivityDataObject extends AbstractActivityDataObject {
 
     @XStreamAsAttribute
-    public final int offset;
+    protected final int offset;
 
     @XStreamConverter(UrlEncodingStringConverter.class)
-    public final String text;
+    protected final String text;
 
     @XStreamAlias("replaced")
     @XStreamConverter(UrlEncodingStringConverter.class)
-    public final String replacedText;
+    protected final String replacedText;
 
-    @XStreamAsAttribute
-    protected final IPath editor;
-
-    public IPath getEditor() {
-        return this.editor;
-    }
+    protected final SPathDataObject editor;
 
     /**
      * @param offset
@@ -71,25 +66,41 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
      *            the text that was inserted.
      * @param replacedText
      *            the text that was replaced by this activityDataObject.
-     * @param editor
+     * @param sPathDataObject
      *            path of the editor where this activityDataObject happened.
      * @param source
      *            JID of the user that caused this activityDataObject
      */
     public TextEditActivityDataObject(JID source, int offset, String text,
-        String replacedText, IPath editor) {
+        String replacedText, SPathDataObject sPathDataObject) {
         super(source);
         if (text == null)
             throw new IllegalArgumentException("Text cannot be null");
         if (replacedText == null)
             throw new IllegalArgumentException("ReplacedText cannot be null");
-        if (editor == null)
+        if (sPathDataObject == null)
             throw new IllegalArgumentException("Editor cannot be null");
 
         this.offset = offset;
         this.text = text;
         this.replacedText = replacedText;
-        this.editor = editor;
+        this.editor = sPathDataObject;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getReplacedText() {
+        return replacedText;
+    }
+
+    public SPathDataObject getEditor() {
+        return this.editor;
     }
 
     @Override
@@ -195,6 +206,6 @@ public class TextEditActivityDataObject extends AbstractActivityDataObject {
 
     public IActivity getActivity(ISharedProject sharedProject) {
         return new TextEditActivity(sharedProject.getUser(source), offset,
-            text, replacedText, editor);
+            text, replacedText, editor.toSPath(sharedProject));
     }
 }

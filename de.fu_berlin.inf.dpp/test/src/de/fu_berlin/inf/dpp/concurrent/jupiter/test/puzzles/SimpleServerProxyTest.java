@@ -132,7 +132,7 @@ public class SimpleServerProxyTest extends JupiterTestCase {
 
         /* send two concurrent operations. */
         client_1.sendOperation(new DeleteOperation(0, "abc"), 300);
-        client_2.sendOperation(new InsertOperation(1, "t"), 400);
+        client_2.sendOperation(new InsertOperation(1, "t"), 500);
 
         Thread.sleep(100);
         /* assert local execution. */

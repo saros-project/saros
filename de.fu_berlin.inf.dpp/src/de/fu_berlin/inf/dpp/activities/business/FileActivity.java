@@ -6,18 +6,17 @@ import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FileActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 
-public class FileActivity extends AbstractActivity implements IResourceObject {
+public class FileActivity extends AbstractActivity implements IResourceActivity {
 
     /**
-     * Enum used to distinguish file activityDataObjects which are caused as
-     * part of a consistency recovery and those used as regular
-     * activityDataObjects.
+     * Enumeration used to distinguish file activities which are caused as part
+     * of a consistency recovery and those used as regular activities.
      */
     public static enum Purpose {
         ACTIVITY, RECOVERY;
@@ -27,15 +26,15 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
         Created, Removed, Moved
     }
 
-    protected Type type;
-    protected IPath newPath;
-    protected IPath oldPath;
-    protected Purpose purpose;
-    protected byte[] data;
+    protected final Type type;
+    protected final SPath newPath;
+    protected final SPath oldPath;
+    protected final Purpose purpose;
+    protected final byte[] data;
 
     /**
-     * Utility method for creating a file activityDataObject of type == Created
-     * from a given path.
+     * Utility method for creating a file activity of type == Created for a
+     * given path.
      * 
      * This method will make a snapshot copy of the file at this point in time.
      * 
@@ -43,7 +42,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      *            the path of the file to copy the data from
      */
     public static FileActivity created(IProject project, User source,
-        IPath path, Purpose purpose) throws IOException {
+        SPath path, Purpose purpose) throws IOException {
 
         // TODO Use Eclipse Method of getting the contents of a file:
         // IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -67,7 +66,8 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
         // content,
         // purpose);
 
-        File f = new File(project.getFile(path).getLocation().toOSString());
+        File f = new File(project.getFile(path.getProjectRelativePath())
+            .getLocation().toOSString());
         byte[] content = FileUtils.readFileToByteArray(f);
 
         return new FileActivity(source, Type.Created, path, null, content,
@@ -91,13 +91,13 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      *             the new content of the file could not be read
      */
     public static FileActivity moved(IProject project, User source,
-        IPath destPath, IPath sourcePath, boolean contentChange)
+        SPath destPath, SPath sourcePath, boolean contentChange)
         throws IOException {
 
         byte[] content = null;
         if (contentChange) {
-            File file = new File(project.findMember(destPath).getLocation()
-                .toOSString());
+            File file = new File(project.findMember(
+                destPath.getProjectRelativePath()).getLocation().toOSString());
             content = FileUtils.readFileToByteArray(file);
         }
         return new FileActivity(source, Type.Moved, destPath, sourcePath,
@@ -110,7 +110,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      * @param path
      *            the path of the file to remove
      */
-    public static FileActivity removed(User source, IPath path, Purpose purpose) {
+    public static FileActivity removed(User source, SPath path, Purpose purpose) {
 
         return new FileActivity(source, Type.Removed, path, null, null, purpose);
     }
@@ -131,7 +131,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivity(User source, Type type, IPath newPath, IPath oldPath,
+    public FileActivity(User source, Type type, SPath newPath, SPath oldPath,
         byte[] data, Purpose purpose) {
 
         super(source);
@@ -161,11 +161,11 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
         this.purpose = purpose;
     }
 
-    public IPath getPath() {
+    public SPath getPath() {
         return this.newPath;
     }
 
-    public IPath getOldPath() {
+    public SPath getOldPath() {
         return this.oldPath;
     }
 
@@ -244,7 +244,7 @@ public class FileActivity extends AbstractActivity implements IResourceObject {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new FileActivityDataObject(source.getJID(), type, newPath,
-            oldPath, data, purpose);
+        return new FileActivityDataObject(source.getJID(), type, newPath
+            .toSPathDataObject(), oldPath.toSPathDataObject(), data, purpose);
     }
 }

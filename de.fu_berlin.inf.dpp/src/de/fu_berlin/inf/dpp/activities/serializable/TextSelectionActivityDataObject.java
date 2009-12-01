@@ -20,13 +20,13 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.TextSelectionActivity;
 import de.fu_berlin.inf.dpp.net.JID;
@@ -41,18 +41,17 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
     @XStreamAsAttribute
     private final int length;
 
-    @XStreamAsAttribute
-    private final IPath editor;
+    private final SPathDataObject editor;
 
     public TextSelectionActivityDataObject(JID source, int offset, int length,
-        IPath path) {
+        SPathDataObject sPathDataObject) {
         super(source);
-        if (path == null) {
+        if (sPathDataObject == null) {
             throw new IllegalArgumentException("path must not be null");
         }
         this.offset = offset;
         this.length = length;
-        this.editor = path;
+        this.editor = sPathDataObject;
     }
 
     public int getLength() {
@@ -63,7 +62,7 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
         return this.offset;
     }
 
-    public IPath getEditor() {
+    public SPathDataObject getEditor() {
         return this.editor;
     }
 
@@ -113,6 +112,6 @@ public class TextSelectionActivityDataObject extends AbstractActivityDataObject 
 
     public IActivity getActivity(ISharedProject sharedProject) {
         return new TextSelectionActivity(sharedProject.getUser(source), offset,
-            length, editor);
+            length, editor.toSPath(sharedProject));
     }
 }

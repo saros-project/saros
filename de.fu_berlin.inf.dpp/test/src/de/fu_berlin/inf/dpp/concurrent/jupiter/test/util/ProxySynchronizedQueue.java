@@ -22,10 +22,10 @@ public class ProxySynchronizedQueue {
     private static Logger log = Logger.getLogger(ProxySynchronizedQueue.class);
 
     private Algorithm algorithm;
-    private SimulateNetzwork connection;
+    private NetworkSimulator connection;
     private User user;
 
-    public ProxySynchronizedQueue(User user, SimulateNetzwork connection) {
+    public ProxySynchronizedQueue(User user, NetworkSimulator connection) {
         this.user = user;
         this.algorithm = new Jupiter(false);
         this.connection = connection;

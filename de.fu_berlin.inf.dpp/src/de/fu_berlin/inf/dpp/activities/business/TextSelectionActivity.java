@@ -20,21 +20,21 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextSelectionActivityDataObject;
 
 public class TextSelectionActivity extends AbstractActivity {
 
-    private final int offset;
-    private final int length;
-    private final IPath path;
+    protected final int offset;
+    protected final int length;
+    protected final SPath path;
 
-    public TextSelectionActivity(User source, int offset, int length, IPath path) {
+    public TextSelectionActivity(User source, int offset, int length, SPath path) {
 
         super(source);
         if (path == null) {
@@ -53,7 +53,7 @@ public class TextSelectionActivity extends AbstractActivity {
         return this.offset;
     }
 
-    public IPath getEditor() {
+    public SPath getEditor() {
         return this.path;
     }
 
@@ -102,6 +102,6 @@ public class TextSelectionActivity extends AbstractActivity {
 
     public IActivityDataObject getActivityDataObject() {
         return new TextSelectionActivityDataObject(source.getJID(), offset,
-            length, path);
+            length, path.toSPathDataObject());
     }
 }

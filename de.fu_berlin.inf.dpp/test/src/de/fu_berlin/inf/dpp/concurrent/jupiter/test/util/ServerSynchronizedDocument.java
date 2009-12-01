@@ -24,24 +24,15 @@ public class ServerSynchronizedDocument implements JupiterServer,
     private Algorithm algorithm;
 
     private User user;
-    private SimulateNetzwork connection;
+    private NetworkSimulator connection;
 
     private boolean accessDenied = false;
 
     private HashMap<JID, ProxySynchronizedQueue> proxyQueues;
 
-    public ServerSynchronizedDocument(SimulateNetzwork connection, User user) {
+    public ServerSynchronizedDocument(NetworkSimulator connection, User user) {
         this.user = user;
-        init(connection);
-    }
-
-    /**
-     * init proxy queue and network connection.
-     * 
-     * @param con
-     */
-    private void init(SimulateNetzwork con) {
-        this.connection = con;
+        this.connection = connection;
         this.proxyQueues = new HashMap<JID, ProxySynchronizedQueue>();
     }
 

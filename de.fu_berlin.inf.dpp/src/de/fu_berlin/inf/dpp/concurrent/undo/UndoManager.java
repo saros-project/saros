@@ -356,8 +356,8 @@ public class UndoManager implements Disposable, IActivityProvider {
                         currentLocalAtomicOperation, operation, Boolean.FALSE);
                 }
                 log.debug("adding remote " + operation + " to history");
-                undoHistory.add(textEditActivityDataObject.getEditor(),
-                    Type.REMOTE, operation);
+                undoHistory.add(textEditActivityDataObject.getEditor()
+                    .getProjectRelativePath(), Type.REMOTE, operation);
             } else {
                 if (!textEditActivityDataObject.getEditor().equals(
                     currentActiveEditor)) {

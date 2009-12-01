@@ -13,23 +13,23 @@ public class StopActivity extends AbstractActivity {
 
     protected User initiator;
 
-    // the user who has to be locked / unlocked
-    protected User user;
+    /** The user who has to be locked / unlocked. */
+    protected final User user;
 
     public enum Type {
         LOCKREQUEST, UNLOCKREQUEST
     }
 
-    protected Type type;
+    protected final Type type;
 
     public enum State {
         INITIATED, ACKNOWLEDGED
     }
 
-    protected State state;
+    protected final State state;
 
-    // a stop activityDataObject has a unique id
-    protected String stopActivityID;
+    /** A stop activity has a unique ID. */
+    protected final String stopActivityID;
 
     public StopActivity(User source, User initiator, User user, Type type,
         State state, String stopActivityID) {

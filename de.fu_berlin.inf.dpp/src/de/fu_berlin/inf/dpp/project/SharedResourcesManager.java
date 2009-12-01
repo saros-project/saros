@@ -45,10 +45,11 @@ import org.picocontainer.Disposable;
 import org.picocontainer.annotations.Inject;
 
 import de.fu_berlin.inf.dpp.Saros;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.FolderActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
-import de.fu_berlin.inf.dpp.activities.business.IResourceObject;
+import de.fu_berlin.inf.dpp.activities.business.IResourceActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
 import de.fu_berlin.inf.dpp.annotations.Component;
 import de.fu_berlin.inf.dpp.concurrent.watchdog.ConsistencyWatchdogClient;
@@ -130,18 +131,18 @@ public class SharedResourcesManager implements IResourceChangeListener,
     protected class ResourceDeltaVisitor implements IResourceDeltaVisitor {
 
         // stores activityDataObjects that happen while one change event
-        protected List<IResourceObject> activitiesBuffer = new ArrayList<IResourceObject>();
+        protected List<IResourceActivity> activitiesBuffer = new ArrayList<IResourceActivity>();
 
         /**
          * Compares the length (in number segments) of IPaths of given
          * Activities. Longer path is 'bigger'.
          * */
         protected class PathLengthComparator implements
-            Comparator<IResourceObject> {
+            Comparator<IResourceActivity> {
 
-            public int compare(IResourceObject a1, IResourceObject a2) {
-                int a1sc = a1.getPath().segmentCount();
-                int a2sc = a2.getPath().segmentCount();
+            public int compare(IResourceActivity a1, IResourceActivity a2) {
+                int a1sc = a1.getPath().getProjectRelativePath().segmentCount();
+                int a2sc = a2.getPath().getProjectRelativePath().segmentCount();
 
                 return a1sc - a2sc;
             }
@@ -153,11 +154,11 @@ public class SharedResourcesManager implements IResourceChangeListener,
          * Activities. Shorter path is 'bigger'.
          * */
         protected class ReversePathLengthComparator implements
-            Comparator<IResourceObject> {
+            Comparator<IResourceActivity> {
 
             PathLengthComparator pathLengthComparator = new PathLengthComparator();
 
-            public int compare(IResourceObject a1, IResourceObject a2) {
+            public int compare(IResourceActivity a1, IResourceActivity a2) {
                 return -pathLengthComparator.compare(a1, a2);
             }
         }
@@ -174,23 +175,23 @@ public class SharedResourcesManager implements IResourceChangeListener,
         /**
          * Orders activityDataObjects in buffer.
          */
-        protected List<IResourceObject> getOrderedActivities() {
+        protected List<IResourceActivity> getOrderedActivities() {
             // TODO Use a comparator which includes all this as a sorting rule
 
-            List<IResourceObject> fileCreateActivities = new ArrayList<IResourceObject>();
-            List<IResourceObject> fileMoveActivities = new ArrayList<IResourceObject>();
-            List<IResourceObject> fileRemoveActivities = new ArrayList<IResourceObject>();
+            List<IResourceActivity> fileCreateActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> fileMoveActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> fileRemoveActivities = new ArrayList<IResourceActivity>();
 
-            List<IResourceObject> folderCreateActivities = new ArrayList<IResourceObject>();
-            List<IResourceObject> folderRemoveActivities = new ArrayList<IResourceObject>();
+            List<IResourceActivity> folderCreateActivities = new ArrayList<IResourceActivity>();
+            List<IResourceActivity> folderRemoveActivities = new ArrayList<IResourceActivity>();
 
-            List<IResourceObject> orderedList;
+            List<IResourceActivity> orderedList;
 
             /**
              * split all activityDataObjects in activityDataObjects buffer in
              * groups ({File,Folder} * {Create, Move, Delete})
              */
-            for (IResourceObject activity : activitiesBuffer) {
+            for (IResourceActivity activity : activitiesBuffer) {
                 FolderActivity.Type tFolder;
                 FileActivity.Type tFile;
 
@@ -224,7 +225,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
             Collections.sort(folderCreateActivities, pathLengthComparator);
             Collections.sort(folderRemoveActivities, iplc);
 
-            orderedList = new ArrayList<IResourceObject>();
+            orderedList = new ArrayList<IResourceActivity>();
 
             // add activityDataObjects to the result
             orderedList.addAll(folderCreateActivities);
@@ -257,7 +258,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 return false;
             }
 
-            IResourceObject activity = null;
+            IResourceActivity activity = null;
 
             if (resource instanceof IFile)
                 activity = handleFileDelta(delta);
@@ -273,28 +274,28 @@ public class SharedResourcesManager implements IResourceChangeListener,
             return delta.getKind() != IResourceDelta.NO_CHANGE;
         }
 
-        protected IResourceObject handleFolderDelta(IResourceDelta delta) {
+        protected IResourceActivity handleFolderDelta(IResourceDelta delta) {
             IResource resource = delta.getResource();
             switch (delta.getKind()) {
             case IResourceDelta.ADDED:
 
                 return new FolderActivity(sharedProject.getLocalUser(),
-                    FolderActivity.Type.Created, resource
-                        .getProjectRelativePath());
+                    FolderActivity.Type.Created, new SPath(resource
+                        .getProjectRelativePath()));
 
             case IResourceDelta.REMOVED:
                 if (isMoved(delta))
                     return null;
                 return new FolderActivity(sharedProject.getLocalUser(),
-                    FolderActivity.Type.Removed, resource
-                        .getProjectRelativePath());
+                    FolderActivity.Type.Removed, new SPath(resource
+                        .getProjectRelativePath()));
 
             default:
                 return null;
             }
         }
 
-        protected IResourceObject handleFileDelta(IResourceDelta delta) {
+        protected IResourceActivity handleFileDelta(IResourceDelta delta) {
             IResource resource = delta.getResource();
             int kind = delta.getKind();
 
@@ -322,8 +323,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
                     try {
                         return FileActivity.moved(sharedProject.getProject(),
-                            sharedProject.getLocalUser(), newPath, oldPath,
-                            isContentChange(delta));
+                            sharedProject.getLocalUser(), new SPath(newPath),
+                            new SPath(oldPath), isContentChange(delta));
                     } catch (IOException e) {
                         log
                             .warn("Resource could not be read for sending to peers:"
@@ -344,9 +345,9 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 try {
 
                     return FileActivity.created(sharedProject.getProject(),
-                        sharedProject.getLocalUser(), resource.getFullPath()
-                            .makeRelative().removeFirstSegments(1),
-                        Purpose.ACTIVITY);
+                        sharedProject.getLocalUser(), new SPath(resource
+                            .getFullPath().makeRelative()
+                            .removeFirstSegments(1)), Purpose.ACTIVITY);
                 } catch (IOException e) {
                     log.warn("Resource could not be read for sending to peers:"
                         + resource.getLocation(), e);
@@ -357,7 +358,8 @@ public class SharedResourcesManager implements IResourceChangeListener,
                 if (isMoved(delta)) // Ignore "REMOVED" while moving
                     return null;
                 return FileActivity.removed(sharedProject.getLocalUser(),
-                    resource.getProjectRelativePath(), Purpose.ACTIVITY);
+                    new SPath(resource.getProjectRelativePath()),
+                    Purpose.ACTIVITY);
 
             default:
                 return null;
@@ -537,7 +539,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
         IProject project = this.sharedProject.getProject();
 
-        IPath path = activity.getPath();
+        IPath path = activity.getPath().getProjectRelativePath();
         IFile file = sharedProject.getProject().getFile(path);
 
         if (activity.isRecovery()) {
@@ -563,15 +565,15 @@ public class SharedResourcesManager implements IResourceChangeListener,
             FileUtil.delete(file);
         } else if (activity.getType() == FileActivity.Type.Moved) {
 
-            IPath newFilePath = activity.getPath();
+            IPath newFilePath = activity.getPath().getProjectRelativePath();
             IResource fileOldResource = project.findMember(activity
-                .getOldPath());
+                .getOldPath().getProjectRelativePath());
             IResource nfpR = project.getFile(newFilePath);
             newFilePath = nfpR.getFullPath();
 
             if (fileOldResource == null) {
                 log.error(".exec Old File is not availible while moving "
-                    + activity.getOldPath().toOSString());
+                    + activity.getOldPath());
             } else
                 FileUtil.move(newFilePath, fileOldResource);
 
@@ -598,7 +600,7 @@ public class SharedResourcesManager implements IResourceChangeListener,
 
     protected void exec(FolderActivity activity) throws CoreException {
         IFolder folder = this.sharedProject.getProject().getFolder(
-            activity.getPath());
+            activity.getPath().getProjectRelativePath());
 
         if (activity.getType() == FolderActivity.Type.Created) {
             FileUtil.create(folder);

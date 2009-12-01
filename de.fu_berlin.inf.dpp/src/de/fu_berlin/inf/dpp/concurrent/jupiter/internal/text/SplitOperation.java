@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.TextEditActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
 
@@ -156,7 +157,7 @@ public class SplitOperation implements Operation {
 
             if (isReplace(lastOp, operation)) {
                 result.add(new TextEditActivity(source, lastOp.getPosition(),
-                    operation.getText(), lastOp.getText(), path));
+                    operation.getText(), lastOp.getText(), new SPath(path)));
                 lastOp = null;
                 continue;
             } else {

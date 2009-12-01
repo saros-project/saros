@@ -1,6 +1,6 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.eclipse.core.runtime.IPath;
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 
 /**
  * An interface for activityDataObjects that are resource related (e.g.
@@ -12,12 +12,12 @@ public interface IResourceActivityDataObject extends IActivityDataObject {
      * The path to the file that this activityDataObject is about. For instance
      * for creating a file this path denotes the file which is created.
      */
-    public IPath getPath();
+    public SPathDataObject getPath();
 
     /**
      * Returns the old/source path in case this activityDataObject represents a
      * moving of files.
      */
-    public IPath getOldPath();
+    public SPathDataObject getOldPath();
 
 }

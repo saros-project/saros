@@ -19,11 +19,10 @@
  */
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.eclipse.core.runtime.IPath;
-
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity.Type;
@@ -42,31 +41,30 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
     @XStreamAsAttribute
     protected final Type type;
 
-    @XStreamAlias("editor")
-    @XStreamAsAttribute
-    protected final IPath path;
+    protected final SPathDataObject path;
 
     /**
-     * @param path
+     * @param sPathDataObject
      *            a valid project-relative path or <code>null</code> if former
      *            resource should be deactivated.
      */
-    public EditorActivityDataObject(JID source, Type type, IPath path) {
+    public EditorActivityDataObject(JID source, Type type,
+        SPathDataObject sPathDataObject) {
         super(source);
-        if ((type != Type.Activated) && (path == null)) {
+        if ((type != Type.Activated) && (sPathDataObject == null)) {
             throw new IllegalArgumentException(
                 "Null path for non-activation type editor activityDataObject given.");
         }
 
         this.type = type;
-        this.path = path;
+        this.path = sPathDataObject;
     }
 
     /**
      * @return the project-relative path to the resource that should be
      *         activated.
      */
-    public IPath getPath() {
+    public SPathDataObject getPath() {
         return this.path;
     }
 
@@ -120,6 +118,7 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISharedProject sharedProject) {
-        return new EditorActivity(sharedProject.getUser(source), type, path);
+        return new EditorActivity(sharedProject.getUser(source), type, path
+            .toSPath(sharedProject));
     }
 }

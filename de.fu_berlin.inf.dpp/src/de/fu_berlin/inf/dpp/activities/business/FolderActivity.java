@@ -1,37 +1,33 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.FolderActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 
-public class FolderActivity extends AbstractActivity implements IResourceObject {
+public class FolderActivity extends AbstractActivity implements
+    IResourceActivity {
 
     public static enum Type {
-        Created, Removed, Moved
+        Created, Removed
     }
 
-    private final Type type;
-    private final IPath path;
-    private IPath oldPath;
+    protected final Type type;
+    protected final SPath path;
 
-    public FolderActivity(User source, Type type, IPath path) {
+    public FolderActivity(User source, Type type, SPath path) {
         super(source);
         this.type = type;
         this.path = path;
     }
 
-    public IPath getPath() {
+    public SPath getPath() {
         return this.path;
     }
 
-    /**
-     * Returns the folder which was moved to a new destination (given by
-     * getPath()) or null if not a move.
-     */
-    public IPath getOldPath() {
-        return this.oldPath;
+    public SPath getOldPath() {
+        // Yes, that's a bit ugly.
+        return null;
     }
 
     public Type getType() {
@@ -42,7 +38,6 @@ public class FolderActivity extends AbstractActivity implements IResourceObject 
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((oldPath == null) ? 0 : oldPath.hashCode());
         result = prime * result + ((path == null) ? 0 : path.hashCode());
         result = prime * result + ((type == null) ? 0 : type.hashCode());
         return result;
@@ -57,11 +52,6 @@ public class FolderActivity extends AbstractActivity implements IResourceObject 
         if (getClass() != obj.getClass())
             return false;
         FolderActivity other = (FolderActivity) obj;
-        if (oldPath == null) {
-            if (other.oldPath != null)
-                return false;
-        } else if (!oldPath.equals(other.oldPath))
-            return false;
         if (path == null) {
             if (other.path != null)
                 return false;
@@ -77,11 +67,7 @@ public class FolderActivity extends AbstractActivity implements IResourceObject 
 
     @Override
     public String toString() {
-        if (type == Type.Moved)
-            return "FolderActivity(type: Moved, old path: " + this.oldPath
-                + ", new path: " + this.path + ")";
-        return "FolderActivity(type: " + this.type + ", path: " + this.path
-            + ")";
+        return "FolderActivity(type: " + type + ", path: " + path + ")";
     }
 
     public boolean dispatch(IActivityConsumer consumer) {
@@ -93,7 +79,8 @@ public class FolderActivity extends AbstractActivity implements IResourceObject 
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new FolderActivityDataObject(source.getJID(), type, oldPath);
+        return new FolderActivityDataObject(source.getJID(), type, path
+            .toSPathDataObject());
     }
 
 }

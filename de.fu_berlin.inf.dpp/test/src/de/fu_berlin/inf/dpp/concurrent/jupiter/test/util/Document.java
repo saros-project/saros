@@ -74,18 +74,18 @@ public class Document {
 
         for (TextEditActivity activity : activities) {
 
-            int start = activity.offset;
-            int end = start + activity.replacedText.length();
+            int start = activity.getOffset();
+            int end = start + activity.getReplacedText().length();
             String is = doc.toString().substring(start, end);
 
-            if (!is.equals(activity.replacedText)) {
-                log.warn("Text should be '" + activity.replacedText + "' is '"
-                    + is + "'");
+            if (!is.equals(activity.getReplacedText())) {
+                log.warn("Text should be '" + activity.getReplacedText()
+                    + "' is '" + is + "'");
                 throw new RuntimeException("Text should be '"
-                    + activity.replacedText + "' is '" + is + "'");
+                    + activity.getReplacedText() + "' is '" + is + "'");
             }
 
-            doc.replace(start, end, activity.text);
+            doc.replace(start, end, activity.getText());
         }
     }
 }

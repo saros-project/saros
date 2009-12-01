@@ -97,9 +97,10 @@ public class ConcurrentDocumentServer implements Disposable {
 
     protected final IActivityReceiver hostReceiver = new AbstractActivityReceiver() {
         @Override
-        public void receive(FileActivity fileActivityDataObject) {
-            if (fileActivityDataObject.getType() == FileActivity.Type.Removed) {
-                server.removePath(fileActivityDataObject.getPath());
+        public void receive(FileActivity fileActivity) {
+            if (fileActivity.getType() == FileActivity.Type.Removed) {
+                server.removePath(fileActivity.getPath()
+                    .getProjectRelativePath());
             }
         }
     };

@@ -19,15 +19,22 @@
  */
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.eclipse.core.runtime.IPath;
+import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.EditorActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 
 /**
- * A text load activityDataObject activates a new resource. If the path is
- * <code>null</code> no resource is currently active.
+ * Activity that for activating, closing, and saving editors. If the
+ * {@link #getPath()} returns <code>null</code> then no resource is currently
+ * active.
+ * 
+ * Saving is not document but editor specific because one editor might perform
+ * changes on the document before actually saving while others just save. An
+ * example is a Java editor with save actions enabled vs. a plain text editor
+ * for the very same document.
  * 
  * @author rdjemili
  */
@@ -38,30 +45,34 @@ public class EditorActivity extends AbstractActivity {
     }
 
     protected final Type type;
-    protected final IPath path;
+    protected final SPath path;
 
     /**
      * @param path
-     *            a valid project-relative path or <code>null</code> if former
-     *            resource should be deactivated.
+     *            an {@link SPath} or type {@link Type#Activated} and
+     *            <code>null</code> as path if there is no editor activated
+     *            anymore.
      */
-    public EditorActivity(User source, Type type, IPath path) {
+    public EditorActivity(User source, Type type, @Nullable SPath path) {
 
         super(source);
-        if ((type != Type.Activated) && (path == null)) {
-            throw new IllegalArgumentException(
-                "Null path for non-activation type editor activityDataObject given.");
+        if (path == null) {
+            if (type != Type.Activated) {
+                throw new IllegalArgumentException(
+                    "Null path for non-activation type editor activityDataObject given.");
+            }
+        } else {
+            if (path.getEditorType() == null) {
+                throw new IllegalArgumentException("No editor ID set on "
+                    + path + ".");
+            }
         }
 
         this.type = type;
         this.path = path;
     }
 
-    /**
-     * @return the project-relative path to the resource that should be
-     *         activated.
-     */
-    public IPath getPath() {
+    public SPath getPath() {
         return this.path;
     }
 
@@ -115,6 +126,7 @@ public class EditorActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new EditorActivityDataObject(source.getJID(), type, path);
+        return new EditorActivityDataObject(source.getJID(), type, path
+            .toSPathDataObject());
     }
 }

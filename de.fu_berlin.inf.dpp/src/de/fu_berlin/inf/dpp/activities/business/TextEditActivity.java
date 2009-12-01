@@ -21,9 +21,9 @@ package de.fu_berlin.inf.dpp.activities.business;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.runtime.IPath;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.TextEditActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -39,14 +39,10 @@ import de.fu_berlin.inf.dpp.util.Util;
  */
 public class TextEditActivity extends AbstractActivity {
 
-    public final int offset;
-    public final String text;
-    public final String replacedText;
-    protected final IPath editor;
-
-    public IPath getEditor() {
-        return this.editor;
-    }
+    protected final int offset;
+    protected final String text;
+    protected final String replacedText;
+    protected final SPath editor;
 
     /**
      * @param offset
@@ -62,7 +58,7 @@ public class TextEditActivity extends AbstractActivity {
      *            JID of the user that caused this activityDataObject
      */
     public TextEditActivity(User source, int offset, String text,
-        String replacedText, IPath editor) {
+        String replacedText, SPath editor) {
 
         super(source);
         if (text == null)
@@ -76,6 +72,22 @@ public class TextEditActivity extends AbstractActivity {
         this.text = text;
         this.replacedText = replacedText;
         this.editor = editor;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getReplacedText() {
+        return replacedText;
+    }
+
+    public SPath getEditor() {
+        return this.editor;
     }
 
     @Override
@@ -183,6 +195,6 @@ public class TextEditActivity extends AbstractActivity {
 
     public IActivityDataObject getActivityDataObject() {
         return new TextEditActivityDataObject(source.getJID(), offset, text,
-            replacedText, editor);
+            replacedText, editor.toSPathDataObject());
     }
 }

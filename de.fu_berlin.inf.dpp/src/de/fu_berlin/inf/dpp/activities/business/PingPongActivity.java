@@ -9,14 +9,9 @@ import de.fu_berlin.inf.dpp.activities.serializable.PingPongActivityDataObject;
 
 public class PingPongActivity extends AbstractActivity {
 
-    public User initiator;
+    protected final User initiator;
 
-    public DateTime departureTime;
-
-    // TODO Remove this constructor.
-    public PingPongActivity(User source) {
-        super(source);
-    }
+    protected final DateTime departureTime;
 
     public PingPongActivity(User source, User initiator, DateTime departureTime) {
 

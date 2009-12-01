@@ -31,16 +31,16 @@ public class ClientSynchronizedDocument implements NetworkEventHandler,
 
     protected User user;
     private JID server_jid;
-    private SimulateNetzwork connection;
+    private NetworkSimulator connection;
 
     private HashMap<String, JupiterDocumentListener> documentListener = new HashMap<String, JupiterDocumentListener>();
 
     public ClientSynchronizedDocument(JID server, String content,
-        SimulateNetzwork con, User user) {
+        NetworkSimulator connection, User user) {
         this.server_jid = server;
         this.doc = new Document(content);
         this.algorithm = new Jupiter(true);
-        this.connection = con;
+        this.connection = connection;
         this.user = user;
     }
 

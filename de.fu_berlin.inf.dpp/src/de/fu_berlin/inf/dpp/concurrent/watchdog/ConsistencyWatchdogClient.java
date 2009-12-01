@@ -150,8 +150,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
         @Override
         public void receive(ChecksumActivity checksumActivityDataObject) {
 
-            latestChecksums.put(checksumActivityDataObject.getPath(),
-                checksumActivityDataObject);
+            latestChecksums.put(checksumActivityDataObject.getPath()
+                .getProjectRelativePath(), checksumActivityDataObject);
 
             performCheck(checksumActivityDataObject);
         }
@@ -300,7 +300,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
     }
 
     private boolean isInconsistent(ChecksumActivity checksum) {
-        IPath path = checksum.getPath();
+        IPath path = checksum.getPath().getProjectRelativePath();
 
         ISharedProject sharedProject = sessionManager.getSharedProject();
         IFile file = sharedProject.getProject().getFile(path);
@@ -396,7 +396,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             return;
 
         if (isInconsistent(checksumActivity)) {
-            pathsWithWrongChecksums.add(checksumActivity.getPath());
+            pathsWithWrongChecksums.add(checksumActivity.getPath()
+                .getProjectRelativePath());
         } else {
             pathsWithWrongChecksums.remove(checksumActivity.getPath());
         }

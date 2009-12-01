@@ -13,6 +13,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -83,15 +84,15 @@ public class RemoteDriverManager {
         @Override
         public void receive(final EditorActivity editorActivity) {
             User sender = editorActivity.getSource();
-            IPath path = editorActivity.getPath();
-
-            if (path == null) {
-                /**
-                 * path == null means that the user has no active editor any
-                 * more
+            SPath sPath = editorActivity.getPath();
+            if (sPath == null) {
+                /*
+                 * sPath == null means that the user has no active editor any
+                 * more.
                  */
                 return;
             }
+            IPath path = sPath.getProjectRelativePath();
 
             switch (editorActivity.getType()) {
             case Activated:

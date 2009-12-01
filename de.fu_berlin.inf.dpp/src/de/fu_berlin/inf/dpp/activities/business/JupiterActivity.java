@@ -1,8 +1,7 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.eclipse.core.runtime.IPath;
-
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.JupiterActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Operation;
@@ -22,10 +21,10 @@ public class JupiterActivity extends AbstractActivity {
 
     private final Operation operation;
 
-    private IPath editor;
+    private final SPath editor;
 
     public JupiterActivity(Timestamp timestamp, Operation operation,
-        User source, IPath editor) {
+        User source, SPath editor) {
 
         super(source);
         this.timestamp = timestamp;
@@ -93,7 +92,7 @@ public class JupiterActivity extends AbstractActivity {
         return buffer.toString();
     }
 
-    public IPath getEditorPath() {
+    public SPath getEditorPath() {
         return this.editor;
     }
 
@@ -107,6 +106,6 @@ public class JupiterActivity extends AbstractActivity {
 
     public IActivityDataObject getActivityDataObject() {
         return new JupiterActivityDataObject(timestamp, operation, source
-            .getJID(), editor);
+            .getJID(), editor.toSPathDataObject());
     }
 }

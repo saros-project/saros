@@ -7,20 +7,24 @@ import org.apache.log4j.Logger;
 import de.fu_berlin.inf.dpp.net.JID;
 
 /**
- * this class simulate a network.
+ * This class simulates a network.
+ * 
+ * TODO The use of threads is unnecessary and causes non-deterministic behavior
+ * when running the tests for example in debug mode. This should be replaced by
+ * an implementation that does not use threads to "send" the messages.
  * 
  * @author troll
  * 
  */
-public class SimulateNetzwork {
+public class NetworkSimulator {
 
-    private static Logger log = Logger.getLogger(SimulateNetzwork.class);
+    private static Logger log = Logger.getLogger(NetworkSimulator.class);
 
     private HashMap<JID, NetworkEventHandler> clients;
 
     private RuntimeException error;
 
-    public SimulateNetzwork() {
+    public NetworkSimulator() {
         clients = new HashMap<JID, NetworkEventHandler>();
     }
 

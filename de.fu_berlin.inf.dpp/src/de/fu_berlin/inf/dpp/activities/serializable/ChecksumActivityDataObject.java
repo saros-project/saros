@@ -1,11 +1,11 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.ChecksumActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -35,8 +35,7 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
      */
     public static final int NON_EXISTING_DOC = -1;
 
-    @XStreamAsAttribute
-    protected IPath path;
+    protected SPathDataObject path;
 
     @XStreamAsAttribute
     protected long hash;
@@ -51,32 +50,24 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
      * Constructor for a ChecksumActivityDataObject with no jupiterTimestamp set
      * (such is used when communicating with users which are observers)
      */
-    public ChecksumActivityDataObject(JID source, IPath path, long hash,
-        long length) {
-        this(source, path, hash, length, null);
+    public ChecksumActivityDataObject(JID source,
+        SPathDataObject sPathDataObject, long hash, long length) {
+        this(source, sPathDataObject, hash, length, null);
     }
 
     /**
      * Constructor for checksum activityDataObjects including a Timestamp (for
      * users which are drivers)
      */
-    public ChecksumActivityDataObject(JID source, IPath path, long hash,
-        long length, @Nullable Timestamp jupiterTimestamp) {
+    public ChecksumActivityDataObject(JID source,
+        SPathDataObject sPathDataObject, long hash, long length,
+        @Nullable Timestamp jupiterTimestamp) {
 
         super(source);
-        this.path = path;
+        this.path = sPathDataObject;
         this.hash = hash;
         this.length = length;
         this.jupiterTimestamp = jupiterTimestamp;
-    }
-
-    /**
-     * Create a ChecksumActivityDataObject which indicates that the file is
-     * missing on the host.
-     */
-    public static ChecksumActivityDataObject missing(JID source, IPath path) {
-        return new ChecksumActivityDataObject(source, path, NON_EXISTING_DOC,
-            NON_EXISTING_DOC);
     }
 
     /**
@@ -91,7 +82,7 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     /**
      * Returns the path this checksum is about
      */
-    public IPath getPath() {
+    public SPathDataObject getPath() {
         return this.path;
     }
 
@@ -157,7 +148,7 @@ public class ChecksumActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISharedProject sharedProject) {
-        return new ChecksumActivity(sharedProject.getUser(source), path, hash,
-            length, jupiterTimestamp);
+        return new ChecksumActivity(sharedProject.getUser(source), path
+            .toSPath(sharedProject), hash, length, jupiterTimestamp);
     }
 }

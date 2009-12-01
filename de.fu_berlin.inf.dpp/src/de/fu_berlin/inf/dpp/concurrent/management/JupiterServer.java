@@ -84,7 +84,7 @@ public class JupiterServer {
         JupiterActivity jupiterActivity) throws TransformationException {
 
         JupiterDocumentServer docServer = getServer(jupiterActivity
-            .getEditorPath());
+            .getEditorPath().getProjectRelativePath());
 
         return docServer.transformJupiterActivity(jupiterActivity);
     }
@@ -94,7 +94,7 @@ public class JupiterServer {
         throws TransformationException {
 
         JupiterDocumentServer docServer = getServer(checksumActivityDataObject
-            .getPath());
+            .getPath().getProjectRelativePath());
 
         return docServer.withTimestamp(checksumActivityDataObject);
     }

@@ -22,7 +22,7 @@ public abstract class JupiterTestCase extends TestCase {
     public User carl;
     public User host;
 
-    protected SimulateNetzwork network;
+    protected NetworkSimulator network;
 
     static {
         PropertyConfigurator.configureAndWatch("log4j.properties", 60 * 1000);
@@ -30,7 +30,7 @@ public abstract class JupiterTestCase extends TestCase {
 
     @Override
     public void setUp() {
-        network = new SimulateNetzwork();
+        network = new NetworkSimulator();
 
         alice = createUserMock("alice");
         bob = createUserMock("bob");

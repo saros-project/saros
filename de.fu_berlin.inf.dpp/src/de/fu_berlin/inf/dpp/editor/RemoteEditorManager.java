@@ -15,6 +15,7 @@ import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.source.ILineRange;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.business.AbstractActivityReceiver;
 import de.fu_berlin.inf.dpp.activities.business.EditorActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
@@ -174,33 +175,42 @@ public class RemoteEditorManager {
 
         protected IActivityReceiver activityDataObjectReceiver = new AbstractActivityReceiver() {
             @Override
-            public void receive(EditorActivity editorActivityDataObject) {
+            public void receive(EditorActivity editorActivity) {
 
-                switch (editorActivityDataObject.getType()) {
+                SPath sPath = editorActivity.getPath();
+                IPath projectRelativePath = sPath != null ? sPath
+                    .getProjectRelativePath() : null;
+
+                switch (editorActivity.getType()) {
                 case Activated:
-                    activated(editorActivityDataObject.getPath());
+                    activated(projectRelativePath);
                     break;
                 case Saved:
                     break;
                 case Closed:
-                    closed(editorActivityDataObject.getPath());
+                    closed(projectRelativePath);
                     break;
+                default:
+                    log.warn("Unexpected type: " + editorActivity.getType());
+                    assert false;
                 }
             }
 
             @Override
             public void receive(ViewportActivity viewportActivityDataObject) {
 
-                setViewport(viewportActivityDataObject.getEditor(),
-                    viewportActivityDataObject.getLineRange());
+                setViewport(viewportActivityDataObject.getEditor()
+                    .getProjectRelativePath(), viewportActivityDataObject
+                    .getLineRange());
             }
 
             @Override
             public void receive(
                 TextSelectionActivity textSelectionActivityDataObject) {
 
-                setSelection(textSelectionActivityDataObject.getEditor(),
-                    textSelectionActivityDataObject.getSelection());
+                setSelection(textSelectionActivityDataObject.getEditor()
+                    .getProjectRelativePath(), textSelectionActivityDataObject
+                    .getSelection());
             }
         };
 

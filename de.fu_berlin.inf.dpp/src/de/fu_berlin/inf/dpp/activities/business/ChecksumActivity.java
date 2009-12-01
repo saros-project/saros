@@ -1,9 +1,9 @@
 package de.fu_berlin.inf.dpp.activities.business;
 
-import org.eclipse.core.runtime.IPath;
 import org.picocontainer.annotations.Nullable;
 
 import de.fu_berlin.inf.dpp.User;
+import de.fu_berlin.inf.dpp.activities.SPath;
 import de.fu_berlin.inf.dpp.activities.serializable.ChecksumActivityDataObject;
 import de.fu_berlin.inf.dpp.activities.serializable.IActivityDataObject;
 import de.fu_berlin.inf.dpp.concurrent.jupiter.Timestamp;
@@ -30,24 +30,24 @@ public class ChecksumActivity extends AbstractActivity {
      */
     public static final int NON_EXISTING_DOC = -1;
 
-    protected IPath path;
-    protected long hash;
-    protected long length;
-    protected Timestamp jupiterTimestamp;
+    protected final SPath path;
+    protected final long hash;
+    protected final long length;
+    protected final Timestamp jupiterTimestamp;
 
     /**
      * Constructor for a ChecksumActivity with no jupiterTimestamp set (such is
      * used when communicating with users which are observers)
      */
-    public ChecksumActivity(User source, IPath path, long hash, long length) {
+    public ChecksumActivity(User source, SPath path, long hash, long length) {
         this(source, path, hash, length, null);
     }
 
     /**
-     * Constructor for checksum activityDataObjects including a Timestamp (for
-     * users which are drivers)
+     * Constructor for checksum activities including a Timestamp (for users
+     * which are drivers)
      */
-    public ChecksumActivity(User source, IPath path, long hash, long length,
+    public ChecksumActivity(User source, SPath path, long hash, long length,
         @Nullable Timestamp jupiterTimestamp) {
 
         super(source);
@@ -61,7 +61,7 @@ public class ChecksumActivity extends AbstractActivity {
      * Create a ChecksumActivity which indicates that the file is missing on the
      * host.
      */
-    public static ChecksumActivity missing(User source, IPath path) {
+    public static ChecksumActivity missing(User source, SPath path) {
         return new ChecksumActivity(source, path, NON_EXISTING_DOC,
             NON_EXISTING_DOC);
     }
@@ -76,9 +76,9 @@ public class ChecksumActivity extends AbstractActivity {
     }
 
     /**
-     * Returns the path this checksum is about
+     * Returns the path this checksum is about.
      */
-    public IPath getPath() {
+    public SPath getPath() {
         return this.path;
     }
 
@@ -144,7 +144,7 @@ public class ChecksumActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new ChecksumActivityDataObject(source.getJID(), path, hash,
-            length);
+        return new ChecksumActivityDataObject(source.getJID(), path
+            .toSPathDataObject(), hash, length);
     }
 }

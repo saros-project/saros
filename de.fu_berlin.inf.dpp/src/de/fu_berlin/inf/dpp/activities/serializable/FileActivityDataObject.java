@@ -1,16 +1,11 @@
 package de.fu_berlin.inf.dpp.activities.serializable;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
-
-import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IPath;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import de.fu_berlin.inf.dpp.activities.SPathDataObject;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity;
 import de.fu_berlin.inf.dpp.activities.business.IActivity;
 import de.fu_berlin.inf.dpp.activities.business.FileActivity.Purpose;
@@ -25,99 +20,14 @@ public class FileActivityDataObject extends AbstractActivityDataObject
     @XStreamAsAttribute
     protected Type type;
 
-    @XStreamAsAttribute
-    protected IPath newPath;
+    protected SPathDataObject newPath;
 
-    @XStreamAsAttribute
-    protected IPath oldPath;
+    protected SPathDataObject oldPath;
 
     @XStreamAsAttribute
     protected Purpose purpose;
 
     protected byte[] data;
-
-    /**
-     * Utility method for creating a file activityDataObject of type == Created
-     * from a given path.
-     * 
-     * This method will make a snapshot copy of the file at this point in time.
-     * 
-     * @param path
-     *            the path of the file to copy the data from
-     */
-    public static FileActivityDataObject created(IProject project, JID source,
-        IPath path, Purpose purpose) throws IOException {
-
-        // TODO Use Eclipse Method of getting the contents of a file:
-        // IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-        //
-        // IFile file = (IFile) project.findMember(path);
-        // IPath npath = file.getProjectRelativePath();
-        //
-        // InputStream in = null;
-        // byte[] content = null;
-        // try {
-        // in = file.getContents();
-        // content = IOUtils.toByteArray(in);
-        // } catch (CoreException e) {
-        // log.warn(".created() can not get the content of "
-        // + npath.toOSString());
-        // } finally {
-        // IOUtils.closeQuietly(in);
-        // }
-        //
-        // return new FileActivityDataObject(source, Type.Created, npath, null,
-        // content,
-        // purpose);
-
-        File f = new File(project.getFile(path).getLocation().toOSString());
-        byte[] content = FileUtils.readFileToByteArray(f);
-
-        return new FileActivityDataObject(source, Type.Created, path, null,
-            content, purpose);
-    }
-
-    /**
-     * Builder for moving files.
-     * 
-     * @param source
-     *            JabberID of the origin user
-     * 
-     * @param destPath
-     *            path where the file moved to
-     * @param sourcePath
-     *            path where the file moved from
-     * @param contentChange
-     *            if true, a snapshot copy is made of the file at the
-     *            destination path and sent as part of the activityDataObject.
-     * @throws IOException
-     *             the new content of the file could not be read
-     */
-    public static FileActivityDataObject moved(IProject project, JID source,
-        IPath destPath, IPath sourcePath, boolean contentChange)
-        throws IOException {
-
-        byte[] content = null;
-        if (contentChange) {
-            File file = new File(project.findMember(destPath).getLocation()
-                .toOSString());
-            content = FileUtils.readFileToByteArray(file);
-        }
-        return new FileActivityDataObject(source, Type.Moved, destPath,
-            sourcePath, content, Purpose.ACTIVITY);
-    }
-
-    /**
-     * Builder for removing files
-     * 
-     * @param path
-     *            the path of the file to remove
-     */
-    public static FileActivityDataObject removed(JID source, IPath path,
-        Purpose purpose) {
-        return new FileActivityDataObject(source, Type.Removed, path, null,
-            null, purpose);
-    }
 
     /**
      * Generic constructor for {@link FileActivityDataObject}s
@@ -135,8 +45,9 @@ public class FileActivityDataObject extends AbstractActivityDataObject
      *            data of the file to be created (only valid for creating and
      *            moving)
      */
-    public FileActivityDataObject(JID source, Type type, IPath newPath,
-        IPath oldPath, byte[] data, Purpose purpose) {
+    public FileActivityDataObject(JID source, Type type,
+        SPathDataObject newPath, SPathDataObject oldPath, byte[] data,
+        Purpose purpose) {
         super(source);
 
         if (type == null || purpose == null)
@@ -164,11 +75,11 @@ public class FileActivityDataObject extends AbstractActivityDataObject
         this.purpose = purpose;
     }
 
-    public IPath getPath() {
+    public SPathDataObject getPath() {
         return this.newPath;
     }
 
-    public IPath getOldPath() {
+    public SPathDataObject getOldPath() {
         return this.oldPath;
     }
 
@@ -247,7 +158,8 @@ public class FileActivityDataObject extends AbstractActivityDataObject
     }
 
     public IActivity getActivity(ISharedProject sharedProject) {
-        return new FileActivity(sharedProject.getUser(source), type, newPath,
-            oldPath, data, purpose);
+        return new FileActivity(sharedProject.getUser(source), type, newPath
+            .toSPath(sharedProject), oldPath.toSPath(sharedProject), data,
+            purpose);
     }
 }
