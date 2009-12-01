@@ -322,7 +322,14 @@ public class FileUtil {
         }
         IWorkspaceRunnable createFolderProcedure = new IWorkspaceRunnable() {
             public void run(IProgressMonitor monitor) throws CoreException {
-                create(getParentFolder(folder));
+
+                // recursively create folders until parent folder exists
+                // or project root is reached
+                IFolder parentFolder = getParentFolder(folder);
+                if (parentFolder != null) {
+                    create(parentFolder);
+                }
+
                 folder.create(IResource.NONE, true, monitor);
 
                 if (monitor.isCanceled()) {
