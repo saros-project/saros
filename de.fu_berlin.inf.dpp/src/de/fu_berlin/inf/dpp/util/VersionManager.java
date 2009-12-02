@@ -137,6 +137,12 @@ public class VersionManager {
          */
 
         /**
+         * Version 9.12.04.r1862
+         */
+        compatibilityChart.put(new Version("9.12.04.r1862"), Arrays
+            .asList(new Version("9.12.04.r1862")));
+
+        /**
          * Version 9.10.30.r1833
          */
         compatibilityChart.put(new Version("9.10.30.r1833"), Arrays
