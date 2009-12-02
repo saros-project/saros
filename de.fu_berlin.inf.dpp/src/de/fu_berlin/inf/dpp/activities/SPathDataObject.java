@@ -32,7 +32,8 @@ public class SPathDataObject {
     @Override
     public String toString() {
         return "SPathDataObject [editorType=" + editorType + ", path="
-            + path.toPortableString() + ", projectID=" + projectID + "]";
+            + (path != null ? path.toPortableString() : null) + ", projectID="
+            + projectID + "]";
     }
 
     @Override
