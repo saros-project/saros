@@ -93,6 +93,9 @@ public class RemoteDriverManager {
                 return;
             }
             IPath path = sPath.getProjectRelativePath();
+            if (path == null) {
+                return;
+            }
 
             switch (editorActivity.getType()) {
             case Activated:

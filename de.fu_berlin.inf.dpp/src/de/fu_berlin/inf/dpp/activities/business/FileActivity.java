@@ -245,6 +245,7 @@ public class FileActivity extends AbstractActivity implements IResourceActivity 
 
     public IActivityDataObject getActivityDataObject() {
         return new FileActivityDataObject(source.getJID(), type, newPath
-            .toSPathDataObject(), oldPath.toSPathDataObject(), data, purpose);
+            .toSPathDataObject(), (oldPath != null ? oldPath
+            .toSPathDataObject() : null), data, purpose);
     }
 }

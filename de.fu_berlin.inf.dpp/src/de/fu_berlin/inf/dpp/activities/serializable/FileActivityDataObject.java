@@ -159,7 +159,7 @@ public class FileActivityDataObject extends AbstractActivityDataObject
 
     public IActivity getActivity(ISharedProject sharedProject) {
         return new FileActivity(sharedProject.getUser(source), type, newPath
-            .toSPath(sharedProject), oldPath.toSPath(sharedProject), data,
-            purpose);
+            .toSPath(sharedProject), (oldPath != null ? oldPath
+            .toSPath(sharedProject) : null), data, purpose);
     }
 }

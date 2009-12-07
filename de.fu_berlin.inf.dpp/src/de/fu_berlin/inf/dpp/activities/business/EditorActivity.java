@@ -126,7 +126,7 @@ public class EditorActivity extends AbstractActivity {
     }
 
     public IActivityDataObject getActivityDataObject() {
-        return new EditorActivityDataObject(source.getJID(), type, path
-            .toSPathDataObject());
+        return new EditorActivityDataObject(source.getJID(), type,
+            (path != null ? path.toSPathDataObject() : null));
     }
 }

@@ -1,6 +1,7 @@
 package de.fu_berlin.inf.dpp.activities;
 
 import org.eclipse.core.runtime.IPath;
+import org.picocontainer.annotations.Nullable;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -19,7 +20,9 @@ public class SPathDataObject {
     @XStreamAsAttribute
     protected String editorType;
 
-    public SPathDataObject(String projectID, IPath path, String editorType) {
+    public SPathDataObject(String projectID, @Nullable IPath path,
+        @Nullable String editorType) {
+        
         this.projectID = projectID;
         this.path = path;
         this.editorType = editorType;

@@ -324,7 +324,7 @@ public class UndoManager implements Disposable, IActivityProvider {
          * @return true if the given activityDataObject was created locally
          */
         protected boolean local(IActivity activityDataObject) {
-            return activityDataObject.getSource().equals(saros.getMyJID());
+            return activityDataObject.getSource().isLocal();
         }
 
         /**
@@ -359,8 +359,8 @@ public class UndoManager implements Disposable, IActivityProvider {
                 undoHistory.add(textEditActivityDataObject.getEditor()
                     .getProjectRelativePath(), Type.REMOTE, operation);
             } else {
-                if (!textEditActivityDataObject.getEditor().equals(
-                    currentActiveEditor)) {
+                if (!textEditActivityDataObject.getEditor()
+                    .getProjectRelativePath().equals(currentActiveEditor)) {
                     log
                         .error("Editor of the local TextEditActivity is not the current "
                             + "active editor. Possibly the current active editor is not"

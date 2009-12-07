@@ -92,8 +92,11 @@ public class SPath {
 
     @Override
     public String toString() {
-        return "SPath [editorType=" + editorType + ", path="
-            + projectRelativePath.toPortableString() + ", projectID="
-            + projectID + "]";
+        return "SPath [editorType="
+            + editorType
+            + ", path="
+            + (projectRelativePath != null ? projectRelativePath
+                .toPortableString() : "<no path>") + ", projectID=" + projectID
+            + "]";
     }
 }
