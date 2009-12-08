@@ -158,7 +158,7 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
 
         @Override
         public void receive(TextEditActivity text) {
-            latestChecksums.remove(text.getEditor());
+            latestChecksums.remove(text.getEditor().getProjectRelativePath());
         }
 
         @Override
@@ -176,11 +176,14 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             switch (fileActivityDataObject.getType()) {
             case Created:
             case Removed:
-                latestChecksums.remove(fileActivityDataObject.getPath());
+                latestChecksums.remove(fileActivityDataObject.getPath()
+                    .getProjectRelativePath());
                 break;
             case Moved:
-                latestChecksums.remove(fileActivityDataObject.getPath());
-                latestChecksums.remove(fileActivityDataObject.getOldPath());
+                latestChecksums.remove(fileActivityDataObject.getPath()
+                    .getProjectRelativePath());
+                latestChecksums.remove(fileActivityDataObject.getOldPath()
+                    .getProjectRelativePath());
                 break;
             default:
                 log.error("Unhandled FileActivity.Type: "
@@ -399,7 +402,8 @@ public class ConsistencyWatchdogClient extends AbstractActivityProvider {
             pathsWithWrongChecksums.add(checksumActivity.getPath()
                 .getProjectRelativePath());
         } else {
-            pathsWithWrongChecksums.remove(checksumActivity.getPath());
+            pathsWithWrongChecksums.remove(checksumActivity.getPath()
+                .getProjectRelativePath());
         }
 
         if (pathsWithWrongChecksums.isEmpty()) {

@@ -19,6 +19,8 @@
  */
 package de.fu_berlin.inf.dpp.activities.serializable;
 
+import org.picocontainer.annotations.Nullable;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
@@ -49,7 +51,8 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
      *            resource should be deactivated.
      */
     public EditorActivityDataObject(JID source, Type type,
-        SPathDataObject sPathDataObject) {
+        @Nullable SPathDataObject sPathDataObject) {
+        
         super(source);
         if ((type != Type.Activated) && (sPathDataObject == null)) {
             throw new IllegalArgumentException(
@@ -118,7 +121,7 @@ public class EditorActivityDataObject extends AbstractActivityDataObject {
     }
 
     public IActivity getActivity(ISharedProject sharedProject) {
-        return new EditorActivity(sharedProject.getUser(source), type, path
-            .toSPath(sharedProject));
+        return new EditorActivity(sharedProject.getUser(source), type,
+            (path != null ? path.toSPath(sharedProject) : null));
     }
 }

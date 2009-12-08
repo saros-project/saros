@@ -168,19 +168,6 @@ public interface ISharedProject extends IActivityListener {
     public ActivitySequencer getSequencer();
 
     /**
-     * Use this object to make the changes to the project's state
-     * (started/stopped) atomic. E.g. <code>
-     * <pre>
-     * synchronized (project.getStartStopSyncObject()) {
-     *   if (!project.isStopped())
-     *     project.stop();
-     * }
-     * </pre>
-     * </code>
-     */
-    public Object getSartStopSyncObject();
-
-    /**
      * Activates sending of activityDataObjects. The reason that this isn't done
      * automatically are unit tests.
      */
@@ -190,12 +177,6 @@ public interface ISharedProject extends IActivityListener {
      * Deactivates sending of activityDataObjects.
      */
     public void stop();
-
-    /**
-     * @return <code>true</code> if the currend {@link ISharedProject} is
-     *         stopped, <code>false</code> otherwise
-     */
-    public boolean isStopped();
 
     /**
      * Given a resource qualified JID, this method will return the user which
