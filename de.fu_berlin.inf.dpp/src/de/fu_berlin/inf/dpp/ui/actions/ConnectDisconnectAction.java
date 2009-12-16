@@ -20,6 +20,7 @@
 package de.fu_berlin.inf.dpp.ui.actions;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -48,7 +49,7 @@ import de.fu_berlin.inf.dpp.util.Util;
 public class ConnectDisconnectAction extends Action implements Disposable {
 
     private static final Logger log = Logger
-        .getLogger(ConnectDisconnectAction.class.getName());
+        .getLogger(ConnectDisconnectAction.class);
 
     protected IStatusLineManager statusLineManager;
 
@@ -102,12 +103,23 @@ public class ConnectDisconnectAction extends Action implements Disposable {
             propertyChangeListener);
     }
 
+    protected final AtomicBoolean running = new AtomicBoolean();
+
     @Override
     public void run() {
 
         Util.runSafeAsync("ConnectDisconnectAction-", log, new Runnable() {
             public void run() {
-                runConnectDisconnect();
+                try {
+                    if (running.getAndSet(true)) {
+                        log
+                            .info("User clicked too fast, running already a connect or disconnect.");
+                        return;
+                    }
+                    runConnectDisconnect();
+                } finally {
+                    running.set(false);
+                }
             }
         });
     }
